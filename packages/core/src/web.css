@@ -1268,8 +1268,13 @@
       flex-direction: row;
     }
 
-    &[data-side="left"] {
-      justify-content: flex-start;
+    /* Physical margins, since a left drawer stays on the left in right-to-left pages. */
+    &[data-side="left"] > * {
+      margin-right: auto;
+    }
+
+    &[data-side="right"] > * {
+      margin-left: auto;
     }
 
     & > * {
