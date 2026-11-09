@@ -143,11 +143,11 @@ function PhoneStrip({
                 <span
                   key={`${index}-${playing}`}
                   onAnimationEnd={advance}
-                  className="absolute inset-y-0 start-0 bg-foreground"
+                  className="absolute inset-y-0 start-0 w-full origin-left bg-foreground rtl:origin-right"
                   style={
                     playing
                       ? { animation: "strip-fill 4s linear forwards" }
-                      : { width: "100%" }
+                      : undefined
                   }
                 />
               )}
@@ -172,6 +172,25 @@ function PhoneStrip({
   )
 }
 
+let shotObserver: ResizeObserver | undefined
+const shots = new Map<Element, () => () => void>()
+
+// Every shot reads its size before any shot writes, since each write restyles
+// a whole shot and would make the next read lay out again.
+function resizeShots(entries: ResizeObserverEntry[]) {
+  const resized = new Set<() => () => void>()
+  for (const entry of entries) {
+    const measure = shots.get(entry.target)
+    if (measure) {
+      resized.add(measure)
+    }
+  }
+  const writes = [...resized].map((measure) => measure())
+  for (const write of writes) {
+    write()
+  }
+}
+
 function PhoneShot({
   width,
   children,
@@ -189,24 +208,32 @@ function PhoneShot({
       return
     }
     const phone = matchMedia("(width < 40rem)")
-    const update = () => {
-      shot.inert = phone.matches
-      if (!phone.matches) {
-        return
+    const measure = () => {
+      const isPhone = phone.matches
+      const scale = isPhone ? element.clientWidth / width : 1
+      const height = isPhone ? shot.offsetHeight * scale : 0
+      return () => {
+        if (shot.inert !== isPhone) {
+          shot.inert = isPhone
+        }
+        if (isPhone) {
+          element.style.setProperty("--shot-scale", String(scale))
+          element.style.setProperty("--shot-height", `${height}px`)
+        }
       }
-      const scale = element.clientWidth / width
-      element.style.setProperty("--shot-scale", String(scale))
-      element.style.setProperty(
-        "--shot-height",
-        `${shot.offsetHeight * scale}px`
-      )
     }
-    const observer = new ResizeObserver(update)
-    observer.observe(element)
-    observer.observe(shot)
+    const update = () => measure()()
+    shotObserver ??= new ResizeObserver(resizeShots)
+    shots.set(element, measure)
+    shots.set(shot, measure)
+    shotObserver.observe(element)
+    shotObserver.observe(shot)
     phone.addEventListener("change", update)
     return () => {
-      observer.disconnect()
+      shotObserver?.unobserve(element)
+      shotObserver?.unobserve(shot)
+      shots.delete(element)
+      shots.delete(shot)
       phone.removeEventListener("change", update)
     }
   }, [width])

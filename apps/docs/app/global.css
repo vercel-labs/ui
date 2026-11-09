@@ -1,3 +1,4 @@
+@layer ui-sdk;
 @import "tailwindcss";
 
 @custom-variant dark {
@@ -371,9 +372,9 @@ body {
 
 @keyframes strip-fill {
   from {
-    width: 0;
+    transform: scaleX(0);
   }
   to {
-    width: 100%;
+    transform: scaleX(1);
   }
 }

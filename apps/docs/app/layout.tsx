@@ -39,6 +39,11 @@ export default function Layout({ children }: LayoutProps<"/">) {
       className={`${geist.variable} ${geistMono.variable}`}
       suppressHydrationWarning
     >
+      <head>
+        {/* With no nonce, ui-sdk adopts constructed sheets, which add a layer
+        without relaying out the whole page as a new `<style>` does. */}
+        <meta property="csp-nonce" />
+      </head>
       <body className="flex min-h-dvh flex-col bg-canvas font-sans text-foreground">
         <SitePreferences>
           <SiteHeader urls={urls} />

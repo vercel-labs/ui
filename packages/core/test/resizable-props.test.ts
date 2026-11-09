@@ -427,3 +427,94 @@ test("a group disabled mid-drag gives the page back its cursor, text selection a
   expect(pageStyle()).not.toContain("user-select")
   expect(pageStyle()).not.toContain("resize")
 })
+
+// Each write of the page-wide drag sheet restyles the whole page, and a touch has no cursor to show.
+test("a touch drag resizes without writing the page's cursor and selection styles", async () => {
+  const instance = resizable({ id: "g" })
+  const root = document.body.appendChild(document.createElement("div"))
+  cleanups.push(bind(instance.part("root", {}), root)!)
+  const element = (left: number, width: number) => {
+    const el = root.appendChild(document.createElement("div"))
+    el.getBoundingClientRect = () => new DOMRect(left, 0, width, 10)
+    return el
+  }
+  cleanups.push(
+    bind(instance.part("panel", { id: "a", defaultSize: 50 }), element(0, 50))!
+  )
+  const handle = element(50, 2)
+  cleanups.push(bind(instance.part("handle", { id: "h" }), handle)!)
+  cleanups.push(bind(instance.part("panel", { id: "b" }), element(52, 50))!)
+  await Promise.resolve()
+  const pageStyle = () =>
+    [
+      ...(document.adoptedStyleSheets ?? []).flatMap((sheet) =>
+        [...sheet.cssRules].map((rule) => rule.cssText)
+      ),
+      ...[...document.querySelectorAll("style")].map(
+        (style) => style.textContent
+      ),
+    ].join("\n")
+  const pointer = (type: string, clientX: number) =>
+    new PointerEvent(type, {
+      pointerId: 1,
+      pointerType: "touch",
+      isPrimary: true,
+      button: 0,
+      buttons: type === "pointerup" ? 0 : 1,
+      clientX,
+      clientY: 5,
+      bubbles: true,
+      cancelable: true,
+    })
+  handle.dispatchEvent(pointer("pointerdown", 51))
+  expect(instance.get().dragging).toBe("h")
+  expect(pageStyle()).not.toContain("resize")
+  document.dispatchEvent(pointer("pointermove", 61))
+  await new Promise((resolve) => requestAnimationFrame(resolve))
+  expect(instance.api.getLayout()).toEqual([60, 40])
+  expect(pageStyle()).not.toContain("user-select")
+  document.dispatchEvent(pointer("pointerup", 61))
+  expect(instance.get().dragging).toBeNull()
+  expect(pageStyle()).not.toContain("resize")
+})
+
+// The document's press listener runs on every tap, so one outside every group reads no layout.
+test("a press outside every group measures no handle", async () => {
+  const instance = resizable({ id: "g" })
+  const root = document.body.appendChild(document.createElement("div"))
+  cleanups.push(bind(instance.part("root", {}), root)!)
+  cleanups.push(
+    bind(
+      instance.part("panel", { id: "a", defaultSize: 50 }),
+      root.appendChild(document.createElement("div"))
+    )!
+  )
+  const handle = root.appendChild(document.createElement("div"))
+  const measure = vi.fn(() => new DOMRect(50, 0, 2, 10))
+  handle.getBoundingClientRect = measure
+  cleanups.push(bind(instance.part("handle", { id: "h" }), handle)!)
+  cleanups.push(
+    bind(
+      instance.part("panel", { id: "b" }),
+      root.appendChild(document.createElement("div"))
+    )!
+  )
+  await Promise.resolve()
+  measure.mockClear()
+  const outside = document.body.appendChild(document.createElement("button"))
+  outside.dispatchEvent(
+    new PointerEvent("pointerdown", {
+      pointerId: 1,
+      pointerType: "touch",
+      isPrimary: true,
+      button: 0,
+      buttons: 1,
+      clientX: 51,
+      clientY: 5,
+      bubbles: true,
+      cancelable: true,
+    })
+  )
+  expect(measure).not.toHaveBeenCalled()
+  expect(instance.get().dragging).toBeNull()
+})

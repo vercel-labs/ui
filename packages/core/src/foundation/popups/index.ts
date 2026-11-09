@@ -21,6 +21,7 @@ export {
   type PopupOpenOptions,
   type PopupResult,
   popupTriggerAttrs,
+  prepareReset,
   resetPopoverStyles,
 } from "./popup"
 export { createOpenSteps, createSteppedPopup, unopened } from "./popup-steps"

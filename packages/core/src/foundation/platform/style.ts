@@ -82,8 +82,9 @@ function pageNonce(doc: Document) {
  * without 'unsafe-inline' blocks a `<style>` element without its nonce, so
  * it takes the one the page's `<meta property="csp-nonce">` gives. When the
  * tag has no nonce, the style is a constructed sheet instead, which no policy
- * blocks. Adopted sheets come after the page's own, so there `@layer ui-sdk`
- * is declared after the page's layers, unless its CSS declares it first.
+ * blocks. Adopted sheets come after the page's own styles, adopted ones
+ * included, so there `@layer ui-sdk` is declared after the page's layers,
+ * unless its CSS declares it first.
  */
 function writeStyle(doc: Document, id: string, css: string) {
   if (!doc.head) {
@@ -148,23 +149,12 @@ function adoptStyle(
     entry.sheet.replaceSync(css)
     entry.css = css
   }
-  const list = doc.adoptedStyleSheets
-  if (list.includes(entry.sheet)) {
-    return
+  if (!doc.adoptedStyleSheets.includes(entry.sheet)) {
+    // Appended, since Chrome restyles and relayouts the whole page when a sheet
+    // goes in mid-list. ui-sdk's rules are in `@layer ui-sdk`, whose order is set
+    // where it's first declared, so where the sheet sits doesn't matter.
+    doc.adoptedStyleSheets = [...doc.adoptedStyleSheets, entry.sheet]
   }
-  // After the others it wrote, ahead of the page's own adopted sheets.
-  const ours = new Set([...sheets.values()].map(({ sheet }) => sheet))
-  let index = 0
-  list.forEach((sheet, at) => {
-    if (ours.has(sheet)) {
-      index = at + 1
-    }
-  })
-  doc.adoptedStyleSheets = [
-    ...list.slice(0, index),
-    entry.sheet,
-    ...list.slice(index),
-  ]
 }
 
 // A hidden element shows again when a class sets `display`, like a utility
@@ -180,13 +170,16 @@ function enforceHidden(doc: Document) {
   )
 }
 
+let queued: (() => void)[] | undefined
+
 /**
  * Runs work that restyles the whole page, like writing a stylesheet or
  * registering a property, ahead of the interaction that needs it. Done on
  * open, it delays a popup's first frame on a large page. Before the first
  * paint nothing is styled yet, so it runs at once: a page of 200 web
  * component dialogs went idle only after a key press could come. After it,
- * it runs once the page is idle.
+ * it runs once the page is idle, with the other work queued by then, so they
+ * cost one restyle.
  */
 function ahead(work: () => void) {
   if (typeof window === "undefined") {
@@ -194,8 +187,15 @@ function ahead(work: () => void) {
   }
   if (!performance.getEntriesByType("paint").length) {
     work()
+  } else if (queued) {
+    queued.push(work)
   } else {
-    ;(window.requestIdleCallback ?? setTimeout)(work)
+    queued = [work]
+    ;(window.requestIdleCallback ?? setTimeout)(() => {
+      const jobs = queued!
+      queued = undefined
+      jobs.forEach((job) => job())
+    })
   }
 }
 

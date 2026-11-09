@@ -184,6 +184,34 @@ for (const { name, policy, meta, layers } of policies) {
   })
 }
 
+test("ui-sdk's sheets go after the page's adopted ones, and the page's layers still win", async ({
+  page,
+  open,
+}) => {
+  await serve(page, { ...policies[1], css: policies[1].layers })
+  await page.addInitScript(() => {
+    const sheet = new CSSStyleSheet()
+    sheet.replaceSync(
+      "@layer page { :where([data-slot])::backdrop { background: rgb(255 0 0 / 0.5) } }"
+    )
+    document.adoptedStyleSheets = [sheet]
+    Object.assign(window, { pageSheet: sheet })
+  })
+  await open("select", { presentation: "sheet" })
+  await page.getByRole("combobox", { name: "Fruit" }).click()
+  await expect(page.getByRole("listbox")).toBeVisible()
+  expect(await backdropColor(page)).toBe("rgba(255, 0, 0, 0.5)")
+  const order = await page.evaluate(() => {
+    const { pageSheet } = window as unknown as { pageSheet: CSSStyleSheet }
+    return document.adoptedStyleSheets.map((sheet) =>
+      sheet === pageSheet ? "page" : "ui-sdk"
+    )
+  })
+  expect(order[0]).toBe("page")
+  expect(order.length).toBeGreaterThan(1)
+  expect(await blockedStyles(page)).toEqual([])
+})
+
 test("a page that replaces its adopted sheets gets ui-sdk's styles back at the next bind", async ({
   page,
   open,
