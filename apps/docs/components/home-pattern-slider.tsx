@@ -71,7 +71,7 @@ function PatternSlider() {
       max={100}
       step={25}
       format={labelOf}
-      className="fixed end-4 bottom-4 z-50 flex w-64 flex-col gap-3 border border-foreground bg-background p-4 font-mono text-[11px] leading-4 tracking-[0.06em] uppercase"
+      className="fixed inset-x-0 bottom-4 z-50 mx-auto flex w-64 flex-col gap-3 border border-foreground bg-background p-4 font-mono text-[11px] leading-4 tracking-[0.06em] uppercase"
     >
       <span aria-hidden="true">Patterns</span>
       <SliderControl className="flex h-6 items-center">
