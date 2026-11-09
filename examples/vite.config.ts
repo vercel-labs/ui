@@ -2,7 +2,8 @@ import solid from "@solidjs/vite-plugin"
 import { svelte } from "@sveltejs/vite-plugin-svelte"
 import vue from "@vitejs/plugin-vue"
 import { globSync } from "node:fs"
-import { defineConfig, type UserConfig } from "vite"
+import { createRequire } from "node:module"
+import { defineConfig, type Plugin, type UserConfig } from "vite"
 
 const solidFiles = [
   "**/packages/solid/**",
@@ -13,7 +14,10 @@ const builds: Record<
   string,
   { ext: string; config?: (ssr: boolean) => UserConfig }
 > = {
-  react: { ext: "tsx" },
+  react: {
+    ext: "tsx",
+    config: (ssr) => (ssr ? {} : { plugins: [docsReact()] }),
+  },
   vue: { ext: "vue", config: () => ({ plugins: [vue()] }) },
   svelte: { ext: "svelte", config: () => ({ plugins: [svelte()] }) },
   solid: {
@@ -21,6 +25,39 @@ const builds: Record<
     config: (ssr) => ({ plugins: [solid({ include: solidFiles, ssr })] }),
   },
   web: { ext: "ts" },
+}
+
+// The docs hand the React examples their own React, Next's copy, so a page runs
+// one React. An import the docs' React lacks fails the build, not the page.
+function docsReact(): Plugin {
+  const docs = createRequire(new URL("../apps/docs/", import.meta.url))
+  const provided = ["react", "react/jsx-runtime", "react-dom"]
+  const prefix = "\0docs-react:"
+  return {
+    name: "docs-react",
+    enforce: "pre",
+    resolveId(source) {
+      if (!/^react(-dom)?(\/|$)/.test(source)) {
+        return
+      }
+      if (!provided.includes(source)) {
+        this.error(`The docs don't hand ${source} to the examples.`)
+      }
+      return { id: prefix + source, moduleSideEffects: false }
+    },
+    load(id) {
+      if (!id.startsWith(prefix)) {
+        return
+      }
+      const source = id.slice(prefix.length)
+      const names = Object.keys(docs(`next/dist/compiled/${source}`))
+      return [
+        `const m = globalThis.__docsReact[${JSON.stringify(source)}]`,
+        "export default m",
+        `export const { ${names.join(", ")} } = m`,
+      ].join("\n")
+    },
+  }
 }
 
 const only = process.env.EXAMPLES_ONLY?.split(",")
