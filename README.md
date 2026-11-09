@@ -4,7 +4,7 @@ A library of UI behaviors for building accessible interfaces: keyboard navigatio
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./assets/behaviors-dark.svg">
-  <img alt="An environment selector split into three behaviors: createPopup, createListbox and createTypeahead." src="./assets/behaviors-light.svg">
+  <img alt="An environment selector split into three behaviors: createPopup, createSelection and createTypeahead." src="./assets/behaviors-light.svg">
 </picture>
 
 **[Read the docs](https://ui-sdk.dev/docs)**
