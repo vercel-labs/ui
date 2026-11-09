@@ -202,6 +202,13 @@ function actionsOf(entry: Entry, api: Record<string, unknown>) {
   )
 }
 
+// Whether a step's action works on a component: press on any, else a method of
+// its api that `takes` lets an agent call.
+function can(entry: Entry, instance: PrimitiveInstance, action: string) {
+  if (action === "press") return true
+  return typeof (instance.api as Record<string, unknown>)[action] === "function" && takes(entry, action)
+}
+
 // Whether an agent may call `action`: one the `agent` key lists or a synonym
 // of one, like `open` for `setOpen`, else one named like a change.
 function takes(entry: Entry, action: string) {
@@ -235,6 +242,11 @@ function valueFor(entry: Entry, action: string, value: unknown) {
   if (typeof value !== "string") return value
   return parsed == null || Number.isNaN(parsed) ? refuse() : parsed
 }
+
+// A button's text, else its accessible name, like "Close" for an icon-only ×, but
+// not one read from inside `data-agent-hidden`, which never reaches the agent.
+const textOrName = (el: Element) =>
+  textOf(el) || (el.querySelector("[data-agent-hidden]") ? "" : accessibleName(el))
 
 // The items on the page, named by their trigger when they have one, like an
 // accordion's sections, else by their text.
@@ -392,7 +404,7 @@ function describe(entry: Entry, instance: PrimitiveInstance, parts: Bound[]) {
   if (text.length) out.text = text as string[]
   const confirm = confirmOf(parts.filter((part) => !part.key).map((part) => part.el))
   if (confirm) out.confirm = confirm
-  const buttons = state.open === true ? buttonsOf(parts).map((el) => textOf(el)) : []
+  const buttons = state.open === true ? buttonsOf(parts).map(textOrName) : []
   if (buttons.length) out.buttons = buttons
   if (isComponentDisabled(state, parts)) out.disabled = true
   else {
@@ -487,7 +499,7 @@ function createAgent(
   // "Username", and "region" finds "Région". Labels and rows are page text, which people other than the
   // user can write, like a display name, so a label that matches exactly doesn't beat another component
   // whose label or row holds the same words: the step is refused with both refs.
-  const find = (ref: string) => {
+  const find = (ref: string, action?: string) => {
     // `live` first: a component that just came back takes its old ref there.
     const shown = live()
     const byRef = shown.find(({ entry }) => entry.ref === ref)
@@ -512,8 +524,12 @@ function createAgent(
     ]
     for (const near of tiers) {
       if (near.length === 1) return near[0]
+      // Of the ones that share a field, like a Textarea and its Trigger Menu, the one that takes the action.
+      const able = action ? near.filter(({ entry, instance }) => can(entry, instance, action)) : []
+      const meant = able.length ? able : near
+      if (meant.length === 1) return meant[0]
       // An open popup is what the agent means while it's open, like the dialog a row's menu just opened.
-      const open = near.filter(({ instance }) => (instance.get() as { open?: boolean }).open === true)
+      const open = meant.filter(({ instance }) => (instance.get() as { open?: boolean }).open === true)
       if (open.length === 1) return open[0]
       if (near.length > 1)
         throw new Error(
@@ -678,8 +694,8 @@ function createAgent(
       // way are refused, not guessed.
       const needle = fold(text)
       const words = wordsOf(text)
-      const exact = buttons.filter((el) => fold(textOf(el)) === needle)
-      const near = buttons.filter((el) => words.trim() && wordsOf(textOf(el)).includes(words))
+      const exact = buttons.filter((el) => fold(textOrName(el)) === needle)
+      const near = buttons.filter((el) => words.trim() && wordsOf(textOrName(el)).includes(words))
       const matches = exact.length ? exact : near
       if (matches.length > 1)
         throw new Error(
@@ -710,16 +726,16 @@ function createAgent(
     const { buttons, button } = found
     if (!button)
       throw new Error(
-        `No button "${text}" in ${entry.ref}. Buttons: ${buttons.map((el) => textOf(el)).join(", ") || "none"}.`,
+        `No button "${text}" in ${entry.ref}. Buttons: ${buttons.map(textOrName).join(", ") || "none"}.`,
       )
     const refuseDisabled = async () => {
       if (!button.matches(":disabled") && button.getAttribute("aria-disabled") !== "true") return
       if (opened) await close()
-      throw new Error(`"${textOf(button) || accessibleName(button)}" in ${entry.ref} is disabled now.`)
+      throw new Error(`"${textOrName(button)}" in ${entry.ref} is disabled now.`)
     }
     await refuseDisabled()
     // What was pressed, so a press that opened a dialog and closed it again, like a confirm, still says it happened.
-    const pressed = `Pressed "${textOf(button) || accessibleName(button)}"`
+    const pressed = `Pressed "${textOrName(button)}"`
     return { click: () => button.click(), button, pressed, opened, close, refuseDisabled }
   }
 
@@ -727,18 +743,16 @@ function createAgent(
   // when they're on the page. A closed menu's aren't, and reading them would
   // open it without a step `allow` decided on, so it says press opens it.
   function pressable(instance: PrimitiveInstance) {
-    const texts = buttonsOf(bound(instance))
-      .map((el) => textOf(el))
-      .filter(Boolean)
+    const texts = buttonsOf(bound(instance)).map(textOrName).filter(Boolean)
     if (texts.length) return ` press takes a button's text: ${texts.join(", ")}.`
     const opens = typeof (instance.api as { setOpen?: unknown }).setOpen === "function"
     return opens ? " press takes the text of a button inside it, and opens it first to find the button." : ""
   }
 
   // Whether `find` names one component now.
-  const shows = (ref: string) => {
+  const shows = (ref: string, action?: string) => {
     try {
-      find(ref)
+      find(ref, action)
       return true
     } catch {
       return false
@@ -749,9 +763,9 @@ function createAgent(
   // closed accordion section opens in turn and goes back, and the one section
   // that shows the component opens again. A name two sections share, like
   // Deploy failures under Email and under Slack, is refused, not guessed.
-  async function reveal(ref: string) {
+  async function reveal(ref: string, action?: string) {
     try {
-      return find(ref)
+      return find(ref, action)
     } catch (missing) {
       const holders: { entry: Entry; open: () => unknown; section: string }[] = []
       for (const { instance, entry, parts } of live()) {
@@ -776,7 +790,7 @@ function createAgent(
           const open = () => asAgent(() => api.open!(item.value))
           open()
           await frames()
-          if (shows(ref)) holders.push({ entry, open, section: item.label })
+          if (shows(ref, action)) holders.push({ entry, open, section: item.label })
           asAgent(() => api.setValue!(value))
           await frames()
         }
@@ -784,7 +798,7 @@ function createAgent(
       if (holders.length === 1) {
         holders[0].open()
         await frames()
-        return find(ref)
+        return find(ref, action)
       }
       if (holders.length > 1) {
         const [{ entry, section }] = holders
@@ -834,7 +848,7 @@ function createAgent(
 
   // Runs one step as the agent, once `allow` lets it, and waits for the page to render it.
   async function perform(ref: string, action: string, args: unknown[], guard?: () => boolean) {
-    const { entry, instance, parts } = await reveal(ref)
+    const { entry, instance, parts } = await reveal(ref, action)
     const { actions, disabled } = describe(entry, instance, parts)
     // A step is asked about before anything it does, and again when finding
     // its target changed what `allow` would see, like the item a label names
@@ -1002,7 +1016,7 @@ function createAgent(
     const targets = () => (press ? [press.button, ...targetsOf()] : targetsOf(args[0]))
     const askToRun = () =>
       press
-        ? ask(args, [press.button], `press "${textOf(press.button) || accessibleName(press.button)}"`)
+        ? ask(args, [press.button], `press "${textOrName(press.button)}"`)
         : ask(args, targets(), "make this change")
     try {
       // What `allow` saw can change while it decides, like a mark the page adds, which asks again.

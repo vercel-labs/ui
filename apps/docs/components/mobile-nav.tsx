@@ -9,7 +9,7 @@ import type { Section } from "@/lib/sections"
 import type * as PageTree from "fumadocs-core/page-tree"
 import { ArrowUpRightIcon } from "lucide-react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { useDocsPathname } from "@/lib/pathname"
 import * as React from "react"
 import { BetaCard } from "./beta-card"
 import { HeaderCopyPrompt } from "./copy-prompt"
@@ -37,7 +37,7 @@ function MobileNav({
 }) {
   const [open, setOpen] = React.useState(false)
   const searching = useSearchOpen()
-  const pathname = usePathname()
+  const pathname = useDocsPathname()
   const header = React.useRef<HTMLElement>(null)
 
   // Search can navigate while the menu is open, so the menu closes on any navigation.
