@@ -340,6 +340,23 @@ function fixtureComponents(folder) {
 const isComponent = (name) =>
   existsSync(path.join(root, "packages/core/src/components", name))
 
+const isSpec = (file) => file.endsWith(".spec.ts")
+
+/** The spec files that import a test helper, like `forms.helpers.ts` or `perf/budgets.ts`. */
+function importingSpecs(file) {
+  const target = file.replace(/\.ts$/, "")
+  return specFiles.filter((spec) =>
+    [
+      ...readFileSync(path.join(specRoot, spec), "utf8").matchAll(
+        /from\s*"(\.[^"]+)"/g
+      ),
+    ].some(
+      ([, specifier]) =>
+        path.join("tests/specs", specifier).replace(/\.ts$/, "") === target
+    )
+  )
+}
+
 /** Each touched component with the frameworks it runs on, and each framework shared code reaches. */
 function plan(files) {
   const touched = new Map()
@@ -358,13 +375,24 @@ function plan(files) {
   for (const file of files) {
     const parts = file.split("/")
     const reach = frameworksOf(file)
-    if (file.startsWith("tests/specs/")) {
+    if (/^tests\/(specs|perf)\/.*\.ts$/.test(file) && !isSpec(file)) {
+      // A helper or a perf budget runs with every spec that imports it.
+      for (const spec of importingSpecs(file)) {
+        touch(componentOf(spec.split(".")[0]), reach)
+      }
+    } else if (file.startsWith("tests/specs/")) {
       const component = componentOf(parts[2].split(".")[0])
       if (component) {
         touch(component, reach)
       } else {
         share(file, reach)
       }
+    } else if (
+      file === "pnpm-lock.yaml" ||
+      /^packages\/[\w-]+\/package\.json$/.test(file)
+    ) {
+      // A dependency change can move any spec of the frameworks it reaches.
+      share(file, reach)
     } else if (file.startsWith("apps/playground/src/fixtures/")) {
       for (const component of fixtureComponents(parts[4])) {
         touch(component, reach)
