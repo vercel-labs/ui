@@ -37,3 +37,13 @@ test("a button moved into a disabled fieldset after it binds ignores presses", a
   expect(actions).toBe(1)
   expect(span.hasAttribute("data-disabled")).toBe(true)
 })
+
+test("a disabled button keeps the author's tabindex once it binds", async () => {
+  defineButtonElements()
+  document.body.innerHTML = `<ui-button disabled><button tabindex="0">Save</button></ui-button>`
+  await wait()
+  const button = document.querySelector("button")!
+  expect(button.getAttribute("tabindex")).toBe("0")
+  expect(button.hasAttribute("aria-disabled")).toBe(false)
+  expect(button.hasAttribute("disabled")).toBe(true)
+})

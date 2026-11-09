@@ -54,7 +54,6 @@ describe("button attributes", () => {
       type: "button",
       disabled: "",
       "aria-disabled": "true",
-      tabindex: "-1",
     })
     expect(buttonElementAttrs("unknown", { type: "button", disabled: true, focusable: true })).toMatchObject({
       disabled: undefined,

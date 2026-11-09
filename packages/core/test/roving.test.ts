@@ -86,7 +86,7 @@ describe("servers render one tab stop", () => {
     ).toMatchObject({
       disabled: "",
       "aria-disabled": "true",
-      tabindex: "-1",
+      tabindex: undefined,
     })
   })
 

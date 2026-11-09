@@ -12,17 +12,14 @@ function outcome(view: ReturnType<typeof mount>, dir: "ltr" | "rtl") {
   const slot = focused?.getAttribute("data-slot") ?? ""
   const key = focused?.getAttribute("data-value") ?? focused?.textContent?.trim() ?? ""
   const mirrored: Record<string, string> = { left: "right", right: "left" }
-  const alike = (value: string) => value.replace(/^mount-\d+/, "mount")
   const state = JSON.stringify(view.state, (name, value) =>
     name === "id"
       ? undefined
-      : value && typeof value === "object" && !Array.isArray(value)
-        ? Object.fromEntries(Object.entries(value).map(([field, entry]) => [alike(field), entry]))
-        : typeof value !== "string"
-          ? value
-          : dir === "rtl" && (name === "direction" || name === "side") && value in mirrored
-            ? mirrored[value]
-            : alike(value),
+      : typeof value !== "string"
+        ? value
+        : dir === "rtl" && (name === "direction" || name === "side") && value in mirrored
+          ? mirrored[value]
+          : value.replace(/^mount-\d+/, "mount"),
   )
   return { focus: `${slot} ${key}`, state }
 }

@@ -24,18 +24,20 @@ function buttonRole<State>(elementOf: (state: State, context: { key: string }) =
 
 // A native button is natively disabled, or keeps focus with aria-disabled when
 // `focusable`. Links and other elements always use aria-disabled. Until a part
-// binds, which is all a server sees, it gets both, so either element is right.
+// binds, which is all a server sees, it gets both, and leaves its tab stop alone.
 function buttonElementAttrs(
   element: ButtonElement,
   options: { type?: string; disabled: boolean; focusable: boolean; tabindex?: string },
 ) {
   const native = element === "button"
   const unknown = element === "unknown"
+  const mayBeNative = native || unknown
   const unfocusable = options.disabled && !options.focusable
-  const defaultTabindex = unfocusable ? (native ? undefined : "-1") : element === "other" ? "0" : undefined
+  const leavesTabOrder = unfocusable && !mayBeNative
+  const defaultTabindex = leavesTabOrder ? "-1" : element === "other" ? "0" : undefined
   return {
-    type: native || unknown ? options.type : undefined,
-    disabled: (native || unknown) && unfocusable ? "" : undefined,
+    type: mayBeNative ? options.type : undefined,
+    disabled: mayBeNative && unfocusable ? "" : undefined,
     "aria-disabled": options.disabled && (unknown || !(native && unfocusable)) ? "true" : undefined,
     tabindex: options.tabindex ?? defaultTabindex,
   }
