@@ -56,6 +56,30 @@ const sameCell = (
   b: GridCell | null | undefined
 ) => !!a && !!b && a.row === b.row && a.col === b.col
 
+const cellName = (cell: GridCell) => `${cell.row}:${cell.col}`
+
+/**
+ * How a cell slot reads the active cell, for its `selects`, so a move reaches
+ * the cell it leaves and the one it lands on, not every cell:
+ * `selects({ active: byCell })`. The slot's props are the cell's `row` and `col`.
+ * @experimental
+ */
+const byCell = {
+  values: ({ props }: { props: GridCell }) => [cellName(props)],
+  moved(
+    previous: GridCell | null | undefined,
+    next: GridCell | null | undefined,
+    notify: (name: string) => void
+  ) {
+    // Before the grid is entered, the first cell that isn't disabled has the tab stop.
+    if (!previous || !next) {
+      return true
+    }
+    notify(cellName(previous))
+    notify(cellName(next))
+  },
+}
+
 /**
  * Gives a grid one tab stop and moves it by row and column. Call it once in
  * `api`, keep it on the api, and wire the cell slot:
@@ -65,6 +89,7 @@ const sameCell = (
  * cell: slot<{ row: number; col: number }>({
  *   role: "gridcell",
  *   focus: "roving",
+ *   selects: selects({ active: byCell }),
  *   keys: [
  *     "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight",
  *     "Home", "End", "ctrl+Home", "ctrl+End", "PageUp", "PageDown",
@@ -292,6 +317,7 @@ function createGridFocus<State extends object>(
 type GridFocus = ReturnType<typeof createGridFocus>
 
 export {
+  byCell,
   createGridFocus,
   type GridCell,
   type GridFocus,

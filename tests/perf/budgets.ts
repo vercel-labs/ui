@@ -75,6 +75,20 @@ const budgets = {
       requestAnimationFrame: 12,
     },
   },
+  "grid.arrow-key": {
+    measures:
+      "Cells notified when an arrow key moves the active cell of a grid.",
+    why: "Every cell heard every move and wrote its attributes again, about 11 ms per key on a 100 by 26 spreadsheet.",
+    // The cell that loses the tab stop and the one that takes it.
+    notified: 2,
+  },
+  "grid.extend": {
+    measures:
+      "Cells notified when Shift+Arrow grows a range of 2 rows by 5 columns by a row.",
+    why: "A range change reaches the cells that join or leave it and the cells of the sides that move, never the rest of the grid.",
+    // The row that joins, and the row that stops being the bottom edge.
+    notified: 10,
+  },
   "accordion.mount": {
     measures:
       "Sorts of the items into document order when a long accordion mounts, with closed panels unmounted and kept for find in page.",

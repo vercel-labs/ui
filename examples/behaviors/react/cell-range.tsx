@@ -1,8 +1,11 @@
 import * as React from "react"
 import {
+  byCell,
+  byCellRange,
   createCellRange,
   createGridFocus,
   definePrimitive,
+  selects,
   type CellRange,
   type GridCell,
 } from "@ui-sdk/core"
@@ -64,6 +67,7 @@ const sheet = definePrimitive({
     }),
     cell: slot<{ id: string; row: number; col: number }>({
       props: { row: "number", col: "number" },
+      selects: selects({ active: byCell, range: byCellRange }),
       attrs: (state, { props, api }) => ({
         role: "gridcell",
         tabindex: api.grid.tabIndex(state, props),

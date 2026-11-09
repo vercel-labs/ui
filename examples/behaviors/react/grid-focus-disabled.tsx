@@ -1,5 +1,11 @@
 import * as React from "react"
-import { createGridFocus, definePrimitive, type GridCell } from "@ui-sdk/core"
+import {
+  byCell,
+  createGridFocus,
+  definePrimitive,
+  selects,
+  type GridCell,
+} from "@ui-sdk/core"
 import { createParts, usePart, type PartProps } from "@ui-sdk/react/primitive"
 
 type TheaterState = { active: GridCell | null }
@@ -29,6 +35,7 @@ const theater = definePrimitive({
     }),
     seat: slot<{ id: string; row: number; col: number }>({
       props: { row: "number", col: "number" },
+      selects: selects({ active: byCell }),
       attrs: (state, { props, api }) => ({
         role: "gridcell",
         tabindex: api.grid.tabIndex(state, props),

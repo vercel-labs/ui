@@ -321,6 +321,7 @@ Each cell has a zero-based `row` and `col`. Connect its tab stop, keys and eleme
 ```ts
 seat: slot<{ row: number; col: number }>({
   props: { row: "number", col: "number" },
+  selects: selects({ active: byCell }),
   attrs: (state, { props, api }) => ({
     role: "gridcell",
     tabindex: api.grid.tabIndex(state, props),
@@ -334,6 +335,8 @@ seat: slot<{ row: number; col: number }>({
 ```
 
 Render the cells inside rows with `role="row"`, inside a root with `role="grid"`. Give each cell a stable `id`, such as `"1:2"`, so the primitive can tell them apart.
+
+`selects({ active: byCell })` lets a move reach only the cell it leaves and the cell it lands on, so a grid with thousands of cells stays fast.
 
 <ComponentExample
   name="behaviors/grid-focus"

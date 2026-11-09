@@ -232,6 +232,7 @@ export {
   type VirtualizerOptions,
 } from "./foundation/lists/virtualizer"
 export {
+  byCell,
   createGridFocus,
   type GridCell,
   type GridFocus,
@@ -239,6 +240,7 @@ export {
   type GridFocusReason,
 } from "./foundation/focus/grid-focus"
 export {
+  byCellRange,
   cellRangeMessage,
   cellsToText,
   createCellRange,

@@ -75,6 +75,80 @@ const boundsOf = ({ anchor, end }: CellRange) => ({
   right: Math.max(anchor.col, end.col),
 })
 
+function eachOutside(
+  bounds: CellBounds,
+  other: CellBounds | null,
+  notify: (name: string) => void
+) {
+  for (let row = bounds.top; row <= bounds.bottom; row++) {
+    const inside = !!other && row >= other.top && row <= other.bottom
+    for (let col = bounds.left; col <= bounds.right; col++) {
+      if (inside && col >= other.left && col <= other.right) {
+        col = other.right
+      } else {
+        notify(`${row}:${col}`)
+      }
+    }
+  }
+}
+
+function eachMovedSide(
+  before: CellBounds,
+  after: CellBounds,
+  notify: (name: string) => void
+) {
+  const row = (bounds: CellBounds, at: number) => {
+    for (let col = bounds.left; col <= bounds.right; col++) {
+      notify(`${at}:${col}`)
+    }
+  }
+  const col = (bounds: CellBounds, at: number) => {
+    for (let row = bounds.top; row <= bounds.bottom; row++) {
+      notify(`${row}:${at}`)
+    }
+  }
+  if (before.top !== after.top) {
+    ;(row(before, before.top), row(after, after.top))
+  }
+  if (before.bottom !== after.bottom) {
+    ;(row(before, before.bottom), row(after, after.bottom))
+  }
+  if (before.left !== after.left) {
+    ;(col(before, before.left), col(after, after.left))
+  }
+  if (before.right !== after.right) {
+    ;(col(before, before.right), col(after, after.right))
+  }
+}
+
+/**
+ * How a cell slot reads the range, for its `selects`, so a change reaches the
+ * cells that join or leave it and the cells on the sides that move, not every cell:
+ * `selects({ active: byCell, range: byCellRange })`.
+ * @experimental
+ */
+const byCellRange = {
+  values: ({ props }: { props: GridCell }) => [`${props.row}:${props.col}`],
+  moved(
+    previous: CellRange | null | undefined,
+    next: CellRange | null | undefined,
+    notify: (name: string) => void
+  ) {
+    const before = previous ? boundsOf(previous) : null
+    const after = next ? boundsOf(next) : null
+    if (before) {
+      eachOutside(before, after, notify)
+    }
+    if (after) {
+      eachOutside(after, before, notify)
+    }
+    // A cell that stays in the range keeps its edges unless one of their sides moved.
+    if (before && after) {
+      eachMovedSide(before, after, notify)
+    }
+  },
+}
+
 /**
  * Text with tabs between cells and newlines between rows, quoted where a cell holds either.
  * @experimental
@@ -141,6 +215,7 @@ function textToCells(text: string) {
  * cell: slot<{ row: number; col: number }>({
  *   role: "gridcell",
  *   focus: "roving",
+ *   selects: selects({ active: byCell, range: byCellRange }),
  *   keys: [
  *     "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Home", "End", "ctrl+Home", "ctrl+End",
  *     "PageUp", "PageDown", "shift+ArrowUp", "shift+ArrowDown", "shift+ArrowLeft", "shift+ArrowRight",
@@ -477,6 +552,7 @@ function createCellRange<State extends object>(
 type CellRangeSelection = ReturnType<typeof createCellRange>
 
 export {
+  byCellRange,
   cellRangeMessage,
   cellsToText,
   createCellRange,

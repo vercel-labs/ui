@@ -260,6 +260,54 @@ cd tests && PLAYGROUND_PORT=5310 ../scripts/test-slot.sh npx playwright test spe
 cd tests && PLAYGROUND_PORT=5310 ../scripts/test-slot.sh npx playwright test specs/tabs.counts --project react -g 'arrow keys do no work that grows with the tab count'
 ```
 
+<a id="grid-arrow-key"></a>
+
+### grid.arrow-key
+
+**Measures:** Cells notified when an arrow key moves the active cell of a grid.
+
+**Why:** Every cell heard every move and wrote its attributes again, about 11 ms per key on a 100 by 26 spreadsheet.
+
+**Budget:**
+
+- At most 2 parts notified.
+
+**Notes:** The cell that loses the tab stop and the one that takes it.
+
+**Tests:**
+
+- `store-fanout.test.ts` › a move in a grid notifies the cell it leaves and the one it lands on
+
+**Run:**
+
+```bash
+cd packages/core && ../../scripts/test-slot.sh npx vitest run test/store-fanout.test.ts -t 'a move in a grid notifies the cell it leaves and the one it lands on'
+```
+
+<a id="grid-extend"></a>
+
+### grid.extend
+
+**Measures:** Cells notified when Shift+Arrow grows a range of 2 rows by 5 columns by a row.
+
+**Why:** A range change reaches the cells that join or leave it and the cells of the sides that move, never the rest of the grid.
+
+**Budget:**
+
+- At most 10 parts notified.
+
+**Notes:** The row that joins, and the row that stops being the bottom edge.
+
+**Tests:**
+
+- `store-fanout.test.ts` › a range growing by a row notifies that row and the one that was its bottom edge
+
+**Run:**
+
+```bash
+cd packages/core && ../../scripts/test-slot.sh npx vitest run test/store-fanout.test.ts -t 'a range growing by a row notifies that row and the one that was its bottom edge'
+```
+
 <a id="accordion-mount"></a>
 
 ### accordion.mount
