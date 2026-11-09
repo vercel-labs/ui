@@ -2074,7 +2074,9 @@
 
     &
       > :not(:has(> :is([data-slot="calendar-previous"], [data-slot="calendar-next"]))):not(
-        [data-slot="calendar-heading"]
+        [data-slot="calendar-heading"],
+        [data-slot="calendar-previous"],
+        [data-slot="calendar-next"]
       ) {
       grid-column: 1 / -1;
     }
@@ -2214,7 +2216,9 @@
 
     &
       > :not(:has(> :is([data-slot="calendar-previous"], [data-slot="calendar-next"]))):not(
-        [data-slot="calendar-heading"]
+        [data-slot="calendar-heading"],
+        [data-slot="calendar-previous"],
+        [data-slot="calendar-next"]
       ) {
       grid-column: 1 / -1;
     }
