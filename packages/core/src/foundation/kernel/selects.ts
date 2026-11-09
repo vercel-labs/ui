@@ -57,11 +57,9 @@ const isReader = (values: unknown): values is Reader<any, any> =>
 type Narrowed = {
   selectors: Map<string, Set<Listener>>
   // The keys anything selects on, so a change to a key nobody selects on,
-  // like a filtered list on every keystroke, compares nothing, with the
-  // reader's `moved` for a key read by name.
-  selecting: Map<PropertyKey, Moved | undefined>
-  // Every part that reads a key by name, for a change that reaches them all.
-  naming: Map<PropertyKey, Set<Listener>>
+  // like a filtered list on every keystroke, compares nothing. Readers of one
+  // key keep their own `moved`, with the parts a `true` from it reaches.
+  selecting: Map<PropertyKey, Map<Moved, Set<Listener>>>
 }
 
 const narrowedStores = new WeakMap<Store<any>, Narrowed>()
@@ -76,26 +74,22 @@ function narrowedOf(store: Store<any>) {
   const narrowed: Narrowed = {
     selectors: new Map(),
     selecting: new Map(),
-    naming: new Map(),
   }
   narrowedStores.set(store, narrowed)
   store.setFanout((changed, previous, run) => {
     const state = store.get()
     for (const key of changed) {
-      if (!narrowed.selecting.has(key)) {
+      const movers = narrowed.selecting.get(key)
+      if (!movers) {
         continue
       }
       const notify = (value: unknown) =>
         narrowed.selectors.get(`${String(key)}:${value}`)?.forEach(run)
-      const moved: Moved = narrowed.selecting.get(key) ?? eachMoved
-      if (
-        moved(
-          (previous as Record<PropertyKey, unknown>)[key],
-          state[key],
-          notify
-        ) === true
-      ) {
-        narrowed.naming.get(key)?.forEach(run)
+      const before = (previous as Record<PropertyKey, unknown>)[key]
+      for (const [moved, naming] of movers) {
+        if (moved(before, state[key], notify) === true) {
+          naming.forEach(run)
+        }
       }
     }
   })
@@ -171,13 +165,14 @@ function selects<State extends object, Api, Props>(
       const cleanups = [subscribeSkipping(part.store, reads, listener)]
       for (const [key, values] of selected(part, props)) {
         const reader = reads[key]
-        if (isReader(reader)) {
-          const narrowed = narrowedOf(part.store)
-          narrowed.selecting.set(key, reader.moved as Moved)
-          cleanups.push(join(narrowed.naming, key, listener))
-        }
-        for (const value of values) {
-          cleanups.push(select(part.store, key, value, listener))
+        const moved = isReader(reader) ? (reader.moved as Moved) : eachMoved
+        cleanups.push(
+          ...values.map((value) =>
+            select(part.store, key, value, listener, moved)
+          )
+        )
+        if (moved !== eachMoved) {
+          cleanups.push(join(moversOf(part.store, key), moved, listener))
         }
       }
       return () => cleanups.forEach((cleanup) => cleanup())
@@ -198,13 +193,23 @@ function select<State extends object, Key extends keyof State>(
   store: Store<State>,
   key: Key,
   value: Selected<State, Key>,
-  listener: Listener
+  listener: Listener,
+  moved: Moved = eachMoved
 ) {
-  const narrowed = narrowedOf(store)
-  if (!narrowed.selecting.has(key)) {
-    narrowed.selecting.set(key, undefined)
+  const movers = moversOf(store, key)
+  if (!movers.has(moved)) {
+    movers.set(moved, new Set())
   }
-  return join(narrowed.selectors, `${String(key)}:${value}`, listener)
+  return join(narrowedOf(store).selectors, `${String(key)}:${value}`, listener)
+}
+
+function moversOf(store: Store<any>, key: PropertyKey) {
+  const { selecting } = narrowedOf(store)
+  let movers = selecting.get(key)
+  if (!movers) {
+    selecting.set(key, (movers = new Map()))
+  }
+  return movers
 }
 
 // Runs `notify` for the value a key left and the one it took, for an array,

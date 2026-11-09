@@ -14,6 +14,18 @@ import {
 // A spreadsheet's grid, whose cells read the active cell and the range by name.
 type SheetState = { active: GridCell | null; range: CellRange | null }
 
+const byRow = {
+  values: ({ props }: { props: { row: number } }) => [`row ${props.row}`],
+  moved(
+    previous: GridCell | null,
+    next: GridCell | null,
+    notify: (name: string) => void
+  ) {
+    notify(`row ${previous?.row}`)
+    notify(`row ${next?.row}`)
+  },
+}
+
 const sheet = definePrimitive({
   name: "sheet",
   options: { rows: "number", cols: "number", disabled: "value" },
@@ -47,6 +59,14 @@ const sheet = definePrimitive({
         tabindex: api.grid.tabIndex(state, props),
         "data-active": api.grid.isActive(state, props) ? "" : undefined,
         ...api.range.cellAttrs(state, props),
+      }),
+    }),
+    // Reads the active cell by another reader, which shares the cells' key.
+    rowHeader: slot<{ row: number }>({
+      props: { row: "number" },
+      selects: selects({ active: byRow, range: [] }),
+      attrs: (state, { props }) => ({
+        "data-active": state.active?.row === props.row ? "" : undefined,
       }),
     }),
   }),

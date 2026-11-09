@@ -905,6 +905,7 @@ describe("grid cells read the active cell and the range by name", () => {
     for (let col = 0; col < 4; col++) {
       cells.push({ slot: "cell", props: { id: `${row}:${col}`, row, col } })
     }
+    cells.push({ slot: "rowHeader", props: { id: `row ${row}`, row } })
   }
 
   test("no cell misses a change", async () => {
@@ -947,7 +948,8 @@ describe("grid cells read the active cell and the range by name", () => {
       ["leave the grid", () => store.set({ active: null, range: null })],
       ["enter it again", () => grid.focus({ row: 4, col: 0 })],
     ])
-    expect(heard["move a cell"]).toBe(2)
+    // The two cells, and the header of the row they share.
+    expect(heard["move a cell"]).toBe(3)
     // The cell that joins the range, and the one it grows from, which loses its bottom edge.
     expect(heard["grow a range"]).toBe(2)
   })
