@@ -58,7 +58,9 @@ const eslint = new ESLint({
 })
 
 const results = await eslint.lintFiles(files)
-if (fix) await ESLint.outputFixes(results)
+if (fix) {
+  await ESLint.outputFixes(results)
+}
 
 let failed = false
 for (const result of results) {
