@@ -300,6 +300,16 @@ describe("date input", () => {
     expect(onValueChange).toHaveBeenCalledTimes(1)
   })
 
+  test("Backspace works from the key alone, as WebKit sends no beforeinput on an empty segment", async () => {
+    const { segment, key, focused, instance } = mount(dateInput, { defaultValue: "2026-11-02" })
+    segment("day").focus()
+    key("Backspace")
+    expect(instance.get().value).toBeNull()
+    await tick()
+    key("Backspace")
+    expect(focused()).toBe("month")
+  })
+
   test("a partly filled date is a bad input until it's whole", async () => {
     const { segment, type } = mount(dateInput, {})
     segment("month").focus()
@@ -424,6 +434,15 @@ describe("time input", () => {
     segment("hour").focus()
     type("930")
     expect(instance.get().value).toBe("09:30")
+  })
+
+  test("Enter keeps a digit still waiting for the next, before the form submits", () => {
+    const { segment, type, key, instance } = mount(timeInput, { defaultValue: "09:30", hourCycle: 24 })
+    segment("minute").focus()
+    type("4")
+    expect(instance.get().value).toBe("09:30")
+    key("Enter")
+    expect(instance.get().value).toBe("09:04")
   })
 
   test("arrow keys wrap minutes without moving the hour", () => {
