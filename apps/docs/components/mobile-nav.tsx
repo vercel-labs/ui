@@ -19,7 +19,6 @@ import * as React from "react"
 import { BetaCard } from "./beta-card"
 import { HeaderCopyPrompt } from "./copy-prompt"
 import { GitHubLink } from "./github-link"
-import { Haptic, vibrate } from "./haptic"
 import { FrameworkCheck } from "./site-preferences"
 import { Logo, VercelLogo } from "./logo"
 import { SearchTrigger, setSearchOpen, useSearchOpen } from "./search"
@@ -118,30 +117,18 @@ function MobileNav({
         {/* Phones show the icon alone, so the breadcrumb fits. */}
         <SearchTrigger className="hit-area flex size-8 items-center justify-center rounded-2xl text-sm text-foreground outline-none transition-colors hover:bg-foreground/[0.06] focus-visible:ring-3 focus-visible:ring-ring/30 max-sm:[&>span]:sr-only max-sm:[&_svg]:size-5 sm:h-8 sm:w-auto sm:gap-2 sm:ps-2.5 sm:pe-3" />
         <GitHubLink className="text-foreground hover:bg-foreground/[0.06] [&_svg]:size-5" />
-        <Popover
-          open={open}
-          onOpenChange={(next) => {
-            vibrate()
-            setOpen(next)
-          }}
-          modal
-        >
+        <Popover open={open} onOpenChange={setOpen} modal>
           {searching ? (
             <button
               type="button"
               aria-label="Close search"
-              onClick={() => {
-                vibrate()
-                setSearchOpen(false)
-              }}
+              onClick={() => setSearchOpen(false)}
               className={menuButton}
             >
-              <Haptic />
               <MenuIcon open />
             </button>
           ) : (
             <PopoverTrigger aria-label="Menu" className={menuButton}>
-              <Haptic />
               <MenuIcon open={open} />
             </PopoverTrigger>
           )}

@@ -1,6 +1,5 @@
 "use client"
 
-import { cn } from "cn"
 import {
   Command,
   CommandEmpty,
@@ -25,7 +24,6 @@ import { SearchIcon } from "lucide-react"
 import { bindPersistentLayer } from "@ui-sdk/core"
 import { useRouter } from "next/navigation"
 import * as React from "react"
-import { Haptic, vibrate } from "./haptic"
 
 function Highlighted({ text }: { text: string }) {
   return text.split(/(<mark>.*?<\/mark>|`[^`]+`)/).map((part, index) => {
@@ -134,13 +132,11 @@ function SearchTrigger({
     <DialogTrigger
       controller={searchDialog}
       shortcut={shortcut ? "mod+k" : undefined}
-      className={cn(
-        "relative",
+      className={
         className ??
-          "flex h-8 w-full items-center gap-2 rounded-2xl px-3 text-sm text-subtle outline-none transition-colors hover:bg-foreground/5 hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/30"
-      )}
+        "flex h-8 w-full items-center gap-2 rounded-2xl px-3 text-sm text-subtle outline-none transition-colors hover:bg-foreground/5 hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/30"
+      }
     >
-      <Haptic />
       {icon && <SearchIcon className="size-4 shrink-0" />}
       <span>{label}</span>
     </DialogTrigger>
@@ -182,14 +178,7 @@ function Search({
   )
 
   return (
-    <Dialog
-      controller={searchDialog}
-      open={open}
-      onOpenChange={(next) => {
-        vibrate()
-        setSearchOpen(next)
-      }}
-    >
+    <Dialog controller={searchDialog} open={open} onOpenChange={setSearchOpen}>
       {/* No backdrop. Phones get a full panel under the header, like the menu. */}
       <DialogContent
         instant
