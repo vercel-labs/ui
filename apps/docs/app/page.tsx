@@ -1,34 +1,33 @@
-import { AskPoster } from "@/components/home-ask"
 import { BehaviorsPoster } from "@/components/home-behaviors"
 import { CopyPromptButton } from "@/components/copy-prompt"
-import { OperatePoster } from "@/components/home-operate"
 import { PhoneShot, PhoneStrip } from "@/components/home-more"
+import { Poster, StartPoster, Title } from "@/components/home-posters"
 import { SelectBlueprint } from "@/components/home-select"
-import { AgentsTile, FlowTile } from "@/components/home-agents"
-import { SheetTile } from "@/components/home-sheet"
-import { CanvasTile, TimelineTile } from "@/components/home-builds"
-import { WeekTile } from "@/components/home-week"
 import {
   AccordionTile,
+  AgentsTile,
+  AskPoster,
   CalendarTile,
+  CanvasTile,
   ColorTile,
   CommandTile,
+  FlowTile,
   NumberInputTile,
-  Numeral,
   OTPTile,
-  Poster,
+  OperatePoster,
   RatingTile,
   ResizableTile,
   SegmentedTile,
+  SheetTile,
   SliderTile,
-  StartPoster,
   SwitchTile,
   TabsTile,
-  Title,
+  TimelineTile,
   TokenInputTile,
   ToolbarTile,
   TreeTile,
-} from "@/components/home-posters"
+  WeekTile,
+} from "@/components/home-tiles"
 import { Logo } from "@/components/logo"
 import { MobileNav } from "@/components/mobile-nav"
 import { Search } from "@/components/search"

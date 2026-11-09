@@ -16,7 +16,7 @@ import { createParts, usePart, type PartProps } from "@ui-sdk/react/primitive"
 import { cn } from "cn"
 import { Redo2Icon, SparklesIcon, Undo2Icon } from "lucide-react"
 import * as React from "react"
-import { Numeral, Poster, Title } from "./home-posters"
+import { Numeral, Title } from "./home-posters"
 
 type Cells = Record<string, string>
 type SheetState = {
@@ -328,7 +328,7 @@ function SheetCell({
   return usePart(sheet, "cell", { id: cellName({ row, col }), row, col }, props)
 }
 
-function SheetTile({ className, fig }: { className?: string; fig?: string }) {
+function SheetDemo() {
   const [cells, setCells] = React.useState(start)
   const [pending, setPending] = React.useState<string[]>([])
   const [note, setNote] = React.useState(
@@ -386,15 +386,7 @@ function SheetTile({ className, fig }: { className?: string; fig?: string }) {
   }
   const filled = Object.keys(answers).filter((name) => cells[name]).length
   return (
-    <Poster
-      fig={fig}
-      head={"A SPREADSHEET WITH AI\nSELECT CELLS, THEN PRESS RUN\n⌘Z UNDOES IT"}
-      touch={"A SPREADSHEET WITH AI\nSELECT CELLS, THEN TAP RUN"}
-      tone="white"
-      pattern="rules"
-      body="justify-between gap-8"
-      className={className}
-    >
+    <>
       <div className="flex flex-wrap items-baseline justify-between gap-x-8 gap-y-4">
         <Title id="spreadsheet" max={6.5} className="-ms-[0.05em]">
           Spreadsheet.
@@ -497,8 +489,8 @@ function SheetTile({ className, fig }: { className?: string; fig?: string }) {
           </div>
         </div>
       </Sheet>
-    </Poster>
+    </>
   )
 }
 
-export { SheetTile }
+export { SheetDemo }

@@ -10,7 +10,6 @@ import {
   UserPickerOption,
   UserPickerTrigger,
 } from "./home-user-picker"
-import { Poster } from "./home-posters"
 
 const ink = "border border-foreground"
 const label = "font-mono text-[11px] tracking-[0.06em] uppercase"
@@ -509,7 +508,7 @@ const views = [
 
 type View = (typeof views)[number]["value"]
 
-function AskPoster({ fig }: { fig?: string }) {
+function AskDemo() {
   const [step, setStep] = React.useState(4)
   const [view, setView] = React.useState<View>("ask")
   const [framework, setFramework] = React.useState("react")
@@ -536,14 +535,7 @@ function AskPoster({ fig }: { fig?: string }) {
   }
   const current = views.find((entry) => entry.value === view)!
   return (
-    <Poster
-      fig={fig}
-      head={"ASKING YOUR AGENT\nFOR A NEW COMPONENT"}
-      tone="white"
-      pattern="grid"
-      body="gap-10"
-      className="lg:min-h-0"
-    >
+    <>
       <div className="flex flex-col gap-6 @[40rem]:hidden">
         <div
           role="group"
@@ -662,7 +654,7 @@ function AskPoster({ fig }: { fig?: string }) {
           )}
         </Step>
       </ol>
-    </Poster>
+    </>
   )
 }
 
@@ -679,4 +671,4 @@ function Placeholder({ lines }: { lines: number }) {
   )
 }
 
-export { AskPoster }
+export { AskDemo }
