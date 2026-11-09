@@ -8,7 +8,12 @@ import { whenKept } from "../kernel/keep"
 import { isFocusFromKeyboard } from "../kernel/modality"
 import { openAttrs } from "../kernel/attrs"
 import { isBrowser } from "../platform/env"
-import { position, type Anchor, type PositionProps } from "../platform/position"
+import {
+  position,
+  preparePosition,
+  type Anchor,
+  type PositionProps,
+} from "../platform/position"
 import { type Side } from "../platform/sides"
 import { tabbables } from "../focus/tabbable"
 import { accessibleName } from "../text/accessible-name"
@@ -62,8 +67,14 @@ function placementOptions(
   }
 }
 
-// Placed beside its anchor, which flips and stays on screen.
-const placement = { position, anchor: contentAnchor, options: placementOptions }
+// Placed beside its anchor, which flips and stays on screen. `prepare` runs
+// once an instance is kept, ahead of the first open.
+const placement = {
+  position,
+  prepare: () => whenKept(preparePosition),
+  anchor: contentAnchor,
+  options: placementOptions,
+}
 
 // A popup a press opens: a press on the trigger opens and closes it, another
 // trigger takes the open popup over, and a press on one the pointer opened

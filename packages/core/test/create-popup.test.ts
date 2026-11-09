@@ -913,14 +913,16 @@ describe("a shown popup's modal effects", () => {
 
   test.each(cases)(
     "$name follows modal from $from to $to while open",
-    ({ show, to }) => {
+    async ({ show, to }) => {
       const outside = document.body.appendChild(
         document.createElement("button")
       )
       const view = show()
       mounts.push(view)
+      await frame()
       const focused = document.activeElement
       rerenderOf(view).setOptions({ modal: to })
+      await frame()
       const effects = modalTriple(view.state.modal)
       expect(view.state.open).toBe(true)
       expect(document.activeElement).toBe(focused)

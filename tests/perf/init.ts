@@ -146,6 +146,7 @@ async function countRestyles(page: Page, run: () => Promise<unknown>) {
       (sum, { args }) => sum + (args?.elementCount ?? 0),
       0
     ),
+    each: recalcs.map(({ args }) => args?.elementCount ?? 0),
   }
 }
 

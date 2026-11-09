@@ -1,6 +1,6 @@
 import { shadowRootsAround, watchMoves, watchShadowRoots } from "./moves"
 import { physicalSide, type PhysicalSide, type Side } from "./sides"
-import { registerUninherited } from "./style"
+import { ahead, registerUninherited } from "./style"
 
 /**
  * How a popup lines up along the side it opens on.
@@ -330,6 +330,18 @@ const slowCheck = 500
 // inside it. A child that needs the room copies it on the popup, like
 // `[--list-height:var(--available-height)]`.
 const roomVariables = ["--available-height", "--available-width"]
+
+let roomRegistered = false
+
+// Registering restyles the whole page, so it's done ahead of the first open.
+// `position` still registers them if a popup opens first.
+function preparePosition() {
+  if (roomRegistered) {
+    return
+  }
+  roomRegistered = true
+  ahead(() => registerUninherited(roomVariables))
+}
 
 function createWriter(el: HTMLElement) {
   const written = new Map<string, string | null>()
@@ -892,6 +904,7 @@ export {
   type PortalProps,
   position,
   type PositionOptions,
+  preparePosition,
   type PositionProps,
   untransformed,
   type VirtualAnchor,

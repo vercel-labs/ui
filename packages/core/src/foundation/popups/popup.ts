@@ -33,7 +33,7 @@ import {
 } from "../kernel/modality"
 import { isAfter } from "../kernel/order"
 import { isBrowser } from "../platform/env"
-import { writeStyle } from "../platform/style"
+import { afterPaint, ahead, enforceHidden, writeStyle } from "../platform/style"
 import {
   activeElement,
   composedContains,
@@ -437,25 +437,19 @@ function resetPopoverStyles(doc: Document, selectors: string[]) {
 const prepared = new WeakSet<string[]>()
 
 /**
- * Writes `resetPopoverStyles` for `selectors` ahead of the first open.
- * Changing a stylesheet restyles and lays out the whole page, so written on
- * open, it delays the popup's first frame on a large page. Before the page's
- * first paint nothing is laid out yet, so it's written at once; a page of
- * 200 web component dialogs went idle only after a key press could come.
- * After it, it's written once the page is idle. Binding still writes it if
- * the popup opens first.
+ * Writes `resetPopoverStyles` for `selectors` ahead of the first open, with
+ * the rule that keeps hidden parts hidden, which the content's bind writes
+ * otherwise. Binding still writes both if the popup opens first.
  */
 function prepareReset(selectors: string[]) {
   if (!isBrowser || prepared.has(selectors)) {
     return
   }
   prepared.add(selectors)
-  const write = () => resetPopoverStyles(document, selectors)
-  if (!performance.getEntriesByType("paint").length) {
-    write()
-  } else {
-    ;(window.requestIdleCallback ?? setTimeout)(write)
-  }
+  ahead(() => {
+    resetPopoverStyles(document, selectors)
+    enforceHidden(document)
+  })
 }
 
 // Android's back gesture, through a CloseWatcher. Only on Android: on desktop
@@ -612,11 +606,15 @@ function createPopupLayer<
       const openerLayer = before && findLayer(before)
       const openerTarget = openerLayer ? undefined : lastClosed()
       upstream = openerLayer?.returnTarget ?? (() => openerTarget)
+      const exiting = !!shown
       store.set({ mounted: true } as Partial<State>)
       // Reopened while animating out, it attaches again: the close already let
       // go of the inert page and the close watcher, and focus has to move in.
+      // Content that binds as it mounts has attached by now, so only once.
       if (bound) {
-        hide()
+        if (exiting) {
+          hide()
+        }
         show()
       } else if (!isBrowser) {
         enterPending = false
@@ -1022,6 +1020,7 @@ function createPopupLayer<
     }
     let releaseLock: (() => void) | undefined
     let releaseOwnInert: (() => void) | undefined
+    let pendingFreeze: (() => void) | undefined
     const freezePage = () => {
       const keep = [
         el,
@@ -1039,12 +1038,15 @@ function createPopupLayer<
           }
         }
       }
+      // The lock measures the page, so it goes before the page turns inert,
+      // while layout is still clean. After it, that read restyles half the page.
+      releaseLock = lockScroll(el.ownerDocument, el)
       const inert = inertOutside(keep)
       own.keep = inert.keep
       releaseInert = releaseOwnInert = inert
-      releaseLock = lockScroll(el.ownerDocument, el)
     }
     const thawPage = () => {
+      pendingFreeze?.()
       releaseOwnInert?.()
       releaseLock?.()
       if (releaseInert === releaseOwnInert) {
@@ -1053,7 +1055,25 @@ function createPopupLayer<
       releaseOwnInert = releaseLock = own.keep = undefined
     }
     if (modal.inertAndLock) {
-      freezePage()
+      // Both restyle the whole page, which on a phone takes longer than drawing
+      // the popup. So they wait until the popup has painted.
+      pendingFreeze = afterPaint(() => {
+        pendingFreeze = undefined
+        if (!store.get().open) {
+          return
+        }
+        const focused = activeElement()
+        freezePage()
+        // Focus that rested on the page, inert now, moves in.
+        if (
+          tabMode() === "trap" &&
+          focused &&
+          !usable(focused as HTMLElement)
+        ) {
+          focusPending = true
+          initialFocus(config.initialFocus)
+        }
+      })
     }
     remodal = () => {
       const next = options.modal()

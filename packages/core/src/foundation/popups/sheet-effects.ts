@@ -12,6 +12,7 @@
 //   the scroller's ScrollTimeline, so effects track native scrolling.
 // At rest every value is written inline, and no animation is left holding it.
 import { dimAmount, expandAmount, progressAmount } from "../motion/curves"
+import { ahead } from "../platform/style"
 
 /**
  * Keyframes for an element that follows a sheet, like `{ scale: [1, 0.94] }`. Index 0 is closed, the last is fully expanded.
@@ -69,6 +70,13 @@ function registerVariables(doc: Document) {
     } catch {
       // Already registered, by another copy of the package or the app's own @property.
     }
+  }
+}
+
+// Registering restyles the whole page, so it's done ahead of the first sheet.
+function prepareVariables() {
+  if (typeof document !== "undefined" && !registered.has(document)) {
+    ahead(() => registerVariables(document))
   }
 }
 
@@ -393,6 +401,7 @@ function cssName(property: string) {
 
 export {
   createSheetEffects,
+  prepareVariables,
   type SheetEffects,
   type SheetKeyframes,
   type SheetMotion,

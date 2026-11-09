@@ -1,9 +1,12 @@
 import * as React from "react"
 import {
+  byCell,
+  byCellRange,
   cellsToText,
   createCellRange,
   createGridFocus,
   definePrimitive,
+  selects,
   textToCells,
   type CellRange,
   type GridCell,
@@ -106,6 +109,7 @@ const prices = definePrimitive({
     }),
     cell: slot<{ id: string; row: number; col: number }, { text: string }>({
       props: { row: "number", col: "number" },
+      selects: selects({ active: byCell, range: byCellRange }),
       state: (state, { props }) => ({
         text: state.cells[props.row][props.col],
       }),

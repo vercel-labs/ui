@@ -208,6 +208,7 @@ const range = createCellRange(context, {
 Return `range` from `api`, then update the existing cell slot:
 
 ```ts
+selects: selects({ active: byCell, range: byCellRange }),
 attrs: (state, { props, api }) => ({
   role: "gridcell",
   tabindex: api.grid.tabIndex(state, props),
@@ -220,7 +221,7 @@ on: {
 bind: (el, { api, props }) => api.range.bind(el, props),
 ```
 
-`range.bind` also binds grid focus, and `range.keydown` forwards ordinary navigation to the grid. You don't need to call both behaviors for the same event.
+`range.bind` also binds grid focus, and `range.keydown` forwards ordinary navigation to the grid. You don't need to call both behaviors for the same event. `byCellRange` lets a range change reach only the cells that join or leave it and the cells along the sides that move.
 
 <ComponentExample
   name="behaviors/cell-range"

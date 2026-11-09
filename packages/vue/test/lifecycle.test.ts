@@ -54,7 +54,9 @@ function mount(render: () => unknown) {
   return el
 }
 
-const wait = (ms = 10) => new Promise((done) => setTimeout(done, ms))
+// A modal locks the page a frame after it shows, so a check waits for that frame.
+const wait = (ms = 10) =>
+  new Promise((done) => requestAnimationFrame(() => setTimeout(done, ms)))
 const locked = () => document.documentElement.style.overflow === "hidden"
 
 const OpenDialog = defineComponent({

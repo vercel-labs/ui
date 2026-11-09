@@ -8,6 +8,7 @@ import {
   attachSheet,
   isDragSurface,
   parentSheet,
+  prepareSheet,
   sheetLayers,
   type Sheet,
   type SheetOutlet,
@@ -30,6 +31,7 @@ import { sameValue } from "../../foundation/kernel/store"
 import { deriveFromOptions, deriveState } from "../../foundation/kernel/derive"
 import { createChange } from "../../foundation/kernel/input-source"
 import { drawerPreset } from "../../foundation/popups/popup-presets"
+import { whenKept } from "../../foundation/kernel/keep"
 
 type DrawerState = DialogState & {
   snapPoint: SnapPoint | null
@@ -113,6 +115,7 @@ function drawerApi(
   let outlets: SheetOutlet[] = []
   // What moves the sheet, while the content is bound.
   let sheet: Sheet | undefined
+  whenKept(prepareSheet)
 
   // Drawer options are Dialog's, with a wider `onDismissAttempt` that accepts every dialog reason.
   const dialog = dialogApi(

@@ -177,71 +177,79 @@ function Search({
     [loaded, search]
   )
 
+  // The dialog opens into this wrapper. Added beside the page instead, it took
+  // the page's place as last child, which restyled the whole page.
   return (
-    <Dialog controller={searchDialog} open={open} onOpenChange={setSearchOpen}>
-      {/* No backdrop. Phones get a full panel under the header, like the menu. */}
-      <DialogContent
-        instant
-        initialFocus="input"
-        backdropClassName="hidden"
-        className="max-w-[37rem] max-lg:top-14 max-lg:bottom-0 max-lg:left-0 max-lg:max-h-none max-lg:w-full max-lg:max-w-none max-lg:translate-x-0 max-lg:bg-canvas max-lg:text-lg max-lg:shadow-none max-lg:ring-0"
+    <div className="contents">
+      <Dialog
+        controller={searchDialog}
+        open={open}
+        onOpenChange={setSearchOpen}
       >
-        <DialogTitle className="sr-only">Search the docs</DialogTitle>
-        <Command
-          filter={false}
-          onQueryChange={setSearch}
-          onAction={(value) => {
-            const url =
-              results.find((result) => result.id === value)?.url ?? value
-            setSearchOpen(false)
-            router.push(url)
-          }}
-          className="flex min-h-0 flex-1 flex-col max-lg:px-3"
+        {/* No backdrop. Phones get a full panel under the header, like the menu. */}
+        <DialogContent
+          instant
+          initialFocus="input"
+          backdropClassName="hidden"
+          className="max-w-[37rem] max-lg:top-14 max-lg:bottom-0 max-lg:left-0 max-lg:max-h-none max-lg:w-full max-lg:max-w-none max-lg:translate-x-0 max-lg:bg-canvas max-lg:text-lg max-lg:shadow-none max-lg:ring-0"
         >
-          <CommandInput
-            aria-label="Search the docs"
-            placeholder="Search the docs"
-            className="max-lg:text-xl!"
-          />
-          <CommandEmpty>
-            {searching
-              ? "Searching…"
-              : loaded?.error
-                ? "Search isn’t available right now."
-                : search && `Nothing found for “${search}”.`}
-          </CommandEmpty>
-          <CommandList aria-busy={searching || undefined}>
-            {search ? (
-              results.map((result) => (
-                <CommandItem
-                  key={result.id}
-                  value={result.id}
-                  label={result.content.replace(/<\/?mark>|`/g, "")}
-                  className={result.type === "page" ? "" : "ps-6 text-subtle"}
-                >
-                  <span className="line-clamp-1">
-                    <Highlighted text={result.content} />
-                  </span>
-                </CommandItem>
-              ))
-            ) : (
-              <CommandGroup>
-                <CommandGroupLabel>Pages</CommandGroupLabel>
-                {pages.map((page) => (
+          <DialogTitle className="sr-only">Search the docs</DialogTitle>
+          <Command
+            filter={false}
+            onQueryChange={setSearch}
+            onAction={(value) => {
+              const url =
+                results.find((result) => result.id === value)?.url ?? value
+              setSearchOpen(false)
+              router.push(url)
+            }}
+            className="flex min-h-0 flex-1 flex-col max-lg:px-3"
+          >
+            <CommandInput
+              aria-label="Search the docs"
+              placeholder="Search the docs"
+              className="max-lg:text-xl!"
+            />
+            <CommandEmpty>
+              {searching
+                ? "Searching…"
+                : loaded?.error
+                  ? "Search isn’t available right now."
+                  : search && `Nothing found for “${search}”.`}
+            </CommandEmpty>
+            <CommandList aria-busy={searching || undefined}>
+              {search ? (
+                results.map((result) => (
                   <CommandItem
-                    key={page.url}
-                    value={page.url}
-                    label={page.name}
+                    key={result.id}
+                    value={result.id}
+                    label={result.content.replace(/<\/?mark>|`/g, "")}
+                    className={result.type === "page" ? "" : "ps-6 text-subtle"}
                   >
-                    {page.name}
+                    <span className="line-clamp-1">
+                      <Highlighted text={result.content} />
+                    </span>
                   </CommandItem>
-                ))}
-              </CommandGroup>
-            )}
-          </CommandList>
-        </Command>
-      </DialogContent>
-    </Dialog>
+                ))
+              ) : (
+                <CommandGroup>
+                  <CommandGroupLabel>Pages</CommandGroupLabel>
+                  {pages.map((page) => (
+                    <CommandItem
+                      key={page.url}
+                      value={page.url}
+                      label={page.name}
+                    >
+                      {page.name}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              )}
+            </CommandList>
+          </Command>
+        </DialogContent>
+      </Dialog>
+    </div>
   )
 }
 

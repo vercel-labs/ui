@@ -11,6 +11,11 @@ function perfSize(fallback = 10) {
   return Number(new URLSearchParams(location.search).get("n") ?? fallback)
 }
 
+/** Whether popups open modal, which makes the rest of the page inert and locks its scroll: ?modal. */
+function perfModal() {
+  return new URLSearchParams(location.search).has("modal") || undefined
+}
+
 /** How many options each select in a row renders: ?options=30. */
 function perfOptions() {
   return Number(new URLSearchParams(location.search).get("options") ?? 3)
@@ -164,6 +169,7 @@ export {
   leakTreeItems,
   mountWhenAsked,
   perfItems,
+  perfModal,
   perfOptions,
   perfSize,
   perfThumbs,

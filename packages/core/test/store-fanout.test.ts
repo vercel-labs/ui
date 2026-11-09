@@ -3,6 +3,7 @@ import { budgets } from "../../../tests/perf/budgets"
 import { menu } from "./menu-parts"
 import { toolbar } from "../src/components/toolbar/toolbar"
 import { fakeElement } from "./selects"
+import { sheet } from "./sheet"
 import { press, subscribe } from "../src/foundation/kernel/part"
 import type { PrimitiveInstance } from "../src/foundation/kernel/primitive-types"
 
@@ -52,6 +53,41 @@ for (const n of [10, 500, 2000]) {
       'checkbox-item {"value":"wrap"}',
       'item-indicator {"id":"wrap-check","item":"checkbox-item","itemKey":"wrap"}',
     ])
+  })
+
+  const sheetCells = (n: number) => {
+    const instance = sheet({ id: "s", rows: n, cols: 10 })
+    const notified = new Set<string>()
+    for (let row = 0; row < n; row++) {
+      for (let col = 0; col < 10; col++) {
+        subscribe(
+          (instance as PrimitiveInstance).part("cell", {
+            id: `${row}:${col}`,
+            row,
+            col,
+          }),
+          () => notified.add(`${row}:${col}`)
+        )
+      }
+    }
+    return { ...instance.api, notified }
+  }
+
+  test(`a move in a grid notifies the cell it leaves and the one it lands on (n=${n})`, () => {
+    const { grid, notified } = sheetCells(n)
+    grid.focus({ row: 0, col: 0 })
+    notified.clear()
+    grid.focus({ row: 1, col: 0 })
+    expect(notified.size).toBe(budgets["grid.arrow-key"].notified)
+  })
+
+  test(`a range growing by a row notifies that row and the one that was its bottom edge (n=${n})`, () => {
+    const { grid, range, notified } = sheetCells(n)
+    grid.focus({ row: 1, col: 0 })
+    range.select({ anchor: { row: 1, col: 0 }, end: { row: 2, col: 4 } })
+    notified.clear()
+    range.select({ anchor: { row: 1, col: 0 }, end: { row: 3, col: 4 } })
+    expect(notified.size).toBe(budgets["grid.extend"].notified)
   })
 
   test(`a toolbar button rendered as another element notifies only itself (n=${n})`, () => {

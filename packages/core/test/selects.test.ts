@@ -23,6 +23,8 @@ import {
 import { attrs, bind, press as partPress } from "../src/foundation/kernel/part"
 import type { PrimitiveInstance } from "../src/foundation/kernel/primitive-types"
 import { kept } from "./kept"
+import type { GridCell } from "../src/foundation/focus/grid-focus"
+import { sheet } from "./sheet"
 
 // Every primitive whose slots have `selects`: each test drives the selected
 // key through every kind of change, to and from null and to values no part
@@ -894,5 +896,61 @@ describe("accordion parts select on their own item", () => {
     // The root, which shows the value, and the four parts of the item that
     // opens and of the one that closes.
     expect(heard["open another item"]).toBe(9)
+  })
+})
+
+describe("grid cells read the active cell and the range by name", () => {
+  const cells: Part[] = []
+  for (let row = 0; row < 5; row++) {
+    for (let col = 0; col < 4; col++) {
+      cells.push({ slot: "cell", props: { id: `${row}:${col}`, row, col } })
+    }
+    cells.push({ slot: "rowHeader", props: { id: `row ${row}`, row } })
+  }
+
+  test("no cell misses a change", async () => {
+    const instance = sheet({
+      id: "s",
+      rows: 5,
+      cols: 4,
+      disabled: (cell) => cell.row === 0 && cell.col === 0,
+    })
+    const { grid, range, store } = instance.api
+    const select = (anchor: GridCell, end: GridCell) => () =>
+      range.select({ anchor, end })
+    const heard = await expectNoMissedUpdates(instance, cells, [
+      ["enter the grid", () => grid.focus({ row: 1, col: 1 })],
+      ["move a cell", () => grid.focus({ row: 1, col: 2 })],
+      ["grow a range", select({ row: 1, col: 2 }, { row: 2, col: 2 })],
+      ["grow it again", select({ row: 1, col: 2 }, { row: 3, col: 3 })],
+      ["shrink it", select({ row: 1, col: 2 }, { row: 2, col: 3 })],
+      ["swap its corners", select({ row: 2, col: 3 }, { row: 1, col: 2 })],
+      [
+        "move it so it overlaps",
+        select({ row: 2, col: 1 }, { row: 4, col: 3 }),
+      ],
+      [
+        "move it clear of itself",
+        select({ row: 0, col: 0 }, { row: 1, col: 0 }),
+      ],
+      ["select rows", () => range.selectRows(1, 2)],
+      ["select columns", () => range.selectColumns(3)],
+      ["select every cell", () => range.selectAll()],
+      ["drop the range", () => range.select(null)],
+      [
+        "select a range away from the active cell",
+        select({ row: 3, col: 0 }, { row: 4, col: 1 }),
+      ],
+      [
+        "move the active cell, which keeps the range",
+        () => grid.focus({ row: 4, col: 3 }),
+      ],
+      ["leave the grid", () => store.set({ active: null, range: null })],
+      ["enter it again", () => grid.focus({ row: 4, col: 0 })],
+    ])
+    // The two cells, and the header of the row they share.
+    expect(heard["move a cell"]).toBe(3)
+    // The cell that joins the range, and the one it grows from, which loses its bottom edge.
+    expect(heard["grow a range"]).toBe(2)
   })
 })

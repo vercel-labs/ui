@@ -1,12 +1,13 @@
-import { perfItems, perfSize } from "tests/fixtures/perf.ts"
+import { perfItems, perfModal, perfSize } from "tests/fixtures/perf.ts"
 
 // Many popovers on one page, like a row action in every row of a table, for
-// the counts specs. Only the first one is opened.
+// the counts specs. Only the first one is opened. ?modal opens them modal.
 async function mount(root: HTMLElement) {
+  const modal = perfModal() ? ' modal="true"' : ""
   const popovers = perfItems(perfSize())
     .map(
       (item) => `
-        <ui-popover>
+        <ui-popover${modal}>
           <ui-popover-trigger><button>${item.label}</button></ui-popover-trigger>
           <ui-popover-content class="popup" aria-label="${item.label}">
             ${item.label} details.

@@ -75,6 +75,20 @@ const budgets = {
       requestAnimationFrame: 12,
     },
   },
+  "grid.arrow-key": {
+    measures:
+      "Cells notified when an arrow key moves the active cell of a grid.",
+    why: "Every cell heard every move and wrote its attributes again, about 11 ms per key on a 100 by 26 spreadsheet.",
+    // The cell that loses the tab stop and the one that takes it.
+    notified: 2,
+  },
+  "grid.extend": {
+    measures:
+      "Cells notified when Shift+Arrow grows a range of 2 rows by 5 columns by a row.",
+    why: "A range change reaches the cells that join or leave it and the cells of the sides that move, never the rest of the grid.",
+    // The row that joins, and the row that stops being the bottom edge.
+    notified: 10,
+  },
   "accordion.mount": {
     measures:
       "Sorts of the items into document order when a long accordion mounts, with closed panels unmounted and kept for find in page.",
@@ -252,6 +266,13 @@ const budgets = {
     // on those itself, so none of them renders, and no other option does.
     // One render per hidden option until 2026-10-13.
     rendersPerChangedOption: 0,
+  },
+  "popup.open-modal": {
+    measures:
+      "Style recalculations that restyle the whole page while a modal popover or a dialog opens over a page of many buttons.",
+    why: "A modal open makes the page inert and locks its scroll, which restyles the page once. A layout read after those writes, or a CSS property registered on open, made the browser restyle it again in the same task, 3 to 4 times on a phone menu.",
+    // The one the inert page and the scroll lock need.
+    pageRestyles: 1,
   },
   "popup.reopen": {
     measures:
