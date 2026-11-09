@@ -256,7 +256,10 @@ function Poster({
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 overflow-hidden"
       >
-        <div className="absolute inset-0" style={patterns[pattern]} />
+        <div
+          className="absolute inset-0 opacity-[var(--pattern-opacity,1)]"
+          style={patterns[pattern]}
+        />
         {backdrop}
       </div>
       <div

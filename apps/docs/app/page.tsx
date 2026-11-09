@@ -3,6 +3,7 @@ import { BehaviorsPoster } from "@/components/home-behaviors"
 import { CopyPromptButton } from "@/components/copy-prompt"
 import { OperatePoster } from "@/components/home-operate"
 import { PhoneShot, PhoneStrip } from "@/components/home-more"
+import { PatternSlider } from "@/components/home-pattern-slider"
 import { SelectBlueprint } from "@/components/home-select"
 import { AgentsTile, FlowTile } from "@/components/home-agents"
 import { SheetTile } from "@/components/home-sheet"
@@ -111,6 +112,7 @@ export default function HomePage() {
     <div className="relative flex flex-1 flex-col">
       <MobileNav registry={process.env.NPM_REGISTRY} />
       <Search pages={pages} />
+      <PatternSlider />
       <main data-width="wide" className="container flex-1 pt-6 pb-24 sm:pt-10">
         <h1 className="text-4xl leading-[1.15] font-[450] tracking-[-0.045em] text-balance sm:text-6xl sm:leading-[1.08] lg:text-7xl">
           A library of behaviors for agents to build the next generation of user
