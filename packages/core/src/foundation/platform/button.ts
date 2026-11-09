@@ -1,12 +1,11 @@
 // What Button and Toggle share: a part that acts like a button whatever it's
 // rendered as. A native button keeps its own behavior, a link stays a link,
-// and anything else becomes a button. The element is only known once it
-// binds, so state starts as "button", which is what servers render.
+// and anything else becomes a button.
 import { withSource } from "../kernel/details"
 import { trusted } from "../kernel/trusted"
 
-/** What a button-like part is rendered as. */
-type ButtonElement = "button" | "link" | "other"
+/** What a button-like part is rendered as, `unknown` until it binds. */
+type ButtonElement = "button" | "link" | "other" | "unknown"
 
 function buttonElement(el: HTMLElement) {
   if (el.tagName === "BUTTON") return "button"
@@ -23,21 +22,23 @@ function buttonRole<State>(elementOf: (state: State, context: { key: string }) =
   }
 }
 
-// The attributes a button-like part needs for its element. A disabled part is
-// natively disabled, or keeps focus with aria-disabled when `focusable`. Links
-// and other elements have no native disabled, so they always use aria-disabled.
-// `tabindex` overrides the tab stop, for parts that rove inside a group.
+// A native button is natively disabled, or keeps focus with aria-disabled when
+// `focusable`. Links and other elements always use aria-disabled. Until a part
+// binds, which is all a server sees, it gets both, and leaves its tab stop alone.
 function buttonElementAttrs(
   element: ButtonElement,
   options: { type?: string; disabled: boolean; focusable: boolean; tabindex?: string },
 ) {
   const native = element === "button"
+  const unknown = element === "unknown"
+  const mayBeNative = native || unknown
   const unfocusable = options.disabled && !options.focusable
-  const defaultTabindex = unfocusable ? (native ? undefined : "-1") : element === "other" ? "0" : undefined
+  const leavesTabOrder = unfocusable && !mayBeNative
+  const defaultTabindex = leavesTabOrder ? "-1" : element === "other" ? "0" : undefined
   return {
-    type: native ? options.type : undefined,
-    disabled: native && unfocusable ? "" : undefined,
-    "aria-disabled": options.disabled && !(native && unfocusable) ? "true" : undefined,
+    type: mayBeNative ? options.type : undefined,
+    disabled: mayBeNative && unfocusable ? "" : undefined,
+    "aria-disabled": options.disabled && (unknown || !(native && unfocusable)) ? "true" : undefined,
     tabindex: options.tabindex ?? defaultTabindex,
   }
 }

@@ -143,7 +143,7 @@ const buttonPrimitive = /* @__PURE__ */ definePrimitive({
     formDisabled: false,
     focusableWhenDisabled: !!options.focusableWhenDisabled,
     type: options.type ?? "button",
-    element: "button",
+    element: "unknown",
     pending: false,
     error: undefined,
   }),

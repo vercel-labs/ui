@@ -50,6 +50,65 @@ Each component also has its own file, named like its import, if you'd rather lis
 
 To host the files yourself, copy the `browser` folder from the `@ui-sdk/web` package into your site. It holds `web.js` and the `web` folder it loads from, so keep the two side by side. Browsers only run module scripts from a server, so open the page through one, not from a file on disk.
 
+### Build Your Own
+
+`core.js` has every behavior from `@ui-sdk/core`, along with `definePrimitive` and `createParts`. Import it to build a component we don't ship, on the same page as ours. This one is a small grid of cells you can move through with the arrow keys and select with Shift:
+
+```html
+<script type="module">
+  import {
+    createCellRange,
+    createGridFocus,
+    createParts,
+    definePrimitive,
+  } from "https://ui-sdk.dev/web@0/core.js"
+
+  const sheet = definePrimitive({
+    name: "sheet",
+    options: { rows: "number", cols: "number" },
+    state: () => ({ active: null, range: null }),
+    api: (context) => {
+      const rows = () => context.options().rows
+      const cols = () => context.options().cols
+      const grid = createGridFocus(context, { key: "active", rows, cols })
+      return { grid, range: createCellRange(context, { key: "range", grid, rows, cols }) }
+    },
+    slots: (slot) => ({
+      root: slot({ attrs: () => ({ role: "grid" }) }),
+      row: slot({ attrs: () => ({ role: "row" }) }),
+      cell: slot({
+        props: { row: "number", col: "number" },
+        attrs: (state, { props, api }) => ({
+          role: "gridcell",
+          tabindex: api.grid.tabIndex(state, props),
+          ...api.range.cellAttrs(state, props),
+        }),
+        on: {
+          keydown: (event, { api }) => api.range.keydown(event),
+          pointerdown: (event, { api, props }) => api.range.pointerdown(event, props),
+        },
+        bind: (el, { api, props }) => api.range.bind(el, props),
+      }),
+    }),
+  })
+
+  createParts(sheet, { root: "my-sheet", row: "my-sheet-row", cell: "my-sheet-cell" })
+</script>
+
+<my-sheet rows="2" cols="2" aria-label="Numbers">
+  <my-sheet-row>
+    <my-sheet-cell row="0" col="0">4</my-sheet-cell>
+    <my-sheet-cell row="0" col="1">8</my-sheet-cell>
+  </my-sheet-row>
+  <my-sheet-row>
+    <my-sheet-cell row="1" col="0">15</my-sheet-cell>
+    <my-sheet-cell row="1" col="1">16</my-sheet-cell>
+  </my-sheet-row>
+</my-sheet>
+```
+
+Selected cells get `aria-selected` and `data-selected` to style. [Compose Behaviors](../core/compose-behaviors) walks through building a primitive, and [Rendering Primitives](./rendering) covers `createParts`. `core.js` shares its files with the components, so a page that uses both loads that code once.
+
 ## Add Your Styles
 
 Components use light DOM and are unstyled, so you style them with your app's CSS or with Tailwind CSS. [Styling and Animation](./styling-and-animation) covers both.

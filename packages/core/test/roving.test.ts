@@ -79,12 +79,13 @@ describe("servers render one tab stop", () => {
     expect(stop("link", { id: "b" })).toBe("0")
   })
 
-  test("a disabled item that can't take focus is natively disabled and never claims it", () => {
+  test("a disabled item that can't take focus is disabled as a button and a link, and never claims it", () => {
     const bar = toolbar({ id: "t" })
     expect(
       attrs(bar.part("button", { id: "a", disabled: true, focusableWhenDisabled: false })),
     ).toMatchObject({
       disabled: "",
+      "aria-disabled": "true",
       tabindex: undefined,
     })
   })

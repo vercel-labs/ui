@@ -30,9 +30,13 @@ rmSync(outDir, { recursive: true, force: true })
 // component's helpers, so its Tabs came out about three times larger.
 await write(
   {
-    input: Object.fromEntries(
-      entries.map((entry) => [entry, path.join(packageDir, "src/entries", `${entry}.ts`)]),
-    ),
+    input: {
+      ...Object.fromEntries(
+        entries.map((entry) => [entry, path.join(packageDir, "src/entries", `${entry}.ts`)]),
+      ),
+      // Built with the components, so a page using both shares one kernel.
+      core: path.join(packageDir, "src/browser-core.ts"),
+    },
   },
   { dir: path.join(outDir, "web"), entryFileNames: "[name].js", chunkFileNames: "chunks/[hash].js" },
 )

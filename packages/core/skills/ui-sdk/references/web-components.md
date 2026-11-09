@@ -8,6 +8,10 @@ What the `@ui-sdk/web` types don't say, learned by probing.
 - There's no `primitive` entry. `createParts`, `wrappedButton` and the element types, like `UiInputElement`, come from `@ui-sdk/web` itself.
 - A component entry, like `@ui-sdk/web/input`, defines its elements when imported. Its types are `export {}`. A `define…Elements()` function you may find in another `.d.ts` isn't what the entry exports, and calling it fails.
 
+## Without a bundler
+
+A plain HTML page, like an Artifact, loads our elements with `<script type="module" src="https://ui-sdk.dev/web@0.js"></script>`. To build elements of your own there, import the behaviors, `definePrimitive` and `createParts` from `https://ui-sdk.dev/web@0/core.js`. It has everything in `@ui-sdk/core`'s root, but not subpaths like `@ui-sdk/core/tabs` or helpers like `toast()`.
+
 ## Tag names and markup
 
 Each component's page, like `node_modules/@ui-sdk/web/docs/components/input.md`, shows its tags and markup. `node_modules/@ui-sdk/web/custom-elements.json` lists every tag each entry defines, with its attributes and their types, properties, the controller's methods on `.api`, events, parts and data attributes. Search it for a tag, like `"tagName": "ui-input-group"`, before probing. To confirm what an entry defines, probe it:

@@ -1,4 +1,5 @@
 import { watchFormDisabled } from "../../foundation/forms/form"
+import { flagWhileBound } from "../../foundation/kernel/bound-keys"
 import {
   buttonElement,
   buttonElementAttrs,
@@ -186,8 +187,11 @@ type State = {
   stop: string | null
   // Buttons rendered as something else, like a link, by key. Known once they bind.
   elements: Record<string, ButtonElement>
+  // Until the root binds, as on a server, an item without an entry may be anything.
+  bound: boolean
 }
 
+const elementOf = (state: State, key: string) => state.elements[key] ?? (state.bound ? "button" : "unknown")
 const across = (orientation: ToolbarOrientation) => (orientation === "horizontal" ? "vertical" : "horizontal")
 const isToolbarDisabled = (state: State) => state.disabled || state.formDisabled
 const isDisabled = (state: State, props: ItemProps) =>
@@ -352,6 +356,7 @@ const toolbarPrimitive = /* @__PURE__ */ definePrimitive({
     formDisabled: false,
     stop: null,
     elements: {},
+    bound: false,
   }),
   sync: fromOptions,
   api: toolbarApi,
@@ -372,11 +377,14 @@ const toolbarPrimitive = /* @__PURE__ */ definePrimitive({
       on: {
         keydown: (event, { api }) => api.internal.keydown(event),
       },
-      bind: (el, { store }) => watchFormDisabled(el, store),
+      bind: (el, { store }) => {
+        const cleanups = [flagWhileBound(store, "bound", { now: true }), watchFormDisabled(el, store)]
+        return () => cleanups.forEach((cleanup) => cleanup())
+      },
     }),
 
     button: slot<ItemProps, ToolbarButtonState>({
-      ...buttonRole<State>((state, { key }) => state.elements[key] ?? "button"),
+      ...buttonRole<State>((state, { key }) => elementOf(state, key)),
       focus: "roving",
       press: { none: "The author's click does the work, and Enter and Space on other elements send one." },
       props: {
@@ -393,7 +401,7 @@ const toolbarPrimitive = /* @__PURE__ */ definePrimitive({
       attrs: (state, { key, props, api }) => {
         const item = itemAttrs(state, key, props, api)
         return {
-          ...buttonElementAttrs(state.elements[key] ?? "button", {
+          ...buttonElementAttrs(elementOf(state, key), {
             type: "button",
             disabled: item.disabled,
             focusable: item.focusable,
@@ -414,7 +422,7 @@ const toolbarPrimitive = /* @__PURE__ */ definePrimitive({
 
     link: slot<Pick<ItemProps, "groupDisabled">, ToolbarLinkState>({
       props: { id: "id", groupDisabled: { kind: "boolean", from: "group.disabled" } },
-      selects: selects({ stop: ({ key }) => [key, null], elements: [] }),
+      selects: selects({ stop: ({ key }) => [key, null], elements: [], bound: [] }),
       state: (state, { props }) => ({ disabled: isDisabled(state, props), orientation: state.orientation }),
       attrs: (state, { key, props, api }) => {
         const item = itemAttrs(state, key, props, api)
@@ -432,7 +440,7 @@ const toolbarPrimitive = /* @__PURE__ */ definePrimitive({
         // From the group the item sits in.
         groupDisabled: { kind: "boolean", from: "group.disabled" },
       },
-      selects: selects({ stop: ({ key }) => [key, null], elements: [] }),
+      selects: selects({ stop: ({ key }) => [key, null], elements: [], bound: [] }),
       state: (state, { props }) => ({ disabled: isDisabled(state, props), orientation: state.orientation }),
       attrs: (state, { key, props, api }) => {
         const item = itemAttrs(state, key, props, api)

@@ -128,6 +128,13 @@ function Fixture() {
       <Button class="button" render={(props) => <a {...props} href={toggleFixture.docs.href} />}>
         {toggleFixture.docs.label}
       </Button>
+      <Button
+        class="button"
+        disabled
+        render={(props) => <a {...props} href={toggleFixture.changelog.href} />}
+      >
+        {toggleFixture.changelog.label}
+      </Button>
       <Separator class="rule" />
       <Separator class="rule" decorative />
       <button>After</button>

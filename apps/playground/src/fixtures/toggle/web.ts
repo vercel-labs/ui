@@ -11,7 +11,7 @@ const toggles = (items: ToggleFixtureItem[]) =>
     .join("")
 
 function markup() {
-  const { form, docs } = toggleFixture
+  const { form, docs, changelog } = toggleFixture
   return `
     <div class="fixture">
       <button>Before</button>
@@ -37,6 +37,7 @@ function markup() {
       <button id="finish-publishing">Finish publishing</button>
       <button id="fail-publishing">Fail publishing</button>
       <ui-button><a class="button" href="${docs.href}">${docs.label}</a></ui-button>
+      <ui-button disabled><a class="button" href="${changelog.href}">${changelog.label}</a></ui-button>
       <ui-separator class="rule"></ui-separator>
       <ui-separator class="rule" decorative></ui-separator>
       <button>After</button>

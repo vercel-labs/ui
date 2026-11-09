@@ -69,6 +69,28 @@ test("a component's own file defines it without web.js", async ({ page }) => {
   expect(entries).toEqual(["tabs"])
 })
 
+test("core.js builds a component of your own beside the ready-made ones", async ({ page }) => {
+  const chunks: string[] = []
+  page.on("request", (request) => {
+    if (request.url().includes("/web/chunks/")) chunks.push(request.url())
+  })
+  await page.goto("/sheet.html")
+  const cell = (name: string) => page.getByRole("gridcell", { name, exact: true })
+  await expect(page.getByRole("grid", { name: "Numbers" })).toBeVisible()
+  await expect(cell("4")).toHaveAttribute("tabindex", "0")
+  await cell("4").click()
+  await page.keyboard.press("ArrowRight")
+  await expect(cell("8")).toBeFocused()
+  await page.keyboard.press("Shift+ArrowDown")
+  for (const name of ["8", "23"]) await expect(cell(name)).toHaveAttribute("aria-selected", "true")
+  await expect(cell("4")).not.toHaveAttribute("aria-selected", "true")
+
+  const bold = page.getByRole("button", { name: "Bold" })
+  await bold.click()
+  await expect(bold).toHaveAttribute("aria-pressed", "true")
+  expect(chunks.length).toBe(new Set(chunks).size)
+})
+
 test("form controls get their values back after going back, with no events, like native ones", async ({
   page,
 }) => {

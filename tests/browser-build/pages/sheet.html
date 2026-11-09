@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Sheet</title>
+    <script type="module" src="{{files}}/web.js"></script>
+    <script type="module">
+      import { createCellRange, createGridFocus, createParts, definePrimitive } from "{{files}}/web/core.js"
+
+      const sheet = definePrimitive({
+        name: "sheet",
+        options: { rows: "number", cols: "number" },
+        state: () => ({ active: null, range: null }),
+        api: (context) => {
+          const rows = () => context.options().rows
+          const cols = () => context.options().cols
+          const grid = createGridFocus(context, { key: "active", rows, cols })
+          return { grid, range: createCellRange(context, { key: "range", grid, rows, cols }) }
+        },
+        slots: (slot) => ({
+          root: slot({ attrs: () => ({ role: "grid" }) }),
+          row: slot({ attrs: () => ({ role: "row" }) }),
+          cell: slot({
+            props: { row: "number", col: "number" },
+            attrs: (state, { props, api }) => ({
+              role: "gridcell",
+              tabindex: api.grid.tabIndex(state, props),
+              ...api.range.cellAttrs(state, props),
+            }),
+            on: {
+              keydown: (event, { api }) => api.range.keydown(event),
+              pointerdown: (event, { api, props }) => api.range.pointerdown(event, props),
+            },
+            bind: (el, { api, props }) => api.range.bind(el, props),
+          }),
+        }),
+      })
+
+      createParts(sheet, { root: "my-sheet", row: "my-sheet-row", cell: "my-sheet-cell" })
+    </script>
+  </head>
+  <body>
+    <ui-toggle><button>Bold</button></ui-toggle>
+
+    <my-sheet rows="2" cols="3" aria-label="Numbers">
+      <my-sheet-row>
+        <my-sheet-cell row="0" col="0">4</my-sheet-cell>
+        <my-sheet-cell row="0" col="1">8</my-sheet-cell>
+        <my-sheet-cell row="0" col="2">15</my-sheet-cell>
+      </my-sheet-row>
+      <my-sheet-row>
+        <my-sheet-cell row="1" col="0">16</my-sheet-cell>
+        <my-sheet-cell row="1" col="1">23</my-sheet-cell>
+        <my-sheet-cell row="1" col="2">42</my-sheet-cell>
+      </my-sheet-row>
+    </my-sheet>
+  </body>
+</html>

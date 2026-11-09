@@ -237,7 +237,7 @@ const passwordInputPrimitive = /* @__PURE__ */ definePrimitive({
     formDisabled: false,
     controlDisabled: false,
     controlId: options.controlId ?? null,
-    toggleElement: "button",
+    toggleElement: "unknown",
     ...settings(options),
   }),
   live: ["value"],
