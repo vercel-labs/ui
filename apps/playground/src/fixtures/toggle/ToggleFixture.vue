@@ -114,6 +114,11 @@ async function publish() {
         <a v-bind="props">{{ toggleFixture.docs.label }}</a>
       </template>
     </Button>
+    <Button class="button" :href="toggleFixture.changelog.href" disabled>
+      <template #render="{ props }">
+        <a v-bind="props">{{ toggleFixture.changelog.label }}</a>
+      </template>
+    </Button>
     <Separator class="rule" />
     <Separator class="rule" decorative />
     <button>After</button>

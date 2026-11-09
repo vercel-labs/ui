@@ -34,6 +34,7 @@ const toggleFixture = {
   // publishing" rejects.
   form: { label: "Profile", field: "Name", defaultName: "Ada" },
   docs: { label: "Docs", href: "#docs" },
+  changelog: { label: "Changelog", href: "#changelog" },
 }
 
 // What the "Last action" status says after a change.

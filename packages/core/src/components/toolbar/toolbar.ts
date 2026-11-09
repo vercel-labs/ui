@@ -1,4 +1,5 @@
 import { watchFormDisabled } from "../../foundation/forms/form"
+import { flagWhileBound } from "../../foundation/kernel/bound-keys"
 import {
   buttonElement,
   buttonElementAttrs,
@@ -377,8 +378,8 @@ const toolbarPrimitive = /* @__PURE__ */ definePrimitive({
         keydown: (event, { api }) => api.internal.keydown(event),
       },
       bind: (el, { store }) => {
-        store.set({ bound: true })
-        return watchFormDisabled(el, store)
+        const cleanups = [flagWhileBound(store, "bound", { now: true }), watchFormDisabled(el, store)]
+        return () => cleanups.forEach((cleanup) => cleanup())
       },
     }),
 
@@ -421,7 +422,7 @@ const toolbarPrimitive = /* @__PURE__ */ definePrimitive({
 
     link: slot<Pick<ItemProps, "groupDisabled">, ToolbarLinkState>({
       props: { id: "id", groupDisabled: { kind: "boolean", from: "group.disabled" } },
-      selects: selects({ stop: ({ key }) => [key, null], elements: [] }),
+      selects: selects({ stop: ({ key }) => [key, null], elements: [], bound: [] }),
       state: (state, { props }) => ({ disabled: isDisabled(state, props), orientation: state.orientation }),
       attrs: (state, { key, props, api }) => {
         const item = itemAttrs(state, key, props, api)
@@ -439,7 +440,7 @@ const toolbarPrimitive = /* @__PURE__ */ definePrimitive({
         // From the group the item sits in.
         groupDisabled: { kind: "boolean", from: "group.disabled" },
       },
-      selects: selects({ stop: ({ key }) => [key, null], elements: [] }),
+      selects: selects({ stop: ({ key }) => [key, null], elements: [], bound: [] }),
       state: (state, { props }) => ({ disabled: isDisabled(state, props), orientation: state.orientation }),
       attrs: (state, { key, props, api }) => {
         const item = itemAttrs(state, key, props, api)

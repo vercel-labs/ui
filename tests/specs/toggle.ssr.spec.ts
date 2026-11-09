@@ -26,22 +26,39 @@ test("the server renders one tab stop per group, on the pressed toggle", async (
   expect(await hydrationErrors(page)).toEqual([])
 })
 
-test("the server disables a button as a button and a link, and hydration keeps what fits", async ({
+// What the HTML the server sent shows for the button or link named `name`, before hydration.
+const serverAttrs = (page: import("@playwright/test").Page, name: string) =>
+  page.evaluate((name) => {
+    const template = document.createElement("template")
+    template.innerHTML = (window as unknown as { __serverHtml: string }).__serverHtml
+    const el = [...template.content.querySelectorAll("a, button")].find(
+      (el) => el.textContent?.trim() === name,
+    )
+    return { disabled: el?.hasAttribute("disabled"), ariaDisabled: el?.getAttribute("aria-disabled") }
+  }, name)
+
+test("the server disables a native button, and hydration leaves it natively disabled", async ({
   page,
   open,
 }) => {
   await open("toggle")
-  const server = await page.evaluate(() => {
-    const template = document.createElement("template")
-    template.innerHTML = (window as unknown as { __serverHtml: string }).__serverHtml
-    const button = [...template.content.querySelectorAll("button")].find(
-      (el) => el.textContent?.trim() === "Delete",
-    )
-    return [button?.hasAttribute("disabled"), button?.getAttribute("aria-disabled")]
-  })
-  expect(server).toEqual([true, "true"])
+  expect(await serverAttrs(page, "Delete")).toEqual({ disabled: true, ariaDisabled: "true" })
   await expect(buttonNamed(page, "Delete")).toBeDisabled()
   await expect(buttonNamed(page, "Delete")).not.toHaveAttribute("aria-disabled", /.*/)
+  expect(await hydrationErrors(page)).toEqual([])
+})
+
+test("the server disables a button rendered as a link, and hydration leaves it a disabled link", async ({
+  page,
+  open,
+}) => {
+  await open("toggle")
+  expect(await serverAttrs(page, "Changelog")).toMatchObject({ ariaDisabled: "true" })
+  const link = page.getByRole("link", { name: "Changelog" })
+  await expect(link).toHaveAttribute("aria-disabled", "true")
+  await expect(link).toHaveAttribute("tabindex", "-1")
+  await expect(link).not.toHaveAttribute("disabled", /.*/)
+  await expect(link).not.toHaveAttribute("type", /.*/)
   expect(await hydrationErrors(page)).toEqual([])
 })
 

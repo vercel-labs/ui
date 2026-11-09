@@ -126,6 +126,9 @@ function Fixture() {
       <Button className="button" render={<a href={toggleFixture.docs.href} />}>
         {toggleFixture.docs.label}
       </Button>
+      <Button className="button" disabled render={<a href={toggleFixture.changelog.href} />}>
+        {toggleFixture.changelog.label}
+      </Button>
       <Separator className="rule" />
       <Separator className="rule" decorative />
       <button>After</button>

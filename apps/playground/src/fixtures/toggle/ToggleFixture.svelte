@@ -111,6 +111,11 @@
       <a {...props}>{toggleFixture.docs.label}</a>
     {/snippet}
   </Button>
+  <Button class="button" href={toggleFixture.changelog.href} disabled>
+    {#snippet render({ props })}
+      <a {...props}>{toggleFixture.changelog.label}</a>
+    {/snippet}
+  </Button>
   <Separator class="rule" />
   <Separator class="rule" decorative />
   <button>After</button>
