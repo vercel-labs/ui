@@ -30,7 +30,13 @@ Object.defineProperty(HTMLElement.prototype, "inert", {
   },
 })
 
+// The popup a test leaves bound waits a frame to make the page inert, which
+// can land after the test file's DOM is gone.
+let unbindLast: (() => void) | undefined
+
 afterEach(() => {
+  unbindLast?.()
+  unbindLast = undefined
   document.body.replaceChildren()
   document.documentElement.removeAttribute("style")
 })
@@ -55,7 +61,8 @@ async function openPopup(preset: "dialog" | "popover", modal: Modal) {
     close: () => store.set({ open: false }),
     modal: () => modalTriple(modal),
   })
-  const bind = () => popup.bind(el, { initialFocus: () => field })
+  const bind = () =>
+    (unbindLast = popup.bind(el, { initialFocus: () => field }))
   const unbind = bind()
   popup.opening("keyboard")
   store.set({ open: true })
