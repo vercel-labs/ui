@@ -189,8 +189,8 @@ export default function HomePage() {
             Behaviors? What are those?
           </h2>
           <p className="max-w-[50rem] text-lg leading-[1.5] tracking-[-0.015em] text-pretty text-foreground/70 sm:text-xl lg:text-2xl lg:leading-[1.45]">
-            They are the pieces that make a component work: keyboard navigation, focus, selection, popups, drag
-            and drop, and screen reader support.
+            They are the pieces that make a component work: keyboard navigation, focus, selection, popups,
+            drag and drop, and screen reader support.
           </p>
         </div>
         <div className="mt-8 sm:mt-10">
@@ -203,8 +203,8 @@ export default function HomePage() {
             to build components?
           </h2>
           <p className="max-w-[50rem] text-lg leading-[1.5] tracking-[-0.015em] text-pretty text-foreground/70 sm:text-xl lg:text-2xl lg:leading-[1.45]">
-            You don’t. Ask your agent. We made them really good at it. The agent picks the behaviors it needs and
-            puts them together in your framework.
+            You don’t. Ask your agent. We made them really good at it. The agent picks the behaviors it needs
+            and puts them together in your framework.
           </p>
         </div>
         <div className="mt-8 sm:mt-10">

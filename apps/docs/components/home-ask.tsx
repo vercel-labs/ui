@@ -4,19 +4,13 @@ import { Tabs, TabsList, TabsPanel, TabsTab } from "@ui-sdk/react/tabs"
 import { cn } from "cn"
 import { CheckIcon, ChevronDownIcon } from "lucide-react"
 import * as React from "react"
-import {
-  UserPicker,
-  UserPickerContent,
-  UserPickerOption,
-  UserPickerTrigger,
-} from "./home-user-picker"
+import { UserPicker, UserPickerContent, UserPickerOption, UserPickerTrigger } from "./home-user-picker"
 import { Poster } from "./home-posters"
 
 const ink = "border border-foreground"
 const label = "font-mono text-[11px] tracking-[0.06em] uppercase"
 
-const prompt =
-  "Build me a picker for assigning a teammate to a task."
+const prompt = "Build me a picker for assigning a teammate to a task."
 
 const behaviors = [
   {
