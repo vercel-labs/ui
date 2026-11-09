@@ -22,6 +22,7 @@ import { separator } from "../src/components/separator/separator"
 import { slider } from "../src/components/slider/slider"
 import { tabs } from "../src/components/tabs/tabs"
 import { tree } from "../src/components/tree/tree"
+import { triggerMenu } from "../src/components/trigger-menu/trigger-menu"
 
 let cleanups: (() => void)[] = []
 afterEach(() => {
@@ -819,6 +820,25 @@ describe("agent", () => {
       { value: "src", label: "src" },
       { value: "src/index.ts", label: "index.ts" },
     ])
+  })
+
+  test("of two components on one field, the step goes to the one that takes its action", async () => {
+    const agent = createAgent()
+    const message = textarea({ id: "message" })
+    const mentions = triggerMenu({ id: "mentions", triggers: [{ char: "@", items: [] }] })
+    const field = document.body.appendChild(document.createElement("textarea"))
+    field.setAttribute("aria-label", "Message")
+    cleanups.push(
+      bind(message.part("root"), field),
+      bind(mentions.part("input"), field),
+      () => message.destroy(),
+      () => mentions.destroy(),
+    )
+    const named = agent.snapshot().filter((component) => component.label === "Message")
+    expect(named.map((component) => component.component).sort()).toEqual(["textarea", "trigger-menu"])
+    const outcome = await agent.act({ steps: [{ ref: "Message", action: "setValue", args: ["Hello"] }] })
+    expect(outcome.ok).toBe(true)
+    expect(message.get().value).toBe("Hello")
   })
 
   test("a press waits for the button's action, and a failed action fails the step", async () => {

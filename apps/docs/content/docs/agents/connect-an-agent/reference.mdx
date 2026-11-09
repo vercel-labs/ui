@@ -114,7 +114,7 @@ The bridge tries these in order and uses the first that fits:
 
 Names match regardless of case and accents, so `"Region"` finds "Région" and `"strasse"` finds "Straße".
 
-When a name fits more than one component, the step fails and lists each one's ref, label and row text, such as `"Jane Doe" names 2 components: c1 Admin (Jane Doe), c4 Jane Doe. Use a ref.` Retry the step with one of those refs. That holds even when one label matches exactly, since labels and rows are page text anyone can write, like a person's display name. If exactly one of them is an open popup, the step uses that one.
+When a name fits more than one component, the step fails and lists each one's ref, label and row text, such as `"Jane Doe" names 2 components: c1 Admin (Jane Doe), c4 Jane Doe. Use a ref.` Retry the step with one of those refs. That holds even when one label matches exactly, since labels and rows are page text anyone can write, like a person's display name. If exactly one of them takes the step's action, like a Textarea and the Trigger Menu on the same field for `setValue`, the step uses that one. Otherwise, if exactly one of them is an open popup, the step uses that one.
 
 A returning component can reuse a remembered ref when its kind, label, and row text match. The bridge remembers refs for the last 500 that left. Identical components receive remembered refs in the order they return. Read a fresh snapshot after reordering or renaming components instead of assuming each ref still names the same control.
 
