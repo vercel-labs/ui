@@ -236,8 +236,10 @@ function valueFor(entry: Entry, action: string, value: unknown) {
   return parsed == null || Number.isNaN(parsed) ? refuse() : parsed
 }
 
-// A button's text, else its accessible name, like "Close" for an icon-only ×.
-const textOrName = (el: Element) => textOf(el) || accessibleName(el)
+// A button's text, else its accessible name, like "Close" for an icon-only ×, but
+// not one read from inside `data-agent-hidden`, which never reaches the agent.
+const textOrName = (el: Element) =>
+  textOf(el) || (el.querySelector("[data-agent-hidden]") ? "" : accessibleName(el))
 
 // The items on the page, named by their trigger when they have one, like an
 // accordion's sections, else by their text.

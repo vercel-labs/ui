@@ -870,6 +870,21 @@ describe("agent", () => {
     expect(instance.get().open).toBe(false)
   })
 
+  test("a button with no text but what's off-limits isn't named by it", () => {
+    const agent = createAgent()
+    const instance = dialog({ id: "token", defaultOpen: true })
+    const popup = document.body.appendChild(
+      Object.assign(document.createElement("div"), { getAnimations: () => [] }),
+    )
+    popup.setAttribute("aria-label", "Token")
+    const copy = popup.appendChild(document.createElement("button"))
+    copy.innerHTML = `<span data-agent-hidden>sk-123</span>`
+    cleanups.push(bind(instance.part("content"), popup), bind(instance.part("close"), copy), () =>
+      instance.destroy(),
+    )
+    expect(agent.snapshot().find((component) => component.component === "dialog")?.buttons).toEqual([""])
+  })
+
   test("a press waits for the button's action, and a failed action fails the step", async () => {
     const agent = createAgent()
     let fail = false
