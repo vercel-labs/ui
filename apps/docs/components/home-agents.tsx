@@ -132,7 +132,8 @@ const crew = definePrimitive({
         style: "touch-action:none;user-select:none",
       }),
       on: {
-        keydown: (event, { el, api, key }) => api.transfer.keydown(event, key) || api.roving.keydown(event, el!),
+        keydown: (event, { el, api, key }) =>
+          api.transfer.keydown(event, key) || api.roving.keydown(event, el!),
         pointerdown: (event, { api, key }) => api.transfer.pointerdown(event, key),
       },
       bind: (el, part) => {
@@ -254,7 +255,8 @@ function AgentsTile({ className, fig }: { className?: string; fig?: string }) {
                       const done = lane === "done"
                       const active = !done && index === 0
                       const amount = progress[key] ?? 0
-                      const step = job.steps[Math.min(job.steps.length - 1, Math.floor(amount * job.steps.length))]
+                      const step =
+                        job.steps[Math.min(job.steps.length - 1, Math.floor(amount * job.steps.length))]
                       return (
                         <CrewCard
                           key={key}
@@ -434,7 +436,9 @@ const flow = definePrimitive({
           connect.start(`${key}:out`)
         } else if (event.key === "Backspace" || event.key === "Delete") {
           event.preventDefault()
-          const edges = store.get().edges.filter((edge) => nodeOf(edge.from) !== key && nodeOf(edge.to) !== key)
+          const edges = store
+            .get()
+            .edges.filter((edge) => nodeOf(edge.from) !== key && nodeOf(edge.to) !== key)
           change("edges", edges, { reason: "delete-key", event })
         } else roving.keydown(event, el)
       },
@@ -445,7 +449,9 @@ const flow = definePrimitive({
       state: (state) => ({ edges: state.edges }),
       attrs: (state) => {
         const { world } = layouts[state.layout]
-        return { style: css({ position: "relative", width: `${world.width}px`, height: `${world.height}px` }) }
+        return {
+          style: css({ position: "relative", width: `${world.width}px`, height: `${world.height}px` }),
+        }
       },
     }),
     node: slot<{ value: string }>({
@@ -492,13 +498,17 @@ const flow = definePrimitive({
     }),
     edge: slot<{ value: string; from: string; to: string }>({
       props: { value: "string", from: "string", to: "string" },
-      attrs: (state, { props }) => ({ d: curve(state, portPoint(state, props.from), portPoint(state, props.to)) }),
+      attrs: (state, { props }) => ({
+        d: curve(state, portPoint(state, props.from), portPoint(state, props.to)),
+      }),
     }),
     wire: slot({
       live: live<FlowState, any, {}>((state) => {
         const draft = state.connecting
         if (!draft) return { d: "" }
-        return { d: curve(state, portPoint(state, draft.from), draft.to ? portPoint(state, draft.to) : draft) }
+        return {
+          d: curve(state, portPoint(state, draft.from), draft.to ? portPoint(state, draft.to) : draft),
+        }
       }),
     }),
   }),
@@ -511,7 +521,13 @@ const FlowPort = flowParts.Port
 const FlowWire = flowParts.Wire
 
 function FlowEdge({ edge, ...props }: { edge: Wire } & PartProps<"path">) {
-  return usePart(flow, "edge", { value: `${edge.from}>${edge.to}`, from: edge.from, to: edge.to }, props, "path")
+  return usePart(
+    flow,
+    "edge",
+    { value: `${edge.from}>${edge.to}`, from: edge.from, to: edge.to },
+    props,
+    "path",
+  )
 }
 
 function order(edges: Wire[]) {
@@ -551,11 +567,16 @@ function FlowTile({ className, fig }: { className?: string; fig?: string }) {
     const keys = (at: number) => Object.keys(level).filter((key) => level[key] === at)
     timers.current = Array.from({ length: depth + 1 }, (_, at) => [
       window.setTimeout(
-        () => setRun((current) => ({ ...current, ...Object.fromEntries(keys(at).map((key) => [key, "running"])) })),
+        () =>
+          setRun((current) => ({
+            ...current,
+            ...Object.fromEntries(keys(at).map((key) => [key, "running"])),
+          })),
         at * 700 + 50,
       ),
       window.setTimeout(
-        () => setRun((current) => ({ ...current, ...Object.fromEntries(keys(at).map((key) => [key, "done"])) })),
+        () =>
+          setRun((current) => ({ ...current, ...Object.fromEntries(keys(at).map((key) => [key, "done"])) })),
         at * 700 + 650,
       ),
     ]).flat()
@@ -604,8 +625,18 @@ function FlowTile({ className, fig }: { className?: string; fig?: string }) {
         </div>
         <div ref={frame} className={cn("overflow-hidden bg-background", ink)}>
           <div className="mx-auto" style={{ height: world.height * scale, width: world.width * scale }}>
-            <div dir="ltr" style={{ width: world.width, transform: `scale(${scale})`, transformOrigin: "0 0" }}>
-              <Flow key={layout} layout={layout} edges={edges} onEdgesChange={onEdgesChange} scale={scale} aria-label="Workflow">
+            <div
+              dir="ltr"
+              style={{ width: world.width, transform: `scale(${scale})`, transformOrigin: "0 0" }}
+            >
+              <Flow
+                key={layout}
+                layout={layout}
+                edges={edges}
+                onEdgesChange={onEdgesChange}
+                scale={scale}
+                aria-label="Workflow"
+              >
                 {({ edges: shown }) => (
                   <>
                     <svg
@@ -620,7 +651,9 @@ function FlowTile({ className, fig }: { className?: string; fig?: string }) {
                           edge={edge}
                           className={cn(
                             "stroke-[1.5] transition-colors",
-                            run[nodeOf(edge.from)] === "done" ? "stroke-foreground [stroke-width:2.5]" : "stroke-foreground",
+                            run[nodeOf(edge.from)] === "done"
+                              ? "stroke-foreground [stroke-width:2.5]"
+                              : "stroke-foreground",
                           )}
                         />
                       ))}
@@ -654,13 +687,23 @@ function FlowTile({ className, fig }: { className?: string; fig?: string }) {
                           {step.input && (
                             <FlowPort
                               value={`${step.value}:in`}
-                              className={cn(port, vertical ? "-top-[5px] left-1/2 -translate-x-1/2" : "top-1/2 -left-[5px] -translate-y-1/2")}
+                              className={cn(
+                                port,
+                                vertical
+                                  ? "-top-[5px] left-1/2 -translate-x-1/2"
+                                  : "top-1/2 -left-[5px] -translate-y-1/2",
+                              )}
                             />
                           )}
                           {step.output && (
                             <FlowPort
                               value={`${step.value}:out`}
-                              className={cn(port, vertical ? "-bottom-[5px] left-1/2 -translate-x-1/2" : "top-1/2 -right-[5px] -translate-y-1/2")}
+                              className={cn(
+                                port,
+                                vertical
+                                  ? "-bottom-[5px] left-1/2 -translate-x-1/2"
+                                  : "top-1/2 -right-[5px] -translate-y-1/2",
+                              )}
                             />
                           )}
                         </FlowNode>

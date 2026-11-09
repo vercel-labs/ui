@@ -296,15 +296,25 @@ body {
 @layer components {
   @media (pointer: coarse) {
     main[data-width="wide"]
-      :is(button, a[href], [role="slider"], [role="switch"], [data-slot$="-thumb"], [data-slot$="-handle"]):not(
-        [data-slot="switch-thumb"]
-      ) {
+      :is(
+        button,
+        a[href],
+        [role="slider"],
+        [role="switch"],
+        [data-slot$="-thumb"],
+        [data-slot$="-handle"]
+      ):not([data-slot="switch-thumb"]) {
       position: relative;
     }
     main[data-width="wide"]
-      :is(button, a[href], [role="slider"], [role="switch"], [data-slot$="-thumb"], [data-slot$="-handle"]):not(
-        [data-slot="switch-thumb"]
-      )::after {
+      :is(
+        button,
+        a[href],
+        [role="slider"],
+        [role="switch"],
+        [data-slot$="-thumb"],
+        [data-slot$="-handle"]
+      ):not([data-slot="switch-thumb"])::after {
       content: "";
       position: absolute;
       inset: min(0px, calc((100% - 44px) / 2));

@@ -19,7 +19,9 @@ function DialogContent({
 }) {
   return (
     <>
-      <DialogBackdrop className={cn(instant ? "fixed inset-0 bg-black/20 dark:bg-black/50" : backdrop, backdropClassName)} />
+      <DialogBackdrop
+        className={cn(instant ? "fixed inset-0 bg-black/20 dark:bg-black/50" : backdrop, backdropClassName)}
+      />
       <DialogContentPrimitive
         className={cn(
           "fixed top-[12vh] left-1/2 flex max-h-[min(32rem,76vh)] w-[calc(100%-3rem)] max-w-xl sm:w-[calc(100%-4rem)] -translate-x-1/2 flex-col overflow-hidden rounded-3xl bg-popover text-sm text-popover-foreground shadow-2xl ring-1 ring-foreground outline-none",

@@ -68,7 +68,9 @@ function HeaderCopyPrompt() {
   React.useEffect(() => {
     if (!home) return
     const update = () => {
-      const rects = [...document.querySelectorAll("main [data-copy-prompt]")].map((target) => target.getBoundingClientRect())
+      const rects = [...document.querySelectorAll("main [data-copy-prompt]")].map((target) =>
+        target.getBoundingClientRect(),
+      )
       const visible = rects.some((rect) => rect.bottom > 86 && rect.top < window.innerHeight)
       setPast(rects.length > 0 && rects[0].bottom < 86 && !visible)
     }

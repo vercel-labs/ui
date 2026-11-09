@@ -47,7 +47,7 @@ function BehaviorDrawing() {
               y="-41"
               width="27"
               height="21"
-             
+
               stroke="var(--muted-foreground)"
               strokeOpacity="0.45"
               strokeWidth="0.7"
@@ -97,7 +97,7 @@ function BehaviorLayers() {
             <rect
               width="248"
               height="36"
-             
+
               fill={index === 2 ? "var(--muted)" : "none"}
               stroke={index === 2 ? "currentColor" : "var(--border)"}
               strokeWidth={index === 2 ? 1.7 : 0.7}
@@ -109,7 +109,7 @@ function BehaviorLayers() {
                 y="-3"
                 width="254"
                 height="42"
-               
+
                 stroke="currentColor"
                 strokeOpacity="0.3"
                 strokeWidth="0.6"
@@ -145,7 +145,7 @@ function BehaviorLayers() {
             <rect
               width="248"
               height="36"
-             
+
               fill={index === 1 ? "var(--muted)" : "var(--canvas)"}
               stroke="var(--border)"
               strokeWidth="0.8"
@@ -175,7 +175,7 @@ function BehaviorLayers() {
             y="-56"
             width="280"
             height="38"
-           
+
             fill="var(--muted)"
             stroke="var(--muted-foreground)"
             strokeWidth="0.7"
@@ -186,7 +186,7 @@ function BehaviorLayers() {
           y="-56"
           width="280"
           height="38"
-         
+
           fill="var(--canvas)"
           stroke="currentColor"
           strokeWidth="1.2"
@@ -209,7 +209,7 @@ function BehaviorLayers() {
           y="14"
           width="252"
           height="136"
-         
+
           stroke="var(--muted-foreground)"
           strokeOpacity="0.55"
           strokeWidth="0.7"
@@ -247,7 +247,7 @@ function LayerPlate({ strong = false }: { strong?: boolean }) {
         y="6"
         width="280"
         height="164"
-       
+
         fill="var(--muted)"
         stroke="var(--muted-foreground)"
         strokeOpacity="0.6"
@@ -262,7 +262,7 @@ function LayerPlate({ strong = false }: { strong?: boolean }) {
       <rect
         width="280"
         height="164"
-       
+
         fill="var(--canvas)"
         stroke="var(--muted-foreground)"
         strokeOpacity="0.75"

@@ -166,7 +166,10 @@ const sheet = definePrimitive({
       editorKeydown(event: KeyboardEvent) {
         const active = grid.active()
         if (!edit.inputKeydown(event) || !active || event.key !== "Enter") return
-        grid.focus({ row: Math.min(rows - 1, active.row + 1), col: active.col }, { reason: "list-navigation", event })
+        grid.focus(
+          { row: Math.min(rows - 1, active.row + 1), col: active.col },
+          { reason: "list-navigation", event },
+        )
         range.select(null, { reason: "list-navigation", event })
       },
     }
@@ -180,13 +183,18 @@ const sheet = definePrimitive({
         "aria-multiselectable": "true",
         style: css({
           display: "grid",
-          "grid-template-columns": "1.75rem minmax(4.5rem,0.7fr) minmax(0,2fr) minmax(5rem,0.8fr) minmax(0,1.4fr)",
+          "grid-template-columns":
+            "1.75rem minmax(4.5rem,0.7fr) minmax(0,2fr) minmax(5rem,0.8fr) minmax(0,1.4fr)",
         }),
       }),
     }),
     row: slot<{ value: string }>({
       props: { value: "string" },
-      attrs: (_state, { key }) => ({ role: "row", "aria-rowindex": String(Number(key) + 1), style: "display:contents" }),
+      attrs: (_state, { key }) => ({
+        role: "row",
+        "aria-rowindex": String(Number(key) + 1),
+        style: "display:contents",
+      }),
     }),
     header: slot<{ value: string }, { selected: boolean }>({
       props: { value: "string" },
@@ -306,7 +314,7 @@ function SheetTile({ className, fig }: { className?: string; fig?: string }) {
           setPending((current) => current.filter((item) => item !== name))
           if (index < targets.length - 1) return
           history.current.record(next)
-                setNote(`Filled ${targets.length} ${targets.length === 1 ? "cell" : "cells"}. Press ⌘Z to undo`)
+          setNote(`Filled ${targets.length} ${targets.length === 1 ? "cell" : "cells"}. Press ⌘Z to undo`)
         },
         300 + index * 180,
       ),
@@ -334,14 +342,21 @@ function SheetTile({ className, fig }: { className?: string; fig?: string }) {
           <span className={cn(label, "text-muted-foreground")}>cells filled</span>
         </div>
       </div>
-      <Sheet cells={cells} pending={pending} onCellsChange={commit} onRun={run} onUndo={() => step("undo")} onRedo={() => step("redo")}>
+      <Sheet
+        cells={cells}
+        pending={pending}
+        onCellsChange={commit}
+        onRun={run}
+        onUndo={() => step("undo")}
+        onRedo={() => step("redo")}
+      >
         <div className="flex flex-col gap-4">
           <div className={cn("flex items-center gap-2 bg-background p-1.5 ps-3", ink)}>
             <SparklesIcon aria-hidden="true" className="size-3.5 shrink-0" />
-            <span className="min-w-0 flex-1 truncate font-mono text-[12px]">Fill this in from the feedback</span>
-            <SheetRun className={press}>
-              Run
-            </SheetRun>
+            <span className="min-w-0 flex-1 truncate font-mono text-[12px]">
+              Fill this in from the feedback
+            </span>
+            <SheetRun className={press}>Run</SheetRun>
           </div>
           <div className="overflow-x-auto [scrollbar-width:none]">
             <SheetGrid
@@ -363,7 +378,8 @@ function SheetTile({ className, fig }: { className?: string; fig?: string }) {
                       col={col}
                       className={cn(
                         "relative flex h-11 min-w-0 cursor-cell items-center border-e border-b border-foreground/15 px-2 select-none last:border-e-0 data-selected:bg-foreground/[0.07] data-active:outline-2 data-active:-outline-offset-2 data-active:outline-foreground data-active:outline-solid",
-                        row === 0 && "font-mono text-[10px] tracking-[0.06em] text-muted-foreground uppercase",
+                        row === 0 &&
+                          "font-mono text-[10px] tracking-[0.06em] text-muted-foreground uppercase",
                       )}
                     >
                       {({ value, editing, pending: waiting }) =>

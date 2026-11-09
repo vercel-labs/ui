@@ -240,7 +240,14 @@ function WeekTile({ className, fig }: { className?: string; fig?: string }) {
                     }}
                   >
                     {Object.keys(start).map((id) => (
-                      <Event key={id} id={id} box={shown[id]} active={active === id} twelve={twelve} small={scale < 0.85} />
+                      <Event
+                        key={id}
+                        id={id}
+                        box={shown[id]}
+                        active={active === id}
+                        twelve={twelve}
+                        small={scale < 0.85}
+                      />
                     ))}
                   </div>
                 </div>
@@ -296,7 +303,10 @@ function WeekTile({ className, fig }: { className?: string; fig?: string }) {
             </SegmentedControlItem>
           ))}
         </SegmentedControl>
-        <div aria-hidden="true" className={cn(label, "flex flex-wrap items-center gap-x-4 gap-y-2 text-muted-foreground")}>
+        <div
+          aria-hidden="true"
+          className={cn(label, "flex flex-wrap items-center gap-x-4 gap-y-2 text-muted-foreground")}
+        >
           <span className="flex items-center gap-1.5">
             <span className={cn("size-3 bg-background", ink)} />
             Meeting

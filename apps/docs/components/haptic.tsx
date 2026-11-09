@@ -4,7 +4,10 @@
 // so a transparent label over the control passes the tap to a hidden switch.
 function Haptic() {
   return (
-    <label aria-hidden="true" className="absolute inset-0 touch-manipulation [-webkit-tap-highlight-color:transparent]">
+    <label
+      aria-hidden="true"
+      className="absolute inset-0 touch-manipulation [-webkit-tap-highlight-color:transparent]"
+    >
       <input
         type="checkbox"
         tabIndex={-1}

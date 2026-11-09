@@ -10,7 +10,8 @@ function PhoneMore({ label, children }: { label: string; children: React.ReactNo
 
   React.useEffect(() => {
     const reveal = () => {
-      const target = location.hash && ref.current?.querySelector(`[id="${CSS.escape(location.hash.slice(1))}"]`)
+      const target =
+        location.hash && ref.current?.querySelector(`[id="${CSS.escape(location.hash.slice(1))}"]`)
       if (!target || target.getClientRects().length) return
       setOpen(true)
       requestAnimationFrame(() => target.scrollIntoView())
@@ -38,7 +39,15 @@ function PhoneMore({ label, children }: { label: string; children: React.ReactNo
   )
 }
 
-function PhoneStrip({ names, className, children }: { names: string[]; className?: string; children: React.ReactNode }) {
+function PhoneStrip({
+  names,
+  className,
+  children,
+}: {
+  names: string[]
+  className?: string
+  children: React.ReactNode
+}) {
   const ref = React.useRef<HTMLDivElement>(null)
   const [index, setIndex] = React.useState(0)
   const [playing, setPlaying] = React.useState(false)
@@ -72,7 +81,10 @@ function PhoneStrip({ names, className, children }: { names: string[]; className
     const element = ref.current
     const card = element && ([...element.children] as HTMLElement[]).filter((card) => card.offsetParent)[next]
     if (!element || !card) return
-    element.scrollTo({ left: card.offsetLeft - (element.clientWidth - card.offsetWidth) / 2, behavior: "smooth" })
+    element.scrollTo({
+      left: card.offsetLeft - (element.clientWidth - card.offsetWidth) / 2,
+      behavior: "smooth",
+    })
   }
 
   const advance = () => {

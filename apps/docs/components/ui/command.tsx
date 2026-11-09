@@ -48,7 +48,10 @@ function CommandGroupLabel({
 }: Omit<ComponentProps<typeof CommandGroupLabelPrimitive>, "className"> & { className?: string }) {
   return (
     <CommandGroupLabelPrimitive
-      className={cn("px-2.5 pt-2 pb-1 font-mono text-[11px] tracking-[0.06em] text-muted-foreground uppercase", className)}
+      className={cn(
+        "px-2.5 pt-2 pb-1 font-mono text-[11px] tracking-[0.06em] text-muted-foreground uppercase",
+        className,
+      )}
       {...props}
     />
   )

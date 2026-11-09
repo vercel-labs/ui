@@ -104,7 +104,9 @@ function Field({
 
 function Settings({ changed, active }: { changed: string[]; active: string | null }) {
   return (
-    <div className={cn("flex w-full max-w-md flex-col gap-4 bg-background p-4 @[36rem]:gap-6 @[36rem]:p-8", ink)}>
+    <div
+      className={cn("flex w-full max-w-md flex-col gap-4 bg-background p-4 @[36rem]:gap-6 @[36rem]:p-8", ink)}
+    >
       <div className="flex items-baseline justify-between gap-4">
         <span className="text-lg font-medium tracking-[-0.02em]">Project settings</span>
         <span className={cn(label, "text-muted-foreground")}>acme/web</span>
@@ -113,7 +115,11 @@ function Settings({ changed, active }: { changed: string[]; active: string | nul
         <Select defaultValue="europe" items={regions}>
           <SelectLabel className={cn(label, "text-muted-foreground")}>Region</SelectLabel>
           <SelectTrigger
-            className={cn("flex h-11 w-full items-center justify-between gap-3 bg-background px-3 text-[15px]", ink, ring)}
+            className={cn(
+              "flex h-11 w-full items-center justify-between gap-3 bg-background px-3 text-[15px]",
+              ink,
+              ring,
+            )}
           >
             <SelectValue />
             <ChevronDownIcon aria-hidden="true" className="size-4" />
@@ -190,11 +196,17 @@ function Settings({ changed, active }: { changed: string[]; active: string | nul
           </NumberInputGroup>
         </NumberInput>
       </Field>
-      <Field name="Preview deployments" changed={changed.includes("Preview deployments")} active={active === "Preview deployments"}>
+      <Field
+        name="Preview deployments"
+        changed={changed.includes("Preview deployments")}
+        active={active === "Preview deployments"}
+      >
         <label className="flex items-center justify-between gap-4">
           <span className="flex flex-col gap-0.5">
             <span className="text-[15px]">Preview deployments</span>
-            <span className="hidden text-sm text-muted-foreground @[36rem]:inline">A link for every pull request.</span>
+            <span className="hidden text-sm text-muted-foreground @[36rem]:inline">
+              A link for every pull request.
+            </span>
           </span>
           <Switch
             aria-label="Preview deployments"
@@ -219,7 +231,10 @@ function Prompt({ active, changed }: { active: string | null; changed: string[] 
       className={cn(
         "box-decoration-clone transition-colors duration-300",
         part.ref && active === part.ref && "bg-[#006bff] text-white",
-        part.ref && changed.includes(part.ref) && active !== part.ref && "underline decoration-[#006bff] decoration-dashed underline-offset-4",
+        part.ref &&
+          changed.includes(part.ref) &&
+          active !== part.ref &&
+          "underline decoration-[#006bff] decoration-dashed underline-offset-4",
       )}
     >
       {part.text}
@@ -274,7 +289,12 @@ function OperatePoster({ fig }: { fig?: string }) {
       setActive(step.ref)
       setEntries((current) => [
         ...current,
-        { type: "act", ref: step.ref, code: `act({ steps: [{ ref: "${step.ref}", action: "${step.action}", args: ${JSON.stringify(step.args ?? [])} }] })`, lines: [] },
+        {
+          type: "act",
+          ref: step.ref,
+          code: `act({ steps: [{ ref: "${step.ref}", action: "${step.action}", args: ${JSON.stringify(step.args ?? [])} }] })`,
+          lines: [],
+        },
       ])
       await wait(650)
       const result = await agent.act({ steps: [step] })
@@ -291,7 +311,13 @@ function OperatePoster({ fig }: { fig?: string }) {
     }
     setActive(null)
     await wait(300)
-    setEntries((current) => [...current, { type: "note", text: "I moved the project to Asia Pacific, switched it to Pro, set it to 3 instances and turned on preview deployments." }])
+    setEntries((current) => [
+      ...current,
+      {
+        type: "note",
+        text: "I moved the project to Asia Pacific, switched it to Pro, set it to 3 instances and turned on preview deployments.",
+      },
+    ])
     setRunning(false)
   }
   const reset = () => {
@@ -318,7 +344,9 @@ function OperatePoster({ fig }: { fig?: string }) {
             <span className="size-2.5 border border-foreground" />
             <span className="size-2.5 border border-foreground" />
           </span>
-          <span className={cn(label, "flex-1 truncate text-center text-muted-foreground")}>acme/web · Settings</span>
+          <span className={cn(label, "flex-1 truncate text-center text-muted-foreground")}>
+            acme/web · Settings
+          </span>
           <span aria-hidden="true" className="w-[2.875rem]" />
         </div>
         <div className="grid gap-2 @[56rem]:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] @[56rem]:gap-0">
@@ -332,53 +360,62 @@ function OperatePoster({ fig }: { fig?: string }) {
               className="hidden min-h-0 flex-1 flex-col overflow-y-auto p-4 [scrollbar-width:thin] @[56rem]:flex"
             >
               <div className="mt-auto flex flex-col gap-3">
-              {!sent && (
-                <p className="text-sm text-pretty text-muted-foreground">
-                  Send the message below and watch the agent read the form and fill it in.
-                </p>
-              )}
-              {entries.map((entry, index) =>
-                entry.type === "user" ? (
-                  <p
-                    key={index}
-                    className="ms-6 bg-foreground px-3.5 py-2.5 text-[15px] leading-[1.45] text-pretty text-background"
-                  >
-                    <Prompt active={active} changed={changed} />
+                {!sent && (
+                  <p className="text-sm text-pretty text-muted-foreground">
+                    Send the message below and watch the agent read the form and fill it in.
                   </p>
-                ) : entry.type === "note" ? (
-                  <p key={index} className="text-[15px]">
-                    {entry.text}
-                  </p>
-                ) : (
-                  <div
-                    key={index}
-                    className={cn(
-                      "flex flex-col gap-1 border-s-2 ps-3 font-mono text-[11.5px] leading-[1.55] transition-colors duration-300",
-                      entry.type === "act" && active === entry.ref ? "border-[#006bff]" : "border-foreground/20",
-                    )}
-                  >
-                    <span
+                )}
+                {entries.map((entry, index) =>
+                  entry.type === "user" ? (
+                    <p
+                      key={index}
+                      className="ms-6 bg-foreground px-3.5 py-2.5 text-[15px] leading-[1.45] text-pretty text-background"
+                    >
+                      <Prompt active={active} changed={changed} />
+                    </p>
+                  ) : entry.type === "note" ? (
+                    <p key={index} className="text-[15px]">
+                      {entry.text}
+                    </p>
+                  ) : (
+                    <div
+                      key={index}
                       className={cn(
-                        "w-fit box-decoration-clone break-words transition-colors duration-300",
-                        entry.type === "act" && active === entry.ref && "bg-[#006bff] text-white",
+                        "flex flex-col gap-1 border-s-2 ps-3 font-mono text-[11.5px] leading-[1.55] transition-colors duration-300",
+                        entry.type === "act" && active === entry.ref
+                          ? "border-[#006bff]"
+                          : "border-foreground/20",
                       )}
                     >
-                      <span aria-hidden="true" className="opacity-50">
-                        →{" "}
+                      <span
+                        className={cn(
+                          "w-fit box-decoration-clone break-words transition-colors duration-300",
+                          entry.type === "act" && active === entry.ref && "bg-[#006bff] text-white",
+                        )}
+                      >
+                        <span aria-hidden="true" className="opacity-50">
+                          →{" "}
+                        </span>
+                        agent.{entry.code}
                       </span>
-                      agent.{entry.code}
-                    </span>
-                    {entry.lines.length > 0 && (
-                      <span className="whitespace-pre-wrap text-muted-foreground">{entry.lines.join("\n")}</span>
-                    )}
-                  </div>
-                ),
-              )}
+                      {entry.lines.length > 0 && (
+                        <span className="whitespace-pre-wrap text-muted-foreground">
+                          {entry.lines.join("\n")}
+                        </span>
+                      )}
+                    </div>
+                  ),
+                )}
               </div>
             </div>
             <div className="@[56rem]:p-3">
               <div className="flex flex-col border border-foreground bg-foreground text-background">
-                <p className={cn("min-h-[4.5rem] p-4 text-[15px] leading-[1.45] text-pretty", sent && "@[56rem]:text-background/40")}>
+                <p
+                  className={cn(
+                    "min-h-[4.5rem] p-4 text-[15px] leading-[1.45] text-pretty",
+                    sent && "@[56rem]:text-background/40",
+                  )}
+                >
                   {sent ? (
                     <>
                       <span className="hidden @[56rem]:inline">Ask the agent to change something</span>

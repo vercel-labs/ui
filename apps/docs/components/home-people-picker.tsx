@@ -83,7 +83,11 @@ const peoplePicker = definePrimitive({
         if (roving.keydown(event, el) || !isTypeaheadKey(event)) return
         const items = roving.items()
         const labels = items.map((item) => labelOf(item.el))
-        const index = typeahead(event.key, labels, items.findIndex((item) => item.el === el))
+        const index = typeahead(
+          event.key,
+          labels,
+          items.findIndex((item) => item.el === el),
+        )
         if (index !== -1) roving.focus(items[index].key)
       },
     }

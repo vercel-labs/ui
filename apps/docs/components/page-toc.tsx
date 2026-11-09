@@ -15,7 +15,9 @@ function PageToc({ toc, url }: { toc: TableOfContents; url: string }) {
     >
       {items.length > 1 && (
         <AnchorProvider toc={items} single>
-          <div className="mb-2.5 font-mono text-[11px] tracking-[0.06em] text-muted-foreground uppercase">On this page</div>
+          <div className="mb-2.5 font-mono text-[11px] tracking-[0.06em] text-muted-foreground uppercase">
+            On this page
+          </div>
           <Items items={items} />
           <div className="my-4 h-px bg-foreground/10" />
         </AnchorProvider>

@@ -1549,4 +1549,15 @@ function EditorTile({ className, fig }: { className?: string; fig?: string }) {
   )
 }
 
-export { Board, BoardBox, BoardHandle, CanvasTile, EditorTile, MixerTile, PlanTile, SequencerTile, TimelineTile, useFit }
+export {
+  Board,
+  BoardBox,
+  BoardHandle,
+  CanvasTile,
+  EditorTile,
+  MixerTile,
+  PlanTile,
+  SequencerTile,
+  TimelineTile,
+  useFit,
+}

@@ -58,7 +58,11 @@ function subscribeSearch(listener: () => void) {
 }
 
 function useSearchOpen() {
-  return React.useSyncExternalStore(subscribeSearch, () => searchOpen, () => false)
+  return React.useSyncExternalStore(
+    subscribeSearch,
+    () => searchOpen,
+    () => false,
+  )
 }
 
 const indexes = new Map<Framework, Promise<ReturnType<typeof createSearchIndex>>>()
@@ -174,7 +178,11 @@ function Search({ section, pages }: { section?: Section; pages: { name: string; 
           }}
           className="flex min-h-0 flex-1 flex-col max-lg:px-3"
         >
-          <CommandInput aria-label="Search the docs" placeholder="Search the docs" className="max-lg:text-xl!" />
+          <CommandInput
+            aria-label="Search the docs"
+            placeholder="Search the docs"
+            className="max-lg:text-xl!"
+          />
           <CommandEmpty>
             {searching
               ? "Searching…"

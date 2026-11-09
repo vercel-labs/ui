@@ -19,8 +19,14 @@ const prompt =
   "Build me a picker for assigning a teammate. I want to jump to someone by typing their name, use the arrow keys, and have it close when I click away."
 
 const behaviors = [
-  { name: "createPopup", body: "Opens next to the button, stays on screen, closes on Escape or a click outside." },
-  { name: "createRovingFocus", body: "Moves between people with the arrow keys, with one Tab stop for the list." },
+  {
+    name: "createPopup",
+    body: "Opens next to the button, stays on screen, closes on Escape or a click outside.",
+  },
+  {
+    name: "createRovingFocus",
+    body: "Moves between people with the arrow keys, with one Tab stop for the list.",
+  },
   { name: "createTypeahead", body: "Jumps to the person whose name you start typing." },
   { name: "createSelection", body: "Remembers who you picked and marks them as selected." },
 ]
@@ -31,7 +37,10 @@ const excerpt: { text: string; behavior?: string }[] = [
   { text: "  api: (context) => {" },
   { text: "    const change = createChange(context)" },
   { text: "    const popup = createPopup(context, { preset: popoverPreset })", behavior: "createPopup" },
-  { text: '    const roving = createRovingFocus(context, { slot: "option", key: "stop" })', behavior: "createRovingFocus" },
+  {
+    text: '    const roving = createRovingFocus(context, { slot: "option", key: "stop" })',
+    behavior: "createRovingFocus",
+  },
   { text: "    const typeahead = createTypeahead()", behavior: "createTypeahead" },
   { text: "    const selection = createSelection(context, {", behavior: "createSelection" },
   { text: '      key: "value",', behavior: "createSelection" },
@@ -42,15 +51,22 @@ const excerpt: { text: string; behavior?: string }[] = [
   { text: "  slots: (slot) => ({" },
   { text: "    trigger: popupTrigger(slot),", behavior: "createPopup" },
   { text: "    content: popupContent(slot),", behavior: "createPopup" },
-  { text: "    option: slot({ bind: (el, part) => part.api.roving.bind(el, part) }),", behavior: "createRovingFocus" },
-  { text: "  }),", },
+  {
+    text: "    option: slot({ bind: (el, part) => part.api.roving.bind(el, part) }),",
+    behavior: "createRovingFocus",
+  },
+  { text: "  })," },
   { text: "})" },
 ]
 
 function Glyph({ name }: { name: string }) {
   const stroke = "stroke-foreground fill-none"
   return (
-    <svg aria-hidden="true" viewBox="0 0 96 56" className="hidden h-12 w-20 shrink-0 overflow-visible @[30rem]:block @[64rem]:h-16 @[64rem]:w-28">
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 96 56"
+      className="hidden h-12 w-20 shrink-0 overflow-visible @[30rem]:block @[64rem]:h-16 @[64rem]:w-28"
+    >
       {name === "createPopup" && (
         <>
           <rect x={8} y={4} width={80} height={14} className={cn(stroke, "fill-background")} />
@@ -62,8 +78,19 @@ function Glyph({ name }: { name: string }) {
       {name === "createTypeahead" &&
         ["G", "R", "A"].map((key, index) => (
           <g key={key}>
-            <rect x={14 + index * 24} y={14} width={20} height={20} className={cn(stroke, "fill-background")} />
-            <text x={24 + index * 24} y={28} textAnchor="middle" className="fill-foreground font-mono text-[10px]">
+            <rect
+              x={14 + index * 24}
+              y={14}
+              width={20}
+              height={20}
+              className={cn(stroke, "fill-background")}
+            />
+            <text
+              x={24 + index * 24}
+              y={28}
+              textAnchor="middle"
+              className="fill-foreground font-mono text-[10px]"
+            >
               {key}
             </text>
           </g>
@@ -71,8 +98,19 @@ function Glyph({ name }: { name: string }) {
       {name === "createRovingFocus" &&
         ["↑", "↓"].map((key, index) => (
           <g key={key}>
-            <rect x={24 + index * 26} y={16} width={22} height={22} className={cn(stroke, "fill-background")} />
-            <text x={35 + index * 26} y={31} textAnchor="middle" className="fill-foreground font-mono text-[11px]">
+            <rect
+              x={24 + index * 26}
+              y={16}
+              width={22}
+              height={22}
+              className={cn(stroke, "fill-background")}
+            />
+            <text
+              x={35 + index * 26}
+              y={31}
+              textAnchor="middle"
+              className="fill-foreground font-mono text-[11px]"
+            >
               {key}
             </text>
           </g>
@@ -80,7 +118,10 @@ function Glyph({ name }: { name: string }) {
       {name === "createSelection" &&
         [0, 1, 2].map((row) => (
           <g key={row}>
-            <path d={`M8,${10 + row * 18} H64`} className={cn(stroke, row === 1 ? "" : "stroke-foreground/30")} />
+            <path
+              d={`M8,${10 + row * 18} H64`}
+              className={cn(stroke, row === 1 ? "" : "stroke-foreground/30")}
+            />
             {row === 1 && <path d="M74,28 l4,4 l8,-9" className={cn(stroke, "[stroke-width:1.5]")} />}
           </g>
         ))}
@@ -88,68 +129,67 @@ function Glyph({ name }: { name: string }) {
   )
 }
 
-
 const code = [
   {
-    "value": "react",
-    "label": "React",
-    "parts": {
-      "name": "people-picker.ts",
-      "code": "import { createParts } from \"@ui-sdk/react/primitive\"\n\nconst {\n  Root: PeoplePicker,\n  Trigger: PeoplePickerTrigger,\n  Content: PeoplePickerContent,\n  Option: PeoplePickerOption,\n} = createParts(peoplePicker, {\n  trigger: \"button\",\n  content: \"div\",\n  option: \"div\",\n})"
+    value: "react",
+    label: "React",
+    parts: {
+      name: "people-picker.ts",
+      code: 'import { createParts } from "@ui-sdk/react/primitive"\n\nconst {\n  Root: PeoplePicker,\n  Trigger: PeoplePickerTrigger,\n  Content: PeoplePickerContent,\n  Option: PeoplePickerOption,\n} = createParts(peoplePicker, {\n  trigger: "button",\n  content: "div",\n  option: "div",\n})',
     },
-    "usage": {
-      "name": "assign-task.tsx",
-      "code": "<PeoplePicker>\n  <PeoplePickerTrigger>Assign to</PeoplePickerTrigger>\n  <PeoplePickerContent>\n    {people.map((person) => (\n      <PeoplePickerOption key={person.value} value={person.value}>\n        {person.label}\n      </PeoplePickerOption>\n    ))}\n  </PeoplePickerContent>\n</PeoplePicker>"
-    }
+    usage: {
+      name: "assign-task.tsx",
+      code: "<PeoplePicker>\n  <PeoplePickerTrigger>Assign to</PeoplePickerTrigger>\n  <PeoplePickerContent>\n    {people.map((person) => (\n      <PeoplePickerOption key={person.value} value={person.value}>\n        {person.label}\n      </PeoplePickerOption>\n    ))}\n  </PeoplePickerContent>\n</PeoplePicker>",
+    },
   },
   {
-    "value": "vue",
-    "label": "Vue",
-    "parts": {
-      "name": "people-picker.ts",
-      "code": "import { createParts } from \"@ui-sdk/vue/primitive\"\n\nconst {\n  Root: PeoplePicker,\n  Trigger: PeoplePickerTrigger,\n  Content: PeoplePickerContent,\n  Option: PeoplePickerOption,\n} = createParts(peoplePicker, {\n  trigger: \"button\",\n  content: \"div\",\n  option: \"div\",\n})"
+    value: "vue",
+    label: "Vue",
+    parts: {
+      name: "people-picker.ts",
+      code: 'import { createParts } from "@ui-sdk/vue/primitive"\n\nconst {\n  Root: PeoplePicker,\n  Trigger: PeoplePickerTrigger,\n  Content: PeoplePickerContent,\n  Option: PeoplePickerOption,\n} = createParts(peoplePicker, {\n  trigger: "button",\n  content: "div",\n  option: "div",\n})',
     },
-    "usage": {
-      "name": "AssignTask.vue",
-      "code": "<PeoplePicker>\n  <PeoplePickerTrigger>Assign to</PeoplePickerTrigger>\n  <PeoplePickerContent>\n    <PeoplePickerOption v-for=\"person in people\" :key=\"person.value\" :value=\"person.value\">\n      {{ person.label }}\n    </PeoplePickerOption>\n  </PeoplePickerContent>\n</PeoplePicker>"
-    }
+    usage: {
+      name: "AssignTask.vue",
+      code: '<PeoplePicker>\n  <PeoplePickerTrigger>Assign to</PeoplePickerTrigger>\n  <PeoplePickerContent>\n    <PeoplePickerOption v-for="person in people" :key="person.value" :value="person.value">\n      {{ person.label }}\n    </PeoplePickerOption>\n  </PeoplePickerContent>\n</PeoplePicker>',
+    },
   },
   {
-    "value": "svelte",
-    "label": "Svelte",
-    "parts": {
-      "name": "people-picker.ts",
-      "code": "import { createParts } from \"@ui-sdk/svelte/primitive\"\n\nconst {\n  Root: PeoplePicker,\n  Trigger: PeoplePickerTrigger,\n  Content: PeoplePickerContent,\n  Option: PeoplePickerOption,\n} = createParts(peoplePicker, {\n  trigger: \"button\",\n  content: \"div\",\n  option: \"div\",\n})"
+    value: "svelte",
+    label: "Svelte",
+    parts: {
+      name: "people-picker.ts",
+      code: 'import { createParts } from "@ui-sdk/svelte/primitive"\n\nconst {\n  Root: PeoplePicker,\n  Trigger: PeoplePickerTrigger,\n  Content: PeoplePickerContent,\n  Option: PeoplePickerOption,\n} = createParts(peoplePicker, {\n  trigger: "button",\n  content: "div",\n  option: "div",\n})',
     },
-    "usage": {
-      "name": "AssignTask.svelte",
-      "code": "<PeoplePicker>\n  <PeoplePickerTrigger>Assign to</PeoplePickerTrigger>\n  <PeoplePickerContent>\n    {#each people as person (person.value)}\n      <PeoplePickerOption value={person.value}>{person.label}</PeoplePickerOption>\n    {/each}\n  </PeoplePickerContent>\n</PeoplePicker>"
-    }
+    usage: {
+      name: "AssignTask.svelte",
+      code: "<PeoplePicker>\n  <PeoplePickerTrigger>Assign to</PeoplePickerTrigger>\n  <PeoplePickerContent>\n    {#each people as person (person.value)}\n      <PeoplePickerOption value={person.value}>{person.label}</PeoplePickerOption>\n    {/each}\n  </PeoplePickerContent>\n</PeoplePicker>",
+    },
   },
   {
-    "value": "solid",
-    "label": "Solid",
-    "parts": {
-      "name": "people-picker.ts",
-      "code": "import { createParts } from \"@ui-sdk/solid/primitive\"\n\nconst {\n  Root: PeoplePicker,\n  Trigger: PeoplePickerTrigger,\n  Content: PeoplePickerContent,\n  Option: PeoplePickerOption,\n} = createParts(peoplePicker, {\n  trigger: \"button\",\n  content: \"div\",\n  option: \"div\",\n})"
+    value: "solid",
+    label: "Solid",
+    parts: {
+      name: "people-picker.ts",
+      code: 'import { createParts } from "@ui-sdk/solid/primitive"\n\nconst {\n  Root: PeoplePicker,\n  Trigger: PeoplePickerTrigger,\n  Content: PeoplePickerContent,\n  Option: PeoplePickerOption,\n} = createParts(peoplePicker, {\n  trigger: "button",\n  content: "div",\n  option: "div",\n})',
     },
-    "usage": {
-      "name": "assign-task.tsx",
-      "code": "<PeoplePicker>\n  <PeoplePickerTrigger>Assign to</PeoplePickerTrigger>\n  <PeoplePickerContent>\n    <For each={people}>\n      {(person) => <PeoplePickerOption value={person.value}>{person.label}</PeoplePickerOption>}\n    </For>\n  </PeoplePickerContent>\n</PeoplePicker>"
-    }
+    usage: {
+      name: "assign-task.tsx",
+      code: "<PeoplePicker>\n  <PeoplePickerTrigger>Assign to</PeoplePickerTrigger>\n  <PeoplePickerContent>\n    <For each={people}>\n      {(person) => <PeoplePickerOption value={person.value}>{person.label}</PeoplePickerOption>}\n    </For>\n  </PeoplePickerContent>\n</PeoplePicker>",
+    },
   },
   {
-    "value": "web",
-    "label": "Web Components",
-    "parts": {
-      "name": "people-picker.ts",
-      "code": "import { createParts, wrappedButton } from \"@ui-sdk/web\"\n\ncreateParts(peoplePicker, {\n  root: \"people-picker\",\n  trigger: { tag: \"people-picker-trigger\", target: wrappedButton },\n  content: \"people-picker-content\",\n  option: \"people-picker-option\",\n})"
+    value: "web",
+    label: "Web Components",
+    parts: {
+      name: "people-picker.ts",
+      code: 'import { createParts, wrappedButton } from "@ui-sdk/web"\n\ncreateParts(peoplePicker, {\n  root: "people-picker",\n  trigger: { tag: "people-picker-trigger", target: wrappedButton },\n  content: "people-picker-content",\n  option: "people-picker-option",\n})',
     },
-    "usage": {
-      "name": "index.html",
-      "code": "<people-picker>\n  <people-picker-trigger>\n    <button>Assign to</button>\n  </people-picker-trigger>\n  <people-picker-content>\n    <people-picker-option value=\"ada\">Ada Lovelace</people-picker-option>\n    <people-picker-option value=\"grace\">Grace Hopper</people-picker-option>\n  </people-picker-content>\n</people-picker>"
-    }
-  }
+    usage: {
+      name: "index.html",
+      code: '<people-picker>\n  <people-picker-trigger>\n    <button>Assign to</button>\n  </people-picker-trigger>\n  <people-picker-content>\n    <people-picker-option value="ada">Ada Lovelace</people-picker-option>\n    <people-picker-option value="grace">Grace Hopper</people-picker-option>\n  </people-picker-content>\n</people-picker>',
+    },
+  },
 ]
 
 const people = [
@@ -188,7 +228,10 @@ function Step({
         {!last && (
           <span
             aria-hidden="true"
-            className={cn("w-px flex-1 transition-colors duration-300", next ? "bg-foreground" : "bg-foreground/20")}
+            className={cn(
+              "w-px flex-1 transition-colors duration-300",
+              next ? "bg-foreground" : "bg-foreground/20",
+            )}
           />
         )}
       </div>
@@ -295,9 +338,22 @@ function Code({
   )
 }
 
-function PromptCard({ building, onSend, className }: { building: boolean; onSend: () => void; className?: string }) {
+function PromptCard({
+  building,
+  onSend,
+  className,
+}: {
+  building: boolean
+  onSend: () => void
+  className?: string
+}) {
   return (
-    <div className={cn("flex max-w-3xl flex-col border border-foreground bg-foreground text-background", className)}>
+    <div
+      className={cn(
+        "flex max-w-3xl flex-col border border-foreground bg-foreground text-background",
+        className,
+      )}
+    >
       <p className="flex-1 p-5 text-lg leading-[1.5] tracking-[-0.015em] text-pretty @[40rem]:p-7 @[40rem]:text-2xl @[40rem]:leading-[1.4]">
         {prompt}
         <span
@@ -384,7 +440,8 @@ function AskPoster({ fig }: { fig?: string }) {
   const timers = React.useRef<ReturnType<typeof setTimeout>[]>([])
   React.useEffect(() => () => timers.current.forEach(clearTimeout), [])
   const building = step < 4
-  const lit = hovered ?? (step >= 1 && step < 4 ? behaviors[Math.min(Math.floor(step * 1.5) - 1, 3)]?.name : null)
+  const lit =
+    hovered ?? (step >= 1 && step < 4 ? behaviors[Math.min(Math.floor(step * 1.5) - 1, 3)]?.name : null)
   const send = () => {
     timers.current.forEach(clearTimeout)
     setStep(0)
@@ -428,7 +485,10 @@ function AskPoster({ fig }: { fig?: string }) {
           ))}
         </div>
         <div className="flex min-h-[30rem] flex-col gap-5">
-          <h3 aria-live="polite" className="text-2xl leading-tight font-[450] tracking-[-0.035em] text-balance">
+          <h3
+            aria-live="polite"
+            className="text-2xl leading-tight font-[450] tracking-[-0.035em] text-balance"
+          >
             {current.title}
           </h3>
           {view === "ask" && <PromptCard building={building} onSend={sendOnPhone} className="flex-1" />}
@@ -445,7 +505,9 @@ function AskPoster({ fig }: { fig?: string }) {
             <Behaviors step={step} lit={lit} onHover={setHovered} />
             <div className={cn(ink, "flex min-w-0 flex-col border-t-0 bg-background @[64rem]:border-t")}>
               <div className="flex h-10 items-center justify-between gap-3 border-b border-foreground px-4">
-                <span className="font-mono text-[11px] whitespace-nowrap text-muted-foreground">people-picker.ts</span>
+                <span className="font-mono text-[11px] whitespace-nowrap text-muted-foreground">
+                  people-picker.ts
+                </span>
                 <span className={cn(label, "hidden whitespace-nowrap text-muted-foreground @[30rem]:inline")}>
                   The important part
                 </span>

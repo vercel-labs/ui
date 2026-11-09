@@ -934,7 +934,10 @@ function ColorTile({ className, fig }: { className?: string; fig?: string }) {
           value={value}
           onValueChange={setValue}
           format={format}
-          className={cn("flex w-64 max-w-full flex-col gap-3 bg-background p-3 @[20rem]:w-80 [&_[data-slot=color-picker-area-canvas]]:grayscale [&_[data-slot=color-picker-area-thumb]]:grayscale [&_[data-slot=color-picker-slider]]:grayscale [&_[data-slot=color-picker-swatch-item]]:grayscale [&_[data-slot=color-picker-swatch]]:grayscale", ink)}
+          className={cn(
+            "flex w-64 max-w-full flex-col gap-3 bg-background p-3 @[20rem]:w-80 [&_[data-slot=color-picker-area-canvas]]:grayscale [&_[data-slot=color-picker-area-thumb]]:grayscale [&_[data-slot=color-picker-slider]]:grayscale [&_[data-slot=color-picker-swatch-item]]:grayscale [&_[data-slot=color-picker-swatch]]:grayscale",
+            ink,
+          )}
         >
           <ColorPickerArea className="relative h-32 cursor-crosshair border border-foreground @[20rem]:h-44">
             <ColorPickerAreaCanvas className="absolute inset-0 size-full" />

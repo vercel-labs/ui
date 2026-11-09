@@ -186,9 +186,7 @@ export default function HomePage() {
               >
                 Read the Docs
               </Link>
-              <CopyPromptButton
-                className="flex h-16 items-center justify-between gap-4 bg-[#006bff] px-6 text-start text-xl font-[450] tracking-[-0.03em] whitespace-nowrap text-white transition-colors outline-none hover:bg-[#0059d6] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[#006bff] sm:h-20 sm:px-8 sm:text-2xl"
-              >
+              <CopyPromptButton className="flex h-16 items-center justify-between gap-4 bg-[#006bff] px-6 text-start text-xl font-[450] tracking-[-0.03em] whitespace-nowrap text-white transition-colors outline-none hover:bg-[#0059d6] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[#006bff] sm:h-20 sm:px-8 sm:text-2xl">
                 Copy Prompt
               </CopyPromptButton>
             </div>
@@ -234,8 +232,8 @@ export default function HomePage() {
           <AskPoster fig={fig(4)} />
         </div>
         <Section title="Or start with one we’ve already built." items={components} start={5}>
-          Each one is made from the same behaviors. Pick one, style it your way, and use it in React, Vue, Svelte,
-          Solid or Web Components.
+          Each one is made from the same behaviors. Pick one, style it your way, and use it in React, Vue,
+          Svelte, Solid or Web Components.
         </Section>
         <PhoneStrip
           names={components.filter((item) => item.phone).map((item) => item.name)}

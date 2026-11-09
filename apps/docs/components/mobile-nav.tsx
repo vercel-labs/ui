@@ -106,10 +106,15 @@ function MobileNav({
           modal
         >
           {searching ? (
-            <button type="button" aria-label="Close search" onClick={() => {
+            <button
+              type="button"
+              aria-label="Close search"
+              onClick={() => {
                 vibrate()
                 setSearchOpen(false)
-              }} className={menuButton}>
+              }}
+              className={menuButton}
+            >
               <Haptic />
               <MenuIcon open />
             </button>
@@ -133,7 +138,9 @@ function MobileNav({
         </Popover>
       </div>
       <div aria-hidden="true" className="pointer-events-none absolute inset-x-6 -bottom-px h-px sm:inset-x-8">
-        <span className={cn("absolute inset-x-3.5 top-0 h-px", docs ? "bg-foreground/[0.06]" : "bg-foreground")} />
+        <span
+          className={cn("absolute inset-x-3.5 top-0 h-px", docs ? "bg-foreground/[0.06]" : "bg-foreground")}
+        />
         <span className="pointer-events-none absolute size-[11px] text-foreground group-data-docs/header:text-foreground/30 before:absolute before:inset-x-0 before:top-[5px] before:h-px before:bg-current/40 after:absolute after:inset-y-0 after:start-[5px] after:w-px after:bg-current/40 -start-[5px] -top-[5px] group-data-open/header:hidden" />
         <span className="pointer-events-none absolute size-[11px] text-foreground group-data-docs/header:text-foreground/30 before:absolute before:inset-x-0 before:top-[5px] before:h-px before:bg-current/40 after:absolute after:inset-y-0 after:start-[5px] after:w-px after:bg-current/40 -end-[5px] -top-[5px] group-data-open/header:hidden" />
       </div>
@@ -258,7 +265,9 @@ function MobileMenu({
 function MenuGroup({ label, children }: { label?: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-4">
-      {label && <div className="font-mono text-[11px] tracking-[0.06em] text-muted-foreground uppercase">{label}</div>}
+      {label && (
+        <div className="font-mono text-[11px] tracking-[0.06em] text-muted-foreground uppercase">{label}</div>
+      )}
       <ul className="flex flex-col gap-3">{children}</ul>
     </div>
   )

@@ -8,12 +8,7 @@ function ToggleGroup({
   className,
   ...props
 }: Omit<ComponentProps<typeof ToggleGroupPrimitive>, "className"> & { className?: string }) {
-  return (
-    <ToggleGroupPrimitive
-      className={cn("flex w-fit items-center gap-1", className)}
-      {...props}
-    />
-  )
+  return <ToggleGroupPrimitive className={cn("flex w-fit items-center gap-1", className)} {...props} />
 }
 
 function Toggle({

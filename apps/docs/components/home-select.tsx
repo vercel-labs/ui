@@ -35,13 +35,30 @@ function Tag({
       onPointerUp={(event) => event.pointerType !== "mouse" && onHover(lit ? null : index)}
       className="cursor-default"
     >
-      <rect x={from[0]} y={y - 12} width={140} height={Math.max(24, from[1] - y + 16)} className="fill-transparent" />
-      <circle cx={from[0]} cy={from[1]} r={2.5} className={cn(fade, lit ? "fill-[#006bff]" : "fill-foreground")} />
+      <rect
+        x={from[0]}
+        y={y - 12}
+        width={140}
+        height={Math.max(24, from[1] - y + 16)}
+        className="fill-transparent"
+      />
+      <circle
+        cx={from[0]}
+        cy={from[1]}
+        r={2.5}
+        className={cn(fade, lit ? "fill-[#006bff]" : "fill-foreground")}
+      />
       <path
         d={`M${from[0]},${from[1]} H${from[0] + 14} L398,${y}`}
         className={cn(fade, "fill-none", lit ? "stroke-[#006bff]" : "stroke-foreground")}
       />
-      <rect x={398} y={y - 9} width={18} height={18} className={cn(fade, lit ? "fill-[#006bff]" : "fill-foreground")} />
+      <rect
+        x={398}
+        y={y - 9}
+        width={18}
+        height={18}
+        className={cn(fade, lit ? "fill-[#006bff]" : "fill-foreground")}
+      />
       <text x={407} y={y + 3.5} textAnchor="middle" className={cn(mono, "fill-background")}>
         {index}
       </text>
@@ -54,7 +71,12 @@ function Tag({
 
 function Ticks({ x1, y1, x2, y2 }: { x1: number; y1: number; x2: number; y2: number }) {
   const tick = (x: number, y: number) => (x1 === x2 ? `M${x - 5},${y} H${x + 5}` : `M${x},${y - 5} V${y + 5}`)
-  return <path d={`M${x1},${y1} L${x2},${y2} ${tick(x1, y1)} ${tick(x2, y2)}`} className="fill-none stroke-foreground" />
+  return (
+    <path
+      d={`M${x1},${y1} L${x2},${y2} ${tick(x1, y1)} ${tick(x2, y2)}`}
+      className="fill-none stroke-foreground"
+    />
+  )
 }
 
 function Drawing({ active, onHover }: { active: number | null; onHover: (index: number | null) => void }) {
@@ -105,8 +127,17 @@ function Drawing({ active, onHover }: { active: number | null; onHover: (index: 
         <tspan className={cn(fade, active === 3 && "fill-[#006bff]")}>Pro</tspan>
         duction
       </text>
-      <path d="M76,236 h26" className={cn(fade, "fill-none", active === 3 ? "stroke-[#006bff]" : "stroke-transparent")} />
-      <rect x={64} y={112} width={292} height={140} className={cn(fade, "fill-none", active === 2 ? "stroke-[#006bff]" : "stroke-transparent")} />
+      <path
+        d="M76,236 h26"
+        className={cn(fade, "fill-none", active === 3 ? "stroke-[#006bff]" : "stroke-transparent")}
+      />
+      <rect
+        x={64}
+        y={112}
+        width={292}
+        height={140}
+        className={cn(fade, "fill-none", active === 2 ? "stroke-[#006bff]" : "stroke-transparent")}
+      />
 
       <Ticks x1={40} y1={204} x2={40} y2={248} />
       <text x={32} y={229} textAnchor="end" className={cn(mono, "fill-muted-foreground")}>
@@ -115,7 +146,13 @@ function Drawing({ active, onHover }: { active: number | null; onHover: (index: 
 
       {["P", "R", "O"].map((key, index) => (
         <g key={key}>
-          <rect x={272 + index * 28} y={276} width={22} height={22} className={cn(edge(3), "fill-background")} />
+          <rect
+            x={272 + index * 28}
+            y={276}
+            width={22}
+            height={22}
+            className={cn(edge(3), "fill-background")}
+          />
           <text
             x={283 + index * 28}
             y={290.5}
@@ -153,14 +190,28 @@ function Mark({
   onHover: (index: number | null) => void
 }) {
   return (
-    <g onPointerUp={(event) => event.pointerType !== "mouse" && onHover(lit ? null : index)} className="cursor-default">
+    <g
+      onPointerUp={(event) => event.pointerType !== "mouse" && onHover(lit ? null : index)}
+      className="cursor-default"
+    >
       <rect x={from[0]} y={y - 16} width={280 - from[0]} height={32} className="fill-transparent" />
-      <circle cx={from[0]} cy={from[1]} r={2.5} className={cn(fade, lit ? "fill-[#006bff]" : "fill-foreground")} />
+      <circle
+        cx={from[0]}
+        cy={from[1]}
+        r={2.5}
+        className={cn(fade, lit ? "fill-[#006bff]" : "fill-foreground")}
+      />
       <path
         d={`M${from[0]},${from[1]} L256,${y}`}
         className={cn(fade, "fill-none", lit ? "stroke-[#006bff]" : "stroke-foreground")}
       />
-      <rect x={256} y={y - 9} width={18} height={18} className={cn(fade, lit ? "fill-[#006bff]" : "fill-foreground")} />
+      <rect
+        x={256}
+        y={y - 9}
+        width={18}
+        height={18}
+        className={cn(fade, lit ? "fill-[#006bff]" : "fill-foreground")}
+      />
       <text x={265} y={y + 3.5} textAnchor="middle" className={cn(mono, "fill-background")}>
         {index}
       </text>
@@ -168,7 +219,13 @@ function Mark({
   )
 }
 
-function PhoneDrawing({ active, onHover }: { active: number | null; onHover: (index: number | null) => void }) {
+function PhoneDrawing({
+  active,
+  onHover,
+}: {
+  active: number | null
+  onHover: (index: number | null) => void
+}) {
   const edge = (index: number) => cn(fade, active === index ? "stroke-[#006bff]" : "stroke-foreground")
   return (
     <svg
@@ -196,14 +253,23 @@ function PhoneDrawing({ active, onHover }: { active: number | null; onHover: (in
       <text x={14} y={155} className="fill-foreground text-[14px]">
         Staging
       </text>
-      <rect x={4} y={84} width={232} height={132} className={cn(fade, active === 2 ? "fill-[#006bff]/10" : "fill-transparent")} />
+      <rect
+        x={4}
+        y={84}
+        width={232}
+        height={132}
+        className={cn(fade, active === 2 ? "fill-[#006bff]/10" : "fill-transparent")}
+      />
       <path d="M216,151 l4,4 l7,-8" className="fill-none stroke-foreground" />
       <rect x={4} y={172} width={232} height={44} className="fill-foreground" />
       <text x={14} y={199} className="fill-background text-[14px]">
         <tspan className={cn(fade, active === 3 && "fill-[#006bff]")}>Pro</tspan>
         duction
       </text>
-      <path d="M14,205 h26" className={cn(fade, "fill-none", active === 3 ? "stroke-[#006bff]" : "stroke-transparent")} />
+      <path
+        d="M14,205 h26"
+        className={cn(fade, "fill-none", active === 3 ? "stroke-[#006bff]" : "stroke-transparent")}
+      />
       <rect
         x={4}
         y={84}
@@ -214,7 +280,13 @@ function PhoneDrawing({ active, onHover }: { active: number | null; onHover: (in
 
       {["P", "R", "O"].map((key, index) => (
         <g key={key}>
-          <rect x={150 + index * 28} y={240} width={22} height={22} className={cn(edge(3), "fill-background")} />
+          <rect
+            x={150 + index * 28}
+            y={240}
+            width={22}
+            height={22}
+            className={cn(edge(3), "fill-background")}
+          />
           <text
             x={161 + index * 28}
             y={254.5}
@@ -250,7 +322,9 @@ function SelectBlueprint() {
             key={behavior.name}
             onPointerEnter={(event) => event.pointerType === "mouse" && setActive(index + 1)}
             onPointerLeave={(event) => event.pointerType === "mouse" && setActive(null)}
-            onPointerUp={(event) => event.pointerType !== "mouse" && setActive(active === index + 1 ? null : index + 1)}
+            onPointerUp={(event) =>
+              event.pointerType !== "mouse" && setActive(active === index + 1 ? null : index + 1)
+            }
             className="flex gap-3"
           >
             <span
