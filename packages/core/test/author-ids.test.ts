@@ -187,6 +187,33 @@ test("an id the server rendered stays until a microtask after the part binds", (
   expect(attrs(panel)["aria-labelledby"]).toBe("t-tab-a")
 })
 
+test("a part that points at no id reads no other part's id, so each cell of a grid renders alone", async () => {
+  const cellAttrs = vi.fn(
+    (state: { active: string }, { key }: { key: string }) => ({
+      role: "gridcell",
+      "data-active": state.active === key ? "" : undefined,
+    })
+  )
+  const grid = definePrimitive({
+    name: "grid",
+    state: () => ({ active: "0:0" }),
+    api: (context) => ({
+      move: (active: string) => context.store.set({ active }),
+    }),
+    slots: (slot) => ({ cell: slot({ attrs: cellAttrs }) }),
+  })
+  const instance = grid({ id: "g" })
+  const cells = Array.from({ length: 500 }, (_, index) =>
+    instance.part("cell", { id: `0:${index}` })
+  )
+  cells.forEach((cell) => bind(cell, element(cell.key)))
+  await settle()
+  instance.api.move("0:1")
+  cellAttrs.mockClear()
+  attrs(cells[1])
+  expect(cellAttrs).toHaveBeenCalledTimes(1)
+})
+
 test("an id on an element whose slot makes none tells no part", async () => {
   const instance = tabs({ id: "t" })
   let heard = 0

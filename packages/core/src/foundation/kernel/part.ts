@@ -569,7 +569,8 @@ const madeId = (part: Part) =>
 // name an author's id keep working, and the parts that point at it too.
 function aliased(part: PartRecord, attrs: Attrs) {
   const { owner } = part
-  if (!owner.named?.size) {
+  // Most parts point at nothing, like a grid's cells, which then never build the aliases.
+  if (!owner.named?.size || !references.some((name) => attrs[name])) {
     return attrs
   }
   const aliases = aliasesOf(owner, part.store)
