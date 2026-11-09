@@ -214,19 +214,24 @@ function fieldApi(context: PrimitiveContext<FieldOptions, FieldStore, string>) {
       announce(el: HTMLElement) {
         if (typeof MutationObserver === "undefined") return () => {}
         const textOf = () => el.textContent?.replace(/\s+/g, " ").trim() ?? ""
-        const silent = quiet
+        let silent = quiet
         let said = ""
         const say = () => {
           const text = textOf()
           if (!text || text === said) return
           said = text
+          if (silent) return
           import("../../foundation/platform/announce").then(
             ({ announce }) => el.isConnected && announce(text, { doc: el.ownerDocument }),
             () => {},
           )
         }
         // A framework may fill the text after the part binds.
-        const timer = setTimeout(() => (silent ? (said = textOf()) : say()))
+        const timer = setTimeout(() => {
+          if (silent) said = textOf()
+          silent = false
+          say()
+        })
         const observer = new MutationObserver(say)
         observer.observe(el, { childList: true, characterData: true, subtree: true })
         return () => {

@@ -2295,6 +2295,11 @@
       background: var(--color-slider-background), var(--ui-checker);
     }
 
+    &[data-orientation="vertical"] {
+      width: 0.75rem;
+      height: 10rem;
+    }
+
     &[data-disabled] {
       opacity: 0.5;
     }
@@ -2319,11 +2324,18 @@
   }
 
   [data-slot="color-picker-slider-thumb"] {
-    top: 50%;
-    translate: calc(var(--color-slider-thumb-position) * -1) -50%;
+    &[data-orientation="horizontal"] {
+      top: 50%;
+      translate: calc(var(--color-slider-thumb-position) * -1) -50%;
 
-    &:is([dir="rtl"] *) {
-      translate: var(--color-slider-thumb-position) -50%;
+      &:is([dir="rtl"] *) {
+        translate: var(--color-slider-thumb-position) -50%;
+      }
+    }
+
+    &[data-orientation="vertical"] {
+      left: 50%;
+      translate: -50% var(--color-slider-thumb-position);
     }
   }
 

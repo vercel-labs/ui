@@ -249,7 +249,10 @@ test("an error that appears or changes later is announced, one from the first re
   setAnnouncer((text) => heard.push(text))
   try {
     const { instance, control } = await bound()
-    const first = watchError(instance, "Enter your email.")
+    // A framework can fill the text a moment after the part binds.
+    const first = watchError(instance, "")
+    await Promise.resolve()
+    first.write("Enter your email.")
     await settle()
     expect(heard).toEqual([])
 
@@ -259,7 +262,8 @@ test("an error that appears or changes later is announced, one from the first re
     first.unwatch()
 
     submit(control)
-    const revealed = watchError(instance, "Fill out this field.")
+    const revealed = watchError(instance, "")
+    revealed.write("Fill out this field.")
     await settle()
     expect(heard).toEqual(["Enter a valid email."])
     revealed.unwatch()
