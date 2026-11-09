@@ -17,7 +17,7 @@ import {
 import { popoverPreset, type PopoverOpenChangeReason } from "@ui-sdk/core/popover"
 import { createParts } from "@ui-sdk/react/primitive"
 
-type PeoplePickerOptions = {
+type UserPickerOptions = {
   open?: boolean
   defaultOpen?: boolean
   onOpenChange?: (open: boolean, details: ChangeDetails<PopoverOpenChangeReason | "item-press">) => void
@@ -26,10 +26,10 @@ type PeoplePickerOptions = {
   onValueChange?: (value: string[], details: ChangeDetails<"item-press">) => void
 }
 
-type PeoplePickerState = ReturnType<typeof popupState> & { value: string[]; stop: string | null }
+type UserPickerState = ReturnType<typeof popupState> & { value: string[]; stop: string | null }
 
-const peoplePicker = definePrimitive({
-  name: "people-picker",
+const userPicker = definePrimitive({
+  name: "user-picker",
   options: {
     open: "boolean",
     defaultOpen: "boolean",
@@ -38,7 +38,7 @@ const peoplePicker = definePrimitive({
     defaultValue: "value",
     onValueChange: "callback",
   },
-  state: (options: PeoplePickerOptions): PeoplePickerState => ({
+  state: (options: UserPickerOptions): UserPickerState => ({
     ...popupState(options),
     value: options.value ?? options.defaultValue ?? [],
     stop: null,
@@ -50,7 +50,7 @@ const peoplePicker = definePrimitive({
   api: (context) => {
     const popup = createPopup(context, { preset: popoverPreset })
     const change = createChange(context)
-    const roving = createRovingFocus<PeoplePickerState, { value: string }>(context, {
+    const roving = createRovingFocus<UserPickerState, { value: string }>(context, {
       slot: "option",
       key: "stop",
     })
@@ -110,10 +110,10 @@ const peoplePicker = definePrimitive({
 })
 
 const {
-  Root: PeoplePicker,
-  Trigger: PeoplePickerTrigger,
-  Content: PeoplePickerContent,
-  Option: PeoplePickerOption,
-} = createParts(peoplePicker, { trigger: "button", content: "div", option: "div" })
+  Root: UserPicker,
+  Trigger: UserPickerTrigger,
+  Content: UserPickerContent,
+  Option: UserPickerOption,
+} = createParts(userPicker, { trigger: "button", content: "div", option: "div" })
 
-export { PeoplePicker, PeoplePickerContent, PeoplePickerOption, PeoplePickerTrigger }
+export { UserPicker, UserPickerContent, UserPickerOption, UserPickerTrigger }

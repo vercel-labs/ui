@@ -258,7 +258,7 @@ function Poster({
             head
           )}
         </div>
-        {fig && <div className="hidden shrink-0 text-muted-foreground @[26rem]:block">{fig}</div>}
+        {fig && <div className="hidden shrink-0 text-foreground/70 @[26rem]:block">{fig}</div>}
       </div>
       <div className={cn("relative flex min-w-0 flex-1 flex-col", body)}>{children}</div>
       {(title || meta) && (
@@ -531,7 +531,7 @@ function CalendarTile({ className, fig }: { className?: string; fig?: string }) 
                 <CalendarDay
                   value={cell.date}
                   className={cn(
-                    "size-9 text-center text-sm tabular-nums transition-colors @[22rem]:size-11 @[22rem]:text-base @[30rem]:size-13 @[30rem]:text-lg hover:bg-foreground/[0.06] data-outside:text-muted-foreground/50 data-today:underline data-today:underline-offset-4",
+                    "size-9 text-center text-sm tabular-nums transition-colors @[22rem]:size-11 @[22rem]:text-base @[30rem]:size-13 @[30rem]:text-lg hover:bg-foreground/[0.06] data-outside:text-muted-foreground data-today:underline data-today:underline-offset-4",
                     "data-range-middle:bg-foreground/[0.08]",
                     "[&[data-selected]:not([data-range-middle])]:bg-foreground [&[data-selected]:not([data-range-middle])]:text-background",
                     ring,
@@ -709,8 +709,8 @@ function NumberInputTile({ className, fig }: { className?: string; fig?: string 
   return (
     <ComponentPoster
       fig={fig}
-      head={"PICK A NUMBER\nTYPE IT, CLICK, OR USE\nTHE ARROWS"}
-      touch={"PICK A NUMBER\nTYPE IT, TAP, OR DRAG\nTHE RULER"}
+      head={"PICK A NUMBER\nTYPE IT, CLICK OR USE\nTHE ARROWS"}
+      touch={"PICK A NUMBER\nTYPE IT, TAP OR DRAG\nTHE RULER"}
       pattern="halftone"
       title="Number Input."
       id="number-input"
@@ -868,7 +868,7 @@ function SegmentedTile({ className, fig }: { className?: string; fig?: string })
   return (
     <ComponentPoster
       fig={fig}
-      head={"PICK ONE OPTION\nOR USE THE ARROWS"}
+      head={"PICK ONE OPTION\nCLICK OR USE THE ARROWS"}
       touch={"PICK ONE OPTION\nTAP TO SWITCH"}
       tone="white"
       pattern="rings"
@@ -921,7 +921,7 @@ function ColorTile({ className, fig }: { className?: string; fig?: string }) {
   return (
     <ComponentPoster
       fig={fig}
-      head={"PICK A COLOR\nDRAG, OR TYPE A VALUE"}
+      head={"PICK A COLOR\nDRAG OR TYPE A VALUE"}
       pattern="squares"
       title="Color Picker."
       id="color-picker"
@@ -1392,7 +1392,7 @@ function ToolbarTile({ className, fig }: { className?: string; fig?: string }) {
   return (
     <ComponentPoster
       fig={fig}
-      head={"TAB ONCE TO GET IN\nTHEN USE THE ARROWS"}
+      head={"FORMAT THE TEXT\nTAB ONCE, THEN USE THE ARROWS"}
       touch={"FORMAT THE TEXT\nTAP A BUTTON TO TURN IT ON"}
       tone="white"
       pattern="plus"
@@ -1451,7 +1451,7 @@ function StartPoster({ fig }: { fig?: string }) {
   return (
     <Poster
       fig={fig}
-      head={"TRY IT IN YOUR PROJECT\nSTART WITH THE DOCS"}
+      head={"THAT'S UI SDK\nNOW BUILD SOMETHING WITH IT"}
       pattern="hatch"
       body="justify-end"
       backdrop={

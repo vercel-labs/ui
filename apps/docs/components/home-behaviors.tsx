@@ -1,5 +1,5 @@
 import { cn } from "cn"
-import { Poster, Title } from "./home-posters"
+import { Poster } from "./home-posters"
 
 const behaviors = [
   { name: "createRovingFocus", group: "Focus", body: "Arrow keys move through a list, with one Tab stop." },
@@ -20,10 +20,11 @@ function BehaviorsPoster({ fig }: { fig?: string }) {
   return (
     <Poster
       fig={fig}
-      head={"A FEW OF THE BEHAVIORS\nTHE REST ARE IN THE DOCS"}
+      head={"HERE ARE SOME BEHAVIORS\nEACH ONE DOES ONE THING"}
       tone="white"
       pattern="none"
       body="gap-12"
+      className="lg:min-h-0!"
     >
       <ul className="grid border-t border-foreground @[40rem]:grid-cols-2 @[72rem]:grid-cols-4">
         {behaviors.map((behavior, index) => (
@@ -51,9 +52,12 @@ function BehaviorsPoster({ fig }: { fig?: string }) {
         ))}
       </ul>
       <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-6">
-        <Title id="behaviors" max={8} className="-ms-[0.05em]">
-          Behaviors.
-        </Title>
+        <h2
+          id="behaviors"
+          className="scroll-mt-24 text-lg leading-[1.5] font-medium tracking-[-0.015em] text-pretty text-foreground sm:text-xl lg:text-2xl lg:leading-[1.45]"
+        >
+          We built 50+ behaviors for your agents.
+        </h2>
       </div>
     </Poster>
   )
