@@ -11,6 +11,7 @@ import type { Layer } from "../platform/layers"
 import type { Popup } from "./popup"
 import type { SheetConfig } from "./presentation"
 import { attachSheet, parentSheet, sheetLayers, type Sheet } from "./sheet"
+import { prepareVariables } from "./sheet-effects"
 
 // The dim is the viewport's `::backdrop`: black at 0.2, like iOS, unless the
 // content sets `--sheet-backdrop`. It takes presses, so one on the dim is an
@@ -162,4 +163,4 @@ function showSheet(
   }
 }
 
-export { presentSheet }
+export { prepareVariables, presentSheet }

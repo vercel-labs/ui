@@ -180,4 +180,23 @@ function enforceHidden(doc: Document) {
   )
 }
 
-export { enforceHidden, registerUninherited, setStyle, writeStyle }
+/**
+ * Runs work that restyles the whole page, like writing a stylesheet or
+ * registering a property, ahead of the interaction that needs it. Done on
+ * open, it delays a popup's first frame on a large page. Before the first
+ * paint nothing is styled yet, so it runs at once: a page of 200 web
+ * component dialogs went idle only after a key press could come. After it,
+ * it runs once the page is idle.
+ */
+function ahead(work: () => void) {
+  if (typeof window === "undefined") {
+    return
+  }
+  if (!performance.getEntriesByType("paint").length) {
+    work()
+  } else {
+    ;(window.requestIdleCallback ?? setTimeout)(work)
+  }
+}
+
+export { ahead, enforceHidden, registerUninherited, setStyle, writeStyle }

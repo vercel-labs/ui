@@ -660,6 +660,31 @@ cd tests && PLAYGROUND_PORT=5310 ../scripts/test-slot.sh npx playwright test spe
 cd tests && PLAYGROUND_PORT=5310 ../scripts/test-slot.sh npx playwright test specs/combobox.counts --project react
 ```
 
+<a id="popup-open-modal"></a>
+
+### popup.open-modal
+
+**Measures:** Style recalculations that restyle the whole page while a modal popover or a dialog opens over a page of many buttons.
+
+**Why:** A modal open makes the page inert and locks its scroll, which restyles the page once. A layout read after those writes, or a CSS property registered on open, made the browser restyle it again in the same task, 3 to 4 times on a phone menu.
+
+**Budget:**
+
+- `pageRestyles`: 1.
+
+**Notes:** The one the inert page and the scroll lock need.
+
+**Tests:**
+
+- `popup-open.counts.spec.ts` › a modal popover restyles the page once as it opens
+- `popup-open.counts.spec.ts` › a dialog restyles the page once as it opens
+
+**Run:**
+
+```bash
+cd tests && PLAYGROUND_PORT=5310 ../scripts/test-slot.sh npx playwright test specs/popup-open.counts --project react
+```
+
 <a id="popup-reopen"></a>
 
 ### popup.reopen

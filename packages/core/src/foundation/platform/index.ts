@@ -48,10 +48,12 @@ export {
   position,
   type PositionOptions,
   type PositionProps,
+  preparePosition,
 } from "./position"
 export { pressedScrollbar } from "./scrollbar"
 export { physicalSide, type PhysicalSide, type Side } from "./sides"
 export {
+  ahead,
   enforceHidden,
   registerUninherited,
   setStyle,

@@ -71,6 +71,7 @@ export {
   attachSheet,
   isDragSurface,
   parentSheet,
+  prepareSheet,
   type Sheet,
   type SheetDriverName,
   type SheetKeyframes,

@@ -253,6 +253,13 @@ const budgets = {
     // One render per hidden option until 2026-10-13.
     rendersPerChangedOption: 0,
   },
+  "popup.open-modal": {
+    measures:
+      "Style recalculations that restyle the whole page while a modal popover or a dialog opens over a page of many buttons.",
+    why: "A modal open makes the page inert and locks its scroll, which restyles the page once. A layout read after those writes, or a CSS property registered on open, made the browser restyle it again in the same task, 3 to 4 times on a phone menu.",
+    // The one the inert page and the scroll lock need.
+    pageRestyles: 1,
+  },
   "popup.reopen": {
     measures:
       "Frames from Enter on the trigger of a menu, select, popover or dialog that opened and closed before, until the popup settles.",
