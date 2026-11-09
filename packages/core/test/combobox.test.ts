@@ -144,3 +144,38 @@ describe("combobox headless", () => {
     expect(instance.api.getQuery()).toBe("astro")
   })
 })
+
+describe("a create option whose onCreate returns a Promise", () => {
+  const deferred = () => {
+    let resolve!: () => void
+    const promise = new Promise<void>((done) => (resolve = done))
+    return { promise, resolve }
+  }
+
+  test("resolving after the list closed and reopened leaves it open", async () => {
+    const save = deferred()
+    const instance = combobox({ id: "c", items: frameworks })
+    instance.part("create", { onCreate: () => save.promise })
+    instance.api.internal.typed("Kiwi")
+    instance.api.internal.create()
+    instance.api.close()
+    instance.api.open()
+    save.resolve()
+    await save.promise
+    await Promise.resolve()
+    expect(instance.get().open).toBe(true)
+  })
+
+  test("with multiple, text typed while it was pending stays", async () => {
+    const save = deferred()
+    const instance = combobox({ id: "c", items: frameworks, multiple: true })
+    instance.part("create", { onCreate: () => save.promise })
+    instance.api.internal.typed("Kiwi")
+    instance.api.internal.create()
+    instance.api.internal.typed("Ast")
+    save.resolve()
+    await save.promise
+    await Promise.resolve()
+    expect(instance.api.getQuery()).toBe("Ast")
+  })
+})

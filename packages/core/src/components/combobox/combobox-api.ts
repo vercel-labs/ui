@@ -276,6 +276,9 @@ function comboboxApi(
   let placed: string | null = null
   let settling = false
   let shownQuery: { from: string; to: string } | null = null
+  // Counts closes, so an onCreate Promise that settles after the list closed
+  // doesn't close it again once it's reopened.
+  let session = 0
   // The value deleting the text emptied while the list is open, which Escape brings back.
   let clearedValue: { value: unknown } | null = null
 
@@ -394,6 +397,7 @@ function comboboxApi(
         if (open) {
           return
         }
+        session++
         pendingHighlight = placed = null
         store.set({ highlighted: null, focusInList: false })
         if (closed) {
@@ -717,11 +721,14 @@ function comboboxApi(
     if (!createShown(state, props)) {
       return
     }
+    const started = session
     const result = props.onCreate?.(state.query.trim())
     const done = () => {
       if (!store.get().multiple) {
-        hide({ reason: "item-press", event })
-      } else if (!options().keepQuery) {
+        if (started === session) {
+          hide({ reason: "item-press", event })
+        }
+      } else if (!options().keepQuery && store.get().query === state.query) {
         setQuery("", { reason: "item-press", event })
       }
     }
