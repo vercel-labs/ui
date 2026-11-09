@@ -824,7 +824,7 @@ describe("agent", () => {
 
   test("an item's label leaves out text a screen reader skips, like its check mark", async () => {
     const agent = createAgent()
-    const people = listbox({ id: "people", selectionMode: "multiple" })
+    const people = listbox({ id: "people", multiple: true })
     const list = document.body.appendChild(document.createElement("div"))
     list.setAttribute("aria-label", "People")
     cleanups.push(bind(people.part("root"), list), () => people.destroy())
