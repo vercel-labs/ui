@@ -79,10 +79,12 @@ function useSearchIndex(framework: Framework, enabled: boolean) {
 function SearchTrigger({
   label = "Search",
   shortcut,
+  icon = true,
   className,
 }: {
   label?: string
   shortcut?: boolean
+  icon?: boolean
   className?: string
 }) {
   return (
@@ -94,7 +96,7 @@ function SearchTrigger({
         "flex h-8 w-full items-center gap-2 rounded-2xl px-3 text-sm text-subtle outline-none transition-colors hover:bg-foreground/5 hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/30"
       }
     >
-      <SearchIcon className="size-4 shrink-0" />
+      {icon && <SearchIcon className="size-4 shrink-0" />}
       <span>{label}</span>
     </DialogTrigger>
   )
@@ -123,7 +125,7 @@ function Search({ section, pages }: { section?: Section; pages: { name: string; 
         if (!next) setSearch("")
       }}
     >
-      <DialogContent instant className="max-w-[37rem]">
+      <DialogContent instant initialFocus="input" className="max-w-[37rem]">
         <DialogTitle className="sr-only">Search the docs</DialogTitle>
         <Command
           filter={false}

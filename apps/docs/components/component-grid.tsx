@@ -9,7 +9,7 @@ function Card({ title, description, href }: { title: string; description?: strin
       className="flex flex-col gap-1 rounded-2xl bg-background p-4 text-[15px] sm:text-sm ring-1 ring-foreground/15 outline-none transition-shadow hover:ring-foreground/15 focus-visible:ring-3 focus-visible:ring-ring/30 dark:bg-foreground/[0.03] dark:ring-foreground/10 dark:hover:ring-foreground/20"
     >
       <span className="font-medium text-foreground">{title}</span>
-      {description && <span className="line-clamp-2 leading-relaxed text-subtle">{description}</span>}
+      {description && <span className="leading-relaxed text-subtle sm:line-clamp-2">{description}</span>}
     </Link>
   )
 }

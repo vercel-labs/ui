@@ -174,7 +174,7 @@ function FrameworkTabs({
               ))}
             </SelectContent>
           </Select>
-          <CopyButton label={copyLabel} className="ms-auto max-sm:[&>span]:sr-only" />
+          <CopyButton label={copyLabel} className="ms-auto" />
         </TabBar>
         {children}
       </Tabs>

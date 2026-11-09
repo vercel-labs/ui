@@ -24,7 +24,7 @@ import {
 } from "@ui-sdk/react/select"
 import { Switch, SwitchThumb } from "@ui-sdk/react/switch"
 import { cn } from "cn"
-import { ArrowUpIcon, CheckIcon, ChevronDownIcon, MinusIcon, PlusIcon, RotateCcwIcon } from "lucide-react"
+import { CheckIcon, ChevronDownIcon, MinusIcon, PlusIcon } from "lucide-react"
 import * as React from "react"
 import { Poster } from "./home-posters"
 
@@ -91,9 +91,9 @@ function Field({
       className={cn(
         "flex flex-col gap-2 outline-offset-[6px] transition-[outline-color,outline-width] duration-300",
         active
-          ? "outline-2 outline-solid outline-foreground"
+          ? "outline-2 outline-solid outline-[#006bff]"
           : changed
-            ? "outline-1 outline-dashed outline-foreground"
+            ? "outline-1 outline-dashed outline-[#006bff]"
             : "outline-1 outline-dashed outline-transparent",
       )}
     >
@@ -104,7 +104,7 @@ function Field({
 
 function Settings({ changed, active }: { changed: string[]; active: string | null }) {
   return (
-    <div className={cn("flex w-full max-w-md flex-col gap-6 bg-background p-5 @[36rem]:p-8", ink)}>
+    <div className={cn("flex w-full max-w-md flex-col gap-4 bg-background p-4 @[36rem]:gap-6 @[36rem]:p-8", ink)}>
       <div className="flex items-baseline justify-between gap-4">
         <span className="text-lg font-medium tracking-[-0.02em]">Project settings</span>
         <span className={cn(label, "text-muted-foreground")}>acme/web</span>
@@ -179,7 +179,7 @@ function Settings({ changed, active }: { changed: string[]; active: string | nul
             </NumberInputDecrement>
             <NumberInputControl
               aria-label="Instances"
-              className="w-full min-w-0 flex-1 bg-transparent text-center text-[15px] tabular-nums outline-none"
+              className="w-full min-w-0 flex-1 bg-transparent text-center text-[15px] tabular-nums outline-none pointer-coarse:text-base"
             />
             <NumberInputIncrement
               aria-label="More instances"
@@ -194,7 +194,7 @@ function Settings({ changed, active }: { changed: string[]; active: string | nul
         <label className="flex items-center justify-between gap-4">
           <span className="flex flex-col gap-0.5">
             <span className="text-[15px]">Preview deployments</span>
-            <span className="text-sm text-muted-foreground">A link for every pull request.</span>
+            <span className="hidden text-sm text-muted-foreground @[36rem]:inline">A link for every pull request.</span>
           </span>
           <Switch
             aria-label="Preview deployments"
@@ -218,8 +218,8 @@ function Prompt({ active, changed }: { active: string | null; changed: string[] 
       key={index}
       className={cn(
         "box-decoration-clone transition-colors duration-300",
-        part.ref && active === part.ref && "bg-background text-foreground",
-        part.ref && changed.includes(part.ref) && active !== part.ref && "underline decoration-dashed underline-offset-4",
+        part.ref && active === part.ref && "bg-[#006bff] text-white",
+        part.ref && changed.includes(part.ref) && active !== part.ref && "underline decoration-[#006bff] decoration-dashed underline-offset-4",
       )}
     >
       {part.text}
@@ -245,6 +245,16 @@ function OperatePoster({ fig }: { fig?: string }) {
       timers.current.push(window.setTimeout(resolve, ms))
     })
   const sent = entries.length > 0
+  const last = entries[entries.length - 1]
+  const status = !last
+    ? "Press Send and watch the form"
+    : last.type === "user"
+      ? "Reading the page"
+      : last.type === "call"
+        ? "agent.snapshot()"
+        : last.type === "act"
+          ? `agent.act(${last.ref})`
+          : "Done. Four settings changed"
   const send = async () => {
     if (!agent || running || sent) return
     setRunning(true)
@@ -299,10 +309,10 @@ function OperatePoster({ fig }: { fig?: string }) {
       tone="white"
       pattern="grid"
       body="gap-6"
-      className="lg:min-h-0"
+      className="max-sm:gap-6 lg:min-h-0"
     >
-      <div className={cn("flex min-w-0 flex-col bg-background", ink)}>
-        <div className="flex h-10 items-center gap-4 border-b border-foreground px-4">
+      <div className={cn("flex min-w-0 flex-col @max-[56rem]:border-0 @[56rem]:bg-background", ink)}>
+        <div className="hidden h-10 items-center gap-4 border-b border-foreground px-4 @[56rem]:flex">
           <span aria-hidden="true" className="flex gap-1.5">
             <span className="size-2.5 border border-foreground" />
             <span className="size-2.5 border border-foreground" />
@@ -311,28 +321,15 @@ function OperatePoster({ fig }: { fig?: string }) {
           <span className={cn(label, "flex-1 truncate text-center text-muted-foreground")}>acme/web · Settings</span>
           <span aria-hidden="true" className="w-[2.875rem]" />
         </div>
-        <div className="grid @[56rem]:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
-          <div className="order-2 flex h-[34rem] min-w-0 flex-col border-t border-foreground @[56rem]:order-1 @[56rem]:h-[40rem] @[56rem]:border-e @[56rem]:border-t-0">
-            <div className="flex items-center justify-between gap-3 border-b border-foreground/15 px-4 py-3">
+        <div className="grid gap-2 @[56rem]:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] @[56rem]:gap-0">
+          <div className="order-2 flex min-w-0 flex-col @[56rem]:order-1 @[56rem]:h-[48rem] @[56rem]:border-e @[56rem]:border-foreground">
+            <div className="hidden h-[3.25rem] items-center border-b border-foreground/15 px-4 @[56rem]:flex">
               <span className={cn(label, "text-muted-foreground")}>Agent</span>
-              <button
-                type="button"
-                onClick={reset}
-                disabled={!sent}
-                className={cn(
-                  label,
-                  "inline-flex h-7 items-center gap-1.5 px-2 text-muted-foreground hover:text-foreground disabled:opacity-0 [&_svg]:size-3.5",
-                  ring,
-                )}
-              >
-                <RotateCcwIcon aria-hidden="true" />
-                Reset
-              </button>
             </div>
             <div
               ref={log}
               aria-live="polite"
-              className="flex min-h-0 flex-1 flex-col overflow-y-auto p-4 [scrollbar-width:thin]"
+              className="hidden min-h-0 flex-1 flex-col overflow-y-auto p-4 [scrollbar-width:thin] @[56rem]:flex"
             >
               <div className="mt-auto flex flex-col gap-3">
               {!sent && (
@@ -357,13 +354,13 @@ function OperatePoster({ fig }: { fig?: string }) {
                     key={index}
                     className={cn(
                       "flex flex-col gap-1 border-s-2 ps-3 font-mono text-[11.5px] leading-[1.55] transition-colors duration-300",
-                      entry.type === "act" && active === entry.ref ? "border-foreground" : "border-foreground/20",
+                      entry.type === "act" && active === entry.ref ? "border-[#006bff]" : "border-foreground/20",
                     )}
                   >
                     <span
                       className={cn(
                         "w-fit box-decoration-clone break-words transition-colors duration-300",
-                        entry.type === "act" && active === entry.ref && "bg-foreground text-background",
+                        entry.type === "act" && active === entry.ref && "bg-[#006bff] text-white",
                       )}
                     >
                       <span aria-hidden="true" className="opacity-50">
@@ -379,26 +376,41 @@ function OperatePoster({ fig }: { fig?: string }) {
               )}
               </div>
             </div>
-            <div className="p-3">
+            <div className="@[56rem]:p-3">
               <div className="flex flex-col border border-foreground bg-foreground text-background">
-                <p className={cn("min-h-[4.5rem] p-4 text-[15px] leading-[1.45] text-pretty", sent && "text-background/40")}>
-                  {sent ? "Ask the agent to change something" : <Prompt active={null} changed={[]} />}
+                <p className={cn("min-h-[4.5rem] p-4 text-[15px] leading-[1.45] text-pretty", sent && "@[56rem]:text-background/40")}>
+                  {sent ? (
+                    <>
+                      <span className="hidden @[56rem]:inline">Ask the agent to change something</span>
+                      <span className="@[56rem]:hidden">
+                        <Prompt active={active} changed={changed} />
+                      </span>
+                    </>
+                  ) : (
+                    <Prompt active={null} changed={[]} />
+                  )}
                 </p>
                 <div className="flex items-center justify-end gap-3 border-t border-background/25 p-2">
                   <button
                     type="button"
-                    onClick={send}
-                    disabled={running || sent}
+                    onClick={sent && !running ? reset : send}
+                    disabled={running}
                     className="inline-flex h-9 items-center gap-2.5 bg-background px-4 font-mono text-[12px] tracking-[0.06em] text-foreground uppercase transition-colors outline-none hover:bg-background/85 focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[#006bff] disabled:opacity-50"
                   >
-                    {running ? "Working" : "Send"}
-                    <ArrowUpIcon aria-hidden="true" className="size-4" />
+                    {running ? "Working" : sent ? "Reset" : "Send"}
                   </button>
                 </div>
               </div>
             </div>
+            <p
+              aria-live="polite"
+              className="order-first flex h-7 items-center gap-2 font-mono text-[11px] text-muted-foreground @[56rem]:hidden"
+            >
+              <span aria-hidden="true">→</span>
+              <span className="truncate">{status}</span>
+            </p>
           </div>
-          <div className="order-1 flex min-w-0 items-center justify-center bg-[radial-gradient(circle,color-mix(in_oklab,var(--foreground)_18%,transparent)_1px,transparent_1.5px)] bg-size-[16px_16px] p-5 @[36rem]:p-10 @[56rem]:order-2">
+          <div className="order-1 flex min-w-0 items-center justify-center @[36rem]:border @[36rem]:border-foreground @[36rem]:bg-background @[36rem]:bg-[radial-gradient(circle,color-mix(in_oklab,var(--foreground)_18%,transparent)_1px,transparent_1.5px)] @[36rem]:bg-size-[16px_16px] @[36rem]:p-10 @[56rem]:order-2 @[56rem]:border-0">
             <Settings key={form} changed={changed} active={active} />
           </div>
         </div>

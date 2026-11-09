@@ -34,10 +34,30 @@ function MobileNav({
   // Search can navigate while the menu is open, so the menu closes on any navigation.
   React.useEffect(() => setOpen(false), [pathname])
 
+  const [hidden, setHidden] = React.useState(false)
+  React.useEffect(() => {
+    let last = window.scrollY
+    let anchor = last
+    let down = true
+    const onScroll = () => {
+      const y = window.scrollY
+      if (y > last !== down && y !== last) {
+        down = y > last
+        anchor = last
+      }
+      last = y
+      if (y < 56 || (!down && anchor - y > 120)) setHidden(false)
+      else if (down && y - anchor > 8) setHidden(true)
+    }
+    window.addEventListener("scroll", onScroll, { passive: true })
+    return () => window.removeEventListener("scroll", onScroll)
+  }, [])
+
   return (
     <header
       data-mobile-header
-      className="container sticky top-0 z-10 flex h-14 items-center gap-3 bg-canvas/85 backdrop-blur-md lg:hidden"
+      data-hidden={hidden && !open ? "" : undefined}
+      className="container sticky top-0 z-10 flex h-14 items-center gap-3 bg-canvas transition-transform duration-200 data-hidden:-translate-y-[calc(100%+12px)] motion-reduce:transition-none lg:hidden"
     >
       <a
         href="https://vercel.com"
@@ -60,12 +80,12 @@ function MobileNav({
       </Link>
       <div className="ms-auto flex items-center gap-1">
         {/* Phones show the icon alone, so the breadcrumb fits. */}
-        <SearchTrigger className="flex size-8 items-center justify-center rounded-2xl bg-foreground/[0.045] text-sm text-subtle outline-none transition-colors hover:bg-foreground/[0.07] hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/30 max-sm:[&>span]:sr-only sm:w-auto sm:gap-2 sm:ps-2.5 sm:pe-3" />
-        <GitHubLink />
+        <SearchTrigger className="flex size-8 items-center justify-center rounded-2xl border border-foreground text-sm text-foreground outline-none transition-colors hover:bg-foreground/[0.06] focus-visible:ring-3 focus-visible:ring-ring/30 max-sm:[&>span]:sr-only sm:w-auto sm:gap-2 sm:ps-2.5 sm:pe-3" />
+        <GitHubLink className="border border-foreground text-foreground hover:bg-foreground/[0.06]" />
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger
             aria-label="Menu"
-            className="group -me-3 inline-flex size-10 touch-manipulation items-center justify-center rounded-2xl outline-none focus-visible:ring-3 focus-visible:ring-ring/30"
+            className="group relative inline-flex size-8 touch-manipulation items-center justify-center rounded-2xl border border-foreground outline-none transition-colors after:absolute after:-inset-1.5 hover:bg-foreground/[0.06] focus-visible:ring-3 focus-visible:ring-ring/30"
           >
             <span className="relative size-4">
               <span className="absolute start-0 top-1 h-0.5 w-4 bg-foreground transition-all duration-100 group-aria-expanded:top-[0.4375rem] group-aria-expanded:-rotate-45 motion-reduce:transition-none" />
@@ -78,12 +98,17 @@ function MobileNav({
             align="start"
             sideOffset={0}
             collisionPadding={0}
-            className="h-(--available-height) w-(--anchor-width) overflow-y-auto overscroll-contain bg-canvas/90 outline-none backdrop-blur-md [scrollbar-width:none] lg:hidden"
+            className="h-(--available-height) w-(--anchor-width) overflow-y-auto overscroll-contain bg-canvas outline-none [scrollbar-width:none] lg:hidden"
           >
             <PopoverTitle className="sr-only">Menu</PopoverTitle>
             <MobileMenu section={section} tree={tree} urls={urls} onNavigate={() => setOpen(false)} />
           </PopoverContent>
         </Popover>
+      </div>
+      <div aria-hidden="true" className="pointer-events-none absolute inset-x-6 -bottom-px h-px sm:inset-x-8">
+        <span className="absolute inset-x-3.5 top-0 h-px bg-foreground" />
+        <span className="pointer-events-none absolute size-[11px] text-foreground before:absolute before:inset-x-0 before:top-[5px] before:h-px before:bg-current/40 after:absolute after:inset-y-0 after:start-[5px] after:w-px after:bg-current/40 -start-[5px] -top-[5px]" />
+        <span className="pointer-events-none absolute size-[11px] text-foreground before:absolute before:inset-x-0 before:top-[5px] before:h-px before:bg-current/40 after:absolute after:inset-y-0 after:start-[5px] after:w-px after:bg-current/40 -end-[5px] -top-[5px]" />
       </div>
     </header>
   )
@@ -194,7 +219,7 @@ function MobileMenu({
 function MenuGroup({ label, children }: { label?: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-4">
-      {label && <div className="text-sm font-medium text-subtle">{label}</div>}
+      {label && <div className="font-mono text-[11px] tracking-[0.06em] text-muted-foreground uppercase">{label}</div>}
       <ul className="flex flex-col gap-3">{children}</ul>
     </div>
   )
@@ -219,7 +244,7 @@ function MenuLink({
         onClick={onNavigate}
         className={cn(
           "block w-fit rounded-md text-2xl font-medium tracking-tight outline-none transition-colors focus-visible:ring-3 focus-visible:ring-ring/30",
-          current ? "text-brand" : "text-foreground/70 hover:text-foreground",
+          current ? "text-foreground underline decoration-1 underline-offset-[0.2em]" : "text-foreground/60 hover:text-foreground",
         )}
       >
         {children}

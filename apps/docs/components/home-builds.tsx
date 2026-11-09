@@ -677,7 +677,7 @@ function CanvasTile({ className, fig }: { className?: string; fig?: string }) {
                       </NumberInputScrubArea>
                       <NumberInputControl
                         aria-label={key}
-                        className="h-8 w-full min-w-0 bg-transparent pe-2 text-end outline-none focus-visible:bg-foreground/[0.06]"
+                        className="h-8 w-full min-w-0 bg-transparent pe-2 text-end outline-none focus-visible:bg-foreground/[0.06] pointer-coarse:text-base"
                       />
                     </NumberInput>
                   ))}

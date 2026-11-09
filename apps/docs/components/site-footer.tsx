@@ -5,9 +5,9 @@ function SiteFooter() {
   return (
     <footer className="container">
       <div aria-hidden="true" className="relative h-px">
-        <span className="absolute inset-x-5 top-0 h-px bg-foreground" />
-        <span className="pointer-events-none absolute -top-[5px] size-[11px] text-foreground before:absolute before:inset-x-0 before:top-[5px] before:h-px before:bg-current/40 after:absolute after:inset-y-0 after:start-[5px] after:w-px after:bg-current/40 start-0" />
-        <span className="pointer-events-none absolute -top-[5px] size-[11px] text-foreground before:absolute before:inset-x-0 before:top-[5px] before:h-px before:bg-current/40 after:absolute after:inset-y-0 after:start-[5px] after:w-px after:bg-current/40 end-0" />
+        <span className="absolute inset-x-3.5 top-0 h-px bg-foreground" />
+        <span className="pointer-events-none absolute -top-[5px] size-[11px] text-foreground before:absolute before:inset-x-0 before:top-[5px] before:h-px before:bg-current/40 after:absolute after:inset-y-0 after:start-[5px] after:w-px after:bg-current/40 -start-1.5" />
+        <span className="pointer-events-none absolute -top-[5px] size-[11px] text-foreground before:absolute before:inset-x-0 before:top-[5px] before:h-px before:bg-current/40 after:absolute after:inset-y-0 after:start-[5px] after:w-px after:bg-current/40 -end-1.5" />
       </div>
       <div className="flex items-center justify-between gap-4 py-8">
         <div className="flex items-center gap-4">

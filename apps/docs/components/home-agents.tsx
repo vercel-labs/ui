@@ -19,7 +19,7 @@ import {
 import { createParts, usePart, type PartProps } from "@ui-sdk/react/primitive"
 import { Toggle } from "@ui-sdk/react/toggle"
 import { cn } from "cn"
-import { CheckIcon, PauseIcon, PlayIcon, RotateCcwIcon } from "lucide-react"
+import { CheckIcon } from "lucide-react"
 import * as React from "react"
 import { Numeral, Poster, Title } from "./home-posters"
 
@@ -191,6 +191,7 @@ function AgentsTile({ className, fig }: { className?: string; fig?: string }) {
     <Poster
       fig={fig}
       head={"A BOARD FOR THREE AGENTS\nDRAG A TASK TO HAND IT OVER\nOR USE SPACE AND THE ARROWS"}
+      touch={"A BOARD FOR THREE AGENTS\nDRAG A TASK TO HAND IT OVER"}
       pattern="columns"
       body="justify-between gap-8"
       className={className}
@@ -215,12 +216,10 @@ function AgentsTile({ className, fig }: { className?: string; fig?: string }) {
               onPressedChange={setRunning}
               className={press}
             >
-              {running ? <PauseIcon aria-hidden="true" /> : <PlayIcon aria-hidden="true" />}
               {running ? "Pause" : "Run"}
             </Toggle>
           ) : (
             <button type="button" onClick={restart} className={press}>
-              <RotateCcwIcon aria-hidden="true" />
               Run again
             </button>
           )}
@@ -304,15 +303,15 @@ function AgentsTile({ className, fig }: { className?: string; fig?: string }) {
 type Step = { value: string; label: string; kind: string; input: boolean; output: boolean }
 type Wire = { from: string; to: string }
 type FlowState = {
+  layout: Layout
   positions: Record<string, MovePoint>
   edges: Wire[]
   focused: string | null
   moving: MoveDraft | null
   connecting: ConnectDraft | null
 }
-type FlowOptions = { edges: Wire[]; onEdgesChange?: (edges: Wire[]) => void; scale?: number }
+type FlowOptions = { layout: Layout; edges: Wire[]; onEdgesChange?: (edges: Wire[]) => void; scale?: number }
 
-const world = { width: 640, height: 400 }
 const node = { width: 150, height: 56 }
 
 const steps: Step[] = [
@@ -322,12 +321,29 @@ const steps: Step[] = [
   { value: "slack", label: "Send to Slack", kind: "Action", input: true, output: false },
 ]
 
-const placed: Record<string, MovePoint> = {
-  email: { x: 24, y: 64 },
-  docs: { x: 24, y: 280 },
-  summarize: { x: 252, y: 172 },
-  slack: { x: 466, y: 172 },
+const layouts = {
+  wide: {
+    world: { width: 640, height: 400 },
+    vertical: false,
+    placed: {
+      email: { x: 24, y: 64 },
+      docs: { x: 24, y: 280 },
+      summarize: { x: 252, y: 172 },
+      slack: { x: 466, y: 172 },
+    } as Record<string, MovePoint>,
+  },
+  tall: {
+    world: { width: 320, height: 470 },
+    vertical: true,
+    placed: {
+      email: { x: 4, y: 16 },
+      docs: { x: 166, y: 16 },
+      summarize: { x: 85, y: 206 },
+      slack: { x: 85, y: 396 },
+    } as Record<string, MovePoint>,
+  },
 }
+type Layout = keyof typeof layouts
 
 const wired: Wire[] = [
   { from: "email:out", to: "summarize:in" },
@@ -341,22 +357,29 @@ function portPoint(state: FlowState, port: string) {
   const key = nodeOf(port)
   const at = state.positions[key]
   const drag = state.moving?.keys.includes(key) ? state.moving : null
+  const out = port.endsWith(":out")
+  const vertical = layouts[state.layout].vertical
   return {
-    x: at.x + (drag?.dx ?? 0) + (port.endsWith(":out") ? node.width : 0),
-    y: at.y + (drag?.dy ?? 0) + node.height / 2,
+    x: at.x + (drag?.dx ?? 0) + (vertical ? node.width / 2 : out ? node.width : 0),
+    y: at.y + (drag?.dy ?? 0) + (vertical ? (out ? node.height : 0) : node.height / 2),
   }
 }
 
-function curve(from: { x: number; y: number }, to: { x: number; y: number }) {
+function curve(state: FlowState, from: { x: number; y: number }, to: { x: number; y: number }) {
+  if (layouts[state.layout].vertical) {
+    const reach = Math.max(40, Math.abs(to.y - from.y) / 2)
+    return `M${from.x},${from.y} C${from.x},${from.y + reach} ${to.x},${to.y - reach} ${to.x},${to.y}`
+  }
   const reach = Math.max(40, Math.abs(to.x - from.x) / 2)
   return `M${from.x},${from.y} C${from.x + reach},${from.y} ${to.x - reach},${to.y} ${to.x},${to.y}`
 }
 
 const flow = definePrimitive({
   name: "flow",
-  options: { edges: "value", onEdgesChange: "callback", scale: "number" },
+  options: { layout: "value", edges: "value", onEdgesChange: "callback", scale: "number" },
   state: (options: FlowOptions): FlowState => ({
-    positions: placed,
+    layout: options.layout,
+    positions: layouts[options.layout].placed,
     edges: options.edges,
     focused: null,
     moving: null,
@@ -379,7 +402,10 @@ const flow = definePrimitive({
       set: (value, details) => change("positions", value, details),
       step: () => 8,
       scale,
-      bounds: () => ({ minX: 0, minY: 0, maxX: world.width - node.width, maxY: world.height - node.height }),
+      bounds: () => {
+        const { world } = layouts[store.get().layout]
+        return { minX: 0, minY: 0, maxX: world.width - node.width, maxY: world.height - node.height }
+      },
       label: (key) => stepOf(key).label,
     })
     const linked = (from: string, to: string) =>
@@ -417,9 +443,10 @@ const flow = definePrimitive({
   slots: (slot) => ({
     root: slot<{}, { edges: Wire[] }>({
       state: (state) => ({ edges: state.edges }),
-      attrs: () => ({
-        style: css({ position: "relative", width: `${world.width}px`, height: `${world.height}px` }),
-      }),
+      attrs: (state) => {
+        const { world } = layouts[state.layout]
+        return { style: css({ position: "relative", width: `${world.width}px`, height: `${world.height}px` }) }
+      },
     }),
     node: slot<{ value: string }>({
       props: { value: "string" },
@@ -465,13 +492,13 @@ const flow = definePrimitive({
     }),
     edge: slot<{ value: string; from: string; to: string }>({
       props: { value: "string", from: "string", to: "string" },
-      attrs: (state, { props }) => ({ d: curve(portPoint(state, props.from), portPoint(state, props.to)) }),
+      attrs: (state, { props }) => ({ d: curve(state, portPoint(state, props.from), portPoint(state, props.to)) }),
     }),
     wire: slot({
       live: live<FlowState, any, {}>((state) => {
         const draft = state.connecting
         if (!draft) return { d: "" }
-        return { d: curve(portPoint(state, draft.from), draft.to ? portPoint(state, draft.to) : draft) }
+        return { d: curve(state, portPoint(state, draft.from), draft.to ? portPoint(state, draft.to) : draft) }
       }),
     }),
   }),
@@ -501,12 +528,16 @@ function order(edges: Wire[]) {
 }
 
 const port =
-  "absolute top-1/2 size-2.5 -translate-y-1/2 cursor-crosshair border border-foreground bg-background after:absolute after:-inset-2 data-[connect=candidate]:border-2 data-[connect=source]:bg-foreground data-[connect=target]:bg-foreground"
+  "absolute size-2.5 cursor-crosshair border border-foreground bg-background after:absolute after:-inset-2 data-[connect=candidate]:border-2 data-[connect=source]:bg-foreground data-[connect=target]:bg-foreground"
 
 function FlowTile({ className, fig }: { className?: string; fig?: string }) {
   const [edges, setEdges] = React.useState(wired)
   const [run, setRun] = React.useState<Record<string, "running" | "done">>({})
-  const [frame, scale] = useFit(world.width)
+  const [frame, fit] = useFit(layouts.wide.world.width)
+  const layout: Layout = fit * layouts.wide.world.width < 480 ? "tall" : "wide"
+  const { world, vertical } = layouts[layout]
+  const width = fit * layouts.wide.world.width
+  const scale = layout === "tall" ? Math.min(1, width / world.width) : fit
   const timers = React.useRef<number[]>([])
   React.useEffect(() => () => timers.current.forEach(clearTimeout), [])
   const level = order(edges)
@@ -546,6 +577,7 @@ function FlowTile({ className, fig }: { className?: string; fig?: string }) {
     <Poster
       fig={fig}
       head={"WIRE UP A WORKFLOW\nDRAG FROM ONE DOT TO ANOTHER\nOR PRESS C TO CONNECT"}
+      touch={"WIRE UP A WORKFLOW\nDRAG FROM ONE DOT TO ANOTHER"}
       pattern="plus"
       body="justify-between gap-8"
       className={className}
@@ -564,7 +596,6 @@ function FlowTile({ className, fig }: { className?: string; fig?: string }) {
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-2">
           <button type="button" onClick={go} className={press}>
-            <PlayIcon aria-hidden="true" />
             Run
           </button>
           <span aria-live="polite" className={cn(label, "text-muted-foreground")}>
@@ -572,9 +603,9 @@ function FlowTile({ className, fig }: { className?: string; fig?: string }) {
           </span>
         </div>
         <div ref={frame} className={cn("overflow-hidden bg-background", ink)}>
-          <div style={{ height: world.height * scale }}>
+          <div className="mx-auto" style={{ height: world.height * scale, width: world.width * scale }}>
             <div dir="ltr" style={{ width: world.width, transform: `scale(${scale})`, transformOrigin: "0 0" }}>
-              <Flow edges={edges} onEdgesChange={onEdgesChange} scale={scale} aria-label="Workflow">
+              <Flow key={layout} layout={layout} edges={edges} onEdgesChange={onEdgesChange} scale={scale} aria-label="Workflow">
                 {({ edges: shown }) => (
                   <>
                     <svg
@@ -620,9 +651,17 @@ function FlowTile({ className, fig }: { className?: string; fig?: string }) {
                             {state === "done" && <CheckIcon aria-hidden="true" className="size-3" />}
                           </span>
                           <span className="text-[14px] font-medium">{step.label}</span>
-                          {step.input && <FlowPort value={`${step.value}:in`} className={cn(port, "-left-[5px]")} />}
+                          {step.input && (
+                            <FlowPort
+                              value={`${step.value}:in`}
+                              className={cn(port, vertical ? "-top-[5px] left-1/2 -translate-x-1/2" : "top-1/2 -left-[5px] -translate-y-1/2")}
+                            />
+                          )}
                           {step.output && (
-                            <FlowPort value={`${step.value}:out`} className={cn(port, "-right-[5px]")} />
+                            <FlowPort
+                              value={`${step.value}:out`}
+                              className={cn(port, vertical ? "-bottom-[5px] left-1/2 -translate-x-1/2" : "top-1/2 -right-[5px] -translate-y-1/2")}
+                            />
                           )}
                         </FlowNode>
                       )

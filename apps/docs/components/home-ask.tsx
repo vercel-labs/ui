@@ -2,7 +2,7 @@
 
 import { Tabs, TabsList, TabsPanel, TabsTab } from "@ui-sdk/react/tabs"
 import { cn } from "cn"
-import { ArrowUpIcon, CheckIcon, ChevronDownIcon } from "lucide-react"
+import { CheckIcon, ChevronDownIcon } from "lucide-react"
 import * as React from "react"
 import {
   PeoplePicker,
@@ -161,13 +161,6 @@ const people = [
   { value: "margaret", label: "Margaret Hamilton", role: "Engineering" },
 ]
 
-function initials(name: string) {
-  return name
-    .split(" ")
-    .map((part) => part[0])
-    .join("")
-}
-
 function Step({
   index,
   title,
@@ -228,11 +221,6 @@ function Picker() {
             ink,
           )}
         >
-          {assignee && (
-            <span className="flex size-7 shrink-0 items-center justify-center border border-current font-mono text-[10px]">
-              {initials(assignee.label)}
-            </span>
-          )}
           <span className="flex-1 truncate">{assignee?.label ?? "Pick someone"}</span>
           <ChevronDownIcon aria-hidden="true" className="size-4" />
         </PeoplePickerTrigger>
@@ -243,9 +231,6 @@ function Picker() {
               value={person.value}
               className="group/option flex h-11 cursor-default items-center gap-3 px-2 text-[15px] outline-none select-none hover:bg-foreground/[0.06] focus:bg-foreground focus:text-background"
             >
-              <span className="flex size-7 shrink-0 items-center justify-center border border-current font-mono text-[10px]">
-                {initials(person.label)}
-              </span>
               <span className="flex-1">{person.label}</span>
               <span className="font-mono text-[10px] tracking-[0.06em] uppercase opacity-60">{person.role}</span>
               <CheckIcon aria-hidden="true" className="invisible size-4 group-aria-selected/option:visible" />
@@ -280,7 +265,13 @@ function Code({
       <TabsList className="flex overflow-x-auto border-b border-foreground [scrollbar-width:none]">
         {code.map((entry) => (
           <TabsTab key={entry.value} value={entry.value} className={tab}>
-            {entry.label}
+            {entry.label === "Web Components" ? (
+              <>
+                Web<span className="hidden @[30rem]:inline"> Components</span>
+              </>
+            ) : (
+              entry.label
+            )}
           </TabsTab>
         ))}
       </TabsList>
@@ -305,8 +296,90 @@ function Code({
   )
 }
 
+function PromptCard({ building, onSend, className }: { building: boolean; onSend: () => void; className?: string }) {
+  return (
+    <div className={cn("flex max-w-3xl flex-col border border-foreground bg-foreground text-background", className)}>
+      <p className="flex-1 p-5 text-lg leading-[1.5] tracking-[-0.015em] text-pretty @[40rem]:p-7 @[40rem]:text-2xl @[40rem]:leading-[1.4]">
+        {prompt}
+        <span
+          aria-hidden="true"
+          className={cn(
+            "ms-1 inline-block h-[1em] w-2 translate-y-[0.15em] bg-background",
+            building ? "opacity-0" : "animate-caret-blink",
+          )}
+        />
+      </p>
+      <div className="flex items-center justify-between gap-3 border-t border-background/25 p-3 ps-5 @[40rem]:ps-7">
+        <span aria-live="polite" className={cn(label, "min-w-0 truncate text-background/60")}>
+          {building ? "Building..." : "Press Send to try it"}
+        </span>
+        <button
+          type="button"
+          onClick={onSend}
+          className="inline-flex h-11 shrink-0 items-center gap-3 bg-background px-4 @[26rem]:px-5 font-mono text-[13px] tracking-[0.06em] text-foreground uppercase transition-colors outline-none hover:bg-background/85 focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[#006bff]"
+        >
+          Send
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function Behaviors({
+  step,
+  lit,
+  onHover,
+}: {
+  step: number
+  lit: string | null | undefined
+  onHover: React.Dispatch<React.SetStateAction<string | null>>
+}) {
+  return (
+    <ul className="grid gap-px border border-foreground bg-foreground @[40rem]:grid-cols-2 @[64rem]:gap-3 @[64rem]:border-0 @[64rem]:bg-transparent">
+      {behaviors.map((behavior, index) => (
+        <li
+          key={behavior.name}
+          onPointerEnter={(event) => event.pointerType === "mouse" && onHover(behavior.name)}
+          onPointerLeave={(event) => event.pointerType === "mouse" && onHover(null)}
+          onClick={() => onHover((current) => (current === behavior.name ? null : behavior.name))}
+          className={cn(
+            "flex cursor-default items-center gap-4 bg-background p-4 transition-shadow duration-300 [&>*]:transition-[opacity,translate] [&>*]:duration-300 @[64rem]:flex-col @[64rem]:items-start @[64rem]:p-5 @[64rem]:outline @[64rem]:outline-foreground",
+            lit === behavior.name && "shadow-[inset_0_0_0_2px_#006bff] [&_code]:text-[#006bff]",
+            !(step >= 1 && step * 1.5 > index) && "[&>*]:translate-y-1 [&>*]:opacity-25",
+          )}
+        >
+          <Glyph name={behavior.name} />
+          <span className="flex min-w-0 flex-col gap-1">
+            <code className="font-mono text-[15px] @[64rem]:text-base">{behavior.name}</code>
+            <span className="text-sm leading-[1.45] text-pretty text-muted-foreground @[64rem]:text-[15px] @[64rem]:leading-[1.5]">
+              {behavior.body}
+            </span>
+          </span>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+function Result() {
+  return (
+    <div className={cn("flex min-h-72 flex-col justify-center bg-background p-5 @[36rem]:p-10", ink)}>
+      <Picker />
+    </div>
+  )
+}
+
+const views = [
+  { value: "ask", label: "Ask", title: "You ask your agent for a picker." },
+  { value: "behaviors", label: "Build", title: "It builds one from behaviors." },
+  { value: "component", label: "Component", title: "You get a new component." },
+] as const
+
+type View = (typeof views)[number]["value"]
+
 function AskPoster({ fig }: { fig?: string }) {
   const [step, setStep] = React.useState(4)
+  const [view, setView] = React.useState<View>("ask")
   const [framework, setFramework] = React.useState("react")
   const [hovered, setHovered] = React.useState<string | null>(null)
   const timers = React.useRef<ReturnType<typeof setTimeout>[]>([])
@@ -318,6 +391,12 @@ function AskPoster({ fig }: { fig?: string }) {
     setStep(0)
     timers.current = [1, 2, 3, 4].map((next) => setTimeout(() => setStep(next), next * 700))
   }
+  const sendOnPhone = () => {
+    send()
+    setView("behaviors")
+    timers.current.push(setTimeout(() => setView("component"), 4 * 700 + 900))
+  }
+  const current = views.find((entry) => entry.value === view)!
   return (
     <Poster
       fig={fig}
@@ -327,59 +406,44 @@ function AskPoster({ fig }: { fig?: string }) {
       body="gap-10"
       className="lg:min-h-0"
     >
-      <ol className="flex flex-col">
+      <div className="flex flex-col gap-6 @[40rem]:hidden">
+        <div role="group" aria-label="Steps" className={cn("grid grid-cols-3", ink)}>
+          {views.map((entry, index) => (
+            <button
+              key={entry.value}
+              type="button"
+              aria-pressed={view === entry.value}
+              onClick={() => {
+                timers.current.forEach(clearTimeout)
+                setStep(4)
+                setView(entry.value)
+              }}
+              className={cn(
+                label,
+                "flex h-10 items-center justify-center gap-1.5 border-s border-foreground text-muted-foreground transition-colors outline-none first:border-s-0 focus-visible:outline-2 focus-visible:outline-solid focus-visible:-outline-offset-2 focus-visible:outline-[#006bff] aria-pressed:bg-foreground aria-pressed:text-background",
+              )}
+            >
+              <span className="tabular-nums opacity-60">{index + 1}</span>
+              {entry.label}
+            </button>
+          ))}
+        </div>
+        <div className="flex min-h-[30rem] flex-col gap-5">
+          <h3 aria-live="polite" className="text-2xl leading-tight font-[450] tracking-[-0.035em] text-balance">
+            {current.title}
+          </h3>
+          {view === "ask" && <PromptCard building={building} onSend={sendOnPhone} className="flex-1" />}
+          {view === "behaviors" && <Behaviors step={step} lit={lit} onHover={setHovered} />}
+          {view === "component" && <Result />}
+        </div>
+      </div>
+      <ol className="hidden flex-col @[40rem]:flex">
         <Step index={1} title="You ask your agent for a picker." active next={step >= 1}>
-          <div className="flex max-w-3xl flex-col border border-foreground bg-foreground text-background">
-            <p className="p-5 text-lg leading-[1.5] tracking-[-0.015em] text-pretty @[40rem]:p-7 @[40rem]:text-2xl @[40rem]:leading-[1.4]">
-              {prompt}
-              <span
-                aria-hidden="true"
-                className={cn(
-                  "ms-1 inline-block h-[1em] w-2 translate-y-[0.15em] bg-background",
-                  building ? "opacity-0" : "animate-caret-blink",
-                )}
-              />
-            </p>
-            <div className="flex items-center justify-between gap-3 border-t border-background/25 p-3 ps-5 @[40rem]:ps-7">
-              <span aria-live="polite" className={cn(label, "whitespace-nowrap text-background/60")}>
-                {building ? "Building..." : "Press Send to try it"}
-              </span>
-              <button
-                type="button"
-                onClick={send}
-                className="inline-flex h-11 items-center gap-3 bg-background px-5 font-mono text-[13px] tracking-[0.06em] text-foreground uppercase transition-colors outline-none hover:bg-background/85 focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[#006bff]"
-              >
-                Send
-                <ArrowUpIcon aria-hidden="true" className="size-4" />
-              </button>
-            </div>
-          </div>
+          <PromptCard building={building} onSend={send} />
         </Step>
-        <Step index={2} title="It picks the behaviors it needs." active={step >= 1} next={step >= 4}>
+        <Step index={2} title="It builds one from behaviors." active={step >= 1} next={step >= 4}>
           <div className="grid @[64rem]:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] @[64rem]:gap-6">
-            <ul className="grid gap-px border border-foreground bg-foreground @[40rem]:grid-cols-2 @[64rem]:gap-3 @[64rem]:border-0 @[64rem]:bg-transparent">
-              {behaviors.map((behavior, index) => (
-                <li
-                  key={behavior.name}
-                  onPointerEnter={(event) => event.pointerType === "mouse" && setHovered(behavior.name)}
-                  onPointerLeave={(event) => event.pointerType === "mouse" && setHovered(null)}
-                  onClick={() => setHovered((current) => (current === behavior.name ? null : behavior.name))}
-                  className={cn(
-                    "flex cursor-default items-center gap-4 bg-background p-4 transition-[opacity,translate,box-shadow] duration-300 @[64rem]:flex-col @[64rem]:items-start @[64rem]:p-5 @[64rem]:outline @[64rem]:outline-foreground",
-                    lit === behavior.name && "shadow-[inset_0_0_0_1px_var(--foreground)]",
-                    step >= 1 && step * 1.5 > index ? "opacity-100" : "translate-y-1 opacity-25",
-                  )}
-                >
-                  <Glyph name={behavior.name} />
-                  <span className="flex min-w-0 flex-col gap-1">
-                    <code className="font-mono text-[15px] @[64rem]:text-base">{behavior.name}</code>
-                    <span className="text-sm leading-[1.45] text-pretty text-muted-foreground @[64rem]:text-[15px] @[64rem]:leading-[1.5]">
-                      {behavior.body}
-                    </span>
-                  </span>
-                </li>
-              ))}
-            </ul>
+            <Behaviors step={step} lit={lit} onHover={setHovered} />
             <div className={cn(ink, "flex min-w-0 flex-col border-t-0 bg-background @[64rem]:border-t")}>
               <div className="flex h-10 items-center justify-between gap-3 border-b border-foreground px-4">
                 <span className="font-mono text-[11px] whitespace-nowrap text-muted-foreground">people-picker.ts</span>
@@ -394,7 +458,7 @@ function AskPoster({ fig }: { fig?: string }) {
                       key={index}
                       className={cn(
                         "block px-4 transition-colors duration-200",
-                        line.behavior && lit === line.behavior && "bg-foreground text-background",
+                        line.behavior && lit === line.behavior && "bg-[#006bff] text-white",
                         line.behavior && lit && lit !== line.behavior && "opacity-60",
                       )}
                     >
@@ -411,17 +475,7 @@ function AskPoster({ fig }: { fig?: string }) {
             <Placeholder lines={22} />
           ) : (
             <div className="grid gap-4 @[64rem]:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] @[64rem]:gap-6">
-              <div className={cn("flex flex-col justify-start bg-background p-5 @[36rem]:p-10", ink)}>
-                <div className="mb-8 flex flex-col gap-1.5 border-b border-foreground/15 pb-8">
-                  <span className={cn(label, "text-muted-foreground")}>Task</span>
-                  <p className="text-2xl leading-tight font-[450] tracking-[-0.03em]">Update the pricing page</p>
-                  <p className="text-[15px] text-muted-foreground">Due Friday. Three things left to check.</p>
-                </div>
-                <Picker />
-                <p className={cn(label, "mt-auto pt-10 text-muted-foreground")}>
-                  Open it, then type a name or use the arrow keys
-                </p>
-              </div>
+              <Result />
               <Code lines={22} framework={framework} onFrameworkChange={setFramework} />
             </div>
           )}

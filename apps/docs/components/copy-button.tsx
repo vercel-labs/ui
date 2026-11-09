@@ -28,12 +28,14 @@ function CopyButton({ label, className }: { label?: string; className?: string }
         type="button"
         onClick={copy}
         className={cn(
-          "inline-flex h-8 shrink-0 items-center gap-1.5 rounded-frame-control bg-foreground/5 px-2.5 text-[13px] text-foreground outline-none transition-colors hover:bg-foreground/10 focus-visible:ring-3 focus-visible:ring-ring/30",
+          "inline-flex h-8 shrink-0 items-center rounded-frame-control bg-foreground/5 px-2.5 text-[13px] text-foreground outline-none transition-colors hover:bg-foreground/10 focus-visible:ring-3 focus-visible:ring-ring/30",
           className,
         )}
       >
-        {copied ? <CheckIcon className="size-3.5" /> : <CopyIcon className="size-3.5" />}
-        <span>{copied ? "Copied" : label}</span>
+        <span className="grid justify-items-center">
+          <span className={cn("col-start-1 row-start-1", copied && "invisible")}>{label}</span>
+          <span className={cn("col-start-1 row-start-1", !copied && "invisible")}>Copied</span>
+        </span>
       </button>
     )
   }

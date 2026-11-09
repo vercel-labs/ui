@@ -2,6 +2,7 @@ import { AskPoster } from "@/components/home-ask"
 import { BehaviorsPoster } from "@/components/home-behaviors"
 import { CopyPromptButton } from "@/components/copy-prompt"
 import { OperatePoster } from "@/components/home-operate"
+import { PhoneShot, PhoneStrip } from "@/components/home-more"
 import { SelectBlueprint } from "@/components/home-select"
 import { AgentsTile, FlowTile } from "@/components/home-agents"
 import { SheetTile } from "@/components/home-sheet"
@@ -32,23 +33,22 @@ import { Logo } from "@/components/logo"
 import { MobileNav } from "@/components/mobile-nav"
 import { Search } from "@/components/search"
 import { sectionPages, sectionTree } from "@/lib/section-tree"
-import { CopyIcon } from "lucide-react"
 import { cn } from "cn"
 import Link from "next/link"
 
 const components = [
-  { name: "Calendar", Tile: CalendarTile },
+  { name: "Calendar", Tile: CalendarTile, phone: true },
   { name: "Command", Tile: CommandTile },
-  { name: "Switch", Tile: SwitchTile },
+  { name: "Switch", Tile: SwitchTile, phone: true },
   { name: "Tabs", Tile: TabsTile },
-  { name: "Slider", Tile: SliderTile },
+  { name: "Slider", Tile: SliderTile, phone: true },
   { name: "Accordion", Tile: AccordionTile },
-  { name: "Color Picker", Tile: ColorTile },
-  { name: "Rating", Tile: RatingTile },
+  { name: "Color Picker", Tile: ColorTile, phone: true },
+  { name: "Rating", Tile: RatingTile, phone: true },
   { name: "Tree", Tile: TreeTile },
   { name: "Resizable", Tile: ResizableTile },
   { name: "Segmented Control", Tile: SegmentedTile },
-  { name: "OTP Input", Tile: OTPTile },
+  { name: "OTP Input", Tile: OTPTile, phone: true },
   { name: "Toolbar", Tile: ToolbarTile },
   { name: "Token Input", Tile: TokenInputTile },
   { name: "Number Input", Tile: NumberInputTile },
@@ -69,9 +69,9 @@ const cross =
 function Rule({ className }: { className?: string }) {
   return (
     <div aria-hidden="true" className={cn("relative mb-4 h-[11px]", className)}>
-      <span className="absolute inset-x-5 top-[5px] h-px bg-foreground" />
-      <span className={cn(cross, "start-0")} />
-      <span className={cn(cross, "end-0")} />
+      <span className="absolute inset-x-3.5 top-[5px] h-px bg-foreground" />
+      <span className={cn(cross, "-start-[5px]")} />
+      <span className={cn(cross, "-end-[5px]")} />
     </div>
   )
 }
@@ -95,14 +95,14 @@ function Section({
     <>
       <Rule className="mt-20 sm:mt-28" />
       <div className="flex flex-col gap-4 pt-3 sm:gap-5 sm:pt-5">
-        <h2 className="text-4xl leading-[1.08] font-[450] tracking-[-0.045em] text-balance sm:text-6xl lg:text-7xl">
+        <h2 className="text-4xl leading-[1.15] font-[450] tracking-[-0.045em] text-balance sm:text-6xl sm:leading-[1.08] lg:text-7xl">
           {title}
         </h2>
         <p className="max-w-2xl text-lg leading-[1.5] tracking-[-0.015em] text-pretty text-muted-foreground sm:text-xl lg:text-2xl lg:leading-[1.45]">
           {children}
         </p>
       </div>
-      <ol className="mt-6 mb-8 grid grid-cols-2 gap-x-4 border-t border-foreground/15 font-mono text-[11px] tracking-[0.06em] uppercase sm:mb-10 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6">
+      <ol className="mt-6 mb-8 grid grid-cols-3 gap-x-4 border-t border-foreground/15 font-mono text-[11px] tracking-[0.06em] uppercase max-sm:hidden sm:mb-10 lg:grid-cols-4 2xl:grid-cols-6">
         {items.map((item, index) => (
           <li key={item.name} className="border-b border-foreground/15">
             <a
@@ -117,6 +117,7 @@ function Section({
           </li>
         ))}
       </ol>
+      <div aria-hidden="true" className="h-8 sm:hidden" />
     </>
   )
 }
@@ -130,12 +131,11 @@ export default function HomePage() {
       <MobileNav />
       <Search pages={pages} />
       <main data-width="wide" className="container flex-1 pt-6 pb-24 sm:pt-10">
-        <Rule className="lg:hidden" />
-        <h1 className="text-4xl leading-[1.08] font-[450] tracking-[-0.045em] text-balance sm:text-6xl lg:text-7xl">
+        <h1 className="text-4xl leading-[1.15] font-[450] tracking-[-0.045em] text-balance sm:text-6xl sm:leading-[1.08] lg:text-7xl">
           A library of behaviors for agents to build the next generation of user interfaces.
         </h1>
         <div className="mt-8 grid grid-cols-1 gap-3 sm:mt-10 lg:grid-cols-2 lg:gap-4">
-          <div className="flex flex-col gap-3 lg:gap-4">
+          <div className="flex flex-col gap-3 max-lg:contents lg:gap-4">
             <Poster
               fig="FIG. 01"
               head={"WHAT IS UI SDK?\nTHE SHORT VERSION"}
@@ -148,7 +148,7 @@ export default function HomePage() {
                 /wait-what
               </p>
               <div className="flex max-w-[46rem] min-w-0 flex-col items-start gap-5 text-xl leading-[1.5] tracking-[-0.02em] text-pretty text-foreground 2xl:text-[1.375rem] [&_code]:border [&_code]:border-foreground/20 [&_code]:px-1 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-[0.8em] [&_code]:whitespace-nowrap [&_code]:text-foreground">
-                <p className="text-2xl leading-[1.3] tracking-[-0.025em] 2xl:text-[1.75rem]">
+                <p className="text-2xl leading-[1.4] tracking-[-0.025em] sm:leading-[1.3] 2xl:text-[1.75rem]">
                   Say we give an agent a Select component. It can build a Select. Makes sense, right?
                 </p>
                 <p>
@@ -179,42 +179,39 @@ export default function HomePage() {
                 </p>
               </div>
             </Poster>
-            <div className="grid gap-3 sm:grid-cols-2 lg:gap-4">
+            <div className="grid gap-3 max-lg:order-last sm:grid-cols-2 lg:gap-4">
               <Link
                 href="/docs"
                 className="group/docs flex h-16 items-center justify-between gap-4 bg-foreground px-6 text-xl font-[450] tracking-[-0.03em] whitespace-nowrap text-background transition-colors outline-none hover:bg-foreground/85 focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[#006bff] sm:h-20 sm:px-8 sm:text-2xl"
               >
                 Read the Docs
-                <span aria-hidden="true" className="transition-transform group-hover/docs:translate-x-1">
-                  →
-                </span>
               </Link>
               <CopyPromptButton
                 className="flex h-16 items-center justify-between gap-4 bg-[#006bff] px-6 text-start text-xl font-[450] tracking-[-0.03em] whitespace-nowrap text-white transition-colors outline-none hover:bg-[#0059d6] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[#006bff] sm:h-20 sm:px-8 sm:text-2xl"
               >
-                Copy prompt
-                <CopyIcon aria-hidden="true" className="size-5" />
+                Copy Prompt
               </CopyPromptButton>
             </div>
           </div>
           <Poster
             fig="FIG. 02"
             head={"WHAT'S INSIDE A SELECT\nHOVER A PART TO FIND IT"}
+            touch={"WHAT'S INSIDE A SELECT\nTAP A PART TO FIND IT"}
             tone="white"
             pattern="blueprint"
             body="justify-between gap-8"
-            className="border-2 border-foreground"
+            className="border-foreground [--poster-border:2px]"
           >
             <SelectBlueprint />
-            <Title id="inside-a-select" max={20} className="-ms-[0.05em]">
+            <Title id="inside-a-select" max={20} className="-me-[0.05em] self-end text-end">
               Inside a Select.
             </Title>
           </Poster>
         </div>
         <Rule className="mt-20 sm:mt-28" />
         <div className="flex flex-col gap-4 pt-3 sm:gap-5 sm:pt-5">
-          <h2 className="text-4xl leading-[1.08] font-[450] tracking-[-0.045em] text-balance sm:text-6xl lg:text-7xl">
-            Here are some of the behaviors.
+          <h2 className="text-4xl leading-[1.15] font-[450] tracking-[-0.045em] text-balance sm:text-6xl sm:leading-[1.08] lg:text-7xl">
+            It starts with behaviors.
           </h2>
           <p className="max-w-2xl text-lg leading-[1.5] tracking-[-0.015em] text-pretty text-muted-foreground sm:text-xl lg:text-2xl lg:leading-[1.45]">
             We’ve built more than 40 of them so far. Each one does one thing, like moving focus with the arrow
@@ -226,11 +223,11 @@ export default function HomePage() {
         </div>
         <Rule className="mt-20 sm:mt-28" />
         <div className="flex flex-col gap-4 pt-3 sm:gap-5 sm:pt-5">
-          <h2 className="text-4xl leading-[1.08] font-[450] tracking-[-0.045em] text-balance sm:text-6xl lg:text-7xl">
-            Ask your agent for a component.
+          <h2 className="text-4xl leading-[1.15] font-[450] tracking-[-0.045em] text-balance sm:text-6xl sm:leading-[1.08] lg:text-7xl">
+            Use them to build your own components.
           </h2>
           <p className="max-w-2xl text-lg leading-[1.5] tracking-[-0.015em] text-pretty text-muted-foreground sm:text-xl lg:text-2xl lg:leading-[1.45]">
-            It picks the behaviors it needs and puts them together into something new.
+            Ask your agent for one. It picks the behaviors it needs and puts them together.
           </p>
         </div>
         <div className="mt-8 sm:mt-10">
@@ -240,32 +237,44 @@ export default function HomePage() {
           Each one is made from the same behaviors. Pick one, style it your way, and use it in React, Vue, Svelte,
           Solid or Web Components.
         </Section>
-        <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 lg:gap-4 min-[90rem]:grid-cols-3">
+        <PhoneStrip
+          names={components.filter((item) => item.phone).map((item) => item.name)}
+          className="relative grid grid-cols-1 gap-3 max-sm:-mx-6 max-sm:flex max-sm:gap-6 max-sm:snap-x max-sm:snap-mandatory max-sm:-my-2 max-sm:overflow-x-auto max-sm:overflow-y-hidden max-sm:overscroll-x-contain max-sm:px-6 max-sm:py-2 max-sm:[scrollbar-width:none] lg:grid-cols-2 lg:gap-4 min-[90rem]:grid-cols-3"
+        >
           {components.map((item, index) => (
             <item.Tile
               key={item.name}
               fig={fig(index + 5)}
-              className={index === components.length - 1 ? "lg:col-span-2 min-[90rem]:col-span-1" : undefined}
+              className={cn(
+                "max-sm:w-[calc(100vw-5rem)] max-sm:shrink-0 max-sm:snap-center max-sm:gap-8",
+                !item.phone && "max-sm:hidden",
+                index === components.length - 1 && "lg:col-span-2 min-[90rem]:col-span-1",
+              )}
             />
           ))}
-        </div>
+        </PhoneStrip>
         <Section title="Then build anything." items={builds} start={components.length + 5}>
           A timeline you can scrub, agents you can hand work to, a spreadsheet that fills itself in. The same
           behaviors, put together by an agent. Here are a few we made.
         </Section>
-        <div className="grid grid-cols-1 gap-3 lg:gap-4 min-[90rem]:grid-cols-2">
+        <PhoneStrip
+          names={builds.map((item) => item.name)}
+          className="relative grid grid-cols-1 gap-3 max-sm:-mx-6 max-sm:flex max-sm:gap-6 max-sm:snap-x max-sm:snap-mandatory max-sm:-my-2 max-sm:items-start max-sm:overflow-x-auto max-sm:overflow-y-hidden max-sm:overscroll-x-contain max-sm:px-6 max-sm:py-2 max-sm:[scrollbar-width:none] lg:grid-cols-2 lg:gap-4"
+        >
           {builds.map((item, index) => (
-            <item.Tile key={item.name} fig={fig(index + components.length + 5)} />
+            <PhoneShot key={item.name} width={720}>
+              <item.Tile fig={fig(index + components.length + 5)} />
+            </PhoneShot>
           ))}
-        </div>
+        </PhoneStrip>
         <Rule className="mt-20 sm:mt-28" />
         <div className="flex flex-col gap-4 pt-3 sm:gap-5 sm:pt-5">
-          <h2 className="text-4xl leading-[1.08] font-[450] tracking-[-0.045em] text-balance sm:text-6xl lg:text-7xl">
-            And agents can use it too.
+          <h2 className="text-4xl leading-[1.15] font-[450] tracking-[-0.045em] text-balance sm:text-6xl sm:leading-[1.08] lg:text-7xl">
+            And we’ve made agents really good at using it.
           </h2>
           <p className="max-w-2xl text-lg leading-[1.5] tracking-[-0.015em] text-pretty text-muted-foreground sm:text-xl lg:text-2xl lg:leading-[1.45]">
-            Everything you build tells an agent what it is and what it can do. So an agent can read your page
-            and change it for you, without a screenshot or a single click.
+            They know every behavior, so they build with it the right way. And they can read and operate what
+            they built, without a screenshot.
           </p>
         </div>
         <div className="mt-8 sm:mt-10">
@@ -273,6 +282,17 @@ export default function HomePage() {
         </div>
         <div className="mt-3 lg:mt-4">
           <StartPoster fig={fig(components.length + builds.length + 6)} />
+        </div>
+        <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:mt-4 lg:gap-4">
+          <Link
+            href="/docs/components"
+            className="flex h-16 items-center bg-foreground px-6 text-xl font-[450] tracking-[-0.03em] whitespace-nowrap text-background transition-colors outline-none hover:bg-foreground/85 focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[#006bff] sm:h-20 sm:px-8 sm:text-2xl"
+          >
+            Browse Components
+          </Link>
+          <CopyPromptButton className="flex h-16 items-center justify-between gap-4 bg-[#006bff] px-6 text-start text-xl font-[450] tracking-[-0.03em] whitespace-nowrap text-white transition-colors outline-none hover:bg-[#0059d6] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[#006bff] sm:h-20 sm:px-8 sm:text-2xl">
+            Copy Prompt
+          </CopyPromptButton>
         </div>
       </main>
     </div>

@@ -14,7 +14,7 @@ import {
 } from "@ui-sdk/core"
 import { createParts, usePart, type PartProps } from "@ui-sdk/react/primitive"
 import { cn } from "cn"
-import { CornerDownLeftIcon, Redo2Icon, SparklesIcon, Undo2Icon } from "lucide-react"
+import { Redo2Icon, SparklesIcon, Undo2Icon } from "lucide-react"
 import * as React from "react"
 import { Numeral, Poster, Title } from "./home-posters"
 
@@ -317,6 +317,7 @@ function SheetTile({ className, fig }: { className?: string; fig?: string }) {
     <Poster
       fig={fig}
       head={"A SPREADSHEET WITH AI\nSELECT CELLS, THEN PRESS RUN\n⌘Z UNDOES IT"}
+      touch={"A SPREADSHEET WITH AI\nSELECT CELLS, THEN TAP RUN"}
       tone="white"
       pattern="rules"
       body="justify-between gap-8"
@@ -340,7 +341,6 @@ function SheetTile({ className, fig }: { className?: string; fig?: string }) {
             <span className="min-w-0 flex-1 truncate font-mono text-[12px]">Fill this in from the feedback</span>
             <SheetRun className={press}>
               Run
-              <CornerDownLeftIcon aria-hidden="true" />
             </SheetRun>
           </div>
           <div className="overflow-x-auto [scrollbar-width:none]">
@@ -368,7 +368,7 @@ function SheetTile({ className, fig }: { className?: string; fig?: string }) {
                     >
                       {({ value, editing, pending: waiting }) =>
                         editing ? (
-                          <SheetEditor className="h-full w-full bg-transparent outline-none" />
+                          <SheetEditor className="h-full w-full bg-transparent outline-none pointer-coarse:text-base" />
                         ) : waiting ? (
                           <span aria-hidden="true" className="h-2 w-2/3 animate-pulse bg-foreground/15" />
                         ) : (

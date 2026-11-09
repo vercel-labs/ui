@@ -80,11 +80,13 @@ const Event = React.memo(function Event({
   box,
   active,
   twelve,
+  small,
 }: {
   id: string
   box: ResizeBox
   active: boolean
   twelve: boolean
+  small: boolean
 }) {
   const { name, kind } = events[id]
   const short = box.height < 60
@@ -110,13 +112,14 @@ const Event = React.memo(function Event({
       >
         <span
           className={cn(
-            "text-[13px] leading-tight font-medium tracking-[-0.01em]",
+            "leading-tight font-medium tracking-[-0.01em]",
+            small ? "text-base" : "text-[13px]",
             box.height >= 90 ? "line-clamp-2 shrink-0" : "truncate",
           )}
         >
           {name}
         </span>
-        {!short && (
+        {!short && !small && (
           <span
             className={cn(
               "shrink-0 font-mono text-[10px] tabular-nums",
@@ -237,7 +240,7 @@ function WeekTile({ className, fig }: { className?: string; fig?: string }) {
                     }}
                   >
                     {Object.keys(start).map((id) => (
-                      <Event key={id} id={id} box={shown[id]} active={active === id} twelve={twelve} />
+                      <Event key={id} id={id} box={shown[id]} active={active === id} twelve={twelve} small={scale < 0.85} />
                     ))}
                   </div>
                 </div>

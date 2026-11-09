@@ -1,4 +1,4 @@
-import Link from "next/link"
+import { cn } from "cn"
 import { Poster, Title } from "./home-posters"
 
 const behaviors = [
@@ -19,7 +19,10 @@ function BehaviorsPoster({ fig }: { fig?: string }) {
         {behaviors.map((behavior, index) => (
           <li
             key={behavior.name}
-            className="grid grid-cols-[1.75rem_minmax(0,1fr)] gap-x-2 border-b border-foreground/15 py-4 @[40rem]:pe-6 @[72rem]:py-5"
+            className={cn(
+              "grid grid-cols-[1.75rem_minmax(0,1fr)] gap-x-2 border-b border-foreground/15 py-4 @[40rem]:pe-6 @[72rem]:py-5",
+              index > 3 && "@max-[40rem]:hidden",
+            )}
           >
             <span aria-hidden="true" className="pt-0.5 font-mono text-[11px] text-muted-foreground tabular-nums">
               {String(index + 1).padStart(2, "0")}
@@ -38,15 +41,6 @@ function BehaviorsPoster({ fig }: { fig?: string }) {
         <Title id="behaviors" max={8} className="-ms-[0.05em]">
           Behaviors.
         </Title>
-        <Link
-          href="/docs/core/behaviors"
-          className="group/all flex items-center gap-3 font-mono text-[11px] tracking-[0.06em] uppercase outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[#006bff]"
-        >
-          <span className="group-hover/all:underline group-hover/all:underline-offset-4">See all of them</span>
-          <span aria-hidden="true" className="transition-transform group-hover/all:translate-x-0.5">
-            →
-          </span>
-        </Link>
       </div>
     </Poster>
   )

@@ -68,8 +68,9 @@ function HeaderCopyPrompt() {
   React.useEffect(() => {
     if (!home) return
     const update = () => {
-      const target = document.querySelector("main [data-copy-prompt]")
-      setPast(target ? target.getBoundingClientRect().bottom < 86 : false)
+      const rects = [...document.querySelectorAll("main [data-copy-prompt]")].map((target) => target.getBoundingClientRect())
+      const visible = rects.some((rect) => rect.bottom > 86 && rect.top < window.innerHeight)
+      setPast(rects.length > 0 && rects[0].bottom < 86 && !visible)
     }
     update()
     window.addEventListener("scroll", update, { passive: true })

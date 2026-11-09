@@ -133,6 +133,7 @@ function getMDXComponents(
     table: (props) => (
       <Frame variant="flat" className="my-6 overflow-x-auto">
         <table
+          data-docs-table=""
           className="w-full border-collapse text-start text-[15px] sm:text-sm [&_tr:last-child>td]:border-0"
           {...props}
         />
@@ -146,13 +147,13 @@ function getMDXComponents(
     ),
     td: (props) => (
       <td
-        className="border-b border-border/60 px-4 py-2.5 align-top text-foreground/80 [&_code]:whitespace-nowrap"
+        className="border-b border-border/60 px-4 py-2.5 align-top text-foreground/80 has-[[data-won]]:bg-green-500/10 [&_code]:whitespace-nowrap"
         {...props}
       />
     ),
     // A table cell's value where we win, filling the cell as on the why page.
     Won: ({ children }: { children: ReactNode }) => (
-      <span className="-mx-4 -my-2.5 block bg-green-500/10 px-4 py-2.5 font-semibold text-green-800 dark:text-green-300">
+      <span data-won className="font-semibold text-green-800 dark:text-green-300">
         {children}
       </span>
     ),

@@ -65,6 +65,7 @@ import {
   SliderValue,
 } from "@ui-sdk/react/slider"
 import { Resizable, ResizableHandle, ResizablePanel } from "@ui-sdk/react/resizable"
+import { Label } from "@ui-sdk/react/label"
 import { Switch, SwitchThumb } from "@ui-sdk/react/switch"
 import { Tabs, TabsList, TabsPanel, TabsTab } from "@ui-sdk/react/tabs"
 import {
@@ -208,6 +209,7 @@ function Poster({
   title,
   meta,
   head,
+  touch,
   tone = "gray",
   pattern = "grid",
   backdrop,
@@ -219,6 +221,7 @@ function Poster({
   title?: React.ReactNode
   meta?: { label: string; href?: string }[]
   head?: React.ReactNode
+  touch?: React.ReactNode
   tone?: keyof typeof tones
   pattern?: keyof typeof patterns
   backdrop?: React.ReactNode
@@ -230,7 +233,7 @@ function Poster({
     <section
       id={typeof title === "string" ? slug(title) : undefined}
       className={cn(
-        "@container relative scroll-mt-24 flex min-w-0 flex-col gap-10 border lg:min-h-[36rem] text-foreground border-foreground/10 bg-(--poster) p-6 sm:p-8 lg:p-10",
+        "@container relative scroll-mt-24 flex min-w-0 flex-col gap-10 border-(length:--poster-border) [--poster-border:1px] lg:min-h-[36rem] text-foreground border-foreground/10 bg-(--poster) p-6 sm:p-8 lg:p-10",
         tones[tone],
         className,
       )}
@@ -239,12 +242,23 @@ function Poster({
         <div className="absolute inset-0" style={patterns[pattern]} />
         {backdrop}
       </div>
-      <span aria-hidden="true" className={cn(cross, "-start-1.5 -top-1.5")} />
-      <span aria-hidden="true" className={cn(cross, "-end-1.5 -top-1.5")} />
-      <span aria-hidden="true" className={cn(cross, "-start-1.5 -bottom-1.5")} />
-      <span aria-hidden="true" className={cn(cross, "-end-1.5 -bottom-1.5")} />
+      <div aria-hidden="true" className="pointer-events-none absolute -inset-(--poster-border)">
+        <span className={cn(cross, "-start-[5px] -top-[5px]")} />
+        <span className={cn(cross, "-end-[5px] -top-[5px]")} />
+        <span className={cn(cross, "-start-[5px] -bottom-[5px]")} />
+        <span className={cn(cross, "-end-[5px] -bottom-[5px]")} />
+      </div>
       <div className="relative flex items-start justify-between gap-6 font-mono text-[11px] leading-4 tracking-[0.06em] text-foreground uppercase">
-        <div className="min-w-0 whitespace-pre-line">{head}</div>
+        <div className="min-w-0 whitespace-pre-line">
+          {touch ? (
+            <>
+              <span className="pointer-coarse:hidden">{head}</span>
+              <span className="hidden pointer-coarse:inline">{touch}</span>
+            </>
+          ) : (
+            head
+          )}
+        </div>
         {fig && <div className="hidden shrink-0 text-muted-foreground @[26rem]:block">{fig}</div>}
       </div>
       <div className={cn("relative flex min-w-0 flex-1 flex-col", body)}>{children}</div>
@@ -418,7 +432,7 @@ function ComponentPoster({
   name: string
 }) {
   return (
-    <Poster {...props} body="gap-10">
+    <Poster {...props} body="gap-8 sm:gap-10">
       <div className="flex flex-1 items-center justify-center">{children}</div>
       <div className="flex flex-col gap-5">
         <Title id={id} max={13} className="-ms-[0.04em]">
@@ -450,8 +464,7 @@ const keyboard: Record<string, string[]> = {
 
 function Keys({ keys }: { keys: string[] }) {
   return (
-    <div className="flex flex-wrap items-center gap-1.5">
-      <span className={cn(label, "me-1.5 text-muted-foreground")}>Keys</span>
+    <div className="flex flex-wrap items-center gap-1.5 pointer-coarse:hidden">
       {keys.map((key) => (
         <kbd
           key={key}
@@ -486,6 +499,7 @@ function CalendarTile({ className, fig }: { className?: string; fig?: string }) 
     <ComponentPoster
       fig={fig}
       head={"PICK YOUR DATES\nDRAG ACROSS THEM\nOR USE THE ARROWS"}
+      touch={"PICK YOUR DATES\nTAP A START, THEN AN END"}
       tone="white"
       pattern="plus"
       title="Calendar."
@@ -494,7 +508,7 @@ function CalendarTile({ className, fig }: { className?: string; fig?: string }) 
       className={className}
     >
       <Measure>
-        <Calendar mode="range" defaultValue={range} className={cn("bg-background p-3", ink)}>
+        <Calendar mode="range" fixedWeeks defaultValue={range} className={cn("bg-background p-3", ink)}>
           <div className="mb-3 flex items-center justify-between">
             <CalendarPrevious className={icon}>
               <ChevronLeftIcon aria-hidden="true" />
@@ -547,6 +561,7 @@ function CommandTile({ className, fig }: { className?: string; fig?: string }) {
     <ComponentPoster
       fig={fig}
       head={"SEARCH EVERYTHING\nTYPE, THEN PRESS ENTER"}
+      touch={"SEARCH EVERYTHING\nTYPE, THEN TAP A RESULT"}
       pattern="halftone"
       title="Command."
       id="command"
@@ -656,6 +671,7 @@ function RatingTile({ className, fig }: { className?: string; fig?: string }) {
     <ComponentPoster
       fig={fig}
       head={"RATE IT\nHOVER TO PREVIEW A SCORE"}
+      touch={"RATE IT\nTAP A STAR"}
       tone="white"
       pattern="dots"
       title="Rating."
@@ -687,6 +703,7 @@ function NumberInputTile({ className, fig }: { className?: string; fig?: string 
     <ComponentPoster
       fig={fig}
       head={"PICK A NUMBER\nTYPE IT, CLICK, OR USE\nTHE ARROWS"}
+      touch={"PICK A NUMBER\nTYPE IT, TAP, OR DRAG\nTHE RULER"}
       pattern="halftone"
       title="Number Input."
       id="number-input"
@@ -750,6 +767,7 @@ function SwitchTile({ className, fig }: { className?: string; fig?: string }) {
     <ComponentPoster
       fig={fig}
       head={"TURN THINGS ON AND OFF\nCLICK OR PRESS SPACE"}
+      touch={"TURN THINGS ON AND OFF\nTAP A SWITCH"}
       tone="white"
       pattern="hatch"
       title="Switch."
@@ -762,11 +780,16 @@ function SwitchTile({ className, fig }: { className?: string; fig?: string }) {
           {switches.map((setting) => (
             <div key={setting.title} className="flex items-center justify-between gap-4 p-4">
               <div className="flex flex-col gap-1">
-                <span className={label}>{setting.title}</span>
-                <span className={description}>{setting.body}</span>
+                <Label htmlFor={`setting-${slug(setting.title)}`} className={cn(label, "cursor-default")}>
+                  {setting.title}
+                </Label>
+                <span id={`setting-${slug(setting.title)}-description`} className={description}>
+                  {setting.body}
+                </span>
               </div>
               <Switch
-                aria-label={setting.title}
+                id={`setting-${slug(setting.title)}`}
+                aria-describedby={`setting-${slug(setting.title)}-description`}
                 defaultChecked={setting.on}
                 className={cn(
                   "group/switch inline-flex h-5 w-9 shrink-0 items-center bg-background p-[3px] transition-colors data-checked:bg-foreground",
@@ -789,6 +812,7 @@ function SliderTile({ className, fig }: { className?: string; fig?: string }) {
     <ComponentPoster
       fig={fig}
       head={"SET THE VOLUME\nDRAG, CLICK OR USE\nTHE ARROWS"}
+      touch={"SET THE VOLUME\nDRAG OR TAP THE TRACK"}
       tone="white"
       pattern="columns"
       title="Slider."
@@ -838,6 +862,7 @@ function SegmentedTile({ className, fig }: { className?: string; fig?: string })
     <ComponentPoster
       fig={fig}
       head={"PICK ONE OPTION\nOR USE THE ARROWS"}
+      touch={"PICK ONE OPTION\nTAP TO SWITCH"}
       tone="white"
       pattern="rings"
       title="Segmented Control."
@@ -857,7 +882,7 @@ function SegmentedTile({ className, fig }: { className?: string; fig?: string })
               key={view}
               value={view.toLowerCase()}
               className={cn(
-                "relative h-16 flex-1 px-4 text-xl font-medium @[24rem]:h-20 @[24rem]:text-2xl text-muted-foreground transition-colors data-checked:text-background",
+                "relative h-16 min-w-0 flex-1 px-2 text-lg font-medium @[22rem]:px-4 @[22rem]:text-xl @[24rem]:h-20 @[24rem]:text-2xl text-muted-foreground transition-colors data-checked:text-background",
                 ring,
               )}
             >
@@ -949,7 +974,7 @@ function ColorTile({ className, fig }: { className?: string; fig?: string }) {
           <div className="flex gap-2">
             <ColorPickerInput
               aria-label="Color"
-              className={cn(control, "min-w-0 flex-1 px-2.5 font-mono text-[12px]")}
+              className={cn(control, "min-w-0 flex-1 px-2.5 font-mono text-[12px] pointer-coarse:text-base")}
             />
           </div>
           <ColorPickerSwatches aria-label="Presets" className="grid grid-cols-8 gap-1.5">
@@ -976,11 +1001,6 @@ const files: Node[] = [
     children: [
       { value: "app/layout.tsx", label: "layout.tsx" },
       { value: "app/page.tsx", label: "page.tsx" },
-      {
-        value: "app/settings",
-        label: "settings",
-        children: [{ value: "app/settings/page.tsx", label: "page.tsx" }],
-      },
     ],
   },
   {
@@ -1023,6 +1043,7 @@ function TreeTile({ className, fig }: { className?: string; fig?: string }) {
     <ComponentPoster
       fig={fig}
       head={"OPEN A FOLDER\nRIGHT ARROW OPENS\nLEFT ARROW CLOSES"}
+      touch={"OPEN A FOLDER\nTAP TO OPEN OR CLOSE IT"}
       pattern="isometric"
       title="Tree."
       id="tree"
@@ -1061,7 +1082,7 @@ const periods = [
   },
 ]
 const tab = cn(
-  "h-11 flex-1 px-3 text-sm font-medium text-muted-foreground transition-colors select-none hover:text-foreground data-selected:bg-foreground data-selected:text-background",
+  "h-11 min-w-0 flex-1 px-2 text-sm font-medium text-muted-foreground @[22rem]:px-3 transition-colors select-none hover:text-foreground data-selected:bg-foreground data-selected:text-background",
   ring,
 )
 
@@ -1070,6 +1091,7 @@ function TabsTile({ className, fig }: { className?: string; fig?: string }) {
     <ComponentPoster
       fig={fig}
       head={"SWITCH TABS\nCLICK OR USE THE ARROWS"}
+      touch={"SWITCH TABS\nTAP ONE TO OPEN IT"}
       pattern="ruler"
       title="Tabs."
       id="tabs"
@@ -1257,6 +1279,7 @@ function AccordionTile({ className, fig }: { className?: string; fig?: string })
     <ComponentPoster
       fig={fig}
       head={"ONE SECTION OPEN AT A TIME\n⌘F FINDS TEXT IN CLOSED ONES"}
+      touch={"ONE SECTION OPEN AT A TIME\nTAP A TITLE TO OPEN IT"}
       tone="white"
       pattern="rules"
       title="Accordion."
@@ -1300,6 +1323,7 @@ function ResizableTile({ className, fig }: { className?: string; fig?: string })
     <ComponentPoster
       fig={fig}
       head={"RESIZE THE PANELS\nDRAG THE LINE OR\nUSE THE ARROWS"}
+      touch={"RESIZE THE PANELS\nDRAG THE LINE"}
       pattern="columns"
       title="Resizable."
       id="resizable"
@@ -1311,9 +1335,9 @@ function ResizableTile({ className, fig }: { className?: string; fig?: string })
           <ResizablePanel defaultSize={38} minSize={20} className="flex flex-col gap-1 overflow-hidden p-4">
             <span className={cn(label, "mb-2 text-muted-foreground")}>Files</span>
             {["page.tsx", "layout.tsx", "globals.css"].map((file) => (
-              <span key={file} className="flex items-center gap-2 truncate text-sm">
+              <span key={file} className="flex min-w-0 items-center gap-2 text-sm">
                 <FileIcon aria-hidden="true" className="size-3.5 shrink-0" />
-                {file}
+                <span className="truncate">{file}</span>
               </span>
             ))}
           </ResizablePanel>
@@ -1348,7 +1372,7 @@ const aligns = [
 ]
 
 const toggle = cn(
-  "flex size-9 items-center justify-center transition-colors @[24rem]:size-10 hover:bg-foreground/[0.06] data-pressed:bg-foreground data-pressed:text-background [&_svg]:size-4",
+  "flex size-8 items-center justify-center transition-colors @[22rem]:size-9 @[24rem]:size-10 hover:bg-foreground/[0.06] data-pressed:bg-foreground data-pressed:text-background [&_svg]:size-4",
   ring,
 )
 
@@ -1359,6 +1383,7 @@ function ToolbarTile({ className, fig }: { className?: string; fig?: string }) {
     <ComponentPoster
       fig={fig}
       head={"TAB ONCE TO GET IN\nTHEN USE THE ARROWS"}
+      touch={"FORMAT THE TEXT\nTAP A BUTTON TO TURN IT ON"}
       tone="white"
       pattern="plus"
       title="Toolbar."
@@ -1370,7 +1395,7 @@ function ToolbarTile({ className, fig }: { className?: string; fig?: string }) {
         <div className={cn("flex flex-col bg-background", ink)}>
           <Toolbar
             aria-label="Formatting"
-            className="flex items-center gap-1 border-b border-foreground p-1.5"
+            className="flex flex-wrap items-center gap-1 border-b border-foreground p-1.5"
           >
             <ToggleGroup aria-label="Style" value={marked} onValueChange={setMarked} className="flex">
               {marks.map(({ value, label: name, Icon }) => (
@@ -1428,7 +1453,7 @@ function StartPoster({ fig }: { fig?: string }) {
     >
       <Link
         href="/docs"
-        className="w-fit text-[length:clamp(3rem,11cqi,11rem)] leading-[0.82] after:absolute after:inset-0 font-[450] tracking-[-0.06em] whitespace-nowrap underline-offset-[0.08em] outline-none hover:underline focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-4 focus-visible:outline-[#006bff]"
+        className="w-fit text-[length:clamp(2.5rem,11cqi,11rem)] leading-[0.82] after:absolute after:inset-0 font-[450] tracking-[-0.06em] whitespace-nowrap underline-offset-[0.08em] outline-none hover:underline focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-4 focus-visible:outline-[#006bff]"
       >
         Start building.
       </Link>
