@@ -12,8 +12,6 @@
   }
 }
 
-/* A tap target at least 32px square around a smaller control, without changing how it looks or
-   where it sits. */
 @utility hit-area {
   position: relative;
   &::after {
@@ -181,6 +179,11 @@ html {
   color: var(--foreground);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+body {
+  background: var(--canvas) !important;
+  color: var(--foreground) !important;
 }
 
 .shiki,

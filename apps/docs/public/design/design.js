@@ -30,22 +30,12 @@ function dedent(html) {
   return lines.map((line) => line.slice(indent)).join("\n")
 }
 
-const sliders = [...document.querySelectorAll(".ds-tokens ui-slider")]
-
-for (const slider of sliders) {
-  slider.addEventListener("valuechange", (event) => {
-    root.style.setProperty(slider.dataset.token, `${[].concat(event.detail.value)[0] / 16}rem`)
-    refresh()
-  })
-}
-
 document.getElementById("ds-scheme").addEventListener("pressedchange", (event) => {
   root.dataset.scheme = event.detail.value ? "dark" : "light"
+  for (const meta of document.querySelectorAll('meta[name="theme-color"]')) {
+    meta.content = event.detail.value ? "#0a0a0a" : "#ffffff"
+  }
   refresh()
-})
-
-document.getElementById("ds-dir").addEventListener("pressedchange", (event) => {
-  root.dir = event.detail.value ? "rtl" : "ltr"
 })
 
 const probe = document.createElement("div")
@@ -54,11 +44,30 @@ document.body.append(probe)
 
 function resolveColor(token) {
   probe.style.backgroundColor = `var(${token})`
-  const [r, g, b, a = 1] = getComputedStyle(probe)
-    .backgroundColor.match(/[\d.]+/g)
-    .map(Number)
-  const hex = `#${[r, g, b].map((channel) => channel.toString(16).padStart(2, "0")).join("")}`
-  return a < 1 ? `${hex} at ${Math.round(a * 100)}%` : hex
+  const value = getComputedStyle(probe).backgroundColor
+  const numbers = value.match(/[\d.]+/g).map(Number)
+  const [l, c, h, a = 1] = value.startsWith("oklch") ? numbers : toOklch(...numbers)
+  const round = (number, digits) => +number.toFixed(digits)
+  const color = c < 0.0005 ? `${round(l, 3)} 0 0` : `${round(l, 3)} ${round(c, 3)} ${round(h, 1)}`
+  return a < 1 ? `oklch(${color} / ${round(a, 2)})` : `oklch(${color})`
+}
+
+function toOklch(r, g, b, a) {
+  const [lr, lg, lb] = [r, g, b].map((channel) => {
+    const value = channel / 255
+    return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4
+  })
+  const l = Math.cbrt(0.4122214708 * lr + 0.5363325363 * lg + 0.0514459929 * lb)
+  const m = Math.cbrt(0.2119034982 * lr + 0.6806995451 * lg + 0.1073969566 * lb)
+  const s = Math.cbrt(0.0883024619 * lr + 0.2817188376 * lg + 0.6299787005 * lb)
+  const x = 1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s
+  const y = 0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s
+  return [
+    0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s,
+    Math.hypot(x, y),
+    ((Math.atan2(y, x) * 180) / Math.PI + 360) % 360,
+    a,
+  ]
 }
 
 function refresh() {
@@ -96,3 +105,13 @@ customElements.whenDefined("ui-trigger-menu").then(() => {
 })
 
 document.addEventListener("submit", (event) => event.preventDefault())
+
+const tags = new Set([...document.querySelectorAll("*")].map((element) => element.localName))
+const defined = [...tags].filter((tag) => tag.startsWith("ui-")).map((tag) => customElements.whenDefined(tag))
+Promise.race([Promise.all(defined), new Promise((resolve) => setTimeout(resolve, 3000))]).then(() =>
+  requestAnimationFrame(() => {
+    refresh()
+    root.dataset.ready = ""
+    if (location.hash) document.getElementById(location.hash.slice(1))?.scrollIntoView()
+  }),
+)

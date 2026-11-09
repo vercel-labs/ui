@@ -3,6 +3,8 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)" />
     <title>web.css · UI SDK</title>
     <meta
       name="description"
@@ -13,37 +15,36 @@
     <link rel="stylesheet" href="/design/design.css" />
   </head>
   <body>
+    <a class="ds-skip" href="#content">Skip to content</a>
     <header class="ds-bar">
-      <div class="ds-brand">web.css <span>UI SDK design system</span></div>
+      <div class="ds-brand">
+        <a href="https://vercel.com" target="_blank" rel="noreferrer" aria-label="Vercel">
+          <svg viewBox="0 0 115 100" aria-hidden="true">
+            <path d="M57.5 0 115 100H0z" fill="currentColor" />
+          </svg>
+        </a>
+        <span aria-hidden="true">/</span>
+        <a href="/" aria-label="UI SDK home">
+          <svg viewBox="7 3.5 304 84" fill="none" aria-hidden="true">
+            <path
+              d="M7 3.64H22.08V55.724C22.08 67.904 28.692 74.284 40.988 74.284C53.284 74.284 59.896 67.904 59.896 55.724V3.64H74.976V56.188C74.976 76.372 62.448 87.392 40.988 87.392C19.528 87.392 7 76.372 7 56.188V3.64ZM130.894 3.64V16.748H117.67V72.892H131.59V86H88.5544V72.892H102.59V16.748H89.2504V3.64H130.894Z"
+              fill="currentColor"
+            />
+            <rect x="153" y="7.5" width="154" height="75" rx="37.5" stroke="currentColor" stroke-width="8" />
+            <path
+              d="M183.603 51.8472C184.393 56.468 187.677 59.508 193.088 59.508C197.222 59.508 200.019 57.8664 199.958 54.7048C199.897 51.5432 197.222 49.7192 190.473 48.0776C181.11 45.828 175.091 42.0584 175.091 35.1272C175.091 27.284 181.657 22.3592 191.507 22.3592C201.113 22.3592 207.68 28.2568 208.713 36.9512L199.472 37.4376C198.985 32.8776 195.824 30.02 191.264 30.02C187.251 30.02 184.393 32.0872 184.576 35.2488C184.697 38.8968 188.953 40.1128 193.574 41.268C203.241 43.396 209.382 47.5304 209.382 54.4008C209.382 62.6088 202.147 67.2296 192.845 67.2296C182.326 67.2296 174.909 61.3928 174.301 52.2728L183.603 51.8472ZM226.773 23.332C240.757 23.332 248.601 31.1144 248.601 44.9768C248.601 58.7784 240.879 66.5 227.138 66.5H211.877V23.332H226.773ZM221.119 58.7176H226.773C235.164 58.7176 239.177 54.2792 239.177 44.916C239.177 35.5528 235.164 31.1144 226.773 31.1144H221.119V58.7176ZM250.431 23.332H259.672V42.18L275.359 23.332H286.12L270.252 42.3624L287.093 66.5H276.575L264.172 48.564L259.672 53.7928V66.5H250.431V23.332Z"
+              fill="currentColor"
+            />
+          </svg>
+        </a>
+      </div>
       <div class="ds-controls">
         <ui-toggle id="ds-scheme"><button>Dark</button></ui-toggle>
-        <ui-toggle id="ds-dir"><button>RTL</button></ui-toggle>
-      </div>
-      <div class="ds-tokens">
-        <ui-field>
-          <ui-slider data-token="--ui-radius" default-value="0" min="0" max="16" step="1">
-            <div class="ds-spread">
-              <ui-field-label>Radius</ui-field-label><ui-slider-value></ui-slider-value>
-            </div>
-            <ui-slider-control><ui-slider-track><ui-slider-indicator></ui-slider-indicator><ui-slider-thumb></ui-slider-thumb></ui-slider-track></ui-slider-control>
-          </ui-slider>
-        </ui-field>
-        <ui-field>
-          <ui-slider data-token="--ui-font-size" default-value="13" min="11" max="18" step="1">
-            <div class="ds-spread">
-              <ui-field-label>Font size</ui-field-label><ui-slider-value></ui-slider-value>
-            </div>
-            <ui-slider-control><ui-slider-track><ui-slider-indicator></ui-slider-indicator><ui-slider-thumb></ui-slider-thumb></ui-slider-track></ui-slider-control>
-          </ui-slider>
-        </ui-field>
-        <ui-field>
-          <ui-slider data-token="--ui-spacing" default-value="4" min="3" max="6" step="0.25">
-            <div class="ds-spread">
-              <ui-field-label>Spacing</ui-field-label><ui-slider-value></ui-slider-value>
-            </div>
-            <ui-slider-control><ui-slider-track><ui-slider-indicator></ui-slider-indicator><ui-slider-thumb></ui-slider-thumb></ui-slider-track></ui-slider-control>
-          </ui-slider>
-        </ui-field>
+        <script>
+          if (matchMedia("(prefers-color-scheme: dark)").matches) {
+            document.getElementById("ds-scheme").setAttribute("default-pressed", "")
+          }
+        </script>
       </div>
     </header>
 
@@ -74,15 +75,22 @@
           <li><a href="#autocomplete">Autocomplete</a></li>
           <li><a href="#avatar">Avatar</a></li>
           <li><a href="#button">Button</a></li>
+          <li><a href="#calendar">Calendar</a></li>
+          <li><a href="#carousel">Carousel</a></li>
           <li><a href="#checkbox">Checkbox</a></li>
           <li><a href="#collapsible">Collapsible</a></li>
+          <li><a href="#color-picker">Color picker</a></li>
           <li><a href="#combobox">Combobox</a></li>
           <li><a href="#command">Command</a></li>
+          <li><a href="#date-input">Date input</a></li>
+          <li><a href="#date-picker">Date picker</a></li>
           <li><a href="#dialog">Dialog</a></li>
           <li><a href="#drawer">Drawer</a></li>
           <li><a href="#field">Field</a></li>
+          <li><a href="#file-input">File input</a></li>
           <li><a href="#form">Form</a></li>
           <li><a href="#hover-card">Hover card</a></li>
+          <li><a href="#image-cropper">Image cropper</a></li>
           <li><a href="#input">Input</a></li>
           <li><a href="#listbox">Listbox</a></li>
           <li><a href="#menu">Menu</a></li>
@@ -90,9 +98,17 @@
           <li><a href="#meter">Meter</a></li>
           <li><a href="#navigation-menu">Navigation menu</a></li>
           <li><a href="#number-input">Number input</a></li>
+          <li><a href="#otp-input">OTP input</a></li>
+          <li><a href="#pagination">Pagination</a></li>
+          <li><a href="#password-input">Password input</a></li>
           <li><a href="#popover">Popover</a></li>
+          <li><a href="#preferences">Preferences</a></li>
           <li><a href="#progress">Progress</a></li>
           <li><a href="#radio">Radio</a></li>
+          <li><a href="#rating">Rating</a></li>
+          <li><a href="#resizable">Resizable</a></li>
+          <li><a href="#scroll-area">Scroll area</a></li>
+          <li><a href="#segmented-control">Segmented control</a></li>
           <li><a href="#select">Select</a></li>
           <li><a href="#separator">Separator</a></li>
           <li><a href="#slider">Slider</a></li>
@@ -100,44 +116,57 @@
           <li><a href="#tabs">Tabs</a></li>
           <li><a href="#text">Text elements</a></li>
           <li><a href="#textarea">Textarea</a></li>
+          <li><a href="#time-input">Time input</a></li>
+          <li><a href="#toast">Toast</a></li>
           <li><a href="#toggle">Toggle</a></li>
           <li><a href="#toggle-group">Toggle group</a></li>
+          <li><a href="#token-input">Token input</a></li>
+          <li><a href="#toolbar">Toolbar</a></li>
           <li><a href="#tooltip">Tooltip</a></li>
+          <li><a href="#tree">Tree</a></li>
           <li><a href="#trigger-menu">Trigger menu</a></li>
         </ul>
         <h2>More</h2>
         <ul>
           <li><a href="#patterns">Patterns</a></li>
-          <li><a href="#coverage">Coverage</a></li>
         </ul>
       </nav>
 
-      <main class="ds-main">
+      <main class="ds-main" id="content" tabindex="-1">
         <div class="ds-intro">
           <h1>web.css</h1>
+          <aside class="ds-callout">
+            <strong>Simple on purpose.</strong>
+            <p>
+              This is a bare-bones design system we made to get you started. It’s kept small so it’s easy to
+              read and easy to change.
+            </p>
+            <p>
+              It isn’t meant to be your final look. Change the tokens, override what you need, or swap it for
+              your own styles when you’re ready.
+            </p>
+          </aside>
           <p>
             A small, flat design system for UI SDK components. Square by default, built from a handful of
             tokens, with no animation and shadows only on things that float. It styles parts through their
             <code>data-slot</code> and state attributes, so the same stylesheet works in React, Vue, Svelte,
             Solid and web components.
           </p>
-          <p>
-            Use the bar above to switch color scheme and direction, or drag a token. Every example on
-            this page updates.
-          </p>
+          <p>Switch to Dark in the bar above to see every example in dark mode.</p>
         </div>
 
         <section class="ds-section" id="install">
           <h2>Install</h2>
           <p>Without a bundler, add two tags. The stylesheet follows the same release as the loader.</p>
           <pre
-            class="ds-code"><code>&lt;script type="module" src="https://ui-sdk.dev/web.js"&gt;&lt;/script&gt;
+            class="ds-code"
+          ><code>&lt;script type="module" src="https://ui-sdk.dev/web.js"&gt;&lt;/script&gt;
 &lt;link rel="stylesheet" href="https://ui-sdk.dev/web.css" /&gt;</code></pre>
           <p>With a bundler, import it once from core, next to your own CSS.</p>
           <pre class="ds-code"><code>import "@ui-sdk/core/web.css"</code></pre>
           <p>
             Everything sits in <code>@layer ui-sdk</code>, so any style you write without a layer wins.
-            Components inherit your page's font. To use the system font, set
+            Components inherit your page’s font. To use the system font, set
             <code>font-family: var(--ui-font-sans)</code> on <code>body</code>.
           </p>
         </section>
@@ -147,31 +176,31 @@
           <table class="ds-table">
             <tbody>
               <tr>
-                <td>Flat</td>
+                <th scope="row">Flat</th>
                 <td class="ds-muted">
                   Borders separate things. Shadows only appear on menus, lists, popovers and dialogs, which
                   sit above the page.
                 </td>
               </tr>
               <tr>
-                <td>Square</td>
+                <th scope="row">Square</th>
                 <td class="ds-muted">
                   Corners start at zero. One token rounds everything, and small parts scale from it.
                 </td>
               </tr>
               <tr>
-                <td>Still</td>
+                <th scope="row">Still</th>
                 <td class="ds-muted">Nothing animates. A state change is visible the moment it happens.</td>
               </tr>
               <tr>
-                <td>One height</td>
+                <th scope="row">One height</th>
                 <td class="ds-muted">
                   Every control is <code>--ui-spacing × 8</code> tall, so inputs, selects and buttons line up
                   on one row.
                 </td>
               </tr>
               <tr>
-                <td>Yours to override</td>
+                <th scope="row">Yours to override</th>
                 <td class="ds-muted">
                   A low cascade layer and plain custom properties. No classes to learn and nothing to unset.
                 </td>
@@ -183,16 +212,16 @@
         <section class="ds-section" id="themes">
           <h2>Themes</h2>
           <p>
-            A theme is a set of tokens. Set them on <code>:root</code>, or on any element to theme only what's
+            A theme is a set of tokens. Set them on <code>:root</code>, or on any element to theme only what’s
             inside it.
           </p>
           <pre class="ds-code"><code>:root {
   --ui-radius: 0.5rem;
   --ui-spacing: 0.28125rem;
-  --ui-primary: light-dark(#0062e0, #4c9aff);
+  --ui-primary: light-dark(oklch(0.529 0.207 259.2), oklch(0.685 0.168 256));
 }</code></pre>
           <p>
-            Colors follow the page's <code>color-scheme</code>. Set <code>color-scheme: light dark</code> to
+            Colors follow the page’s <code>color-scheme</code>. Set <code>color-scheme: light dark</code> to
             follow the system, or <code>dark</code> to force it.
           </p>
         </section>
@@ -208,37 +237,46 @@
           <h3>Surfaces and text</h3>
           <div class="ds-grid">
             <div class="ds-swatch">
-              <i style="background: var(--ui-background)"></i><b>--ui-background</b><span data-color="--ui-background"></span>
+              <i style="background: var(--ui-background)"></i><b>--ui-background</b
+              ><span data-color="--ui-background"></span>
             </div>
             <div class="ds-swatch">
-              <i style="background: var(--ui-foreground)"></i><b>--ui-foreground</b><span data-color="--ui-foreground"></span>
+              <i style="background: var(--ui-foreground)"></i><b>--ui-foreground</b
+              ><span data-color="--ui-foreground"></span>
             </div>
             <div class="ds-swatch">
-              <i style="background: var(--ui-muted)"></i><b>--ui-muted</b><span data-color="--ui-muted"></span>
+              <i style="background: var(--ui-muted)"></i><b>--ui-muted</b
+              ><span data-color="--ui-muted"></span>
             </div>
             <div class="ds-swatch">
-              <i style="background: var(--ui-muted-foreground)"></i><b>--ui-muted-foreground</b><span data-color="--ui-muted-foreground"></span>
+              <i style="background: var(--ui-muted-foreground)"></i><b>--ui-muted-foreground</b
+              ><span data-color="--ui-muted-foreground"></span>
             </div>
           </div>
           <h3>Lines</h3>
           <div class="ds-grid">
             <div class="ds-swatch">
-              <i style="background: var(--ui-border)"></i><b>--ui-border</b><span data-color="--ui-border"></span>
+              <i style="background: var(--ui-border)"></i><b>--ui-border</b
+              ><span data-color="--ui-border"></span>
             </div>
             <div class="ds-swatch">
-              <i style="background: var(--ui-input)"></i><b>--ui-input</b><span data-color="--ui-input"></span>
+              <i style="background: var(--ui-input)"></i><b>--ui-input</b
+              ><span data-color="--ui-input"></span>
             </div>
           </div>
           <h3>Accent and status</h3>
           <div class="ds-grid">
             <div class="ds-swatch">
-              <i style="background: var(--ui-primary)"></i><b>--ui-primary</b><span data-color="--ui-primary"></span>
+              <i style="background: var(--ui-primary)"></i><b>--ui-primary</b
+              ><span data-color="--ui-primary"></span>
             </div>
             <div class="ds-swatch">
-              <i style="background: var(--ui-primary-foreground)"></i><b>--ui-primary-foreground</b><span data-color="--ui-primary-foreground"></span>
+              <i style="background: var(--ui-primary-foreground)"></i><b>--ui-primary-foreground</b
+              ><span data-color="--ui-primary-foreground"></span>
             </div>
             <div class="ds-swatch">
-              <i style="background: var(--ui-destructive)"></i><b>--ui-destructive</b><span data-color="--ui-destructive"></span>
+              <i style="background: var(--ui-destructive)"></i><b>--ui-destructive</b
+              ><span data-color="--ui-destructive"></span>
             </div>
           </div>
           <h3>Focus and overlay</h3>
@@ -247,10 +285,12 @@
               <i style="background: var(--ui-ring)"></i><b>--ui-ring</b><span data-color="--ui-ring"></span>
             </div>
             <div class="ds-swatch">
-              <i style="background: var(--ui-ring-border)"></i><b>--ui-ring-border</b><span data-color="--ui-ring-border"></span>
+              <i style="background: var(--ui-ring-border)"></i><b>--ui-ring-border</b
+              ><span data-color="--ui-ring-border"></span>
             </div>
             <div class="ds-swatch">
-              <i style="background: var(--ui-overlay)"></i><b>--ui-overlay</b><span data-color="--ui-overlay"></span>
+              <i style="background: var(--ui-overlay)"></i><b>--ui-overlay</b
+              ><span data-color="--ui-overlay"></span>
             </div>
           </div>
         </section>
@@ -275,14 +315,18 @@
                 <td>
                   <span
                     id="ds-t-title"
-                    style="font-size: calc(var(--ui-font-size) + 0.125rem); font-weight: 600">Delete this project?</span>
+                    style="font-size: calc(var(--ui-font-size) + 0.125rem); font-weight: 600"
+                    >Delete this project?</span
+                  >
                 </td>
                 <td class="ds-mono" data-measure="#ds-t-title|fontSize"></td>
               </tr>
               <tr>
                 <td>Base</td>
                 <td>
-                  <span id="ds-t-base" style="font-size: var(--ui-font-size)">Buttons, inputs, menus and body text.</span>
+                  <span id="ds-t-base" style="font-size: var(--ui-font-size)"
+                    >Buttons, inputs, menus and body text.</span
+                  >
                 </td>
                 <td class="ds-mono" data-measure="#ds-t-base|fontSize"></td>
               </tr>
@@ -291,7 +335,9 @@
                 <td>
                   <span
                     id="ds-t-label"
-                    style="font-size: calc(var(--ui-font-size) - 0.0625rem); font-weight: 500">Email address</span>
+                    style="font-size: calc(var(--ui-font-size) - 0.0625rem); font-weight: 500"
+                    >Email address</span
+                  >
                 </td>
                 <td class="ds-mono" data-measure="#ds-t-label|fontSize"></td>
               </tr>
@@ -301,7 +347,9 @@
                   <span
                     id="ds-t-desc"
                     class="ds-muted"
-                    style="font-size: calc(var(--ui-font-size) - 0.0625rem)">We'll send a confirmation link.</span>
+                    style="font-size: calc(var(--ui-font-size) - 0.0625rem)"
+                    >We’ll send a confirmation link.</span
+                  >
                 </td>
                 <td class="ds-mono" data-measure="#ds-t-desc|fontSize"></td>
               </tr>
@@ -311,7 +359,9 @@
                   <span
                     id="ds-t-small"
                     class="ds-muted"
-                    style="font-size: calc(var(--ui-font-size) - 0.125rem)">Group labels and shortcuts</span>
+                    style="font-size: calc(var(--ui-font-size) - 0.125rem)"
+                    >Group labels and shortcuts</span
+                  >
                 </td>
                 <td class="ds-mono" data-measure="#ds-t-small|fontSize"></td>
               </tr>
@@ -422,19 +472,30 @@
           <div class="ds-example" data-caption="Input, number input, select, toggle and button on one row.">
             <template>
               <div class="ds-row">
-                <ui-input><input placeholder="Search" aria-label="Search" style="width: 10rem" /></ui-input>
+                <ui-input><input placeholder="Search…" aria-label="Search" style="width: 10rem" /></ui-input>
                 <ui-number-input default-value="2" min="1" aria-label="Count">
                   <ui-number-input-group>
-                    <ui-number-input-decrement><button aria-label="Decrease"></button></ui-number-input-decrement>
-                    <ui-number-input-control><input /></ui-number-input-control>
-                    <ui-number-input-increment><button aria-label="Increase"></button></ui-number-input-increment>
+                    <ui-number-input-decrement
+                      ><button aria-label="Decrease"></button
+                    ></ui-number-input-decrement>
+                    <ui-number-input-control><input aria-label="Count" /></ui-number-input-control>
+                    <ui-number-input-increment
+                      ><button aria-label="Increase"></button
+                    ></ui-number-input-increment>
                   </ui-number-input-group>
                 </ui-number-input>
                 <ui-select default-value="week" aria-label="Range">
-                  <ui-select-trigger><button style="min-width: 7rem"><ui-select-value></ui-select-value></button></ui-select-trigger>
+                  <ui-select-trigger
+                    ><button aria-label="Range" style="min-width: 7rem">
+                      <ui-select-value></ui-select-value></button
+                  ></ui-select-trigger>
                   <ui-select-content>
-                    <ui-select-item value="day">Day<ui-select-item-indicator></ui-select-item-indicator></ui-select-item>
-                    <ui-select-item value="week">Week<ui-select-item-indicator></ui-select-item-indicator></ui-select-item>
+                    <ui-select-item value="day"
+                      >Day<ui-select-item-indicator></ui-select-item-indicator
+                    ></ui-select-item>
+                    <ui-select-item value="week"
+                      >Week<ui-select-item-indicator></ui-select-item-indicator
+                    ></ui-select-item>
                   </ui-select-content>
                 </ui-select>
                 <ui-toggle><button>Live</button></ui-toggle>
@@ -454,19 +515,23 @@
           <div class="ds-row" style="gap: 24px">
             <div class="ds-stack" style="gap: 6px">
               <div id="ds-r-small" class="ds-box" style="border-radius: calc(var(--ui-radius) / 2)">½</div>
-              <span class="ds-mono ds-muted" data-measure="#ds-r-small|borderRadius"></span><span class="ds-muted">Checkbox, tracks</span>
+              <span class="ds-mono ds-muted" data-measure="#ds-r-small|borderRadius"></span
+              ><span class="ds-muted">Checkbox, tracks</span>
             </div>
             <div class="ds-stack" style="gap: 6px">
               <div id="ds-r-base" class="ds-box" style="border-radius: var(--ui-radius)">1</div>
-              <span class="ds-mono ds-muted" data-measure="#ds-r-base|borderRadius"></span><span class="ds-muted">Controls</span>
+              <span class="ds-mono ds-muted" data-measure="#ds-r-base|borderRadius"></span
+              ><span class="ds-muted">Controls</span>
             </div>
             <div class="ds-stack" style="gap: 6px">
               <div id="ds-r-large" class="ds-box" style="border-radius: calc(var(--ui-radius) * 1.5)">1½</div>
-              <span class="ds-mono ds-muted" data-measure="#ds-r-large|borderRadius"></span><span class="ds-muted">Popups, dialogs</span>
+              <span class="ds-mono ds-muted" data-measure="#ds-r-large|borderRadius"></span
+              ><span class="ds-muted">Popups, dialogs</span>
             </div>
             <div class="ds-stack" style="gap: 6px">
               <div id="ds-r-full" class="ds-box" style="border-radius: calc(var(--ui-radius) * 999)">∞</div>
-              <span class="ds-mono ds-muted" data-measure="#ds-r-full|borderRadius"></span><span class="ds-muted">Switch, thumb</span>
+              <span class="ds-mono ds-muted" data-measure="#ds-r-full|borderRadius"></span
+              ><span class="ds-muted">Switch, thumb</span>
             </div>
           </div>
         </section>
@@ -493,7 +558,8 @@
           <div class="ds-row" style="gap: 24px">
             <div
               class="ds-surface ds-ring"
-              style="width: 8rem; height: 2rem; border-color: var(--ui-ring-border)">
+              style="width: 8rem; height: 2rem; border-color: var(--ui-ring-border)"
+            >
               Focused field
             </div>
             <div
@@ -503,7 +569,8 @@
                 height: 2rem;
                 border-color: var(--ui-destructive);
                 outline: 4px solid color-mix(in oklab, var(--ui-destructive) 20%, transparent);
-              ">
+              "
+            >
               Invalid field
             </div>
           </div>
@@ -513,7 +580,7 @@
           <h2>Icons</h2>
           <p>
             The stylesheet draws the four icons components need, as CSS masks in <code>currentColor</code>, so
-            there's no icon library to load. Put your own <code>&lt;svg&gt;</code> in a part and the CSS icon
+            there’s no icon library to load. Put your own <code>&lt;svg&gt;</code> in a part and the CSS icon
             steps aside.
           </p>
           <table class="ds-table">
@@ -522,26 +589,26 @@
                 <td>
                   <span class="ds-icon" style="display: block; mask-image: var(--ui-icon-chevron)"></span>
                 </td>
-                <td class="ds-mono">--ui-icon-chevron</td>
+                <th scope="row" class="ds-mono">--ui-icon-chevron</th>
                 <td class="ds-muted">Select, combobox, accordion, collapsible, navigation menu, submenus</td>
               </tr>
               <tr>
                 <td>
                   <span class="ds-icon" style="display: block; mask-image: var(--ui-icon-check)"></span>
                 </td>
-                <td class="ds-mono">--ui-icon-check</td>
+                <th scope="row" class="ds-mono">--ui-icon-check</th>
                 <td class="ds-muted">Checkbox, selected items, checked menu items</td>
               </tr>
               <tr>
                 <td>
                   <span class="ds-icon" style="display: block; mask-image: var(--ui-icon-minus)"></span>
                 </td>
-                <td class="ds-mono">--ui-icon-minus</td>
+                <th scope="row" class="ds-mono">--ui-icon-minus</th>
                 <td class="ds-muted">Indeterminate checkbox, number input decrement</td>
               </tr>
               <tr>
                 <td><span class="ds-icon" style="display: block; mask-image: var(--ui-icon-plus)"></span></td>
-                <td class="ds-mono">--ui-icon-plus</td>
+                <th scope="row" class="ds-mono">--ui-icon-plus</th>
                 <td class="ds-muted">Number input increment</td>
               </tr>
             </tbody>
@@ -566,21 +633,32 @@
             <template>
               <ui-accordion default-value="shipping" style="width: 28rem; max-width: 100%">
                 <ui-accordion-item value="shipping">
-                  <ui-accordion-header><h3>
+                  <ui-accordion-header
+                    ><h3>
                       <ui-accordion-trigger><button type="button">Shipping</button></ui-accordion-trigger>
-                    </h3></ui-accordion-header>
-                  <ui-accordion-panel>Orders ship within two business days. You get a tracking link by email.</ui-accordion-panel>
+                    </h3></ui-accordion-header
+                  >
+                  <ui-accordion-panel
+                    >Orders ship within two business days. You get a tracking link by
+                    email.</ui-accordion-panel
+                  >
                 </ui-accordion-item>
                 <ui-accordion-item value="returns">
-                  <ui-accordion-header><h3>
+                  <ui-accordion-header
+                    ><h3>
                       <ui-accordion-trigger><button type="button">Returns</button></ui-accordion-trigger>
-                    </h3></ui-accordion-header>
-                  <ui-accordion-panel hidden>Return anything within 30 days for a full refund.</ui-accordion-panel>
+                    </h3></ui-accordion-header
+                  >
+                  <ui-accordion-panel hidden
+                    >Return anything within 30 days for a full refund.</ui-accordion-panel
+                  >
                 </ui-accordion-item>
                 <ui-accordion-item value="warranty">
-                  <ui-accordion-header><h3>
+                  <ui-accordion-header
+                    ><h3>
                       <ui-accordion-trigger><button type="button">Warranty</button></ui-accordion-trigger>
-                    </h3></ui-accordion-header>
+                    </h3></ui-accordion-header
+                  >
                   <ui-accordion-panel hidden>Every product has a two year warranty.</ui-accordion-panel>
                 </ui-accordion-item>
               </ui-accordion>
@@ -603,14 +681,21 @@
           <div class="ds-example">
             <template>
               <ui-alert-dialog>
-                <ui-alert-dialog-trigger><button data-variant="destructive">Delete project</button></ui-alert-dialog-trigger>
+                <ui-alert-dialog-trigger
+                  ><button data-variant="destructive">Delete project</button></ui-alert-dialog-trigger
+                >
                 <ui-alert-dialog-backdrop hidden></ui-alert-dialog-backdrop>
                 <ui-alert-dialog-content hidden>
                   <ui-alert-dialog-title>Delete this project?</ui-alert-dialog-title>
-                  <ui-alert-dialog-description>This permanently deletes the project and its deployment history.</ui-alert-dialog-description>
+                  <ui-alert-dialog-description
+                    >This permanently deletes the project and its deployment
+                    history.</ui-alert-dialog-description
+                  >
                   <div class="ds-row" style="justify-content: flex-end">
                     <ui-alert-dialog-close><button>Cancel</button></ui-alert-dialog-close>
-                    <ui-alert-dialog-close value="confirm"><button data-variant="destructive">Delete</button></ui-alert-dialog-close>
+                    <ui-alert-dialog-close value="confirm"
+                      ><button data-variant="destructive">Delete</button></ui-alert-dialog-close
+                    >
                   </div>
                 </ui-alert-dialog-content>
               </ui-alert-dialog>
@@ -658,8 +743,12 @@
           <p>A picture with initials to fall back on while it loads or when it fails.</p>
           <div class="ds-example">
             <template>
-              <ui-avatar><img src="/apple-touch-icon.png" alt="UI SDK" /><ui-avatar-fallback>UI</ui-avatar-fallback></ui-avatar>
-              <ui-avatar><img src="/design/missing.png" alt="Hollis Grant" /><ui-avatar-fallback>HG</ui-avatar-fallback></ui-avatar>
+              <ui-avatar
+                ><img src="/apple-touch-icon.png" alt="UI SDK" /><ui-avatar-fallback
+                  >UI</ui-avatar-fallback
+                ></ui-avatar
+              >
+              <ui-avatar><ui-avatar-fallback>HG</ui-avatar-fallback></ui-avatar>
             </template>
           </div>
           <ul class="ds-parts">
@@ -682,7 +771,12 @@
               <ui-button><button>Cancel</button></ui-button>
               <ui-button><button data-variant="destructive">Delete</button></ui-button>
               <ui-button disabled><button>Disabled</button></ui-button>
-              <ui-button><button aria-label="Add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5v14" /></svg></button></ui-button>
+              <ui-button
+                ><button aria-label="Add">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14M12 5v14" />
+                  </svg></button
+              ></ui-button>
             </template>
           </div>
           <ul class="ds-parts">
@@ -692,6 +786,93 @@
           </ul>
         </section>
 
+        <section class="ds-section" id="calendar">
+          <h2>Calendar</h2>
+          <p>
+            A month in a bordered box. The selected day is filled, today is underlined, and days from other
+            months fade.
+          </p>
+          <div class="ds-example">
+            <template>
+              <ui-calendar default-value="2026-10-16">
+                <ui-calendar-previous><button aria-label="Previous month"></button></ui-calendar-previous>
+                <ui-calendar-heading></ui-calendar-heading>
+                <ui-calendar-next><button aria-label="Next month"></button></ui-calendar-next>
+                <ui-calendar-grid>
+                  <ui-calendar-weekdays
+                    ><template><ui-calendar-weekday></ui-calendar-weekday></template
+                  ></ui-calendar-weekdays>
+                  <ui-calendar-weeks
+                    ><template><ui-calendar-day></ui-calendar-day></template
+                  ></ui-calendar-weeks>
+                </ui-calendar-grid>
+              </ui-calendar>
+              <ui-calendar mode="range" default-value="2026-10-12,2026-10-16">
+                <ui-calendar-previous><button aria-label="Previous month"></button></ui-calendar-previous>
+                <ui-calendar-heading></ui-calendar-heading>
+                <ui-calendar-next><button aria-label="Next month"></button></ui-calendar-next>
+                <ui-calendar-grid>
+                  <ui-calendar-weekdays
+                    ><template><ui-calendar-weekday></ui-calendar-weekday></template
+                  ></ui-calendar-weekdays>
+                  <ui-calendar-weeks
+                    ><template><ui-calendar-day></ui-calendar-day></template
+                  ></ui-calendar-weeks>
+                </ui-calendar-grid>
+              </ui-calendar>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>calendar-root</code></li>
+            <li><code>calendar-previous</code></li>
+            <li><code>calendar-heading</code></li>
+            <li><code>calendar-next</code></li>
+            <li><code>calendar-grid</code></li>
+            <li><code>calendar-weekday</code></li>
+            <li><code>calendar-day</code></li>
+            <li><code>[data-selected]</code></li>
+            <li><code>[data-range-middle]</code></li>
+            <li><code>[data-today]</code></li>
+          </ul>
+        </section>
+        <section class="ds-section" id="carousel">
+          <h2>Carousel</h2>
+          <p>
+            Previous and Next sit on either side of the slides, with a dot for each slide below. The current
+            dot is filled.
+          </p>
+          <div class="ds-example">
+            <template>
+              <ui-carousel aria-label="Featured" class="ds-w" style="width: 26rem">
+                <ui-carousel-viewport>
+                  <ui-carousel-content>
+                    <ui-carousel-item><div class="ds-tile">Spring</div></ui-carousel-item>
+                    <ui-carousel-item><div class="ds-tile">Summer</div></ui-carousel-item>
+                    <ui-carousel-item><div class="ds-tile">Autumn</div></ui-carousel-item>
+                    <ui-carousel-item><div class="ds-tile">Winter</div></ui-carousel-item>
+                  </ui-carousel-content>
+                </ui-carousel-viewport>
+                <ui-carousel-previous><button aria-label="Previous slide"></button></ui-carousel-previous>
+                <ui-carousel-next><button aria-label="Next slide"></button></ui-carousel-next>
+                <ui-carousel-indicator-group aria-label="Choose a season">
+                  <ui-carousel-indicator><button aria-label="Spring"></button></ui-carousel-indicator>
+                  <ui-carousel-indicator><button aria-label="Summer"></button></ui-carousel-indicator>
+                  <ui-carousel-indicator><button aria-label="Autumn"></button></ui-carousel-indicator>
+                  <ui-carousel-indicator><button aria-label="Winter"></button></ui-carousel-indicator>
+                </ui-carousel-indicator-group>
+              </ui-carousel>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>carousel-viewport</code></li>
+            <li><code>carousel-content</code></li>
+            <li><code>carousel-item</code></li>
+            <li><code>carousel-previous</code></li>
+            <li><code>carousel-next</code></li>
+            <li><code>carousel-indicator</code></li>
+            <li><code>[data-selected]</code></li>
+          </ul>
+        </section>
         <section class="ds-section" id="checkbox">
           <h2>Checkbox</h2>
           <p>
@@ -700,12 +881,31 @@
           </p>
           <div class="ds-example" data-layout="column">
             <template>
-              <label><ui-checkbox default-checked><ui-checkbox-indicator></ui-checkbox-indicator></ui-checkbox> Accept terms</label>
-              <label><ui-checkbox><ui-checkbox-indicator></ui-checkbox-indicator></ui-checkbox> Send me product updates</label>
-              <label><ui-checkbox default-checked="indeterminate"><ui-checkbox-indicator></ui-checkbox-indicator></ui-checkbox> Some selected</label>
-              <label><ui-checkbox disabled><ui-checkbox-indicator></ui-checkbox-indicator></ui-checkbox> Disabled</label>
-              <label class="ds-w"><ui-checkbox><ui-checkbox-indicator></ui-checkbox-indicator></ui-checkbox>
-                <span>A longer label that wraps onto a second line, with a <a href="#checkbox">link</a> inside it.</span></label>
+              <label
+                ><ui-checkbox default-checked><ui-checkbox-indicator></ui-checkbox-indicator></ui-checkbox>
+                Accept terms</label
+              >
+              <label
+                ><ui-checkbox><ui-checkbox-indicator></ui-checkbox-indicator></ui-checkbox> Send me product
+                updates</label
+              >
+              <label
+                ><ui-checkbox default-checked="indeterminate"
+                  ><ui-checkbox-indicator></ui-checkbox-indicator
+                ></ui-checkbox>
+                Some selected</label
+              >
+              <label
+                ><ui-checkbox disabled><ui-checkbox-indicator></ui-checkbox-indicator></ui-checkbox>
+                Disabled</label
+              >
+              <label class="ds-w"
+                ><ui-checkbox><ui-checkbox-indicator></ui-checkbox-indicator></ui-checkbox>
+                <span
+                  >A longer label that wraps onto a second line, with a <a href="#checkbox">link</a> inside
+                  it.</span
+                ></label
+              >
             </template>
           </div>
           <ul class="ds-parts">
@@ -735,6 +935,57 @@
           </ul>
         </section>
 
+        <section class="ds-section" id="color-picker">
+          <h2>Color picker</h2>
+          <p>
+            A saturation area, hue and alpha sliders on a checkerboard, and a row of presets. The selected
+            preset gets an outline.
+          </p>
+          <div class="ds-example">
+            <template>
+              <ui-color-picker aria-label="Brand color" format="hex" default-value="#2563eb">
+                <ui-color-picker-area
+                  ><ui-color-picker-area-thumb></ui-color-picker-area-thumb
+                ></ui-color-picker-area>
+                <div>
+                  <ui-color-picker-eye-dropper
+                    ><button aria-label="Pick from screen"></button
+                  ></ui-color-picker-eye-dropper>
+                  <div>
+                    <ui-color-picker-slider channel="hue"
+                      ><ui-color-picker-slider-thumb></ui-color-picker-slider-thumb
+                    ></ui-color-picker-slider>
+                    <ui-color-picker-slider channel="alpha"
+                      ><ui-color-picker-slider-thumb></ui-color-picker-slider-thumb
+                    ></ui-color-picker-slider>
+                  </div>
+                  <ui-color-picker-swatch></ui-color-picker-swatch>
+                </div>
+                <ui-color-picker-input><input aria-label="Hex color" /></ui-color-picker-input>
+                <ui-color-picker-swatches aria-label="Presets">
+                  <ui-color-picker-swatch-item value="#dc2626"></ui-color-picker-swatch-item>
+                  <ui-color-picker-swatch-item value="#ea580c"></ui-color-picker-swatch-item>
+                  <ui-color-picker-swatch-item value="#ca8a04"></ui-color-picker-swatch-item>
+                  <ui-color-picker-swatch-item value="#16a34a"></ui-color-picker-swatch-item>
+                  <ui-color-picker-swatch-item value="#0891b2"></ui-color-picker-swatch-item>
+                  <ui-color-picker-swatch-item value="#2563eb"></ui-color-picker-swatch-item>
+                  <ui-color-picker-swatch-item value="#7c3aed"></ui-color-picker-swatch-item>
+                  <ui-color-picker-swatch-item value="#171717"></ui-color-picker-swatch-item>
+                </ui-color-picker-swatches>
+              </ui-color-picker>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>color-picker-area</code></li>
+            <li><code>color-picker-area-thumb</code></li>
+            <li><code>color-picker-slider</code></li>
+            <li><code>color-picker-slider-thumb</code></li>
+            <li><code>color-picker-swatch</code></li>
+            <li><code>color-picker-input</code></li>
+            <li><code>color-picker-swatch-item</code></li>
+            <li><code>color-picker-eye-dropper</code></li>
+          </ul>
+        </section>
         <section class="ds-section" id="combobox">
           <h2>Combobox</h2>
           <p>
@@ -754,10 +1005,18 @@
                 <ui-combobox-content hidden>
                   <ui-combobox-empty>No frameworks found.</ui-combobox-empty>
                   <ui-combobox-list>
-                    <ui-combobox-item value="next" label="Next.js">Next.js<ui-combobox-item-indicator></ui-combobox-item-indicator></ui-combobox-item>
-                    <ui-combobox-item value="nuxt" label="Nuxt">Nuxt<ui-combobox-item-indicator></ui-combobox-item-indicator></ui-combobox-item>
-                    <ui-combobox-item value="sveltekit" label="SvelteKit">SvelteKit<ui-combobox-item-indicator></ui-combobox-item-indicator></ui-combobox-item>
-                    <ui-combobox-item value="astro" label="Astro">Astro<ui-combobox-item-indicator></ui-combobox-item-indicator></ui-combobox-item>
+                    <ui-combobox-item value="next" label="Next.js"
+                      >Next.js<ui-combobox-item-indicator></ui-combobox-item-indicator
+                    ></ui-combobox-item>
+                    <ui-combobox-item value="nuxt" label="Nuxt"
+                      >Nuxt<ui-combobox-item-indicator></ui-combobox-item-indicator
+                    ></ui-combobox-item>
+                    <ui-combobox-item value="sveltekit" label="SvelteKit"
+                      >SvelteKit<ui-combobox-item-indicator></ui-combobox-item-indicator
+                    ></ui-combobox-item>
+                    <ui-combobox-item value="astro" label="Astro"
+                      >Astro<ui-combobox-item-indicator></ui-combobox-item-indicator
+                    ></ui-combobox-item>
                   </ui-combobox-list>
                 </ui-combobox-content>
               </ui-combobox>
@@ -779,7 +1038,9 @@
           <div class="ds-example">
             <template>
               <ui-command>
-                <ui-command-input><input aria-label="Search commands" placeholder="Type a command or search..." /></ui-command-input>
+                <ui-command-input
+                  ><input aria-label="Search commands" placeholder="Type a command or search…"
+                /></ui-command-input>
                 <ui-command-empty>No results found.</ui-command-empty>
                 <ui-command-list>
                   <ui-command-group>
@@ -791,8 +1052,12 @@
                   <ui-command-separator></ui-command-separator>
                   <ui-command-group>
                     <ui-command-group-label>Settings</ui-command-group-label>
-                    <ui-command-item value="profile" shortcut="mod+p"><span>Profile</span><ui-command-shortcut></ui-command-shortcut></ui-command-item>
-                    <ui-command-item value="settings" shortcut="mod+s"><span>Settings</span><ui-command-shortcut></ui-command-shortcut></ui-command-item>
+                    <ui-command-item value="profile" shortcut="mod+p"
+                      ><span>Profile</span><ui-command-shortcut></ui-command-shortcut
+                    ></ui-command-item>
+                    <ui-command-item value="settings" shortcut="mod+s"
+                      ><span>Settings</span><ui-command-shortcut></ui-command-shortcut
+                    ></ui-command-item>
                   </ui-command-group>
                 </ui-command-list>
               </ui-command>
@@ -808,6 +1073,69 @@
           </ul>
         </section>
 
+        <section class="ds-section" id="date-input">
+          <h2>Date input</h2>
+          <p>Looks like an input. Each part of the date is its own segment, and the focused one is filled.</p>
+          <div class="ds-example">
+            <template>
+              <ui-field>
+                <ui-field-label>Start date</ui-field-label>
+                <ui-date-input default-value="2026-10-16"></ui-date-input>
+              </ui-field>
+              <ui-field>
+                <ui-field-label>End date</ui-field-label>
+                <ui-date-input></ui-date-input>
+              </ui-field>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>date-input-root</code></li>
+            <li><code>date-input-segment</code></li>
+            <li><code>[data-type]</code></li>
+          </ul>
+        </section>
+        <section class="ds-section" id="date-picker">
+          <h2>Date picker</h2>
+          <p>
+            An input you can type a date into, with a calendar button inside its end. The calendar opens in a
+            popup.
+          </p>
+          <div class="ds-example">
+            <template>
+              <ui-field class="ds-w" style="width: 14rem">
+                <ui-field-label>Due date</ui-field-label>
+                <ui-date-picker default-value="2026-10-16">
+                  <div>
+                    <ui-date-picker-input><input /></ui-date-picker-input>
+                    <ui-date-picker-trigger
+                      ><button aria-label="Choose date"></button
+                    ></ui-date-picker-trigger>
+                  </div>
+                  <ui-date-picker-content hidden>
+                    <ui-calendar-previous><button aria-label="Previous month"></button></ui-calendar-previous>
+                    <ui-calendar-heading></ui-calendar-heading>
+                    <ui-calendar-next><button aria-label="Next month"></button></ui-calendar-next>
+                    <ui-calendar-grid>
+                      <ui-calendar-weekdays
+                        ><template><ui-calendar-weekday></ui-calendar-weekday></template
+                      ></ui-calendar-weekdays>
+                      <ui-calendar-weeks
+                        ><template><ui-calendar-day></ui-calendar-day></template
+                      ></ui-calendar-weeks>
+                    </ui-calendar-grid>
+                  </ui-date-picker-content>
+                </ui-date-picker>
+              </ui-field>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>date-picker-input</code></li>
+            <li><code>date-picker-trigger</code></li>
+            <li><code>date-picker-clear</code></li>
+            <li><code>date-picker-content</code></li>
+            <li><code>date-picker-hint</code></li>
+          </ul>
+        </section>
         <section class="ds-section" id="dialog">
           <h2>Dialog</h2>
           <p>A focused task over a dimmed page. Title, description, content and actions.</p>
@@ -819,7 +1147,9 @@
                 <ui-dialog-content hidden>
                   <ui-dialog-title>Edit profile</ui-dialog-title>
                   <ui-dialog-description>Changes show on your public page.</ui-dialog-description>
-                  <ui-field><ui-field-label>Name</ui-field-label><ui-input><input value="Hollis Grant" /></ui-input></ui-field>
+                  <ui-field
+                    ><ui-field-label>Name</ui-field-label><ui-input><input value="Hollis Grant" /></ui-input
+                  ></ui-field>
                   <div class="ds-row" style="justify-content: flex-end">
                     <ui-dialog-close><button>Cancel</button></ui-dialog-close>
                     <ui-dialog-close><button data-variant="solid">Save</button></ui-dialog-close>
@@ -852,7 +1182,9 @@
                   <ui-drawer-title>Move goal</ui-drawer-title>
                   <ui-drawer-description>Set your daily activity goal.</ui-drawer-description>
                   <div class="ds-row">
-                    <ui-drawer-close value="submit"><button data-variant="solid">Submit</button></ui-drawer-close>
+                    <ui-drawer-close value="submit"
+                      ><button data-variant="solid">Submit</button></ui-drawer-close
+                    >
                     <ui-drawer-close><button>Cancel</button></ui-drawer-close>
                   </div>
                 </ui-drawer-content>
@@ -878,16 +1210,24 @@
             <template>
               <ui-field class="ds-w">
                 <ui-field-label>Email</ui-field-label>
-                <ui-input><input placeholder="you@example.com" /></ui-input>
-                <ui-field-description>We'll send a confirmation link.</ui-field-description>
+                <ui-input
+                  ><input type="email" autocomplete="email" spellcheck="false" placeholder="you@example.com"
+                /></ui-input>
+                <ui-field-description>We’ll send a confirmation link.</ui-field-description>
               </ui-field>
               <ui-field-set class="ds-w">
                 <fieldset>
                   <legend>Address</legend>
                   <ui-field-description>Where we send your order.</ui-field-description>
                   <ui-field-group>
-                    <ui-field><ui-field-label>Street</ui-field-label><ui-input><input /></ui-input></ui-field>
-                    <ui-field><ui-field-label>City</ui-field-label><ui-input><input /></ui-input></ui-field>
+                    <ui-field
+                      ><ui-field-label>Street</ui-field-label
+                      ><ui-input><input autocomplete="street-address" /></ui-input
+                    ></ui-field>
+                    <ui-field
+                      ><ui-field-label>City</ui-field-label
+                      ><ui-input><input autocomplete="address-level2" /></ui-input
+                    ></ui-field>
                   </ui-field-group>
                 </fieldset>
               </ui-field-set>
@@ -904,6 +1244,43 @@
           </ul>
         </section>
 
+        <section class="ds-section" id="file-input">
+          <h2>File input</h2>
+          <p>
+            A dashed drop zone that turns solid while you drag files over it, and a list of the files you
+            added.
+          </p>
+          <div class="ds-example">
+            <template>
+              <ui-file-input multiple class="ds-w" style="width: 22rem">
+                <ui-file-input-dropzone>
+                  <p>Drop files here</p>
+                  <p>PNG or JPG, up to 10 MB.</p>
+                  <ui-file-input-trigger><button>Browse Files</button></ui-file-input-trigger>
+                </ui-file-input-dropzone>
+                <ui-file-input-list aria-label="Files">
+                  <template>
+                    <ui-file-input-item>
+                      <span data-file="name"></span>
+                      <span data-file="size"></span>
+                      <ui-file-input-item-remove
+                        ><button aria-label="Remove file"></button
+                      ></ui-file-input-item-remove>
+                    </ui-file-input-item>
+                  </template>
+                </ui-file-input-list>
+              </ui-file-input>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>file-input-dropzone</code></li>
+            <li><code>file-input-trigger</code></li>
+            <li><code>file-input-list</code></li>
+            <li><code>file-input-item</code></li>
+            <li><code>file-input-item-remove</code></li>
+            <li><code>[data-dragging]</code></li>
+          </ul>
+        </section>
         <section class="ds-section" id="form">
           <h2>Form</h2>
           <p>Fields validate on submit. Press "Create account" with the form empty to see errors.</p>
@@ -918,23 +1295,36 @@
                 <ui-field name="email">
                   <ui-field-label>Email</ui-field-label>
                   <ui-input><input type="email" required autocomplete="email" /></ui-input>
-                  <ui-field-description>We'll send a confirmation link.</ui-field-description>
+                  <ui-field-description>We’ll send a confirmation link.</ui-field-description>
                   <ui-field-error match="valueMissing">Enter your email address.</ui-field-error>
-                  <ui-field-error match="typeMismatch">Enter an email address like hollis@example.com.</ui-field-error>
+                  <ui-field-error match="typeMismatch"
+                    >Enter an email address like hollis@example.com.</ui-field-error
+                  >
                 </ui-field>
                 <ui-field name="team">
                   <ui-field-label>Team size</ui-field-label>
                   <ui-select placeholder="Select a size" required>
-                    <ui-select-trigger><button><ui-select-value></ui-select-value></button></ui-select-trigger>
+                    <ui-select-trigger
+                      ><button><ui-select-value></ui-select-value></button
+                    ></ui-select-trigger>
                     <ui-select-content>
-                      <ui-select-item value="1">Just me<ui-select-item-indicator></ui-select-item-indicator></ui-select-item>
-                      <ui-select-item value="10">2 to 10<ui-select-item-indicator></ui-select-item-indicator></ui-select-item>
-                      <ui-select-item value="50">11 to 50<ui-select-item-indicator></ui-select-item-indicator></ui-select-item>
+                      <ui-select-item value="1"
+                        >Just me<ui-select-item-indicator></ui-select-item-indicator
+                      ></ui-select-item>
+                      <ui-select-item value="10"
+                        >2 to 10<ui-select-item-indicator></ui-select-item-indicator
+                      ></ui-select-item>
+                      <ui-select-item value="50"
+                        >11 to 50<ui-select-item-indicator></ui-select-item-indicator
+                      ></ui-select-item>
                     </ui-select-content>
                   </ui-select>
                   <ui-field-error match="valueMissing">Choose a team size.</ui-field-error>
                 </ui-field>
-                <label><ui-switch name="updates" default-checked><ui-switch-thumb></ui-switch-thumb></ui-switch> Email me product updates</label>
+                <label
+                  ><ui-switch name="updates" default-checked><ui-switch-thumb></ui-switch-thumb></ui-switch>
+                  Email me product updates</label
+                >
                 <div class="ds-row">
                   <ui-button><button type="submit" data-variant="solid">Create account</button></ui-button>
                   <ui-button><button type="reset">Reset</button></ui-button>
@@ -964,13 +1354,52 @@
           </ul>
         </section>
 
+        <section class="ds-section" id="image-cropper">
+          <h2>Image cropper</h2>
+          <p>
+            The area outside the crop is dimmed. Square handles sit on the corners and edges, and a grid shows
+            while you drag.
+          </p>
+          <div class="ds-example">
+            <template>
+              <ui-image-cropper aria-label="Photo" src="/design/photo.svg" min-width="64" min-height="64">
+                <ui-image-cropper-viewport>
+                  <ui-image-cropper-image><img alt="Hills under a pale sky" /></ui-image-cropper-image>
+                  <ui-image-cropper-selection>
+                    <ui-image-cropper-grid></ui-image-cropper-grid>
+                    <ui-image-cropper-handle position="nw"></ui-image-cropper-handle>
+                    <ui-image-cropper-handle position="n"></ui-image-cropper-handle>
+                    <ui-image-cropper-handle position="ne"></ui-image-cropper-handle>
+                    <ui-image-cropper-handle position="e"></ui-image-cropper-handle>
+                    <ui-image-cropper-handle position="se"></ui-image-cropper-handle>
+                    <ui-image-cropper-handle position="s"></ui-image-cropper-handle>
+                    <ui-image-cropper-handle position="sw"></ui-image-cropper-handle>
+                    <ui-image-cropper-handle position="w"></ui-image-cropper-handle>
+                  </ui-image-cropper-selection>
+                </ui-image-cropper-viewport>
+              </ui-image-cropper>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>image-cropper-viewport</code></li>
+            <li><code>image-cropper-image</code></li>
+            <li><code>image-cropper-selection</code></li>
+            <li><code>image-cropper-grid</code></li>
+            <li><code>image-cropper-handle</code></li>
+          </ul>
+        </section>
         <section class="ds-section" id="input">
           <h2>Input</h2>
           <p>Fills its field. Focus turns the border darker, and an invalid value turns it red.</p>
           <div class="ds-example" data-layout="column">
             <template>
-              <ui-field class="ds-w"><ui-field-label>Name</ui-field-label><ui-input><input placeholder="Hollis Grant" /></ui-input></ui-field>
-              <ui-field class="ds-w"><ui-field-label>Disabled</ui-field-label><ui-input><input value="Can't change this" disabled /></ui-input></ui-field>
+              <ui-field class="ds-w"
+                ><ui-field-label>Name</ui-field-label><ui-input><input placeholder="Hollis Grant" /></ui-input
+              ></ui-field>
+              <ui-field class="ds-w"
+                ><ui-field-label>Disabled</ui-field-label
+                ><ui-input><input value="Can’t change this" disabled /></ui-input
+              ></ui-field>
             </template>
           </div>
           <ul class="ds-parts">
@@ -982,16 +1411,29 @@
 
         <section class="ds-section" id="listbox">
           <h2>Listbox</h2>
-          <p>A list you pick from in place, with checks on what's selected.</p>
+          <p>A list you pick from in place, with checks on what’s selected.</p>
           <div class="ds-example">
             <template>
               <ui-field>
-                <ui-field-label>Email me about</ui-field-label>
-                <ui-listbox multiple activation="automatic" default-value="mentions">
-                  <ui-listbox-item value="comments">Comments<ui-listbox-item-indicator></ui-listbox-item-indicator></ui-listbox-item>
-                  <ui-listbox-item value="mentions">Mentions<ui-listbox-item-indicator></ui-listbox-item-indicator></ui-listbox-item>
-                  <ui-listbox-item value="reactions">Reactions<ui-listbox-item-indicator></ui-listbox-item-indicator></ui-listbox-item>
-                  <ui-listbox-item value="billing" disabled>Billing<ui-listbox-item-indicator></ui-listbox-item-indicator></ui-listbox-item>
+                <ui-field-label id="email-label">Email me about</ui-field-label>
+                <ui-listbox
+                  aria-labelledby="email-label"
+                  multiple
+                  activation="automatic"
+                  default-value="mentions"
+                >
+                  <ui-listbox-item value="comments"
+                    >Comments<ui-listbox-item-indicator></ui-listbox-item-indicator
+                  ></ui-listbox-item>
+                  <ui-listbox-item value="mentions"
+                    >Mentions<ui-listbox-item-indicator></ui-listbox-item-indicator
+                  ></ui-listbox-item>
+                  <ui-listbox-item value="reactions"
+                    >Reactions<ui-listbox-item-indicator></ui-listbox-item-indicator
+                  ></ui-listbox-item>
+                  <ui-listbox-item value="billing" disabled
+                    >Billing<ui-listbox-item-indicator></ui-listbox-item-indicator
+                  ></ui-listbox-item>
                 </ui-listbox>
               </ui-field>
             </template>
@@ -1063,13 +1505,22 @@
                 <ui-menu>
                   <ui-menu-trigger><button>View</button></ui-menu-trigger>
                   <ui-menu-content>
-                    <ui-menu-checkbox-item value="status-bar" default-checked><ui-menu-item-indicator></ui-menu-item-indicator>Status bar</ui-menu-checkbox-item>
-                    <ui-menu-checkbox-item value="minimap"><ui-menu-item-indicator keep-mounted></ui-menu-item-indicator>Minimap</ui-menu-checkbox-item>
+                    <ui-menu-checkbox-item value="status-bar" default-checked
+                      ><ui-menu-item-indicator></ui-menu-item-indicator>Status bar</ui-menu-checkbox-item
+                    >
+                    <ui-menu-checkbox-item value="minimap"
+                      ><ui-menu-item-indicator keep-mounted></ui-menu-item-indicator
+                      >Minimap</ui-menu-checkbox-item
+                    >
                     <ui-menu-separator></ui-menu-separator>
                     <ui-menu-radio-group default-value="comfortable">
                       <ui-menu-group-label>Density</ui-menu-group-label>
-                      <ui-menu-radio-item value="compact"><ui-menu-item-indicator></ui-menu-item-indicator>Compact</ui-menu-radio-item>
-                      <ui-menu-radio-item value="comfortable"><ui-menu-item-indicator></ui-menu-item-indicator>Comfortable</ui-menu-radio-item>
+                      <ui-menu-radio-item value="compact"
+                        ><ui-menu-item-indicator></ui-menu-item-indicator>Compact</ui-menu-radio-item
+                      >
+                      <ui-menu-radio-item value="comfortable"
+                        ><ui-menu-item-indicator></ui-menu-item-indicator>Comfortable</ui-menu-radio-item
+                      >
                     </ui-menu-radio-group>
                   </ui-menu-content>
                 </ui-menu>
@@ -1124,13 +1575,25 @@
                     <ui-navigation-menu-content>
                       <ul>
                         <li>
-                          <ui-navigation-menu-link><a href="#navigation-menu"><span>Introduction</span><span>One core for every framework.</span></a></ui-navigation-menu-link>
+                          <ui-navigation-menu-link
+                            ><a href="#navigation-menu"
+                              ><span>Introduction</span><span>One core for every framework.</span></a
+                            ></ui-navigation-menu-link
+                          >
                         </li>
                         <li>
-                          <ui-navigation-menu-link><a href="#navigation-menu"><span>Installation</span><span>Add the package and render a part.</span></a></ui-navigation-menu-link>
+                          <ui-navigation-menu-link
+                            ><a href="#navigation-menu"
+                              ><span>Installation</span><span>Add the package and render a part.</span></a
+                            ></ui-navigation-menu-link
+                          >
                         </li>
                         <li>
-                          <ui-navigation-menu-link><a href="#navigation-menu"><span>Styling</span><span>Data attributes and CSS variables.</span></a></ui-navigation-menu-link>
+                          <ui-navigation-menu-link
+                            ><a href="#navigation-menu"
+                              ><span>Styling</span><span>Data attributes and CSS variables.</span></a
+                            ></ui-navigation-menu-link
+                          >
                         </li>
                       </ul>
                     </ui-navigation-menu-content>
@@ -1177,9 +1640,13 @@
                 <ui-number-input default-value="1" min="1">
                   <ui-field-label>Quantity</ui-field-label>
                   <ui-number-input-group>
-                    <ui-number-input-decrement><button aria-label="Decrease"></button></ui-number-input-decrement>
+                    <ui-number-input-decrement
+                      ><button aria-label="Decrease"></button
+                    ></ui-number-input-decrement>
                     <ui-number-input-control><input /></ui-number-input-control>
-                    <ui-number-input-increment><button aria-label="Increase"></button></ui-number-input-increment>
+                    <ui-number-input-increment
+                      ><button aria-label="Increase"></button
+                    ></ui-number-input-increment>
                   </ui-number-input-group>
                 </ui-number-input>
               </ui-field>
@@ -1193,6 +1660,95 @@
           </ul>
         </section>
 
+        <section class="ds-section" id="otp-input">
+          <h2>OTP input</h2>
+          <p>One box per character, joined into groups. The box you’re typing in gets the focus ring.</p>
+          <div class="ds-example">
+            <template>
+              <ui-field>
+                <ui-field-label>Verification code</ui-field-label>
+                <ui-otp-input max-length="6">
+                  <ui-otp-input-group>
+                    <ui-otp-input-slot></ui-otp-input-slot>
+                    <ui-otp-input-slot></ui-otp-input-slot>
+                    <ui-otp-input-slot></ui-otp-input-slot>
+                  </ui-otp-input-group>
+                  <ui-otp-input-separator></ui-otp-input-separator>
+                  <ui-otp-input-group>
+                    <ui-otp-input-slot></ui-otp-input-slot>
+                    <ui-otp-input-slot></ui-otp-input-slot>
+                    <ui-otp-input-slot></ui-otp-input-slot>
+                  </ui-otp-input-group>
+                </ui-otp-input>
+              </ui-field>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>otp-input-group</code></li>
+            <li><code>otp-input-slot</code></li>
+            <li><code>otp-input-separator</code></li>
+            <li><code>[data-active]</code></li>
+          </ul>
+        </section>
+        <section class="ds-section" id="pagination">
+          <h2>Pagination</h2>
+          <p>Plain page numbers. The current page gets a border, and gaps show an ellipsis.</p>
+          <div class="ds-example">
+            <template>
+              <ui-pagination aria-label="Pages" page-count="12" default-page="4">
+                <ui-pagination-list>
+                  <ui-pagination-item
+                    ><ui-pagination-previous
+                      ><button aria-label="Previous page"></button></ui-pagination-previous
+                  ></ui-pagination-item>
+                  <template
+                    ><ui-pagination-item
+                      ><ui-pagination-link><button></button></ui-pagination-link></ui-pagination-item
+                  ></template>
+                  <template data-ellipsis
+                    ><ui-pagination-item><ui-pagination-ellipsis></ui-pagination-ellipsis></ui-pagination-item
+                  ></template>
+                  <ui-pagination-item
+                    ><ui-pagination-next><button aria-label="Next page"></button></ui-pagination-next
+                  ></ui-pagination-item>
+                </ui-pagination-list>
+              </ui-pagination>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>pagination-list</code></li>
+            <li><code>pagination-item</code></li>
+            <li><code>pagination-link</code></li>
+            <li><code>pagination-previous</code></li>
+            <li><code>pagination-next</code></li>
+            <li><code>pagination-ellipsis</code></li>
+            <li><code>[aria-current]</code></li>
+          </ul>
+        </section>
+        <section class="ds-section" id="password-input">
+          <h2>Password input</h2>
+          <p>An input with a button inside its end that shows or hides what you typed.</p>
+          <div class="ds-example">
+            <template>
+              <ui-field class="ds-w">
+                <ui-field-label>Password</ui-field-label>
+                <ui-password-input name="password">
+                  <input />
+                  <ui-password-input-toggle
+                    ><button aria-label="Show password"></button
+                  ></ui-password-input-toggle>
+                </ui-password-input>
+                <ui-field-description>Use at least 8 characters.</ui-field-description>
+              </ui-field>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>password-input-root</code></li>
+            <li><code>password-input-control</code></li>
+            <li><code>password-input-toggle</code></li>
+            <li><code>[data-visible]</code></li>
+          </ul>
+        </section>
         <section class="ds-section" id="popover">
           <h2>Popover</h2>
           <p>Floating content with a title, a description and actions.</p>
@@ -1220,9 +1776,30 @@
           </ul>
         </section>
 
+        <section class="ds-section" id="preferences">
+          <h2>Preferences</h2>
+          <p>
+            Preferences saves a choice, like list or grid, and has no look of its own. Style what you put
+            inside it.
+          </p>
+          <div class="ds-example">
+            <template>
+              <ui-preferences>
+                <ui-segmented-control default-value="list" aria-label="View">
+                  <ui-segmented-control-indicator></ui-segmented-control-indicator>
+                  <ui-segmented-control-item value="list">List</ui-segmented-control-item>
+                  <ui-segmented-control-item value="grid">Grid</ui-segmented-control-item>
+                </ui-segmented-control>
+              </ui-preferences>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>display: contents</code></li>
+          </ul>
+        </section>
         <section class="ds-section" id="progress">
           <h2>Progress</h2>
-          <p>How far a task has come. Without a value it's indeterminate and shows a still stripe.</p>
+          <p>How far a task has come. Without a value it’s indeterminate and shows a still stripe.</p>
           <div class="ds-example" data-layout="column">
             <template>
               <ui-progress value="60" class="ds-w">
@@ -1253,9 +1830,18 @@
               <ui-field>
                 <ui-field-label>Shipping</ui-field-label>
                 <ui-radio-group default-value="standard">
-                  <label><ui-radio value="standard"><ui-radio-indicator></ui-radio-indicator></ui-radio> Standard</label>
-                  <label><ui-radio value="express"><ui-radio-indicator></ui-radio-indicator></ui-radio> Express</label>
-                  <label><ui-radio value="overnight" disabled><ui-radio-indicator></ui-radio-indicator></ui-radio> Overnight</label>
+                  <label
+                    ><ui-radio value="standard"><ui-radio-indicator></ui-radio-indicator></ui-radio>
+                    Standard</label
+                  >
+                  <label
+                    ><ui-radio value="express"><ui-radio-indicator></ui-radio-indicator></ui-radio>
+                    Express</label
+                  >
+                  <label
+                    ><ui-radio value="overnight" disabled><ui-radio-indicator></ui-radio-indicator></ui-radio>
+                    Overnight</label
+                  >
                 </ui-radio-group>
               </ui-field>
             </template>
@@ -1267,6 +1853,122 @@
           </ul>
         </section>
 
+        <section class="ds-section" id="rating">
+          <h2>Rating</h2>
+          <p>
+            Stars fill from the start in the primary color. Hovering shows what you’d pick in a lighter shade.
+          </p>
+          <div class="ds-example">
+            <template>
+              <ui-rating aria-label="Rating" default-value="3">
+                <template><ui-rating-item></ui-rating-item></template>
+              </ui-rating>
+              <ui-rating aria-label="Average rating" step="0.5" default-value="3.5" read-only>
+                <template><ui-rating-item></ui-rating-item></template>
+              </ui-rating>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>rating-item</code></li>
+            <li><code>rating-radio</code></li>
+            <li><code>[data-filled]</code></li>
+            <li><code>[data-highlighted]</code></li>
+            <li><code>--rating-fill</code></li>
+          </ul>
+        </section>
+        <section class="ds-section" id="resizable">
+          <h2>Resizable</h2>
+          <p>
+            Panels split by a 1px line. The line darkens while you hover or drag it, and has a wider hit area
+            than it shows.
+          </p>
+          <div class="ds-example">
+            <template>
+              <ui-resizable class="ds-resizable">
+                <ui-resizable-panel default-size="35" min-size="20">
+                  <strong>Files</strong>
+                  <p class="ds-muted">page.tsx<br />layout.tsx<br />global.css</p>
+                </ui-resizable-panel>
+                <ui-resizable-handle aria-label="Resize files"></ui-resizable-handle>
+                <ui-resizable-panel default-size="65" min-size="30">
+                  <ui-resizable orientation="vertical">
+                    <ui-resizable-panel default-size="60" min-size="30">
+                      <strong>page.tsx</strong>
+                      <p class="ds-muted">Saved just now</p>
+                    </ui-resizable-panel>
+                    <ui-resizable-handle aria-label="Resize editor"></ui-resizable-handle>
+                    <ui-resizable-panel default-size="40" min-size="30">
+                      <strong>Terminal</strong>
+                      <p class="ds-muted">Ready on port 3000</p>
+                    </ui-resizable-panel>
+                  </ui-resizable>
+                </ui-resizable-panel>
+              </ui-resizable>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>resizable-root</code></li>
+            <li><code>resizable-panel</code></li>
+            <li><code>resizable-handle</code></li>
+            <li><code>[data-dragging]</code></li>
+          </ul>
+        </section>
+        <section class="ds-section" id="scroll-area">
+          <h2>Scroll area</h2>
+          <p>A bordered box with a thin scrollbar that shows while you hover or scroll.</p>
+          <div class="ds-example">
+            <template>
+              <ui-scroll-area class="ds-w" style="height: 12rem">
+                <ui-scroll-area-viewport role="region" aria-label="Release notes">
+                  <ui-scroll-area-content>
+                    <ul class="ds-list">
+                      <li>v1.8 Faster search</li>
+                      <li>v1.7 Shared views</li>
+                      <li>v1.6 Keyboard shortcuts</li>
+                      <li>v1.5 Dark mode</li>
+                      <li>v1.4 Comments</li>
+                      <li>v1.3 Exports</li>
+                      <li>v1.2 Teams</li>
+                      <li>v1.1 Labels</li>
+                      <li>v1.0 First release</li>
+                    </ul>
+                  </ui-scroll-area-content>
+                </ui-scroll-area-viewport>
+                <ui-scroll-area-scrollbar
+                  ><ui-scroll-area-thumb></ui-scroll-area-thumb
+                ></ui-scroll-area-scrollbar>
+              </ui-scroll-area>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>scroll-area-viewport</code></li>
+            <li><code>scroll-area-content</code></li>
+            <li><code>scroll-area-scrollbar</code></li>
+            <li><code>scroll-area-thumb</code></li>
+          </ul>
+        </section>
+        <section class="ds-section" id="segmented-control">
+          <h2>Segmented control</h2>
+          <p>Options on a muted track. The selected one sits on a raised, bordered indicator.</p>
+          <div class="ds-example">
+            <template>
+              <ui-field>
+                <ui-field-label id="view-label">View</ui-field-label>
+                <ui-segmented-control default-value="list" aria-labelledby="view-label">
+                  <ui-segmented-control-indicator></ui-segmented-control-indicator>
+                  <ui-segmented-control-item value="list">List</ui-segmented-control-item>
+                  <ui-segmented-control-item value="board">Board</ui-segmented-control-item>
+                  <ui-segmented-control-item value="calendar">Calendar</ui-segmented-control-item>
+                </ui-segmented-control>
+              </ui-field>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>segmented-control-indicator</code></li>
+            <li><code>segmented-control-item</code></li>
+            <li><code>[data-checked]</code></li>
+          </ul>
+        </section>
         <section class="ds-section" id="select">
           <h2>Select</h2>
           <p>
@@ -1278,11 +1980,19 @@
               <ui-field class="ds-w">
                 <ui-field-label>Role</ui-field-label>
                 <ui-select placeholder="Select a role">
-                  <ui-select-trigger><button><ui-select-value></ui-select-value></button></ui-select-trigger>
+                  <ui-select-trigger
+                    ><button><ui-select-value></ui-select-value></button
+                  ></ui-select-trigger>
                   <ui-select-content>
-                    <ui-select-item value="viewer">Viewer<ui-select-item-indicator></ui-select-item-indicator></ui-select-item>
-                    <ui-select-item value="editor">Editor<ui-select-item-indicator></ui-select-item-indicator></ui-select-item>
-                    <ui-select-item value="admin">Admin<ui-select-item-indicator></ui-select-item-indicator></ui-select-item>
+                    <ui-select-item value="viewer"
+                      >Viewer<ui-select-item-indicator></ui-select-item-indicator
+                    ></ui-select-item>
+                    <ui-select-item value="editor"
+                      >Editor<ui-select-item-indicator></ui-select-item-indicator
+                    ></ui-select-item>
+                    <ui-select-item value="admin"
+                      >Admin<ui-select-item-indicator></ui-select-item-indicator
+                    ></ui-select-item>
                   </ui-select-content>
                 </ui-select>
               </ui-field>
@@ -1306,7 +2016,8 @@
                 <ui-separator></ui-separator><span class="ds-muted">or</span><ui-separator></ui-separator>
               </div>
               <div class="ds-row">
-                <span>Docs</span><ui-separator orientation="vertical"></ui-separator><span>Blog</span><ui-separator orientation="vertical"></ui-separator><span>Changelog</span>
+                <span>Docs</span><ui-separator orientation="vertical"></ui-separator><span>Blog</span
+                ><ui-separator orientation="vertical"></ui-separator><span>Changelog</span>
               </div>
             </template>
           </div>
@@ -1329,7 +2040,11 @@
                   <div class="ds-spread">
                     <ui-field-label>Volume</ui-field-label><ui-slider-value></ui-slider-value>
                   </div>
-                  <ui-slider-control><ui-slider-track><ui-slider-indicator></ui-slider-indicator><ui-slider-thumb></ui-slider-thumb></ui-slider-track></ui-slider-control>
+                  <ui-slider-control
+                    ><ui-slider-track
+                      ><ui-slider-indicator></ui-slider-indicator
+                      ><ui-slider-thumb></ui-slider-thumb></ui-slider-track
+                  ></ui-slider-control>
                 </ui-slider>
               </ui-field>
             </template>
@@ -1349,9 +2064,15 @@
           <p>For settings that apply at once. Square at zero radius, a pill above it.</p>
           <div class="ds-example" data-layout="column">
             <template>
-              <label><ui-switch><ui-switch-thumb></ui-switch-thumb></ui-switch> Airplane mode</label>
-              <label><ui-switch default-checked><ui-switch-thumb></ui-switch-thumb></ui-switch> Wi-Fi</label>
-              <label><ui-switch disabled><ui-switch-thumb></ui-switch-thumb></ui-switch> Disabled</label>
+              <label
+                ><ui-switch><ui-switch-thumb></ui-switch-thumb></ui-switch> Airplane mode</label
+              >
+              <label
+                ><ui-switch default-checked><ui-switch-thumb></ui-switch-thumb></ui-switch> Wi-Fi</label
+              >
+              <label
+                ><ui-switch disabled><ui-switch-thumb></ui-switch-thumb></ui-switch> Disabled</label
+              >
             </template>
           </div>
           <ul class="ds-parts">
@@ -1371,8 +2092,12 @@
                   <ui-tabs-tab value="password"><button type="button">Password</button></ui-tabs-tab>
                   <ui-tabs-tab value="billing" disabled><button type="button">Billing</button></ui-tabs-tab>
                 </ui-tabs-list>
-                <ui-tabs-panel value="account">Update your name, email address and profile photo.</ui-tabs-panel>
-                <ui-tabs-panel value="password">Choose a new password. You stay signed in on this device.</ui-tabs-panel>
+                <ui-tabs-panel value="account"
+                  >Update your name, email address and profile photo.</ui-tabs-panel
+                >
+                <ui-tabs-panel value="password"
+                  >Choose a new password. You stay signed in on this device.</ui-tabs-panel
+                >
                 <ui-tabs-panel value="billing">Billing.</ui-tabs-panel>
               </ui-tabs>
             </template>
@@ -1391,7 +2116,8 @@
           <p>A few plain elements get a matching look: links, code, keys and rules.</p>
           <div class="ds-example" data-layout="column">
             <template>
-              <p style="margin: 0"> Read the <a href="#install">installation guide</a>, then run
+              <p style="margin: 0">
+                Read the <a href="#install">installation guide</a>, then run
                 <code>npm install @ui-sdk/web</code>. Press <kbd>Esc</kbd> to close a dialog.
               </p>
               <hr />
@@ -1405,7 +2131,10 @@
           <p>An input for longer text. It starts five lines tall and resizes vertically.</p>
           <div class="ds-example">
             <template>
-              <ui-field class="ds-w"><ui-field-label>Message</ui-field-label><ui-textarea><textarea placeholder="Type your message here."></textarea></ui-textarea></ui-field>
+              <ui-field class="ds-w"
+                ><ui-field-label>Message</ui-field-label
+                ><ui-textarea><textarea placeholder="Type your message here…"></textarea></ui-textarea
+              ></ui-field>
             </template>
           </div>
           <ul class="ds-parts">
@@ -1413,6 +2142,53 @@
           </ul>
         </section>
 
+        <section class="ds-section" id="time-input">
+          <h2>Time input</h2>
+          <p>The same segments as Date input, for hours, minutes and AM or PM.</p>
+          <div class="ds-example">
+            <template>
+              <ui-field>
+                <ui-field-label>Meeting time</ui-field-label>
+                <ui-time-input default-value="09:30"></ui-time-input>
+              </ui-field>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>time-input-root</code></li>
+            <li><code>time-input-segment</code></li>
+            <li><code>[data-type]</code></li>
+          </ul>
+        </section>
+        <section class="ds-section" id="toast">
+          <h2>Toast</h2>
+          <p>
+            A floating card in a corner of the page with a title, a description and an optional action. Toasts
+            stack without moving.
+          </p>
+          <div
+            class="ds-example"
+            data-caption="A toast drawn in place. On a page, toasts appear in a region fixed to a corner."
+          >
+            <template>
+              <div class="ds-w" style="width: 22rem">
+                <div data-slot="toast-root" role="status">
+                  <div data-slot="toast-title">Event created</div>
+                  <button type="button" data-slot="toast-action">Undo</button>
+                  <div data-slot="toast-description">Friday, June 12 at 10:00 AM</div>
+                </div>
+              </div>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>toast-region</code></li>
+            <li><code>toast-list</code></li>
+            <li><code>toast-root</code></li>
+            <li><code>toast-title</code></li>
+            <li><code>toast-description</code></li>
+            <li><code>toast-action</code></li>
+            <li><code>toast-close</code></li>
+          </ul>
+        </section>
         <section class="ds-section" id="toggle">
           <h2>Toggle</h2>
           <p>A button that stays pressed. Pressed shows a muted fill and a darker border.</p>
@@ -1447,16 +2223,84 @@
           </ul>
         </section>
 
+        <section class="ds-section" id="token-input">
+          <h2>Token input</h2>
+          <p>A text area where mentions and tags become small bordered tokens. Type @ to try it.</p>
+          <div class="ds-example">
+            <template>
+              <ui-field class="ds-w" style="width: 22rem">
+                <ui-field-label id="message-label">Message</ui-field-label>
+                <ui-token-input>
+                  <ui-token-input-editor
+                    placeholder="Type @ to mention someone…"
+                    aria-labelledby="message-label"
+                  ></ui-token-input-editor>
+                  <template>
+                    <ui-token-input-token>
+                      <span data-token-label></span>
+                      <ui-token-input-token-remove></ui-token-input-token-remove>
+                    </ui-token-input-token>
+                  </template>
+                  <ui-trigger-menu data-mentions>
+                    <ui-trigger-menu-content
+                      ><ui-trigger-menu-list></ui-trigger-menu-list
+                    ></ui-trigger-menu-content>
+                  </ui-trigger-menu>
+                </ui-token-input>
+              </ui-field>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>token-input-editor</code></li>
+            <li><code>token-input-token</code></li>
+            <li><code>token-input-token-remove</code></li>
+            <li><code>[data-selected]</code></li>
+          </ul>
+        </section>
+        <section class="ds-section" id="toolbar">
+          <h2>Toolbar</h2>
+          <p>
+            Borderless buttons and toggles in a bordered strip. A pressed toggle gets a border, and separators
+            are 1px lines.
+          </p>
+          <div class="ds-example">
+            <template>
+              <ui-toolbar aria-label="Formatting">
+                <ui-toggle
+                  ><button aria-label="Bold"><strong>B</strong></button></ui-toggle
+                >
+                <ui-toggle default-pressed
+                  ><button aria-label="Italic"><em>I</em></button></ui-toggle
+                >
+                <ui-toggle
+                  ><button aria-label="Underline"><u>U</u></button></ui-toggle
+                >
+                <ui-toolbar-separator></ui-toolbar-separator>
+                <ui-toolbar-button><button>Link</button></ui-toolbar-button>
+                <ui-toolbar-button><button>Comment</button></ui-toolbar-button>
+              </ui-toolbar>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>toolbar-root</code></li>
+            <li><code>toolbar-button</code></li>
+            <li><code>toolbar-separator</code></li>
+            <li><code>toolbar-group</code></li>
+            <li><code>toolbar-link</code></li>
+          </ul>
+        </section>
         <section class="ds-section" id="tooltip">
           <h2>Tooltip</h2>
           <p>A short, inverted label on hover or keyboard focus. Flat, with no shadow.</p>
           <div class="ds-example">
             <template>
               <ui-tooltip>
-                <ui-tooltip-trigger><button aria-label="Add to library">
+                <ui-tooltip-trigger
+                  ><button aria-label="Add to library">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" />
-                    </svg></button></ui-tooltip-trigger>
+                    </svg></button
+                ></ui-tooltip-trigger>
                 <ui-tooltip-content>Add to library</ui-tooltip-content>
               </ui-tooltip>
             </template>
@@ -1467,6 +2311,72 @@
           </ul>
         </section>
 
+        <section class="ds-section" id="tree">
+          <h2>Tree</h2>
+          <p>
+            Rows indent by level. Branches have a chevron that turns when they open, and the selected row is
+            muted.
+          </p>
+          <div class="ds-example">
+            <template>
+              <ui-tree aria-label="Files" default-expanded="app" default-value="app/page.tsx">
+                <ui-tree-item value="app">
+                  <ui-tree-item-label
+                    ><ui-tree-item-indicator></ui-tree-item-indicator><span>app</span></ui-tree-item-label
+                  >
+                  <ui-tree-group>
+                    <ui-tree-item value="app/layout.tsx"
+                      ><ui-tree-item-label><span>layout.tsx</span></ui-tree-item-label></ui-tree-item
+                    >
+                    <ui-tree-item value="app/page.tsx"
+                      ><ui-tree-item-label><span>page.tsx</span></ui-tree-item-label></ui-tree-item
+                    >
+                    <ui-tree-item value="app/settings">
+                      <ui-tree-item-label
+                        ><ui-tree-item-indicator></ui-tree-item-indicator
+                        ><span>settings</span></ui-tree-item-label
+                      >
+                      <ui-tree-group>
+                        <ui-tree-item value="app/settings/page.tsx"
+                          ><ui-tree-item-label><span>page.tsx</span></ui-tree-item-label></ui-tree-item
+                        >
+                      </ui-tree-group>
+                    </ui-tree-item>
+                  </ui-tree-group>
+                </ui-tree-item>
+                <ui-tree-item value="components">
+                  <ui-tree-item-label
+                    ><ui-tree-item-indicator></ui-tree-item-indicator
+                    ><span>components</span></ui-tree-item-label
+                  >
+                  <ui-tree-group>
+                    <ui-tree-item value="components/button.tsx"
+                      ><ui-tree-item-label><span>button.tsx</span></ui-tree-item-label></ui-tree-item
+                    >
+                    <ui-tree-item value="components/card.tsx"
+                      ><ui-tree-item-label><span>card.tsx</span></ui-tree-item-label></ui-tree-item
+                    >
+                  </ui-tree-group>
+                </ui-tree-item>
+                <ui-tree-item value="package.json"
+                  ><ui-tree-item-label><span>package.json</span></ui-tree-item-label></ui-tree-item
+                >
+                <ui-tree-item value="README.md"
+                  ><ui-tree-item-label><span>README.md</span></ui-tree-item-label></ui-tree-item
+                >
+              </ui-tree>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>tree-item</code></li>
+            <li><code>tree-label</code></li>
+            <li><code>tree-indicator</code></li>
+            <li><code>tree-group</code></li>
+            <li><code>[data-selected]</code></li>
+            <li><code>[data-expanded]</code></li>
+            <li><code>--tree-level</code></li>
+          </ul>
+        </section>
         <section class="ds-section" id="trigger-menu">
           <h2>Trigger menu</h2>
           <p>Suggestions that open as you type a character. Type <kbd>@</kbd> to mention someone.</p>
@@ -1476,7 +2386,7 @@
                 <ui-field class="ds-w">
                   <ui-field-label>Message</ui-field-label>
                   <ui-trigger-menu-input>
-                    <textarea placeholder="Type @ to mention someone"></textarea>
+                    <textarea placeholder="Type @ to mention someone…"></textarea>
                   </ui-trigger-menu-input>
                 </ui-field>
                 <ui-trigger-menu-content>
@@ -1498,30 +2408,52 @@
         <section class="ds-section" id="patterns">
           <h2>Patterns</h2>
           <p>Components put together the way a product would use them.</p>
+          <h3>Accounts</h3>
           <div class="ds-example">
             <template>
               <div class="ds-card" style="width: 22rem; max-width: 100%">
                 <div class="ds-stack" style="gap: 4px">
-                  <h3>Sign in to Acme</h3>
+                  <h4>Sign in to Acme</h4>
                   <p>Welcome back. Enter your details to continue.</p>
                 </div>
                 <ui-button><button style="width: 100%">Continue with GitHub</button></ui-button>
                 <div class="ds-row" style="flex-wrap: nowrap">
                   <ui-separator></ui-separator><span class="ds-muted">or</span><ui-separator></ui-separator>
                 </div>
-                <ui-field><ui-field-label>Email</ui-field-label><ui-input><input type="email" placeholder="you@example.com" /></ui-input></ui-field>
-                <ui-field><ui-field-label>Password</ui-field-label><ui-input><input type="password" /></ui-input></ui-field>
-                <label><ui-checkbox default-checked><ui-checkbox-indicator></ui-checkbox-indicator></ui-checkbox> Keep me signed in</label>
+                <ui-field
+                  ><ui-field-label>Email</ui-field-label
+                  ><ui-input
+                    ><input
+                      type="email"
+                      autocomplete="email"
+                      spellcheck="false"
+                      placeholder="you@example.com" /></ui-input
+                ></ui-field>
+                <ui-field
+                  ><ui-field-label>Password</ui-field-label
+                  ><ui-input><input type="password" autocomplete="current-password" /></ui-input
+                ></ui-field>
+                <label
+                  ><ui-checkbox default-checked><ui-checkbox-indicator></ui-checkbox-indicator></ui-checkbox>
+                  Keep me signed in</label
+                >
                 <ui-button><button data-variant="solid" style="width: 100%">Sign in</button></ui-button>
               </div>
               <div class="ds-card" style="width: 26rem; max-width: 100%">
                 <div class="ds-stack" style="gap: 4px">
-                  <h3>Notifications</h3>
+                  <h4>Notifications</h4>
                   <p>Choose what we email you about.</p>
                 </div>
-                <label><ui-switch default-checked><ui-switch-thumb></ui-switch-thumb></ui-switch> Comments on your work</label>
-                <label><ui-switch default-checked><ui-switch-thumb></ui-switch-thumb></ui-switch> Mentions</label>
-                <label><ui-switch><ui-switch-thumb></ui-switch-thumb></ui-switch> Weekly digest</label>
+                <label
+                  ><ui-switch default-checked><ui-switch-thumb></ui-switch-thumb></ui-switch> Comments on your
+                  work</label
+                >
+                <label
+                  ><ui-switch default-checked><ui-switch-thumb></ui-switch-thumb></ui-switch> Mentions</label
+                >
+                <label
+                  ><ui-switch><ui-switch-thumb></ui-switch-thumb></ui-switch> Weekly digest</label
+                >
                 <ui-meter value="68">
                   <ui-meter-label>Monthly emails used</ui-meter-label>
                   <ui-meter-value></ui-meter-value>
@@ -1534,16 +2466,794 @@
               </div>
             </template>
           </div>
-        </section>
 
-        <section class="ds-section" id="coverage">
-          <h2>Coverage</h2>
-          <p>
-            web.css styles the components on this page. These still render with the browser's defaults:
-            calendar, carousel, color picker, date input, date picker, file input, image cropper, OTP input,
-            pagination, password input, preferences, rating, resizable, scroll area, segmented control, time
-            input, toast, token input, toolbar and tree.
-          </p>
+          <h3>Team</h3>
+          <div class="ds-example">
+            <template>
+              <div class="ds-card" style="width: 34rem; max-width: 100%">
+                <div class="ds-stack" style="gap: 4px">
+                  <h4>Invite your team</h4>
+                  <p>New members get access to every project in this workspace.</p>
+                </div>
+                <div class="ds-row" style="align-items: flex-end; flex-wrap: nowrap">
+                  <ui-field style="flex: 1"
+                    ><ui-field-label>Email</ui-field-label
+                    ><ui-input
+                      ><input
+                        type="email"
+                        autocomplete="off"
+                        spellcheck="false"
+                        placeholder="name@example.com" /></ui-input
+                  ></ui-field>
+                  <ui-select default-value="editor">
+                    <ui-select-trigger
+                      ><button aria-label="Role" style="min-width: 7rem">
+                        <ui-select-value></ui-select-value></button
+                    ></ui-select-trigger>
+                    <ui-select-content>
+                      <ui-select-item value="viewer"
+                        >Viewer<ui-select-item-indicator></ui-select-item-indicator
+                      ></ui-select-item>
+                      <ui-select-item value="editor"
+                        >Editor<ui-select-item-indicator></ui-select-item-indicator
+                      ></ui-select-item>
+                      <ui-select-item value="admin"
+                        >Admin<ui-select-item-indicator></ui-select-item-indicator
+                      ></ui-select-item>
+                    </ui-select-content>
+                  </ui-select>
+                  <ui-button><button data-variant="solid">Invite</button></ui-button>
+                </div>
+                <ui-separator></ui-separator>
+                <ul class="ds-people">
+                  <li>
+                    <ui-avatar><ui-avatar-fallback>HG</ui-avatar-fallback></ui-avatar>
+                    <div><strong>Hollis Grant</strong><span>hollis@example.com</span></div>
+                    <ui-menu>
+                      <ui-menu-trigger><button>Owner</button></ui-menu-trigger>
+                      <ui-menu-content>
+                        <ui-menu-item value="transfer">Transfer ownership</ui-menu-item>
+                      </ui-menu-content>
+                    </ui-menu>
+                  </li>
+                  <li>
+                    <ui-avatar><ui-avatar-fallback>IM</ui-avatar-fallback></ui-avatar>
+                    <div><strong>Inès Moreau</strong><span>ines@example.com</span></div>
+                    <ui-menu>
+                      <ui-menu-trigger><button>Editor</button></ui-menu-trigger>
+                      <ui-menu-content>
+                        <ui-menu-item value="viewer">Make viewer</ui-menu-item>
+                        <ui-menu-item value="admin">Make admin</ui-menu-item>
+                        <ui-menu-separator></ui-menu-separator>
+                        <ui-menu-item value="remove" destructive>Remove</ui-menu-item>
+                      </ui-menu-content>
+                    </ui-menu>
+                  </li>
+                  <li>
+                    <ui-avatar><ui-avatar-fallback>KM</ui-avatar-fallback></ui-avatar>
+                    <div><strong>Kofi Mensah</strong><span>kofi@example.com</span></div>
+                    <ui-menu>
+                      <ui-menu-trigger><button>Viewer</button></ui-menu-trigger>
+                      <ui-menu-content>
+                        <ui-menu-item value="editor">Make editor</ui-menu-item>
+                        <ui-menu-item value="admin">Make admin</ui-menu-item>
+                        <ui-menu-separator></ui-menu-separator>
+                        <ui-menu-item value="remove" destructive>Remove</ui-menu-item>
+                      </ui-menu-content>
+                    </ui-menu>
+                  </li>
+                </ul>
+              </div>
+            </template>
+          </div>
+
+          <h3>Scheduling</h3>
+          <div class="ds-example">
+            <template>
+              <div class="ds-card" style="width: 40rem; max-width: 100%">
+                <div class="ds-stack" style="gap: 4px">
+                  <h4>Book a call</h4>
+                  <p>Pick a day and a time. We’ll send you an invite.</p>
+                </div>
+                <div class="ds-row" style="align-items: flex-start; gap: 24px">
+                  <ui-calendar default-value="2026-10-16" aria-label="Day">
+                    <ui-calendar-previous><button aria-label="Previous month"></button></ui-calendar-previous>
+                    <ui-calendar-heading></ui-calendar-heading>
+                    <ui-calendar-next><button aria-label="Next month"></button></ui-calendar-next>
+                    <ui-calendar-grid>
+                      <ui-calendar-weekdays
+                        ><template><ui-calendar-weekday></ui-calendar-weekday></template
+                      ></ui-calendar-weekdays>
+                      <ui-calendar-weeks
+                        ><template><ui-calendar-day></ui-calendar-day></template
+                      ></ui-calendar-weeks>
+                    </ui-calendar-grid>
+                  </ui-calendar>
+                  <div class="ds-stack" style="flex: 1; min-width: 12rem">
+                    <ui-field>
+                      <ui-field-label>Length</ui-field-label>
+                      <ui-segmented-control default-value="30" aria-label="Length">
+                        <ui-segmented-control-indicator></ui-segmented-control-indicator>
+                        <ui-segmented-control-item value="15">15 min</ui-segmented-control-item>
+                        <ui-segmented-control-item value="30">30 min</ui-segmented-control-item>
+                        <ui-segmented-control-item value="60">1 hour</ui-segmented-control-item>
+                      </ui-segmented-control>
+                    </ui-field>
+                    <ui-field>
+                      <ui-field-label>Start</ui-field-label>
+                      <ui-time-input default-value="10:30"></ui-time-input>
+                    </ui-field>
+                    <ui-field
+                      ><ui-field-label>Notes</ui-field-label
+                      ><ui-textarea>
+                        <textarea placeholder="What would you like to talk about?"></textarea></ui-textarea
+                    ></ui-field>
+                    <ui-button><button data-variant="solid">Book Call</button></ui-button>
+                  </div>
+                </div>
+              </div>
+            </template>
+          </div>
+
+          <h3>Checkout</h3>
+          <div class="ds-example">
+            <template>
+              <div class="ds-card" style="width: 26rem; max-width: 100%">
+                <div class="ds-stack" style="gap: 4px">
+                  <h4>Payment</h4>
+                  <p>You won’t be charged until your order ships.</p>
+                </div>
+                <ui-field
+                  ><ui-field-label>Name on card</ui-field-label
+                  ><ui-input><input autocomplete="cc-name" /></ui-input
+                ></ui-field>
+                <ui-field
+                  ><ui-field-label>Card number</ui-field-label
+                  ><ui-input
+                    ><input
+                      inputmode="numeric"
+                      autocomplete="cc-number"
+                      placeholder="1234 1234 1234 1234" /></ui-input
+                ></ui-field>
+                <div class="ds-row" style="align-items: flex-start; flex-wrap: nowrap">
+                  <ui-field
+                    ><ui-field-label>Expires</ui-field-label
+                    ><ui-date-input default-value="2028-04-01"></ui-date-input
+                  ></ui-field>
+                  <ui-field style="flex: 1"
+                    ><ui-field-label>CVC</ui-field-label
+                    ><ui-input><input inputmode="numeric" autocomplete="cc-csc" /></ui-input
+                  ></ui-field>
+                </div>
+                <ui-field>
+                  <ui-field-label>Delivery</ui-field-label>
+                  <ui-radio-group default-value="standard">
+                    <label
+                      ><ui-radio value="standard"><ui-radio-indicator></ui-radio-indicator></ui-radio>
+                      Standard, free</label
+                    >
+                    <label
+                      ><ui-radio value="express"><ui-radio-indicator></ui-radio-indicator></ui-radio> Express,
+                      $12</label
+                    >
+                  </ui-radio-group>
+                </ui-field>
+                <label
+                  ><ui-checkbox default-checked><ui-checkbox-indicator></ui-checkbox-indicator></ui-checkbox>
+                  Billing address is the same as shipping</label
+                >
+                <ui-separator></ui-separator>
+                <div class="ds-spread"><span class="ds-muted">Total</span><strong>$148.00</strong></div>
+                <ui-button><button data-variant="solid" style="width: 100%">Pay $148.00</button></ui-button>
+              </div>
+              <div class="ds-card" style="width: 20rem; max-width: 100%">
+                <div class="ds-stack" style="gap: 4px">
+                  <h4>Check your email</h4>
+                  <p>We sent a six digit code to hollis@example.com.</p>
+                </div>
+                <ui-field>
+                  <ui-field-label>Code</ui-field-label>
+                  <ui-otp-input max-length="6">
+                    <ui-otp-input-group>
+                      <ui-otp-input-slot></ui-otp-input-slot>
+                      <ui-otp-input-slot></ui-otp-input-slot>
+                      <ui-otp-input-slot></ui-otp-input-slot>
+                    </ui-otp-input-group>
+                    <ui-otp-input-separator></ui-otp-input-separator>
+                    <ui-otp-input-group>
+                      <ui-otp-input-slot></ui-otp-input-slot>
+                      <ui-otp-input-slot></ui-otp-input-slot>
+                      <ui-otp-input-slot></ui-otp-input-slot>
+                    </ui-otp-input-group>
+                  </ui-otp-input>
+                </ui-field>
+                <ui-button><button data-variant="solid" style="width: 100%">Verify</button></ui-button>
+                <p>Didn’t get it? <a href="#patterns">Send a new code</a>.</p>
+              </div>
+            </template>
+          </div>
+
+          <h3>Uploads</h3>
+          <div class="ds-example">
+            <template>
+              <div class="ds-card" style="width: 26rem; max-width: 100%">
+                <div class="ds-stack" style="gap: 4px">
+                  <h4>Add attachments</h4>
+                  <p>Files are shared with everyone on this ticket.</p>
+                </div>
+                <ui-file-input multiple>
+                  <ui-file-input-dropzone>
+                    <p>Drop files here</p>
+                    <p>Up to 25 MB each.</p>
+                    <ui-file-input-trigger><button>Browse Files</button></ui-file-input-trigger>
+                  </ui-file-input-dropzone>
+                  <ui-file-input-list aria-label="Attachments">
+                    <template>
+                      <ui-file-input-item>
+                        <span data-file="name"></span>
+                        <span data-file="size"></span>
+                        <ui-file-input-item-remove
+                          ><button aria-label="Remove file"></button
+                        ></ui-file-input-item-remove>
+                      </ui-file-input-item>
+                    </template>
+                  </ui-file-input-list>
+                </ui-file-input>
+                <ui-progress value="72">
+                  <ui-progress-label>design-review.pdf</ui-progress-label>
+                  <ui-progress-value></ui-progress-value>
+                  <ui-progress-track><ui-progress-indicator></ui-progress-indicator></ui-progress-track>
+                </ui-progress>
+                <ui-progress>
+                  <ui-progress-label>screen-recording.mov</ui-progress-label>
+                  <ui-progress-track><ui-progress-indicator></ui-progress-indicator></ui-progress-track>
+                </ui-progress>
+              </div>
+            </template>
+          </div>
+
+          <h3>Reviews</h3>
+          <div class="ds-example">
+            <template>
+              <div class="ds-card" style="width: 26rem; max-width: 100%">
+                <div class="ds-stack" style="gap: 4px">
+                  <h4>How was your stay?</h4>
+                  <p>Your review helps other guests choose.</p>
+                </div>
+                <ui-field>
+                  <ui-field-label>Overall</ui-field-label>
+                  <ui-rating aria-label="Overall" default-value="4"
+                    ><template><ui-rating-item></ui-rating-item></template
+                  ></ui-rating>
+                </ui-field>
+                <ui-field>
+                  <ui-field-label>Cleanliness</ui-field-label>
+                  <ui-slider default-value="80">
+                    <ui-slider-control
+                      ><ui-slider-track
+                        ><ui-slider-indicator></ui-slider-indicator
+                        ><ui-slider-thumb></ui-slider-thumb></ui-slider-track
+                    ></ui-slider-control>
+                  </ui-slider>
+                </ui-field>
+                <ui-field
+                  ><ui-field-label>Review</ui-field-label
+                  ><ui-textarea><textarea placeholder="What did you like?"></textarea></ui-textarea
+                ></ui-field>
+                <ui-field>
+                  <ui-field-label>Trip</ui-field-label>
+                  <ui-toggle-group default-value="couple" aria-label="Trip">
+                    <ui-toggle value="solo"><button>Solo</button></ui-toggle>
+                    <ui-toggle value="couple"><button>Couple</button></ui-toggle>
+                    <ui-toggle value="family"><button>Family</button></ui-toggle>
+                  </ui-toggle-group>
+                </ui-field>
+                <label
+                  ><ui-switch default-checked><ui-switch-thumb></ui-switch-thumb></ui-switch> Show my
+                  name</label
+                >
+                <div class="ds-row" style="justify-content: flex-end">
+                  <ui-button><button>Skip</button></ui-button>
+                  <ui-button><button data-variant="solid">Post Review</button></ui-button>
+                </div>
+              </div>
+              <div class="ds-card" style="width: 20rem; max-width: 100%">
+                <div class="ds-stack" style="gap: 4px">
+                  <h4>Filters</h4>
+                  <p>128 places match.</p>
+                </div>
+                <ui-accordion default-value="type" style="width: 100%">
+                  <ui-accordion-item value="type">
+                    <ui-accordion-header
+                      ><h5>
+                        <ui-accordion-trigger
+                          ><button type="button">Type of place</button></ui-accordion-trigger
+                        >
+                      </h5></ui-accordion-header
+                    >
+                    <ui-accordion-panel>
+                      <div class="ds-stack" style="gap: 8px; padding-top: 4px">
+                        <label
+                          ><ui-checkbox default-checked
+                            ><ui-checkbox-indicator></ui-checkbox-indicator
+                          ></ui-checkbox>
+                          Entire home</label
+                        >
+                        <label
+                          ><ui-checkbox><ui-checkbox-indicator></ui-checkbox-indicator></ui-checkbox> Private
+                          room</label
+                        >
+                        <label
+                          ><ui-checkbox><ui-checkbox-indicator></ui-checkbox-indicator></ui-checkbox> Shared
+                          room</label
+                        >
+                      </div>
+                    </ui-accordion-panel>
+                  </ui-accordion-item>
+                  <ui-accordion-item value="price">
+                    <ui-accordion-header
+                      ><h5>
+                        <ui-accordion-trigger><button type="button">Price</button></ui-accordion-trigger>
+                      </h5></ui-accordion-header
+                    >
+                    <ui-accordion-panel hidden>
+                      <ui-slider default-value="80/240" min="0" max="400" aria-label="Price range">
+                        <ui-slider-control
+                          ><ui-slider-track
+                            ><ui-slider-indicator></ui-slider-indicator><ui-slider-thumb></ui-slider-thumb
+                            ><ui-slider-thumb></ui-slider-thumb></ui-slider-track
+                        ></ui-slider-control>
+                      </ui-slider>
+                    </ui-accordion-panel>
+                  </ui-accordion-item>
+                  <ui-accordion-item value="rooms">
+                    <ui-accordion-header
+                      ><h5>
+                        <ui-accordion-trigger><button type="button">Rooms</button></ui-accordion-trigger>
+                      </h5></ui-accordion-header
+                    >
+                    <ui-accordion-panel hidden>
+                      <ui-number-input default-value="2" min="1" aria-label="Bedrooms">
+                        <ui-number-input-group>
+                          <ui-number-input-decrement
+                            ><button aria-label="Fewer bedrooms"></button
+                          ></ui-number-input-decrement>
+                          <ui-number-input-control><input aria-label="Bedrooms" /></ui-number-input-control>
+                          <ui-number-input-increment
+                            ><button aria-label="More bedrooms"></button
+                          ></ui-number-input-increment>
+                        </ui-number-input-group>
+                      </ui-number-input>
+                    </ui-accordion-panel>
+                  </ui-accordion-item>
+                </ui-accordion>
+                <div class="ds-row" style="justify-content: space-between">
+                  <ui-button><button>Clear</button></ui-button>
+                  <ui-button><button data-variant="solid">Show 128 Places</button></ui-button>
+                </div>
+              </div>
+            </template>
+          </div>
+
+          <h3>Settings</h3>
+          <div class="ds-example">
+            <template>
+              <div class="ds-card" style="width: 34rem; max-width: 100%">
+                <ui-tabs default-value="general">
+                  <ui-tabs-list aria-label="Project settings">
+                    <ui-tabs-tab value="general"><button type="button">General</button></ui-tabs-tab>
+                    <ui-tabs-tab value="domains"><button type="button">Domains</button></ui-tabs-tab>
+                    <ui-tabs-tab value="usage"><button type="button">Usage</button></ui-tabs-tab>
+                  </ui-tabs-list>
+                  <ui-tabs-panel value="general">
+                    <div class="ds-stack" style="gap: 16px; padding-top: 8px">
+                      <ui-field
+                        ><ui-field-label>Project name</ui-field-label
+                        ><ui-input><input value="Acme Web" /></ui-input
+                      ></ui-field>
+                      <ui-field>
+                        <ui-field-label>Framework</ui-field-label>
+                        <ui-select default-value="next">
+                          <ui-select-trigger
+                            ><button><ui-select-value></ui-select-value></button
+                          ></ui-select-trigger>
+                          <ui-select-content>
+                            <ui-select-item value="next"
+                              >Next.js<ui-select-item-indicator></ui-select-item-indicator
+                            ></ui-select-item>
+                            <ui-select-item value="nuxt"
+                              >Nuxt<ui-select-item-indicator></ui-select-item-indicator
+                            ></ui-select-item>
+                            <ui-select-item value="sveltekit"
+                              >SvelteKit<ui-select-item-indicator></ui-select-item-indicator
+                            ></ui-select-item>
+                          </ui-select-content>
+                        </ui-select>
+                      </ui-field>
+                      <ui-field>
+                        <ui-field-label>Launch date</ui-field-label>
+                        <ui-date-picker default-value="2026-11-10">
+                          <div>
+                            <ui-date-picker-input><input /></ui-date-picker-input>
+                            <ui-date-picker-trigger
+                              ><button aria-label="Choose launch date"></button
+                            ></ui-date-picker-trigger>
+                          </div>
+                          <ui-date-picker-content hidden>
+                            <ui-calendar-previous
+                              ><button aria-label="Previous month"></button
+                            ></ui-calendar-previous>
+                            <ui-calendar-heading></ui-calendar-heading>
+                            <ui-calendar-next><button aria-label="Next month"></button></ui-calendar-next>
+                            <ui-calendar-grid>
+                              <ui-calendar-weekdays
+                                ><template><ui-calendar-weekday></ui-calendar-weekday></template
+                              ></ui-calendar-weekdays>
+                              <ui-calendar-weeks
+                                ><template><ui-calendar-day></ui-calendar-day></template
+                              ></ui-calendar-weeks>
+                            </ui-calendar-grid>
+                          </ui-date-picker-content>
+                        </ui-date-picker>
+                      </ui-field>
+                      <label
+                        ><ui-switch default-checked><ui-switch-thumb></ui-switch-thumb></ui-switch> Preview
+                        deployments for every branch</label
+                      >
+                      <ui-separator></ui-separator>
+                      <div class="ds-spread" style="align-items: center">
+                        <div class="ds-stack" style="gap: 2px">
+                          <strong>Delete project</strong><span class="ds-muted">This can’t be undone.</span>
+                        </div>
+                        <ui-alert-dialog>
+                          <ui-alert-dialog-trigger
+                            ><button data-variant="destructive">Delete</button></ui-alert-dialog-trigger
+                          >
+                          <ui-alert-dialog-backdrop hidden></ui-alert-dialog-backdrop>
+                          <ui-alert-dialog-content hidden>
+                            <ui-alert-dialog-title>Delete Acme Web?</ui-alert-dialog-title>
+                            <ui-alert-dialog-description
+                              >This deletes the project, its domains and every
+                              deployment.</ui-alert-dialog-description
+                            >
+                            <div class="ds-row" style="justify-content: flex-end">
+                              <ui-alert-dialog-close><button>Cancel</button></ui-alert-dialog-close>
+                              <ui-alert-dialog-close value="confirm"
+                                ><button data-variant="destructive">Delete</button></ui-alert-dialog-close
+                              >
+                            </div>
+                          </ui-alert-dialog-content>
+                        </ui-alert-dialog>
+                      </div>
+                    </div>
+                  </ui-tabs-panel>
+                  <ui-tabs-panel value="domains">
+                    <div class="ds-stack" style="gap: 12px; padding-top: 8px">
+                      <ui-field
+                        ><ui-field-label>Domain</ui-field-label
+                        ><ui-input><input spellcheck="false" placeholder="example.com" /></ui-input
+                      ></ui-field>
+                      <ui-button><button>Add Domain</button></ui-button>
+                    </div>
+                  </ui-tabs-panel>
+                  <ui-tabs-panel value="usage">
+                    <div class="ds-stack" style="gap: 16px; padding-top: 8px">
+                      <ui-meter value="72">
+                        <ui-meter-label>Bandwidth</ui-meter-label>
+                        <ui-meter-value></ui-meter-value>
+                        <ui-meter-track><ui-meter-indicator></ui-meter-indicator></ui-meter-track>
+                      </ui-meter>
+                      <ui-meter value="35">
+                        <ui-meter-label>Build minutes</ui-meter-label>
+                        <ui-meter-value></ui-meter-value>
+                        <ui-meter-track><ui-meter-indicator></ui-meter-indicator></ui-meter-track>
+                      </ui-meter>
+                    </div>
+                  </ui-tabs-panel>
+                </ui-tabs>
+              </div>
+              <div class="ds-card" style="width: 18rem; max-width: 100%">
+                <div class="ds-stack" style="gap: 4px">
+                  <h4>Brand</h4>
+                  <p>Used for buttons and links in emails.</p>
+                </div>
+                <ui-color-picker
+                  aria-label="Brand color"
+                  format="hex"
+                  default-value="#16a34a"
+                  style="width: 100%"
+                >
+                  <ui-color-picker-area
+                    ><ui-color-picker-area-thumb></ui-color-picker-area-thumb
+                  ></ui-color-picker-area>
+                  <ui-color-picker-slider channel="hue"
+                    ><ui-color-picker-slider-thumb></ui-color-picker-slider-thumb
+                  ></ui-color-picker-slider>
+                  <div>
+                    <ui-color-picker-swatch></ui-color-picker-swatch>
+                    <ui-color-picker-input><input aria-label="Brand hex color" /></ui-color-picker-input>
+                  </div>
+                </ui-color-picker>
+              </div>
+            </template>
+          </div>
+
+          <h3>Workspace</h3>
+          <div class="ds-example">
+            <template>
+              <div class="ds-card" style="width: 44rem; max-width: 100%; padding: 0; gap: 0">
+                <div class="ds-row" style="justify-content: space-between; padding: 8px">
+                  <ui-toolbar aria-label="Editor">
+                    <ui-toggle
+                      ><button aria-label="Bold"><strong>B</strong></button></ui-toggle
+                    >
+                    <ui-toggle
+                      ><button aria-label="Italic"><em>I</em></button></ui-toggle
+                    >
+                    <ui-toolbar-separator></ui-toolbar-separator>
+                    <ui-toolbar-button><button>Comment</button></ui-toolbar-button>
+                  </ui-toolbar>
+                  <div class="ds-row">
+                    <ui-tooltip>
+                      <ui-tooltip-trigger><button>Share</button></ui-tooltip-trigger>
+                      <ui-tooltip-content>Copy a link to this file</ui-tooltip-content>
+                    </ui-tooltip>
+                    <ui-button><button data-variant="solid">Publish</button></ui-button>
+                  </div>
+                </div>
+                <ui-resizable class="ds-workspace">
+                  <ui-resizable-panel default-size="32" min-size="20">
+                    <ui-tree
+                      aria-label="Files"
+                      default-expanded="app"
+                      default-value="app/page.tsx"
+                      style="max-width: none"
+                    >
+                      <ui-tree-item value="app">
+                        <ui-tree-item-label
+                          ><ui-tree-item-indicator></ui-tree-item-indicator
+                          ><span>app</span></ui-tree-item-label
+                        >
+                        <ui-tree-group>
+                          <ui-tree-item value="app/layout.tsx"
+                            ><ui-tree-item-label><span>layout.tsx</span></ui-tree-item-label></ui-tree-item
+                          >
+                          <ui-tree-item value="app/page.tsx"
+                            ><ui-tree-item-label><span>page.tsx</span></ui-tree-item-label></ui-tree-item
+                          >
+                        </ui-tree-group>
+                      </ui-tree-item>
+                      <ui-tree-item value="lib">
+                        <ui-tree-item-label
+                          ><ui-tree-item-indicator></ui-tree-item-indicator
+                          ><span>lib</span></ui-tree-item-label
+                        >
+                        <ui-tree-group>
+                          <ui-tree-item value="lib/utils.ts"
+                            ><ui-tree-item-label><span>utils.ts</span></ui-tree-item-label></ui-tree-item
+                          >
+                        </ui-tree-group>
+                      </ui-tree-item>
+                      <ui-tree-item value="package.json"
+                        ><ui-tree-item-label><span>package.json</span></ui-tree-item-label></ui-tree-item
+                      >
+                    </ui-tree>
+                  </ui-resizable-panel>
+                  <ui-resizable-handle aria-label="Resize sidebar"></ui-resizable-handle>
+                  <ui-resizable-panel default-size="68" min-size="40">
+                    <ui-scroll-area style="height: 100%; border: 0">
+                      <ui-scroll-area-viewport role="region" aria-label="page.tsx">
+                        <ui-scroll-area-content>
+                          <pre class="ds-mono" style="margin: 0">
+export default function Page() {
+  return (
+    &lt;main&gt;
+      &lt;h1&gt;Welcome back&lt;/h1&gt;
+      &lt;p&gt;Here's what changed while you were away.&lt;/p&gt;
+    &lt;/main&gt;
+  )
+}</pre>
+                        </ui-scroll-area-content>
+                      </ui-scroll-area-viewport>
+                      <ui-scroll-area-scrollbar
+                        ><ui-scroll-area-thumb></ui-scroll-area-thumb
+                      ></ui-scroll-area-scrollbar>
+                    </ui-scroll-area>
+                  </ui-resizable-panel>
+                </ui-resizable>
+              </div>
+            </template>
+          </div>
+
+          <h3>Data</h3>
+          <div class="ds-example">
+            <template>
+              <div class="ds-card" style="width: 44rem; max-width: 100%">
+                <div class="ds-row" style="justify-content: space-between">
+                  <ui-segmented-control default-value="all" aria-label="Status">
+                    <ui-segmented-control-indicator></ui-segmented-control-indicator>
+                    <ui-segmented-control-item value="all">All</ui-segmented-control-item>
+                    <ui-segmented-control-item value="paid">Paid</ui-segmented-control-item>
+                    <ui-segmented-control-item value="due">Due</ui-segmented-control-item>
+                  </ui-segmented-control>
+                  <ui-input
+                    ><input
+                      type="search"
+                      aria-label="Search invoices"
+                      placeholder="Search invoices…"
+                      style="width: 14rem"
+                  /></ui-input>
+                </div>
+                <table class="ds-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Invoice</th>
+                      <th scope="col">Customer</th>
+                      <th scope="col">Status</th>
+                      <th scope="col">Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>INV-1042</td>
+                      <td>Northwind</td>
+                      <td>Paid</td>
+                      <td>$2,400.00</td>
+                    </tr>
+                    <tr>
+                      <td>INV-1041</td>
+                      <td>Globex</td>
+                      <td>Due</td>
+                      <td>$860.00</td>
+                    </tr>
+                    <tr>
+                      <td>INV-1040</td>
+                      <td>Initech</td>
+                      <td>Paid</td>
+                      <td>$1,120.00</td>
+                    </tr>
+                    <tr>
+                      <td>INV-1039</td>
+                      <td>Umbrella</td>
+                      <td>Paid</td>
+                      <td>$315.00</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div class="ds-row" style="justify-content: space-between">
+                  <span class="ds-muted">Showing 1 to 4 of 48</span>
+                  <ui-pagination aria-label="Invoice pages" page-count="12">
+                    <ui-pagination-list>
+                      <ui-pagination-item
+                        ><ui-pagination-previous
+                          ><button aria-label="Previous page"></button></ui-pagination-previous
+                      ></ui-pagination-item>
+                      <template
+                        ><ui-pagination-item
+                          ><ui-pagination-link><button></button></ui-pagination-link></ui-pagination-item
+                      ></template>
+                      <template data-ellipsis
+                        ><ui-pagination-item
+                          ><ui-pagination-ellipsis></ui-pagination-ellipsis></ui-pagination-item
+                      ></template>
+                      <ui-pagination-item
+                        ><ui-pagination-next><button aria-label="Next page"></button></ui-pagination-next
+                      ></ui-pagination-item>
+                    </ui-pagination-list>
+                  </ui-pagination>
+                </div>
+              </div>
+              <div class="ds-card" style="width: 24rem; max-width: 100%; padding: 0">
+                <ui-command style="width: 100%; border: 0">
+                  <ui-command-input
+                    ><input aria-label="Search" placeholder="Search or jump to…"
+                  /></ui-command-input>
+                  <ui-command-empty>No results found.</ui-command-empty>
+                  <ui-command-list>
+                    <ui-command-group>
+                      <ui-command-group-label>Projects</ui-command-group-label>
+                      <ui-command-item value="acme"><span>Acme Web</span></ui-command-item>
+                      <ui-command-item value="docs"><span>Docs</span></ui-command-item>
+                    </ui-command-group>
+                    <ui-command-separator></ui-command-separator>
+                    <ui-command-group>
+                      <ui-command-group-label>Actions</ui-command-group-label>
+                      <ui-command-item value="new" shortcut="mod+n"
+                        ><span>New project</span><ui-command-shortcut></ui-command-shortcut
+                      ></ui-command-item>
+                      <ui-command-item value="invite" shortcut="mod+i"
+                        ><span>Invite people</span><ui-command-shortcut></ui-command-shortcut
+                      ></ui-command-item>
+                    </ui-command-group>
+                  </ui-command-list>
+                </ui-command>
+              </div>
+            </template>
+          </div>
+
+          <h3>Messages</h3>
+          <div class="ds-example">
+            <template>
+              <div class="ds-card" style="width: 28rem; max-width: 100%">
+                <div class="ds-row" style="flex-wrap: nowrap">
+                  <ui-avatar><ui-avatar-fallback>IM</ui-avatar-fallback></ui-avatar>
+                  <div class="ds-stack" style="gap: 2px">
+                    <strong>Inès Moreau</strong>
+                    <span class="ds-muted">Can you check the new onboarding flow before Friday?</span>
+                  </div>
+                </div>
+                <ui-field>
+                  <ui-field-label id="reply-label">Reply</ui-field-label>
+                  <ui-token-input>
+                    <ui-token-input-editor
+                      placeholder="Type @ to mention someone…"
+                      aria-labelledby="reply-label"
+                    ></ui-token-input-editor>
+                    <template>
+                      <ui-token-input-token>
+                        <span data-token-label></span>
+                        <ui-token-input-token-remove></ui-token-input-token-remove>
+                      </ui-token-input-token>
+                    </template>
+                    <ui-trigger-menu data-mentions>
+                      <ui-trigger-menu-content
+                        ><ui-trigger-menu-list></ui-trigger-menu-list
+                      ></ui-trigger-menu-content>
+                    </ui-trigger-menu>
+                  </ui-token-input>
+                </ui-field>
+                <div class="ds-row" style="justify-content: space-between">
+                  <ui-popover>
+                    <ui-popover-trigger><button>Remind Me</button></ui-popover-trigger>
+                    <ui-popover-content>
+                      <ui-popover-title>Remind me</ui-popover-title>
+                      <ui-popover-description
+                        >We’ll bring this message back to the top of your inbox.</ui-popover-description
+                      >
+                      <ui-radio-group default-value="tomorrow" aria-label="When">
+                        <label
+                          ><ui-radio value="hour"><ui-radio-indicator></ui-radio-indicator></ui-radio> In an
+                          hour</label
+                        >
+                        <label
+                          ><ui-radio value="tomorrow"><ui-radio-indicator></ui-radio-indicator></ui-radio>
+                          Tomorrow morning</label
+                        >
+                        <label
+                          ><ui-radio value="week"><ui-radio-indicator></ui-radio-indicator></ui-radio> Next
+                          week</label
+                        >
+                      </ui-radio-group>
+                      <ui-popover-close><button data-variant="solid">Set Reminder</button></ui-popover-close>
+                    </ui-popover-content>
+                  </ui-popover>
+                  <ui-button><button data-variant="solid">Send</button></ui-button>
+                </div>
+              </div>
+              <div class="ds-card" style="width: 20rem; max-width: 100%">
+                <div class="ds-stack" style="gap: 4px">
+                  <h4>Password</h4>
+                  <p>Pick something you don’t use anywhere else.</p>
+                </div>
+                <ui-field>
+                  <ui-field-label>Current password</ui-field-label>
+                  <ui-password-input
+                    ><input autocomplete="current-password" /><ui-password-input-toggle
+                      ><button aria-label="Show current password"></button></ui-password-input-toggle
+                  ></ui-password-input>
+                </ui-field>
+                <ui-field>
+                  <ui-field-label>New password</ui-field-label>
+                  <ui-password-input
+                    ><input autocomplete="new-password" /><ui-password-input-toggle
+                      ><button aria-label="Show new password"></button></ui-password-input-toggle
+                  ></ui-password-input>
+                  <ui-field-description>At least 12 characters.</ui-field-description>
+                </ui-field>
+                <ui-button><button data-variant="solid">Update Password</button></ui-button>
+              </div>
+            </template>
+          </div>
         </section>
       </main>
     </div>
