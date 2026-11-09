@@ -3120,13 +3120,6 @@
       height: 2.75rem;
     }
 
-    :is(label, [data-slot="label-root"]):has(
-      > :is([data-slot="checkbox-root"], [data-slot="radio-root"], [data-slot="switch-root"])
-    ) {
-      padding-block: max(0px, calc((2.75rem - 1lh) / 2));
-      margin-block: min(0px, calc((1lh - 2.75rem) / 2));
-    }
-
     [data-slot="rating-item"] {
       width: 1.5rem;
       height: 1.5rem;
@@ -3145,6 +3138,9 @@
       button[data-slot],
       [data-slot="navigation-menu-link"],
       [data-slot="segmented-control-item"],
+      :is(label, [data-slot="label-root"]):has(
+        > :is([data-slot="checkbox-root"], [data-slot="radio-root"], [data-slot="switch-root"])
+      ),
       :not(label, [data-slot="label-root"])
         > :is([data-slot="checkbox-root"], [data-slot="radio-root"], [data-slot="switch-root"])
     ) {
@@ -3178,6 +3174,9 @@
         [data-slot="color-picker-slider-thumb"],
         :not(label, [data-slot="label-root"])
           > :is([data-slot="checkbox-root"], [data-slot="radio-root"], [data-slot="switch-root"])
+      )::after,
+    :is(label, [data-slot="label-root"]):has(
+        > :is([data-slot="checkbox-root"], [data-slot="radio-root"], [data-slot="switch-root"])
       )::after,
     :is(
       [data-slot="select-trigger"],
