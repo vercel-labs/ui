@@ -109,7 +109,7 @@ jobs:
         run: pnpm docs:perf --check
 
       - name: Bundle size
-        run: pnpm size
+        run: pnpm size --strict
 
   # The web components built for pages without a bundler, loaded from another
   # origin like the docs site serves them (tests/browser-build.config.ts).
