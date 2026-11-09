@@ -172,7 +172,7 @@ function selects<State extends object, Api, Props>(
           )
         )
         if (moved !== eachMoved) {
-          cleanups.push(join(moversOf(part.store, key), moved, listener))
+          cleanups.push(joinMover(part.store, key, moved, listener))
         }
       }
       return () => cleanups.forEach((cleanup) => cleanup())
@@ -196,20 +196,37 @@ function select<State extends object, Key extends keyof State>(
   listener: Listener,
   moved: Moved = eachMoved
 ) {
-  const movers = moversOf(store, key)
-  if (!movers.has(moved)) {
-    movers.set(moved, new Set())
+  // Keeps the key's mover while this selector needs it, under a listener of its own.
+  const leaveMover = joinMover(store, key, moved, () => {})
+  const leave = join(
+    narrowedOf(store).selectors,
+    `${String(key)}:${value}`,
+    listener
+  )
+  return () => {
+    leave()
+    leaveMover()
   }
-  return join(narrowedOf(store).selectors, `${String(key)}:${value}`, listener)
 }
 
-function moversOf(store: Store<any>, key: PropertyKey) {
+function joinMover(
+  store: Store<any>,
+  key: PropertyKey,
+  moved: Moved,
+  listener: Listener
+) {
   const { selecting } = narrowedOf(store)
   let movers = selecting.get(key)
   if (!movers) {
     selecting.set(key, (movers = new Map()))
   }
-  return movers
+  const leave = join(movers, moved, listener)
+  return () => {
+    leave()
+    if (!movers.size && selecting.get(key) === movers) {
+      selecting.delete(key)
+    }
+  }
 }
 
 // Runs `notify` for the value a key left and the one it took, for an array,

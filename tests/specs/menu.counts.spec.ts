@@ -193,7 +193,7 @@ test.describe("work per interaction in a long menu", () => {
         )
       )
       report("menu.scroll", n, {
-        counts: restyled,
+        counts: { recalcs: restyled.recalcs, elements: restyled.elements },
         renders: {},
         subscriptions: 0,
       })
