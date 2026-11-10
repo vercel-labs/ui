@@ -972,7 +972,7 @@
     [data-slot="rename-close"],
     [data-slot="help-trigger"],
     [data-slot="pins-close"],
-    [data-slot="hint-target"],
+    [data-slot="callout-target"],
     [data-slot="toasts-add"],
     [data-slot="recipe-action"],
     [data-slot="desktop-action"],
