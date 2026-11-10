@@ -63,12 +63,24 @@ jobs:
           commit-message: "chore: version packages"
           pr-title: "chore: version packages"
 
+  # The version pull request is opened with the workflow's token, so CI never
+  # runs on it. Its merge commit passes the full suite before anything packs.
+  suite:
+    name: Full suite
+    needs: select-mode
+    if: needs.select-mode.outputs.mode == 'publish' && vars.NPM_PUBLISH == 'true'
+    permissions:
+      contents: read
+    uses: ./.github/workflows/ci.yml
+    with:
+      suite: full
+
   # Publishing waits for the NPM_PUBLISH repository variable, which is set to
   # true once each package has a trusted publisher on npm. Until then a merged
   # version pull request publishes nothing. See contributing/releasing.md.
   pack:
     name: Pack
-    needs: select-mode
+    needs: [select-mode, suite]
     if: needs.select-mode.outputs.mode == 'publish' && vars.NPM_PUBLISH == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 20

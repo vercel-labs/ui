@@ -17,7 +17,7 @@ Pick the packages it touches, the bump (patch, minor or major) and write one lin
 `.github/workflows/release.yml` runs on every push to main:
 
 1. With changesets on main, it opens or updates the **chore: version packages** pull request. It bumps every package to the new version, writes each `CHANGELOG.md` and removes the changesets.
-2. Merging that pull request publishes the new version to npm with provenance, tags it and creates a GitHub release.
+2. Merging that pull request runs the full suite on the merge commit, then publishes the new version to npm with provenance, tags it and creates a GitHub release.
 3. With nothing to version or publish, it does nothing.
 
 Publishing uses npm trusted publishing, so there's no npm token in the repo.
@@ -28,13 +28,14 @@ npm sets up a trusted publisher only for a package that exists, so the first ver
 
 1. In the repo's settings, under Actions, General, allow GitHub Actions to create pull requests.
 2. Add a changeset and merge the version pull request. Publishing stays off until the `NPM_PUBLISH` repository variable is `true`, so the merge publishes nothing.
-3. From an up-to-date main, signed in to npm with publish rights on `@ui-sdk`:
+3. Run the CI workflow on main with the `full` suite (Actions, CI, Run workflow), and wait for it to pass.
+4. From that commit of main, signed in to npm with publish rights on `@ui-sdk`:
 
    ```bash
    pnpm install && pnpm build && pnpm docs:packages && pnpm check:packages && pnpm changeset publish && git push --follow-tags
    ```
 
-4. On npmjs.com, add a trusted publisher to each of the six packages: GitHub Actions, repository `vercel-labs/ui`, workflow `release.yml`.
-5. In the repo's settings, set the Actions variable `NPM_PUBLISH` to `true`.
+5. On npmjs.com, add a trusted publisher to each of the six packages: GitHub Actions, repository `vercel-labs/ui`, workflow `release.yml`.
+6. In the repo's settings, set the Actions variable `NPM_PUBLISH` to `true`.
 
 From then on, merging a version pull request is the whole release.
