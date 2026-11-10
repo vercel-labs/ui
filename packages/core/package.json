@@ -88,6 +88,7 @@
     "./carousel": "./src/components/carousel/carousel.ts",
     "./listbox": "./src/components/listbox/listbox-root.ts",
     "./tree": "./src/components/tree/tree.ts",
+    "./waterfall": "./src/components/waterfall/waterfall.ts",
     "./async-options": "./src/foundation/lists/async-options.ts",
     "./text-match": "./src/foundation/text/text-match.ts",
     "./date": "./src/foundation/date/date.ts",
@@ -344,6 +345,10 @@
       "./tree": {
         "types": "./dist/components/tree/tree.d.ts",
         "default": "./dist/components/tree/tree.js"
+      },
+      "./waterfall": {
+        "types": "./dist/components/waterfall/waterfall.d.ts",
+        "default": "./dist/components/waterfall/waterfall.js"
       },
       "./async-options": {
         "types": "./dist/foundation/lists/async-options.d.ts",

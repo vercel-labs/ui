@@ -94,7 +94,8 @@
     "./toolbar": "./src/toolbar.tsx",
     "./tooltip": "./src/tooltip.tsx",
     "./tree": "./src/tree.tsx",
-    "./trigger-menu": "./src/trigger-menu.tsx"
+    "./trigger-menu": "./src/trigger-menu.tsx",
+    "./waterfall": "./src/waterfall.tsx"
   },
   "sideEffects": false,
   "files": [
@@ -370,6 +371,10 @@
       "./trigger-menu": {
         "types": "./dist/trigger-menu.d.ts",
         "default": "./dist/trigger-menu.js"
+      },
+      "./waterfall": {
+        "types": "./dist/waterfall.d.ts",
+        "default": "./dist/waterfall.js"
       },
       "./package.json": "./package.json"
     }

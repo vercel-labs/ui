@@ -540,6 +540,62 @@
     transition: height 200ms;
   }
 
+  /* Waterfall. Rows are a grid of name, status and timeline; bars are placed by the row's variables. */
+  [data-slot="waterfall-root"] {
+    display: flex;
+    flex-direction: column;
+    width: 640px;
+  }
+
+  :is([data-slot="waterfall-header-row"], [data-slot="waterfall-row"]) {
+    display: grid;
+    grid-template-columns: 200px 60px 1fr;
+    height: 24px;
+    align-items: center;
+  }
+
+  [data-slot="waterfall-row"][hidden] {
+    display: none;
+  }
+
+  [data-slot="waterfall-row"][data-selected] {
+    font-weight: bold;
+  }
+
+  [data-slot="waterfall-row-header"] {
+    padding-inline-start: calc((var(--waterfall-level) - 1) * 16px);
+    white-space: nowrap;
+  }
+
+  [data-slot="waterfall-indicator"] {
+    display: inline-block;
+    width: 16px;
+  }
+
+  [data-slot="waterfall-indicator"]:empty::before {
+    content: "▸";
+  }
+
+  :is([data-slot="waterfall-axis"], [data-slot="waterfall-bar"]) {
+    position: relative;
+    height: 100%;
+  }
+
+  :is([data-slot="waterfall-tick"], [data-slot="waterfall-mark"]) {
+    position: absolute;
+    inset-inline-start: var(--waterfall-tick, var(--waterfall-mark));
+    font-size: 10px;
+  }
+
+  [data-slot="waterfall-bar"]::before {
+    content: "";
+    position: absolute;
+    inset-block: 6px;
+    inset-inline-start: var(--waterfall-start);
+    width: var(--waterfall-size);
+    background: steelblue;
+  }
+
   /* Accordion. Panels animate their height through the measured variable. */
   .accordion,
   [data-slot="accordion"] {
