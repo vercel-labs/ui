@@ -2,7 +2,8 @@
 # Runs the docs dev server. The docs load examples that Vite prebuilds into
 # apps/docs/public/examples, so this builds them before every start and
 # rebuilds a framework's within seconds of a change to its examples or its
-# adapter (a change to core rebuilds them all). Reload the page to see it.
+# adapter (a change to core rebuilds them all), and the stylesheets after a
+# change to one. Reload the page to see it.
 # As a safeguard, it restarts the server with a clean build cache whenever
 # `.next/dev` grows past a limit: it once filled the disk.
 # Usage: scripts/docs-dev.sh (DOCS_PORT and DOCS_CACHE_LIMIT_MB are optional).
@@ -31,13 +32,15 @@ build_examples() {
 
 # The frameworks whose examples are stale: those with an example, a mount or
 # an adapter newer than the last build, or all of them for anything else.
+# Then `styles` for a newer stylesheet.
 stale_frameworks() {
-  [ -f "$stamp" ] || { echo "$frameworks"; return; }
+  [ -f "$stamp" ] || { echo "$frameworks styles"; return; }
   find "$examples" "$root"/packages/*/src -newer "$stamp" -type f \
-    \( -name '*.vue' -o -name '*.svelte' -o -name '*.ts' -o -name '*.tsx' \) \
+    \( -name '*.vue' -o -name '*.svelte' -o -name '*.ts' -o -name '*.tsx' -o -name '*.css' \) \
     -not -path '*/node_modules/*' -not -path '*/dist/*' -not -name '*.test.ts' 2>/dev/null |
     while read -r file; do
       case "${file#"$root"/}" in
+        *.css) echo styles ;;
         examples/*/react/* | examples/components/*/react/* | examples/mount/react.ts | packages/react/*) echo react ;;
         examples/*/vue/* | examples/components/*/vue/* | examples/mount/vue.ts | packages/vue/*) echo vue ;;
         examples/*/svelte/* | examples/components/*/svelte/* | examples/mount/svelte.ts | packages/svelte/*) echo svelte ;;

@@ -4442,4 +4442,159 @@
     width: 96px;
     height: 96px;
   }
+
+  /* ─── Core: Foundations ───────────────────────────────────────────── */
+
+  /* A select or date input in a demo's controls row takes its content's width. */
+  :scope:is(
+      [data-example="behaviors/number-format"],
+      [data-example="behaviors/number-parse"],
+      [data-example="behaviors/date-months"],
+      [data-example="behaviors/date-locale"],
+      [data-example="behaviors/date-parse"],
+      [data-example="behaviors/color-mix"],
+      [data-example="behaviors/image-crop"]
+    )
+    [data-slot="controls"]
+    > :is(select, input) {
+    width: auto;
+  }
+
+  /* Announce: a command beside a labeled copy button. */
+  :scope[data-example="behaviors/announce"] [data-slot="copy-root"] {
+    width: auto;
+    min-width: 5.5rem;
+    padding-inline: var(--space-2) var(--space-3);
+  }
+
+  /* History: a grid of pixel buttons under the undo and redo controls. */
+  :scope[data-example="behaviors/history"]
+    [data-slot="pixels-cell"]:not([data-painted]) {
+    box-shadow: inset 0 0 0 1px var(--line);
+
+    &:hover {
+      box-shadow: inset 0 0 0 1px var(--ink);
+    }
+  }
+
+  /* Number scale: a half dial whose needle turns with the slider below it. */
+  :scope[data-example="behaviors/number-scale"] {
+    & [data-slot="number-scale-dial"] {
+      position: relative;
+      box-sizing: border-box;
+      width: 12rem;
+      height: 6rem;
+      overflow: hidden;
+      border-radius: 6rem 6rem 0 0;
+      background: var(--surface-1);
+      box-shadow: var(--shadow-1);
+    }
+
+    & [data-slot="number-scale-needle"] {
+      position: absolute;
+      bottom: -1px;
+      left: 50%;
+      width: 5rem;
+      height: 2px;
+      border-radius: 1px;
+      background: var(--ink);
+      transform-origin: 0 50%;
+
+      &::before {
+        position: absolute;
+        top: -4px;
+        left: -5px;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--ink);
+        content: "";
+      }
+    }
+
+    & [data-slot="field-root"] [data-slot="row"] {
+      justify-content: space-between;
+    }
+
+    & [data-slot="field-control"][type="range"] {
+      width: 100%;
+      height: auto;
+      margin: 0;
+      padding: 0;
+      background: none;
+      box-shadow: none;
+    }
+  }
+
+  /* Number format: the value large, its fraction and symbols dimmed, over the plain and range forms. */
+  :scope[data-example="behaviors/number-format"] {
+    & [data-slot="number-format-result"] {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      width: 20rem;
+      max-width: 100%;
+    }
+
+    & [data-slot="number-format-value"] {
+      font-size: 32px;
+      font-weight: 600;
+      line-height: 40px;
+      font-variant-numeric: tabular-nums;
+      overflow-wrap: anywhere;
+
+      &
+        > :is(
+          [data-type="currency"],
+          [data-type="decimal"],
+          [data-type="fraction"],
+          [data-type="percentSign"],
+          [data-type="unit"],
+          [data-type="compact"]
+        ) {
+        color: var(--muted);
+        font-weight: 400;
+      }
+    }
+  }
+
+  /* Month sizes: three small months in a row that wraps on a narrow screen. */
+  :scope[data-example="behaviors/month-sizes"] [data-slot="month-sizes-row"] {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  /* Contrast: a sample line on the picked background, as wide as a field. */
+  :scope[data-example="behaviors/color-contrast"]
+    [data-slot="contrast-preview"] {
+    box-sizing: border-box;
+    width: 20rem;
+    max-width: 100%;
+    padding: var(--space-4);
+    box-shadow: inset 0 0 0 1px var(--line-faint);
+  }
+
+  /* Image crop: the crop button with the cropped file beside it. */
+  :scope[data-example="behaviors/image-crop"] [data-slot="image-crop-output"] {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    min-height: 96px;
+  }
+
+  /* Pointer kind: a button over details that keep their line while closed. */
+  :scope[data-example="behaviors/pointer-kind"]
+    [data-slot="pointer-kind-root"] {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+
+    & > [data-slot="pointer-kind-details"] {
+      min-height: 20px;
+      margin: 0;
+      color: var(--muted);
+      font-size: var(--text-sm);
+    }
+  }
 }

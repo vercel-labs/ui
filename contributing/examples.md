@@ -36,10 +36,10 @@ examples/
   behaviors/ core/ experiments/     demo groups for the Core pages
 ```
 
-`apps/docs/app/examples.css` only imports these, tokens first, then base, then components in alphabetical order. Each file wraps its rules in `@scope ([data-example])`.
+Each file wraps its rules in `@scope ([data-example])`. `pnpm --filter examples build` builds each into its own file, and a docs page loads only the ones its examples need: tokens and base first, then the example's folder's, those of the components bundled into it and those its own primitives are named after, in alphabetical order. So a date picker example gets Calendar's styles too, and a page with no examples gets none.
 
 - **Use only the tokens.** Colors, lines, shadows and radii come from `styles/tokens.css`. Colors use `light-dark()`, so they follow the page's color scheme.
-- **A component styles only its own slots,** in its own file. If a demo needs a shared part to look different, scope the rule under the demo's slot.
+- **A component styles only its own slots,** in its own file, since a page loads that file only for examples that use the component. Styles several components share go in base. If a demo needs a shared part to look different, scope the rule under the demo's slot.
 - **Keep selectors flat:** one attribute selector, with `&` for states and children.
 
 ## Checks

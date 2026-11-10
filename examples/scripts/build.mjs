@@ -1,10 +1,10 @@
-// Builds the examples the docs load, for every framework at once, or for the
-// ones named: `node scripts/build.mjs react vue`. Each framework but web is
-// also rendered to HTML in Node, which the docs show until an example mounts.
+// Builds the examples the docs load and their stylesheets, or the ones named:
+// `node scripts/build.mjs react styles`. Each framework but web is also
+// rendered to HTML in Node, which the docs show until an example mounts.
 import { writeFile } from "node:fs/promises"
 import { build } from "vite"
 
-const all = ["react", "vue", "svelte", "solid", "web"]
+const all = ["react", "vue", "svelte", "solid", "web", "styles"]
 const named = process.argv.slice(2)
 const unknown = named.filter((framework) => !all.includes(framework))
 if (unknown.length) {
@@ -15,7 +15,7 @@ const root = new URL("..", import.meta.url).pathname
 await Promise.all(
   (named.length ? named : all).map(async (mode) => {
     await build({ root, mode, logLevel: "warn" })
-    if (mode !== "web") {
+    if (mode !== "web" && mode !== "styles") {
       await prerender(mode)
     }
   })

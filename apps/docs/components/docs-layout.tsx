@@ -8,9 +8,6 @@ import { getStarted, source } from "@/lib/source"
 import type { Node, Root } from "fumadocs-core/page-tree"
 import { notFound } from "next/navigation"
 import type { ReactNode } from "react"
-// Only docs pages show examples. Loaded site-wide, their rules made every
-// restyle on the homepage almost twice as slow.
-import "@/app/examples.css"
 
 // Core's sidebar opens with an overview of the whole site: Get Started, Core's
 // introduction, the tutorial and the changelog. Core's guides follow under its name.

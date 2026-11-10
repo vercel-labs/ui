@@ -3,6 +3,7 @@ import { svelte } from "@sveltejs/vite-plugin-svelte"
 import vue from "@vitejs/plugin-vue"
 import { globSync } from "node:fs"
 import { createRequire } from "node:module"
+import path from "node:path"
 import { defineConfig, type Plugin, type UserConfig } from "vite"
 
 const solidFiles = [
@@ -62,7 +63,86 @@ function docsReact(): Plugin {
 
 const only = process.env.EXAMPLES_ONLY?.split(",")
 
+const examplesFolder = import.meta.dirname
+const sharedStylesheets = ["styles/tokens.css", "styles/base.css"]
+const stylesheets = new Map(
+  globSync(["*/*.css", "components/*/*.css"])
+    .filter((file) => !sharedStylesheets.includes(file))
+    .sort()
+    .map((file) => [path.basename(file, ".css"), file])
+)
+
+// Lists each example's stylesheets, so a docs page loads only those: the
+// shared ones, its folder's, and those of every component bundled into it,
+// like Calendar's in a date picker, or that its own primitives are named after.
+const listStylesheets = (): Plugin => ({
+  name: "list-stylesheets",
+  generateBundle(_, bundle) {
+    const chunks = new Map(
+      Object.values(bundle).flatMap((file) =>
+        file.type === "chunk" ? [[file.fileName, file] as const] : []
+      )
+    )
+    const styles: Record<string, string[]> = {}
+    for (const entry of chunks.values()) {
+      if (!entry.isEntry || entry.name === "mount") {
+        continue
+      }
+      const names = new Set([entry.name.split("/")[0]])
+      const visited = new Set<string>()
+      const visit = (fileName: string) => {
+        const chunk = chunks.get(fileName)
+        if (!chunk || visited.has(fileName)) {
+          return
+        }
+        visited.add(fileName)
+        for (const id of chunk.moduleIds) {
+          const [, component, file] =
+            id.match(
+              /\/packages\/\w+\/src\/(?:components\/([\w-]+)\/)?([\w-]+)/
+            ) ?? []
+          if (file) {
+            names.add(component ?? file).add(file)
+          } else if (id.startsWith(examplesFolder)) {
+            const code = this.getModuleInfo(id)?.code ?? ""
+            for (const [, name] of code.matchAll(/\bname: "([\w-]+)"/g)) {
+              names.add(name)
+            }
+          }
+        }
+        chunk.imports.forEach(visit)
+      }
+      visit(entry.fileName)
+      styles[entry.name] = [
+        ...sharedStylesheets,
+        ...[...stylesheets].flatMap(([name, file]) =>
+          names.has(name) ? [file] : []
+        ),
+      ]
+    }
+    this.emitFile({
+      type: "asset",
+      fileName: "styles.json",
+      source: JSON.stringify(styles),
+    })
+  },
+})
+
 export default defineConfig(({ mode, isSsrBuild = false }) => {
+  if (mode === "styles") {
+    return {
+      build: {
+        outDir: "../apps/docs/public/examples/styles",
+        emptyOutDir: true,
+        rolldownOptions: {
+          input: [...sharedStylesheets, ...stylesheets.values()],
+          output: { assetFileNames: "[name]-[hash][extname]" },
+        },
+        manifest: "manifest.json",
+      },
+    }
+  }
+
   const framework = mode in builds ? mode : "vue"
   const { ext } = builds[framework]
   const config = builds[framework].config?.(isSsrBuild) ?? {}
@@ -101,6 +181,7 @@ export default defineConfig(({ mode, isSsrBuild = false }) => {
 
   return {
     ...config,
+    plugins: [...(config.plugins ?? []), listStylesheets()],
     define,
     build: {
       outDir: `../apps/docs/public/examples/${framework}`,

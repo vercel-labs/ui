@@ -596,6 +596,24 @@
 
   /* ─── Fields ─── */
 
+  [data-slot="field-label"],
+  [data-slot="field-legend"],
+  [data-slot="select-label"],
+  [data-slot="combobox-label"],
+  [data-slot="autocomplete-label"] {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 0;
+    color: var(--ink);
+    font-size: var(--text-md);
+    font-weight: 500;
+
+    &[data-disabled] {
+      color: var(--line-disabled);
+    }
+  }
+
   /* Each field is its own selector, not one :is() list, so the browser only
      tries it on matching elements. The list was tried on every element. */
   [data-slot="input-root"]:where(

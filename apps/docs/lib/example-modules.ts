@@ -27,11 +27,17 @@ function exampleIndex() {
 
 async function readExampleModules(name: string, framework: Framework) {
   const folder = frameworks[framework].example
-  const [manifest, prerendered]: [Manifest, Record<string, string>] =
-    await Promise.all([
-      readBuilt(folder, "manifest.json"),
-      readBuilt(folder, "prerender.json"),
-    ])
+  const [manifest, prerendered, styles, stylesheets]: [
+    Manifest,
+    Record<string, string>,
+    Record<string, string[]>,
+    Manifest,
+  ] = await Promise.all([
+    readBuilt(folder, "manifest.json"),
+    readBuilt(folder, "prerender.json"),
+    readBuilt(folder, "styles.json"),
+    readBuilt("styles", "manifest.json"),
+  ])
   const entries = Object.entries(manifest)
   const find = (entry: string) =>
     entries.find(([, chunk]) => chunk.isEntry && chunk.name === entry)?.[0]
@@ -57,6 +63,9 @@ async function readExampleModules(name: string, framework: Framework) {
     src: url(manifest[example].file),
     mount: url(manifest[mount].file),
     preload: [...files].map(url),
+    styles: styles[name].map(
+      (source) => `/examples/styles/${stylesheets[source].file}`
+    ),
     html: prerendered[name],
   }
 }

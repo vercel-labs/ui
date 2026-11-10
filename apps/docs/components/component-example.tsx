@@ -98,6 +98,9 @@ async function ComponentExample({
 
   return (
     <figure className="my-8">
+      {modules?.styles.map((href) => (
+        <link key={href} rel="stylesheet" href={href} precedence="examples" />
+      ))}
       {hideCode || hideTabs ? (
         <Frame className="flex flex-col overflow-hidden">
           {preview}
