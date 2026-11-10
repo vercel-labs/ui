@@ -49,9 +49,9 @@ jobs:
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
 
-  # WebKit and Firefox, every shard. Retries are on in CI, so a test that
-  # passes on retry counts as flaky, not failed: the Playwright report job
-  # lists it in its summary and annotates it with a warning.
+  # WebKit and Firefox, every shard, and the docs tests. Retries are on in CI,
+  # so a test that passes on retry counts as flaky, not failed: the Playwright
+  # report job lists it in its summary and annotates it with a warning.
   suite:
     name: WebKit and Firefox
     needs: changed

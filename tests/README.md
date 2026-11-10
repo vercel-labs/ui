@@ -22,23 +22,23 @@ A file filter is a regular expression matched against the path, so `specs/menu` 
 
 ## At a glance
 
-| Kind                                  | Files                                                             | Runs in                                                                              | CI tier |
-| ------------------------------------- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------ | ------- |
-| [Behavior](#behavior)                 | `tests/specs/<name>.spec.ts`                                      | Every framework project with the fixture, plus the portal, sheet and engine projects | `pr`    |
-| [Accessibility](#accessibility)       | `<name>.a11y.spec.ts`                                             | Like behavior, without the sheet projects                                            | `pr`    |
-| [Screen reader](#screen-reader)       | `<name>.sr.spec.ts`                                               | Like behavior, without the sheet projects                                            | `pr`    |
-| [Right to left](#right-to-left)       | `<name>.rtl.spec.ts`                                              | Like behavior, without the sheet projects                                            | `pr`    |
-| [Server rendering](#server-rendering) | `<name>.ssr.spec.ts`                                              | `react-ssr`, `vue-ssr`                                                               | `main`  |
-| [Custom rendering](#custom-rendering) | `<name>.render.spec.ts`                                           | Like behavior, without the sheet projects                                            | `pr`    |
-| [Enhancements](#enhancements)         | `<name>.enhancements.spec.ts`, and any test tagged `@enhancement` | Like behavior, without the sheet projects                                            | `pr`    |
-| [Kitchen sinks](#kitchen-sinks)       | `<name>.kitchen-sink.spec.ts`                                     | `react`, `vue`, `web` and their engine projects                                      | `pr`    |
-| [Count gates](#count-gates)           | `<name>.counts.spec.ts`                                           | `react`, `vue`, `web`, engines                                                       | `pr`    |
-| [Leak specs](#leak-specs)             | `leaks.spec.ts`                                                   | `react`, `vue`, `web` and Edge. Chromium only                                        | `pr`    |
-| [One-off specs](#one-off-specs)       | `<name>.<topic>.spec.ts`, like `combobox.virtual.spec.ts`         | Like behavior, without the sheet projects                                            | `pr`    |
-| [Unit tests](#unit-tests)             | `packages/*/test/*.test.ts(x)`                                    | Node, vitest                                                                         | `pr`    |
-| [Docs tests](#docs-tests)             | `tests/docs/*.spec.ts`                                            | Chromium, against the docs site                                                      | `main`  |
-| [Bundle size](#bundle-size)           | `scripts/size.mjs`, `size-budget.json`                            | Node                                                                                 | `pr`    |
-| [Perf docs](#perf-docs)               | `scripts/perf-docs.mjs`                                           | Node                                                                                 | `pr`    |
+| Kind                                  | Files                                                             | Runs in                                                                              | CI tier   |
+| ------------------------------------- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------ | --------- |
+| [Behavior](#behavior)                 | `tests/specs/<name>.spec.ts`                                      | Every framework project with the fixture, plus the portal, sheet and engine projects | `pr`      |
+| [Accessibility](#accessibility)       | `<name>.a11y.spec.ts`                                             | Like behavior, without the sheet projects                                            | `pr`      |
+| [Screen reader](#screen-reader)       | `<name>.sr.spec.ts`                                               | Like behavior, without the sheet projects                                            | `pr`      |
+| [Right to left](#right-to-left)       | `<name>.rtl.spec.ts`                                              | Like behavior, without the sheet projects                                            | `pr`      |
+| [Server rendering](#server-rendering) | `<name>.ssr.spec.ts`                                              | `react-ssr`, `vue-ssr`                                                               | `main`    |
+| [Custom rendering](#custom-rendering) | `<name>.render.spec.ts`                                           | Like behavior, without the sheet projects                                            | `pr`      |
+| [Enhancements](#enhancements)         | `<name>.enhancements.spec.ts`, and any test tagged `@enhancement` | Like behavior, without the sheet projects                                            | `pr`      |
+| [Kitchen sinks](#kitchen-sinks)       | `<name>.kitchen-sink.spec.ts`                                     | `react`, `vue`, `web` and their engine projects                                      | `pr`      |
+| [Count gates](#count-gates)           | `<name>.counts.spec.ts`                                           | `react`, `vue`, `web`, engines                                                       | `pr`      |
+| [Leak specs](#leak-specs)             | `leaks.spec.ts`                                                   | `react`, `vue`, `web` and Edge. Chromium only                                        | `pr`      |
+| [One-off specs](#one-off-specs)       | `<name>.<topic>.spec.ts`, like `combobox.virtual.spec.ts`         | Like behavior, without the sheet projects                                            | `pr`      |
+| [Unit tests](#unit-tests)             | `packages/*/test/*.test.ts(x)`                                    | Node, vitest                                                                         | `pr`      |
+| [Docs tests](#docs-tests)             | `tests/docs/*.spec.ts`                                            | Chromium, against the docs site                                                      | `nightly` |
+| [Bundle size](#bundle-size)           | `scripts/size.mjs`, `size-budget.json`                            | Node                                                                                 | `pr`      |
+| [Perf docs](#perf-docs)               | `scripts/perf-docs.mjs`                                           | Node                                                                                 | `pr`      |
 
 ## Projects
 
@@ -67,7 +67,7 @@ From `.github/workflows`:
 | ------------------ | ------------------------------------------------- | ---------------------------------------------------------------------------------------------- | -------------------------------------------- |
 | `affected`         | Pull requests and pushes to `main`                | The specs the changes can affect, from `pnpm test:pr`, on 1 to 12 runners                      | Typecheck, perf docs, unit tests             |
 | `affected-engines` | Pushes to a pull request with the `engines` label | `affected`, plus `web-webkit` and `web-firefox` for the touched specs                          | Typecheck, perf docs, unit tests             |
-| `engines`          | Adding the `engines` label to a pull request      | `*-webkit`, `*-firefox`                                                                        |                                              |
+| `engines`          | Adding the `engines` label to a pull request      | `*-webkit`, `*-firefox`                                                                        | Docs tests                                   |
 | `main`             | Run workflow                                      | Every Chromium project: the 5 frameworks, `*-data`, `*-ssr`, `*-portal`, `*-sheet` (10 shards) | Typecheck, perf docs, unit tests             |
 | `nightly`          | 03:00 UTC Monday to Saturday, when main changed   | `*-webkit`, `*-firefox`                                                                        |                                              |
 | `full`             | Sundays from `weekly.yml`, and Run workflow       | Everything above                                                                               | Typecheck, perf docs, unit tests, docs tests |
@@ -249,7 +249,7 @@ cd packages/core && ../../scripts/test-slot.sh npx vitest run -t 'notifies two i
 
 ## Docs tests
 
-`tests/docs/*.spec.ts`, with their own config, `tests/docs.config.ts`. Smoke tests against the docs site in every framework (React, Vue, Svelte, Solid and web components): every example renders and its controls work, every framework has the same examples, every public prop appears in at least one React example (`props.spec.ts`), demo links point somewhere real, spec lists say where tests run, and axe passes on the docs shell. Chromium only. Specs take `test` from `docs/docs-test.ts`, whose `page.goto` scrolls to each example, since examples load as they near the viewport, and waits until every one has replaced its prerendered HTML. CI: `main` and `full`.
+`tests/docs/*.spec.ts`, with their own config, `tests/docs.config.ts`. Smoke tests against the docs site in every framework (React, Vue, Svelte, Solid and web components): every example renders and its controls work, every framework has the same examples, every public prop appears in at least one React example (`props.spec.ts`), demo links point somewhere real, spec lists say where tests run, and axe passes on the docs shell. Chromium only. Specs take `test` from `docs/docs-test.ts`, whose `page.goto` scrolls to each example, since examples load as they near the viewport, and waits until every one has replaced its prerendered HTML. It also stands in for Vercel's analytics scripts, which only Vercel serves. CI: `nightly` and `full`.
 
 The config builds the examples first, then starts `next dev` locally or a production build in CI, on `DOCS_PORT`:
 

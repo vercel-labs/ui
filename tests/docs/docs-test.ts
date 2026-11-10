@@ -19,6 +19,20 @@ const live = async (page: Page) => {
 
 const test = base.extend({
   page: async ({ page }, use) => {
+    // Vercel serves the analytics scripts only on its own hosting.
+    await page.route("**/_vercel/**", (route) =>
+      route.fulfill({ contentType: "text/javascript", body: "" })
+    )
+    // Next prefetches a Core or Agents page's segments by the URL a link names,
+    // but serves that page through a rewrite, so the prefetch 404s. Following
+    // the link still renders the page, so a missed prefetch isn't an error.
+    await page.route(/[?&]_rsc=/, async (route) => {
+      const response = await route.fetch()
+      const prefetch = route.request().headers()["next-router-segment-prefetch"]
+      await route.fulfill(
+        prefetch && response.status() === 404 ? { status: 204 } : { response }
+      )
+    })
     const goto = page.goto.bind(page)
     page.goto = async (url, options) => {
       const response = await goto(url, options)
@@ -26,6 +40,7 @@ const test = base.extend({
       return response
     }
     await use(page)
+    await page.unrouteAll({ behavior: "ignoreErrors" })
   },
 })
 

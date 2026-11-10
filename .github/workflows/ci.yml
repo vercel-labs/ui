@@ -336,7 +336,7 @@ jobs:
   docs:
     name: Docs tests
     needs: plan
-    if: needs.plan.outputs.suite == 'full'
+    if: contains(fromJSON('["full", "nightly"]'), needs.plan.outputs.suite)
     runs-on: ubuntu-24.04
     # Every framework, 576 tests: about 16 minutes on two workers.
     timeout-minutes: 45
