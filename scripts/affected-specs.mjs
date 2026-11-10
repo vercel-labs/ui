@@ -288,21 +288,16 @@ function importingComponents(file, importers) {
 }
 
 /**
- * Spec prefixes that aren't components, like `forms`, by the components their
- * fixtures render, like Checkbox: a component's change runs them too.
+ * Spec prefixes by the components their fixtures render, like `forms` and
+ * `field` by Checkbox: a component's change runs them too.
  */
 function sharedSpecsByComponent() {
-  const own = new Set(
-    readdirSync(path.join(root, "packages/core/src/components"))
-  )
   const byComponent = new Map()
   const folders = readdirSync(fixtureRoot, { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
     .map((entry) => entry.name)
   for (const folder of folders) {
-    const users = fixtureComponents(folder).filter(
-      (user) => !own.has(user) && user !== "leaks"
-    )
+    const users = fixtureComponents(folder).filter((user) => user !== "leaks")
     if (users.length === 0) {
       continue
     }
@@ -326,9 +321,14 @@ function sharedSpecsByComponent() {
   return byComponent
 }
 
-/** Components whose specs open a fixture folder, like `menu-cases` for menu.cases.spec.ts. */
+/**
+ * Components whose specs open a fixture folder, like `menu-cases` for
+ * menu.cases.spec.ts, or list it, like presentation.spec.ts's `fixture: "menu"`.
+ */
 function fixtureComponents(folder) {
-  const opens = new RegExp(`open\\(\\s*"${folder}"|fixture=${folder}\\b`)
+  const opens = new RegExp(
+    `open\\(\\s*"${folder}"|fixture=${folder}\\b|fixture: "${folder}"`
+  )
   const owners = specFiles.filter((file) =>
     opens.test(readFileSync(path.join(specRoot, file), "utf8"))
   )
@@ -336,6 +336,9 @@ function fixtureComponents(folder) {
     ? owners.map((file) => file.split(".")[0])
     : [componentOf(folder)].filter(Boolean)
 }
+
+const isComponent = (name) =>
+  existsSync(path.join(root, "packages/core/src/components", name))
 
 /** Each touched component with the frameworks it runs on, and each framework shared code reaches. */
 function plan(files) {
@@ -389,7 +392,14 @@ function plan(files) {
         for (const component of reached) {
           touch(component, reach)
           for (const spec of sharedSpecs.get(component) ?? []) {
-            touch(spec, reach)
+            // Another component's specs, like Field's for Checkbox, run on
+            // `react` like shared code, since every framework's would cost more.
+            touch(
+              spec,
+              isComponent(spec)
+                ? sharedFrameworks(new Map([[file, reach]]))
+                : reach
+            )
           }
         }
       } else {
