@@ -181,8 +181,7 @@ export default function HomePage() {
           </div>
           <Poster
             fig="FIG. 02"
-            head={"WHAT'S INSIDE A SELECT\nHOVER A PART TO FIND IT"}
-            touch={"WHAT'S INSIDE A SELECT\nTAP A PART TO FIND IT"}
+            head={"WHAT'S INSIDE A SELECT\nPICK A PART BELOW TO FIND IT"}
             tone="white"
             pattern="blueprint"
             body="justify-between gap-8"
