@@ -14,7 +14,7 @@ import {
 import { selectPreset } from "../../foundation/popups/popup-presets"
 import { dispatchChange, formInternals } from "../../foundation/forms/form"
 import {
-  createListbox,
+  createFilteredListbox,
   itemKey,
   revealInList,
   type ListData,
@@ -204,7 +204,7 @@ function selectApi(
     onLoadMore: () => options().onLoadMore,
   })
 
-  const listbox = createListbox({
+  const listbox = createFilteredListbox({
     store,
     focus: () => (searching() ? "virtual" : "real"),
     items: () => store.get().items,

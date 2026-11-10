@@ -25,7 +25,7 @@ export {
   rememberIcon,
 } from "./item-icon"
 export {
-  createListbox,
+  createFilteredListbox,
   filterAttribute,
   flattenData,
   itemKey,

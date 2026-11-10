@@ -1,7 +1,6 @@
-// Filtering for the listbox engine, behind Select, Combobox, Autocomplete,
-// Command and TriggerMenu: by label and keywords, the way `filter` asks, with
-// case and accents folded, and ranked by score. `createListbox` is the engine
-// with it plugged in. Listbox, which nobody types into, uses the engine alone.
+// Filtering for the listbox engine behind Select, Combobox, Autocomplete,
+// Command and TriggerMenu, ranked by score with case and accents folded.
+// Listbox, which nobody types into, uses the engine alone.
 import {
   createListboxEngine,
   isGroup,
@@ -168,7 +167,9 @@ function rankData<T>(data: ListData<T>, query: string, filter: ListFilter<T>) {
 const filtering = { data: filterData, matches: itemMatches }
 
 /** The listbox engine, filtering by `query` the way `filter` asks. */
-function createListbox(config: Parameters<typeof createListboxEngine>[0]) {
+function createFilteredListbox(
+  config: Parameters<typeof createListboxEngine>[0]
+) {
   return createListboxEngine(config, filtering)
 }
 
@@ -192,7 +193,13 @@ function filterAttribute<Mode extends string>(
   }
 }
 
-export { createListbox, filterAttribute, filterData, itemMatches, textMatches }
+export {
+  createFilteredListbox,
+  filterAttribute,
+  filterData,
+  itemMatches,
+  textMatches,
+}
 export {
   flattenData,
   itemKey,

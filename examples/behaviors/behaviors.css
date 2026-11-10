@@ -3984,6 +3984,71 @@
     }
   }
 
+  /* ─── Behaviors: Listbox ──────────────────────────────────────────── */
+
+  [data-slot="fruit-picker-root"] {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    width: 14rem;
+    max-width: 100%;
+    font-size: var(--text-sm);
+  }
+
+  [data-slot="fruit-picker-input"] {
+    box-sizing: border-box;
+    width: 100%;
+    height: var(--size);
+    padding-inline: 10px;
+    border: 0;
+    border-radius: var(--radius-control);
+    background: var(--surface-1);
+    box-shadow: inset 0 0 0 1px var(--line);
+    color: var(--ink);
+    font: inherit;
+
+    &::placeholder {
+      color: var(--muted);
+    }
+
+    &:focus-visible {
+      box-shadow: inset 0 0 0 1px var(--ink);
+      outline-offset: 0;
+    }
+  }
+
+  [data-slot="fruit-picker-list"] {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    box-sizing: border-box;
+    height: 15rem;
+    overflow-y: auto;
+    padding: 5px;
+    border-radius: var(--radius-surface);
+    background: var(--surface-1);
+    box-shadow: var(--shadow-1);
+  }
+
+  [data-slot="fruit-picker-option"] {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    min-height: 32px;
+    padding-inline: 10px;
+    border-radius: var(--radius-row);
+    cursor: default;
+    user-select: none;
+
+    &[data-highlighted] {
+      background: var(--tint);
+    }
+
+    &[aria-selected="true"] {
+      font-weight: 600;
+    }
+  }
+
   /* ─── Behaviors: Viewport ─────────────────────────────────────────── */
 
   :is(

@@ -9,7 +9,7 @@ import { pressKeepsFocus } from "../focus/press-keeps-focus"
 import { isApple } from "../platform/platform"
 import { fuzzyFilter } from "../text/fuzzy"
 import {
-  createListbox,
+  createFilteredListbox,
   type ListData,
   type ListFilter,
   type Listbox,
@@ -136,7 +136,7 @@ function createAutocompleteCore<
     onLoadMore: () => options().onLoadMore,
   })
 
-  const listbox = createListbox({
+  const listbox = createFilteredListbox({
     store,
     focus: () => (store.get().focusInList ? "real" : "virtual"),
     items: config.items,

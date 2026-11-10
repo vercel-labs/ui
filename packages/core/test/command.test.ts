@@ -7,7 +7,7 @@ import {
 } from "../src/components/command/command-data"
 import { fuzzyFilter, fuzzyScore } from "../src/foundation/text/fuzzy"
 import {
-  createListbox,
+  createFilteredListbox,
   filterData,
   itemKey,
   type ListData,
@@ -158,7 +158,7 @@ describe("ranking", () => {
       label: `Item ${index} ${index % 7 === 0 ? "settings" : "action"}`,
     }))
     let query = ""
-    const listbox = createListbox({
+    const listbox = createFilteredListbox({
       store: createStore({ highlighted: null as string | null }, [
         "highlighted",
       ]),
@@ -352,7 +352,7 @@ describe("command headless", () => {
 
   test("two items with one value warn in development, naming the component and the value", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
-    const listbox = createListbox({
+    const listbox = createFilteredListbox({
       store: createStore({ highlighted: null as string | null }, [
         "highlighted",
       ]),

@@ -1,11 +1,107 @@
 ---
 title: Lists
-description: Render long lists, follow new messages, and edit values in place.
+description: Search a list of options, render long lists, follow new messages, and edit values in place.
 ---
 
-Use `createVirtualizer` for long lists, `createStickToBottom` for chats and logs, and `createInlineEdit` for editable labels.
+Use `createListbox` for options you move through and search, `createVirtualizer` for long lists, `createStickToBottom` for chats and logs, and `createInlineEdit` for editable labels.
 
 Each helper works on its own or alongside [focus](./focus#grids) and [selection](./selection) in a component.
+
+## Options You Search
+
+### Move Through the Options
+
+`createListbox` keeps one option highlighted and moves the highlight with the arrow keys, the way a listbox or a combobox does. Keep the highlighted option's key in state, starting at `null`, and create the behavior in `api`:
+
+```ts
+import { createListbox } from "@ui-sdk/core"
+
+const listbox = createListbox(context, {
+  key: "highlighted",
+  focus: "virtual",
+})
+```
+
+With `focus: "virtual"`, focus stays where it is, like in a search input, and the input points `aria-activedescendant` at the highlighted option. Leave `focus` out and the highlight moves real focus from option to option instead.
+
+Each option joins in its slot's `bind`, and `attrs` gives it an `id`, `data-highlighted` and `aria-disabled`:
+
+```ts
+option: slot<{ value: string }>({
+  role: "option",
+  focus: "active-descendant",
+  props: { value: "string" },
+  selects: selects({ highlighted: ({ key }) => [key, null] }),
+  attrs: (state, part) => ({
+    ...part.api.listbox.attrs(state, part),
+    "aria-selected": String(state.value === part.key),
+  }),
+  on: { pointermove: (event, { key, api }) => api.listbox.highlight(key, { event }) },
+  bind: (el, part) => part.api.listbox.bind(el, part),
+}),
+```
+
+`selects` lets a move reach only the option it leaves and the one it lands on. On the input, set `aria-activedescendant` to `api.listbox.activeId(state)` and pass `keydown` to `api.listbox.keydown(event)`. The arrows, PageUp and PageDown move the highlight. With real focus, Home, End and typing an option's name move it too. Moving past either end wraps around unless `loop` returns `false`.
+
+Choosing an option is yours. On Enter, read the highlighted key from state and write your value with [`createChange`](../kernel/handle-changes#changes), or with [`createSelection`](./selection) when people can choose several.
+
+### Filter as You Type
+
+Pass the text to filter by as `query`. In composed lists like the one above, an option only renders while it matches, so add `present` to the option slot:
+
+```ts
+const listbox = createListbox(context, {
+  key: "highlighted",
+  focus: "virtual",
+  query: () => context.store.get().query,
+})
+```
+
+```ts
+present: (_state, part) => part.api.listbox.shows(part),
+```
+
+Options match by their `label` prop, or by their text when they have none, ignoring case and accents. When the query changes, call `listbox.move("first")` to highlight the best match, as this search does:
+
+<ComponentExample
+  name="behaviors/listbox"
+  caption="Type to filter the fruit. Use Up and Down to move the highlight, and Enter or a click to choose one."
+/>
+
+`filter` decides what matches: `"contains"` by default, `"startsWith"`, or a function that returns `true`, `false`, or a score. A score ranks the options, best first, and 0 hides one. `listbox.count()` says how many options match, for a message when none do.
+
+### Options as Data
+
+For options that come from data, pass them as `items`: strings, items with a `value` and `label`, groups and separators. `listbox.items()` returns what matches the query, in order, so render that instead of the full list:
+
+```ts
+const listbox = createListbox(context, {
+  key: "highlighted",
+  items: () => context.options().items,
+  query: () => context.store.get().query,
+})
+```
+
+Pass `onHighlight` to hear where the highlight moved, with its index for a [virtualizer](#long-lists) to scroll to, and `onEnd` to load the next page when it reaches the last option.
+
+### Options
+
+<TypeTable
+  path="../../packages/core/src/foundation/lists/listbox-behavior.ts"
+  name="ListboxBehaviorOptions"
+  type="ListboxBehaviorOptions<{ highlighted: string | null }>"
+  events={false}
+  examples={{
+    key: "Move Through the Options",
+    focus: "Move Through the Options",
+    loop: "Move Through the Options",
+    query: "Filter as You Type",
+    filter: "Filter as You Type",
+    items: "Options as Data",
+    onHighlight: "Options as Data",
+    onEnd: "Options as Data",
+  }}
+/>
 
 ## Long Lists
 

@@ -25,7 +25,7 @@ import { unopened } from "../../foundation/popups/popup-steps"
 import { triggerMenuPreset } from "../../foundation/popups/popup-presets"
 import { matchesShortcut } from "../../foundation/platform/platform"
 import {
-  createListbox,
+  createFilteredListbox,
   itemKey,
   type ListData,
 } from "../../foundation/lists/listbox"
@@ -185,7 +185,7 @@ function triggerMenuApi(
     return !!level?.item && !argumentOf(level)?.items
   }
 
-  const listbox = createListbox({
+  const listbox = createFilteredListbox({
     store,
     focus: "virtual",
     items: () => store.get().items,

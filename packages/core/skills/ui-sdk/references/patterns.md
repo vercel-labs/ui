@@ -132,6 +132,52 @@ if (isTypeaheadKey(event) && (event.key !== " " || typeahead.active())) {
 }
 ```
 
+## A search box over options with `createListbox`
+
+Keep focus in the input and highlight options with `aria-activedescendant`. The input is a `combobox`, each option an `option`, and choosing is a value you write with `createChange`:
+
+```ts
+const listbox = createListbox(context, {
+  key: "highlighted",
+  focus: "virtual",
+  query: () => context.store.get().query,
+})
+```
+
+```ts
+input: slot({
+  attrs: (state, { id, api }) => ({
+    role: "combobox",
+    "aria-expanded": "true",
+    "aria-controls": `${id}-list`,
+    "aria-activedescendant": api.listbox.activeId(state),
+  }),
+  on: {
+    input: (event, { api }) => api.search((event.target as HTMLInputElement).value),
+    keydown: (event, { api }) => api.keydown(event),
+  },
+}),
+option: slot<{ value: string }>({
+  role: "option",
+  focus: "active-descendant",
+  props: { value: "string" },
+  selects: selects({ highlighted: ({ key }) => [key, null] }),
+  present: (_state, part) => part.api.listbox.shows(part),
+  attrs: (state, part) => ({
+    ...part.api.listbox.attrs(state, part),
+    "aria-selected": String(state.value === part.key),
+  }),
+  press: ({ key, api }, event) => api.choose(key, event),
+  on: {
+    pointerdown: (event) => event.preventDefault(),
+    pointermove: (event, { key, api }) => api.listbox.highlight(key, { event }),
+  },
+  bind: (el, part) => part.api.listbox.bind(el, part),
+}),
+```
+
+`api.search` writes the query and calls `listbox.move("first")`, and `api.keydown` chooses the highlighted key on Enter before passing other keys to `listbox.keydown`. `pointerdown` keeps focus in the input. For options from data, pass `items` and render `listbox.items()`.
+
 ## A `createFocusRecovery` fallback
 
 `fallback` runs after the state change, so the part that left is already gone from your lists. Walk a stable order from its key to find the neighbor that's still there, the next one first:

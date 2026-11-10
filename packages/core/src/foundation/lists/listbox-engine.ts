@@ -259,7 +259,7 @@ type ListFiltering = {
 
 function createListboxEngine(
   config: {
-    store: Store<{ highlighted: string | null }>
+    store: Pick<Store<{ highlighted: string | null }>, "get" | "set">
     // "real" moves DOM focus to items. "virtual" leaves it where it is, and the
     // owner points aria-activedescendant at the highlighted item. A function
     // decides per open, like real focus for a touch screen reader.

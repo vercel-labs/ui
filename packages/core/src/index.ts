@@ -92,6 +92,20 @@ export {
   type SelectionOptions,
 } from "./foundation/selection/selection-model"
 export {
+  createListbox,
+  type ListboxBehavior,
+  type ListboxBehaviorOptions,
+  type ListboxOption,
+} from "./foundation/lists/listbox-behavior"
+export type {
+  ListData,
+  ListFilter,
+  ListGroup,
+  ListHighlightDetails,
+  ListItem,
+  ListSeparator,
+} from "./foundation/lists/listbox-engine"
+export {
   createTreeCollection,
   treeDataNodes,
   treeFromPaths,

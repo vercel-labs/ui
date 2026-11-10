@@ -5,7 +5,7 @@ import {
   type ComboboxValueChangeReason,
 } from "../src/components/combobox/combobox"
 import {
-  createListbox,
+  createFilteredListbox,
   filterData,
   flattenData,
   itemKey,
@@ -137,7 +137,7 @@ describe("composed items", () => {
     const store = createStore({ highlighted: null as string | null }, [
       "highlighted",
     ])
-    const listbox = createListbox({
+    const listbox = createFilteredListbox({
       store,
       focus: "virtual",
       items: () => undefined,
@@ -161,7 +161,7 @@ describe("navigation over data", () => {
     const store = createStore({ highlighted: null as string | null }, [
       "highlighted",
     ])
-    const listbox = createListbox({
+    const listbox = createFilteredListbox({
       store,
       focus: "virtual",
       items: () => fruits,
@@ -218,7 +218,7 @@ describe("navigation over data", () => {
     const store = createStore({ highlighted: null as string | null }, [
       "highlighted",
     ])
-    const listbox = createListbox({
+    const listbox = createFilteredListbox({
       store,
       focus: "virtual",
       items: () => [
@@ -243,7 +243,7 @@ describe("navigation over data", () => {
       "highlighted",
     ])
     let reached = 0
-    const listbox = createListbox({
+    const listbox = createFilteredListbox({
       store,
       focus: "virtual",
       items: () => [
@@ -282,7 +282,7 @@ describe("navigation over data", () => {
     const store = createStore({ highlighted: null as string | null }, [
       "highlighted",
     ])
-    const listbox = createListbox({
+    const listbox = createFilteredListbox({
       store,
       focus: "virtual",
       items: () => [
@@ -344,7 +344,7 @@ describe("navigation over data", () => {
     const store = createStore({ highlighted: null as string | null }, [
       "highlighted",
     ])
-    const listbox = createListbox({
+    const listbox = createFilteredListbox({
       store,
       focus: "virtual",
       items: () => many,

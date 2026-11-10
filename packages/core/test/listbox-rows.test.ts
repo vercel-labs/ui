@@ -3,7 +3,7 @@ import { combobox } from "../src/components/combobox/combobox"
 import { comboboxSelectAll } from "../src/components/combobox/combobox-parts"
 import { chipsThatFit } from "../src/components/combobox/combobox-chips"
 import {
-  createListbox,
+  createFilteredListbox,
   itemKey,
   type ListData,
 } from "../src/foundation/lists/listbox"
@@ -36,7 +36,7 @@ describe("items shown while the query is empty", () => {
       "highlighted",
     ])
     const state = { query }
-    const listbox = createListbox({
+    const listbox = createFilteredListbox({
       store,
       focus: "virtual",
       items: () => fruits,

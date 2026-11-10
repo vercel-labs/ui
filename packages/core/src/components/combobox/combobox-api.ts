@@ -25,7 +25,7 @@ import { comboboxPreset } from "../../foundation/popups/popup-presets"
 import { normalize } from "../../foundation/text/typeahead"
 import { dispatchChange, formInternals } from "../../foundation/forms/form"
 import {
-  createListbox,
+  createFilteredListbox,
   flattenData,
   itemKey,
   type ListData,
@@ -313,7 +313,7 @@ function comboboxApi(
     onLoadMore: () => options().onLoadMore,
   })
 
-  const listbox = createListbox({
+  const listbox = createFilteredListbox({
     store,
     focus: () => (store.get().focusInList ? "real" : "virtual"),
     items: () => store.get().items,
