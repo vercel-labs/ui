@@ -1,7 +1,7 @@
 @import "tailwindcss";
 @source "./";
 
-[data-slot="waterfall-root"] {
+[data-slot="waterfall"] {
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -29,7 +29,7 @@
   background: var(--color-neutral-100);
 }
 
-[data-slot="waterfall-root"] :focus-visible {
+[data-slot="waterfall"] :focus-visible {
   outline: 2px solid var(--color-neutral-900);
   outline-offset: -2px;
 }

@@ -1,10 +1,10 @@
 @scope ([data-example]) {
   /* Waterfalls grow downward as spans open, so the rows above stay put. */
-  :scope:has([data-slot="waterfall-root"]) {
+  :scope:has([data-slot="waterfall"]) {
     justify-content: flex-start;
   }
 
-  [data-slot="waterfall-root"] {
+  [data-slot="waterfall"] {
     display: flex;
     position: relative;
     flex-direction: column;
@@ -20,7 +20,7 @@
     font-size: var(--text-md);
   }
 
-  [data-slot="stack"]:has(> [data-slot="waterfall-root"]) {
+  [data-slot="stack"]:has(> [data-slot="waterfall"]) {
     width: 36rem;
     max-width: 100%;
   }
@@ -209,7 +209,7 @@
   }
 
   /* Virtualized: the scroller is the panel, and rows sit at their offsets in the waterfall. */
-  [data-slot="scroll"]:has(> [data-slot="waterfall-root"]) {
+  [data-slot="scroll"]:has(> [data-slot="waterfall"]) {
     flex: none;
     box-sizing: border-box;
     width: 36rem;
@@ -221,7 +221,7 @@
     box-shadow: var(--shadow-1);
     overscroll-behavior: contain;
 
-    & > [data-slot="waterfall-root"] {
+    & > [data-slot="waterfall"] {
       display: block;
       width: auto;
       padding: 0;

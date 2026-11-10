@@ -541,7 +541,7 @@
   }
 
   /* Waterfall. Rows are a grid of name, status and timeline; bars are placed by the row's variables. */
-  [data-slot="waterfall-root"] {
+  [data-slot="waterfall"] {
     display: flex;
     flex-direction: column;
     width: 640px;
