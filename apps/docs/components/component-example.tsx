@@ -134,7 +134,7 @@ async function ComponentExample({
               <TabsStackedPanel
                 value="preview"
                 keepMounted
-                className="relative grid rounded-b-frame outline-none focus-visible:ring-3 focus-visible:ring-ring/30"
+                className="relative grid rounded-b-frame outline-none focus-visible:inset-ring-3 focus-visible:inset-ring-ring/30"
               >
                 {preview}
                 <StylingNote
