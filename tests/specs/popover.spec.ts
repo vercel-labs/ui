@@ -877,7 +877,11 @@ test.describe("animation", () => {
   test(
     "a press on a popover animating out reaches what's beneath it",
     { tag: "@enhancement" },
-    async ({ page, open }) => {
+    async ({ page, open, fixtureOptions }) => {
+      test.skip(
+        isSheet(fixtureOptions),
+        "A sheet is modal: its backdrop takes the press, as a modal dialog's does."
+      )
       await open("popover", { animate: "" })
       await page.addStyleTag({
         content:
