@@ -110,6 +110,16 @@ describe("createInputHistory in an input", () => {
     expect(el.value).toBe("")
   })
 
+  test("notices entries added to the same array", () => {
+    const history = ["one"]
+    const { el, type, press } = mount("input", { history })
+    press("ArrowUp")
+    history.push("two")
+    type("")
+    press("ArrowUp")
+    expect(el.value).toBe("two")
+  })
+
   test("a canceled change keeps the value and the key", () => {
     const onValueChange = vi.fn(
       (_value: string, details: { cancel: () => void }) => details.cancel()
@@ -123,7 +133,7 @@ describe("createInputHistory in an input", () => {
     )
   })
 
-  test("leaves the keys alone with a modifier, while read-only, with a popup open, or on a number field", () => {
+  test("leaves the keys alone with a modifier, while read-only, with a popup open, or on a number or email field", () => {
     const { el, press } = mount("input", { history: ["one"] })
     expect(press("ArrowUp", { shiftKey: true }).defaultPrevented).toBe(false)
     expect(press("ArrowUp", { altKey: true }).defaultPrevented).toBe(false)
@@ -134,6 +144,8 @@ describe("createInputHistory in an input", () => {
     expect(press("ArrowUp").defaultPrevented).toBe(false)
     el.removeAttribute("aria-expanded")
     el.type = "number"
+    expect(press("ArrowUp").defaultPrevented).toBe(false)
+    el.type = "email"
     expect(press("ArrowUp").defaultPrevented).toBe(false)
     expect(el.value).toBe("")
   })

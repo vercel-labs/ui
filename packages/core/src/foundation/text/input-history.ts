@@ -20,7 +20,7 @@ type InputHistoryOptions<T> = {
   atEdge?: (direction: "up" | "down", event: KeyboardEvent) => boolean
 }
 
-const recallableTypes = new Set(["text", "search", "url", "email", "tel"])
+const recallableTypes = new Set(["text", "search", "url", "tel"])
 
 type TextField = HTMLInputElement | HTMLTextAreaElement
 
@@ -85,7 +85,7 @@ function createInputHistory<T>(options: InputHistoryOptions<T>) {
   const edits = new Map<number, T>()
 
   function reset() {
-    seen = options.entries() ?? []
+    seen = [...(options.entries() ?? [])]
     at = seen.length
     edits.clear()
   }
