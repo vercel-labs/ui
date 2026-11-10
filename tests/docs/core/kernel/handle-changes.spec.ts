@@ -269,8 +269,8 @@ test("every field in the API reference links to the example that shows it", asyn
   for (const label of [
     "ChangeDetails",
     "CommitDetails",
-    "HistoryOptions",
-    "UndoHistory",
+    "UndoStackOptions",
+    "UndoStack",
   ]) {
     const table = page.getByLabel(label, { exact: true })
     const fields = table.locator("dt")

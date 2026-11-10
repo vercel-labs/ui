@@ -5,7 +5,7 @@ import { withSource } from "../src/foundation/kernel/details"
 import { bind } from "../src/foundation/kernel/part"
 import { createAgent } from "../src/page/agent/agent"
 import { observe, type ObservedChange } from "../src/page/observe/observe"
-import { createTimeline } from "../src/page/timeline/timeline"
+import { createHistory } from "../src/page/history/history"
 
 let cleanups: (() => void)[] = []
 afterEach(() => {
@@ -38,7 +38,7 @@ for (const operation of ["undo", "seek"] as const) {
           return true
         },
       })
-      const timeline = createTimeline(agent)
+      const history = createHistory(agent)
       const changes: ObservedChange[] = []
       const stop = observe((change) => changes.push(change), { live: true })
       const instance = numberInput({ id: "live-number", defaultValue: 1 })
@@ -47,7 +47,7 @@ for (const operation of ["undo", "seek"] as const) {
       cleanups.push(
         bind(instance.part("root"), element),
         () => instance.destroy(),
-        timeline.destroy,
+        history.destroy,
         stop,
         permission.resolve
       )
@@ -61,7 +61,7 @@ for (const operation of ["undo", "seek"] as const) {
       ).toBe(true)
       waiting = true
       const work =
-        operation === "undo" ? timeline.undoSource("agent") : timeline.seek(0)
+        operation === "undo" ? history.undoSource("agent") : history.seek(0)
       await started.promise
       if (edited) {
         withSource("keyboard", () =>
@@ -76,15 +76,15 @@ for (const operation of ["undo", "seek"] as const) {
           key: "value",
           value: 3,
         })
-        expect(timeline.entries()).toHaveLength(1)
+        expect(history.entries()).toHaveLength(1)
       }
       permission.resolve()
       expect(await work).toHaveLength(edited ? 1 : 0)
       expect(instance.get().value).toBe(edited ? 3 : 1)
       if (operation === "undo") {
-        expect(!!timeline.entries()[0].reverted).toBe(!edited)
+        expect(!!history.entries()[0].reverted).toBe(!edited)
       } else {
-        expect(timeline.position()).toBe(edited ? 1 : 0)
+        expect(history.position()).toBe(edited ? 1 : 0)
       }
       expect(
         (

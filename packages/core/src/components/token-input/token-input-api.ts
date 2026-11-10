@@ -2,7 +2,7 @@
 // caret, announcements, and the editor adapter a TriggerMenu writes through.
 import { announce } from "../../foundation/platform/announce"
 import { textDiff } from "../../foundation/text/caret"
-import { createHistory } from "../../foundation/kernel/history"
+import { createUndoStack } from "../../foundation/kernel/undo-stack"
 import { isDisabled } from "../../foundation/lists/listbox-parts"
 import type { PrimitiveContext } from "../../foundation/kernel/primitive-types"
 import type {
@@ -165,7 +165,7 @@ function tokenInputApiBody(
   // this instance's own changes from a value set from outside.
   let committed = store.get().value
   const listeners = new Set<(change: EditorChange) => void>()
-  const history = createHistory<{
+  const history = createUndoStack<{
     value: TokenInputValue
     selection: TextRange | null
   }>({ value: store.get().value, selection: null }, () => options().history)

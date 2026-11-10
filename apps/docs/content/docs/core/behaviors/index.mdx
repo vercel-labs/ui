@@ -207,7 +207,7 @@ Import these helpers from `@ui-sdk/core/gesture`.
 | [`createChange`](../kernel/handle-changes#changes)                       | Asks to change a state value, calling its callback first.                         |
 | [`createCommit`](../kernel/handle-changes#commits)                       | Reports the final value when an interaction ends.                                 |
 | [`dispatch`](../kernel/handle-changes#events-that-arent-state)           | Calls an action's callback, such as `onDelete`, and tells you if it was canceled. |
-| [`createHistory`](../kernel/handle-changes#undo)                         | Records snapshots of any value for undo and redo.                                 |
+| [`createUndoStack`](../kernel/handle-changes#undo)                       | Keeps snapshots of a value you record, so you can undo and redo.                  |
 | [`createController`](../kernel/handle-changes#controllers)               | Lets code outside a component call its methods.                                   |
 | [`sourceOf`](../kernel/handle-changes#how-people-are-working)            | Tells whether an event came from a mouse, touch, pen, keyboard, or code.          |
 | [`isFocusFromKeyboard`](../kernel/handle-changes#how-people-are-working) | Checks whether focus just arrived from the keyboard.                              |
@@ -246,15 +246,15 @@ Import these helpers from `@ui-sdk/core/agent`.
 | [`agentTools`](/docs/agents/connect-an-agent/reference#agenttools)          | Describes the `snapshot`, `act`, and `query` tools for your model. |
 | [`registerTools`](/docs/agents/connect-an-agent/webmcp#register-the-tools)  | Offers the same tools to an agent built into the browser.          |
 
-### Timeline
+### History
 
-Import these helpers from `@ui-sdk/core/timeline`.
+Import these helpers from `@ui-sdk/core/history`.
 
-| Helper                                                                              | What It Does                                                                                            |
-| ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| [`createTimeline`](/docs/agents/connect-an-agent/history-and-undo#start-a-timeline) | Records every change to the page's components and who made it, so you can step back or undo one source. |
-| [`describeEntry`](/docs/agents/connect-an-agent/history-and-undo#read-the-history)  | Writes a short sentence for a timeline entry.                                                           |
-| [`stageChanges`](/docs/agents/connect-an-agent/history-and-undo#try-a-suggestion)   | Tries a set of values on the real controls and lets you put the old ones back.                          |
+| Helper                                                                             | What It Does                                                                                            |
+| ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| [`createHistory`](/docs/agents/connect-an-agent/history-and-undo#start-recording)  | Records every change to the page's components and who made it, so you can step back or undo one source. |
+| [`describeEntry`](/docs/agents/connect-an-agent/history-and-undo#read-the-history) | Writes a short sentence for a history entry.                                                            |
+| [`stageChanges`](/docs/agents/connect-an-agent/history-and-undo#try-a-suggestion)  | Tries a set of values on the real controls and lets you put the old ones back.                          |
 
 ## Values and Testing
 

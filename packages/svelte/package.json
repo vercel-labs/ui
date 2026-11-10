@@ -88,7 +88,7 @@
     "./text-match": "./src/text-match.ts",
     "./agent": "./src/agent.ts",
     "./observe": "./src/observe.ts",
-    "./timeline": "./src/timeline.ts",
+    "./history": "./src/history.ts",
     "./textarea": "./src/textarea.ts",
     "./time-input": "./src/time-input.ts",
     "./toast": "./src/toast.ts",
@@ -436,10 +436,10 @@
         "svelte": "./dist/observe.js",
         "default": "./dist/observe.js"
       },
-      "./timeline": {
-        "types": "./dist/timeline.d.ts",
-        "svelte": "./dist/timeline.js",
-        "default": "./dist/timeline.js"
+      "./history": {
+        "types": "./dist/history.d.ts",
+        "svelte": "./dist/history.js",
+        "default": "./dist/history.js"
       },
       "./package.json": "./package.json"
     }

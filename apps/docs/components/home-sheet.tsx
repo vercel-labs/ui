@@ -4,7 +4,7 @@ import {
   createChange,
   createCellRange,
   createGridFocus,
-  createHistory,
+  createUndoStack,
   createInlineEdit,
   css,
   definePrimitive,
@@ -334,18 +334,18 @@ function SheetDemo() {
   const [note, setNote] = React.useState(
     "Select cells under Feeling or Next step, then press Run"
   )
-  const history = React.useRef(createHistory(start))
+  const stack = React.useRef(createUndoStack(start))
   const timers = React.useRef<number[]>([])
   React.useEffect(() => () => timers.current.forEach(clearTimeout), [])
   const commit = (next: Cells) => {
     setCells(next)
-    history.current.record(next)
+    stack.current.record(next)
   }
   const step = (direction: "undo" | "redo") => {
     if (pending.length) {
       return
     }
-    const next = history.current[direction]()
+    const next = stack.current[direction]()
     if (!next) {
       return
     }
@@ -375,7 +375,7 @@ function SheetDemo() {
           if (index < targets.length - 1) {
             return
           }
-          history.current.record(next)
+          stack.current.record(next)
           setNote(
             `Filled ${targets.length} ${targets.length === 1 ? "cell" : "cells"}. Press ⌘Z to undo`
           )

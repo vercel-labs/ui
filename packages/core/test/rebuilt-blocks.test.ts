@@ -7,7 +7,7 @@ import { afterEach, describe, expect, test, vi } from "vitest"
 import {
   createArea,
   createGridFocus,
-  createHistory,
+  createUndoStack,
   createInlineEdit,
   createStickToBottom,
   createTransfer,
@@ -920,14 +920,14 @@ describe("createArea", () => {
   })
 })
 
-describe("createHistory", () => {
+describe("createUndoStack", () => {
   test("undo and redo walk the recorded states, and mod+z matches per platform", () => {
-    const history = createHistory({ a: 1 })
-    history.record({ a: 2 })
-    history.record({ a: 3 })
-    expect(history.undo()).toEqual({ a: 2 })
-    expect(history.redo()).toEqual({ a: 3 })
-    expect(history.canRedo()).toBe(false)
+    const stack = createUndoStack({ a: 1 })
+    stack.record({ a: 2 })
+    stack.record({ a: 3 })
+    expect(stack.undo()).toEqual({ a: 2 })
+    expect(stack.redo()).toEqual({ a: 3 })
+    expect(stack.canRedo()).toBe(false)
     expect(matchesShortcut(key("z", { metaKey: true }), "mod+z", true)).toBe(
       true
     )

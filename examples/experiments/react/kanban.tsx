@@ -1,7 +1,7 @@
 import * as React from "react"
 import {
   createChange,
-  createHistory,
+  createUndoStack,
   createRovingFocus,
   createTransfer,
   css,
@@ -66,14 +66,14 @@ const kanban = /* @__PURE__ */ definePrimitive({
   api: (context) => {
     const { store } = context
     const change = createChange(context)
-    const history = createHistory(store.get().lists)
+    const stack = createUndoStack(store.get().lists)
     const roving = createRovingFocus<KanbanState, { value: string }>(context, {
       slot: "card",
       key: "focused",
       move: spatialMove(),
     })
-    const syncHistory = () =>
-      store.set({ canUndo: history.canUndo(), canRedo: history.canRedo() })
+    const syncStack = () =>
+      store.set({ canUndo: stack.canUndo(), canRedo: stack.canRedo() })
     const limit = (list: string) => context.options().limits?.[list]
     const transfer = createTransfer<KanbanState>(context, {
       key: "lists",
@@ -82,8 +82,8 @@ const kanban = /* @__PURE__ */ definePrimitive({
         if (!change("lists", value, details)) {
           return false
         }
-        history.record(value)
-        syncHistory()
+        stack.record(value)
+        syncStack()
         return true
       },
       order: () => Object.keys(store.get().lists),
@@ -101,14 +101,14 @@ const kanban = /* @__PURE__ */ definePrimitive({
       if (lists) {
         change("lists", lists, { reason, event })
       }
-      syncHistory()
+      syncStack()
     }
     const api = {
       roving,
       transfer,
       limit,
-      undo: (event?: Event) => travel(history.undo(), "undo", event),
-      redo: (event?: Event) => travel(history.redo(), "redo", event),
+      undo: (event?: Event) => travel(stack.undo(), "undo", event),
+      redo: (event?: Event) => travel(stack.redo(), "redo", event),
       cardKeydown(event: KeyboardEvent, el: HTMLElement, key: string) {
         if (!transfer.keydown(event, key)) {
           roving.keydown(event, el)

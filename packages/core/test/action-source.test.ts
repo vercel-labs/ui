@@ -22,7 +22,7 @@ import {
   withSource,
   type ObservedChange,
 } from "../src/page/observe/observe"
-import { createTimeline } from "../src/page/timeline/timeline"
+import { createHistory } from "../src/page/history/history"
 import { keys } from "../src/testing/input"
 
 let cleanups: (() => void)[] = []
@@ -128,8 +128,8 @@ test("a change the action makes after an await reports the agent that pressed, a
   const changes: ObservedChange[] = []
   cleanups.push(observe((change) => changes.push(change)))
   const agent = createAgent()
-  const timeline = createTimeline(agent)
-  cleanups.push(timeline.destroy)
+  const history = createHistory(agent)
+  cleanups.push(history.destroy)
   const status = mountInput("Status")
   const digest = mountCheckbox("Weekly digest")
   let finish = () => {}
@@ -151,7 +151,7 @@ test("a change the action makes after an await reports the agent that pressed, a
     { label: "Weekly digest", value: true, source: "keyboard" },
     { label: "Status", value: "saved", source: "agent" },
   ])
-  await timeline.undoSource("agent")
+  await history.undoSource("agent")
   expect(status.get().value).toBe("")
   expect(digest.instance.get().checked).toBe(true)
 })

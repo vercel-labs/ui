@@ -1,7 +1,7 @@
 import * as React from "react"
 import {
   createChange,
-  createHistory,
+  createUndoStack,
   createInlineEdit,
   createSpans,
   css,
@@ -80,11 +80,11 @@ const weekCalendar = /* @__PURE__ */ definePrimitive({
   api: (context) => {
     const { store } = context
     const change = createChange(context)
-    const history = createHistory(store.get().events)
+    const stack = createUndoStack(store.get().events)
     let recorded = store.get().events
     const eventElements = new Map<string, HTMLElement>()
-    const syncHistory = () =>
-      store.set({ canUndo: history.canUndo(), canRedo: history.canRedo() })
+    const syncStack = () =>
+      store.set({ canUndo: stack.canUndo(), canRedo: stack.canRedo() })
     // Events set from outside start the history over, so undo never brings back older ones.
     const catchUp = () => {
       const current = store.get().events
@@ -92,7 +92,7 @@ const weekCalendar = /* @__PURE__ */ definePrimitive({
         current !== recorded &&
         JSON.stringify(current) !== JSON.stringify(recorded)
       ) {
-        history.reset((recorded = current))
+        stack.reset((recorded = current))
       }
     }
     const commit = (
@@ -103,8 +103,8 @@ const weekCalendar = /* @__PURE__ */ definePrimitive({
       if (!change("events", events, details)) {
         return false
       }
-      history.record((recorded = events))
-      syncHistory()
+      stack.record((recorded = events))
+      syncStack()
       return true
     }
     const dayLabel = (day: string) =>
@@ -164,15 +164,15 @@ const weekCalendar = /* @__PURE__ */ definePrimitive({
     })
     const travel = (reason: "undo" | "redo", event?: Event) => {
       catchUp()
-      const events = reason === "undo" ? history.undo() : history.redo()
+      const events = reason === "undo" ? stack.undo() : stack.redo()
       if (events && change("events", events, { reason, event })) {
         recorded = events
       } else if (events && reason === "undo") {
-        history.redo()
+        stack.redo()
       } else if (events) {
-        history.undo()
+        stack.undo()
       }
-      syncHistory()
+      syncStack()
     }
 
     const api = {

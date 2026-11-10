@@ -15,7 +15,7 @@ import type {
   Named,
   PrimitiveOptions,
 } from "../../foundation/kernel/primitive-types"
-import type { HistoryOptions } from "../../foundation/kernel/history"
+import type { UndoStackOptions } from "../../foundation/kernel/undo-stack"
 import type {
   TextEditorAdapter,
   TextRange,
@@ -201,7 +201,7 @@ type TokenInputOptions = {
    */
   getTokenDescription?: (token: Token) => string
   /** Undo history: how many steps it keeps, and how long a typing pause starts a new step. */
-  history?: HistoryOptions
+  history?: UndoStackOptions
   /** Disables the input: it can't be focused or changed, and isn't submitted. */
   disabled?: boolean
   /** Keeps the input focusable and submitted, but stops changes. */
@@ -331,7 +331,7 @@ export {
   type TokenInputValueChangeReason,
 }
 export type { TokenInputApi } from "./token-input-api"
-export type { HistoryOptions } from "../../foundation/kernel/history"
+export type { UndoStackOptions } from "../../foundation/kernel/undo-stack"
 export type {
   TextEditorAdapter,
   TextRange,

@@ -489,7 +489,7 @@ const components: Record<string, Component> = {
     types: [
       "TokenInputOptions",
       "TokenInputEditorProps",
-      "HistoryOptions",
+      "UndoStackOptions",
       "TokenInputEditorState",
       "TokenInputTokenState",
     ],

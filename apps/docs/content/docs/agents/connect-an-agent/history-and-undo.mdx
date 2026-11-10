@@ -3,25 +3,27 @@ title: History and Undo
 description: Record component values, step through changes and try suggestions you can revert.
 ---
 
-`createTimeline` records changes to component values. `stageChanges` applies a set of values and gives you a way to restore the previous ones. Both use the agent bridge to change the controls.
+`createHistory` records changes to component values. `stageChanges` applies a set of values and gives you a way to restore the previous ones. Both use the agent bridge to change the controls.
 
-These helpers are experimental. The examples reuse the bridge from the [Guide](./guide), including its permission policy. Import the helpers from your framework's `timeline` entry or `@ui-sdk/core/timeline`.
+For undo inside one component, like a drawing or a board, record its value with [`createUndoStack`](/docs/core/kernel/handle-changes#undo) instead.
 
-## Start a Timeline
+These helpers are experimental. The examples reuse the bridge from the [Guide](./guide), including its permission policy. Import the helpers from your framework's `history` entry or `@ui-sdk/core/history`.
+
+## Start Recording
 
 Start recording before the changes you want to keep:
 
 ```ts
-import { createTimeline } from "@ui-sdk/react/timeline"
+import { createHistory } from "@ui-sdk/react/history"
 import { agent } from "./agent"
 
-const timeline = createTimeline(agent)
+const history = createHistory(agent)
 ```
 
-By default, the timeline records `value`, `checked` and `pressed` changes across the page, from people, agents, and your app. Use `within` to limit it to one element, such as the Guide's `<main>`:
+By default, the history records `value`, `checked` and `pressed` changes across the page, from people, agents, and your app. Use `within` to limit it to one element, such as the Guide's `<main>`:
 
 ```ts
-const timeline = createTimeline(agent, {
+const history = createHistory(agent, {
   within: () => document.querySelector("main"),
   keys: ["value", "checked"],
 })
@@ -29,50 +31,50 @@ const timeline = createTimeline(agent, {
 
 `within` accepts an element or a function that returns one. `keys` replaces the list of state keys to record. Restoring a key uses its `set<Key>` action, such as `setValue` or `setChecked`, so choose keys the component can set through the bridge.
 
-Keep password, card and one-time-code fields outside the recorded panel. Their values are redacted, so the timeline can't restore the originals: their entries carry `redacted: true`, and seeking or undoing leaves those fields as they are and reports them among the changes it couldn't put back.
+Keep password, card and one-time-code fields outside the recorded panel. Their values are redacted, so the history can't restore the originals: their entries carry `redacted: true`, and seeking or undoing leaves those fields as they are and reports them among the changes it couldn't put back.
 
 ## Read the History
 
-`timeline.entries()` returns entries from oldest to newest. Each has an `id`, component `ref`, `label`, state `key`, `value`, `previous`, `source` and `reason`.
+`history.entries()` returns entries from oldest to newest. Each has an `id`, component `ref`, `label`, state `key`, `value`, `previous`, `source` and `reason`.
 
 Use `describeEntry` when you want a short sentence for each entry:
 
 ```ts
-import { describeEntry } from "@ui-sdk/react/timeline"
+import { describeEntry } from "@ui-sdk/react/history"
 
-const labels = timeline.entries().map(describeEntry)
+const labels = history.entries().map(describeEntry)
 ```
 
-For example: "Agent set Project name to Atlas". `timeline.position()` tells you how far you are through the history. It starts at `0`; the end is `timeline.entries().length`.
+For example: "Agent set Project name to Atlas". `history.position()` tells you how far you are through the entries. It starts at `0`; the end is `history.entries().length`.
 
-`timeline.subscribe(listener)` calls a listener when the entries or position change. Read them inside the listener to update your history UI. It returns a function that unsubscribes.
+`history.subscribe(listener)` calls a listener when the entries or position change. Read them inside the listener to update your history UI. It returns a function that unsubscribes.
 
 ## Step Back and Forward
 
 Pass an entry count to `seek`. These calls return to the start of the recorded history, then apply it again:
 
 ```ts
-await timeline.seek(0)
-await timeline.seek(timeline.entries().length)
+await history.seek(0)
+await history.seek(history.entries().length)
 ```
 
-`seek` clamps the position to the available history. If someone makes a new recorded change after seeking back, the timeline drops the entries after that position, like an editor's undo history.
+`seek` clamps the position to the available history. If someone makes a new recorded change after seeking back, the history drops the entries after that position, like undo in an editor.
 
-The timeline restores recorded component values. It doesn't undo a network request, recreate a removed component or reverse an action such as saving a form. Restoration goes through `agent.act`, one control at a time, so current permissions, disabled state and change callbacks still apply, and a control that's refused or has left the page doesn't stop the others.
+The history restores recorded component values. It doesn't undo a network request, recreate a removed component or reverse an action such as saving a form. Restoration goes through `agent.act`, one control at a time, so current permissions, disabled state and change callbacks still apply, and a control that's refused or has left the page doesn't stop the others.
 
 `seek` resolves with the changes it couldn't put back, each as `{ ref, key, value }`, and with an empty array when everything went back. If nothing went back, the position stays where it was.
 
-The timeline doesn't record its own restoring, but it records every other change made meanwhile. When someone changes a control the timeline hasn't restored yet, their change stays, and the control is in the result.
+The history doesn't record its own restoring, but it records every other change made meanwhile. When someone changes a control the history hasn't restored yet, their change stays, and the control is in the result.
 
 ## Undo the Agent's Changes
 
 Use `undoSource` to remove the effect of one source from the applied history:
 
 ```ts
-await timeline.undoSource("agent")
+await history.undoSource("agent")
 ```
 
-The timeline restores each affected key to its latest value from the other sources, or to its starting value if there isn't one. For example, if a person changes the project name after the agent does, that person's value stays.
+It restores each affected key to its latest value from the other sources, or to its starting value if there isn't one. For example, if a person changes the project name after the agent does, that person's value stays.
 
 The entries it put back remain in the history with `reverted: true`, and seeking through the history continues to skip them. Like `seek`, `undoSource` resolves with the changes it couldn't put back, and their entries stay applied. The same method accepts other source names, such as `"keyboard"` or `"programmatic"`.
 
@@ -100,22 +102,22 @@ Here `status` is an Input's controller. When the agent presses Save, the new sta
 
 ## Keep Interactions Together
 
-A drag that commits arrives as one entry. The timeline also combines consecutive changes with the same component, key, source and reason, except for `item-press` and `imperative` changes.
+A drag that commits arrives as one entry. The history also combines consecutive changes with the same component, key, source and reason, except for `item-press` and `imperative` changes.
 
 To record every intermediate step instead, turn coalescing off:
 
 ```ts
-const timeline = createTimeline(agent, { coalesce: false })
+const history = createHistory(agent, { coalesce: false })
 ```
 
-Call `timeline.clear()` to forget the history and keep the controls as they are. Call `timeline.destroy()` when you're done to stop recording and remove its listeners.
+Call `history.clear()` to forget every entry and keep the controls as they are. Call `history.destroy()` when you're done to stop recording and remove its listeners.
 
 ## Try a Suggestion
 
 `stageChanges` puts suggested values on the real controls. Try a different region in the Guide's Select:
 
 ```ts
-import { stageChanges } from "@ui-sdk/react/timeline"
+import { stageChanges } from "@ui-sdk/react/history"
 
 const staged = await stageChanges(agent, [
   { ref: "Region", value: "north-america" },

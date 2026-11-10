@@ -1145,7 +1145,7 @@
     gap: var(--space-3);
   }
 
-  [data-slot="history-grid"] {
+  [data-slot="undo-grid"] {
     display: grid;
     grid-template-columns: repeat(6, 28px);
     gap: var(--space-1);
@@ -4463,8 +4463,8 @@
     padding-inline: var(--space-2) var(--space-3);
   }
 
-  /* History: a grid of pixel buttons under the undo and redo controls. */
-  :scope[data-example="behaviors/history"]
+  /* Undo stack: a grid of pixel buttons under the undo and redo controls. */
+  :scope[data-example="behaviors/undo-stack"]
     [data-slot="pixels-cell"]:not([data-painted]) {
     box-shadow: inset 0 0 0 1px var(--line);
 

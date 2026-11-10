@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest"
-import { createHistory } from "../src/foundation/kernel/history"
+import { createUndoStack } from "../src/foundation/kernel/undo-stack"
 import type { Token } from "../src/foundation/text/text-editor"
 import {
   defaultCodec,
@@ -221,77 +221,77 @@ describe("codec", () => {
   })
 })
 
-describe("history", () => {
+describe("createUndoStack", () => {
   test("typing within the delay joins one entry", () => {
-    const history = createHistory("")
-    history.record("a", { group: "insert", time: 0 })
-    history.record("ab", { group: "insert", time: 100 })
-    history.record("abc", { group: "insert", time: 200 })
-    expect(history.undo()).toBe("")
-    expect(history.canUndo()).toBe(false)
+    const stack = createUndoStack("")
+    stack.record("a", { group: "insert", time: 0 })
+    stack.record("ab", { group: "insert", time: 100 })
+    stack.record("abc", { group: "insert", time: 200 })
+    expect(stack.undo()).toBe("")
+    expect(stack.canUndo()).toBe(false)
   })
 
   test("a pause starts a new entry", () => {
-    const history = createHistory("")
-    history.record("a", { group: "insert", time: 0 })
-    history.record("ab", { group: "insert", time: 700 })
-    expect(history.undo()).toBe("a")
+    const stack = createUndoStack("")
+    stack.record("a", { group: "insert", time: 0 })
+    stack.record("ab", { group: "insert", time: 700 })
+    expect(stack.undo()).toBe("a")
   })
 
   test("another kind of edit starts a new entry, and an edit without a group is its own", () => {
-    const history = createHistory("")
-    history.record("ab", { group: "insert", time: 0 })
-    history.record("a", { group: "delete", time: 10 })
-    history.record("a@x", { time: 20 })
-    history.record("a@xy", { group: "insert", time: 30 })
-    expect(history.undo()).toBe("a@x")
-    expect(history.undo()).toBe("a")
-    expect(history.undo()).toBe("ab")
+    const stack = createUndoStack("")
+    stack.record("ab", { group: "insert", time: 0 })
+    stack.record("a", { group: "delete", time: 10 })
+    stack.record("a@x", { time: 20 })
+    stack.record("a@xy", { group: "insert", time: 30 })
+    expect(stack.undo()).toBe("a@x")
+    expect(stack.undo()).toBe("a")
+    expect(stack.undo()).toBe("ab")
   })
 
   test("sealing ends the group", () => {
-    const history = createHistory("")
-    history.record("a", { group: "insert", time: 0 })
-    history.seal()
-    history.record("ab", { group: "insert", time: 10 })
-    expect(history.undo()).toBe("a")
+    const stack = createUndoStack("")
+    stack.record("a", { group: "insert", time: 0 })
+    stack.seal()
+    stack.record("ab", { group: "insert", time: 10 })
+    expect(stack.undo()).toBe("a")
   })
 
   test("redo walks forward, and a new edit drops what was undone", () => {
-    const history = createHistory("")
-    history.record("a")
-    history.record("b")
-    expect(history.undo()).toBe("a")
-    expect(history.redo()).toBe("b")
-    history.undo()
-    history.record("c")
-    expect(history.canRedo()).toBe(false)
+    const stack = createUndoStack("")
+    stack.record("a")
+    stack.record("b")
+    expect(stack.undo()).toBe("a")
+    expect(stack.redo()).toBe("b")
+    stack.undo()
+    stack.record("c")
+    expect(stack.canRedo()).toBe(false)
   })
 
   test("options given as a getter apply when they change after creation", () => {
     let options: { limit?: number } | undefined
-    const history = createHistory(0, () => options)
+    const stack = createUndoStack(0, () => options)
     options = { limit: 1 }
-    history.record(1)
-    history.record(2)
-    expect(history.undo()).toBe(1)
-    expect(history.canUndo()).toBe(false)
+    stack.record(1)
+    stack.record(2)
+    expect(stack.undo()).toBe(1)
+    expect(stack.canUndo()).toBe(false)
   })
 
   test("the limit drops the oldest entries", () => {
-    const history = createHistory(0, { limit: 2 })
+    const stack = createUndoStack(0, { limit: 2 })
     for (let value = 1; value <= 5; value++) {
-      history.record(value)
+      stack.record(value)
     }
-    expect(history.undo()).toBe(4)
-    expect(history.undo()).toBe(3)
-    expect(history.undo()).toBeUndefined()
+    expect(stack.undo()).toBe(4)
+    expect(stack.undo()).toBe(3)
+    expect(stack.undo()).toBeUndefined()
   })
 
   test("map rewrites every entry without adding one", () => {
-    const history = createHistory("a")
-    history.record("b")
-    history.map((state) => state.toUpperCase())
-    expect(history.undo()).toBe("A")
+    const stack = createUndoStack("a")
+    stack.record("b")
+    stack.map((state) => state.toUpperCase())
+    expect(stack.undo()).toBe("A")
   })
 })

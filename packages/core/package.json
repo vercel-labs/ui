@@ -99,7 +99,7 @@
     "./date-picker": "./src/components/date-picker/date-picker.ts",
     "./agent": "./src/page/agent/agent.ts",
     "./observe": "./src/page/observe/observe.ts",
-    "./timeline": "./src/page/timeline/timeline.ts",
+    "./history": "./src/page/history/history.ts",
     "./gesture": "./src/foundation/motion/gesture.ts",
     "./renderer": "./src/renderer.ts",
     "./testing": "./src/testing.ts",
@@ -388,9 +388,9 @@
         "types": "./dist/page/observe/observe.d.ts",
         "default": "./dist/page/observe/observe.js"
       },
-      "./timeline": {
-        "types": "./dist/page/timeline/timeline.d.ts",
-        "default": "./dist/page/timeline/timeline.js"
+      "./history": {
+        "types": "./dist/page/history/history.d.ts",
+        "default": "./dist/page/history/history.js"
       },
       "./gesture": {
         "types": "./dist/foundation/motion/gesture.d.ts",

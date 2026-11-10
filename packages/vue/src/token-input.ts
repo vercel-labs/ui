@@ -1,7 +1,7 @@
 import type { ChangeDetails } from "@ui-sdk/core"
 import {
   tokenInput as tokenInputPrimitive,
-  type HistoryOptions,
+  type UndoStackOptions,
   type Token,
   type TokenCodec,
   type TokenDeletion,
@@ -81,7 +81,7 @@ const TokenInput = /* @__PURE__ */ renderless(
       copy: String as PropType<"codec" | "label">,
       codec: Object as PropType<TokenCodec>,
       getTokenDescription: Function as PropType<(token: Token) => string>,
-      history: Object as PropType<HistoryOptions>,
+      history: Object as PropType<UndoStackOptions>,
       disabled: optionalBoolean,
       readOnly: optionalBoolean,
       required: optionalBoolean,
@@ -264,7 +264,7 @@ export {
   toText,
 } from "@ui-sdk/core/token-input"
 export type {
-  HistoryOptions,
+  UndoStackOptions,
   TextEditorAdapter,
   TextRange,
   Token,

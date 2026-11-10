@@ -8,7 +8,7 @@ it. The `token` snippet renders each token's content.
   import type { ChangeDetails } from "@ui-sdk/core"
   import {
     tokenInput as tokenInputPrimitive,
-    type HistoryOptions,
+    type UndoStackOptions,
     type Token,
     type TokenCodec,
     type TokenDeletion,
@@ -74,7 +74,7 @@ it. The `token` snippet renders each token's content.
     /** What a token says to screen readers besides its label, like its kind and status. */
     getTokenDescription?: (token: Token) => string
     /** Undo history: how many steps it keeps, and how long a typing pause starts a new step. */
-    history?: HistoryOptions
+    history?: UndoStackOptions
     /** Disables the input: it can't be focused or changed, and isn't submitted. */
     disabled?: boolean
     /** Keeps the input focusable and submitted, but stops changes. */

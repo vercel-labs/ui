@@ -57,7 +57,7 @@
     "./tree": "./src/entries/tree.ts",
     "./agent": "./src/agent.ts",
     "./observe": "./src/observe.ts",
-    "./timeline": "./src/timeline.ts",
+    "./history": "./src/history.ts",
     "./menu": "./src/entries/menu.ts",
     "./menubar": "./src/entries/menubar.ts",
     "./meter": "./src/entries/meter.ts",
@@ -217,9 +217,9 @@
         "types": "./dist/observe.d.ts",
         "default": "./dist/observe.js"
       },
-      "./timeline": {
-        "types": "./dist/timeline.d.ts",
-        "default": "./dist/timeline.js"
+      "./history": {
+        "types": "./dist/history.d.ts",
+        "default": "./dist/history.js"
       },
       "./menu": {
         "types": "./dist/entries/menu.d.ts",

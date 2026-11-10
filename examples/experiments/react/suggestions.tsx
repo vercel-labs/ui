@@ -20,7 +20,7 @@ import {
   SliderTrack,
 } from "@ui-sdk/react/slider"
 import { Switch, SwitchThumb } from "@ui-sdk/react/switch"
-import { stageChanges } from "@ui-sdk/react/timeline"
+import { stageChanges } from "@ui-sdk/react/history"
 import { CheckIcon, XIcon } from "lucide-react"
 
 type Agent = ReturnType<typeof createAgent>

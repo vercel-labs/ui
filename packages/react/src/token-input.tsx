@@ -146,7 +146,7 @@ export {
   toText,
 } from "@ui-sdk/core/token-input"
 export type {
-  HistoryOptions,
+  UndoStackOptions,
   TextEditorAdapter,
   TextRange,
   Token,

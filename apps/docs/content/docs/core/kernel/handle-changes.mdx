@@ -488,17 +488,17 @@ The methods choose their own change reasons. For example, the countdown's `start
 
 ## Undo
 
-Paint a few pixels, then undo and redo. The buttons and keyboard shortcuts use the same history.
+Paint a few pixels, then undo and redo. The buttons and keyboard shortcuts share one undo stack.
 
-<ComponentExample name="behaviors/history" />
+<ComponentExample name="behaviors/undo-stack" />
 
-`createHistory` stores snapshots of any value. Record the result after each edit:
+`createUndoStack` stores snapshots of any value. Record the result after each edit:
 
 ```ts
-const history = createHistory(pixels)
-history.record(nextPixels)
+const stack = createUndoStack(pixels)
+stack.record(nextPixels)
 
-const previous = history.undo()
+const previous = stack.undo()
 if (previous !== undefined) {
   show(previous)
 }
@@ -508,22 +508,24 @@ if (previous !== undefined) {
 
 For keyboard shortcuts, `matchesShortcut(event, "mod+z")` recognizes Command on Apple platforms and Control elsewhere. Use `"mod+shift+z"` for redo.
 
+To record every change on a page, including an agent's, and step back through them, see [History and Undo](/docs/agents/connect-an-agent/history-and-undo).
+
 ### Undo for Typing
 
-Typing usually feels better when a run of edits takes one undo step. Try typing, pausing, and typing again. **Fix** replaces “teh” throughout the history; **Clear** starts over.
+Typing usually feels better when a run of edits takes one undo step. Try typing, pausing, and typing again. **Fix** replaces “teh” in every step; **Clear** starts over.
 
 <ComponentExample name="core/notes-history" />
 
 ```ts
-const history = createHistory("", { limit: 10, groupDelay: 800 })
+const stack = createUndoStack("", { limit: 10, groupDelay: 800 })
 
-history.record(text, { group: "typing" })
-history.seal()
-history.map((text) => text.replaceAll("teh", "the"))
-history.reset("")
+stack.record(text, { group: "typing" })
+stack.seal()
+stack.map((text) => text.replaceAll("teh", "the"))
+stack.reset("")
 ```
 
-Edits in the same `group` join a step while the gaps stay below `groupDelay`. Call `seal()` when that run should end, such as when the caret moves. `limit` caps the undo steps, `map` rewrites every snapshot, and `reset` replaces the history with a new starting value.
+Edits in the same `group` join a step while the gaps stay below `groupDelay`. Call `seal()` when that run should end, such as when the caret moves. `limit` caps the undo steps, `map` rewrites every snapshot, and `reset` starts the stack over from a new value.
 
 ## How People Are Working
 
@@ -581,16 +583,16 @@ A controlled drag has one more timing concern: its draft may need to stay visibl
 ### Undo
 
 <TypeTable
-  path="../../packages/core/src/foundation/kernel/history.ts"
-  name="HistoryOptions"
+  path="../../packages/core/src/foundation/kernel/undo-stack.ts"
+  name="UndoStackOptions"
   events={false}
   examples={{ limit: "Undo for Typing", groupDelay: "Undo for Typing" }}
 />
 
 <TypeTable
-  path="../../packages/core/src/foundation/kernel/history.ts"
-  name="UndoHistory"
-  type="ReturnType<typeof createHistory<unknown>>"
+  path="../../packages/core/src/foundation/kernel/undo-stack.ts"
+  name="UndoStack"
+  type="ReturnType<typeof createUndoStack<unknown>>"
   events={false}
   examples={{
     record: "Undo",

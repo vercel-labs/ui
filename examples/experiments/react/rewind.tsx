@@ -12,23 +12,23 @@ import {
 } from "@ui-sdk/react/slider"
 import { Switch, SwitchThumb } from "@ui-sdk/react/switch"
 import {
-  createTimeline,
+  createHistory,
   describeEntry,
-  type TimelineEntry,
-} from "@ui-sdk/react/timeline"
+  type HistoryEntry,
+} from "@ui-sdk/react/history"
 
 type RewindOptions = {
   agent: ReturnType<typeof createAgent>
 }
 
-type RewindState = { entries: readonly TimelineEntry[]; position: number }
+type RewindState = { entries: readonly HistoryEntry[]; position: number }
 
 type RewindRootState = {
-  entries: readonly TimelineEntry[]
+  entries: readonly HistoryEntry[]
   position: number
-  current: TimelineEntry | undefined
+  current: HistoryEntry | undefined
 }
-type RewindStepState = { entry: TimelineEntry | undefined; applied: boolean }
+type RewindStepState = { entry: HistoryEntry | undefined; applied: boolean }
 type RewindUndoState = { disabled: boolean }
 
 const undoable = (state: RewindState, source: string) =>
@@ -45,13 +45,13 @@ const rewind = /* @__PURE__ */ definePrimitive({
   }),
   api: (context) => {
     const { store } = context
-    let timeline: ReturnType<typeof createTimeline> | undefined
+    let history: ReturnType<typeof createHistory> | undefined
     const api = {
-      seek: (to: number) => timeline?.seek(to),
-      undoSource: (source: string) => timeline?.undoSource(source),
+      seek: (to: number) => history?.seek(to),
+      undoSource: (source: string) => history?.undoSource(source),
       record(el: HTMLElement) {
-        const made = createTimeline(context.options().agent, { within: el })
-        timeline = made
+        const made = createHistory(context.options().agent, { within: el })
+        history = made
         const sync = () =>
           store.set({ entries: made.entries(), position: made.position() })
         sync()
@@ -59,8 +59,8 @@ const rewind = /* @__PURE__ */ definePrimitive({
         return () => {
           unsubscribe()
           made.destroy()
-          if (timeline === made) {
-            timeline = undefined
+          if (history === made) {
+            history = undefined
           }
         }
       },

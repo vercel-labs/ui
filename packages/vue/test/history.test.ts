@@ -3,7 +3,7 @@ import { afterEach, expect, test } from "vitest"
 import { createApp, defineComponent, h, reactive, ref, type App } from "vue"
 import { createAgent } from "../src/agent"
 import { Input } from "../src/input"
-import { createTimeline } from "../src/timeline"
+import { createHistory } from "../src/history"
 
 let app: App | undefined
 afterEach(() => {
@@ -12,7 +12,7 @@ afterEach(() => {
 })
 
 test.each(["raw", "reactive", "ref", "spread"])(
-  "a %s agent restores a Vue input through its timeline",
+  "a %s agent restores a Vue input through its history",
   async (kind) => {
     const element = document.body.appendChild(document.createElement("div"))
     app = createApp(
@@ -31,7 +31,7 @@ test.each(["raw", "reactive", "ref", "spread"])(
           : kind === "spread"
             ? { ...raw }
             : raw
-    const timeline = createTimeline(agent)
+    const history = createHistory(agent)
     try {
       expect(
         (
@@ -41,10 +41,10 @@ test.each(["raw", "reactive", "ref", "spread"])(
         ).ok
       ).toBe(true)
       expect(element.querySelector("input")?.value).toBe("next")
-      expect(await timeline.seek(0)).toEqual([])
+      expect(await history.seek(0)).toEqual([])
       expect(element.querySelector("input")?.value).toBe("initial")
     } finally {
-      timeline.destroy()
+      history.destroy()
     }
   }
 )

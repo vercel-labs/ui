@@ -1,5 +1,5 @@
 import * as React from "react"
-import { createHistory, definePrimitive, matchesShortcut } from "@ui-sdk/core"
+import { createUndoStack, definePrimitive, matchesShortcut } from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
 
 type PixelsState = {
@@ -13,12 +13,12 @@ const pixels = definePrimitive({
   state: (): PixelsState => ({ painted: [], canUndo: false, canRedo: false }),
   api: (context) => {
     const { store } = context
-    const history = createHistory<string[]>([])
+    const stack = createUndoStack<string[]>([])
     const show = (painted: string[] | undefined) => {
       if (painted) {
         store.set({ painted })
       }
-      store.set({ canUndo: history.canUndo(), canRedo: history.canRedo() })
+      store.set({ canUndo: stack.canUndo(), canRedo: stack.canRedo() })
     }
     const api = {
       toggle(cell: string) {
@@ -26,11 +26,11 @@ const pixels = definePrimitive({
         const next = painted.includes(cell)
           ? painted.filter((other) => other !== cell)
           : [...painted, cell]
-        history.record(next)
+        stack.record(next)
         show(next)
       },
-      undo: () => show(history.undo()),
-      redo: () => show(history.redo()),
+      undo: () => show(stack.undo()),
+      redo: () => show(stack.redo()),
       keydown(event: KeyboardEvent) {
         if (matchesShortcut(event, "mod+z")) {
           api.undo()
@@ -103,7 +103,7 @@ function Example() {
         <PixelsUndo data-size="sm">Undo</PixelsUndo>
         <PixelsRedo data-size="sm">Redo</PixelsRedo>
       </div>
-      <div role="group" aria-label="Pixels" data-slot="history-grid">
+      <div role="group" aria-label="Pixels" data-slot="undo-grid">
         {cells.map((cell) => (
           <PixelsCell
             key={cell}

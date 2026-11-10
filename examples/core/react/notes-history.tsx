@@ -1,5 +1,5 @@
 import * as React from "react"
-import { createHistory, definePrimitive, matchesShortcut } from "@ui-sdk/core"
+import { createUndoStack, definePrimitive, matchesShortcut } from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
 
 type NotesState = { text: string; canUndo: boolean; canRedo: boolean }
@@ -9,37 +9,37 @@ const notes = definePrimitive({
   state: (): NotesState => ({ text: "", canUndo: false, canRedo: false }),
   api: (context) => {
     const { store } = context
-    const history = createHistory("", { limit: 10, groupDelay: 800 })
+    const stack = createUndoStack("", { limit: 10, groupDelay: 800 })
     const show = (text: string | undefined) => {
       if (text !== undefined) {
         store.set({ text })
       }
-      store.set({ canUndo: history.canUndo(), canRedo: history.canRedo() })
+      store.set({ canUndo: stack.canUndo(), canRedo: stack.canRedo() })
     }
     return {
       type(text: string) {
-        history.record(text, { group: "typing" })
+        stack.record(text, { group: "typing" })
         show(text)
       },
       key(event: KeyboardEvent) {
         if (matchesShortcut(event, "mod+shift+z")) {
-          show(history.redo())
+          show(stack.redo())
         } else if (matchesShortcut(event, "mod+z")) {
-          show(history.undo())
+          show(stack.undo())
         } else {
           return
         }
         event.preventDefault()
       },
-      seal: () => history.seal(),
-      undo: () => show(history.undo()),
-      redo: () => show(history.redo()),
+      seal: () => stack.seal(),
+      undo: () => show(stack.undo()),
+      redo: () => show(stack.redo()),
       fix() {
-        history.map((text) => text.replaceAll("teh", "the"))
+        stack.map((text) => text.replaceAll("teh", "the"))
         show(store.get().text.replaceAll("teh", "the"))
       },
       clear() {
-        history.reset("")
+        stack.reset("")
         show("")
       },
     }

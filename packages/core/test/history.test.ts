@@ -9,7 +9,7 @@ import { numberInput } from "../src/components/number-input/number-input"
 import { withSource } from "../src/foundation/kernel/details"
 import { bind } from "../src/foundation/kernel/part"
 import { createAgent } from "../src/page/agent/agent"
-import { createTimeline } from "../src/page/timeline/timeline"
+import { createHistory } from "../src/page/history/history"
 
 let cleanups: (() => void)[] = []
 afterEach(() => {
@@ -21,7 +21,7 @@ afterEach(() => {
 // A checked checkbox the agent checked, whose change callback refuses once `refusing` is set.
 async function checkedByAgent() {
   const agent = createAgent()
-  const timeline = createTimeline(agent)
+  const history = createHistory(agent)
   let refusing = false
   const instance = checkbox({
     id: "digest",
@@ -36,43 +36,43 @@ async function checkedByAgent() {
   cleanups.push(
     bind(instance.part("root"), el),
     () => instance.destroy(),
-    timeline.destroy
+    history.destroy
   )
   const [{ ref }] = agent.snapshot()
   await agent.act({ steps: [{ ref, action: "setChecked", args: [true] }] })
-  return { instance, timeline, refuse: () => (refusing = true) }
+  return { instance, history, refuse: () => (refusing = true) }
 }
 
 test("undo puts back what the agent changed", async () => {
-  const { instance, timeline } = await checkedByAgent()
-  expect(await timeline.undoSource("agent")).toEqual([])
+  const { instance, history } = await checkedByAgent()
+  expect(await history.undoSource("agent")).toEqual([])
   expect(instance.get().checked).toBe(false)
-  expect(timeline.entries()[0].reverted).toBe(true)
+  expect(history.entries()[0].reverted).toBe(true)
 })
 
 test("an undo a change callback refuses is reported, and its entry stays applied", async () => {
-  const { instance, timeline, refuse } = await checkedByAgent()
+  const { instance, history, refuse } = await checkedByAgent()
   refuse()
-  expect(await timeline.undoSource("agent")).toEqual([
+  expect(await history.undoSource("agent")).toEqual([
     expect.objectContaining({ key: "checked", value: false }),
   ])
   expect(instance.get().checked).toBe(true)
-  expect(timeline.entries()[0].reverted).toBeUndefined()
+  expect(history.entries()[0].reverted).toBeUndefined()
 })
 
 test("a seek a change callback refuses is reported, and the position stays", async () => {
-  const { instance, timeline, refuse } = await checkedByAgent()
+  const { instance, history, refuse } = await checkedByAgent()
   refuse()
-  expect(await timeline.seek(0)).toEqual([
+  expect(await history.seek(0)).toEqual([
     expect.objectContaining({ key: "checked", value: false }),
   ])
   expect(instance.get().checked).toBe(true)
-  expect(timeline.position()).toBe(1)
+  expect(history.position()).toBe(1)
 })
 
 test("an undo a controlled owner doesn't take is reported, and its entry stays applied", async () => {
   const agent = createAgent()
-  const timeline = createTimeline(agent)
+  const history = createHistory(agent)
   let accepting = true
   const options = {
     id: "digest",
@@ -89,17 +89,17 @@ test("an undo a controlled owner doesn't take is reported, and its entry stays a
   cleanups.push(
     bind(instance.part("root"), el),
     () => instance.destroy(),
-    timeline.destroy
+    history.destroy
   )
   const [{ ref }] = agent.snapshot()
   await agent.act({ steps: [{ ref, action: "setChecked", args: [true] }] })
   expect(instance.get().checked).toBe(true)
   accepting = false
-  expect(await timeline.undoSource("agent")).toEqual([
+  expect(await history.undoSource("agent")).toEqual([
     expect.objectContaining({ key: "checked", value: false }),
   ])
   expect(instance.get().checked).toBe(true)
-  expect(timeline.entries()[0].reverted).toBeUndefined()
+  expect(history.entries()[0].reverted).toBeUndefined()
 })
 
 function deferred() {
@@ -110,12 +110,12 @@ function deferred() {
   return { promise, resolve }
 }
 
-test("a replaced act method is rejected before timeline restoration can bypass its guard", () => {
+test("a replaced act method is rejected before restoring can bypass its guard", () => {
   const agent = createAgent()
   expect(() =>
-    createTimeline({ ...agent, act: (input) => agent.act(input) })
+    createHistory({ ...agent, act: (input) => agent.act(input) })
   ).toThrow(
-    "createTimeline requires an agent with the original act method returned by createAgent."
+    "createHistory requires an agent with the original act method returned by createAgent."
   )
 })
 
@@ -135,7 +135,7 @@ for (const operation of ["undo", "seek"] as const) {
           return true
         },
       })
-      const timeline = createTimeline(agent, { coalesce: false })
+      const history = createHistory(agent, { coalesce: false })
       const first = input({ id: "first", defaultValue: "initial" })
       const second = input({ id: "second", defaultValue: "untouched" })
       for (const [instance, label] of [
@@ -151,7 +151,7 @@ for (const operation of ["undo", "seek"] as const) {
           instance.destroy()
         )
       }
-      cleanups.push(timeline.destroy, release.resolve)
+      cleanups.push(history.destroy, release.resolve)
       expect(
         (
           await agent.act({
@@ -161,7 +161,7 @@ for (const operation of ["undo", "seek"] as const) {
       ).toBe(true)
       waiting = true
       const work =
-        operation === "undo" ? timeline.undoSource("agent") : timeline.seek(0)
+        operation === "undo" ? history.undoSource("agent") : history.seek(0)
       await started.promise
       if (target !== "no edit") {
         const edited = target === "same control" ? first : second
@@ -180,10 +180,10 @@ for (const operation of ["undo", "seek"] as const) {
       )
       expect(failed).toHaveLength(target === "same control" ? 1 : 0)
       if (target === "same control" && operation === "undo") {
-        expect(timeline.entries()[0].reverted).toBeUndefined()
+        expect(history.entries()[0].reverted).toBeUndefined()
       }
       if (target !== "no edit") {
-        expect(timeline.entries()).toContainEqual(
+        expect(history.entries()).toContainEqual(
           expect.objectContaining({ source: "keyboard", value: "human" })
         )
       }
@@ -215,11 +215,11 @@ for (const operation of ["undo", "seek"] as const) {
       const element = document.body.appendChild(document.createElement("div"))
       element.setAttribute("aria-label", "Precision")
       const agent = createAgent()
-      const timeline = createTimeline(agent, { coalesce: false })
+      const history = createHistory(agent, { coalesce: false })
       cleanups.push(
         bind(instance.part("root"), element),
         () => instance.destroy(),
-        timeline.destroy
+        history.destroy
       )
       expect(
         (
@@ -232,14 +232,14 @@ for (const operation of ["undo", "seek"] as const) {
       refuse = refusing
       const failed =
         operation === "undo"
-          ? await timeline.undoSource("agent")
-          : await timeline.seek(0)
+          ? await history.undoSource("agent")
+          : await history.seek(0)
       expect(instance.get().value).toBe(refusing ? 0.124 : 0.121)
       expect(failed).toHaveLength(refusing ? 1 : 0)
       if (operation === "undo") {
-        expect(!!timeline.entries()[0].reverted).toBe(!refusing)
+        expect(!!history.entries()[0].reverted).toBe(!refusing)
       } else {
-        expect(timeline.position()).toBe(refusing ? 1 : 0)
+        expect(history.position()).toBe(refusing ? 1 : 0)
       }
     }
   )

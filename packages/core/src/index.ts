@@ -337,7 +337,10 @@ export {
   type TransferOptions,
   type TransferReason,
 } from "./foundation/drag-and-drop/transfer"
-export { createHistory, type HistoryOptions } from "./foundation/kernel/history"
+export {
+  createUndoStack,
+  type UndoStackOptions,
+} from "./foundation/kernel/undo-stack"
 export { position, type PositionOptions } from "./foundation/platform/position"
 export { direct, live } from "./foundation/kernel/live"
 export { selects } from "./foundation/kernel/selects"

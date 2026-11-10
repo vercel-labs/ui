@@ -3,10 +3,10 @@
 // the clock, which callers can pass in.
 
 /**
- * How an undo history keeps entries.
+ * How an undo stack keeps entries.
  * @experimental
  */
-type HistoryOptions = {
+type UndoStackOptions = {
   /**
    * How many entries are kept.
    * @defaultValue 100
@@ -19,7 +19,7 @@ type HistoryOptions = {
   groupDelay?: number
 }
 
-const defaults: HistoryOptions = {}
+const defaults: UndoStackOptions = {}
 
 /**
  * An undo stack for any state: a board's columns, a drawing, a form. Record
@@ -28,18 +28,18 @@ const defaults: HistoryOptions = {}
  * typing or a drag's steps.
  *
  * ```ts
- * const history = createHistory(lists)
- * history.record(next) // after each change
- * if (matchesShortcut(event, "mod+z")) show(history.undo())
+ * const stack = createUndoStack(lists)
+ * stack.record(next) // after each change
+ * if (matchesShortcut(event, "mod+z")) show(stack.undo())
  * ```
  *
  * `options` can be a getter, read on every edit, so a limit or delay set
  * after creation, like a web component's `history` property, applies.
  * @experimental
  */
-function createHistory<State>(
+function createUndoStack<State>(
   initial: State,
-  options: HistoryOptions | (() => HistoryOptions | undefined) = defaults
+  options: UndoStackOptions | (() => UndoStackOptions | undefined) = defaults
 ) {
   const settings = () =>
     (typeof options === "function" ? options() : options) ?? defaults
@@ -110,4 +110,4 @@ function createHistory<State>(
   }
 }
 
-export { createHistory, type HistoryOptions }
+export { createUndoStack, type UndoStackOptions }

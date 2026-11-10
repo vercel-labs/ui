@@ -22,10 +22,10 @@ import {
 import { createAgent } from "../src/page/agent/agent"
 import { sectorOf } from "../src/foundation/motion/gesture"
 import {
-  createTimeline,
+  createHistory,
   describeEntry,
   stageChanges,
-} from "../src/page/timeline/timeline"
+} from "../src/page/history/history"
 import { bind } from "../src/foundation/kernel/part"
 import { withSource } from "../src/foundation/kernel/details"
 
@@ -766,21 +766,21 @@ describe("css", () => {
   })
 })
 
-describe("createTimeline", () => {
+describe("createHistory", () => {
   test("records changes with their source, seeks back and forth, and undoes only the agent's", async () => {
     const agent = createAgent()
     const wifi = mountCheckbox("wifi", "Wi-Fi")
     const bluetooth = mountCheckbox("bluetooth", "Bluetooth")
-    const timeline = createTimeline(agent, { keys: ["checked"] })
-    cleanups.push(timeline.destroy)
+    const history = createHistory(agent, { keys: ["checked"] })
+    cleanups.push(history.destroy)
     const heard = vi.fn()
-    timeline.subscribe(heard)
+    history.subscribe(heard)
     wifi.api.setChecked(true, { reason: "imperative" })
     await agent.act({
       steps: [{ ref: "Bluetooth", action: "setChecked", args: [true] }],
     })
     expect(
-      timeline
+      history
         .entries()
         .map((entry) => [
           entry.label,
@@ -793,29 +793,29 @@ describe("createTimeline", () => {
       ["Bluetooth", true, false, "agent"],
     ])
     expect(heard).toHaveBeenCalled()
-    expect(timeline.entries().map(describeEntry)).toEqual([
+    expect(history.entries().map(describeEntry)).toEqual([
       "You set Wi-Fi to true",
       "Agent set Bluetooth to true",
     ])
 
-    await timeline.seek(0)
+    await history.seek(0)
     expect([wifi.get().checked, bluetooth.get().checked]).toEqual([
       false,
       false,
     ])
-    expect(timeline.entries()).toHaveLength(2)
-    await timeline.seek(2)
+    expect(history.entries()).toHaveLength(2)
+    await history.seek(2)
     expect([wifi.get().checked, bluetooth.get().checked]).toEqual([true, true])
 
-    await timeline.undoSource("agent")
+    await history.undoSource("agent")
     expect([wifi.get().checked, bluetooth.get().checked]).toEqual([true, false])
-    expect(timeline.entries()[1].reverted).toBe(true)
+    expect(history.entries()[1].reverted).toBe(true)
   })
 
   test("a drag that commits is one entry, and every step without coalescing", () => {
     const agent = createAgent()
-    const settled = createTimeline(agent)
-    const steps = createTimeline(agent, { coalesce: false })
+    const settled = createHistory(agent)
+    const steps = createHistory(agent, { coalesce: false })
     cleanups.push(settled.destroy, steps.destroy)
     const instance = slider({ id: "volume" })
     cleanups.push(() => instance.destroy())
@@ -842,15 +842,15 @@ describe("createTimeline", () => {
   test("a change made from the past drops the future", async () => {
     const agent = createAgent()
     const wifi = mountCheckbox("wifi", "Wi-Fi")
-    const timeline = createTimeline(agent, { keys: ["checked"] })
-    cleanups.push(timeline.destroy)
+    const history = createHistory(agent, { keys: ["checked"] })
+    cleanups.push(history.destroy)
     wifi.api.setChecked(true, { reason: "imperative" })
     wifi.api.setChecked(false, { reason: "imperative" })
-    await timeline.seek(1)
+    await history.seek(1)
     expect(wifi.get().checked).toBe(true)
     wifi.api.setChecked(false, { reason: "imperative" })
-    expect(timeline.entries()).toHaveLength(2)
-    expect(timeline.position()).toBe(2)
+    expect(history.entries()).toHaveLength(2)
+    expect(history.position()).toBe(2)
   })
 
   test("keeps a person's changes made while an undo waits for permission", async () => {
@@ -864,8 +864,8 @@ describe("createTimeline", () => {
     const name = mountInput("Name")
     const email = mountInput("Email")
     const notes = mountInput("Notes")
-    const timeline = createTimeline(agent)
-    cleanups.push(timeline.destroy)
+    const history = createHistory(agent)
+    cleanups.push(history.destroy)
     await agent.act({
       steps: [
         { ref: "Name", action: "setValue", args: ["Ada"] },
@@ -873,7 +873,7 @@ describe("createTimeline", () => {
       ],
     })
 
-    const undone = timeline.undoSource("agent")
+    const undone = history.undoSource("agent")
     await vi.waitFor(() => expect(asked).toHaveLength(1))
     // While Name's undo waits: a field the undo leaves alone, and Email, which it hasn't reached.
     notes.api.setValue("Call back")
@@ -886,7 +886,7 @@ describe("createTimeline", () => {
       "Call back",
     ])
     expect(
-      timeline.entries().map((entry) => [describeEntry(entry), entry.reverted])
+      history.entries().map((entry) => [describeEntry(entry), entry.reverted])
     ).toEqual([
       ["Agent set Name to Ada", true],
       ["Agent set Email to ada@example.com", undefined],
@@ -899,18 +899,18 @@ describe("createTimeline", () => {
     // The person refuses every uncheck.
     const agent = createAgent({ allow: (step) => step.args[0] !== false })
     const wifi = mountCheckbox("wifi", "Wi-Fi")
-    const timeline = createTimeline(agent, { keys: ["checked"] })
-    cleanups.push(timeline.destroy)
+    const history = createHistory(agent, { keys: ["checked"] })
+    cleanups.push(history.destroy)
     await agent.act({
       steps: [{ ref: "Wi-Fi", action: "setChecked", args: [true] }],
     })
 
-    expect(await timeline.undoSource("agent")).toMatchObject([
+    expect(await history.undoSource("agent")).toMatchObject([
       { key: "checked", value: false },
     ])
-    expect(timeline.entries()[0].reverted).toBeUndefined()
-    expect(await timeline.seek(0)).toHaveLength(1)
-    expect(timeline.position()).toBe(1)
+    expect(history.entries()[0].reverted).toBeUndefined()
+    expect(await history.seek(0)).toHaveLength(1)
+    expect(history.position()).toBe(1)
     expect(wifi.get().checked).toBe(true)
   })
 
@@ -918,31 +918,31 @@ describe("createTimeline", () => {
     const agent = createAgent()
     const wifi = mountCheckbox("wifi", "Wi-Fi")
     const bluetooth = mountCheckbox("bluetooth", "Bluetooth")
-    const timeline = createTimeline(agent, { keys: ["checked"] })
-    cleanups.push(timeline.destroy)
+    const history = createHistory(agent, { keys: ["checked"] })
+    cleanups.push(history.destroy)
     wifi.api.setChecked(true, { reason: "imperative" })
     bluetooth.api.setChecked(true, { reason: "imperative" })
     // Wi-Fi leaves the page.
     document.querySelector("label")?.remove()
 
-    expect(await timeline.seek(0)).toEqual([
-      { ref: timeline.entries()[0].ref, key: "checked", value: false },
+    expect(await history.seek(0)).toEqual([
+      { ref: history.entries()[0].ref, key: "checked", value: false },
     ])
     expect(bluetooth.get().checked).toBe(false)
-    expect(timeline.position()).toBe(0)
+    expect(history.position()).toBe(0)
   })
 
   test("a password's change is marked redacted, and seeking or undoing leaves it and reports it", async () => {
     const agent = createAgent()
     const password = mountPassword("Password")
-    const timeline = createTimeline(agent)
-    cleanups.push(timeline.destroy)
+    const history = createHistory(agent)
+    cleanups.push(history.destroy)
     password.api.setValue("hunter2")
     await agent.act({
       steps: [{ ref: "Password", action: "setValue", args: ["hunter3"] }],
     })
     expect(
-      timeline
+      history
         .entries()
         .map((entry) => [entry.value, entry.previous, entry.redacted])
     ).toEqual([
@@ -950,12 +950,12 @@ describe("createTimeline", () => {
       ["[redacted]", "[redacted]", true],
     ])
 
-    expect(await timeline.undoSource("agent")).toMatchObject([{ key: "value" }])
+    expect(await history.undoSource("agent")).toMatchObject([{ key: "value" }])
     expect(password.get().value).toBe("hunter3")
-    expect(timeline.entries()[1].reverted).toBeUndefined()
-    expect(await timeline.seek(0)).toMatchObject([{ key: "value" }])
+    expect(history.entries()[1].reverted).toBeUndefined()
+    expect(await history.seek(0)).toMatchObject([{ key: "value" }])
     expect(password.get().value).toBe("hunter3")
-    expect(timeline.position()).toBe(2)
+    expect(history.position()).toBe(2)
   })
 })
 

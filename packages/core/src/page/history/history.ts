@@ -1,9 +1,6 @@
-// A timeline of every change to the ui-sdk components on a page, or inside
-// one element, made by a person or an agent. Seek back and the controls go
-// back with it; a change made from the past drops the future it replaces.
-// `undoSource("agent")` reverts only what an agent did and keeps the person's
-// changes. It hears changes through `observe` and puts values back through
-// the agent bridge, so it wires to no control.
+// Hears changes through `observe` and puts values back through the agent
+// bridge, so it wires to no control. A change made after seeking back drops
+// the entries after it, like undo in an editor.
 import { sameValue } from "../../foundation/kernel/store"
 import type { createAgent } from "../agent/agent"
 import { guardedActions } from "../agent/guard"
@@ -11,10 +8,10 @@ import { observe, type ObservedChange } from "../observe/observe"
 import { entries as registered, setterOf } from "../observe/registry"
 
 /**
- * One change on the timeline.
+ * One change in the history.
  * @experimental
  */
-type TimelineEntry = {
+type HistoryEntry = {
   id: string
   ref: string
   label: string
@@ -36,10 +33,10 @@ type TimelineEntry = {
 }
 
 /**
- * What `createTimeline` records.
+ * What `createHistory` records.
  * @experimental
  */
-type TimelineOptions = {
+type HistoryOptions = {
   /** Hears only components inside this element, like one panel. Defaults to the whole page. */
   within?: Element | (() => Element | null | undefined)
   /** Keys worth an entry. @defaultValue ["value", "checked", "pressed"] */
@@ -83,13 +80,13 @@ const show = (value: unknown) =>
  * A change in words, like "Agent set Region to Frankfurt".
  * @experimental
  */
-function describeEntry(entry: TimelineEntry) {
+function describeEntry(entry: HistoryEntry) {
   return `${entry.source === "agent" ? "Agent" : "You"} set ${entry.label} to ${show(entry.value)}`
 }
 
 // A key's value after the first `position` entries, skipping reverted ones.
 function valueAt(
-  entries: readonly TimelineEntry[],
+  entries: readonly HistoryEntry[],
   position: number,
   id: string
 ) {
@@ -114,38 +111,38 @@ function valueAt(
 }
 
 /**
- * Starts recording changes, and returns the timeline. `entries()` and
+ * Starts recording changes, and returns the history. `entries()` and
  * `position()` read it, `subscribe` hears it change, `seek(n)` puts the page
  * back to how it was after `n` entries, and `destroy()` stops recording.
  * Pass an agent with its original `act` method so restoration checks run after permission resolves.
  *
  * ```ts
- * const timeline = createTimeline(agent, { within: () => panel })
- * timeline.subscribe(() => render(timeline.entries(), timeline.position()))
- * await timeline.seek(0) // the page as it was when recording started
- * await timeline.undoSource("agent") // only what the agent did
+ * const history = createHistory(agent, { within: () => panel })
+ * history.subscribe(() => render(history.entries(), history.position()))
+ * await history.seek(0) // the page as it was when recording started
+ * await history.undoSource("agent") // only what the agent did
  * ```
  * @experimental
  */
-function createTimeline(
+function createHistory(
   agent: ReturnType<typeof createAgent>,
-  options: TimelineOptions = {}
+  options: HistoryOptions = {}
 ) {
   const act = guardedActions.get(agent.act)
   if (!act) {
     throw new Error(
-      "createTimeline requires an agent with the original act method returned by createAgent."
+      "createHistory requires an agent with the original act method returned by createAgent."
     )
   }
   const keys = options.keys ?? ["value", "checked", "pressed"]
-  let entries: TimelineEntry[] = []
+  let entries: HistoryEntry[] = []
   let position = 0
   let count = 0
   // The keys the running seek or undo is putting back, less any someone else changed meanwhile.
   let restoring = new Set<string>()
   const listeners = new Set<() => void>()
   const emit = () => listeners.forEach((listener) => listener())
-  const update = (next: TimelineEntry[], at: number) => {
+  const update = (next: HistoryEntry[], at: number) => {
     entries = next
     position = at
     emit()
@@ -156,13 +153,13 @@ function createTimeline(
       return
     }
     const id = idOf(observed)
-    // The agent changing a key being put back is the timeline's own write.
+    // The agent changing a key being put back is the history's own write.
     if (observed.source === "agent" && restoring.has(id)) {
       return
     }
     // Anyone else's change is later than the restore, so it stays and the restore leaves that key.
     restoring.delete(id)
-    const entry: TimelineEntry = {
+    const entry: HistoryEntry = {
       id: `e${++count}`,
       ref: observed.ref,
       label: observed.label ?? observed.component,
@@ -263,7 +260,7 @@ function createTimeline(
 
   return {
     /** Every entry, oldest first. */
-    entries: () => entries as readonly TimelineEntry[],
+    entries: () => entries as readonly HistoryEntry[],
     /** How many entries are applied: `entries().length` is now, 0 is the start. */
     position: () => position,
     /** Calls `listener` whenever the entries or the position change, until the returned function runs. */
@@ -313,7 +310,7 @@ function createTimeline(
      */
     undoSource: (source: string) =>
       inTurn(async () => {
-        const undone = new Set<TimelineEntry>()
+        const undone = new Set<HistoryEntry>()
         const values = new Map<string, unknown>()
         entries.slice(0, position).forEach((entry) => {
           const id = idOf(entry)
@@ -364,9 +361,4 @@ function createTimeline(
 
 export { stageChanges, type StagedChange } from "./stage"
 
-export {
-  createTimeline,
-  describeEntry,
-  type TimelineEntry,
-  type TimelineOptions,
-}
+export { createHistory, describeEntry, type HistoryEntry, type HistoryOptions }

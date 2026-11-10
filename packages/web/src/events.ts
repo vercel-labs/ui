@@ -204,7 +204,7 @@ import type {
   CommandValueChangeReason,
 } from "@ui-sdk/core/command"
 import type {
-  HistoryOptions,
+  UndoStackOptions,
   Token,
   TokenCodec,
   TokenInputController,
@@ -1787,7 +1787,7 @@ interface UiTokenInputElement
   /** The value at first, which a form reset returns to. The `value` attribute sets it as codec text. */
   defaultValue?: TokenInputValue
   /** Undo history: how many steps it keeps, and how long a typing pause starts a new step. */
-  history?: HistoryOptions
+  history?: UndoStackOptions
   /** How tokens become text and back. */
   codec?: TokenCodec
   /** What a token says to screen readers besides its label. */

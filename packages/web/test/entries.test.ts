@@ -14,11 +14,11 @@ const entries = readdirSync(path.join(root, "src/entries")).map((file) =>
   file.replace(/\.ts$/, "")
 )
 // React entries for helpers, not components. Web serves them from its root, the agent bridge from its own
-// `./agent`, the timeline from `./timeline`, and the gesture blocks from `@ui-sdk/core/gesture`.
+// `./agent`, the change history from `./history`, and the gesture blocks from `@ui-sdk/core/gesture`.
 const helpers = [
   "./agent",
   "./gesture",
-  "./timeline",
+  "./history",
   "./observe",
   "./async-options",
   "./color",

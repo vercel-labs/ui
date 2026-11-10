@@ -4,7 +4,7 @@ import { defineTokenInputElements } from "../token-input"
 defineTokenInputElements()
 
 export type {
-  HistoryOptions,
+  UndoStackOptions,
   TextEditorAdapter,
   TextRange,
   Token,

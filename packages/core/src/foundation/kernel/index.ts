@@ -30,7 +30,7 @@ export {
 export { settleDraft } from "./draft"
 export { elements } from "./elements"
 export { isComposing, on, selectEvent } from "./events"
-export { createHistory, type HistoryOptions } from "./history"
+export { createUndoStack, type UndoStackOptions } from "./undo-stack"
 export { css } from "./inline-style"
 export { isDestroying, keep, release, unwatched, whenKept } from "./keep"
 export {
