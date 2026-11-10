@@ -176,8 +176,8 @@ function MenuIcon({ open }: { open: boolean }) {
       data-open={open ? "" : undefined}
       className="group/icon relative size-5"
     >
-      <span className="absolute start-0 top-[0.375rem] h-[1.5px] w-5 bg-foreground transition-all duration-100 group-data-open/icon:top-[0.5625rem] group-data-open/icon:-rotate-45 motion-reduce:transition-none" />
-      <span className="absolute start-0 top-[0.75rem] h-[1.5px] w-5 bg-foreground transition-all duration-100 group-data-open/icon:top-[0.5625rem] group-data-open/icon:rotate-45 motion-reduce:transition-none" />
+      <span className="absolute start-0 top-[0.375rem] h-[1.5px] w-5 bg-foreground transition-transform duration-100 group-data-open/icon:[transform:translateY(0.1875rem)_rotate(-45deg)] motion-reduce:transition-none" />
+      <span className="absolute start-0 top-[0.75rem] h-[1.5px] w-5 bg-foreground transition-transform duration-100 group-data-open/icon:[transform:translateY(-0.1875rem)_rotate(45deg)] motion-reduce:transition-none" />
     </span>
   )
 }
