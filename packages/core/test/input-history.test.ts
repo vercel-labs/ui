@@ -143,9 +143,9 @@ describe("createInputHistory in an input", () => {
     el.setAttribute("aria-expanded", "true")
     expect(press("ArrowUp").defaultPrevented).toBe(false)
     el.removeAttribute("aria-expanded")
-    el.type = "number"
+    el.setAttribute("type", "number")
     expect(press("ArrowUp").defaultPrevented).toBe(false)
-    el.type = "email"
+    el.setAttribute("type", "email")
     expect(press("ArrowUp").defaultPrevented).toBe(false)
     expect(el.value).toBe("")
   })
