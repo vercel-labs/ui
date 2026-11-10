@@ -17,13 +17,12 @@ import { toast } from "~/components/ui/toast"
 
 defineProps<{ settings: Settings }>()
 
-const form = useTemplateRef("form")
 const pending = ref(false)
 
-async function submit() {
+async function submit(event: SubmitEvent) {
   pending.value = true
   try {
-    await saveSettings(new FormData(form.value!))
+    await saveSettings(new FormData(event.currentTarget as HTMLFormElement))
     toast.success("Settings saved")
   } catch {
     toast.error("Couldn't save your settings. Try again.")
@@ -34,7 +33,7 @@ async function submit() {
 </script>
 
 <template>
-  <form ref="form" class="grid gap-8" @submit.prevent="submit">
+  <form class="grid gap-8" @submit.prevent="submit">
     <Field class="flex-row items-center justify-between gap-6">
       <div class="grid gap-1.5">
         <FieldLabel>Email notifications</FieldLabel>

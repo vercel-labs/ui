@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { AvatarFallback, Avatar as AvatarPrimitive } from "@ui-sdk/vue/avatar"
 import { cn } from "cn"
-import { computed } from "vue"
 
 const sizes = {
   sm: "size-5 text-[10px]",
