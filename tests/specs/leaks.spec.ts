@@ -9,10 +9,9 @@ import {
   type LeakSnapshot,
 } from "../perf/leaks"
 
-// Leak gates: open and close a popup or a panel 200 times, move through tabs
-// a toolbar or a tree, or drag a slider, a resizable handle or a scroll area's thumb,
-// then mount and unmount it 200 times, and nothing it added stays behind. See
-// tests/perf/budgets.ts.
+// Leak gates: open and close a popup or a panel 200 times, move through tabs, a toolbar,
+// a tree or a waterfall, or drag a slider, a resizable handle or a scroll area's thumb, then
+// mount and unmount it 200 times, and nothing it added stays behind. See tests/perf/budgets.ts.
 
 // How each popup or panel opens and closes from the keyboard, from its trigger.
 // A collapsible's panel has no role, so it's found by its class.
