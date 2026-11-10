@@ -24,12 +24,14 @@ on:
         type: string
         default: full
 
-# A newer push to the same branch or pull request cancels the run in progress.
+# A newer push to a pull request cancels the run in progress. Each push to main
+# gets a group of its own, since its run tests only what changed since the
+# commit before it: a cancelled run would leave that commit untested.
 # Adding a label starts a run of its own, so it never cancels the push's run.
 # When the nightly or weekly workflow calls this one, github.workflow is its name,
 # so its run never cancels, or is cancelled by, a push.
 concurrency:
-  group: ${{ github.workflow }}-ci-${{ github.event.pull_request.number || github.ref }}${{ github.event.action == 'labeled' && format('-label-{0}', github.event.label.name) || '' }}
+  group: ${{ github.workflow }}-ci-${{ github.event.pull_request.number || (github.event_name == 'push' && github.sha) || github.ref }}${{ github.event.action == 'labeled' && format('-label-{0}', github.event.label.name) || '' }}
   cancel-in-progress: true
 
 permissions:
