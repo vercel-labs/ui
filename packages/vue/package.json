@@ -97,6 +97,7 @@
     "./toolbar": "./src/toolbar.ts",
     "./tooltip": "./src/tooltip.ts",
     "./trigger-menu": "./src/trigger-menu.ts",
+    "./waterfall": "./src/waterfall.ts",
     "./nuxt": "./nuxt/module.ts"
   },
   "sideEffects": false,
@@ -379,6 +380,10 @@
       "./trigger-menu": {
         "types": "./dist/trigger-menu.d.ts",
         "default": "./dist/trigger-menu.js"
+      },
+      "./waterfall": {
+        "types": "./dist/waterfall.d.ts",
+        "default": "./dist/waterfall.js"
       },
       "./nuxt": {
         "types": "./dist/nuxt/module.d.ts",

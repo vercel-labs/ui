@@ -641,6 +641,33 @@ const components: Record<string, Component> = {
       pendingAnnouncement: "TreeOptions",
     },
   },
+  waterfall: {
+    source: "waterfall/waterfall.ts",
+    examples: "waterfall",
+    types: [
+      "WaterfallOptions",
+      "WaterfallRowProps",
+      "WaterfallAxisProps",
+      "WaterfallTimeProps",
+      "WaterfallDataItem",
+      "WaterfallDataRow",
+      "WaterfallState",
+      "WaterfallRowState",
+      "WaterfallAxisState",
+      "WaterfallTimeState",
+    ],
+    allowed: {
+      // Logs every change to the console, which no example should do.
+      debug: "WaterfallOptions",
+      // The page's `lang` sets it, and the examples follow the docs page's.
+      locale: "WaterfallOptions",
+      // The waterfall reads a row's parent and level from `items`. They're there for a renderer's own use.
+      parent: "WaterfallDataRow",
+      level: "WaterfallDataRow",
+      // Also `--waterfall-tick` and `--waterfall-mark`, which the stylesheet places them with.
+      position: "WaterfallTimeState",
+    },
+  },
   menubar: {
     source: "menubar/menubar.ts",
     examples: "menubar",

@@ -187,6 +187,7 @@ export { createTokenInputController } from "@ui-sdk/core/token-input"
 export { createToolbarController } from "@ui-sdk/core/toolbar"
 export { createTooltipController } from "@ui-sdk/core/tooltip"
 export { createTreeController } from "@ui-sdk/core/tree"
+export { createWaterfallController } from "@ui-sdk/core/waterfall"
 // Text matching the way the search components match, for your own filters and highlights.
 export { fuzzyScore, matchRanges, matchSegments } from "@ui-sdk/core/text-match"
 export type { MatchRange, MatchSegment } from "@ui-sdk/core/text-match"
@@ -348,6 +349,7 @@ export type {
   ToggleGroupEvents,
   TooltipEvents,
   TreeEvents,
+  WaterfallEvents,
   TriggerMenuEvents,
   UiAccordionElement,
   UiAlertDialogElement,
@@ -411,6 +413,7 @@ export type {
   UiToastRegionElement,
   UiTokenInputElement,
   UiTreeElement,
+  UiWaterfallElement,
   UiToggleElement,
   UiToggleGroupElement,
   UiTooltipElement,

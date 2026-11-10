@@ -1,4 +1,4 @@
-import type { Page } from "@playwright/test"
+import type { Locator, Page } from "@playwright/test"
 
 // A span's row, found by the header that names it.
 const row = (page: Page, label: string) =>
@@ -13,4 +13,11 @@ const cell = (page: Page, label: string, column: number) =>
 const bar = (page: Page, label: string) =>
   row(page, label).locator('[data-slot="waterfall-bar"]')
 
-export { bar, cell, row }
+// A CSS variable a part sets, as the page computes it, like "25%".
+const variable = (locator: Locator, name: string) =>
+  locator.evaluate(
+    (el, name) => getComputedStyle(el).getPropertyValue(name).trim(),
+    name
+  )
+
+export { bar, cell, row, variable }

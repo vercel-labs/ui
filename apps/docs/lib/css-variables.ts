@@ -79,6 +79,14 @@ const components: Record<string, Group[]> = {
     },
   ],
   rating: [{ part: "item", variables: ["--rating-fill"] }],
+  waterfall: [
+    { part: "tick", variables: ["--waterfall-tick"] },
+    { part: "mark", variables: ["--waterfall-mark"] },
+    {
+      part: "row",
+      variables: ["--waterfall-level", "--waterfall-start", "--waterfall-size"],
+    },
+  ],
   "segmented-control": [
     {
       part: "indicator",
@@ -263,6 +271,16 @@ const meaning: Record<string, string> = {
   "--active-tab-width": "Width of the selected tab.",
   "--active-tab-height": "Height of the selected tab.",
   "--rating-fill": "How much of the star the shown score covers, from 0 to 1.",
+  "--waterfall-tick":
+    "Where the tick's time sits on the axis, as a percentage. Use it for `inset-inline-start`.",
+  "--waterfall-mark":
+    "Where the mark's time sits on the axis, as a percentage. Use it for `inset-inline-start`.",
+  "--waterfall-level":
+    "The span's depth, from 1 at the top level. Use it to indent the row's header.",
+  "--waterfall-start":
+    "Where the span starts on the axis, as a percentage, clamped to the range. Use it for the bar's `inset-inline-start`.",
+  "--waterfall-size":
+    "How much of the axis the span covers, as a percentage. Use it for the bar's width. Zero for a span outside the range.",
   "--segmented-control-indicator-left":
     "Distance from the control's left edge to the checked item.",
   "--segmented-control-indicator-right":

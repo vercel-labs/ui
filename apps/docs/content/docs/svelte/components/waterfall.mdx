@@ -1,0 +1,324 @@
+---
+title: Waterfall
+description: Show a trace or a page's requests as bars on a shared time axis, with spans that expand to show what they started.
+---
+
+Use a Waterfall for anything with a start and a duration that nests: a browser's network requests, an OpenTelemetry trace, the steps of a build. Each span is a row with its own bar, placed on one time axis, and screen reader and keyboard users get a treegrid they can walk span by span.
+
+<ComponentExample
+  name="waterfall/network"
+  caption="Use the arrow keys to move between requests. Press Right to move into a row's cells, where each bar reads out when its request starts and how long it takes."
+/>
+
+## Installation
+
+```bash
+npm install @ui-sdk/svelte @ui-sdk/core
+```
+
+## Composition
+
+Use the following composition to build a `Waterfall`:
+
+```text
+Waterfall
+├── WaterfallHeaderRow
+│   ├── WaterfallColumnHeader
+│   └── WaterfallColumnHeader
+│       ├── WaterfallAxis
+│       │   └── WaterfallTick
+│       └── WaterfallMark
+├── WaterfallRow
+│   ├── WaterfallRowHeader
+│   │   └── WaterfallIndicator
+│   ├── WaterfallCell
+│   └── WaterfallBar
+└── WaterfallRow
+    ├── WaterfallRowHeader
+    └── WaterfallBar
+```
+
+Pass every span as `items` and render a `WaterfallRow` for each with the span's `value`. The rows are flat siblings: the waterfall reads each one's level, place among its siblings and children from `items`. Give the waterfall an accessible name.
+
+`WaterfallRowHeader` names the span, and holds the `WaterfallIndicator` of a span with children. `WaterfallBar` is the cell on the time axis. `WaterfallCell` is any other column, like a status or a size. The header row, the axis and marks are optional.
+
+## Usage
+
+Each span has a `value`, a `label`, a `start` and a `duration` in milliseconds, and the spans it started as `children`:
+
+```svelte
+<script lang="ts">
+  import {
+    Waterfall,
+    WaterfallBar,
+    WaterfallRow,
+    WaterfallRowHeader,
+    type WaterfallData,
+  } from "@ui-sdk/svelte/waterfall"
+
+  const requests: WaterfallData = [
+    { value: "document", label: "/", start: 0, duration: 182 },
+    { value: "script", label: "app.js", start: 192, duration: 410 },
+  ]
+</script>
+
+<Waterfall aria-label="Network requests" items={requests}>
+  {#each requests as request (request.value)}
+    <WaterfallRow value={request.value}>
+      <WaterfallRowHeader>{request.label}</WaterfallRowHeader>
+      <WaterfallBar />
+    </WaterfallRow>
+  {/each}
+</Waterfall>
+```
+
+Every row sets `--waterfall-start` and `--waterfall-size`, where its span begins and how much of the axis it covers, as percentages. Place the bar with them in plain CSS, with no layout in JavaScript:
+
+```css
+[data-slot="waterfall-bar"] {
+  position: relative;
+}
+
+[data-slot="waterfall-bar"]::before {
+  content: "";
+  position: absolute;
+  inset-block: 6px;
+  inset-inline-start: var(--waterfall-start);
+  width: var(--waterfall-size);
+  background: steelblue;
+}
+```
+
+Without children, the waterfall renders a row for every span, with its header and bar.
+
+## Network Requests
+
+The first example adds a header row. `WaterfallAxis` renders a `WaterfallTick` at round times, at most `maxTicks` of them, and `WaterfallMark` draws a moment across every row, like DOMContentLoaded, placed by `--waterfall-mark`. The axis is hidden from screen readers, who hear each bar's own times instead. `getBarLabel` changes what a bar says; this one adds the request's size.
+
+## Nested Spans
+
+Spans with `children` expand and collapse. Click a span's indicator, or press Right and Left on its row. To render only the rows that show, bind `expanded` with `bind:expanded` and pass it to `visibleWaterfallRows(items, expanded)`, which flattens the open spans in order.
+
+Clicking a row, or pressing Enter or Space on it, selects it. `bind:value` holds the selected span, like the one a details panel shows. `format` changes how times read, here as narrow milliseconds.
+
+<ComponentExample
+  name="waterfall/trace"
+  caption="Expand payments.charge with Right, then press Enter on gateway.capture. The console logs the selected span. Collapse All closes every span."
+/>
+
+You can also render every row and let the waterfall hide the ones inside a collapsed span: rows it hides get `hidden`, so `expanded` can stay uncontrolled.
+
+## Zoom
+
+`range` sets the stretch of time the axis shows, as `[start, end]`. Change it to zoom or pan: the bars and ticks follow, and a bar outside the range shrinks to its edge. Without it, the axis runs from the earliest start to the latest end.
+
+The `children` snippet of `WaterfallAxis` also receives its `ticks`, for ticks of your own.
+
+<ComponentExample
+  name="waterfall/zoom"
+  caption="Press Zoom In twice. The axis shows smaller steps, and the metrics span stretches past the edges."
+/>
+
+## Large Traces
+
+A trace can have thousands of spans. Render only the rows in view: flatten the open spans with `visibleWaterfallRows`, and render the nearby rows at their offsets. The waterfall still reports every row's level and place among its siblings, so screen readers hear the whole hierarchy.
+
+`onHighlight` reports the index of the row the keyboard moves to. Scroll it into view there, so a row that isn't rendered yet takes focus once it is. An arrow key changes only the two rows it moves between, however long the trace is.
+
+<ComponentExample
+  name="waterfall/virtualized"
+  caption="Press End to focus job 2000, or Page Down to move a page at a time. The trace has 10,000 spans, but only nearby rows render."
+/>
+
+## Controlled
+
+Selection and expanded spans are independent:
+
+| Value      | Shape                    | Change Notification |
+| ---------- | ------------------------ | ------------------- |
+| `value`    | A string or `null`.      | `onValueChange`     |
+| `expanded` | An array of span values. | `onExpandedChange`  |
+
+Use `bind:value` or `bind:expanded` to control one, or use `defaultValue` and `defaultExpanded` for starting state. Call `details.cancel()` in a change callback to reject a change. [State and Events](../state-and-events) covers the shared binding pattern.
+
+## Controller
+
+A `createWaterfallController()` instance can expand or collapse spans, change the selection, or focus a row. `reveal(value)` opens a span's ancestors and focuses its row. The Nested Spans example uses one for Expand All and Collapse All. See [Controllers](../controllers) for setup and lifecycle.
+
+## Custom Rendering
+
+Every part takes a `render` snippet, and its `children` snippet receives the part's state. See [Parts and Composition](../parts-and-composition) for prop merging and state-based rendering.
+
+## Styling
+
+Style a row's state from its `data-selected`, `data-expanded`, `data-branch` and `data-level`, which its header, indicator, cells and bar carry too. Focus moves between rows and cells, so style a focused one with `:focus-visible`. Indent a row's header with `--waterfall-level`, and place its bar with `--waterfall-start` and `--waterfall-size`.
+
+Each part has a `data-slot`, such as `waterfall-row`, and its state attributes are listed under [Data Attributes](#data-attributes).
+
+### WaterfallTick [#styling-waterfalltick]
+
+<CssVariables component="waterfall" part="tick" />
+
+### WaterfallMark [#styling-waterfallmark]
+
+<CssVariables component="waterfall" part="mark" />
+
+### WaterfallRow [#styling-waterfallrow]
+
+<CssVariables component="waterfall" part="row" />
+
+## Data Attributes
+
+### WaterfallMark [#data-attributes-waterfallmark]
+
+<DataAttributes component="waterfall" part="mark" />
+
+### WaterfallRow [#data-attributes-waterfallrow]
+
+<DataAttributes component="waterfall" part="row" />
+
+### WaterfallRowHeader [#data-attributes-waterfallrowheader]
+
+<DataAttributes component="waterfall" part="row-header" />
+
+### WaterfallIndicator [#data-attributes-waterfallindicator]
+
+<DataAttributes component="waterfall" part="indicator" />
+
+### WaterfallCell [#data-attributes-waterfallcell]
+
+<DataAttributes component="waterfall" part="cell" />
+
+### WaterfallBar [#data-attributes-waterfallbar]
+
+<DataAttributes component="waterfall" part="bar" />
+
+## API Reference
+
+### Waterfall
+
+<TypeTable
+  path="../../packages/core/src/components/waterfall/waterfall.ts"
+  name="WaterfallOptions"
+/>
+
+### WaterfallAxis
+
+<TypeTable
+  path="../../packages/core/src/components/waterfall/waterfall.ts"
+  name="WaterfallAxisProps"
+/>
+
+### WaterfallTick and WaterfallMark
+
+<TypeTable
+  path="../../packages/core/src/components/waterfall/waterfall.ts"
+  name="WaterfallTimeProps"
+/>
+
+### WaterfallRow
+
+<TypeTable
+  path="../../packages/core/src/components/waterfall/waterfall.ts"
+  name="WaterfallRowProps"
+/>
+
+### Items as Data
+
+Each span in `items`:
+
+<TypeTable
+  path="../../packages/core/src/components/waterfall/waterfall.ts"
+  name="WaterfallDataItem"
+/>
+
+Each row `visibleWaterfallRows(items, expanded)` returns:
+
+<TypeTable
+  path="../../packages/core/src/components/waterfall/waterfall.ts"
+  name="WaterfallDataRow"
+/>
+
+### State
+
+What render functions, state-based class names and slots receive, per part.
+
+`Waterfall`:
+
+<StateTable
+  path="../../packages/core/src/components/waterfall/waterfall.ts"
+  name="WaterfallState"
+/>
+
+`WaterfallAxis`:
+
+<StateTable
+  path="../../packages/core/src/components/waterfall/waterfall.ts"
+  name="WaterfallAxisState"
+/>
+
+`WaterfallTick` and `WaterfallMark`:
+
+<StateTable
+  path="../../packages/core/src/components/waterfall/waterfall.ts"
+  name="WaterfallTimeState"
+/>
+
+`WaterfallRow`, and its `WaterfallRowHeader`, `WaterfallIndicator`, `WaterfallCell` and `WaterfallBar`:
+
+<StateTable
+  path="../../packages/core/src/components/waterfall/waterfall.ts"
+  name="WaterfallRowState"
+/>
+
+### Reasons
+
+Why spans expanded or collapsed:
+
+<ReasonTable
+  path="../../packages/core/src/components/waterfall/waterfall.ts"
+  name="WaterfallExpandedChangeReason"
+/>
+
+Why the selection changed:
+
+<ReasonTable
+  path="../../packages/core/src/components/waterfall/waterfall.ts"
+  name="WaterfallValueChangeReason"
+/>
+
+### Controller
+
+Create one with `createWaterfallController()` and pass it as `controller`.
+
+<ControllerTable
+  path="../../packages/core/src/components/waterfall/waterfall.ts"
+  name="WaterfallController"
+/>
+
+## Accessibility
+
+The waterfall follows the [WAI-ARIA treegrid pattern](https://www.w3.org/WAI/ARIA/apg/patterns/treegrid/). Rows have the `row` role with `aria-level`, `aria-posinset`, `aria-setsize`, `aria-selected`, and `aria-expanded` on spans with children. `WaterfallRowHeader` is a `rowheader`, so screen readers repeat the span's name as focus moves down a column, and each `WaterfallBar` is a `gridcell` labeled with its span's name, when it starts and how long it lasts, like "GET /api/user, starts at 120 ms, lasts 340 ms". Times are formatted with `Intl` in the page's language.
+
+### Keyboard
+
+The waterfall has one tab stop. Tab enters at the selected row, or the first row, then returns to the row or cell focused last.
+
+| Key                  | Action                                                                                  |
+| -------------------- | --------------------------------------------------------------------------------------- |
+| Down / Up Arrow      | Focus the next or previous row. In a cell, keep the column.                             |
+| Right Arrow          | On a row, expand it, or move into its first cell. In a cell, move right.                |
+| Left Arrow           | In a cell, move left, then back to the row. On a row, collapse it, or focus its parent. |
+| Home / End           | Focus the first or last row. In a cell, the row's first or last cell.                   |
+| Ctrl+Home / Ctrl+End | Focus the first or last row, keeping the column.                                        |
+| Page Up / Page Down  | Move a page of rows.                                                                    |
+| Enter / Space        | Select the row.                                                                         |
+| Typing               | Focus the next row whose label starts with that text.                                   |
+
+Command replaces Ctrl on a Mac. In right-to-left text, Left and Right swap.
+
+### Tested Behavior
+
+Every line below is an automated test.
+
+<SpecList spec="waterfall" />

@@ -88,7 +88,8 @@
     "./token-input": "./src/entries/token-input.ts",
     "./toolbar": "./src/entries/toolbar.ts",
     "./tooltip": "./src/entries/tooltip.ts",
-    "./trigger-menu": "./src/entries/trigger-menu.ts"
+    "./trigger-menu": "./src/entries/trigger-menu.ts",
+    "./waterfall": "./src/entries/waterfall.ts"
   },
   "sideEffects": [
     "./src/entries/*.ts",
@@ -345,6 +346,10 @@
       "./trigger-menu": {
         "types": "./dist/entries/trigger-menu.d.ts",
         "default": "./dist/entries/trigger-menu.js"
+      },
+      "./waterfall": {
+        "types": "./dist/entries/waterfall.d.ts",
+        "default": "./dist/entries/waterfall.js"
       },
       "./package.json": "./package.json"
     }

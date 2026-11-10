@@ -43,6 +43,7 @@ Read `node_modules/@ui-sdk/<framework>/docs/llms.txt` for the list, then pick fr
 | Switch between panels                                | Tabs                                                                     |
 | Show and hide sections                               | Accordion, or Collapsible for one                                        |
 | Browse a hierarchy                                   | Tree                                                                     |
+| Show a trace or request timings on a time axis       | Waterfall                                                                |
 | Page through results                                 | Pagination                                                               |
 | Page through slides                                  | Carousel                                                                 |
 | Resizable panels                                     | Resizable                                                                |

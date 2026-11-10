@@ -78,7 +78,7 @@ describe("time axis", () => {
 
 describe("waterfall rows", () => {
   test("rows render their level, place, expansion and placement on the server", () => {
-    const instance = waterfall({ items, defaultExpanded: ["page"] })
+    const instance = waterfall({ id: "w", items, defaultExpanded: ["page"] })
     const row = (value: string) =>
       attrs(instance.part("row", { value }), { value })
     expect(row("page")).toMatchObject({
@@ -107,10 +107,13 @@ describe("waterfall rows", () => {
       attrs(instance.part("bar", { value: "api" }), { value: "api" })[
         "aria-label"
       ]
-    expect(bar(waterfall({ items }))).toBe("Starts at 600 ms, lasts 300 ms")
+    expect(bar(waterfall({ id: "w", items }))).toBe(
+      "GET /api/user, starts at 600 ms, lasts 300 ms"
+    )
     expect(
       bar(
         waterfall({
+          id: "w",
           items,
           getBarLabel: (item, { start, duration }) =>
             `${item.label} ${start} ${duration}`,
@@ -120,7 +123,7 @@ describe("waterfall rows", () => {
   })
 
   test("a range of your own moves every bar", () => {
-    const instance = waterfall({ items, range: [500, 1000] })
+    const instance = waterfall({ id: "w", items, range: [500, 1000] })
     expect(
       attrs(instance.part("row", { value: "api" }), { value: "api" }).style
     ).toContain("--waterfall-start:20%;--waterfall-size:60%")
@@ -147,7 +150,7 @@ describe("waterfall rows", () => {
 
   test("the controller expands, collapses and selects", () => {
     const controller = createWaterfallController()
-    const instance = kept(waterfall({ items, controller }))
+    const instance = kept(waterfall({ id: "w", items, controller }))
     expect(controller.expandAll()).toBe(true)
     expect(controller.getExpanded()).toEqual(["page", "js"])
     expect(controller.collapse("js")).toBe(true)
@@ -176,7 +179,7 @@ describe("waterfall parts select on their own row", () => {
   ]
 
   test("selecting, expanding and moving the stop reach the rows they change", async () => {
-    const instance = kept(waterfall({ items }))
+    const instance = kept(waterfall({ id: "w", items }))
     const api = instance.api
     const heard = await expectNoMissedUpdates(instance, parts, [
       ["select", () => api.setValue("css")],

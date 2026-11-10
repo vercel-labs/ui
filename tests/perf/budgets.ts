@@ -120,6 +120,21 @@ const budgets = {
     counts: { compareDocumentPosition: 1, getAttribute: 80, nextNode: 3 },
     inserts: 2,
   },
+  "waterfall.arrow-key": {
+    measures:
+      "Work done by 10 ArrowDown presses 50 ms apart and an Enter in a long trace whose every row is rendered.",
+    why: "Rows are keyed by span, so a key reaches the row it leaves and the row it lands on, and a selection the two rows it moves between, never every row of a trace with thousands of spans.",
+    // Web components compare the attributes of the two rows a key reaches and
+    // their parts, and React renders them, 2 of each per key and 1 for Enter.
+    // Up, Down and Enter read no style or layout.
+    renders: { row: 22, bar: 22 },
+    counts: {
+      compareDocumentPosition: 0,
+      getAttribute: 2000,
+      getComputedStyle: 0,
+      offsetHeight: 0,
+    },
+  },
   "collapsible.toggle": {
     measures: "Work done by opening one of a long list of collapsibles.",
     why: "Each collapsible is its own instance, so opening one must not reach the others, as a shared store or a document listener would.",

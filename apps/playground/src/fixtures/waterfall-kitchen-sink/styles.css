@@ -1,0 +1,97 @@
+@import "tailwindcss";
+@source "./";
+
+[data-slot="waterfall-root"] {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  font-size: 13px;
+}
+
+:is([data-slot="waterfall-header-row"], [data-slot="waterfall-row"]) {
+  display: grid;
+  grid-template-columns: 180px 48px 1fr;
+  height: 24px;
+  align-items: center;
+  border-radius: 4px;
+}
+
+[data-slot="waterfall-row"]:not(:has([data-slot="waterfall-cell"])) {
+  grid-template-columns: 180px 1fr;
+}
+
+[data-slot="waterfall-header-row"] {
+  font-size: 12px;
+  color: var(--color-neutral-500);
+}
+
+[data-slot="waterfall-row"][data-selected] {
+  background: var(--color-neutral-100);
+}
+
+[data-slot="waterfall-root"] :focus-visible {
+  outline: 2px solid var(--color-neutral-900);
+  outline-offset: -2px;
+}
+
+[data-slot="waterfall-row-header"] {
+  overflow: hidden;
+  padding-inline-start: calc((var(--waterfall-level) - 1) * 14px);
+  white-space: nowrap;
+}
+
+[data-slot="waterfall-indicator"] {
+  display: inline-block;
+  width: 14px;
+  color: var(--color-neutral-400);
+}
+
+[data-slot="waterfall-indicator"]::before {
+  content: "▸";
+}
+
+[data-slot="waterfall-indicator"][data-expanded]::before {
+  content: "▾";
+}
+
+[data-slot="waterfall-cell"] {
+  font-size: 12px;
+  color: var(--color-neutral-500);
+}
+
+:is([data-slot="waterfall-axis"], [data-slot="waterfall-bar"]) {
+  position: relative;
+  height: 100%;
+}
+
+[data-slot="waterfall-column-header"]:has([data-slot="waterfall-axis"]) {
+  position: relative;
+  height: 100%;
+}
+
+:is([data-slot="waterfall-tick"], [data-slot="waterfall-mark"]) {
+  position: absolute;
+  inset-inline-start: var(--waterfall-tick, var(--waterfall-mark));
+  top: 4px;
+  font-size: 10px;
+}
+
+[data-slot="waterfall-mark"] {
+  inset-block: 0;
+  border-inline-start: 1px dashed var(--color-amber-500);
+  font-size: 0;
+}
+
+[data-slot="waterfall-mark"][data-outside] {
+  display: none;
+}
+
+[data-slot="waterfall-bar"]::before {
+  content: "";
+  position: absolute;
+  inset-block: 6px;
+  inset-inline-start: var(--waterfall-start);
+  width: max(1px, var(--waterfall-size));
+  border-radius: 2px;
+  background: var(--color-sky-600);
+}

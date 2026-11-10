@@ -1,5 +1,5 @@
 import { expect, lastAction, test } from "../fixtures"
-import { bar, cell, row } from "./waterfall.helpers"
+import { bar, cell, row, variable } from "./waterfall.helpers"
 
 // Behavior follows the WAI-ARIA treegrid pattern:
 // https://www.w3.org/WAI/ARIA/apg/patterns/treegrid/
@@ -229,22 +229,15 @@ test.describe("time axis", () => {
     open,
   }) => {
     await open("waterfall", { expanded: "document" })
-    const style = (label: string) => row(page, label).getAttribute("style")
-    expect(await style("GET /")).toContain(
-      "--waterfall-start: 0%; --waterfall-size: 50%"
-    )
-    expect(await style("GET /app.css")).toContain(
-      "--waterfall-start: 6%; --waterfall-size: 17%"
-    )
+    const place = async (label: string) => [
+      await variable(row(page, label), "--waterfall-start"),
+      await variable(row(page, label), "--waterfall-size"),
+    ]
+    expect(await place("GET /")).toEqual(["0%", "50%"])
+    expect(await place("GET /app.css")).toEqual(["6%", "17%"])
     await page.getByRole("button", { name: "Zoom" }).click()
-    await expect(row(page, "GET /app.css")).toHaveAttribute(
-      "style",
-      /--waterfall-start: 0%; --waterfall-size: 0%/
-    )
-    await expect(row(page, "GET /")).toHaveAttribute(
-      "style",
-      /--waterfall-start: 0%; --waterfall-size: 100%/
-    )
+    await expect.poll(() => place("GET /app.css")).toEqual(["0%", "0%"])
+    expect(await place("GET /")).toEqual(["0%", "100%"])
   })
 
   test("each bar tells screen readers when its span starts and how long it lasts", async ({
@@ -254,11 +247,11 @@ test.describe("time axis", () => {
     await open("waterfall", { expanded: "document" })
     await expect(bar(page, "GET /app.css")).toHaveAttribute(
       "aria-label",
-      "Starts at 120 ms, lasts 340 ms"
+      "GET /app.css, starts at 120 ms, lasts 340 ms"
     )
     await expect(bar(page, "GET /font.woff2")).toHaveAttribute(
       "aria-label",
-      "Starts at 1 sec, lasts 1 sec"
+      "GET /font.woff2, starts at 1 sec, lasts 1 sec"
     )
   })
 
@@ -276,12 +269,17 @@ test.describe("time axis", () => {
       "1.5 sec",
       "2 sec",
     ])
-    await expect(
-      axis.locator('[data-slot="waterfall-tick"]').nth(1)
-    ).toHaveAttribute("style", /--waterfall-tick: 25%/)
-    await expect(page.locator('[data-slot="waterfall-mark"]')).toHaveAttribute(
-      "style",
-      /--waterfall-mark: 41%/
-    )
+    expect(
+      await variable(
+        axis.locator('[data-slot="waterfall-tick"]').nth(1),
+        "--waterfall-tick"
+      )
+    ).toBe("25%")
+    expect(
+      await variable(
+        page.locator('[data-slot="waterfall-mark"]'),
+        "--waterfall-mark"
+      )
+    ).toBe("41%")
   })
 })

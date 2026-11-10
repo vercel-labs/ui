@@ -96,3 +96,4 @@ export type {
 export * from "./date-input"
 export * from "./time-input"
 export * from "./tree"
+export * from "./waterfall"

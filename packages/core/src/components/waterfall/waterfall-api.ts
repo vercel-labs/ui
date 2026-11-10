@@ -63,9 +63,9 @@ const cellsOf = (row: HTMLElement) =>
   )
 
 const defaultBarLabel = (
-  _item: WaterfallDataItem,
+  item: WaterfallDataItem,
   { start, duration }: { start: string; duration: string }
-) => `Starts at ${start}, lasts ${duration}`
+) => `${item.label}, starts at ${start}, lasts ${duration}`
 
 /**
  * The rows that show when only the spans in `expanded` are open, in order,
@@ -305,24 +305,24 @@ function waterfallApiBody(
       return
     }
     const mod = event.ctrlKey || event.metaKey
-    const rtl = isRTL(row)
+    const horizontal = event.key === "ArrowLeft" || event.key === "ArrowRight"
+    const rtl = horizontal && isRTL(row)
     const forward = rtl ? "ArrowLeft" : "ArrowRight"
     const backward = rtl ? "ArrowRight" : "ArrowLeft"
     const { keys, index } = visible()
     const at = index.get(key) ?? 0
     const last = keys.length - 1
-    const page = pageSize(row)
-    const toRow = (to: number, keep = column) =>
-      moveTo(keys[clamp(to, 0, last)], keep, event)
+    const toRow = (to: number) =>
+      moveTo(keys[clamp(to, 0, last)], column, event)
 
     if (event.key === "ArrowDown" && !mod) {
       toRow(at + 1)
     } else if (event.key === "ArrowUp" && !mod) {
       toRow(at - 1)
     } else if (event.key === "PageDown") {
-      toRow(at + page)
+      toRow(at + pageSize(row))
     } else if (event.key === "PageUp") {
-      toRow(at - page)
+      toRow(at - pageSize(row))
     } else if (event.key === "Home") {
       if (column > 0 && !mod) {
         cells[0].focus()

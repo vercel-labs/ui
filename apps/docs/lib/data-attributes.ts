@@ -65,6 +65,7 @@ import { separator } from "@ui-sdk/core/separator"
 import { toggle, toggleGroup } from "@ui-sdk/core/toggle"
 import { toolbar } from "@ui-sdk/core/toolbar"
 import { tree } from "@ui-sdk/core/tree"
+import { waterfall } from "@ui-sdk/core/waterfall"
 import { menubar } from "@ui-sdk/core/menubar"
 import { createOverlays } from "@ui-sdk/core/overlays"
 import { createToaster, toastRegion } from "@ui-sdk/core/toast"
@@ -1363,6 +1364,63 @@ const components: Record<
         web: "<ui-tree-item-indicator>",
       },
       checkbox: { react: "TreeItemCheckbox", web: "<ui-tree-item-checkbox>" },
+    },
+  },
+  waterfall: {
+    instances: () => {
+      const items = [
+        {
+          value: "page",
+          label: "GET /",
+          start: 0,
+          duration: 1000,
+          children: [
+            { value: "api", label: "GET /api", start: 200, duration: 300 },
+          ],
+        },
+        { value: "font", label: "GET /font", start: 1200, duration: 400 },
+      ]
+      return [
+        waterfall({
+          id: "docs",
+          items,
+          defaultValue: "api",
+          defaultExpanded: ["page"],
+        }),
+        waterfall({ id: "docs-zoomed", items, range: [0, 1000] }),
+      ]
+    },
+    samples: {
+      root: [{}],
+      "header-row": [{}],
+      "column-header": [{}],
+      axis: [{}],
+      tick: [{ time: 500 }],
+      mark: [{ time: 400 }, { time: 1500 }],
+      row: [{ value: "page" }, { value: "api" }, { value: "font" }],
+      "row-header": [{ value: "page" }, { value: "api" }],
+      indicator: [{ value: "page" }],
+      cell: [{ value: "page" }, { value: "api" }],
+      bar: [{ value: "page" }, { value: "api" }],
+    },
+    interactive: [],
+    descriptions: {
+      "data-level": {
+        text: "The span's depth, from 1 at the top level. Also in the `--waterfall-level` variable.",
+      },
+      "data-branch": { text: "Present on a span with children." },
+      "data-expanded": {
+        text: "Present while a span with children is expanded.",
+      },
+      "data-selected": {
+        text: "Present on the selected span's row and its parts.",
+      },
+      "data-outside": {
+        text: "Present while the mark's time is outside the range, so it doesn't show on the axis.",
+      },
+    },
+    parts: {
+      root: { react: "Waterfall", web: "<ui-waterfall>" },
     },
   },
   menubar: {

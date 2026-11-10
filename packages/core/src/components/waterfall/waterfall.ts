@@ -207,9 +207,8 @@ type WaterfallOptions = {
    */
   locale?: string
   /**
-   * What screen readers hear for a span's bar. Set it in the page's
-   * language. The row's header already names the span.
-   * @defaultValue "Starts at 120 ms, lasts 340 ms"
+   * What screen readers hear for a span's bar. Set it in the page's language.
+   * @defaultValue "GET /api/user, starts at 120 ms, lasts 340 ms"
    */
   getBarLabel?: (
     item: WaterfallDataItem,

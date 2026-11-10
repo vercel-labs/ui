@@ -409,6 +409,35 @@ cd tests && PLAYGROUND_PORT=5310 ../scripts/test-slot.sh npx playwright test spe
 cd tests && PLAYGROUND_PORT=5310 ../scripts/test-slot.sh npx playwright test specs/tree.counts --project react -g 'expanding a folder does no work that grows with the item count'
 ```
 
+<a id="waterfall-arrow-key"></a>
+
+### waterfall.arrow-key
+
+**Measures:** Work done by 10 ArrowDown presses 50 ms apart and an Enter in a long trace whose every row is rendered.
+
+**Why:** Rows are keyed by span, so a key reaches the row it leaves and the row it lands on, and a selection the two rows it moves between, never every row of a trace with thousands of spans.
+
+**Budget:**
+
+- At most 22 `row` renders.
+- At most 22 `bar` renders.
+- No `compareDocumentPosition` calls.
+- At most 2,000 `getAttribute` calls.
+- No `getComputedStyle` calls.
+- No `offsetHeight` calls.
+
+**Notes:** Web components compare the attributes of the two rows a key reaches and their parts, and React renders them, 2 of each per key and 1 for Enter. Up, Down and Enter read no style or layout.
+
+**Tests:**
+
+- `waterfall.counts.spec.ts` › arrow keys and selection do no work that grows with the span count
+
+**Run:**
+
+```bash
+cd tests && PLAYGROUND_PORT=5310 ../scripts/test-slot.sh npx playwright test specs/waterfall.counts --project react -g 'arrow keys and selection do no work that grows with the span count'
+```
+
 <a id="collapsible-toggle"></a>
 
 ### collapsible.toggle

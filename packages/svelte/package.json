@@ -98,7 +98,8 @@
     "./toolbar": "./src/toolbar.ts",
     "./tooltip": "./src/tooltip.ts",
     "./tree": "./src/tree.ts",
-    "./trigger-menu": "./src/trigger-menu.ts"
+    "./trigger-menu": "./src/trigger-menu.ts",
+    "./waterfall": "./src/waterfall.ts"
   },
   "sideEffects": false,
   "files": [
@@ -416,6 +417,11 @@
         "types": "./dist/trigger-menu.d.ts",
         "svelte": "./dist/trigger-menu.js",
         "default": "./dist/trigger-menu.js"
+      },
+      "./waterfall": {
+        "types": "./dist/waterfall.d.ts",
+        "svelte": "./dist/waterfall.js",
+        "default": "./dist/waterfall.js"
       },
       "./token-input": {
         "types": "./dist/token-input.d.ts",

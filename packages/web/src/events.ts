@@ -292,6 +292,13 @@ import type { tokenInput } from "@ui-sdk/core/token-input"
 import type { toolbar } from "@ui-sdk/core/toolbar"
 import type { tooltip } from "@ui-sdk/core/tooltip"
 import type { tree } from "@ui-sdk/core/tree"
+import type {
+  waterfall,
+  WaterfallController,
+  WaterfallDataItem,
+  WaterfallExpandedChangeReason,
+  WaterfallValueChangeReason,
+} from "@ui-sdk/core/waterfall"
 import type { triggerMenu } from "@ui-sdk/core/trigger-menu"
 import type { UiActionDetail } from "./action"
 import type { ToastContent } from "./toast"
@@ -1917,6 +1924,53 @@ interface UiTreeElement
   controller?: TreeController
 }
 
+/**
+ * The events of `<ui-waterfall>`.
+ * @experimental
+ */
+type WaterfallEvents = {
+  valuechange: UiChangeEvent<string | null, WaterfallValueChangeReason>
+  expandedchange: UiChangeEvent<string[], WaterfallExpandedChangeReason>
+  /** The keyboard moved focus to a row, with its place among the rows that show, from 0. */
+  highlight: CustomEvent<{ value: string; index: number; event?: Event }>
+}
+/**
+ * `<ui-waterfall>`: `value`, `expanded`, `items` and the other rich options, the controller's methods on `api`, and typed events.
+ * @experimental
+ */
+interface UiWaterfallElement
+  extends
+    UiElement<WaterfallEvents>,
+    AttributeProperties<
+      typeof waterfall,
+      | "api"
+      | "controller"
+      | "expanded"
+      | "format"
+      | "getBarLabel"
+      | "items"
+      | "range"
+      | "value"
+    > {
+  /** The selected span's value, or `null`. */
+  value: string | null
+  /** The expanded spans' values. */
+  expanded: string[]
+  /** The spans. Without rows of its own, the waterfall renders a row for each. */
+  items: WaterfallDataItem[]
+  /** The stretch of time the axis shows, as `[start, end]` in milliseconds. */
+  range?: [number, number]
+  /** How times read: `Intl.NumberFormat` options for milliseconds, or a function of them. */
+  format?: Intl.NumberFormatOptions | ((value: number) => string)
+  /** What screen readers hear for a span's bar. */
+  getBarLabel?: (
+    item: WaterfallDataItem,
+    details: { start: string; duration: string }
+  ) => string
+  api: WaterfallController
+  controller?: WaterfallController
+}
+
 // Every entry re-exports its elements' types from this file, so importing
 // one, like `import "@ui-sdk/web/toggle"`, brings this map along.
 declare global {
@@ -1971,6 +2025,7 @@ declare global {
     "ui-file-input": UiFileInputElement
     "ui-scroll-area": UiScrollAreaElement
     "ui-tree": UiTreeElement
+    "ui-waterfall": UiWaterfallElement
     "ui-toast-region": UiToastRegionElement
     "ui-overlay-host": UiOverlayHostElement
     "ui-preferences": UiPreferencesElement
@@ -2749,6 +2804,19 @@ declare global {
       "group",
       "keepMounted" | "hiddenUntilFound"
     >
+    "ui-waterfall-header-row": UiPartElement<typeof waterfall, "header-row">
+    "ui-waterfall-column-header": UiPartElement<
+      typeof waterfall,
+      "column-header"
+    >
+    "ui-waterfall-axis": UiPartElement<typeof waterfall, "axis", "maxTicks">
+    "ui-waterfall-tick": UiPartElement<typeof waterfall, "tick", "time">
+    "ui-waterfall-mark": UiPartElement<typeof waterfall, "mark", "time">
+    "ui-waterfall-row": UiPartElement<typeof waterfall, "row", "value">
+    "ui-waterfall-row-header": UiPartElement<typeof waterfall, "row-header">
+    "ui-waterfall-indicator": UiPartElement<typeof waterfall, "indicator">
+    "ui-waterfall-cell": UiPartElement<typeof waterfall, "cell">
+    "ui-waterfall-bar": UiPartElement<typeof waterfall, "bar">
     "ui-trigger-menu-input": UiPartElement<typeof triggerMenu, "input">
     "ui-trigger-menu-content": UiPartElement<
       typeof triggerMenu,
@@ -2949,4 +3017,6 @@ export {
   type UiTooltipElement,
   type UiTreeElement,
   type UiTriggerMenuElement,
+  type UiWaterfallElement,
+  type WaterfallEvents,
 }
