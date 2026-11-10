@@ -10,6 +10,7 @@ import {
   spanPlacement,
   spanRange,
   tickTimes,
+  waterfallTicks,
 } from "../src/components/waterfall/waterfall-time"
 import { attrs, partState } from "../src/foundation/kernel/part"
 import { expectNoMissedUpdates, type Part } from "./selects"
@@ -56,6 +57,24 @@ describe("time axis", () => {
       start: 100,
       size: 0,
     })
+  })
+
+  test("ticks a step apart read differently, however late the range", () => {
+    const labels = (range: [number, number]) =>
+      waterfallTicks(range, 6, "en-US").map((tick) => tick.label)
+    expect(labels([5000, 5004])).toEqual([
+      "5 sec",
+      "5.001 sec",
+      "5.002 sec",
+      "5.003 sec",
+    ])
+    expect(labels([120_000, 120_050])).toEqual([
+      "2 min",
+      "2.0002 min",
+      "2.0003 min",
+      "2.0005 min",
+      "2.0007 min",
+    ])
   })
 
   test("ticks fall on round times and never pass the limit", () => {

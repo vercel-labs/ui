@@ -92,12 +92,18 @@ function tickTimes([start, end]: Range, max: number) {
   return times.length === 0 && first <= end ? [first] : times
 }
 
-// Milliseconds, seconds or minutes, picked by `scale`, so every tick of an axis reads in one unit.
+// The decimals a step needs, like 2 for 0.05, so ticks a step apart read differently.
+const stepDigits = (step: number) =>
+  Math.min(6, Math.max(0, Math.ceil(-Math.log10(step) - 1e-9)))
+
+// Milliseconds, seconds or minutes, picked by `scale`, so every tick of an axis
+// reads in one unit, with the decimals `step` needs in that unit.
 function formatTime(
   time: number,
   locale: string,
   format?: NumberFormat,
-  scale = time
+  scale = time,
+  step?: number
 ) {
   if (format) {
     return formatNumber(time, locale, format)
@@ -107,17 +113,20 @@ function formatTime(
     size < 1000
       ? {
           unit: "millisecond",
-          value: time,
+          ms: 1,
           digits: Math.abs(time) < 10 ? 1 : 0,
         }
       : size < 60_000
-        ? { unit: "second", value: time / 1000, digits: 2 }
-        : { unit: "minute", value: time / 60_000, digits: 1 }
-  return formatNumber(unit.value, locale, {
+        ? { unit: "second", ms: 1000, digits: 2 }
+        : { unit: "minute", ms: 60_000, digits: 1 }
+  return formatNumber(time / unit.ms, locale, {
     style: "unit",
     unit: unit.unit,
     unitDisplay: "short",
-    maximumFractionDigits: unit.digits,
+    maximumFractionDigits: Math.max(
+      unit.digits,
+      step !== undefined && step > 0 ? stepDigits(step / unit.ms) : 0
+    ),
   })
 }
 
@@ -128,9 +137,10 @@ function waterfallTicks(
   format?: NumberFormat
 ) {
   const scale = Math.max(Math.abs(range[0]), Math.abs(range[1]))
+  const step = tickStep(range[1] - range[0], max)
   return tickTimes(range, max).map<WaterfallTickData>((time) => ({
     time,
-    label: formatTime(time, locale, format, scale),
+    label: formatTime(time, locale, format, scale, step),
     position: percentAt(time, range),
   }))
 }
