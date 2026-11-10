@@ -41,6 +41,7 @@ function Example() {
     >
       <Waterfall
         aria-label="Build trace"
+        aria-rowcount={rows().length}
         items={trace}
         range={[0, 400]}
         expanded={expanded()}
@@ -67,6 +68,7 @@ function Example() {
           {(visible) => (
             <WaterfallRow
               value={visible().item.value}
+              aria-rowindex={visible().index + 1}
               style={{ top: `${visible().index * row}px` }}
             >
               <WaterfallRowHeader>

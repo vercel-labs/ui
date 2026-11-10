@@ -47,6 +47,7 @@ function Example() {
     >
       <Waterfall
         aria-label="Build trace"
+        aria-rowcount={rows.length}
         items={trace}
         range={range}
         expanded={expanded}
@@ -70,6 +71,7 @@ function Example() {
           <WaterfallRow
             key={item.value}
             value={item.value}
+            aria-rowindex={index + 1}
             style={{ top: index * row }}
           >
             <WaterfallRowHeader>

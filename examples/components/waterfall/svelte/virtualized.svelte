@@ -57,6 +57,7 @@
 >
   <Waterfall
     aria-label="Build trace"
+    aria-rowcount={rows.length}
     items={trace}
     range={[0, 400]}
     bind:expanded
@@ -64,7 +65,11 @@
     style="height: {rows.length * row}px"
   >
     {#each rows.slice(start, end) as { item, index } (item.value)}
-      <WaterfallRow value={item.value} style="top: {index * row}px">
+      <WaterfallRow
+        value={item.value}
+        aria-rowindex={index + 1}
+        style="top: {index * row}px"
+      >
         <WaterfallRowHeader>
           {#if item.children}
             <WaterfallIndicator>

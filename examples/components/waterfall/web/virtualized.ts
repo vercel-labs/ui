@@ -35,6 +35,7 @@ function mount(root: HTMLElement) {
   const rendered = new Map<string, HTMLElement>()
   const render = () => {
     waterfall.style.height = `${rows.length * row}px`
+    waterfall.setAttribute("aria-rowcount", String(rows.length))
     const start = Math.max(0, Math.floor(scroller.scrollTop / row) - 4)
     const end = Math.min(
       rows.length,
@@ -71,6 +72,7 @@ function mount(root: HTMLElement) {
         rendered.set(value, el)
       }
       el.style.top = `${index * row}px`
+      el.setAttribute("aria-rowindex", String(index + 1))
     }
   }
   render()

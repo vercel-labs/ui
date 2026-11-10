@@ -65,6 +65,7 @@ function onHighlight(_value: string, { index }: ListHighlightDetails) {
     <Waterfall
       v-model:expanded="expanded"
       aria-label="Build trace"
+      :aria-rowcount="rows.length"
       :items="trace"
       :range="[0, 400]"
       :style="{ height: `${rows.length * row}px` }"
@@ -74,6 +75,7 @@ function onHighlight(_value: string, { index }: ListHighlightDetails) {
         v-for="{ item, index } in visible"
         :key="item.value"
         :value="item.value"
+        :aria-rowindex="index + 1"
         :style="{ top: `${index * row}px` }"
       >
         <WaterfallRowHeader>
