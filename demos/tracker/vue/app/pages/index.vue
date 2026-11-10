@@ -8,8 +8,11 @@ import IssueToolbar from "~/components/issue-toolbar.vue"
 import Workspace from "~/components/workspace.vue"
 
 const route = useRoute()
-const { data: issues } = useFetch("/api/issues", { default: () => [] })
-const { data: settings } = useFetch("/api/settings")
+const { data: issues } = useLazyFetch("/api/issues", {
+  key: "issues",
+  default: () => [],
+})
+const { data: settings } = useLazyFetch("/api/settings", { key: "settings" })
 
 const query = computed(() => parseQuery(route.query))
 const matching = computed(() => filterIssues(issues.value, query.value))

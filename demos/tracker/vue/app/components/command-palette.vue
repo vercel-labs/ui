@@ -23,7 +23,10 @@ import {
 } from "~/components/ui/dialog"
 
 const tracker = useTracker()
-const { data: issues } = useFetch("/api/issues", { default: () => [] })
+const { data: issues } = useLazyFetch("/api/issues", {
+  key: "issues",
+  default: () => [],
+})
 const route = useRoute()
 const query = computed(() => parseQuery(route.query))
 const open = ref(false)

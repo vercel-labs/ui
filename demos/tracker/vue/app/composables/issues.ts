@@ -11,13 +11,13 @@ async function send(url: string, options: Options) {
     toast.error("Couldn't save your changes. Try again.")
     return false
   } finally {
-    await refreshNuxtData()
+    await refreshNuxtData("issues")
   }
 }
 
 async function createIssue(form: FormData) {
   const issue = await $fetch("/api/issues", { method: "POST", body: form })
-  await refreshNuxtData()
+  await refreshNuxtData("issues")
   return issue
 }
 
