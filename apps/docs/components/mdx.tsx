@@ -10,6 +10,7 @@ import { CssVariables, DataAttributes } from "./data-attributes"
 import { Pre } from "./code"
 import { Collapsible } from "./collapsible"
 import { ChangelogPosts } from "./changelog-posts"
+import { CopyPromptButton } from "./copy-prompt"
 import { Card, ComponentCards, ComponentGrid } from "./component-grid"
 import { Frame } from "./frame"
 import { FrameworkContent, FrameworkLink } from "./site-preferences"
@@ -215,6 +216,37 @@ function getMDXComponents(
       <ComponentCards {...props} framework={framework} />
     ),
     ChangelogPosts,
+    Video: ({
+      src,
+      poster,
+      title,
+    }: {
+      src: string
+      poster?: string
+      title?: string
+    }) => (
+      <Frame className="my-6 overflow-hidden">
+        <video
+          src={src}
+          poster={poster}
+          aria-label={title}
+          width={1920}
+          height={1080}
+          controls
+          preload="none"
+          playsInline
+          className="block aspect-video h-auto w-full bg-black object-contain"
+        />
+      </Frame>
+    ),
+    CopyPrompt: () => (
+      <CopyPromptButton
+        registry={process.env.NPM_REGISTRY}
+        className="inline-flex h-8 shrink-0 items-center bg-foreground px-3 text-sm font-medium whitespace-nowrap text-background outline-none hover:bg-foreground/85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#006bff] focus-visible:outline-solid"
+      >
+        Copy Prompt
+      </CopyPromptButton>
+    ),
     ComponentExample: (props: {
       name: string
       caption?: string

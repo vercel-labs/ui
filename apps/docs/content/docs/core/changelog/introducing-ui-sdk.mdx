@@ -1,8 +1,14 @@
 ---
 title: Introducing UI SDK
 description: A library of behaviors to build your components. Made for agents.
-date: "2026-11-10"
+date: "2026-11-12"
 ---
+
+<Video
+  src="https://5i7hyknqgxeqd9wd.public.blob.vercel-storage.com/ui-sdk-launch.mp4"
+  poster="/changelog/ui-sdk-launch.webp"
+  title="Introducing UI SDK"
+/>
 
 Today we're releasing UI SDK.
 
@@ -10,7 +16,7 @@ UI SDK is a TypeScript library of UI behaviors, the layers that make up a compon
 
 For example, `createRovingFocus` moves focus with the arrow keys, `createTypeahead` finds an option as you type, and `createPopup` opens a popup next to its button.
 
-We built more than 40 of them. You, or your agent, combine them to build your own components.
+We built more than 50 of them. You, or your agent, combine them to build your own components.
 
 ## Build a component
 
@@ -212,11 +218,11 @@ function Example() {
 </FrameworkTab>
 </FrameworkTabs>
 
-To combine several behaviors in one component, see [Compose Behaviors](/docs/core/compose-behaviors).
+To build one step by step, read [Build a Component](/docs/core/build-a-component). To combine several behaviors, read [Compose Behaviors](/docs/core/compose-behaviors).
 
 ## Component libraries
 
-We used the same behaviors to build a component library for every framework: 53 ready-made components, from a Select to a Date Picker, with the same parts in React, Vue, Svelte, Solid and Web Components. You bring the styles.
+We used the same behaviors to build a component library for every framework: more than 50 ready-made components, from a Select to a Date Picker, with the same parts in React, Vue, Svelte, Solid and Web Components. You bring the styles.
 
 <FrameworkTabs copyLabel="Copy">
 <FrameworkTab value="react">
@@ -361,7 +367,7 @@ function Example() {
 
 These days, agents build our interfaces. And more and more, agents use them too. So we built UI SDK for both.
 
-Everything you build with UI SDK is easy for an agent to use. It can read what's on the page and press, type and pick, just like a person would, within the permissions you set.
+Everything you build with UI SDK is easy for an agent to use. An agent can read what's on the page and press, type and pick, just like a person would, within the permissions you set.
 
 Give an agent your page with `createAgent`:
 
@@ -380,13 +386,13 @@ await agent.act({
 })
 ```
 
-WebMCP lets a page give tools to the agent built into a browser. Call `registerTools` and the browser's agent can read your components and call their actions too. See [WebMCP](/docs/agents/connect-an-agent/webmcp).
+WebMCP lets a page give tools to the agent built into a browser. Call `registerTools` and the browser's agent can read your components and call their actions too. To set it up, read [WebMCP](/docs/agents/connect-an-agent/webmcp).
 
 ## Get started
 
-Pick your framework, then copy this prompt into your agent.
+Copy the setup prompt into your agent, and it sets up UI SDK for you.
 
-<include>../../../shared/setup-prompt.mdx</include>
+<CopyPrompt />
 
 Want to learn more? Read the [introduction](/docs/core).
 
@@ -394,6 +400,4 @@ UI SDK is currently in beta. Try it, and tell us what you think on [GitHub](http
 
 ## Thank you
 
-Before building UI SDK, we spent years using and building component libraries on top of [Radix](https://www.radix-ui.com) and [Base UI](https://base-ui.com), and using other libraries like [React Aria](https://react-spectrum.adobe.com/react-aria/) and [Nuxt UI](https://ui.nuxt.com). UI SDK is everything we learned from that.
-
-Thank you to the teams behind Radix, Base UI, React Aria, [shadcn/ui](https://ui.shadcn.com), Nuxt UI and [Geist](https://vercel.com/geist), and to the [WAI-ARIA Authoring Practices](https://www.w3.org/WAI/ARIA/apg/).
+UI SDK is everything we learned from years of using and building component libraries. Thank you to the teams behind [Radix](https://www.radix-ui.com), [Base UI](https://base-ui.com), [React Aria](https://react-spectrum.adobe.com/react-aria/), [shadcn/ui](https://ui.shadcn.com), [Nuxt UI](https://ui.nuxt.com) and [Geist](https://vercel.com/geist), and to the [WAI-ARIA Authoring Practices](https://www.w3.org/WAI/ARIA/apg/).

@@ -9,7 +9,7 @@ import { cssVariableTable } from "./css-variables"
 import { dataAttributeTables } from "./data-attributes"
 import { readExampleSources } from "./example-sources"
 import { frameworks, type Framework } from "./frameworks"
-import { contentDir, docPage, docPages, readPage } from "./pages"
+import { contentDir, docPage, docPages, readPage, withIncludes } from "./pages"
 import {
   controllerRows,
   reasonRows,
@@ -224,10 +224,18 @@ async function pageMarkdown(
   const styledExample = lean ? attributes(firstExample).name : undefined
 
   // Markdown carries the CSS block of a style snippet; the Tailwind one is a site toggle.
-  let text = body.replace(
-    /<StyleTabs>\s*(```[\s\S]*?\n```)[\s\S]*?<\/StyleTabs>/g,
-    "$1"
-  )
+  const setupPrompt = () =>
+    withIncludes(
+      "<include>setup-prompt.mdx</include>",
+      path.join(contentDir, "../shared")
+    )
+  let text = body
+    .replace(tag("CopyPrompt"), setupPrompt)
+    .replace(
+      tag("Video"),
+      (_, attrs: string) => `[Watch the launch video](${attributes(attrs).src})`
+    )
+    .replace(/<StyleTabs>\s*(```[\s\S]*?\n```)[\s\S]*?<\/StyleTabs>/g, "$1")
   text = await outsideCode(text, async (prose) => {
     let out = prose
       .replace(/<\/?(?:Cards|Callout|Steps)>\n?/g, "")

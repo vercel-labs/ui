@@ -120,4 +120,5 @@ export {
   frameworkGuides,
   readPage,
   sharedHref,
+  withIncludes,
 }
