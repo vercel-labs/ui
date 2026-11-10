@@ -34,6 +34,8 @@ const config = {
   env: {
     WEB_RELEASES: newest(releasesIn(publicDir)),
     WEB_STYLE_RELEASES: JSON.stringify(releasesIn(publicDir, ".css")),
+    // The day of the build, like "2026-11-10", for the homepage's calendar.
+    BUILD_DAY: new Date().toISOString().slice(0, 10),
   },
   async headers() {
     return [

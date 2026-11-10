@@ -103,6 +103,7 @@ import {
   TreeItemLabel,
 } from "@ui-sdk/react/tree"
 import { formatColor, parseColor } from "@ui-sdk/core/color"
+import { addDays, todayDate } from "@ui-sdk/core/date"
 import { cn } from "cn"
 import {
   AlignCenterIcon,
@@ -227,20 +228,12 @@ function Measure({
   )
 }
 
-function iso(date: Date) {
-  return [date.getFullYear(), date.getMonth() + 1, date.getDate()]
-    .map((part) => String(part).padStart(2, "0"))
-    .join("-")
-}
+// The homepage is built ahead of time, so the range starts from the day it was
+// built, which the server and the browser agree on, rather than from today.
+const rangeStart = addDays(process.env.BUILD_DAY ?? todayDate(), 3)
+const range: [string, string] = [rangeStart, addDays(rangeStart, 4)]
 
 function CalendarDemo() {
-  const [range] = React.useState(() => {
-    const start = new Date()
-    start.setDate(start.getDate() + 3)
-    const end = new Date(start)
-    end.setDate(end.getDate() + 4)
-    return [iso(start), iso(end)] as [string, string]
-  })
   return (
     <Measure>
       <Calendar
