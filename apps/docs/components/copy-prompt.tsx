@@ -296,7 +296,7 @@ function CopyPromptDialog({
           <div className="flex items-start justify-between gap-4">
             <div className="flex flex-col gap-1">
               <DialogTitle className="text-lg font-medium tracking-[-0.02em]">
-                Quick Start
+                Copy Prompt
               </DialogTitle>
               <DialogDescription className="text-sm text-muted-foreground">
                 {description}
@@ -327,7 +327,7 @@ function CopyPromptDialog({
         />
         <div className="flex flex-col gap-1">
           <DrawerTitle className="text-lg font-medium tracking-[-0.02em]">
-            Quick Start
+            Copy Prompt
           </DrawerTitle>
           <DrawerDescription className="text-sm text-muted-foreground">
             {description}
@@ -385,11 +385,11 @@ function HeaderCopyPrompt({
         type="button"
         onClick={() => setOpen(true)}
         className={cn(
-          "relative inline-flex h-8 shrink-0 items-center bg-[#006bff] px-3 text-sm font-medium whitespace-nowrap text-white outline-none after:absolute after:-inset-1.5 hover:bg-[#0059d6] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#006bff] focus-visible:outline-solid",
+          "relative inline-flex h-8 shrink-0 items-center bg-foreground px-3 text-sm font-medium whitespace-nowrap text-background outline-none after:absolute after:-inset-1.5 hover:bg-foreground/85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#006bff] focus-visible:outline-solid",
           className
         )}
       >
-        Copy Prompt
+        Quickstart
       </button>
       <CopyPromptDialog
         open={open}

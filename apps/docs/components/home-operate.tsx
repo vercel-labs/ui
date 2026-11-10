@@ -389,24 +389,8 @@ function OperateDemo() {
           ink
         )}
       >
-        <div className="hidden h-10 items-center gap-4 border-b border-foreground px-4 @[56rem]:flex">
-          <span aria-hidden="true" className="flex gap-1.5">
-            <span className="size-2.5 border border-foreground" />
-            <span className="size-2.5 border border-foreground" />
-            <span className="size-2.5 border border-foreground" />
-          </span>
-          <span
-            className={cn(
-              label,
-              "flex-1 truncate text-center text-muted-foreground"
-            )}
-          >
-            acme/web · Settings
-          </span>
-          <span aria-hidden="true" className="w-[2.875rem]" />
-        </div>
         <div className="grid gap-2 @[56rem]:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] @[56rem]:gap-0">
-          <div className="order-2 flex min-w-0 flex-col @[56rem]:order-1 @[56rem]:h-[48rem] @[56rem]:border-e @[56rem]:border-foreground">
+          <div className="order-2 flex min-w-0 flex-col @[56rem]:order-1 @[56rem]:h-[34rem] @[56rem]:border-e @[56rem]:border-foreground">
             <div className="hidden h-[3.25rem] items-center border-b border-foreground/15 px-4 @[56rem]:flex">
               <span className={cn(label, "text-muted-foreground")}>Agent</span>
             </div>

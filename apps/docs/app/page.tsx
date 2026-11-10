@@ -1,7 +1,7 @@
 import { BehaviorsPoster } from "@/components/home-behaviors"
 import { CopyPromptButton } from "@/components/copy-prompt"
 import { PhoneShot, PhoneStrip } from "@/components/home-more"
-import { Poster, StartPoster, Title } from "@/components/home-posters"
+import { Poster, StartPoster } from "@/components/home-posters"
 import { SelectBlueprint } from "@/components/home-select"
 import {
   AccordionTile,
@@ -115,7 +115,7 @@ export default function HomePage() {
           A library of behaviors for agents to build the next generation of user
           interfaces.
         </h1>
-        <div className="mt-8 grid grid-cols-1 gap-3 sm:mt-10 lg:grid-cols-2 lg:gap-4">
+        <div className="mt-8 grid grid-cols-1 gap-3 sm:mt-10 lg:grid-cols-[4fr_5fr] lg:gap-4">
           <Poster
             fig="FIG. 01"
             head={"WHAT IS UI SDK?\nTHE SHORT VERSION"}
@@ -163,16 +163,16 @@ export default function HomePage() {
             </div>
           </Poster>
           <div className="flex flex-col gap-3 max-lg:contents lg:gap-4">
-            <div className="grid gap-3 max-lg:order-first sm:grid-cols-2 lg:gap-4">
+            <div className="grid grid-cols-2 gap-3 max-lg:order-first lg:gap-4">
               <Link
                 href="/docs"
-                className="group/docs flex h-16 items-center justify-between gap-4 bg-foreground px-6 text-xl font-[450] tracking-[-0.03em] whitespace-nowrap text-background transition-colors outline-none hover:bg-foreground/85 focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[#006bff] sm:h-20 sm:px-8 sm:text-2xl"
+                className="group/docs flex h-16 items-center justify-between gap-4 bg-foreground px-4 text-lg font-[450] tracking-[-0.03em] whitespace-nowrap text-background transition-colors outline-none hover:bg-foreground/85 focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[#006bff] max-[359px]:px-3 max-[359px]:text-base sm:h-20 sm:px-8 sm:text-2xl"
               >
                 Read the Docs
               </Link>
               <CopyPromptButton
                 registry={process.env.NPM_REGISTRY}
-                className="flex h-16 items-center justify-between gap-4 bg-[#006bff] px-6 text-start text-xl font-[450] tracking-[-0.03em] whitespace-nowrap text-white transition-colors outline-none hover:bg-[#0059d6] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[#006bff] sm:h-20 sm:px-8 sm:text-2xl"
+                className="flex h-16 items-center justify-between gap-4 bg-[#006bff] px-4 text-start text-lg font-[450] tracking-[-0.03em] whitespace-nowrap text-white transition-colors outline-none hover:bg-[#0059d6] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[#006bff] max-[359px]:px-3 max-[359px]:text-base sm:h-20 sm:px-8 sm:text-2xl"
               >
                 Copy Prompt
               </CopyPromptButton>
@@ -186,13 +186,6 @@ export default function HomePage() {
               className="flex-1"
             >
               <SelectBlueprint />
-              <Title
-                id="inside-a-select"
-                max={20}
-                className="-me-[0.05em] self-end text-end"
-              >
-                Inside a Select.
-              </Title>
             </Poster>
           </div>
         </div>
