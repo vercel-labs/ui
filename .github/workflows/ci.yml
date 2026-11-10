@@ -63,6 +63,11 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
+      # Each framework's own lint rules. Errors from before this check ran are
+      # listed in eslint-suppressions.json, so only new ones fail.
+      - name: Framework lint
+        run: pnpm lint:idioms
+
   unit:
     name: Unit tests
     needs: plan

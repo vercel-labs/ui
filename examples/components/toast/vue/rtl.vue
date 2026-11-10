@@ -22,14 +22,12 @@ const toast = createToaster()
       إظهار الإشعار
     </button>
     <ToastRegion :toaster="toast">
-      <template #default="{ toast: item }">
-        <Toast>
-          <div data-slot="stack">
-            <ToastTitle />
-            <ToastDescription />
-          </div>
-        </Toast>
-      </template>
+      <Toast>
+        <div data-slot="stack">
+          <ToastTitle />
+          <ToastDescription />
+        </div>
+      </Toast>
     </ToastRegion>
   </div>
 </template>

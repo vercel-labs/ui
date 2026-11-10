@@ -5,8 +5,8 @@ import vue from "eslint-plugin-vue"
 import tseslint from "typescript-eslint"
 
 // Each framework's own rules, on that framework's code only. Prettier owns layout and
-// tsc owns types, so their rules stay off. Examples are single-file demos, so Vue's
-// multi-word name rule, written for app components, is off too.
+// tsc owns types, so their rules stay off. So do rules written for apps: Vue's
+// multi-word names, and SvelteKit's `resolve()` for links.
 
 const react = [
   "packages/react/src/**/*.{ts,tsx}",
@@ -58,6 +58,7 @@ const config = [
   {
     files: svelteFiles,
     languageOptions: { parserOptions: { parser: tseslint.parser } },
+    rules: { "svelte/no-navigation-without-resolve": "off" },
   },
 ]
 

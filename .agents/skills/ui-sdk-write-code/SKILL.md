@@ -62,7 +62,7 @@ pnpm --filter examples build   # when you touched examples
 pnpm test:pr                   # the specs your change reaches
 ```
 
-Then run each framework's own lint rules on the files you touched: `npx eslint <files>` (`pnpm lint:idioms` runs them on the whole repo). Fix what each one reports and run it again until all pass.
+Then run each framework's own lint rules on the files you touched: `npx eslint <files>` (`pnpm lint:idioms` runs them on the whole repo, as CI does). Fix what each one reports and run it again until all pass. Older errors are listed in `eslint-suppressions.json`; when you fix one, run `pnpm lint:idioms --prune-suppressions`.
 
 ## 5. Read it cold
 
