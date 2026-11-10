@@ -187,6 +187,7 @@ html > body[data-scroll-locked] {
 html {
   background: var(--canvas);
   color: var(--foreground);
+  -webkit-tap-highlight-color: transparent;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -366,6 +367,41 @@ article [data-variant="flat"] {
       position: absolute;
       inset: min(0px, calc((100% - 44px) / 2));
     }
+  }
+}
+
+/* Touch screens have no hover, so links and buttons dim while a finger is on them.
+   The examples and the homepage demos keep their own look. */
+@layer components {
+  @media (hover: none) {
+    :where(a[href], button, summary, [role="option"]):not(
+        :disabled,
+        [data-example] *,
+        [data-poster] *,
+        [data-press]
+      ):active {
+      opacity: 0.6;
+    }
+  }
+}
+
+/* Icon buttons grow under the finger and spring back when it lifts. */
+@media (hover: none) {
+  [data-press="grow"] {
+    transition-property: color, background-color, scale;
+    transition-duration: 400ms;
+    transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  [data-press="grow"]:active {
+    scale: 1.12;
+    transition-duration: 150ms;
+    transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
+  }
+}
+
+@media (hover: none) and (prefers-reduced-motion: reduce) {
+  [data-press="grow"] {
+    transition-property: color, background-color;
   }
 }
 

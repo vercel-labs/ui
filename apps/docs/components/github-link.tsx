@@ -1,12 +1,19 @@
 import { cn } from "cn"
 
-function GitHubLink({ className }: { className?: string }) {
+function GitHubLink({
+  grow,
+  className,
+}: {
+  grow?: boolean
+  className?: string
+}) {
   return (
     <a
       href="https://github.com/vercel-labs/ui"
       target="_blank"
       rel="noreferrer"
       aria-label="GitHub"
+      data-press={grow ? "grow" : undefined}
       className={cn(
         "hit-area inline-flex size-8 items-center justify-center rounded-2xl text-subtle outline-none transition-colors hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/30",
         className

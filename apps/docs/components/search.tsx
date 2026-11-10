@@ -121,16 +121,19 @@ function SearchTrigger({
   label = "Search",
   shortcut,
   icon = true,
+  grow,
   className,
 }: {
   label?: string
   shortcut?: boolean
   icon?: boolean
+  grow?: boolean
   className?: string
 }) {
   return (
     <DialogTrigger
       controller={searchDialog}
+      data-press={grow ? "grow" : undefined}
       shortcut={shortcut ? "mod+k" : undefined}
       className={
         className ??
