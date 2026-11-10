@@ -169,6 +169,8 @@ type State = {
 
 const noPositions: Record<string, number> = {}
 
+const itemSelector = '[data-slot="chronology-item"]'
+
 const fromOptions = (options: ChronologyOptions) => ({
   orientation: orientationOf(options.orientation, "vertical"),
   feed: !!options.feed,
@@ -369,12 +371,22 @@ const chronologyPrimitive = /* @__PURE__ */ definePrimitive({
         if (typeof MutationObserver === "undefined") {
           return unsubscribe
         }
-        // Events moved in the page, like a list sorted newest first, change
-        // places without binding again. The roving group sorts again first.
-        const observer = new MutationObserver(() =>
-          queueMicrotask(api.internal.measure)
-        )
-        observer.observe(el, { childList: true })
+        // Events moved in the page, like a list sorted newest first, change places
+        // without binding again, also inside a wrapper. The roving group sorts again first.
+        const observer = new MutationObserver((records) => {
+          const moved = records.some(({ addedNodes }) =>
+            [...addedNodes].some(
+              (node) =>
+                node instanceof Element &&
+                (node.matches(itemSelector) ||
+                  !!node.querySelector(itemSelector))
+            )
+          )
+          if (moved) {
+            queueMicrotask(api.internal.measure)
+          }
+        })
+        observer.observe(el, { childList: true, subtree: true })
         return () => {
           observer.disconnect()
           unsubscribe()

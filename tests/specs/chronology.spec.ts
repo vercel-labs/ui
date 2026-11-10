@@ -287,6 +287,36 @@ test.describe("a feed", () => {
     await expect(shipped).toHaveAttribute("aria-setsize", "5")
   })
 
+  test("articles moved inside a wrapper take their new places", async ({
+    page,
+  }) => {
+    await chronology(page, "feed").evaluate((root) => {
+      const wrapper = root.ownerDocument.createElement("div")
+      wrapper.append(...root.querySelectorAll('[data-slot="chronology-item"]'))
+      root.append(wrapper)
+    })
+    await expect(eventNamed(page, "Shipped", "article")).toHaveAttribute(
+      "aria-posinset",
+      "3"
+    )
+    await chronology(page, "feed").evaluate((root) => {
+      const items = root.querySelectorAll('[data-slot="chronology-item"]')
+      items[0].before(items[items.length - 1])
+    })
+    const delivered = eventNamed(page, "Delivered", "article")
+    await expect(delivered).toHaveAttribute("aria-posinset", "1")
+    await expect(delivered).toHaveAttribute("data-first", "")
+    await expect(eventNamed(page, "Shipped", "article")).toHaveAttribute(
+      "aria-posinset",
+      "4"
+    )
+    expect(
+      await delivered.evaluate((el) =>
+        el.style.getPropertyValue("--chronology-index")
+      )
+    ).toBe("0")
+  })
+
   test("Page Down and Page Up move between articles", async ({ page }) => {
     await eventNamed(page, "Packed", "article").focus()
     await page.keyboard.press("PageDown")
