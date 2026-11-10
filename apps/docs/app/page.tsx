@@ -116,8 +116,54 @@ export default function HomePage() {
           interfaces.
         </h1>
         <div className="mt-8 grid grid-cols-1 gap-3 sm:mt-10 lg:grid-cols-2 lg:gap-4">
+          <Poster
+            fig="FIG. 01"
+            head={"WHAT IS UI SDK?\nTHE SHORT VERSION"}
+            tone="gray"
+            pattern="rings"
+            body="gap-10"
+          >
+            <p className="-ms-[0.04em] text-[length:clamp(2.75rem,17cqi,6.5rem)] leading-[0.82] font-[450] tracking-[-0.06em]">
+              /wait-what
+            </p>
+            <div className="flex max-w-[46rem] min-w-0 flex-col items-start gap-5 text-xl leading-[1.5] tracking-[-0.02em] text-pretty text-foreground 2xl:text-[1.375rem] [&_code]:border [&_code]:border-foreground/20 [&_code]:px-1 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-[0.8em] [&_code]:whitespace-nowrap [&_code]:text-foreground">
+              <p className="text-2xl leading-[1.4] tracking-[-0.025em] sm:leading-[1.3] 2xl:text-[1.75rem]">
+                Say we give an agent a Select component. It can build a Select.
+                Makes sense, right?
+              </p>
+              <p>
+                But what if, instead, we gave it the pieces that make up a
+                Select? The popup (<code>createPopup</code>), choosing from the
+                list (<code>createSelection</code>), and finding an option by
+                typing (<code>createTypeahead</code>).
+              </p>
+              <p>
+                Now not only can it build a Select, but it can build an
+                autocomplete, a combobox or even a new component we haven’t
+                thought of yet.
+              </p>
+              <p className="flex items-center gap-2">
+                That’s
+                <span className="flex items-center">
+                  <Logo
+                    role="img"
+                    aria-hidden={false}
+                    aria-label="UI SDK"
+                    focusable="false"
+                    className="inline-block h-[1em] w-auto"
+                  />
+                  .
+                </span>
+              </p>
+              <p>
+                We abstracted the complex interactions of user interfaces into
+                reusable behaviors. And we taught agents how to build and how to
+                use them.
+              </p>
+            </div>
+          </Poster>
           <div className="flex flex-col gap-3 max-lg:contents lg:gap-4">
-            <div className="grid gap-3 sm:grid-cols-2 lg:gap-4">
+            <div className="grid gap-3 max-lg:order-first sm:grid-cols-2 lg:gap-4">
               <Link
                 href="/docs"
                 className="group/docs flex h-16 items-center justify-between gap-4 bg-foreground px-6 text-xl font-[450] tracking-[-0.03em] whitespace-nowrap text-background transition-colors outline-none hover:bg-foreground/85 focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[#006bff] sm:h-20 sm:px-8 sm:text-2xl"
@@ -132,69 +178,23 @@ export default function HomePage() {
               </CopyPromptButton>
             </div>
             <Poster
-              fig="FIG. 01"
-              head={"WHAT IS UI SDK?\nTHE SHORT VERSION"}
-              tone="gray"
-              pattern="rings"
-              body="gap-10"
+              fig="FIG. 02"
+              head={"WHAT'S INSIDE A SELECT\nPICK A PART BELOW TO FIND IT"}
+              tone="white"
+              pattern="blueprint"
+              body="justify-between gap-8"
               className="flex-1"
             >
-              <p className="-ms-[0.04em] text-[length:clamp(2.75rem,17cqi,6.5rem)] leading-[0.82] font-[450] tracking-[-0.06em]">
-                /wait-what
-              </p>
-              <div className="flex max-w-[46rem] min-w-0 flex-col items-start gap-5 text-xl leading-[1.5] tracking-[-0.02em] text-pretty text-foreground 2xl:text-[1.375rem] [&_code]:border [&_code]:border-foreground/20 [&_code]:px-1 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-[0.8em] [&_code]:whitespace-nowrap [&_code]:text-foreground">
-                <p className="text-2xl leading-[1.4] tracking-[-0.025em] sm:leading-[1.3] 2xl:text-[1.75rem]">
-                  Say we give an agent a Select component. It can build a
-                  Select. Makes sense, right?
-                </p>
-                <p>
-                  But what if, instead, we gave it the pieces that make up a
-                  Select? The popup (<code>createPopup</code>), choosing from
-                  the list (<code>createSelection</code>), and finding an option
-                  by typing (<code>createTypeahead</code>).
-                </p>
-                <p>
-                  Now not only can it build a Select, but it can build an
-                  autocomplete, a combobox or even a new component we haven’t
-                  thought of yet.
-                </p>
-                <p className="flex items-center gap-2">
-                  That’s
-                  <span className="flex items-center">
-                    <Logo
-                      role="img"
-                      aria-hidden={false}
-                      aria-label="UI SDK"
-                      focusable="false"
-                      className="inline-block h-[1em] w-auto"
-                    />
-                    .
-                  </span>
-                </p>
-                <p>
-                  We abstracted the complex interactions of user interfaces into
-                  reusable behaviors. And we taught agents how to build and how
-                  to use them.
-                </p>
-              </div>
+              <SelectBlueprint />
+              <Title
+                id="inside-a-select"
+                max={20}
+                className="-me-[0.05em] self-end text-end"
+              >
+                Inside a Select.
+              </Title>
             </Poster>
           </div>
-          <Poster
-            fig="FIG. 02"
-            head={"WHAT'S INSIDE A SELECT\nPICK A PART BELOW TO FIND IT"}
-            tone="white"
-            pattern="blueprint"
-            body="justify-between gap-8"
-          >
-            <SelectBlueprint />
-            <Title
-              id="inside-a-select"
-              max={20}
-              className="-me-[0.05em] self-end text-end"
-            >
-              Inside a Select.
-            </Title>
-          </Poster>
         </div>
         <Rule className="mt-20 sm:mt-28" />
         <div className="flex flex-col gap-4 pt-3 sm:gap-5 sm:pt-5">
