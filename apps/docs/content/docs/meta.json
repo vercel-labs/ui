@@ -2,6 +2,7 @@
   "pages": [
     "core",
     "agents",
+    "guides",
     "react",
     "vue",
     "svelte",

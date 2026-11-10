@@ -1,10 +1,11 @@
 import { frameworkIds, isFramework, type Framework } from "./frameworks"
 
-// The docs' sections: Core and Agents, which no framework changes, then one per framework.
+// The docs' sections: Core, Agents and Guides, which no framework changes, then one per framework.
 
 const sharedSections = {
   core: "Core",
   agents: "Agents",
+  guides: "Guides",
 } as const
 
 type Section = keyof typeof sharedSections | Framework

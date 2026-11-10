@@ -1,0 +1,617 @@
+---
+title: Build a Component with UI SDK
+description: Build a reactions bar, then add state, arrow keys and accessibility one step at a time.
+---
+
+Let's build a reactions bar, like the one under a chat message. Press a reaction to add it, and press it again to take it back.
+
+<ComponentExample
+  name="guides/reactions"
+  caption="Press a reaction to toggle it. Focus one, then use Left and Right to move between them."
+  hideCode={true}
+/>
+
+We'll start with the parts, then add one thing at a time: state, arrow keys and accessibility. The examples on this page are already styled so you can see each change. We'll write those styles near the end.
+
+<Steps>
+
+## Install
+
+Start by installing `@ui-sdk/core` and the package for your framework.
+
+<FrameworkContent value="react">
+
+```bash
+npm add @ui-sdk/core @ui-sdk/react
+```
+
+</FrameworkContent>
+<FrameworkContent value="vue">
+
+```bash
+npm add @ui-sdk/core @ui-sdk/vue
+```
+
+</FrameworkContent>
+<FrameworkContent value="svelte">
+
+```bash
+npm add @ui-sdk/core @ui-sdk/svelte
+```
+
+</FrameworkContent>
+<FrameworkContent value="solid">
+
+```bash
+npm add @ui-sdk/core @ui-sdk/solid
+```
+
+</FrameworkContent>
+<FrameworkContent value="web-components">
+
+```bash
+npm add @ui-sdk/core @ui-sdk/web
+```
+
+</FrameworkContent>
+
+## Define the Primitive
+
+A **primitive** describes a component: its parts, its state and what it does. Create `lib/reactions.ts` and list the parts:
+
+```ts title="lib/reactions.ts"
+import { definePrimitive } from "@ui-sdk/core"
+
+const reactions = definePrimitive({
+  name: "reactions",
+  state: () => ({}),
+  api: () => ({}),
+  slots: (slot) => ({
+    root: slot({}),
+    reaction: slot<{ value: string }>({
+      props: { value: "string" },
+      attrs: () => ({ type: "button" }),
+    }),
+  }),
+})
+
+export { reactions }
+```
+
+- `name` names the component. The root's `data-slot` is the name itself, `reactions`, and every other part's starts with it, like `reactions-reaction`.
+- `state` and `api` are empty for now. We'll fill them in soon.
+- `slots` lists the parts: `root` around the bar, and a `reaction` for each button.
+- `props` lets each reaction take a `value`, like `"heart"`, so the bar can tell them apart.
+
+## Render the Parts
+
+`createParts` turns each slot into a component you can render. The object says which element each one renders: a `<div>` for the root and a `<button>` for each reaction. With web components, it names a custom element for each part instead.
+
+<FrameworkContent value="react">
+
+```tsx title="components/message-reactions.tsx"
+"use client"
+
+import { createParts } from "@ui-sdk/react/primitive"
+import { reactions } from "@/lib/reactions"
+
+const { Root: Reactions, Reaction } = createParts(reactions, {
+  root: "div",
+  reaction: "button",
+})
+
+function MessageReactions() {
+  return (
+    <Reactions>
+      <Reaction value="thumbs-up">👍</Reaction>
+      <Reaction value="heart">❤️</Reaction>
+      <Reaction value="laugh">😂</Reaction>
+      <Reaction value="celebrate">🎉</Reaction>
+    </Reactions>
+  )
+}
+
+export { MessageReactions }
+```
+
+</FrameworkContent>
+<FrameworkContent value="vue">
+
+Create the parts once, in their own module:
+
+```ts title="components/reactions.ts"
+import { createParts } from "@ui-sdk/vue/primitive"
+import { reactions } from "@/lib/reactions"
+
+const { Root: Reactions, Reaction } = createParts(reactions, {
+  root: "div",
+  reaction: "button",
+})
+
+export { Reaction, Reactions }
+```
+
+Then use them in a component:
+
+```vue title="components/MessageReactions.vue"
+<script setup lang="ts">
+import { Reaction, Reactions } from "./reactions"
+</script>
+
+<template>
+  <Reactions>
+    <Reaction value="thumbs-up">👍</Reaction>
+    <Reaction value="heart">❤️</Reaction>
+    <Reaction value="laugh">😂</Reaction>
+    <Reaction value="celebrate">🎉</Reaction>
+  </Reactions>
+</template>
+```
+
+</FrameworkContent>
+<FrameworkContent value="svelte">
+
+```svelte title="components/MessageReactions.svelte"
+<script lang="ts">
+  import { createParts } from "@ui-sdk/svelte/primitive"
+  import { reactions } from "../lib/reactions"
+
+  const { Root: Reactions, Reaction } = createParts(reactions, {
+    root: "div",
+    reaction: "button",
+  })
+</script>
+
+<Reactions>
+  <Reaction value="thumbs-up">👍</Reaction>
+  <Reaction value="heart">❤️</Reaction>
+  <Reaction value="laugh">😂</Reaction>
+  <Reaction value="celebrate">🎉</Reaction>
+</Reactions>
+```
+
+</FrameworkContent>
+<FrameworkContent value="solid">
+
+```tsx title="components/message-reactions.tsx"
+import { createParts } from "@ui-sdk/solid/primitive"
+import { reactions } from "@/lib/reactions"
+
+const { Root: Reactions, Reaction } = createParts(reactions, {
+  root: "div",
+  reaction: "button",
+})
+
+function MessageReactions() {
+  return (
+    <Reactions>
+      <Reaction value="thumbs-up">👍</Reaction>
+      <Reaction value="heart">❤️</Reaction>
+      <Reaction value="laugh">😂</Reaction>
+      <Reaction value="celebrate">🎉</Reaction>
+    </Reactions>
+  )
+}
+
+export { MessageReactions }
+```
+
+</FrameworkContent>
+<FrameworkContent value="web-components">
+
+Register an element for each part from your app's browser entry point. `wrappedButton` puts each reaction's behavior on the `<button>` inside it:
+
+```ts title="components/message-reactions.ts"
+import { createParts, wrappedButton } from "@ui-sdk/web"
+import { reactions } from "@/lib/reactions"
+
+createParts(reactions, {
+  root: "my-reactions",
+  reaction: { tag: "my-reaction", target: wrappedButton },
+})
+```
+
+Then use the elements in your HTML:
+
+```html title="index.html"
+<my-reactions>
+  <my-reaction value="thumbs-up">
+    <button>👍</button>
+  </my-reaction>
+  <my-reaction value="heart">
+    <button>❤️</button>
+  </my-reaction>
+  <my-reaction value="laugh">
+    <button>😂</button>
+  </my-reaction>
+  <my-reaction value="celebrate">
+    <button>🎉</button>
+  </my-reaction>
+</my-reactions>
+```
+
+</FrameworkContent>
+
+You'll see four buttons in a row. Each one has a `data-slot`, like `data-slot="reactions-reaction"`, but pressing it does nothing yet.
+
+## Add State
+
+Next, let's remember which reactions you picked. Four things change in `lib/reactions.ts`:
+
+```ts title="lib/reactions.ts" {5-15,20,22-24}
+import { definePrimitive } from "@ui-sdk/core"
+
+const reactions = definePrimitive({
+  name: "reactions",
+  state: () => ({ picked: [] as string[] }),
+  api: (context) => ({
+    toggle: (value: string) => {
+      const { picked } = context.store.get()
+      context.store.set({
+        picked: picked.includes(value)
+          ? picked.filter((item) => item !== value)
+          : [...picked, value],
+      })
+    },
+  }),
+  slots: (slot) => ({
+    root: slot({}),
+    reaction: slot<{ value: string }>({
+      props: { value: "string" },
+      attrs: (state, part) => ({
+        type: "button",
+        "aria-pressed": String(state.picked.includes(part.key)),
+      }),
+      press: ({ api, key }) => api.toggle(key),
+    }),
+  }),
+})
+
+export { reactions }
+```
+
+- `state` holds `picked`, the values of the reactions you picked. It starts empty.
+- `api` defines `toggle`, which adds a value to `picked`, or takes it out if it's already there.
+- `press` calls `toggle` with the reaction's own value. Inside a slot, `key` is the part's `value`.
+- `attrs` turns state into attributes. A picked reaction gets `aria-pressed="true"`, which tells screen readers it's on and gives you something to style.
+
+<ComponentExample
+  name="guides/reactions-state"
+  caption="Press a reaction to pick it, and press it again to take it back. Then press Tab: focus stops on every reaction."
+  hideCode={true}
+/>
+
+## Move with the Arrow Keys
+
+A row of buttons like this should be a single stop for the Tab key. Once you're in, the arrow keys move between them.
+
+That's a **behavior**, one of the building blocks in `@ui-sdk/core`. `createRovingFocus` gives a group of parts one Tab stop and moves focus with the arrow keys. Add it to `lib/reactions.ts`:
+
+```ts title="lib/reactions.ts" {1,5-8,10-14,31,34-41}
+import { createRovingFocus, definePrimitive } from "@ui-sdk/core"
+
+const reactions = definePrimitive({
+  name: "reactions",
+  state: () => ({
+    picked: [] as string[],
+    focused: null as string | null,
+  }),
+  api: (context) => ({
+    roving: createRovingFocus(context, {
+      slot: "reaction",
+      key: "focused",
+      orientation: () => "horizontal",
+    }),
+    toggle: (value: string) => {
+      const { picked } = context.store.get()
+      context.store.set({
+        picked: picked.includes(value)
+          ? picked.filter((item) => item !== value)
+          : [...picked, value],
+      })
+    },
+  }),
+  slots: (slot) => ({
+    root: slot({}),
+    reaction: slot<{ value: string }>({
+      props: { value: "string" },
+      attrs: (state, part) => ({
+        type: "button",
+        "aria-pressed": String(state.picked.includes(part.key)),
+        tabindex: part.api.roving.tabIndex(state, part),
+      }),
+      press: ({ api, key }) => api.toggle(key),
+      on: {
+        keydown: (event, { el, api }) => {
+          if (el) {
+            api.roving.keydown(event, el)
+          }
+        },
+      },
+      bind: (el, part) => part.api.roving.bind(el, part),
+    }),
+  }),
+})
+
+export { reactions }
+```
+
+- `focused` is a new piece of state. `createRovingFocus` keeps the value of the reaction with the Tab stop there.
+- `slot` and `key` say which parts to move between and where to keep the stop. `orientation` picks Left and Right.
+- `tabIndex` gives the stop `0` and every other reaction `-1`.
+- `keydown` moves focus when you press an arrow key, and `bind` joins each reaction to the group.
+
+<ComponentExample
+  name="guides/reactions-keyboard"
+  caption="Press Tab to focus the bar, then use Left and Right to move. Home and End jump to the first and last reaction. Press Space to toggle."
+  hideCode={true}
+/>
+
+Home and End come with `createRovingFocus`, and so does right to left: on a right-to-left page, Left and Right swap on their own.
+
+## Make It Accessible
+
+The bar works with a mouse and a keyboard. Now let's tell screen readers what it is. A row of buttons with one Tab stop is a **toolbar**. Give the root that role:
+
+```ts title="lib/reactions.ts" {25-28}
+import { createRovingFocus, definePrimitive } from "@ui-sdk/core"
+
+const reactions = definePrimitive({
+  name: "reactions",
+  state: () => ({
+    picked: [] as string[],
+    focused: null as string | null,
+  }),
+  api: (context) => ({
+    roving: createRovingFocus(context, {
+      slot: "reaction",
+      key: "focused",
+      orientation: () => "horizontal",
+    }),
+    toggle: (value: string) => {
+      const { picked } = context.store.get()
+      context.store.set({
+        picked: picked.includes(value)
+          ? picked.filter((item) => item !== value)
+          : [...picked, value],
+      })
+    },
+  }),
+  slots: (slot) => ({
+    root: slot({
+      role: "toolbar",
+      keys: { none: "Each reaction handles its own arrow keys." },
+    }),
+    reaction: slot<{ value: string }>({
+      props: { value: "string" },
+      attrs: (state, part) => ({
+        type: "button",
+        "aria-pressed": String(state.picked.includes(part.key)),
+        tabindex: part.api.roving.tabIndex(state, part),
+      }),
+      press: ({ api, key }) => api.toggle(key),
+      on: {
+        keydown: (event, { el, api }) => {
+          if (el) {
+            api.roving.keydown(event, el)
+          }
+        },
+      },
+      bind: (el, part) => part.api.roving.bind(el, part),
+    }),
+  }),
+})
+
+export { reactions }
+```
+
+- `role` says what the part is. Core writes it for you.
+- `keys` says who handles the arrow keys. Each role asks for what its pattern needs, so a toolbar without `keys` is a type error. Here, each reaction handles its own keys, so `none` says why the root doesn't.
+
+An emoji on its own doesn't make a good name, so give each reaction an `aria-label`, and give the bar one too:
+
+<FrameworkContent value="react">
+
+```tsx title="components/message-reactions.tsx" {13-14,17,20,23}
+"use client"
+
+import { createParts } from "@ui-sdk/react/primitive"
+import { reactions } from "@/lib/reactions"
+
+const { Root: Reactions, Reaction } = createParts(reactions, {
+  root: "div",
+  reaction: "button",
+})
+
+function MessageReactions() {
+  return (
+    <Reactions aria-label="Reactions">
+      <Reaction value="thumbs-up" aria-label="Thumbs up">
+        👍
+      </Reaction>
+      <Reaction value="heart" aria-label="Heart">
+        ❤️
+      </Reaction>
+      <Reaction value="laugh" aria-label="Laugh">
+        😂
+      </Reaction>
+      <Reaction value="celebrate" aria-label="Celebrate">
+        🎉
+      </Reaction>
+    </Reactions>
+  )
+}
+
+export { MessageReactions }
+```
+
+</FrameworkContent>
+<FrameworkContent value="vue">
+
+```vue title="components/MessageReactions.vue" {6-10}
+<script setup lang="ts">
+import { Reaction, Reactions } from "./reactions"
+</script>
+
+<template>
+  <Reactions aria-label="Reactions">
+    <Reaction value="thumbs-up" aria-label="Thumbs up">👍</Reaction>
+    <Reaction value="heart" aria-label="Heart">❤️</Reaction>
+    <Reaction value="laugh" aria-label="Laugh">😂</Reaction>
+    <Reaction value="celebrate" aria-label="Celebrate">🎉</Reaction>
+  </Reactions>
+</template>
+```
+
+</FrameworkContent>
+<FrameworkContent value="svelte">
+
+```svelte title="components/MessageReactions.svelte" {11-15}
+<script lang="ts">
+  import { createParts } from "@ui-sdk/svelte/primitive"
+  import { reactions } from "../lib/reactions"
+
+  const { Root: Reactions, Reaction } = createParts(reactions, {
+    root: "div",
+    reaction: "button",
+  })
+</script>
+
+<Reactions aria-label="Reactions">
+  <Reaction value="thumbs-up" aria-label="Thumbs up">👍</Reaction>
+  <Reaction value="heart" aria-label="Heart">❤️</Reaction>
+  <Reaction value="laugh" aria-label="Laugh">😂</Reaction>
+  <Reaction value="celebrate" aria-label="Celebrate">🎉</Reaction>
+</Reactions>
+```
+
+</FrameworkContent>
+<FrameworkContent value="solid">
+
+```tsx title="components/message-reactions.tsx" {11-12,15,18,21}
+import { createParts } from "@ui-sdk/solid/primitive"
+import { reactions } from "@/lib/reactions"
+
+const { Root: Reactions, Reaction } = createParts(reactions, {
+  root: "div",
+  reaction: "button",
+})
+
+function MessageReactions() {
+  return (
+    <Reactions aria-label="Reactions">
+      <Reaction value="thumbs-up" aria-label="Thumbs up">
+        👍
+      </Reaction>
+      <Reaction value="heart" aria-label="Heart">
+        ❤️
+      </Reaction>
+      <Reaction value="laugh" aria-label="Laugh">
+        😂
+      </Reaction>
+      <Reaction value="celebrate" aria-label="Celebrate">
+        🎉
+      </Reaction>
+    </Reactions>
+  )
+}
+
+export { MessageReactions }
+```
+
+</FrameworkContent>
+<FrameworkContent value="web-components">
+
+```html title="index.html" {1,3,6,9,12}
+<my-reactions aria-label="Reactions">
+  <my-reaction value="thumbs-up">
+    <button aria-label="Thumbs up">👍</button>
+  </my-reaction>
+  <my-reaction value="heart">
+    <button aria-label="Heart">❤️</button>
+  </my-reaction>
+  <my-reaction value="laugh">
+    <button aria-label="Laugh">😂</button>
+  </my-reaction>
+  <my-reaction value="celebrate">
+    <button aria-label="Celebrate">🎉</button>
+  </my-reaction>
+</my-reactions>
+```
+
+</FrameworkContent>
+
+That's the bar at the top of this page. A screen reader announces it as the Reactions toolbar, then reads each reaction by name, and says whether it's pressed.
+
+## Style It
+
+Parts render without styles. Use `data-slot` to pick a part, and `aria-pressed` to style a picked reaction:
+
+```css
+[data-slot="reactions"] {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border: 1px solid #e5e5e5;
+  border-radius: 999px;
+}
+
+[data-slot="reactions-reaction"] {
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  padding: 0.375rem 0.625rem;
+  font-size: 1.25rem;
+
+  &:hover {
+    background: #f5f5f5;
+  }
+
+  &[aria-pressed="true"] {
+    background: #fde68a;
+  }
+}
+```
+
+These attributes are the same in every framework, so the same CSS styles all five versions.
+
+## Check It
+
+`checkPattern` from `@ui-sdk/core/testing` checks a rendered component against its WAI-ARIA pattern. Pass it the bar's root element:
+
+```ts
+import { checkPattern } from "@ui-sdk/core/testing"
+
+await checkPattern(root, "toolbar")
+```
+
+It checks the toolbar's role and that it has one Tab stop, then presses the keys: the arrows, Home and End. If something is wrong, it throws one error listing every problem.
+
+</Steps>
+
+## Next
+
+You've built a component from scratch: parts, state, a behavior and accessibility. Here's where to go from here:
+
+<Cards>
+  <Card
+    title="Handle Changes"
+    href="/docs/core/kernel/handle-changes"
+    description="Tell the app when a reaction is picked, and let it control which ones are."
+  />
+  <Card
+    title="Compose Behaviors"
+    href="/docs/core/compose-behaviors"
+    description="Combine behaviors to build a star rating with shared state and arrow keys."
+  />
+  <Card
+    title="Style a Component"
+    href="/docs/core/kernel/style-a-component"
+    description="Style each part from its data-slot and state, with CSS or Tailwind."
+  />
+  <Card
+    title="Testing"
+    href="/docs/core/testing"
+    description="Test a primitive's interactions, server output and reading direction."
+  />
+</Cards>

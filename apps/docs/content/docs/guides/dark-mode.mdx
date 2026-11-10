@@ -1,0 +1,794 @@
+---
+title: Add Dark Mode
+description: Add light, dark and system color schemes to your app, saved between visits and right from the first paint.
+---
+
+Let's add dark mode to an app. People pick **Light**, **Dark** or **System**, the choice is saved, and the page shows it from the first paint. Try it on this card:
+
+<ComponentExample
+  name="guides/dark-mode"
+  caption="Choose Dark, then reload the page: the card stays dark. Choose System to follow your device's setting."
+  hideCode={true}
+/>
+
+The same steps work in any app. The last step adds a cookie for apps that render on the server.
+
+<Steps>
+
+## Install
+
+Start by installing `@ui-sdk/core` and the package for your framework.
+
+<FrameworkContent value="react">
+
+```bash
+npm add @ui-sdk/core @ui-sdk/react
+```
+
+</FrameworkContent>
+<FrameworkContent value="vue">
+
+```bash
+npm add @ui-sdk/core @ui-sdk/vue
+```
+
+</FrameworkContent>
+<FrameworkContent value="svelte">
+
+```bash
+npm add @ui-sdk/core @ui-sdk/svelte
+```
+
+</FrameworkContent>
+<FrameworkContent value="solid">
+
+```bash
+npm add @ui-sdk/core @ui-sdk/solid
+```
+
+</FrameworkContent>
+<FrameworkContent value="web-components">
+
+```bash
+npm add @ui-sdk/core @ui-sdk/web
+```
+
+</FrameworkContent>
+
+## Create the Color Scheme
+
+`createColorScheme` holds the choice: `"light"`, `"dark"` or `"system"`. Create one for your app in `lib/color-scheme.ts`:
+
+```ts title="lib/color-scheme.ts"
+import { createColorScheme, createLocalStorage } from "@ui-sdk/core"
+
+const colorScheme = createColorScheme({
+  storage: createLocalStorage("color-scheme"),
+  global: true,
+})
+
+export { colorScheme }
+```
+
+- The choice starts at `"system"`, which follows the device's setting.
+- `storage` saves the choice in localStorage, so it's still there on the next visit.
+- `global: true` puts the choice on `<html>` as `data-color-scheme`, so your whole page can use it.
+
+## Apply It
+
+Wrap your app in `Preferences`. It writes `data-color-scheme` on `<html>` and keeps it current when the choice changes.
+
+<FrameworkContent value="react">
+
+```tsx title="src/app.tsx"
+import { Preferences } from "@ui-sdk/react/preferences"
+import { colorScheme } from "@/lib/color-scheme"
+import { Home } from "@/pages/home"
+
+function App() {
+  return (
+    <Preferences preferences={[colorScheme]}>
+      <Home />
+    </Preferences>
+  )
+}
+
+export { App }
+```
+
+</FrameworkContent>
+<FrameworkContent value="vue">
+
+```vue title="src/App.vue"
+<script setup lang="ts">
+import { Preferences } from "@ui-sdk/vue/preferences"
+import { colorScheme } from "@/lib/color-scheme"
+</script>
+
+<template>
+  <Preferences :preferences="[colorScheme]">
+    <RouterView />
+  </Preferences>
+</template>
+```
+
+</FrameworkContent>
+<FrameworkContent value="svelte">
+
+```svelte title="src/App.svelte"
+<script lang="ts">
+  import { Preferences } from "@ui-sdk/svelte/preferences"
+  import { colorScheme } from "./lib/color-scheme"
+  import Home from "./Home.svelte"
+</script>
+
+<Preferences preferences={[colorScheme]}>
+  <Home />
+</Preferences>
+```
+
+</FrameworkContent>
+<FrameworkContent value="solid">
+
+```tsx title="src/app.tsx"
+import { Preferences } from "@ui-sdk/solid/preferences"
+import { colorScheme } from "@/lib/color-scheme"
+import { Home } from "@/pages/home"
+
+function App() {
+  return (
+    <Preferences preferences={[colorScheme]}>
+      <Home />
+    </Preferences>
+  )
+}
+
+export { App }
+```
+
+</FrameworkContent>
+<FrameworkContent value="web-components">
+
+```html title="index.html"
+<body>
+  <ui-preferences>
+    <main>…</main>
+  </ui-preferences>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+```
+
+```ts title="src/main.ts"
+import "@ui-sdk/web/preferences"
+import { colorScheme } from "./lib/color-scheme"
+
+document.querySelector("ui-preferences")!.preferences = [colorScheme]
+```
+
+</FrameworkContent>
+
+### Show the Choice Before Your App Loads
+
+An app that renders only in the browser, like a Vite app, applies the saved choice once its JavaScript runs. Until then, someone who picked Dark on a light device can see a light page for a moment.
+
+`preferencesScript` writes a tiny script that applies the saved choice as the page loads. Put it at the top of your HTML's `<head>`. With Vite, add it from your config:
+
+```ts title="vite.config.ts"
+import { preferencesScript } from "@ui-sdk/core"
+import { defineConfig } from "vite"
+import { colorScheme } from "./src/lib/color-scheme"
+
+export default defineConfig({
+  plugins: [
+    {
+      name: "preferences-script",
+      transformIndexHtml: () => [
+        {
+          tag: "script",
+          children: preferencesScript([colorScheme]),
+          injectTo: "head-prepend",
+        },
+      ],
+    },
+  ],
+})
+```
+
+Keep your framework's plugin in `plugins` too. The script only reads the saved choice and sets the attribute, before any of your code loads.
+
+## Add Your Colors
+
+Now give each scheme its colors. `color-scheme` tells the browser which scheme an element uses, and `light-dark()` picks a color for it:
+
+<StyleTabs>
+
+```css
+:root,
+[data-color-scheme="system"] {
+  color-scheme: light dark;
+}
+
+[data-color-scheme="light"] {
+  color-scheme: light;
+}
+
+[data-color-scheme="dark"] {
+  color-scheme: dark;
+}
+
+:root,
+[data-color-scheme] {
+  --background: light-dark(#ffffff, #0a0a0a);
+  --foreground: light-dark(#171717, #ededed);
+  --muted: light-dark(#737373, #a3a3a3);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+```
+
+```css
+@import "tailwindcss";
+
+@custom-variant dark {
+  &:where([data-color-scheme="dark"], [data-color-scheme="dark"] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where([data-color-scheme="system"], [data-color-scheme="system"] *) {
+      @slot;
+    }
+  }
+}
+```
+
+```html
+<body
+  class="bg-white text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100"
+>
+  …
+</body>
+```
+
+</StyleTabs>
+
+- With `"system"`, the browser picks the scheme from the device's setting, so the page is right even before any JavaScript runs.
+- Form controls and scrollbars follow `color-scheme` too, so they match without extra styles.
+- In Tailwind, `dark:` covers both a Dark choice and System on a dark device.
+
+## Add a Switcher
+
+Let people choose. A [Segmented Control](/docs/components/segmented-control) fits three options: read the choice with `usePreference`, and change it with `set`.
+
+<FrameworkContent value="react">
+
+```tsx title="components/color-scheme-switcher.tsx"
+"use client"
+
+import { usePreference } from "@ui-sdk/react/preferences"
+import {
+  SegmentedControl,
+  SegmentedControlIndicator,
+  SegmentedControlItem,
+} from "@ui-sdk/react/segmented-control"
+import { colorScheme } from "@/lib/color-scheme"
+
+function ColorSchemeSwitcher() {
+  const { value } = usePreference(colorScheme)
+
+  return (
+    <SegmentedControl
+      aria-label="Color scheme"
+      value={value}
+      onValueChange={(next) => next && colorScheme.set(next)}
+    >
+      <SegmentedControlIndicator />
+      <SegmentedControlItem value="light">Light</SegmentedControlItem>
+      <SegmentedControlItem value="dark">Dark</SegmentedControlItem>
+      <SegmentedControlItem value="system">System</SegmentedControlItem>
+    </SegmentedControl>
+  )
+}
+
+export { ColorSchemeSwitcher }
+```
+
+</FrameworkContent>
+<FrameworkContent value="vue">
+
+```vue title="components/ColorSchemeSwitcher.vue"
+<script setup lang="ts">
+import type { ColorSchemeValue } from "@ui-sdk/core"
+import { usePreference } from "@ui-sdk/vue/preferences"
+import {
+  SegmentedControl,
+  SegmentedControlIndicator,
+  SegmentedControlItem,
+} from "@ui-sdk/vue/segmented-control"
+import { colorScheme } from "@/lib/color-scheme"
+
+const scheme = usePreference(colorScheme)
+const choose = (next: string | null) =>
+  colorScheme.set(next as ColorSchemeValue)
+</script>
+
+<template>
+  <SegmentedControl
+    aria-label="Color scheme"
+    :value="scheme.value"
+    @value-change="choose"
+  >
+    <SegmentedControlIndicator />
+    <SegmentedControlItem value="light">Light</SegmentedControlItem>
+    <SegmentedControlItem value="dark">Dark</SegmentedControlItem>
+    <SegmentedControlItem value="system">System</SegmentedControlItem>
+  </SegmentedControl>
+</template>
+```
+
+</FrameworkContent>
+<FrameworkContent value="svelte">
+
+```svelte title="components/ColorSchemeSwitcher.svelte"
+<script lang="ts">
+  import type { ColorSchemeValue } from "@ui-sdk/core"
+  import { usePreference } from "@ui-sdk/svelte/preferences"
+  import {
+    SegmentedControl,
+    SegmentedControlIndicator,
+    SegmentedControlItem,
+  } from "@ui-sdk/svelte/segmented-control"
+  import { colorScheme } from "../lib/color-scheme"
+
+  const scheme = usePreference(colorScheme)
+</script>
+
+<SegmentedControl
+  aria-label="Color scheme"
+  value={scheme.current.value}
+  onValueChange={(next) => colorScheme.set(next as ColorSchemeValue)}
+>
+  <SegmentedControlIndicator />
+  <SegmentedControlItem value="light">Light</SegmentedControlItem>
+  <SegmentedControlItem value="dark">Dark</SegmentedControlItem>
+  <SegmentedControlItem value="system">System</SegmentedControlItem>
+</SegmentedControl>
+```
+
+</FrameworkContent>
+<FrameworkContent value="solid">
+
+```tsx title="components/color-scheme-switcher.tsx"
+import { usePreference } from "@ui-sdk/solid/preferences"
+import {
+  SegmentedControl,
+  SegmentedControlIndicator,
+  SegmentedControlItem,
+} from "@ui-sdk/solid/segmented-control"
+import { colorScheme } from "@/lib/color-scheme"
+
+function ColorSchemeSwitcher() {
+  const scheme = usePreference(colorScheme)
+
+  return (
+    <SegmentedControl
+      aria-label="Color scheme"
+      value={scheme().value}
+      onValueChange={(next) => next && colorScheme.set(next)}
+    >
+      <SegmentedControlIndicator />
+      <SegmentedControlItem value="light">Light</SegmentedControlItem>
+      <SegmentedControlItem value="dark">Dark</SegmentedControlItem>
+      <SegmentedControlItem value="system">System</SegmentedControlItem>
+    </SegmentedControl>
+  )
+}
+
+export { ColorSchemeSwitcher }
+```
+
+</FrameworkContent>
+<FrameworkContent value="web-components">
+
+```html title="index.html"
+<ui-segmented-control aria-label="Color scheme">
+  <ui-segmented-control-indicator></ui-segmented-control-indicator>
+  <ui-segmented-control-item value="light">Light</ui-segmented-control-item>
+  <ui-segmented-control-item value="dark">Dark</ui-segmented-control-item>
+  <ui-segmented-control-item value="system">System</ui-segmented-control-item>
+</ui-segmented-control>
+```
+
+```ts title="src/color-scheme-switcher.ts"
+import type { ColorSchemeValue } from "@ui-sdk/core"
+import "@ui-sdk/web/segmented-control"
+import { colorScheme } from "./lib/color-scheme"
+
+const switcher = document.querySelector("ui-segmented-control")!
+const show = () => (switcher.value = colorScheme.get().value)
+
+switcher.addEventListener("valuechange", (event) => {
+  colorScheme.set(event.detail.value as ColorSchemeValue)
+})
+show()
+colorScheme.subscribe(show)
+```
+
+</FrameworkContent>
+
+- `value` is the choice itself: `"light"`, `"dark"` or `"system"`. The color scheme also tells you the device's setting as `system`, and the scheme in use as `resolved`.
+- `set` saves the new choice, and `Preferences` updates `<html>` right away.
+- The switcher has no styles of its own. [Segmented Control](/docs/components/segmented-control) shows how to style it, indicator included.
+
+## Use a Cookie on the Server
+
+localStorage only exists in the browser. If your app renders on the server, the server can't see the choice. `Preferences` still applies it before the first paint, but anything that renders from it, like the switcher, starts at System until the page loads.
+
+A cookie travels with every request, so the server can render the saved choice from the first byte. Change `lib/color-scheme.ts` to keep the choice in a cookie:
+
+```ts title="lib/color-scheme.ts"
+import {
+  createColorScheme,
+  createCookieStorage,
+  type ColorSchemeValue,
+} from "@ui-sdk/core"
+
+function readColorScheme(cookie?: string | null) {
+  return createColorScheme({
+    storage: createCookieStorage("color-scheme", { cookie }),
+  }).get().value
+}
+
+function createAppColorScheme(value: ColorSchemeValue) {
+  return createColorScheme({
+    defaultValue: value,
+    storage: createCookieStorage("color-scheme"),
+    global: true,
+  })
+}
+
+type AppColorScheme = ReturnType<typeof createAppColorScheme>
+
+export { createAppColorScheme, readColorScheme, type AppColorScheme }
+```
+
+- `readColorScheme` reads the saved choice from a request's `Cookie` header on the server, and from `document.cookie` in the browser.
+- `createAppColorScheme` creates your app's color scheme, starting from that choice. Each request gets its own, so visitors never share one.
+- Hand your app only the choice, never the whole `Cookie` header. The header can carry other cookies, like a session, that shouldn't end up in the page.
+
+Then read the cookie where your app meets the request, and write the choice on `<html>`:
+
+<FrameworkContent value="react">
+
+With Next.js, read the request in the root layout:
+
+```tsx title="app/layout.tsx"
+import { headers } from "next/headers"
+import { readColorScheme } from "@/lib/color-scheme"
+import { ColorSchemeProvider } from "./color-scheme-provider"
+import "./globals.css"
+
+export default async function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  const colorScheme = readColorScheme((await headers()).get("cookie"))
+
+  return (
+    <html lang="en" data-color-scheme={colorScheme}>
+      <body>
+        <ColorSchemeProvider value={colorScheme}>
+          {children}
+        </ColorSchemeProvider>
+      </body>
+    </html>
+  )
+}
+```
+
+The provider creates the app's color scheme once and shares it through context:
+
+```tsx title="app/color-scheme-provider.tsx"
+"use client"
+
+import type { ColorSchemeValue } from "@ui-sdk/core"
+import { Preferences } from "@ui-sdk/react/preferences"
+import { createContext, use, useState } from "react"
+import { createAppColorScheme, type AppColorScheme } from "@/lib/color-scheme"
+
+const ColorSchemeContext = createContext<AppColorScheme | null>(null)
+
+function ColorSchemeProvider({
+  value,
+  children,
+}: {
+  value: ColorSchemeValue
+  children: React.ReactNode
+}) {
+  const [colorScheme] = useState(() => createAppColorScheme(value))
+
+  return (
+    <ColorSchemeContext value={colorScheme}>
+      <Preferences preferences={[colorScheme]}>{children}</Preferences>
+    </ColorSchemeContext>
+  )
+}
+
+function useColorScheme() {
+  const colorScheme = use(ColorSchemeContext)
+  if (!colorScheme) {
+    throw new Error("useColorScheme needs a ColorSchemeProvider above it.")
+  }
+  return colorScheme
+}
+
+export { ColorSchemeProvider, useColorScheme }
+```
+
+In the switcher, take the color scheme from context instead of importing it:
+
+```tsx
+const colorScheme = useColorScheme()
+const { value } = usePreference(colorScheme)
+```
+
+`<html>` already has the right `data-color-scheme` from the server, so it doesn't need `suppressHydrationWarning`. Reading the request's headers renders each page on request, which the cookie needs anyway.
+
+</FrameworkContent>
+<FrameworkContent value="vue">
+
+With Nuxt, give the color scheme a typed key and a composable to read it:
+
+```ts title="composables/color-scheme.ts"
+import type { InjectionKey } from "vue"
+import type { AppColorScheme } from "~/lib/color-scheme"
+
+const colorSchemeKey: InjectionKey<AppColorScheme> = Symbol("color-scheme")
+
+function useColorScheme() {
+  const colorScheme = inject(colorSchemeKey)
+  if (!colorScheme) {
+    throw new Error("useColorScheme needs app.vue to provide a color scheme.")
+  }
+  return colorScheme
+}
+
+export { colorSchemeKey, useColorScheme }
+```
+
+Then read the request in `app.vue`:
+
+```vue title="app.vue"
+<script setup lang="ts">
+import { Preferences, usePreference } from "@ui-sdk/vue/preferences"
+import { createAppColorScheme, readColorScheme } from "~/lib/color-scheme"
+
+const colorScheme = createAppColorScheme(
+  readColorScheme(useRequestHeader("cookie"))
+)
+const scheme = usePreference(colorScheme)
+
+provide(colorSchemeKey, colorScheme)
+useHead({
+  htmlAttrs: { "data-color-scheme": computed(() => scheme.value.value) },
+})
+</script>
+
+<template>
+  <Preferences :preferences="[colorScheme]">
+    <NuxtPage />
+  </Preferences>
+</template>
+```
+
+`useRequestHeader` returns the `Cookie` header on the server, and nothing in the browser, where `readColorScheme` reads `document.cookie`. `useHead` writes the choice on `<html>`. Nuxt imports `colorSchemeKey` and `useColorScheme` from `composables/` for you.
+
+In the switcher, take the color scheme from `useColorScheme()` instead of importing it:
+
+```ts
+const colorScheme = useColorScheme()
+const scheme = usePreference(colorScheme)
+```
+
+</FrameworkContent>
+<FrameworkContent value="svelte">
+
+With SvelteKit, write the choice on `<html>` from a server hook. Add a `%color-scheme%` placeholder to `src/app.html`:
+
+```html title="src/app.html"
+<!doctype html>
+<html lang="en" data-color-scheme="%color-scheme%">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    %sveltekit.head%
+  </head>
+  <body>
+    <div style="display: contents">%sveltekit.body%</div>
+  </body>
+</html>
+```
+
+Then fill it in for each request:
+
+```ts title="src/hooks.server.ts"
+import type { Handle } from "@sveltejs/kit"
+import { readColorScheme } from "$lib/color-scheme"
+
+export const handle: Handle = ({ event, resolve }) => {
+  const colorScheme = readColorScheme(event.request.headers.get("cookie"))
+  return resolve(event, {
+    transformPageChunk: ({ html }) =>
+      html.replace("%color-scheme%", colorScheme),
+  })
+}
+```
+
+Pass the choice to your root layout:
+
+```ts title="src/routes/+layout.server.ts"
+import { readColorScheme } from "$lib/color-scheme"
+import type { LayoutServerLoad } from "./$types"
+
+export const load: LayoutServerLoad = ({ request }) => ({
+  colorScheme: readColorScheme(request.headers.get("cookie")),
+})
+```
+
+The layout creates the app's color scheme and shares it through context:
+
+```svelte title="src/routes/+layout.svelte"
+<script lang="ts">
+  import { Preferences } from "@ui-sdk/svelte/preferences"
+  import { setContext } from "svelte"
+  import { createAppColorScheme } from "$lib/color-scheme"
+
+  let { data, children } = $props()
+
+  // svelte-ignore state_referenced_locally
+  const colorScheme = createAppColorScheme(data.colorScheme)
+  setContext("color-scheme", colorScheme)
+</script>
+
+<Preferences preferences={[colorScheme]}>
+  {@render children()}
+</Preferences>
+```
+
+In the switcher, take the color scheme from context instead of importing it:
+
+```ts
+import { getContext } from "svelte"
+import type { AppColorScheme } from "$lib/color-scheme"
+
+const colorScheme = getContext<AppColorScheme>("color-scheme")
+const scheme = usePreference(colorScheme)
+```
+
+</FrameworkContent>
+<FrameworkContent value="solid">
+
+Read the request on your server, and pass the choice to your app as a prop. The app creates its color scheme and shares it through context:
+
+```tsx title="src/app.tsx"
+import type { ColorSchemeValue } from "@ui-sdk/core"
+import { Preferences } from "@ui-sdk/solid/preferences"
+import type { JSX } from "@solidjs/web"
+import { createContext, useContext } from "solid-js"
+import { createAppColorScheme, type AppColorScheme } from "@/lib/color-scheme"
+
+const ColorSchemeContext = createContext<AppColorScheme>()
+
+function App(props: { colorScheme: ColorSchemeValue; children: JSX.Element }) {
+  const colorScheme = createAppColorScheme(props.colorScheme)
+
+  return (
+    <ColorSchemeContext value={colorScheme}>
+      <Preferences preferences={[colorScheme]}>{props.children}</Preferences>
+    </ColorSchemeContext>
+  )
+}
+
+const useColorScheme = () => useContext(ColorSchemeContext)
+
+export { App, useColorScheme }
+```
+
+On the server, read the cookie, render the app with it, and write the choice on `<html>`:
+
+```tsx title="src/server.tsx"
+import { generateHydrationScript, renderToString } from "@solidjs/web"
+import { App } from "./app"
+import { readColorScheme } from "./lib/color-scheme"
+import { Home } from "./pages/home"
+
+function renderPage(request: Request) {
+  const colorScheme = readColorScheme(request.headers.get("cookie"))
+  const body = renderToString(() => (
+    <App colorScheme={colorScheme}>
+      <Home />
+    </App>
+  ))
+  return `<!doctype html><html lang="en" data-color-scheme="${colorScheme}"><head>${generateHydrationScript()}</head><body><div id="app">${body}</div></body></html>`
+}
+
+export { renderPage }
+```
+
+In the browser, hydrate with `readColorScheme()`, which reads `document.cookie`:
+
+```tsx
+<App colorScheme={readColorScheme()}>
+  <Home />
+</App>
+```
+
+In the switcher, take the color scheme from context instead of importing it:
+
+```tsx
+const colorScheme = useColorScheme()
+const scheme = usePreference(colorScheme)
+```
+
+</FrameworkContent>
+<FrameworkContent value="web-components">
+
+On your server, read the cookie and write the choice on `<html>`:
+
+```ts title="server.ts"
+import { readColorScheme } from "./src/lib/color-scheme"
+
+const colorScheme = readColorScheme(request.headers.get("cookie"))
+const page = `<!doctype html>
+<html lang="en" data-color-scheme="${colorScheme}">
+  <body>
+    <ui-preferences>…</ui-preferences>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>`
+```
+
+In the browser, create the app's color scheme from the cookie:
+
+```ts title="src/lib/app-color-scheme.ts"
+import { createAppColorScheme, readColorScheme } from "./color-scheme"
+
+const colorScheme = createAppColorScheme(readColorScheme())
+
+export { colorScheme }
+```
+
+Then import `colorScheme` from `./lib/app-color-scheme` in `src/main.ts` and the switcher, where they imported it from `./lib/color-scheme`.
+
+</FrameworkContent>
+
+Apps that only render in the browser, like a Vite app, keep localStorage and the script from [Apply It](#apply-it).
+
+## Check It
+
+Try each of these in your app:
+
+- **Pick Dark and reload.** The page stays dark, with no flash of light while it loads.
+- **Pick System and change your device's setting.** The page follows it right away.
+
+For a server-rendered app, view the page's source: `<html>` already carries the `data-color-scheme` you picked.
+
+</Steps>
+
+## Next
+
+<Cards>
+  <Card
+    title="Preferences"
+    href="/docs/core/behaviors/preferences"
+    description="Save other choices the same way, like density or a sidebar that stays open."
+  />
+  <Card
+    title="Build a Component with UI SDK"
+    href="/docs/guides/build-a-component"
+    description="Build a reactions bar, then add state, arrow keys and accessibility."
+  />
+</Cards>

@@ -205,10 +205,12 @@ function ExamplePreview({
           </React.Suspense>
         </ExampleBoundary>
       ) : (
+        // A prerendered Preferences script writes its saved value before hydration.
         <div
           ref={host}
           inert={!live}
           aria-hidden={!live || undefined}
+          suppressHydrationWarning
           dangerouslySetInnerHTML={html ? { __html: html } : undefined}
           className={content}
         />

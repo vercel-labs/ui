@@ -6,6 +6,7 @@ const menu = [
   { title: "Frameworks", href: "/docs/frameworks" },
   { title: "Components", href: "/docs/components" },
   { title: "Agents", href: "/docs/agents" },
+  { title: "Guides", href: "/docs/guides" },
   { title: "GitHub", href: "https://github.com/vercel-labs/ui" },
 ]
 

@@ -81,7 +81,7 @@ const frameworkHref = new RegExp(`^/docs/(${frameworkPages.join("|")})\\b`)
 
 // Every element MDX renders, styled here instead of with a prose plugin.
 // `framework` is the section's, for tables and examples that differ by
-// framework. Core and Agents pages have none.
+// framework, and the reader's on Guides. Core and Agents pages have none.
 function getMDXComponents(
   framework: Framework = "react",
   resolve: (href: string) => string = (href) => href
@@ -195,6 +195,15 @@ function getMDXComponents(
       </span>
     ),
     img: (props) => <img className="my-6 rounded-2xl" alt="" {...props} />,
+    // A guide's steps: each h2 inside is one, numbered down a line.
+    Steps: ({ children }: { children: ReactNode }) => (
+      <div
+        data-steps=""
+        className="relative my-8 ms-3 border-s border-border/70 ps-6 sm:ps-8 [counter-reset:step] [&>h2]:[counter-increment:step] [&>h2]:before:absolute [&>h2]:before:-start-3 [&>h2]:before:flex [&>h2]:before:size-6 [&>h2]:before:items-center [&>h2]:before:justify-center [&>h2]:before:rounded-full [&>h2]:before:border [&>h2]:before:border-border [&>h2]:before:bg-background [&>h2]:before:font-mono [&>h2]:before:text-xs [&>h2]:before:text-foreground/70 [&>h2]:before:content-[counter(step)] [&>h2:first-child]:mt-0 [&>h2]:after:hidden"
+      >
+        {children}
+      </div>
+    ),
     Cards: ({ children }: { children: ReactNode }) => (
       <div className="my-6 grid gap-3 sm:grid-cols-2">{children}</div>
     ),

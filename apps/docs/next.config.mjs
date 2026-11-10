@@ -53,11 +53,11 @@ const config = {
     ]
   },
   async rewrites() {
-    // Get Started, Core and Agents are built once per framework under /for, and
+    // Get Started, Core, Guides and Agents are built once per framework under /for, and
     // served by the reader's cookie, else React's. The pattern takes the router's
     // `.rsc` and `.segments/` requests too, and leaves `.md` and `llms.txt` alone.
     const source =
-      "/:path((?!.*(?:\\.md|/llms\\.txt)$)docs(?:/(?:core|agents)(?:[./].*)?|\\.(?:rsc|segments/.*))?)"
+      "/:path((?!.*(?:\\.md|/llms\\.txt)$)docs(?:/(?:core|guides|agents)(?:[./].*)?|\\.(?:rsc|segments/.*))?)"
     const cookie = { type: "cookie", key: "framework" }
     return {
       beforeFiles: [

@@ -12,7 +12,7 @@ export async function GET(
   _request: Request,
   { params }: RouteContext<"/api/search/[framework]">
 ) {
-  const sections = ["core", "agents", (await params).framework]
+  const sections = ["core", "agents", "guides", (await params).framework]
   const pages = source
     .getPages()
     .filter((page) => sections.includes(page.slugs[0]))

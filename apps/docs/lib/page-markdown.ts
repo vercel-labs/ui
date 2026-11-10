@@ -230,7 +230,7 @@ async function pageMarkdown(
   )
   text = await outsideCode(text, async (prose) => {
     let out = prose
-      .replace(/<\/?(?:Cards|Callout)>\n?/g, "")
+      .replace(/<\/?(?:Cards|Callout|Steps)>\n?/g, "")
       .replace(/<\/?FrameworkTabs\b[^>]*>\n?/g, "")
       .replace(
         /<Framework(?:Content|Tab)\s+value="([^"]+)">/g,

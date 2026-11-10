@@ -71,7 +71,9 @@ function DocsPage({
       >
         <MDX
           components={getMDXComponents(
-            isFramework(section) ? section : undefined,
+            isFramework(section) || section === "guides"
+              ? framework
+              : undefined,
             resolve
           )}
         />
