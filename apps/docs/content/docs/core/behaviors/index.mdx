@@ -13,24 +13,47 @@ Import helpers from `@ui-sdk/core` unless a different entrypoint is shown.
 | -------------------------------------------------------------------- | ------------------------------------------------------------------------ |
 | [`createRovingFocus`](./focus#roving-focus)                          | Gives a group one Tab stop and moves focus with the arrow keys.          |
 | [`createGridFocus`](./focus#grids)                                   | Moves focus by row and column, including cells that aren't rendered yet. |
+| [`byCell`](./focus#one-tab-stop-in-a-grid)                           | Updates only the cell focus leaves and the cell it lands on.             |
 | [`spatialMove`](./focus#spatial-focus)                               | Chooses the next item from its position on screen.                       |
 | [`nearestInDirection`](./focus#choose-a-target-without-moving-focus) | Finds the nearest item in a direction without moving focus.              |
 | [`createTypeahead`](./focus#typeahead)                               | Finds an item as someone types its name.                                 |
-| [`createInputHistory`](../text#bring-back-earlier-messages)          | Brings back earlier entries with ArrowUp and ArrowDown, like a terminal. |
-| [`isTypeaheadKey`](../text#find-an-item-by-typing)                   | Checks whether a key can be used for typeahead.                          |
-| [`labelOf`](../text#what-an-item-is-called)                          | Reads an element's label for matching typed text.                        |
 | [`createFocusRecovery`](./focus#focus-recovery)                      | Restores focus when the focused item is removed.                         |
 | [`keepFocus`](./focus#focus-that-follows-a-move)                     | Preserves focus through a change that moves an element.                  |
+| [`inputHints`](./focus#input-hints)                                  | Picks the on-screen keyboard and autofill for a kind of field.           |
+
+## Text
+
+| Helper                                                        | What It Does                                                               |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| [`createInputHistory`](../text#bring-back-earlier-messages)   | Brings back earlier entries with ArrowUp and ArrowDown, like a terminal.   |
+| [`isTypeaheadKey`](../text#find-an-item-by-typing)            | Checks whether a key can be used for typeahead.                            |
+| [`labelOf`](../text#what-an-item-is-called)                   | Reads an element's label for matching typed text.                          |
+| [`isComposing`](../text#properly-handle-input-method-editors) | Checks whether an input event is part of text that's still being composed. |
+| [`pageLocale`](../text#the-pages-language)                    | Reads the language of the page, or of one section of it.                   |
+| [`userLocale`](../text#the-pages-language)                    | Reads the browser's preferred language.                                    |
+| [`toLocale`](../text#tags-from-elsewhere)                     | Turns a tag like `en_US` into one that `Intl` accepts.                     |
+
+### Search Matching
+
+Import these helpers from `@ui-sdk/core/text-match`.
+
+| Helper                                                 | What It Does                                                  |
+| ------------------------------------------------------ | ------------------------------------------------------------- |
+| [`fuzzyScore`](../text#rank-what-someone-searches-for) | Scores how well a piece of text matches what someone typed.   |
+| [`matchRanges`](../text#highlight-what-matched)        | Finds where the typed text appears in a piece of text.        |
+| [`matchSegments`](../text#highlight-what-matched)      | Splits text into matched and unmatched pieces you can render. |
 
 ## Selection
 
-| Helper                                           | What It Does                                                     |
-| ------------------------------------------------ | ---------------------------------------------------------------- |
-| [`createSelection`](./selection#selecting-items) | Tracks selected items, including multiple selections and ranges. |
-| [`createLasso`](./selection#rectangle-selection) | Selects items touched by a rectangle drawn with the pointer.     |
-| [`createCellRange`](./selection#ranges-of-cells) | Selects a rectangular range of grid cells.                       |
-| [`cellsToText`](./selection#copy-and-paste)      | Converts cell values to text for copying.                        |
-| [`textToCells`](./selection#copy-and-paste)      | Parses pasted text into rows of cell values.                     |
+| Helper                                                | What It Does                                                     |
+| ----------------------------------------------------- | ---------------------------------------------------------------- |
+| [`createSelection`](./selection#selecting-items)      | Tracks selected items, including multiple selections and ranges. |
+| [`createLasso`](./selection#rectangle-selection)      | Selects items touched by a rectangle drawn with the pointer.     |
+| [`createCellRange`](./selection#ranges-of-cells)      | Selects a rectangular range of grid cells.                       |
+| [`byCellRange`](./selection#select-a-block)           | Updates only the cells that join or leave a range.               |
+| [`cellRangeMessage`](./selection#selecting-from-code) | Provides the default announcements for a range of cells.         |
+| [`cellsToText`](./selection#copy-and-paste)           | Converts cell values to text for copying.                        |
+| [`textToCells`](./selection#copy-and-paste)           | Parses pasted text into rows of cell values.                     |
 
 ## Drag and Drop
 
@@ -51,19 +74,20 @@ Import helpers from `@ui-sdk/core` unless a different entrypoint is shown.
 
 ## Dragging and Resizing
 
-| Helper                                                               | What It Does                                                   |
-| -------------------------------------------------------------------- | -------------------------------------------------------------- |
-| [`createMove`](./direct-manipulation#moving-in-two-dimensions)       | Moves freely positioned objects with the pointer or keyboard.  |
-| [`createResize`](./direct-manipulation#resizing-boxes)               | Resizes boxes from their edges and corners.                    |
-| [`createSwipeActions`](./direct-manipulation#swiping-rows-aside)     | Reveals actions behind a row and supports full-swipe actions.  |
-| [`createArea`](./direct-manipulation#two-dimensional-values)         | Picks a value along two axes, such as a point on a pad.        |
-| [`createSpans`](./direct-manipulation#ranges-on-tracks)              | Draws, moves, and resizes ranges on tracks.                    |
-| [`stackSpans`](./direct-manipulation#days-that-run-down)             | Places overlapping ranges in separate lanes.                   |
-| [`createPreview`](./direct-manipulation#previews)                    | Tracks a value being tried before it is chosen.                |
-| [`moveMessage`](./direct-manipulation#several-at-once)               | Provides the default announcements for changes in position.    |
-| [`resizeMessage`](./direct-manipulation#several-boxes-and-from-code) | Provides the default announcements for resizing boxes.         |
-| [`isSpanFree`](./direct-manipulation#changing-ranges-from-code)      | Checks whether a proposed range overlaps another on its track. |
-| [`spansMessage`](./direct-manipulation#changing-ranges-from-code)    | Provides the default announcements for changes to ranges.      |
+| Helper                                                               | What It Does                                                       |
+| -------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| [`createMove`](./direct-manipulation#moving-in-two-dimensions)       | Moves freely positioned objects with the pointer or keyboard.      |
+| [`createResize`](./direct-manipulation#resizing-boxes)               | Resizes boxes from their edges and corners.                        |
+| [`createSwipeActions`](./direct-manipulation#swiping-rows-aside)     | Reveals actions behind a row and supports full-swipe actions.      |
+| [`bindHold`](./direct-manipulation#pressing-and-holding)             | Runs an action once a press is held, and can repeat it while held. |
+| [`createArea`](./direct-manipulation#two-dimensional-values)         | Picks a value along two axes, such as a point on a pad.            |
+| [`createSpans`](./direct-manipulation#ranges-on-tracks)              | Draws, moves, and resizes ranges on tracks.                        |
+| [`stackSpans`](./direct-manipulation#days-that-run-down)             | Places overlapping ranges in separate lanes.                       |
+| [`createPreview`](./direct-manipulation#previews)                    | Tracks a value being tried before it is chosen.                    |
+| [`moveMessage`](./direct-manipulation#several-at-once)               | Provides the default announcements for changes in position.        |
+| [`resizeMessage`](./direct-manipulation#several-boxes-and-from-code) | Provides the default announcements for resizing boxes.             |
+| [`isSpanFree`](./direct-manipulation#changing-ranges-from-code)      | Checks whether a proposed range overlaps another on its track.     |
+| [`spansMessage`](./direct-manipulation#changing-ranges-from-code)    | Provides the default announcements for changes to ranges.          |
 
 ## Lists
 
@@ -133,12 +157,14 @@ Import these helpers from `@ui-sdk/core/gesture`.
 
 ## Preferences
 
-| Helper                                                             | What It Does                                                                      |
-| ------------------------------------------------------------------ | --------------------------------------------------------------------------------- |
-| [`createPreference`](./preferences#create-a-preference)            | Holds a choice from a list, notifies subscribers, and can save it between visits. |
-| [`createColorScheme`](./preferences#choose-a-color-scheme)         | Builds on a preference to choose light, dark, or the browser's scheme.            |
-| [`colorSchemeOf`](./preferences#browser-preferences-on-the-server) | Reads the color scheme a browser sends with a request.                            |
-| [`preferencesScript`](./preferences#server-rendering)              | Puts saved preferences on their attributes before the first paint.                |
+| Helper                                                             | What It Does                                                                       |
+| ------------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
+| [`createPreference`](./preferences#create-a-preference)            | Holds a choice from a list, notifies subscribers, and can save it between visits.  |
+| [`createColorScheme`](./preferences#choose-a-color-scheme)         | Builds on a preference to choose light, dark, or the browser's scheme.             |
+| [`colorSchemeOf`](./preferences#browser-preferences-on-the-server) | Reads the color scheme a browser sends with a request.                             |
+| [`preferencesScript`](./preferences#server-rendering)              | Puts saved preferences on their attributes before the first paint.                 |
+| [`createPointerKind`](../mobile#pointer-kind)                      | Reports whether the main pointer is a finger or a mouse, and whether it can hover. |
+| [`pointerKindOf`](../mobile#render-on-the-server)                  | Guesses the pointer kind from a request's headers.                                 |
 
 ### Storage
 
@@ -155,3 +181,81 @@ Import these helpers from `@ui-sdk/core/gesture`.
 | [`createViewport`](./canvas#panning-and-zooming)     | Pans and zooms a canvas and converts between screen and canvas coordinates. |
 | [`createConnect`](./canvas#connections)              | Tracks connections between ports with the pointer or keyboard.              |
 | [`connectMessage`](./canvas#snapping-words-and-code) | Provides the default announcements for connection steps.                    |
+
+## Platform
+
+| Helper                                                     | What It Does                                                        |
+| ---------------------------------------------------------- | ------------------------------------------------------------------- |
+| [`announce`](../platform#announcements)                    | Reads a message out to screen readers.                              |
+| [`prepareAnnouncements`](../platform#urgent-announcements) | Adds the regions screen readers listen to before the first message. |
+| [`isRTL`](../platform#direction)                           | Checks whether an element's text runs right to left.                |
+| [`matchesShortcut`](../platform#shortcuts)                 | Checks whether a key press matches a shortcut, such as `mod+b`.     |
+| [`formatShortcut`](../platform#shortcuts)                  | Writes a shortcut the way the user's platform shows it.             |
+| [`ariaKeyshortcuts`](../platform#shortcuts)                | Writes a shortcut as an `aria-keyshortcuts` value.                  |
+
+### Mobile
+
+| Helper                                                         | What It Does                                          |
+| -------------------------------------------------------------- | ----------------------------------------------------- |
+| [`bindViewport`](../mobile#follow-the-viewport)                | Follows the visible viewport and reports each change. |
+| [`bindAvoidKeyboard`](../mobile#keep-a-bar-above-the-keyboard) | Lifts an element above the on-screen keyboard.        |
+
+## Changes and History
+
+| Helper                                                                   | What It Does                                                                      |
+| ------------------------------------------------------------------------ | --------------------------------------------------------------------------------- |
+| [`createChange`](../kernel/handle-changes#changes)                       | Asks to change a state value, calling its callback first.                         |
+| [`createCommit`](../kernel/handle-changes#commits)                       | Reports the final value when an interaction ends.                                 |
+| [`dispatch`](../kernel/handle-changes#events-that-arent-state)           | Calls an action's callback, such as `onDelete`, and tells you if it was canceled. |
+| [`createHistory`](../kernel/handle-changes#undo)                         | Records snapshots of any value for undo and redo.                                 |
+| [`createController`](../kernel/handle-changes#controllers)               | Lets code outside a component call its methods.                                   |
+| [`sourceOf`](../kernel/handle-changes#how-people-are-working)            | Tells whether an event came from a mouse, touch, pen, keyboard, or code.          |
+| [`isFocusFromKeyboard`](../kernel/handle-changes#how-people-are-working) | Checks whether focus just arrived from the keyboard.                              |
+
+### Watching Changes
+
+Import these helpers from `@ui-sdk/core/observe`.
+
+| Helper                                                    | What It Does                                             |
+| --------------------------------------------------------- | -------------------------------------------------------- |
+| [`observe`](../observe#listen-for-changes)                | Calls you with every change to the components on a page. |
+| [`elementOf`](../observe#find-the-element)                | Finds the element of the component a change came from.   |
+| [`withSource`](../observe#keep-the-source-after-an-await) | Keeps a change's source across an `await`.               |
+
+## Building Blocks
+
+| Helper                                                              | What It Does                                                              |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| [`definePrimitive`](../kernel/define-a-primitive#defineprimitive)   | Defines a component's options, state, and parts once for every framework. |
+| [`idPart`](../kernel/define-a-primitive#parts-that-come-and-go)     | Escapes an item value so it can be part of an id.                         |
+| [`elements`](../kernel/define-a-primitive#reading-parts-in-the-api) | Returns a component's bound parts in page order.                          |
+| [`openAttrs`](../kernel/define-a-primitive#naming)                  | Returns the usual attributes for an open or closed part.                  |
+| [`checkedAttrs`](../kernel/define-a-primitive#naming)               | Returns the usual attributes for a checked, unchecked, or mixed part.     |
+| [`css`](../kernel/style-a-component#pass-values-as-css-variables)   | Turns style declarations into a `style` attribute and skips empty values. |
+| [`live`](../kernel/handle-changes#live-state)                       | Writes attributes for state that changes often, without rendering again.  |
+| [`selects`](../kernel/handle-changes#live-state)                    | Tells each part which state changes it needs to hear about.               |
+| [`direct`](../kernel/handle-changes#attributes-kept-current)        | Keeps chosen attributes current between renders.                          |
+
+## Agents
+
+Import these helpers from `@ui-sdk/core/agent`.
+
+| Helper                                                                      | What It Does                                                       |
+| --------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| [`createAgent`](/docs/agents/connect-an-agent/reference#createagentoptions) | Lets an agent read the components on a page and use them.          |
+| [`agentTools`](/docs/agents/connect-an-agent/reference#agenttools)          | Describes the `snapshot`, `act`, and `query` tools for your model. |
+| [`registerTools`](/docs/agents/connect-an-agent/webmcp#register-the-tools)  | Offers the same tools to an agent built into the browser.          |
+
+### Timeline
+
+Import these helpers from `@ui-sdk/core/timeline`.
+
+| Helper                                                                              | What It Does                                                                                            |
+| ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| [`createTimeline`](/docs/agents/connect-an-agent/history-and-undo#start-a-timeline) | Records every change to the page's components and who made it, so you can step back or undo one source. |
+| [`describeEntry`](/docs/agents/connect-an-agent/history-and-undo#read-the-history)  | Writes a short sentence for a timeline entry.                                                           |
+| [`stageChanges`](/docs/agents/connect-an-agent/history-and-undo#try-a-suggestion)   | Tries a set of values on the real controls and lets you put the old ones back.                          |
+
+## Values and Testing
+
+[Number](../number), [Date](../date), [Color](../color), and [Image](../image) cover formatting, parsing, and math for each kind of value. Each has its own entrypoint, such as `@ui-sdk/core/number`. [Testing](../testing) covers the checks for a component of your own.
