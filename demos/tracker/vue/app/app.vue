@@ -2,7 +2,6 @@
 import Header from "~/components/header.vue"
 import { Confirmer } from "~/components/ui/alert-dialog"
 import { Toaster } from "~/components/ui/toast"
-import { provideTracker } from "~/composables/tracker"
 
 const tracker = provideTracker()
 </script>

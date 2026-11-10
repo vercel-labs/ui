@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { Plus } from "@lucide/vue"
 import { people, personOf, priorities, statuses } from "tracker-data"
-import { ref } from "vue"
-import { navigateTo } from "#imports"
 import { Avatar } from "~/components/ui/avatar"
 import { Button, buttonVariants } from "~/components/ui/button"
 import {
@@ -44,8 +42,6 @@ import {
   TooltipShortcut,
   TooltipTrigger,
 } from "~/components/ui/tooltip"
-import { createIssue } from "~/composables/issues"
-import { useTracker } from "~/composables/tracker"
 
 const tracker = useTracker()
 const error = ref<string | null>(null)

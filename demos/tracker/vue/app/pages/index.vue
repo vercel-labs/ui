@@ -1,27 +1,21 @@
 <script setup lang="ts">
 import { countByTab, filterIssues, parseQuery } from "tracker-data"
-import { computed } from "vue"
-import { useRoute } from "#imports"
 import IssueBoard from "~/components/issue-board.vue"
 import IssueDetail from "~/components/issue-detail.vue"
 import IssueList from "~/components/issue-list.vue"
 import IssueTabs from "~/components/issue-tabs.vue"
 import IssueToolbar from "~/components/issue-toolbar.vue"
 import Workspace from "~/components/workspace.vue"
-import { useIssues } from "~/composables/issues"
-import { useSettings } from "~/composables/settings"
 
 const route = useRoute()
-const [{ data: issues }, { data: settings }] = await Promise.all([
-  useIssues(),
-  useSettings(),
-])
+const issues = useIssues()
+const settings = useSettings()
 
 const query = computed(() => parseQuery(route.query))
 const matching = computed(() => filterIssues(issues.value, query.value))
 const counts = computed(() => countByTab(issues.value))
 const issue = computed(
-  () => issues.value.find((issue) => issue.id === query.value.issue) ?? null
+  () => issues.value.find(({ id }) => id === query.value.issue) ?? null
 )
 </script>
 

@@ -1,11 +1,11 @@
 import type { IssuePatch } from "tracker-data"
-import { refreshNuxtData, useFetch } from "#imports"
 import { toast } from "~/components/ui/toast"
 
 type Options = NonNullable<Parameters<typeof $fetch>[1]>
 
 function useIssues() {
-  return useFetch("/api/issues", { key: "issues", default: () => [] })
+  const { data } = useFetch("/api/issues", { key: "issues", default: () => [] })
+  return data
 }
 
 async function send(url: string, options: Options) {

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { Info } from "@lucide/vue"
 import type { Settings } from "tracker-data"
-import { ref } from "vue"
 import { Button, buttonVariants } from "~/components/ui/button"
 import { Field, FieldDescription, FieldLabel } from "~/components/ui/field"
 import { NumberInput } from "~/components/ui/number-input"
@@ -15,16 +14,16 @@ import {
 import { Slider } from "~/components/ui/slider"
 import { Switch } from "~/components/ui/switch"
 import { toast } from "~/components/ui/toast"
-import { saveSettings } from "~/composables/settings"
 
 defineProps<{ settings: Settings }>()
 
+const form = useTemplateRef("form")
 const pending = ref(false)
 
-async function submit(event: SubmitEvent) {
+async function submit() {
   pending.value = true
   try {
-    await saveSettings(new FormData(event.currentTarget as HTMLFormElement))
+    await saveSettings(new FormData(form.value!))
     toast.success("Settings saved")
   } catch {
     toast.error("Couldn't save your settings. Try again.")
@@ -35,7 +34,7 @@ async function submit(event: SubmitEvent) {
 </script>
 
 <template>
-  <form class="grid gap-8" @submit.prevent="submit">
+  <form ref="form" class="grid gap-8" @submit.prevent="submit">
     <Field class="flex-row items-center justify-between gap-6">
       <div class="grid gap-1.5">
         <FieldLabel>Email notifications</FieldLabel>

@@ -2,7 +2,6 @@
 import { fromText } from "@ui-sdk/vue/token-input"
 import { cn } from "cn"
 import { type Issue, people, personOf } from "tracker-data"
-import { ref } from "vue"
 import Mention from "~/components/mention.vue"
 import { Avatar } from "~/components/ui/avatar"
 import { Button } from "~/components/ui/button"
@@ -22,7 +21,6 @@ import {
   TriggerMenuItem,
   TriggerMenuList,
 } from "~/components/ui/trigger-menu"
-import { addComment } from "~/composables/issues"
 
 const props = defineProps<{ issue: Issue }>()
 

@@ -11,8 +11,6 @@ import {
   statuses,
   statusOf,
 } from "tracker-data"
-import { computed, nextTick, ref } from "vue"
-import { navigateTo } from "#imports"
 import Assignee from "~/components/assignee.vue"
 import IssueLabels from "~/components/issue-labels.vue"
 import PriorityIcon from "~/components/priority-icon.vue"
@@ -43,8 +41,6 @@ import {
   ToolbarButton,
   ToolbarSeparator,
 } from "~/components/ui/toolbar"
-import { deleteIssues, updateIssues } from "~/composables/issues"
-import { useTracker } from "~/composables/tracker"
 
 const props = defineProps<{ issues: Issue[]; query: Query; pageSize: number }>()
 

@@ -2,8 +2,6 @@
 import { CircleDot, Columns3, List, Plus, Search, Settings } from "@lucide/vue"
 import { cn } from "cn"
 import { href, parseQuery } from "tracker-data"
-import { computed, ref } from "vue"
-import { navigateTo, useRoute } from "#imports"
 import { buttonVariants } from "~/components/ui/button"
 import {
   Command,
@@ -23,11 +21,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "~/components/ui/dialog"
-import { useIssues } from "~/composables/issues"
-import { useTracker } from "~/composables/tracker"
 
 const tracker = useTracker()
-const { data: issues } = await useIssues()
+const issues = useIssues()
 const route = useRoute()
 const query = computed(() => parseQuery(route.query))
 const open = ref(false)

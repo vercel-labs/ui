@@ -2,8 +2,6 @@
 import { Columns3, List, SlidersHorizontal } from "@lucide/vue"
 import { cn } from "cn"
 import { href, type Query, type View } from "tracker-data"
-import { computed } from "vue"
-import { navigateTo } from "#imports"
 import IssueFilters from "~/components/issue-filters.vue"
 import { buttonVariants } from "~/components/ui/button"
 import {

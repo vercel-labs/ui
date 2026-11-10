@@ -52,7 +52,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "~/components/ui/tooltip"
-import { updateIssues } from "~/composables/issues"
 
 const props = defineProps<{ issue: Issue; query: Query }>()
 

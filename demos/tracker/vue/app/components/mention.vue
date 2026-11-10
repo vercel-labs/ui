@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { personOf } from "tracker-data"
-import { computed } from "vue"
 import { Avatar } from "~/components/ui/avatar"
 import {
   HoverCard,

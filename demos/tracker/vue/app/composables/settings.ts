@@ -1,8 +1,6 @@
-import type { Settings } from "tracker-data"
-import { refreshNuxtData, useFetch } from "#imports"
-
 function useSettings() {
-  return useFetch<Settings>("/api/settings", { key: "settings" })
+  const { data } = useFetch("/api/settings", { key: "settings" })
+  return data
 }
 
 async function saveSettings(form: FormData) {

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { href, type Issue, type Query, statusOf, tabs } from "tracker-data"
-import { computed } from "vue"
 import Assignee from "~/components/assignee.vue"
 import IssueLabels from "~/components/issue-labels.vue"
 import PriorityIcon from "~/components/priority-icon.vue"

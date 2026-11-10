@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import { type Issue, leaves, type Subtask } from "tracker-data"
-import { computed, ref, watch } from "vue"
 import SubtaskItems from "~/components/subtask-items.vue"
 import { Progress } from "~/components/ui/progress"
 import { Tree, type TreeItemData } from "~/components/ui/tree"
-import { setSubtasksDone } from "~/composables/issues"
 
 const props = defineProps<{ issue: Issue }>()
 

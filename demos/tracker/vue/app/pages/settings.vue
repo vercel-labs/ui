@@ -1,11 +1,9 @@
 <script setup lang="ts">
-import { useHead } from "#imports"
 import SettingsForm from "~/components/settings-form.vue"
-import { useSettings } from "~/composables/settings"
 
 useHead({ title: "Settings · Tracker" })
 
-const { data: settings } = await useSettings()
+const settings = useSettings()
 </script>
 
 <template>

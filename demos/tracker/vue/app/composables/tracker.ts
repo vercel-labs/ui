@@ -1,6 +1,6 @@
 import { type ConfirmOptions, createConfirm } from "@ui-sdk/vue/alert-dialog"
 import { createDialogController } from "@ui-sdk/vue/dialog"
-import { inject, type InjectionKey, provide } from "vue"
+import type { InjectionKey } from "vue"
 
 function createTracker() {
   return {

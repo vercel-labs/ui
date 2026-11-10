@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { resizableStorageKey } from "@ui-sdk/vue/resizable"
 import { savedSizes } from "tracker-data"
-import { computed } from "vue"
-import { useCookie } from "#imports"
 import {
   Resizable,
   ResizableHandle,

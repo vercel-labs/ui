@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { labelOf } from "tracker-data"
-import { computed } from "vue"
 import { Badge } from "~/components/ui/badge"
 
 const props = defineProps<{ labels: string[] }>()
