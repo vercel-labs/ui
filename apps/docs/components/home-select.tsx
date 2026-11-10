@@ -407,7 +407,10 @@ function SelectBlueprint() {
               onPointerEnter={(event) =>
                 event.pointerType === "mouse" && setPreview(index + 1)
               }
-              onClick={() => setPicked(index + 1)}
+              onClick={() => {
+                setPicked(index + 1)
+                setPreview(null)
+              }}
               className={cn(
                 "flex cursor-pointer gap-3 border bg-background px-3 py-2.5 text-start transition-colors duration-200 outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#006bff]",
                 lit
