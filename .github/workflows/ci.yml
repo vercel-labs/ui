@@ -361,3 +361,29 @@ jobs:
           path: tests/playwright-report
           retention-days: 14
           overwrite: true
+
+  # One check for the main ruleset to require, since the affected matrix names
+  # its jobs by shard count. A label's run takes another name, so its result
+  # can't stand in for the push's.
+  passed:
+    name: ${{ contains(fromJSON('["skip", "engines"]'), needs.plan.outputs.suite) && format('CI passed ({0})', needs.plan.outputs.suite) || 'CI passed' }}
+    if: always()
+    needs:
+      - plan
+      - check
+      - unit
+      - packages
+      - browser-build
+      - affected-plan
+      - affected
+      - e2e
+      - e2e-report
+      - docs
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          echo "$RESULTS"
+          case " $RESULTS " in *" failure "* | *" cancelled "*) exit 1 ;; esac
