@@ -111,11 +111,18 @@ function write(el: HTMLElement, attrs: Record<string, string | undefined>) {
   }
 }
 
-function render(options: PickerOptions, values: OptionProps[]) {
+// `deferred` mounts and unmounts options in a microtask after a change, the
+// way frameworks that batch their renders do.
+function render(
+  options: PickerOptions,
+  values: OptionProps[],
+  { deferred = false } = {}
+) {
   const instance = picker({ id: "p", ...options }) as PrimitiveInstance
   const input = document.createElement("input")
   const list = document.createElement("div")
   list.setAttribute("role", "listbox")
+  list.tabIndex = -1
   document.body.append(input, list)
   const inputPart = instance.part("input", {})
   cleanups.push(bind(inputPart, input))
@@ -140,7 +147,10 @@ function render(options: PickerOptions, values: OptionProps[]) {
       write(el, partAttrs(part))
     }
     sync()
-    cleanups.push(instance.subscribe(sync), () => unbind?.())
+    cleanups.push(
+      instance.subscribe(() => (deferred ? queueMicrotask(sync) : sync())),
+      () => unbind?.()
+    )
   })
   const syncInput = () => write(input, partAttrs(inputPart))
   syncInput()
@@ -160,7 +170,16 @@ function render(options: PickerOptions, values: OptionProps[]) {
     (instance.get() as { highlighted: string | null }).highlighted
   const shown = () =>
     [...list.children].map((el) => (el as HTMLElement).textContent)
-  return { instance, input, options: elements, press, type, highlighted, shown }
+  return {
+    instance,
+    input,
+    list,
+    options: elements,
+    press,
+    type,
+    highlighted,
+    shown,
+  }
 }
 
 const fruits = [
@@ -317,5 +336,49 @@ describe("createListbox", () => {
     options[1].focus()
     expect(highlighted()).toBe("banana")
     expect(document.activeElement).toBe(options[1])
+  })
+
+  test("an empty list highlights nothing, so Enter can't choose a hidden option", async () => {
+    const instance = picker({
+      id: "p",
+      focus: "virtual",
+      items: ["Apple", "Banana"],
+    }) as PrimitiveInstance
+    const { listbox, search } = apiOf(instance)
+    listbox.move("first")
+    expect(instance.get()).toMatchObject({ highlighted: "Apple" })
+    search("zz")
+    listbox.move("first")
+    expect(instance.get()).toMatchObject({ highlighted: null })
+    expect(listbox.activeId(instance.get() as never)).toBeUndefined()
+  })
+
+  test("the first match stays highlighted while options mount after the query changes", async () => {
+    const { instance, input, press, type, highlighted } = render(
+      { focus: "virtual" },
+      fruits,
+      { deferred: true }
+    )
+    await tick()
+    input.focus()
+    type("an")
+    await tick()
+    type("")
+    apiOf(instance).listbox.move("first")
+    expect(highlighted()).toBe("banana")
+    await tick()
+    expect(highlighted()).toBe("apple")
+    press("ArrowDown")
+    await tick()
+    expect(highlighted()).toBe("banana")
+  })
+
+  test("with real focus, focus returns to the list when its option leaves", async () => {
+    const { list, options, type } = render({}, fruits)
+    await tick()
+    options[3].focus()
+    type("an")
+    await tick()
+    expect(document.activeElement).toBe(list)
   })
 })
