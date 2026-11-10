@@ -355,19 +355,16 @@ const budgets = {
       "Renders, layout and style reads, and attribute reads and writes for 10 ArrowRight presses on the first handle of a group with many panels.",
     why: "A key moves one handle, like a drag's move, and a held key repeats it many times a second.",
     renders: { plain: 0, watched: 10, handle: 0 },
-    // Each key reads the handle's direction and the root font size once,
-    // and the panels' props in the order the group last found, without
-    // sorting. 110 style reads and 400 ordering calls until 2026-10-10, when
-    // each key sorted the panels and read the root font size once per panel:
-    // 11 and 38 a key with 10 panels, 501 and 998 with 500. The attributes read back are the
-    // panels' and handles' a key changes, 8 a key, as for a drag.
+    // Each key reads the handle's direction and the root font size once. The
+    // attributes read back are the live ones of the two handles it moves, 5 each,
+    // and `is` on the 2 panels Svelte renders: 12 a key, 10 before tabindex went live.
     counts: {
       getBoundingClientRect: 0,
       offsetWidth: 0,
       offsetHeight: 0,
       getComputedStyle: 20,
       compareDocumentPosition: 0,
-      getAttribute: 100,
+      getAttribute: 120,
     },
     // Two panels' sizes and the handle's value, and the handle's bounds: 5 or 6 a key.
     writes: 80,

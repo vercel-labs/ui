@@ -876,10 +876,10 @@ cd tests && PLAYGROUND_PORT=5310 ../scripts/test-slot.sh npx playwright test spe
 - No `offsetHeight` calls.
 - At most 20 `getComputedStyle` calls.
 - No `compareDocumentPosition` calls.
-- At most 100 `getAttribute` calls.
+- At most 120 `getAttribute` calls.
 - At most 80 attribute and style writes.
 
-**Notes:** Each key reads the handle's direction and the root font size once, and the panels' props in the order the group last found, without sorting. 110 style reads and 400 ordering calls until 2026-10-10, when each key sorted the panels and read the root font size once per panel: 11 and 38 a key with 10 panels, 501 and 998 with 500. The attributes read back are the panels' and handles' a key changes, 8 a key, as for a drag. Two panels' sizes and the handle's value, and the handle's bounds: 5 or 6 a key.
+**Notes:** Each key reads the handle's direction and the root font size once. The attributes read back are the live ones of the two handles it moves, 5 each, and `is` on the 2 panels Svelte renders: 12 a key, 10 before tabindex went live. Two panels' sizes and the handle's value, and the handle's bounds: 5 or 6 a key.
 
 **Tests:**
 
