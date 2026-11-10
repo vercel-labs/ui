@@ -192,6 +192,20 @@ test.describe("keyboard", () => {
     await expect(cell(page, "GET /app.css", 1)).toBeFocused()
   })
 
+  test("a cell hidden by a collapse gives up the tab stop", async ({
+    page,
+  }) => {
+    await page.getByRole("button", { name: "Expand all" }).click()
+    await row(page, "GET /api/user").focus()
+    await page.keyboard.press("ArrowRight")
+    await expect(cell(page, "GET /api/user", 0)).toBeFocused()
+    await page.getByRole("button", { name: "Collapse all" }).click()
+    await page.getByRole("button", { name: "Expand all" }).click()
+    await expect(
+      page.getByRole("treegrid").locator('[tabindex="0"]')
+    ).toHaveCount(1)
+  })
+
   test("Enter and Space select the focused row", async ({ page }) => {
     await row(page, "GET /app.css").focus()
     await page.keyboard.press("Enter")

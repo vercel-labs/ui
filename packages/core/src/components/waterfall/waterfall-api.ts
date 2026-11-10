@@ -256,6 +256,8 @@ function waterfallApiBody(
       if (target === undefined) {
         return
       }
+      holdCell(null)
+      store.set({ cell: null })
       roving.remember(target)
       if (held) {
         queueMicrotask(() => {
