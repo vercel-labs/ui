@@ -122,7 +122,7 @@ function Poster({
         className="pointer-events-none absolute inset-0 overflow-hidden"
       >
         <div
-          className="absolute inset-0 opacity-[var(--pattern-opacity,1)]"
+          className="absolute inset-0 opacity-50"
           style={patterns[pattern]}
         />
         {backdrop}
