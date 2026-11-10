@@ -86,7 +86,7 @@ function Tag({
 }) {
   const x = layout.tag
   return (
-    <g onClick={() => onPick(index)} className="cursor-pointer">
+    <g onClick={() => onPick(index)} className="cursor-default">
       <rect
         x={from[0]}
         y={y - 16}
@@ -394,7 +394,7 @@ function SelectBlueprint() {
       <div
         role="group"
         aria-label="Behaviors in a Select"
-        className="grid gap-2 @[34rem]:grid-cols-3"
+        className="grid gap-2 @[35rem]:grid-cols-3"
         onPointerLeave={() => setPreview(null)}
       >
         {behaviors.map((behavior, index) => {
@@ -412,7 +412,7 @@ function SelectBlueprint() {
                 setPreview(null)
               }}
               className={cn(
-                "flex cursor-pointer flex-col gap-1 border bg-background px-3 py-2.5 text-start transition-colors duration-200 outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#006bff]",
+                "flex flex-col gap-1 border bg-background px-3 py-2.5 text-start transition-colors duration-200 outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#006bff]",
                 lit
                   ? "border-[#006bff]"
                   : "border-foreground/15 hover:border-foreground/40"
@@ -430,7 +430,7 @@ function SelectBlueprint() {
                 </span>
                 <code
                   className={cn(
-                    "font-mono text-[17px] leading-tight whitespace-nowrap transition-colors duration-200 @[34rem]:text-[15px] @[44rem]:text-[17px]",
+                    "font-mono text-[17px] leading-tight whitespace-nowrap transition-colors duration-200 @[35rem]:text-[15px] @[44rem]:text-[17px]",
                     lit && "text-[#006bff]"
                   )}
                 >
