@@ -234,14 +234,14 @@
 
   /* Tabs. */
   .tabs,
-  [data-slot="tabs-root"] {
+  [data-slot="tabs"] {
     display: flex;
     flex-direction: column;
     gap: 8px;
     min-width: 360px;
   }
 
-  :is(.tabs, [data-slot="tabs-root"])[data-orientation="vertical"] {
+  :is(.tabs, [data-slot="tabs"])[data-orientation="vertical"] {
     flex-direction: row;
   }
 
@@ -298,7 +298,7 @@
       height 200ms;
   }
 
-  [data-slot="rating-root"] {
+  [data-slot="rating"] {
     display: inline-flex;
     gap: 2px;
   }
@@ -318,7 +318,7 @@
     visibility: hidden;
   }
 
-  [data-slot="segmented-control-root"] {
+  [data-slot="segmented-control"] {
     position: relative;
     display: inline-flex;
     gap: 2px;
@@ -328,7 +328,7 @@
     isolation: isolate;
   }
 
-  [data-slot="segmented-control-root"][data-orientation="vertical"] {
+  [data-slot="segmented-control"][data-orientation="vertical"] {
     flex-direction: column;
   }
 
@@ -356,7 +356,7 @@
     pointer-events: none;
   }
 
-  [data-slot="color-picker-root"] {
+  [data-slot="color-picker"] {
     display: grid;
     gap: 8px;
     width: 200px;
@@ -475,7 +475,7 @@
 
   /* Tree. Groups indent their items and animate their height. */
   .tree,
-  [data-slot="tree-root"] {
+  [data-slot="tree"] {
     display: flex;
     flex-direction: column;
     min-width: 320px;
@@ -542,7 +542,7 @@
 
   /* Accordion. Panels animate their height through the measured variable. */
   .accordion,
-  [data-slot="accordion-root"] {
+  [data-slot="accordion"] {
     display: flex;
     flex-direction: column;
     min-width: 360px;
@@ -613,9 +613,9 @@
   }
 
   .checkbox,
-  [data-slot="checkbox-root"],
+  [data-slot="checkbox"],
   .radio,
-  [data-slot="radio-root"] {
+  [data-slot="radio"] {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -629,7 +629,7 @@
   }
 
   .radio,
-  [data-slot="radio-root"] {
+  [data-slot="radio"] {
     border-radius: 50%;
   }
 
@@ -654,7 +654,7 @@
   }
 
   .switch,
-  [data-slot="switch-root"] {
+  [data-slot="switch"] {
     display: inline-flex;
     box-sizing: border-box;
     width: 34px;
@@ -665,7 +665,7 @@
     background: #ccc;
   }
 
-  :is(.switch, [data-slot="switch-root"])[data-checked] {
+  :is(.switch, [data-slot="switch"])[data-checked] {
     background: #222;
   }
 
@@ -686,9 +686,9 @@
     .checkbox,
     .switch,
     .radio,
-    [data-slot="checkbox-root"],
-    [data-slot="switch-root"],
-    [data-slot="radio-root"]
+    [data-slot="checkbox"],
+    [data-slot="switch"],
+    [data-slot="radio"]
   )[data-disabled] {
     opacity: 0.5;
   }
@@ -756,7 +756,7 @@
 
   /* Collapsible. The panel animates its height through the measured variable. */
   .collapsible,
-  [data-slot="collapsible-root"] {
+  [data-slot="collapsible"] {
     min-width: 360px;
   }
 
@@ -1080,7 +1080,7 @@
   }
 
   .rule,
-  [data-slot="separator-root"] {
+  [data-slot="separator"] {
     flex: none;
     align-self: stretch;
     width: 1px;
@@ -1089,7 +1089,7 @@
   }
 
   .rule[data-orientation="horizontal"],
-  [data-slot="separator-root"][data-orientation="horizontal"] {
+  [data-slot="separator"][data-orientation="horizontal"] {
     width: 24px;
     height: 1px;
     min-height: 0;
@@ -1392,7 +1392,7 @@
 /* Command. Each rule targets the class and the data-slot. */
 @layer fixtures {
   .command,
-  [data-slot="command-root"] {
+  [data-slot="command"] {
     display: flex;
     flex-direction: column;
     width: 320px;
@@ -1476,7 +1476,7 @@
 
 /* Avatar: a round box, the image filling it and the fallback centred. */
 .avatar,
-[data-slot="avatar-root"] {
+[data-slot="avatar"] {
   position: relative;
   display: inline-flex;
   width: 40px;
@@ -1521,7 +1521,7 @@
 
 /* OTP Input: boxes in a row. */
 .otp,
-[data-slot="otp-input-root"] {
+[data-slot="otp-input"] {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -1558,7 +1558,7 @@
   height: 1600px;
 }
 .scroll-area,
-[data-slot="scroll-area-root"] {
+[data-slot="scroll-area"] {
   width: 180px;
   height: 200px;
   overflow: hidden;
@@ -1763,9 +1763,9 @@
 @layer fixtures {
   /* Toolbar and Menubar. */
   .toolbar,
-  [data-slot="toolbar-root"],
+  [data-slot="toolbar"],
   .menubar,
-  [data-slot="menubar-root"] {
+  [data-slot="menubar"] {
     display: flex;
     align-items: center;
     gap: 4px;
@@ -1774,9 +1774,9 @@
   }
 
   .toolbar[data-orientation="vertical"],
-  [data-slot="toolbar-root"][data-orientation="vertical"],
+  [data-slot="toolbar"][data-orientation="vertical"],
   .menubar[data-orientation="vertical"],
-  [data-slot="menubar-root"][data-orientation="vertical"] {
+  [data-slot="menubar"][data-orientation="vertical"] {
     flex-direction: column;
     align-items: stretch;
     width: max-content;
@@ -1808,7 +1808,7 @@
   }
   /* Password input. The caps lock note shows while the field reports it. */
   .password-input,
-  [data-slot="password-input-root"] {
+  [data-slot="password-input"] {
     display: inline-flex;
     align-items: center;
     gap: 4px;
@@ -1912,7 +1912,7 @@
 
   /* Listbox: an always-visible list. Long lists scroll inside it. */
   .listbox,
-  [data-slot="listbox-root"] {
+  [data-slot="listbox"] {
     display: flex;
     flex-direction: column;
     gap: 2px;
@@ -1930,7 +1930,7 @@
     max-height: none;
   }
 
-  body[data-layout="scroll-padding"] :is(.listbox, [data-slot="listbox-root"]) {
+  body[data-layout="scroll-padding"] :is(.listbox, [data-slot="listbox"]) {
     scroll-padding-block: 32px;
   }
 
@@ -1989,7 +1989,7 @@
 
   /* Carousel. Three hundred pixels wide, so specs know where each slide lands. */
   .carousel,
-  [data-slot="carousel-root"] {
+  [data-slot="carousel"] {
     display: grid;
     gap: 8px;
     width: 300px;
@@ -2000,7 +2000,7 @@
     width: 300px;
   }
 
-  :is(.carousel, [data-slot="carousel-root"])[data-orientation="vertical"]
+  :is(.carousel, [data-slot="carousel"])[data-orientation="vertical"]
     :is(.carousel-viewport, [data-slot="carousel-viewport"]) {
     height: 120px;
   }
@@ -2015,7 +2015,7 @@
   }
 
   /* A percentage basis in a scroller's column is indefinite, which Firefox sizes by content. */
-  :is(.carousel, [data-slot="carousel-root"])[data-orientation="vertical"]
+  :is(.carousel, [data-slot="carousel"])[data-orientation="vertical"]
     :is(.carousel-slide, [data-slot="carousel-item"]) {
     flex-basis: auto;
     height: calc(120px / var(--per-view, 1));

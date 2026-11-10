@@ -1,5 +1,5 @@
 @scope ([data-example]) {
-  [data-slot="tabs-root"] {
+  [data-slot="tabs"] {
     display: flex;
     flex-direction: column;
     gap: var(--space-2);
@@ -14,7 +14,7 @@
   }
 
   /* A demo with controls above its tabs keeps the tabs' width and still fits a phone. */
-  :scope[data-example^="tabs/"] > * > :has(> [data-slot="tabs-root"]) {
+  :scope[data-example^="tabs/"] > * > :has(> [data-slot="tabs"]) {
     width: 24rem;
     max-width: 100%;
   }
@@ -145,7 +145,7 @@
       display: none;
     }
 
-    & > [data-slot="field-root"],
+    & > [data-slot="field"],
     & [data-slot="field-control"] {
       width: 100%;
     }

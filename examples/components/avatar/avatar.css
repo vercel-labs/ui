@@ -1,5 +1,5 @@
 @scope ([data-example]) {
-  [data-slot="avatar-root"] {
+  [data-slot="avatar"] {
     display: inline-grid;
     flex-shrink: 0;
     place-items: center;

@@ -18,17 +18,17 @@ const serverRatings = (page: import("@playwright/test").Page) =>
     template.innerHTML = (
       window as unknown as { __serverHtml: string }
     ).__serverHtml
-    return [
-      ...template.content.querySelectorAll('[data-slot="rating-root"]'),
-    ].map((root) => ({
-      checked:
-        root
-          .querySelector('[role="radio"][aria-checked="true"]')
-          ?.getAttribute("aria-label") ?? null,
-      fills: [
-        ...root.querySelectorAll<HTMLElement>('[data-slot="rating-item"]'),
-      ].map((el) => Number(el.style.getPropertyValue("--rating-fill"))),
-    }))
+    return [...template.content.querySelectorAll('[data-slot="rating"]')].map(
+      (root) => ({
+        checked:
+          root
+            .querySelector('[role="radio"][aria-checked="true"]')
+            ?.getAttribute("aria-label") ?? null,
+        fills: [
+          ...root.querySelectorAll<HTMLElement>('[data-slot="rating-item"]'),
+        ].map((el) => Number(el.style.getPropertyValue("--rating-fill"))),
+      })
+    )
   })
 
 test("a rating hydrates without mismatches", async ({ page, open }) => {

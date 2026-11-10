@@ -6,7 +6,7 @@ function mount(root: HTMLElement) {
       <ui-hover-card-trigger><a href="https://example.com/people/hollis">@hollis</a></ui-hover-card-trigger>
       <ui-hover-card-content hidden>
         <div data-slot="row">
-          <span data-slot="avatar" aria-hidden="true">HG</span>
+          <span data-slot="initials" aria-hidden="true">HG</span>
           <div data-slot="stack">
             <p>Hollis Grant</p>
             <p>Design engineer on the payments team. Writes about forms and motion.</p>

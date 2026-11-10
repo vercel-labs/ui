@@ -302,7 +302,7 @@ Put it last, after `slots`, so TypeScript has read the api by then. Without it, 
 
 ## Naming
 
-A primitive's `name` prefixes each part's `data-slot`. For example, `name: "copy-button"` and a slot called `root` produce `data-slot="copy-button-root"`.
+A primitive's `name` prefixes each part's `data-slot`, like `tabs-list` for the tabs' `list` slot. The `root` slot gets the name alone, so `name: "copy-button"` gives its root `data-slot="copy-button"`.
 
 Warnings and devtools use this name too. Set `label` when they should show a different name; it doesn't change `data-slot`.
 

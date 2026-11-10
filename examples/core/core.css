@@ -1,7 +1,7 @@
 @scope ([data-example]) {
   /* ─── Core: Autosize ──────────────────────────────────────────────── */
 
-  [data-slot="autosize-root"] {
+  [data-slot="autosize"] {
     width: 18rem;
     max-width: 100%;
     height: auto;
@@ -13,7 +13,7 @@
 
   /* ─── Core: Bold shortcut ─────────────────────────────────────────── */
 
-  [data-slot="bold-text-root"] {
+  [data-slot="bold-text"] {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -56,7 +56,7 @@
     width: 28rem;
     max-width: 100%;
 
-    & > [data-slot="tabs-root"] {
+    & > [data-slot="tabs"] {
       align-self: stretch;
     }
 
@@ -96,7 +96,7 @@
 
   /* ─── Core: City picker ───────────────────────────────────────────── */
 
-  [data-slot="city-picker-root"] {
+  [data-slot="city-picker"] {
     display: flex;
     flex-direction: column;
     gap: 2px;
@@ -126,7 +126,7 @@
       box-shadow: inset 0 0 0 1px var(--ink);
     }
 
-    [data-slot="city-picker-root"]:focus > &[aria-selected="true"] {
+    [data-slot="city-picker"]:focus > &[aria-selected="true"] {
       background: var(--tint);
       box-shadow: inset 0 0 0 1px var(--ink);
     }
@@ -138,7 +138,7 @@
 
   /* ─── Core: Command ───────────────────────────────────────────────── */
 
-  [data-slot="command-list-root"] {
+  [data-slot="edit-list"] {
     display: flex;
     flex-direction: column;
     gap: 2px;
@@ -151,7 +151,7 @@
     box-shadow: var(--shadow-1);
   }
 
-  [data-slot="command-list-command"] {
+  [data-slot="edit-list-command"] {
     display: flex;
     align-items: center;
     gap: var(--space-2);
@@ -167,13 +167,13 @@
       box-shadow: inset 0 0 0 1px var(--ink);
     }
 
-    [data-slot="command-list-root"]:focus > &[aria-selected="true"] {
+    [data-slot="edit-list"]:focus > &[aria-selected="true"] {
       background: var(--tint);
       box-shadow: inset 0 0 0 1px var(--ink);
     }
   }
 
-  [data-slot="command-search-root"] {
+  [data-slot="command-search"] {
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
@@ -279,7 +279,7 @@
 
   /* ─── Core: Confirm button ────────────────────────────────────────── */
 
-  [data-slot="confirm-button-root"] {
+  [data-slot="confirm-button"] {
     box-shadow:
       inset 0 0 0 1px var(--danger),
       var(--shadow-drop);
@@ -321,13 +321,13 @@
     font-size: var(--text-sm);
   }
 
-  [data-slot="copy-button-root"] {
+  [data-slot="copy-button"] {
     min-width: 5.25rem;
   }
 
   /* ─── Core: Disclosure ────────────────────────────────────────────── */
 
-  [data-slot="disclosure-root"] {
+  [data-slot="disclosure"] {
     box-sizing: border-box;
     width: 18rem;
     max-width: 100%;
@@ -518,7 +518,7 @@
 
   /* ─── Core: Fruit picker ──────────────────────────────────────────── */
 
-  [data-slot="fruit-picker-root"] {
+  [data-slot="fruit-picker"] {
     display: flex;
     flex-direction: column;
     gap: 2px;
@@ -546,7 +546,7 @@
       box-shadow: inset 0 0 0 1px var(--ink);
     }
 
-    [data-slot="fruit-picker-root"]:focus > &[aria-selected="true"] {
+    [data-slot="fruit-picker"]:focus > &[aria-selected="true"] {
       background: var(--tint);
       box-shadow: inset 0 0 0 1px var(--ink);
     }
@@ -562,7 +562,7 @@
 
   /* ─── Core: Language tag ──────────────────────────────────────────── */
 
-  [data-slot="language-tag-root"] {
+  [data-slot="language-tag"] {
     display: flex;
     flex-direction: column;
     gap: var(--space-2);
@@ -581,11 +581,11 @@
 
   /* ─── Core: Month grid ────────────────────────────────────────────── */
 
-  [data-slot="stack"]:has(> [data-slot="month-root"]) > select {
+  [data-slot="stack"]:has(> [data-slot="month"]) > select {
     width: auto;
   }
 
-  [data-slot="month-root"] {
+  [data-slot="month"] {
     display: flex;
     flex-direction: column;
     gap: var(--space-2);
@@ -664,7 +664,7 @@
 
   /* ─── Core: Mute button ───────────────────────────────────────────── */
 
-  [data-slot="mute-button-root"] {
+  [data-slot="mute-button"] {
     min-width: 6rem;
   }
 
@@ -684,7 +684,7 @@
 
   /* ─── Core: Notice ────────────────────────────────────────────────── */
 
-  [data-slot="notice-root"] {
+  [data-slot="notice"] {
     display: flex;
     align-items: center;
     gap: var(--space-3);
@@ -704,7 +704,7 @@
 
   /* ─── Core: Page stepper ──────────────────────────────────────────── */
 
-  [data-slot="pager-root"] {
+  [data-slot="pager"] {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -747,7 +747,7 @@
   /* ─── Core: Parts ─────────────────────────────────────────────────── */
 
   :where(
-    [data-slot="autosize-root"],
+    [data-slot="autosize"],
     [data-slot="bold-text-text"],
     [data-slot="checkout-field"],
     [data-slot="filter-list-input"],
@@ -786,7 +786,7 @@
 
   /* ─── Core: Price list ────────────────────────────────────────────── */
 
-  [data-slot="price-list-root"] {
+  [data-slot="price-list"] {
     display: flex;
     flex-direction: column;
     gap: var(--space-1);
@@ -830,7 +830,7 @@
     font-variant-numeric: tabular-nums;
   }
 
-  [data-slot="rating-root"] {
+  [data-slot="rating"] {
     display: flex;
     gap: var(--space-1);
   }
@@ -873,7 +873,7 @@
 
   /* ─── Core: Read more ─────────────────────────────────────────────── */
 
-  [data-slot="read-more-root"] {
+  [data-slot="read-more"] {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -937,11 +937,11 @@
 
   /* ─── Core: Search field ──────────────────────────────────────────── */
 
-  [data-slot="stack"]:has(> [data-slot="search-field-root"]) {
+  [data-slot="stack"]:has(> [data-slot="search-field"]) {
     align-items: stretch;
   }
 
-  [data-slot="search-field-root"] {
+  [data-slot="search-field"] {
     display: flex;
     align-items: center;
     gap: var(--space-1);
@@ -1012,7 +1012,7 @@
 
   /* ─── Core: Seats ─────────────────────────────────────────────────── */
 
-  [data-slot="seats-root"] {
+  [data-slot="seats"] {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1052,7 +1052,7 @@
 
   /* ─── Core: Subscribe form ────────────────────────────────────────── */
 
-  [data-slot="subscribe-root"] {
+  [data-slot="subscribe"] {
     display: flex;
     flex-direction: column;
     gap: var(--space-2);
@@ -1085,7 +1085,7 @@
 
   /* ─── Core: Swatches ──────────────────────────────────────────────── */
 
-  [data-slot="swatches-root"] {
+  [data-slot="swatches"] {
     display: flex;
     gap: var(--space-2);
   }
@@ -1130,7 +1130,7 @@
 
   /* ─── Core: Timer ─────────────────────────────────────────────────── */
 
-  [data-slot="countdown-root"] {
+  [data-slot="countdown"] {
     font-size: 32px;
     font-weight: 600;
     line-height: 1;
@@ -1139,7 +1139,7 @@
 
   /* ─── Core: Tree checkboxes ───────────────────────────────────────── */
 
-  [data-slot="stack"]:has(> [data-slot="check-tree-root"]) {
+  [data-slot="stack"]:has(> [data-slot="check-tree"]) {
     align-items: flex-start;
   }
 
@@ -1170,7 +1170,7 @@
     }
   }
 
-  [data-slot="check-tree-root"] {
+  [data-slot="check-tree"] {
     display: flex;
     flex-direction: column;
     gap: 2px;
@@ -1335,7 +1335,7 @@
   }
 
   /* Price list: a fixed column, so the price stays put as the language changes. */
-  :scope[data-example="core/price-list"] [data-slot="price-list-root"] {
+  :scope[data-example="core/price-list"] [data-slot="price-list"] {
     width: 16rem;
     max-width: 100%;
   }

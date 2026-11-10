@@ -14,7 +14,7 @@
   }
 
   /* In a field, the picker takes the field's width. */
-  [data-slot="field-root"] > [data-slot="date-picker-root"] {
+  [data-slot="field"] > [data-slot="date-picker"] {
     align-self: stretch;
 
     & > [data-slot="row"]:has(> [data-slot="date-picker-input"]) {
@@ -23,11 +23,11 @@
   }
 
   /* A picker inside a stack sits on the stack's center line. */
-  [data-slot="stack"]:has(> [data-slot="date-picker-root"]) {
+  [data-slot="stack"]:has(> [data-slot="date-picker"]) {
     align-items: center;
   }
 
-  [data-slot="date-picker-root"] {
+  [data-slot="date-picker"] {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -170,7 +170,7 @@
       border-top: 1px solid var(--line-faint);
     }
 
-    & [data-slot="calendar-root"] {
+    & [data-slot="calendar"] {
       padding: 0;
       background: none;
       box-shadow: none;

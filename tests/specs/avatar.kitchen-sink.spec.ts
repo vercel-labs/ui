@@ -31,16 +31,14 @@ test("every avatar kitchen sink variant renders and settles", async ({
   // Each card mounts its own root, so wait for all of them.
   await expect
     .poll(() =>
-      page
-        .locator('[data-variant]:not(:has([data-slot="avatar-root"]))')
-        .count()
+      page.locator('[data-variant]:not(:has([data-slot="avatar"]))').count()
     )
     .toBe(0)
 
   for (const card of await cards.all()) {
     const id = await card.getAttribute("data-variant")
     const settles = (await card.getAttribute("data-settles"))!
-    const avatar = card.locator('[data-slot="avatar-root"]').first()
+    const avatar = card.locator('[data-slot="avatar"]').first()
     await card.scrollIntoViewIfNeeded()
     await expect
       .soft(avatar, `${id} settles`)
@@ -77,7 +75,7 @@ test("every avatar kitchen sink variant renders and settles", async ({
   ]
   for (const id of ["sources", "sources-none", "sources-delay"]) {
     const card = page.locator(`[data-variant="${id}"]`)
-    const avatar = card.locator('[data-slot="avatar-root"]')
+    const avatar = card.locator('[data-slot="avatar"]')
     await card.scrollIntoViewIfNeeded()
     for (const [label, status] of steps) {
       await card.getByRole("button", { name: label, exact: true }).click()

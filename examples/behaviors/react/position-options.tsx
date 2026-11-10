@@ -8,7 +8,7 @@ import {
 } from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
 
-type HintOptions = {
+type CalloutOptions = {
   side?: Side
   align?: Align
   sideOffset?: number
@@ -17,10 +17,10 @@ type HintOptions = {
   arrowPadding?: number
 }
 
-type HintState = { open: boolean }
+type CalloutState = { open: boolean }
 
-const hint = definePrimitive({
-  name: "hint",
+const callout = definePrimitive({
+  name: "callout",
   options: {
     side: "string",
     align: "string",
@@ -29,7 +29,7 @@ const hint = definePrimitive({
     collisionPadding: "number",
     arrowPadding: "number",
   },
-  state: (_options: HintOptions): HintState => ({ open: true }),
+  state: (_options: CalloutOptions): CalloutState => ({ open: true }),
   api: (context) => ({
     toggle: () => context.store.set({ open: !context.store.get().open }),
     target: () => context.element("target"),
@@ -61,20 +61,20 @@ const hint = definePrimitive({
   }),
 })
 
-const parts = createParts(hint, {
+const parts = createParts(callout, {
   root: "div",
   target: "button",
   bubble: "div",
   arrow: "span",
 })
 
-const Hint = parts.Root
+const Callout = parts.Root
 
-const HintTarget = parts.Target
+const CalloutTarget = parts.Target
 
-const HintBubble = parts.Bubble
+const CalloutBubble = parts.Bubble
 
-const HintArrow = parts.Arrow
+const CalloutArrow = parts.Arrow
 
 const sides: Side[] = ["top", "right", "bottom", "left", "start", "end"]
 const aligns: Align[] = ["start", "center", "end"]
@@ -88,13 +88,13 @@ function Example() {
     collisionPadding: 8,
   })
   return (
-    <Hint {...{ side, align, ...offsets, arrowPadding: 8 }}>
+    <Callout {...{ side, align, ...offsets, arrowPadding: 8 }}>
       <div data-slot="position-stage">
-        <HintTarget>Shortcuts</HintTarget>
+        <CalloutTarget>Shortcuts</CalloutTarget>
       </div>
-      <HintBubble>
-        <HintArrow />
-      </HintBubble>
+      <CalloutBubble>
+        <CalloutArrow />
+      </CalloutBubble>
       <div data-slot="grid">
         <label data-slot="label">
           Side
@@ -135,17 +135,17 @@ function Example() {
           )
         )}
       </div>
-    </Hint>
+    </Callout>
   )
 }
 
 export {
   Example,
-  hint,
-  Hint,
-  HintArrow,
-  HintBubble,
-  type HintOptions,
-  type HintState,
-  HintTarget,
+  callout,
+  Callout,
+  CalloutArrow,
+  CalloutBubble,
+  type CalloutOptions,
+  type CalloutState,
+  CalloutTarget,
 }

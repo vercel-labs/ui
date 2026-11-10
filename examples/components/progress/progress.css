@@ -1,5 +1,5 @@
 @scope ([data-example]) {
-  [data-slot="progress-root"] {
+  [data-slot="progress"] {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -8,7 +8,7 @@
     max-width: 100%;
   }
 
-  [data-slot="stack"]:has(> [data-slot="progress-root"]) {
+  [data-slot="stack"]:has(> [data-slot="progress"]) {
     width: 20rem;
     max-width: 100%;
   }

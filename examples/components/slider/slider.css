@@ -1,5 +1,5 @@
 @scope ([data-example]) {
-  [data-slot="slider-root"] {
+  [data-slot="slider"] {
     display: flex;
     flex-direction: column;
     gap: var(--space-2);
@@ -16,40 +16,32 @@
     }
   }
 
-  :is(
-      [data-slot="slider-root"],
-      [data-slot="field-root"]:has(> [data-slot="slider-root"])
-    )
+  :is([data-slot="slider"], [data-slot="field"]:has(> [data-slot="slider"]))
     > [data-slot="row"] {
     justify-content: space-between;
     gap: var(--space-4);
   }
 
-  [data-slot="stack"]:has(> [data-slot="slider-root"]) {
+  [data-slot="stack"]:has(> [data-slot="slider"]) {
     align-items: stretch;
     width: 20rem;
     max-width: 100%;
   }
 
   [data-slot="row"]:has(
-    > [data-slot="slider-root"][data-orientation="vertical"],
-    > [data-slot="field-root"]
-      > [data-slot="slider-root"][data-orientation="vertical"]
+    > [data-slot="slider"][data-orientation="vertical"],
+    > [data-slot="field"] > [data-slot="slider"][data-orientation="vertical"]
   ) {
     gap: var(--space-8);
   }
 
   /* A vertical slider's field is as narrow as the slider, with its label centered under it. */
-  [data-slot="field-root"]:has(
-    > [data-slot="slider-root"][data-orientation="vertical"]
-  ) {
+  [data-slot="field"]:has(> [data-slot="slider"][data-orientation="vertical"]) {
     align-items: center;
     width: auto;
   }
 
-  [data-slot="stack"]
-    > form
-    + [data-slot="field-root"]:has([data-slot="slider-root"]) {
+  [data-slot="stack"] > form + [data-slot="field"]:has([data-slot="slider"]) {
     padding-top: var(--space-4);
     border-top: 1px solid var(--line-faint);
   }
@@ -154,9 +146,7 @@
   }
 
   /* A thumb with a value bubble keeps a lane above the track, so the bubble never covers the label. */
-  [data-slot="slider-root"]:has(
-      [data-slot="slider-thumb"] > [data-slot="output"]
-    )
+  [data-slot="slider"]:has([data-slot="slider-thumb"] > [data-slot="output"])
     > [data-slot="slider-control"] {
     margin-top: var(--space-6);
   }

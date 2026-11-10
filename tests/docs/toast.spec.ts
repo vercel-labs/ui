@@ -75,7 +75,7 @@ const open = async (page: Page, framework: string, name: string) => {
 
 const toastIn = (preview: Locator, name: RegExp | string) =>
   preview
-    .locator('[data-slot="toast-root"]')
+    .locator('[data-slot="toast"]')
     .filter({ has: preview.page().getByText(name) })
 
 for (const framework of frameworks) {
@@ -181,7 +181,7 @@ for (const framework of frameworks) {
     for (let count = 0; count < 5; count++) {
       await add.click()
     }
-    await expect(preview.locator('[data-slot="toast-root"]')).toHaveCount(4)
+    await expect(preview.locator('[data-slot="toast"]')).toHaveCount(4)
     await preview.getByRole("checkbox", { name: "Always expanded" }).click()
     await expect(preview.locator('[data-slot="toast-region"]')).toHaveAttribute(
       "data-expanded",
@@ -203,7 +203,7 @@ for (const framework of frameworks) {
       })
     ).toBeVisible()
     await preview.getByRole("button", { name: "Cancel Upload" }).click()
-    await expect(preview.locator('[data-slot="toast-root"]')).toHaveCount(0)
+    await expect(preview.locator('[data-slot="toast"]')).toHaveCount(0)
     await expect(lastLog(preview)).toHaveText("Upload canceled")
   })
 }

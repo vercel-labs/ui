@@ -44,7 +44,7 @@
   :scope
     [data-slot="popover-content"]
     :is(
-      [data-slot="field-root"],
+      [data-slot="field"],
       [data-slot="field-control"],
       textarea,
       select,
@@ -73,7 +73,7 @@
       gap: var(--space-3);
     }
 
-    & [data-slot="field-root"] {
+    & [data-slot="field"] {
       gap: 6px;
     }
 

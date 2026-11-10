@@ -28,14 +28,14 @@ test("every scroll area kitchen sink variant renders and scrolls", async ({
   await expect
     .poll(() =>
       page
-        .locator("[data-variant]:not(:has([data-slot='scroll-area-root']))")
+        .locator("[data-variant]:not(:has([data-slot='scroll-area']))")
         .count()
     )
     .toBe(0)
 
   for (const card of await cards.all()) {
     const id = await card.getAttribute("data-variant")
-    const root = card.locator("[data-slot='scroll-area-root']")
+    const root = card.locator("[data-slot='scroll-area']")
     const viewport = card.locator("[data-slot='scroll-area-viewport']")
     await card.scrollIntoViewIfNeeded()
     await expect.soft(root, `${id} renders`).toBeVisible()
@@ -63,12 +63,12 @@ test("every scroll area kitchen sink variant renders and scrolls", async ({
   for (let index = 0; index < 3; index++) {
     await chat.getByRole("button", { name: "add message" }).click()
   }
-  await expect(chat.locator("[data-slot='scroll-area-root']")).toHaveAttribute(
+  await expect(chat.locator("[data-slot='scroll-area']")).toHaveAttribute(
     "data-at-end",
     ""
   )
   await chat.getByRole("button", { name: "scrollToStart()" }).click()
-  await expect(chat.locator("[data-slot='scroll-area-root']")).toHaveAttribute(
+  await expect(chat.locator("[data-slot='scroll-area']")).toHaveAttribute(
     "data-at-start",
     ""
   )

@@ -66,7 +66,7 @@ function controlsIn(root: HTMLElement) {
     (el) =>
       validates(el) &&
       (el as HTMLInputElement).type !== "hidden" &&
-      el.closest('[data-slot="field-root"]') === root
+      el.closest('[data-slot="field"]') === root
   ) as HTMLElement[]
 }
 

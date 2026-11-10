@@ -70,7 +70,7 @@ test("changes: the first press arms the button, the second confirms", async ({
   page,
 }) => {
   await openExamples(page, url)
-  const button = page.locator(`[data-slot="confirm-button-root"]`).first()
+  const button = page.locator(`[data-slot="confirm-button"]`).first()
   await button.click()
   await expect(button).toHaveText("Press Again to Delete")
   await expect(button).toHaveAttribute("data-armed", "")
@@ -86,7 +86,7 @@ test("what a change reports: the reason, the source, and a cancel", async ({
 }) => {
   await openExamples(page, url)
   const example = page.locator('[data-example="core/confirm-button-details"]')
-  const button = example.locator(`[data-slot="confirm-button-root"]`)
+  const button = example.locator(`[data-slot="confirm-button"]`)
   const last = lastLog(page, "core/confirm-button-details")
   await button.click()
   await expect(last).toHaveText("Arm: press, from mouse")

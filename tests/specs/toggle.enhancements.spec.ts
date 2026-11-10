@@ -173,7 +173,7 @@ test.describe("enhancements", { tag: "@enhancement" }, () => {
   }) => {
     await expect(page.getByRole("separator")).toHaveCount(2)
     await expect(
-      page.locator('[data-slot="separator-root"][role="none"]')
+      page.locator('[data-slot="separator"][role="none"]')
     ).toHaveCount(1)
   })
 })

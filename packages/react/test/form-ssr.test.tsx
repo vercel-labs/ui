@@ -21,7 +21,7 @@ describe("server rendering text fields and forms", () => {
     expect(html).toMatch(/<input[^>]*name="email"[^>]*value="ada@example.com"/)
     expect(html).toContain('required=""')
     expect(html).toContain('data-filled=""')
-    expect(html).toContain('data-slot="input-root"')
+    expect(html).toContain('data-slot="input"')
   })
 
   test("a textarea renders its default value as its text", () => {

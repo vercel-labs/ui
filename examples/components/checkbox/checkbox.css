@@ -1,5 +1,5 @@
 @scope ([data-example]) {
-  [data-slot="checkbox-root"] {
+  [data-slot="checkbox"] {
     display: inline-grid;
     flex-shrink: 0;
     place-items: center;
@@ -79,10 +79,7 @@
   }
 
   /* A checkbox with its own content is a choice card. */
-  [data-slot="checkbox-root"]:not(
-    :empty,
-    :has(> [data-slot="checkbox-indicator"])
-  ) {
+  [data-slot="checkbox"]:not(:empty, :has(> [data-slot="checkbox-indicator"])) {
     display: inline-flex;
     align-items: center;
     gap: var(--space-3);
@@ -146,11 +143,11 @@
     }
   }
 
-  [data-slot="label"]:has(> [data-slot="checkbox-root"][data-disabled]) {
+  [data-slot="label"]:has(> [data-slot="checkbox"][data-disabled]) {
     color: var(--line-disabled);
   }
 
-  :is(th, td) > [data-slot="checkbox-root"] {
+  :is(th, td) > [data-slot="checkbox"] {
     vertical-align: middle;
   }
 }

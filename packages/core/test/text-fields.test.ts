@@ -28,7 +28,7 @@ describe("field set", () => {
 describe("input", () => {
   test("marks whether it holds text, and the native states it's given", () => {
     expect(attrs(input({ id: "i" }).part("root"))).toEqual({
-      "data-slot": "input-root",
+      "data-slot": "input",
     })
     expect(
       attrs(
@@ -38,7 +38,7 @@ describe("input", () => {
         })
       )
     ).toEqual({
-      "data-slot": "input-root",
+      "data-slot": "input",
       "data-filled": "",
       "data-disabled": "",
       "data-required": "",

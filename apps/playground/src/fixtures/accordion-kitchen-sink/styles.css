@@ -30,7 +30,7 @@
 
 /* The shared fixture styles size every accordion for the specs, and their
    unlayered rules beat Tailwind's layers. These parts take their classes instead. */
-#root [data-slot="accordion-root"] {
+#root [data-slot="accordion"] {
   display: revert-layer;
   flex-direction: revert-layer;
   min-width: revert-layer;

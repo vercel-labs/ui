@@ -1392,7 +1392,7 @@ const components: Record<
         web: "<ui-radio-group>",
         slot: "radio-group",
       },
-      root: { react: "Radio", web: "<ui-radio>", slot: "radio-root" },
+      root: { react: "Radio", web: "<ui-radio>", slot: "radio" },
       indicator: {
         react: "RadioIndicator",
         web: "<ui-radio-indicator>",
@@ -2952,7 +2952,8 @@ async function dataAttributeTables(component: string, framework: Framework) {
   const found = await collect(component)
   const { samples, descriptions, parts = {} } = components[component]
   const name = (slot: string) => partLabel(component, slot, framework)
-  const dataSlot = (slot: string) => parts[slot]?.slot ?? `${component}-${slot}`
+  const dataSlot = (slot: string) =>
+    parts[slot]?.slot ?? (slot === "root" ? component : `${component}-${slot}`)
   const slots = Object.keys(samples)
   return {
     styled: slots

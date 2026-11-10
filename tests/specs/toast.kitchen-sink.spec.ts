@@ -23,7 +23,7 @@ test("every kitchen sink variant shows a toast", async ({
   const variants = page.locator("[data-variant]")
   await expect(variants.first()).toBeVisible()
   const region = page.locator('[data-slot="toast-region"]')
-  const toasts = page.locator('[data-slot="toast-root"]')
+  const toasts = page.locator('[data-slot="toast"]')
 
   for (const [side, align] of [
     ["bottom", "end"],

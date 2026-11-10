@@ -165,8 +165,9 @@ function attrs(part: Part, props = part.props, state = part.store.get()) {
       definition.live?.read(state, context)
     )
   }
+  const { name } = ownerOf(part)
   const result: Attrs = {
-    "data-slot": `${ownerOf(part).name}-${part.slot}`,
+    "data-slot": part.slot === "root" ? name : `${name}-${part.slot}`,
     ...(declared === undefined ? undefined : { role }),
     ...own,
   }

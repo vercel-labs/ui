@@ -1,5 +1,5 @@
 @scope ([data-example]) {
-  :is([data-slot="date-input-root"], [data-slot="time-input-root"]) {
+  :is([data-slot="date-input"], [data-slot="time-input"]) {
     display: inline-flex;
     align-items: center;
     width: auto;
@@ -8,8 +8,8 @@
   }
 
   /* A field around a date or time takes the input's width, so its description wraps under it. */
-  [data-slot="field-root"]:has(
-    > :is([data-slot="date-input-root"], [data-slot="time-input-root"])
+  [data-slot="field"]:has(
+    > :is([data-slot="date-input"], [data-slot="time-input"])
   ) {
     width: max-content;
     max-width: 20rem;

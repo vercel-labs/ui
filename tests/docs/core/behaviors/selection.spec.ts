@@ -177,7 +177,7 @@ test("lasso: locked photos stay out, and screen readers hear how many were selec
   page,
 }) => {
   await openBehaviors(page, "selection")
-  const surface = page.locator('[data-slot="photos-root"]')
+  const surface = page.locator('[data-slot="photos"]')
   await surface.scrollIntoViewIfNeeded()
   const box = (await surface.boundingBox())!
   await page.mouse.move(box.x + 4, box.y + 4)

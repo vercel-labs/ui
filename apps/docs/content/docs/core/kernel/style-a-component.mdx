@@ -7,10 +7,10 @@ description: Style each part from its data-slot and the attributes its state set
 
 ## Find the Part
 
-Every part has a `data-slot` attribute: the primitive's `name`, then the slot's. The copy button's root is `copy-button-root`:
+Every part has a `data-slot` attribute: the primitive's `name`, then the slot's, like `tabs-list`. The root part gets the name alone, so the copy button's root is `copy-button`:
 
 ```css
-[data-slot="copy-button-root"] {
+[data-slot="copy-button"] {
   border-radius: 0.5rem;
   padding: 0.25rem 0.75rem;
 }
@@ -33,7 +33,7 @@ root: slot<{}, { copied: boolean }>({
 An empty string adds the attribute, and `undefined` leaves it off. Your CSS can now follow it:
 
 ```css
-[data-slot="copy-button-root"][data-copied] {
+[data-slot="copy-button"][data-copied] {
   background: #171717;
   color: white;
 }

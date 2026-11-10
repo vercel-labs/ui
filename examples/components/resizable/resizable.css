@@ -1,5 +1,5 @@
 @scope ([data-example]) {
-  [data-slot="resizable-root"] {
+  [data-slot="resizable"] {
     box-sizing: border-box;
     width: 28rem;
     max-width: 100%;
@@ -19,7 +19,7 @@
     }
   }
 
-  [data-slot="stack"]:has(> [data-slot="resizable-root"]) {
+  [data-slot="stack"]:has(> [data-slot="resizable"]) {
     width: 28rem;
     max-width: 100%;
   }
@@ -33,7 +33,7 @@
     padding: var(--space-4);
     overflow: hidden;
 
-    &:has(> [data-slot="resizable-root"]) {
+    &:has(> [data-slot="resizable"]) {
       padding: 0;
     }
 

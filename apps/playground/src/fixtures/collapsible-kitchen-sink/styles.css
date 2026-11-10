@@ -41,7 +41,7 @@
 
 /* The shared fixture styles size every collapsible for the specs, and their
    unlayered rules beat Tailwind's layers. These parts take their classes instead. */
-#root [data-slot="collapsible-root"] {
+#root [data-slot="collapsible"] {
   min-width: revert-layer;
 }
 

@@ -1,5 +1,5 @@
 @scope ([data-example]) {
-  [data-slot="color-picker-root"] {
+  [data-slot="color-picker"] {
     --checker: repeating-conic-gradient(
         var(--line-faint) 0 25%,
         var(--surface-1) 0 50%
@@ -26,7 +26,7 @@
     min-width: 0;
   }
 
-  [data-slot="color-picker-root"] > [data-slot="row"] > select {
+  [data-slot="color-picker"] > [data-slot="row"] > select {
     flex: none;
     width: auto;
   }
@@ -169,7 +169,7 @@
     min-width: 0;
   }
 
-  [data-slot="color-picker-root"]:has(> [data-slot="popover-trigger"]) {
+  [data-slot="color-picker"]:has(> [data-slot="popover-trigger"]) {
     width: auto;
   }
 

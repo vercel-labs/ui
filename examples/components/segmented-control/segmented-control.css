@@ -1,5 +1,5 @@
 @scope ([data-example]) {
-  [data-slot="segmented-control-root"] {
+  [data-slot="segmented-control"] {
     position: relative;
     display: inline-flex;
     gap: 2px;
@@ -12,7 +12,7 @@
       flex-direction: column;
     }
 
-    [data-slot="field-root"] > & {
+    [data-slot="field"] > & {
       display: flex;
 
       &[data-orientation="vertical"] {

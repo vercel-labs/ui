@@ -132,7 +132,7 @@ test.each(["value", "modelValue"])(
       await new Promise((resolve) => setTimeout(resolve))
       const label = el.querySelector("label")!.id
       return Array.from(
-        el.querySelectorAll('[data-slot="slider-root"], input[type="range"]')
+        el.querySelectorAll('[data-slot="slider"], input[type="range"]')
       )
         .filter((node) => node.getAttribute("aria-labelledby") === label)
         .map((node) => node.tagName)

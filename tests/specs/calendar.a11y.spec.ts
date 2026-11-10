@@ -56,8 +56,7 @@ test("days are named by their full date, and the steps by their labels", async (
 // Every implementation must expose the same accessibility tree.
 test("accessibility tree", async ({ page, open }) => {
   await open("calendar", { month: "2026-02", value: "2026-02-10" })
-  await expect(page.locator('[data-slot="calendar-root"]'))
-    .toMatchAriaSnapshot(`
+  await expect(page.locator('[data-slot="calendar"]')).toMatchAriaSnapshot(`
     - button "Previous month"
     - heading "February 2026" [level=2]
     - button "Next month"

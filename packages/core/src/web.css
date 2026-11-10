@@ -183,12 +183,8 @@
     --ui-icon: var(--ui-icon-plus);
   }
 
-  :is(label, [data-slot="label-root"]):has(
-    > :is(
-      [data-slot="checkbox-root"],
-      [data-slot="radio-root"],
-      [data-slot="switch-root"]
-    )
+  :is(label, [data-slot="label"]):has(
+    > :is([data-slot="checkbox"], [data-slot="radio"], [data-slot="switch"])
   ) {
     display: inline-flex;
     align-items: flex-start;
@@ -197,18 +193,18 @@
     line-height: var(--ui-line-height);
 
     /* Centers the control on the first line, so a long label wraps under its text. */
-    & > :is([data-slot="checkbox-root"], [data-slot="radio-root"]) {
+    & > :is([data-slot="checkbox"], [data-slot="radio"]) {
       margin-block-start: calc((1lh - 1rem) / 2);
     }
 
-    & > [data-slot="switch-root"] {
+    & > [data-slot="switch"] {
       margin-block-start: calc((1lh - 1.125rem) / 2);
     }
   }
 
   :is(
-    [data-slot="button-root"],
-    [data-slot="toggle-root"],
+    [data-slot="button"],
+    [data-slot="toggle"],
     [data-slot="dialog-trigger"],
     [data-slot="dialog-close"],
     [data-slot="alert-dialog-trigger"],
@@ -290,12 +286,10 @@
   }
 
   /* A trigger right after its input sits inside the input's end. Web components wrap each part, and :has() can't nest. */
-  :not([data-slot="field-root"]):has(
+  :not([data-slot="field"]):has(
     > [data-slot="combobox-input"] + [data-slot="combobox-trigger"]
   ),
-  :not([data-slot="field-root"]):has(
-    > ui-combobox-input + ui-combobox-trigger
-  ) {
+  :not([data-slot="field"]):has(> ui-combobox-input + ui-combobox-trigger) {
     display: flex;
 
     & > :is([data-slot="combobox-input"], ui-combobox-input) {
@@ -321,7 +315,7 @@
     }
   }
 
-  [data-slot="menubar-root"] {
+  [data-slot="menubar"] {
     display: inline-flex;
     gap: 2px;
     padding: 2px;
@@ -340,22 +334,22 @@
     }
   }
 
-  [data-slot="toggle-root"][data-pressed] {
+  [data-slot="toggle"][data-pressed] {
     border-color: var(--ui-foreground);
     background: var(--ui-muted);
   }
 
   :is(
-    [data-slot="toggle-group"] > [data-slot="toggle-root"]:first-child,
-    [data-slot="toggle-group"] > :first-child > [data-slot="toggle-root"]
+    [data-slot="toggle-group"] > [data-slot="toggle"]:first-child,
+    [data-slot="toggle-group"] > :first-child > [data-slot="toggle"]
   ) {
     border-start-start-radius: var(--ui-radius);
     border-end-start-radius: var(--ui-radius);
   }
 
   :is(
-    [data-slot="toggle-group"] > [data-slot="toggle-root"]:last-child,
-    [data-slot="toggle-group"] > :last-child > [data-slot="toggle-root"]
+    [data-slot="toggle-group"] > [data-slot="toggle"]:last-child,
+    [data-slot="toggle-group"] > :last-child > [data-slot="toggle"]
   ) {
     border-start-end-radius: var(--ui-radius);
     border-end-end-radius: var(--ui-radius);
@@ -365,7 +359,7 @@
     display: inline-flex;
     padding-inline-start: 1px;
 
-    & [data-slot="toggle-root"] {
+    & [data-slot="toggle"] {
       position: relative;
       margin-inline-start: -1px;
       border-radius: 0;
@@ -376,7 +370,7 @@
     }
   }
 
-  [data-slot="field-root"] {
+  [data-slot="field"] {
     display: flex;
     flex-direction: column;
     gap: calc(var(--ui-spacing) * 1.5);
@@ -428,8 +422,8 @@
   }
 
   :is(
-    [data-slot="input-root"],
-    [data-slot="textarea-root"],
+    [data-slot="input"],
+    [data-slot="textarea"],
     [data-slot="combobox-input"],
     [data-slot="autocomplete-input"],
     [data-slot="trigger-menu-input"]
@@ -469,13 +463,13 @@
     font-weight: 500;
   }
 
-  :is([data-slot="textarea-root"], [data-slot="trigger-menu-input"]) {
+  :is([data-slot="textarea"], [data-slot="trigger-menu-input"]) {
     min-height: calc(var(--ui-spacing) * 20);
     padding-block: calc(var(--ui-spacing) * 2);
     resize: vertical;
   }
 
-  [data-slot="number-input-root"] {
+  [data-slot="number-input"] {
     display: flex;
     flex-direction: column;
     gap: calc(var(--ui-spacing) * 1.5);
@@ -542,8 +536,8 @@
   }
 
   :is(
-      [data-slot="input-root"],
-      [data-slot="textarea-root"],
+      [data-slot="input"],
+      [data-slot="textarea"],
       [data-slot="select-trigger"],
       [data-slot="combobox-input"],
       [data-slot="autocomplete-input"]
@@ -552,7 +546,7 @@
     outline-color: color-mix(in oklab, var(--ui-destructive) 20%, transparent);
   }
 
-  :is([data-slot="checkbox-root"], [data-slot="radio-root"]) {
+  :is([data-slot="checkbox"], [data-slot="radio"]) {
     display: inline-flex;
     flex-shrink: 0;
     align-items: center;
@@ -577,7 +571,7 @@
     }
   }
 
-  [data-slot="checkbox-root"]:is([data-checked], [data-indeterminate]) {
+  [data-slot="checkbox"]:is([data-checked], [data-indeterminate]) {
     border-color: var(--ui-primary);
     background: var(--ui-primary);
   }
@@ -593,7 +587,7 @@
     gap: calc(var(--ui-spacing) * 2);
   }
 
-  [data-slot="radio-root"] {
+  [data-slot="radio"] {
     border-radius: 50%;
 
     &[data-checked] {
@@ -609,7 +603,7 @@
   }
 
   /* Any radius above zero turns the switch and slider thumb fully round. */
-  [data-slot="switch-root"] {
+  [data-slot="switch"] {
     display: inline-flex;
     flex-shrink: 0;
     align-items: center;
@@ -645,7 +639,7 @@
     }
   }
 
-  [data-slot="slider-root"] {
+  [data-slot="slider"] {
     display: flex;
     flex-direction: column;
     gap: calc(var(--ui-spacing) * 2);
@@ -710,7 +704,7 @@
     }
   }
 
-  :is([data-slot="progress-root"], [data-slot="meter-root"]) {
+  :is([data-slot="progress"], [data-slot="meter"]) {
     display: grid;
     grid-template-columns: 1fr auto;
     gap: calc(var(--ui-spacing) * 1.5);
@@ -747,7 +741,7 @@
     );
   }
 
-  [data-slot="accordion-root"] {
+  [data-slot="accordion"] {
     width: 100%;
     max-width: 28rem;
     border-top: 1px solid var(--ui-border);
@@ -801,7 +795,7 @@
     padding-bottom: calc(var(--ui-spacing) * 4);
   }
 
-  [data-slot="avatar-root"] {
+  [data-slot="avatar"] {
     position: relative;
     display: inline-flex;
     flex-shrink: 0;
@@ -824,7 +818,7 @@
     object-fit: cover;
   }
 
-  [data-slot="separator-root"] {
+  [data-slot="separator"] {
     align-self: center;
     width: 100%;
     height: 1px;
@@ -870,7 +864,7 @@
     }
   }
 
-  [data-slot="field-root"] [data-slot="select-trigger"] {
+  [data-slot="field"] [data-slot="select-trigger"] {
     width: 100%;
     min-width: 0;
   }
@@ -1068,7 +1062,7 @@
     background: var(--ui-border);
   }
 
-  [data-slot="command-root"] {
+  [data-slot="command"] {
     display: flex;
     flex-direction: column;
     width: 22rem;
@@ -1105,7 +1099,7 @@
     overscroll-behavior: contain;
   }
 
-  [data-slot="listbox-root"] {
+  [data-slot="listbox"] {
     display: flex;
     flex-direction: column;
     width: 16rem;
@@ -1117,7 +1111,7 @@
     font-size: var(--ui-font-size);
   }
 
-  [data-slot="navigation-menu-root"] {
+  [data-slot="navigation-menu"] {
     position: relative;
   }
 
@@ -1216,7 +1210,7 @@
     }
   }
 
-  [data-slot="tabs-root"] {
+  [data-slot="tabs"] {
     display: flex;
     flex-direction: column;
 
@@ -1539,12 +1533,12 @@
     rotate: 90deg;
   }
 
-  [data-slot="carousel-root"][data-orientation="vertical"]
+  [data-slot="carousel"][data-orientation="vertical"]
     [data-slot="carousel-previous"]::before {
     rotate: 180deg;
   }
 
-  [data-slot="carousel-root"][data-orientation="vertical"]
+  [data-slot="carousel"][data-orientation="vertical"]
     [data-slot="carousel-next"]::before {
     rotate: none;
   }
@@ -1696,9 +1690,9 @@
 
   /* Inputs made of a box around their own parts. */
   :is(
-    [data-slot="date-input-root"],
-    [data-slot="time-input-root"],
-    [data-slot="password-input-root"]
+    [data-slot="date-input"],
+    [data-slot="time-input"],
+    [data-slot="password-input"]
   ) {
     display: inline-flex;
     align-items: center;
@@ -1727,7 +1721,7 @@
     }
   }
 
-  :is([data-slot="date-input-root"], [data-slot="time-input-root"]) {
+  :is([data-slot="date-input"], [data-slot="time-input"]) {
     align-self: flex-start;
     gap: 0;
     font-variant-numeric: tabular-nums;
@@ -1780,7 +1774,7 @@
     }
   }
 
-  [data-slot="password-input-root"] {
+  [data-slot="password-input"] {
     display: flex;
     padding-inline-end: calc(var(--ui-spacing) * 1);
   }
@@ -1801,7 +1795,7 @@
     }
   }
 
-  [data-slot="date-picker-root"] {
+  [data-slot="date-picker"] {
     display: inline-flex;
     flex-direction: column;
     gap: calc(var(--ui-spacing) * 1.5);
@@ -1841,11 +1835,11 @@
   }
 
   /* The trigger and clear button right after the input sit inside the input's end. */
-  :not([data-slot="field-root"]):has(
+  :not([data-slot="field"]):has(
     > [data-slot="date-picker-input"]
       + :is([data-slot="date-picker-trigger"], [data-slot="date-picker-clear"])
   ),
-  :not([data-slot="field-root"]):has(
+  :not([data-slot="field"]):has(
     > ui-date-picker-input + :is(ui-date-picker-trigger, ui-date-picker-clear)
   ) {
     display: flex;
@@ -1883,7 +1877,7 @@
     font-variant-numeric: tabular-nums;
   }
 
-  [data-slot="otp-input-root"] {
+  [data-slot="otp-input"] {
     display: inline-flex;
     align-items: center;
     gap: calc(var(--ui-spacing) * 2);
@@ -1937,7 +1931,7 @@
     }
   }
 
-  [data-slot="otp-input-root"]:has([aria-invalid="true"])
+  [data-slot="otp-input"]:has([aria-invalid="true"])
     [data-slot="otp-input-slot"] {
     border-color: var(--ui-destructive);
   }
@@ -2033,7 +2027,7 @@
     }
   }
 
-  [data-slot="file-input-root"] {
+  [data-slot="file-input"] {
     display: flex;
     flex-direction: column;
     gap: calc(var(--ui-spacing) * 3);
@@ -2134,7 +2128,7 @@
     }
   }
 
-  [data-slot="calendar-root"] {
+  [data-slot="calendar"] {
     display: inline-grid;
     grid-template-columns: auto 1fr auto;
     align-items: center;
@@ -2314,7 +2308,7 @@
       grid-column: 1 / -1;
     }
 
-    & [data-slot="calendar-root"] {
+    & [data-slot="calendar"] {
       padding: 0;
       border: 0;
     }
@@ -2340,7 +2334,7 @@
     }
   }
 
-  [data-slot="color-picker-root"] {
+  [data-slot="color-picker"] {
     --ui-checker: repeating-conic-gradient(
         var(--ui-muted) 0 25%,
         var(--ui-background) 0 50%
@@ -2506,7 +2500,7 @@
     font-variant-numeric: tabular-nums;
   }
 
-  [data-slot="image-cropper-root"] {
+  [data-slot="image-cropper"] {
     display: flex;
     flex-direction: column;
     gap: calc(var(--ui-spacing) * 3);
@@ -2630,7 +2624,7 @@
     }
   }
 
-  [data-slot="carousel-root"] {
+  [data-slot="carousel"] {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr) auto;
     align-items: center;
@@ -2735,7 +2729,7 @@
     }
   }
 
-  [data-slot="rating-root"] {
+  [data-slot="rating"] {
     display: inline-flex;
     gap: 2px;
 
@@ -2787,12 +2781,12 @@
     border-radius: var(--ui-radius);
     cursor: pointer;
 
-    [data-slot="rating-root"]:is([data-disabled], [data-readonly]) & {
+    [data-slot="rating"]:is([data-disabled], [data-readonly]) & {
       cursor: default;
     }
   }
 
-  [data-slot="resizable-root"] {
+  [data-slot="resizable"] {
     width: 100%;
     min-height: 12rem;
     overflow: hidden;
@@ -2810,7 +2804,7 @@
   [data-slot="resizable-panel"] {
     overflow: hidden;
 
-    &:not(:has(> [data-slot="resizable-root"])) {
+    &:not(:has(> [data-slot="resizable"])) {
       padding: calc(var(--ui-spacing) * 4);
     }
   }
@@ -2855,7 +2849,7 @@
     }
   }
 
-  [data-slot="scroll-area-root"] {
+  [data-slot="scroll-area"] {
     position: relative;
     overflow: hidden;
     border: 1px solid var(--ui-border);
@@ -2903,7 +2897,7 @@
     }
   }
 
-  [data-slot="segmented-control-root"] {
+  [data-slot="segmented-control"] {
     position: relative;
     display: inline-flex;
     gap: 2px;
@@ -2963,7 +2957,7 @@
     background: var(--ui-background);
   }
 
-  [data-slot="toolbar-root"] {
+  [data-slot="toolbar"] {
     display: inline-flex;
     flex-wrap: wrap;
     align-items: center;
@@ -2982,7 +2976,7 @@
       :is(
         [data-slot="toolbar-button"],
         [data-slot="toolbar-link"],
-        [data-slot="toggle-root"]
+        [data-slot="toggle"]
       ) {
       min-width: calc(var(--ui-spacing) * 7);
       height: calc(var(--ui-spacing) * 7);
@@ -3022,7 +3016,7 @@
 
   :is(
     [data-slot="toolbar-group"],
-    [data-slot="toolbar-root"] [data-slot="toggle-group"]
+    [data-slot="toolbar"] [data-slot="toggle-group"]
   ) {
     display: flex;
     align-items: center;
@@ -3033,7 +3027,7 @@
       flex-direction: column;
     }
 
-    & [data-slot="toggle-root"] {
+    & [data-slot="toggle"] {
       margin: 0;
     }
   }
@@ -3051,7 +3045,7 @@
     }
   }
 
-  [data-slot="tree-root"] {
+  [data-slot="tree"] {
     display: flex;
     flex-direction: column;
     gap: 1px;
@@ -3186,7 +3180,7 @@
     }
   }
 
-  [data-slot="toast-root"] {
+  [data-slot="toast"] {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -3296,19 +3290,11 @@
       button[data-slot],
       [data-slot="navigation-menu-link"],
       [data-slot="segmented-control-item"],
-      :is(label, [data-slot="label-root"]):has(
-        > :is(
-          [data-slot="checkbox-root"],
-          [data-slot="radio-root"],
-          [data-slot="switch-root"]
-        )
+      :is(label, [data-slot="label"]):has(
+        > :is([data-slot="checkbox"], [data-slot="radio"], [data-slot="switch"])
       ),
-      :not(label, [data-slot="label-root"])
-        > :is(
-          [data-slot="checkbox-root"],
-          [data-slot="radio-root"],
-          [data-slot="switch-root"]
-        )
+      :not(label, [data-slot="label"])
+        > :is([data-slot="checkbox"], [data-slot="radio"], [data-slot="switch"])
     ) {
       position: relative;
     }
@@ -3338,19 +3324,15 @@
         [data-slot="slider-thumb"],
         [data-slot="color-picker-area-thumb"],
         [data-slot="color-picker-slider-thumb"],
-        :not(label, [data-slot="label-root"])
+        :not(label, [data-slot="label"])
           > :is(
-            [data-slot="checkbox-root"],
-            [data-slot="radio-root"],
-            [data-slot="switch-root"]
+            [data-slot="checkbox"],
+            [data-slot="radio"],
+            [data-slot="switch"]
           )
       )::after,
-    :is(label, [data-slot="label-root"]):has(
-        > :is(
-          [data-slot="checkbox-root"],
-          [data-slot="radio-root"],
-          [data-slot="switch-root"]
-        )
+    :is(label, [data-slot="label"]):has(
+        > :is([data-slot="checkbox"], [data-slot="radio"], [data-slot="switch"])
       )::after,
     :is(
       [data-slot="select-trigger"],
@@ -3384,12 +3366,8 @@
       [data-slot="slider-thumb"],
       [data-slot="color-picker-area-thumb"],
       [data-slot="color-picker-slider-thumb"],
-      :not(label, [data-slot="label-root"])
-        > :is(
-          [data-slot="checkbox-root"],
-          [data-slot="radio-root"],
-          [data-slot="switch-root"]
-        )
+      :not(label, [data-slot="label"])
+        > :is([data-slot="checkbox"], [data-slot="radio"], [data-slot="switch"])
     )::after {
       position: absolute;
       inset: min(0px, calc((100% - 2.75rem) / 2));

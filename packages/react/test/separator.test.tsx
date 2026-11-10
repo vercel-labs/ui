@@ -28,6 +28,6 @@ test("a separator's rendered element follows a new orientation", async () => {
   await React.act(async () => root!.render(separator("vertical")))
 
   expect(container.innerHTML).toBe(
-    '<hr data-slot="separator-root" role="separator" aria-orientation="vertical" data-orientation="vertical" title="vertical">'
+    '<hr data-slot="separator" role="separator" aria-orientation="vertical" data-orientation="vertical" title="vertical">'
   )
 })

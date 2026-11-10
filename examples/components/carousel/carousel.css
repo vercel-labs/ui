@@ -1,5 +1,5 @@
 @scope ([data-example]) {
-  [data-slot="carousel-root"] {
+  [data-slot="carousel"] {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     gap: var(--space-3);
@@ -19,26 +19,26 @@
   }
 
   /* Slides are the same width with or without Previous and Next beside them. */
-  [data-slot="carousel-root"]:not(
+  [data-slot="carousel"]:not(
     :has(> [data-slot="row"] > [data-slot="carousel-viewport"])
   ) {
     width: calc(24rem - 2 * (var(--size) + var(--space-2)));
   }
 
   /* Rows under side buttons line up with the slides. */
-  [data-slot="carousel-root"]:has(
+  [data-slot="carousel"]:has(
       > [data-slot="row"] > [data-slot="carousel-viewport"]
     )
     > [data-slot="row"]:not(:has(> [data-slot="carousel-viewport"])) {
     padding-inline: calc(var(--size) + var(--space-2));
   }
 
-  :scope [data-slot="stack"]:has(> [data-slot="carousel-root"]) {
+  :scope [data-slot="stack"]:has(> [data-slot="carousel"]) {
     width: calc(24rem - 2 * (var(--size) + var(--space-2)));
     max-width: 100%;
     margin-inline: auto;
 
-    & > [data-slot="carousel-root"] {
+    & > [data-slot="carousel"] {
       align-self: stretch;
       width: auto;
       margin-inline: 0;
@@ -47,7 +47,7 @@
 
   :scope
     [data-slot="stack"]:has(
-      > [data-slot="carousel-root"]
+      > [data-slot="carousel"]
         > [data-slot="row"]
         > [data-slot="carousel-viewport"]
     ) {
@@ -173,15 +173,13 @@
   }
 
   /* Previous and Next sit on either side of the slides. */
-  [data-slot="carousel-root"]
-    > [data-slot="row"]
-    > [data-slot="carousel-viewport"] {
+  [data-slot="carousel"] > [data-slot="row"] > [data-slot="carousel-viewport"] {
     flex: 1;
     min-width: 0;
   }
 
   /* Pages: three slides to a page, with the content's gaps taken out of each basis. */
-  :scope[data-example="carousel/pages"] [data-slot="carousel-root"] {
+  :scope[data-example="carousel/pages"] [data-slot="carousel"] {
     width: 32rem;
   }
 

@@ -11,9 +11,7 @@ test("an attachment on OTPInput attaches to its root", () => {
     props: { attach: (el: HTMLElement) => void attached.push(el) },
   })
   flushSync()
-  expect(attached).toEqual([
-    document.querySelector('[data-slot="otp-input-root"]'),
-  ])
+  expect(attached).toEqual([document.querySelector('[data-slot="otp-input"]')])
   expect(document.querySelector("input")?.getAttribute("aria-label")).toBe(
     "Code"
   )

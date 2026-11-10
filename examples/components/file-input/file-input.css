@@ -1,5 +1,5 @@
 @scope ([data-example]) {
-  [data-slot="file-input-root"] {
+  [data-slot="file-input"] {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -99,7 +99,7 @@
 
   /* Page-wide drop: the hint and the upload button share a row above the list. */
   :scope[data-example="file-input/page"]
-    [data-slot="file-input-root"]
+    [data-slot="file-input"]
     > [data-slot="row"] {
     flex-wrap: nowrap;
     justify-content: center;

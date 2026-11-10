@@ -60,8 +60,8 @@ To change what the button shows while it waits, mark content with `data-show="id
 <StyleTabs>
 
 ```css
-[data-slot="button-root"]:not([data-pending]) [data-show="pending"],
-[data-slot="button-root"][data-pending] [data-show="idle"] {
+[data-slot="button"]:not([data-pending]) [data-show="pending"],
+[data-slot="button"][data-pending] [data-show="idle"] {
   display: none;
 }
 ```
@@ -195,7 +195,7 @@ Button tracks the Promise returned by its own `@click`, not one from the form’
 
 ## Styling
 
-Use `data-pending` to show a spinner or waiting cursor, and `data-disabled` to style an unavailable action. The button's `data-slot` is `button-root`, and its attributes are listed under [Data Attributes](#data-attributes).
+Use `data-pending` to show a spinner or waiting cursor, and `data-disabled` to style an unavailable action. The button's `data-slot` is `button`, and its attributes are listed under [Data Attributes](#data-attributes).
 
 [Styling and Animation](/docs/vue/styling-and-animation) covers the styling patterns shared by all components.
 

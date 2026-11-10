@@ -344,9 +344,7 @@ async function load(page: Page, framework: string) {
   await page.goto(kitchenSink(framework))
   await page.locator("body[data-mounted]").waitFor({ state: "attached" })
   // Each card mounts its own root, so wait for all of them.
-  const navs = page.locator(
-    '[data-slot="navigation-menu-root"]:not([data-nested])'
-  )
+  const navs = page.locator('[data-slot="navigation-menu"]:not([data-nested])')
   await expect
     .poll(() => navs.count(), { timeout: 20_000 })
     .toBe(variants.length)

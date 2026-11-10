@@ -200,7 +200,7 @@ A stack at the bottom of the page, in plain CSS:
   height: calc(var(--toast-stack-height) + (var(--toast-count) - 1) * 12px);
 }
 
-[data-slot="toast-root"] {
+[data-slot="toast"] {
   --y: calc(var(--toast-index) * -12px);
   position: absolute;
   inset-inline: 0;
@@ -216,42 +216,42 @@ A stack at the bottom of the page, in plain CSS:
   user-select: none;
 }
 
-[data-slot="toast-root"]:not([data-front], [data-expanded]) {
+[data-slot="toast"]:not([data-front], [data-expanded]) {
   height: var(--toast-front-height);
 }
 
-[data-slot="toast-root"][data-expanded] {
+[data-slot="toast"][data-expanded] {
   --y: calc(-1 * (var(--toast-offset) + var(--toast-index) * 12px));
   scale: 1;
 }
 
-[data-slot="toast-root"][data-starting-style] {
+[data-slot="toast"][data-starting-style] {
   transition: none;
 }
 
-[data-slot="toast-root"][data-starting-style][data-front] {
+[data-slot="toast"][data-starting-style][data-front] {
   --y: 100%;
 }
 
-[data-slot="toast-root"]:is(
+[data-slot="toast"]:is(
   [data-starting-style]:not([data-front]),
   [data-ending-style]
 ) {
   opacity: 0;
 }
 
-[data-slot="toast-root"][data-swiping] {
+[data-slot="toast"][data-swiping] {
   transition: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [data-slot="toast-root"] {
+  [data-slot="toast"] {
     transition-property: opacity;
   }
 }
 ```
 
-Each part has a `data-slot`, such as `toast-root`, and its state attributes are listed under [Data Attributes](#data-attributes).
+Each part has a `data-slot`, such as `toast`, and its state attributes are listed under [Data Attributes](#data-attributes).
 
 ### ToastRegion [#styling-toastregion]
 

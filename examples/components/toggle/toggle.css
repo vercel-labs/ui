@@ -1,5 +1,5 @@
 @scope ([data-example]) {
-  [data-slot="toggle-root"] {
+  [data-slot="toggle"] {
     display: inline-flex;
     flex-shrink: 0;
     align-items: center;
@@ -58,7 +58,7 @@
   }
 
   /* A toggle on its own looks like an outline button, and fills in while pressed. */
-  [data-slot="toggle-root"]:not(
+  [data-slot="toggle"]:not(
     [data-variant="ghost"],
     [data-slot="toggle-group"] *
   ) {
@@ -109,19 +109,19 @@
       flex-direction: column;
     }
 
-    & [data-slot="toggle-root"] {
+    & [data-slot="toggle"] {
       border-radius: var(--radius-row);
     }
   }
 
   /* A group outside a toolbar sits on its own track, sized like a menubar or toolbar so it lines up with inputs. */
-  [data-slot="toggle-group"]:not([data-slot="toolbar-root"] *) {
+  [data-slot="toggle-group"]:not([data-slot="toolbar"] *) {
     padding: 3px;
     border-radius: var(--radius-surface);
     background: var(--surface-1);
     box-shadow: var(--shadow-1);
 
-    & [data-slot="toggle-root"] {
+    & [data-slot="toggle"] {
       height: var(--size-sm);
       min-width: var(--size-sm);
 

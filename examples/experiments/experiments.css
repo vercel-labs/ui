@@ -19,7 +19,7 @@
     }
   }
 
-  [data-slot="blend-pad-root"] {
+  [data-slot="blend-pad"] {
     box-sizing: border-box;
     width: 256px;
     height: 256px;
@@ -96,11 +96,11 @@
   /* ─── Experiments: Board ──────────────────────────────────────────── */
 
   :scope[data-example="experiments/board"] {
-    & [data-slot="stack"]:has(> [data-slot="board-root"]) {
+    & [data-slot="stack"]:has(> [data-slot="board"]) {
       width: 100%;
     }
 
-    & [data-slot="board-root"] {
+    & [data-slot="board"] {
       box-sizing: border-box;
       width: 100%;
       height: 320px;
@@ -171,7 +171,7 @@
   /* ─── Experiments: Canvas ─────────────────────────────────────────── */
 
   :scope[data-example="experiments/canvas"] {
-    & [data-slot="canvas-root"] {
+    & [data-slot="canvas"] {
       box-sizing: border-box;
       width: 100%;
       height: 420px;
@@ -360,7 +360,7 @@
 
   /* ─── Experiments: Chat ───────────────────────────────────────────── */
 
-  [data-slot="chat-root"] {
+  [data-slot="chat"] {
     position: relative;
     display: flex;
     flex-direction: column;
@@ -495,7 +495,7 @@
 
   /* ─── Experiments: Color picker ───────────────────────────────────── */
 
-  [data-slot="hsv-picker-root"] {
+  [data-slot="hsv-picker"] {
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
@@ -663,12 +663,12 @@
 
   /* ─── Experiments: Data grid ──────────────────────────────────────── */
 
-  [data-slot="stack"]:has(> [data-slot="data-grid-root"]) {
+  [data-slot="stack"]:has(> [data-slot="data-grid"]) {
     align-items: stretch;
     width: 100%;
   }
 
-  [data-slot="data-grid-root"] {
+  [data-slot="data-grid"] {
     box-sizing: border-box;
     width: 100%;
     height: 384px;
@@ -791,7 +791,7 @@
   /* ─── Experiments: Desktop ────────────────────────────────────────── */
 
   :scope[data-example="experiments/desktop"] {
-    & [data-slot="desktop-root"] {
+    & [data-slot="desktop"] {
       box-sizing: content-box;
       width: var(--desktop-width);
       height: calc(var(--desktop-height) + 48px);
@@ -1085,7 +1085,7 @@
 
   /* ─── Experiments: Image cropper ──────────────────────────────────── */
 
-  [data-slot="crop-box-root"] {
+  [data-slot="crop-box"] {
     width: var(--crop-box-width);
     max-width: 100%;
     height: var(--crop-box-height);
@@ -1359,7 +1359,7 @@
 
   /* ─── Experiments: Kanban ─────────────────────────────────────────── */
 
-  [data-slot="kanban-root"] {
+  [data-slot="kanban"] {
     display: flex;
     flex-direction: column;
     gap: var(--space-2);
@@ -1625,7 +1625,7 @@
 
   /* ─── Experiments: Outline ────────────────────────────────────────── */
 
-  [data-slot="outline-root"] {
+  [data-slot="outline"] {
     display: flex;
     flex-direction: column;
     gap: 2px;
@@ -1748,7 +1748,7 @@
     background: var(--accent);
   }
 
-  [data-slot="peek-root"] {
+  [data-slot="peek"] {
     display: flex;
     gap: 2px;
     box-sizing: border-box;
@@ -1797,7 +1797,7 @@
 
   /* ─── Experiments: Rewind ─────────────────────────────────────────── */
 
-  [data-slot="rewind-root"] {
+  [data-slot="rewind"] {
     display: flex;
     flex-direction: column;
     gap: var(--space-4);
@@ -1829,7 +1829,7 @@
       width: 7rem;
     }
 
-    & [data-slot="slider-root"] {
+    & [data-slot="slider"] {
       flex: 1;
     }
 
@@ -1921,7 +1921,7 @@
 
   /* ─── Experiments: Selection toolbar ──────────────────────────────── */
 
-  [data-slot="selection-toolbar-root"] {
+  [data-slot="selection-toolbar"] {
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
@@ -2005,7 +2005,7 @@
     }
   }
 
-  [data-slot="sortable-root"] {
+  [data-slot="sortable"] {
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -2339,7 +2339,7 @@
       width: 6rem;
     }
 
-    & [data-slot="slider-root"] {
+    & [data-slot="slider"] {
       flex: 1;
     }
   }
@@ -2441,7 +2441,7 @@
 
   /* ─── Experiments: Week calendar ──────────────────────────────────── */
 
-  [data-slot="week-calendar-root"] {
+  [data-slot="week-calendar"] {
     display: flex;
     flex-direction: column;
     gap: var(--space-2);

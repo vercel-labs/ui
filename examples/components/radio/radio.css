@@ -5,7 +5,7 @@
   }
 
   :scope[data-example^="radio/"]
-    :is([data-slot="field-root"], fieldset, [data-slot="stack"]):has(
+    :is([data-slot="field"], fieldset, [data-slot="stack"]):has(
       [data-slot="radio-group"]
     ):not(:has([data-slot="card"], [data-slot="radio-group"] > button)) {
     width: max-content;
@@ -14,7 +14,7 @@
 
   /* The check keeps its space on every card, so moving it never rewraps the text. */
   :scope[data-example="radio/render"]
-    [data-slot="radio-root"]
+    [data-slot="radio"]
     > svg:not([data-checked]) {
     visibility: hidden;
   }
@@ -47,7 +47,7 @@
   }
 
   /* A choice card keeps its radio at the top end, in line with the title. */
-  [data-slot="card"] > [data-slot="radio-root"] {
+  [data-slot="card"] > [data-slot="radio"] {
     margin-top: 2px;
     margin-inline-start: auto;
 
@@ -56,18 +56,18 @@
     }
   }
 
-  [data-slot="card"]:has(> [data-slot="radio-root"]:focus-visible) {
+  [data-slot="card"]:has(> [data-slot="radio"]:focus-visible) {
     outline: 3px solid var(--halo);
     outline-offset: 2px;
   }
 
   /* A radio in a field of its own sits beside its label and description. */
-  [data-slot="field-root"]:has(> [data-slot="radio-root"]) {
+  [data-slot="field"]:has(> [data-slot="radio"]) {
     flex-direction: row;
     align-items: flex-start;
     width: auto;
 
-    & > [data-slot="radio-root"] {
+    & > [data-slot="radio"] {
       margin-top: 2px;
     }
 
@@ -76,11 +76,11 @@
     }
   }
 
-  [data-slot="radio-group"]:has(> [data-slot="field-root"]) {
+  [data-slot="radio-group"]:has(> [data-slot="field"]) {
     gap: var(--space-3);
   }
 
-  [data-slot="radio-root"] {
+  [data-slot="radio"] {
     display: inline-grid;
     flex-shrink: 0;
     place-items: center;
@@ -165,12 +165,12 @@
     }
   }
 
-  [data-slot="label"]:has(> [data-slot="radio-root"][data-disabled]) {
+  [data-slot="label"]:has(> [data-slot="radio"][data-disabled]) {
     color: var(--line-disabled);
   }
 
   /* A radio with its own content is a choice card. */
-  [data-slot="radio-root"]:not(:empty, :has(> [data-slot="radio-indicator"])) {
+  [data-slot="radio"]:not(:empty, :has(> [data-slot="radio-indicator"])) {
     display: inline-flex;
     align-items: center;
     gap: var(--space-3);

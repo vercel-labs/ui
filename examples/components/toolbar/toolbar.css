@@ -2,7 +2,7 @@
   /* The formatting toolbar spans the notes field below it, like an editor's. */
   :scope[data-example="toolbar/controller"]
     [data-slot="stack"]
-    > [data-slot="toolbar-root"] {
+    > [data-slot="toolbar"] {
     width: 100%;
   }
 
@@ -12,7 +12,7 @@
     min-height: 16rem;
   }
 
-  [data-slot="toolbar-root"] {
+  [data-slot="toolbar"] {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -39,7 +39,7 @@
       :is(
         [data-slot="toolbar-button"],
         [data-slot="toolbar-link"],
-        [data-slot="toggle-root"],
+        [data-slot="toggle"],
         [data-slot="menu-trigger"],
         [data-slot="select-trigger"]
       ):not(:is([data-slot="menu-content"], [data-slot="select-content"]) *) {
@@ -146,7 +146,7 @@
 
   :is(
     [data-slot="toolbar-group"],
-    [data-slot="toolbar-root"] [data-slot="toggle-group"]
+    [data-slot="toolbar"] [data-slot="toggle-group"]
   ) {
     display: flex;
     align-items: center;

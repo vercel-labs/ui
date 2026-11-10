@@ -311,7 +311,7 @@ function mount(
   const text = () =>
     [
       ...container.querySelector(
-        '[data-slot="date-input-root"],[data-slot="time-input-root"]'
+        '[data-slot="date-input"],[data-slot="time-input"]'
       )!.children,
     ]
       .filter(

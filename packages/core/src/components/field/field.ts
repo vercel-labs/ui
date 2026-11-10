@@ -122,7 +122,7 @@ type FieldErrorState = FieldState & {
 
 // A control inside a nested field belongs to that field.
 const ownControl = (root: HTMLElement) => (el: HTMLElement) =>
-  el.closest('[data-slot="field-root"]') === root
+  el.closest('[data-slot="field"]') === root
 
 function fieldApiBody(
   context: PrimitiveContext<FieldOptions, FieldStore, string>

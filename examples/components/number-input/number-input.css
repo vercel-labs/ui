@@ -1,5 +1,5 @@
 @scope ([data-example]) {
-  [data-slot="number-input-root"] {
+  [data-slot="number-input"] {
     display: flex;
     align-items: center;
     gap: var(--space-2);
@@ -25,7 +25,7 @@
     }
   }
 
-  [data-slot="field-root"]:has(> [data-slot="number-input-root"]) {
+  [data-slot="field"]:has(> [data-slot="number-input"]) {
     width: 20rem;
     max-width: 100%;
   }

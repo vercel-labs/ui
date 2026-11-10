@@ -38,7 +38,7 @@ function Example() {
     free.current = event.metaKey || event.ctrlKey
   }
   return (
-    <div data-slot="scrubber-root">
+    <div data-slot="scrubber">
       <div data-slot="scrubber-track">
         {sections.map((candidate) => (
           <div

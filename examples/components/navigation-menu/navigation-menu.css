@@ -14,7 +14,7 @@
     min-height: 22rem;
   }
 
-  [data-slot="navigation-menu-root"] {
+  [data-slot="navigation-menu"] {
     position: relative;
 
     &:not([data-nested]) {

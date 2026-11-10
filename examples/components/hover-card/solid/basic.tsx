@@ -12,7 +12,7 @@ function Example() {
       </HoverCardTrigger>
       <HoverCardContent>
         <div data-slot="row">
-          <span data-slot="avatar" aria-hidden="true">
+          <span data-slot="initials" aria-hidden="true">
             HG
           </span>
           <div data-slot="stack">

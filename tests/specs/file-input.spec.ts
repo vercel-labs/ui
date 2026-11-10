@@ -36,7 +36,7 @@ const actions = (page: Page) => page.getByRole("status", { name: "Actions" })
 const inputOf = (button: Locator) =>
   button.evaluateHandle((el) =>
     el
-      .closest('[data-slot="file-input-root"]')!
+      .closest('[data-slot="file-input"]')!
       .querySelector<HTMLInputElement>('input[type="file"]')!
   )
 

@@ -1,5 +1,5 @@
 @scope ([data-example]) {
-  [data-slot="switch-root"] {
+  [data-slot="switch"] {
     display: inline-flex;
     flex-shrink: 0;
     align-items: center;
@@ -97,16 +97,16 @@
     }
   }
 
-  :is([data-slot="label"], [data-slot="field-root"]):has(
-    [data-slot="switch-root"][data-disabled]
+  :is([data-slot="label"], [data-slot="field"]):has(
+    [data-slot="switch"][data-disabled]
   ) {
     color: var(--line-disabled);
   }
 
   /* A switch row: its label at the start and the switch at the end, in a 20rem column. */
   :scope[data-example^="switch/"]
-    :is([data-slot="label"], [data-slot="field-root"], [data-slot="row"]):has(
-      > [data-slot="switch-root"]
+    :is([data-slot="label"], [data-slot="field"], [data-slot="row"]):has(
+      > [data-slot="switch"]
     ) {
     flex-wrap: nowrap;
     justify-content: space-between;
@@ -118,35 +118,35 @@
 
   /* A row with only a label stays compact, so the switch sits close to it; forms keep the full column. */
   :scope[data-example^="switch/"]:not([data-example="switch/form"])
-    :is([data-slot="label"], [data-slot="field-root"], [data-slot="row"]):has(
-      > [data-slot="switch-root"]
+    :is([data-slot="label"], [data-slot="field"], [data-slot="row"]):has(
+      > [data-slot="switch"]
     ):not(:has(> [data-slot="stack"], > [data-slot="field-description"])) {
     width: 14rem;
   }
 
   :scope[data-example^="switch/"]
-    [data-slot="stack"]:has(> [data-slot="label"] > [data-slot="switch-root"]) {
+    [data-slot="stack"]:has(> [data-slot="label"] > [data-slot="switch"]) {
     max-width: 100%;
   }
 
   :scope[data-example^="switch/"]
-    :is([data-slot="field-root"], [data-slot="row"])
-    > [data-slot="stack"]:has(+ [data-slot="switch-root"]) {
+    :is([data-slot="field"], [data-slot="row"])
+    > [data-slot="stack"]:has(+ [data-slot="switch"]) {
     flex: 1;
     gap: var(--space-1);
   }
 
   /* A row with a description keeps the switch in line with the label. */
   :scope[data-example^="switch/"]
-    :is([data-slot="field-root"], [data-slot="row"]):has(
-      > [data-slot="stack"] + [data-slot="switch-root"]
+    :is([data-slot="field"], [data-slot="row"]):has(
+      > [data-slot="stack"] + [data-slot="switch"]
     ) {
     align-items: flex-start;
   }
 
   /* The error's line stays reserved, so Continue never moves as the error shows and hides. */
   :scope[data-example="switch/invalid"]
-    [data-slot="field-root"]:not(:has(> [data-slot="field-error"]))::after {
+    [data-slot="field"]:not(:has(> [data-slot="field-error"]))::after {
     content: "\a0";
     font-size: var(--text-sm);
   }
@@ -156,8 +156,7 @@
     gap: var(--space-6);
   }
 
-  [data-slot="field-set"]
-    > [data-slot="label"]:has(> [data-slot="switch-root"]) {
+  [data-slot="field-set"] > [data-slot="label"]:has(> [data-slot="switch"]) {
     font-weight: 400;
   }
 
@@ -172,7 +171,7 @@
       border-radius: inherit;
     }
 
-    & > [data-slot="switch-root"] {
+    & > [data-slot="switch"] {
       position: relative;
     }
 

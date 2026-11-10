@@ -13,7 +13,7 @@ import {
     >
     <HoverCardContent>
       <div data-slot="row">
-        <span data-slot="avatar" aria-hidden="true">HG</span>
+        <span data-slot="initials" aria-hidden="true">HG</span>
         <div data-slot="stack">
           <p>Hollis Grant</p>
           <p>

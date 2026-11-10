@@ -1,5 +1,5 @@
 @scope ([data-example]) {
-  [data-slot="rating-root"] {
+  [data-slot="rating"] {
     display: inline-flex;
     gap: 2px;
 

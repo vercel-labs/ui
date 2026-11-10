@@ -361,7 +361,7 @@
     }
   }
 
-  :is([data-slot^="combobox-"]) {
+  :is([data-slot="combobox"], [data-slot^="combobox-"]) {
     &:not([data-pending]) > [data-show="pending"],
     &[data-pending] > [data-hide="pending"],
     &:not([data-checked]) > [data-show="checked"],

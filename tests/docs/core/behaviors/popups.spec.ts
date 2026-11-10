@@ -298,9 +298,9 @@ test("position options: the hint lands on the side asked, follows new options, a
   page,
 }) => {
   await openBehaviors(page, "popups")
-  const target = page.locator('[data-slot="hint-target"]')
-  const bubble = page.locator('[data-slot="hint-bubble"]')
-  const arrow = page.locator('[data-slot="hint-arrow"]')
+  const target = page.locator('[data-slot="callout-target"]')
+  const bubble = page.locator('[data-slot="callout-bubble"]')
+  const arrow = page.locator('[data-slot="callout-arrow"]')
   await target.scrollIntoViewIfNeeded()
   await page.evaluate(() => window.scrollBy(0, -200))
   await expect(bubble).toHaveAttribute("data-side", "top")

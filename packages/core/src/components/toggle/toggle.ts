@@ -419,7 +419,7 @@ const togglePrimitive = /* @__PURE__ */ definePrimitive({
     icon: slot(
       itemIconPart<State, ToggleApi>({
         component: "toggle",
-        item: '[data-slot="toggle-root"]',
+        item: '[data-slot="toggle"]',
         list: '[data-slot="toggle-group"]',
       })
     ),

@@ -1,10 +1,10 @@
 @scope ([data-example]) {
   /* Trees grow downward as branches open, so the rows above stay put. */
-  :scope:has([data-slot="tree-root"]) {
+  :scope:has([data-slot="tree"]) {
     justify-content: flex-start;
   }
 
-  [data-slot="tree-root"] {
+  [data-slot="tree"] {
     display: flex;
     flex-direction: column;
     gap: 1px;
@@ -20,13 +20,13 @@
   }
 
   /* A tree under a controls row keeps its width, and narrows with the preview. */
-  [data-slot="stack"]:has(> [data-slot="tree-root"]) {
+  [data-slot="stack"]:has(> [data-slot="tree"]) {
     width: 20rem;
     max-width: 100%;
   }
 
   /* Virtualized: the scroller is the panel, and rows sit at their offsets in the tree. */
-  [data-slot="scroll"]:has(> [data-slot="tree-root"]) {
+  [data-slot="scroll"]:has(> [data-slot="tree"]) {
     flex: none;
     box-sizing: border-box;
     width: 20rem;
@@ -38,7 +38,7 @@
     box-shadow: var(--shadow-1);
     overscroll-behavior: contain;
 
-    & > [data-slot="tree-root"] {
+    & > [data-slot="tree"] {
       display: block;
       position: relative;
       width: auto;

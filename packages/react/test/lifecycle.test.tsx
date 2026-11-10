@@ -246,7 +246,7 @@ test("<Activity> hid and showed again keeps a field's shown errors", async () =>
   const view = await render(form("visible"))
   await settle()
   await React.act(async () => view.querySelector("input")!.checkValidity())
-  const field = () => view.querySelector("[data-slot=field-root]")!
+  const field = () => view.querySelector("[data-slot=field]")!
   expect(field().hasAttribute("data-invalid")).toBe(true)
   await React.act(async () => root!.render(form("hidden")))
   await settle()

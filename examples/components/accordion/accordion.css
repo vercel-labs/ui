@@ -1,5 +1,5 @@
 @scope ([data-example]) {
-  [data-slot="accordion-root"] {
+  [data-slot="accordion"] {
     width: 100%;
     max-width: 28rem;
     margin-inline: auto;
@@ -12,7 +12,7 @@
   }
 
   /* Center the demo's top-level group around an accordion; its text stays start-aligned. */
-  :scope > * > :has([data-slot="accordion-root"]) {
+  :scope > * > :has([data-slot="accordion"]) {
     align-self: center;
     width: 100%;
     max-width: 28rem;
@@ -95,7 +95,7 @@
       content: "";
     }
 
-    & [data-slot="accordion-root"] {
+    & [data-slot="accordion"] {
       max-width: none;
       border-top: 0;
     }

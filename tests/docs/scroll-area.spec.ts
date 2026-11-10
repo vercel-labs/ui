@@ -34,9 +34,10 @@ const checks: Record<string, Check> = {
     await viewport.evaluate((el) => {
       el.scrollLeft = el.scrollWidth
     })
-    await expect(
-      preview.locator('[data-slot="scroll-area-root"]')
-    ).toHaveAttribute("data-at-x-end", "")
+    await expect(preview.locator('[data-slot="scroll-area"]')).toHaveAttribute(
+      "data-at-x-end",
+      ""
+    )
   },
   "both-axes": async (preview) => {
     await expect(
@@ -45,12 +46,14 @@ const checks: Record<string, Check> = {
     await expect(
       preview.getByRole("rowheader", { name: "v1.12.0" })
     ).toBeVisible()
-    await expect(
-      preview.locator('[data-slot="scroll-area-root"]')
-    ).toHaveAttribute("data-overflow-x", "")
-    await expect(
-      preview.locator('[data-slot="scroll-area-root"]')
-    ).toHaveAttribute("data-overflow-y", "")
+    await expect(preview.locator('[data-slot="scroll-area"]')).toHaveAttribute(
+      "data-overflow-x",
+      ""
+    )
+    await expect(preview.locator('[data-slot="scroll-area"]')).toHaveAttribute(
+      "data-overflow-y",
+      ""
+    )
   },
   rtl: async (preview) => {
     await expect(preview.getByText("الوسوم")).toBeVisible()

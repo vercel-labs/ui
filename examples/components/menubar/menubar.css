@@ -5,7 +5,7 @@
     min-height: 22rem;
   }
 
-  [data-slot="menubar-root"] {
+  [data-slot="menubar"] {
     display: flex;
     align-items: center;
     gap: 2px;

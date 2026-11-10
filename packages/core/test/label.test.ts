@@ -5,7 +5,7 @@ import { attrs, bind } from "../src/foundation/kernel/part"
 
 test("a label renders an id, which a control it names points at", () => {
   expect(attrs(label({ id: "l" }).part("root"))).toEqual({
-    "data-slot": "label-root",
+    "data-slot": "label",
     id: "l",
   })
 })

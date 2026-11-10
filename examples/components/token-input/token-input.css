@@ -1,9 +1,9 @@
 @scope ([data-example]) {
-  [data-slot="token-input-root"] {
+  [data-slot="token-input"] {
     width: 20rem;
     max-width: 100%;
 
-    [data-slot="field-root"] > & {
+    [data-slot="field"] > & {
       width: 100%;
     }
   }
@@ -49,10 +49,7 @@
       color: var(--line-disabled);
     }
 
-    :is(
-        [data-slot="field-root"],
-        [data-slot="field-root"] > [data-slot="token-input-root"]
-      )
+    :is([data-slot="field"], [data-slot="field"] > [data-slot="token-input"])
       > & {
       width: 100%;
     }

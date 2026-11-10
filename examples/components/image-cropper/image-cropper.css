@@ -1,5 +1,5 @@
 @scope ([data-example]) {
-  [data-slot="image-cropper-root"] {
+  [data-slot="image-cropper"] {
     display: flex;
     flex-direction: column;
     gap: var(--space-3);

@@ -169,7 +169,7 @@
 
   /* Two icons in a part: the second shows for the on state. */
   :is(
-    [data-slot="checkbox-root"],
+    [data-slot="checkbox"],
     [data-slot="checkbox-indicator"],
     [data-slot="password-input-toggle"],
     [data-slot="navigation-menu-trigger"],
@@ -211,7 +211,7 @@
     gap: var(--space-3);
   }
 
-  :is([data-slot="card"], [data-slot="field-root"], button, label)
+  :is([data-slot="card"], [data-slot="field"], button, label)
     [data-slot="stack"] {
     align-items: flex-start;
     text-align: start;
@@ -227,7 +227,7 @@
 
   [data-slot="stack"]:has(
     :is(
-      [data-slot="field-root"],
+      [data-slot="field"],
       [data-slot="field-set"],
       [data-slot="card"],
       [data-variant="card"],
@@ -285,7 +285,7 @@
       gap: var(--space-1);
     }
 
-    & > :is([data-slot="checkbox-root"], [data-slot="radio-root"]) {
+    & > :is([data-slot="checkbox"], [data-slot="radio"]) {
       margin-top: 2px;
     }
   }
@@ -441,7 +441,7 @@
     }
   }
 
-  [data-slot="card"]:has(> [data-slot="avatar"]) {
+  [data-slot="card"]:has(> [data-slot="initials"]) {
     align-items: center;
     max-width: 24rem;
   }
@@ -561,7 +561,7 @@
     }
   }
 
-  [data-slot="avatar"] {
+  [data-slot="initials"] {
     display: inline-grid;
     flex-shrink: 0;
     place-items: center;
@@ -616,10 +616,10 @@
 
   /* Each field is its own selector, not one :is() list, so the browser only
      tries it on matching elements. The list was tried on every element. */
-  [data-slot="input-root"]:where(
+  [data-slot="input"]:where(
     :not(
       [data-slot="input-group"] *,
-      [data-slot="password-input-root"] *,
+      [data-slot="password-input"] *,
       [data-slot="number-input-group"] *,
       [data-slot="combobox-chips"] *
     )
@@ -629,15 +629,15 @@
     ):where(
       :not(
         [data-slot="input-group"] *,
-        [data-slot="password-input-root"] *,
+        [data-slot="password-input"] *,
         [data-slot="number-input-group"] *,
         [data-slot="combobox-chips"] *
       )
     ),
-  [data-slot="textarea-root"]:where(
+  [data-slot="textarea"]:where(
     :not(
       [data-slot="input-group"] *,
-      [data-slot="password-input-root"] *,
+      [data-slot="password-input"] *,
       [data-slot="number-input-group"] *,
       [data-slot="combobox-chips"] *
     )
@@ -645,7 +645,7 @@
   [data-slot="combobox-input"]:where(
     :not(
       [data-slot="input-group"] *,
-      [data-slot="password-input-root"] *,
+      [data-slot="password-input"] *,
       [data-slot="number-input-group"] *,
       [data-slot="combobox-chips"] *
     )
@@ -653,7 +653,7 @@
   [data-slot="autocomplete-input"]:where(
     :not(
       [data-slot="input-group"] *,
-      [data-slot="password-input-root"] *,
+      [data-slot="password-input"] *,
       [data-slot="number-input-group"] *,
       [data-slot="combobox-chips"] *
     )
@@ -661,7 +661,7 @@
   [data-slot="toolbar-input"]:where(
     :not(
       [data-slot="input-group"] *,
-      [data-slot="password-input-root"] *,
+      [data-slot="password-input"] *,
       [data-slot="number-input-group"] *,
       [data-slot="combobox-chips"] *
     )
@@ -669,7 +669,7 @@
   [data-slot="color-picker-input"]:where(
     :not(
       [data-slot="input-group"] *,
-      [data-slot="password-input-root"] *,
+      [data-slot="password-input"] *,
       [data-slot="number-input-group"] *,
       [data-slot="combobox-chips"] *
     )
@@ -677,7 +677,7 @@
   [data-slot="color-picker-channel-input"]:where(
     :not(
       [data-slot="input-group"] *,
-      [data-slot="password-input-root"] *,
+      [data-slot="password-input"] *,
       [data-slot="number-input-group"] *,
       [data-slot="combobox-chips"] *
     )
@@ -692,7 +692,7 @@
     ):where(
       :not(
         [data-slot="input-group"] *,
-        [data-slot="password-input-root"] *,
+        [data-slot="password-input"] *,
         [data-slot="number-input-group"] *,
         [data-slot="combobox-chips"] *
       )
@@ -700,18 +700,18 @@
   :where(textarea, select):not([data-slot]):where(
       :not(
         [data-slot="input-group"] *,
-        [data-slot="password-input-root"] *,
+        [data-slot="password-input"] *,
         [data-slot="number-input-group"] *,
         [data-slot="combobox-chips"] *
       )
     ),
   :is(
     [data-slot="input-group"],
-    [data-slot="password-input-root"],
+    [data-slot="password-input"],
     [data-slot="number-input-group"],
     [data-slot="combobox-chips"],
-    [data-slot="date-input-root"],
-    [data-slot="time-input-root"]
+    [data-slot="date-input"],
+    [data-slot="time-input"]
   ) {
     box-sizing: border-box;
     width: 20rem;
@@ -769,7 +769,7 @@
     }
   }
 
-  :is(textarea, [data-slot="textarea-root"]) {
+  :is(textarea, [data-slot="textarea"]) {
     display: block;
     height: auto;
     min-height: 80px;
@@ -813,7 +813,7 @@
 
   :is(
     [data-slot="input-group"],
-    [data-slot="password-input-root"],
+    [data-slot="password-input"],
     [data-slot="number-input-group"],
     [data-slot="combobox-chips"]
   ) {
@@ -906,7 +906,7 @@
   /* ─── Buttons ─── */
 
   :is(
-    [data-slot="button-root"],
+    [data-slot="button"],
     :where(button):not([data-slot]):where(:not([data-slot="input-group"] > *)),
     [data-slot="menu-trigger"]:where(:not([data-slot="menu-content"] *)),
     [data-slot="popover-trigger"],
@@ -951,7 +951,7 @@
     [data-slot="canvas-action"],
     [data-slot="city-map-arrow"],
     [data-slot="notes-expand"],
-    [data-slot="copy-root"],
+    [data-slot="copy"],
     [data-slot="color-reset"],
     [data-slot="image-cropper-rotate"],
     [data-slot="image-cropper-flip"],
@@ -996,11 +996,11 @@
     [data-slot="notice-close"],
     [data-slot="bold-text-toggle"],
     [data-slot="checkout-next"],
-    [data-slot="confirm-button-root"],
-    [data-slot="copy-button-root"],
+    [data-slot="confirm-button"],
+    [data-slot="copy-button"],
     [data-slot="month-next"],
     [data-slot="month-previous"],
-    [data-slot="mute-button-root"],
+    [data-slot="mute-button"],
     [data-slot="save-bar-save"],
     [data-slot="kanban-undo"],
     [data-slot="kanban-redo"],
@@ -1168,7 +1168,7 @@
     [data-slot="combobox-content"],
     [data-slot="autocomplete-content"],
     [data-slot="trigger-menu-content"],
-    [data-slot="command-root"],
+    [data-slot="command"],
     [data-slot="popover-content"],
     [data-slot="hover-card-content"]
   ) {
@@ -1280,7 +1280,7 @@
       [data-slot="combobox-content"],
       [data-slot="autocomplete-content"],
       [data-slot="trigger-menu-content"],
-      [data-slot="command-root"],
+      [data-slot="command"],
       [data-slot="popover-content"],
       [data-slot="hover-card-content"],
       [data-slot="alert-dialog-backdrop"],

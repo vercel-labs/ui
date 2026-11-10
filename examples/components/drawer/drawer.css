@@ -8,7 +8,7 @@
   :scope
     [data-slot="drawer-content"]
     :is(
-      [data-slot="field-root"],
+      [data-slot="field"],
       [data-slot="field-control"],
       textarea,
       input:not([type="checkbox"], [type="radio"], [type="hidden"])

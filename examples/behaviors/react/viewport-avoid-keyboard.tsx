@@ -11,7 +11,7 @@ function Example() {
   const lift = React.useRef<HTMLDivElement>(null)
   React.useEffect(() => bindAvoidKeyboard(lift.current!), [])
   return (
-    <div data-slot="groceries-root">
+    <div data-slot="groceries">
       <textarea
         aria-label="Groceries"
         rows={4}

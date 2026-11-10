@@ -56,7 +56,7 @@ test.describe("enhancements", { tag: "@enhancement" }, () => {
     await page.waitForFunction(
       () =>
         document
-          .querySelector('[data-slot="toast-root"]')
+          .querySelector('[data-slot="toast"]')
           ?.textContent?.includes("First"),
       undefined,
       { polling: "raf" }

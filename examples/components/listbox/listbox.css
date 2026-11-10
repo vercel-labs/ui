@@ -1,5 +1,5 @@
 @scope ([data-example]) {
-  [data-slot="listbox-root"] {
+  [data-slot="listbox"] {
     display: flex;
     flex-direction: column;
     gap: 1px;
@@ -22,7 +22,7 @@
       color: var(--line-disabled);
     }
 
-    [data-slot="field-root"] > & {
+    [data-slot="field"] > & {
       width: 100%;
     }
   }
@@ -100,7 +100,7 @@
   }
 
   /* Horizontal: plain labels, the selected one is a raised pill like a selected tab. */
-  [data-slot="listbox-root"][data-orientation="horizontal"] {
+  [data-slot="listbox"][data-orientation="horizontal"] {
     flex-direction: row;
     gap: 2px;
     width: auto;
@@ -150,7 +150,7 @@
   }
 
   /* A long list scrolls inside a fixed height, starting at the selected option. */
-  :scope[data-example="listbox/scrollable"] [data-slot="listbox-root"] {
+  :scope[data-example="listbox/scrollable"] [data-slot="listbox"] {
     max-height: 16rem;
     overflow-y: auto;
     scroll-padding-block: var(--space-8);

@@ -67,7 +67,7 @@ test("a handle controls the panel before it, and its value is that panel's size"
 test("the accessibility tree", async ({ page, open }) => {
   await open("resizable")
   await expect(sidebarHandle(page)).toHaveAttribute("aria-valuenow", "25")
-  await expect(page.locator('[data-slot="resizable-root"]').first())
+  await expect(page.locator('[data-slot="resizable"]').first())
     .toMatchAriaSnapshot(`
     - group "Sidebar":
       - button "Sidebar action"

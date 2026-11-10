@@ -1,5 +1,5 @@
 @scope ([data-example]) {
-  [data-slot="collapsible-root"] {
+  [data-slot="collapsible"] {
     display: flex;
     flex-direction: column;
     gap: var(--space-2);
@@ -68,12 +68,12 @@
   }
 
   /* Pinned to the top, so opening only grows the demo downward. */
-  :scope:has([data-slot="collapsible-root"]) {
+  :scope:has([data-slot="collapsible"]) {
     justify-content: flex-start;
   }
 
   /* A card whose header is the trigger. */
-  [data-slot="collapsible-root"][data-variant="card"] {
+  [data-slot="collapsible"][data-variant="card"] {
     flex-direction: column;
     align-items: stretch;
     gap: 0;
@@ -138,7 +138,7 @@
         padding: var(--space-3);
       }
 
-      & > [data-slot="field-root"] {
+      & > [data-slot="field"] {
         box-sizing: border-box;
         width: 100%;
 
@@ -180,7 +180,7 @@
     }
   }
 
-  ul:has([data-slot="collapsible-root"]) {
+  ul:has([data-slot="collapsible"]) {
     margin: 0;
     padding: 0;
     list-style: none;

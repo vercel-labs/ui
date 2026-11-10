@@ -10,11 +10,11 @@ import {
 import { createParts } from "@ui-sdk/react/primitive"
 import { Trash2Icon } from "lucide-react"
 
-type CommandListState = { command: string }
+type EditListState = { command: string }
 
-const commandList = definePrimitive({
-  name: "command-list",
-  state: (): CommandListState => ({ command: "copy" }),
+const editList = definePrimitive({
+  name: "edit-list",
+  state: (): EditListState => ({ command: "copy" }),
   api: (context) => {
     const typeahead = createTypeahead()
     return {
@@ -59,44 +59,38 @@ const commandList = definePrimitive({
   }),
 })
 
-const parts = createParts(commandList, { root: "div", command: "div" })
+const parts = createParts(editList, { root: "div", command: "div" })
 
-const CommandList = parts.Root
+const EditList = parts.Root
 
-const CommandListCommand = parts.Command
+const EditListCommand = parts.Command
 
 function Example() {
   return (
-    <CommandList aria-label="Edit">
-      <CommandListCommand value="copy">
+    <EditList aria-label="Edit">
+      <EditListCommand value="copy">
         Copy{" "}
         <kbd aria-hidden="true" data-slot="kbd">
           ⌘C
         </kbd>
-      </CommandListCommand>
-      <CommandListCommand value="cut">
+      </EditListCommand>
+      <EditListCommand value="cut">
         Cut{" "}
         <kbd aria-hidden="true" data-slot="kbd">
           ⌘X
         </kbd>
-      </CommandListCommand>
-      <CommandListCommand value="paste">
+      </EditListCommand>
+      <EditListCommand value="paste">
         Paste{" "}
         <kbd aria-hidden="true" data-slot="kbd">
           ⌘V
         </kbd>
-      </CommandListCommand>
-      <CommandListCommand value="delete" aria-label="Delete">
+      </EditListCommand>
+      <EditListCommand value="delete" aria-label="Delete">
         <Trash2Icon aria-hidden="true" />
-      </CommandListCommand>
-    </CommandList>
+      </EditListCommand>
+    </EditList>
   )
 }
 
-export {
-  CommandList,
-  CommandListCommand,
-  commandList,
-  type CommandListState,
-  Example,
-}
+export { EditList, EditListCommand, editList, type EditListState, Example }

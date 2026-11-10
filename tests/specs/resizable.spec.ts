@@ -405,7 +405,7 @@ test.describe("container", () => {
     expect(await sizeOf(panel(page, "Preview"))).toBeCloseTo(120, 0)
     await page.evaluate(() => {
       document.querySelector<HTMLElement>(
-        '[data-slot="resizable-root"]'
+        '[data-slot="resizable"]'
       )!.style.width = "600px"
     })
     await expect.poll(() => sizeOf(panel(page, "Preview"))).toBeCloseTo(120, 0)
@@ -416,7 +416,7 @@ test.describe("container", () => {
     await open("resizable")
     await page.evaluate(() => {
       document.querySelector<HTMLElement>(
-        '[data-slot="resizable-root"]'
+        '[data-slot="resizable"]'
       )!.style.width = "1000px"
     })
     await expect

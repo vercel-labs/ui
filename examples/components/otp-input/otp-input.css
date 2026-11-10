@@ -1,5 +1,5 @@
 @scope ([data-example]) {
-  [data-slot="otp-input-root"] {
+  [data-slot="otp-input"] {
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
@@ -11,7 +11,7 @@
   }
 
   /* A field around a code takes the code's width, so its label, description and error line up with the slots. */
-  [data-slot="field-root"]:has(> [data-slot="otp-input-root"]) {
+  [data-slot="field"]:has(> [data-slot="otp-input"]) {
     width: min-content;
   }
 
@@ -20,7 +20,7 @@
     width: min-content;
 
     & > form,
-    & [data-slot="field-root"] {
+    & [data-slot="field"] {
       align-self: stretch;
       width: auto;
     }
@@ -68,7 +68,7 @@
       border-end-end-radius: var(--radius-control);
     }
 
-    [data-slot="otp-input-root"]:hover:not(
+    [data-slot="otp-input"]:hover:not(
         [data-focused],
         [data-disabled],
         :has([readonly], [aria-invalid="true"])
@@ -94,11 +94,11 @@
       animation: otp-input-caret 1s step-end infinite;
     }
 
-    [data-slot="otp-input-root"]:has([readonly]) & {
+    [data-slot="otp-input"]:has([readonly]) & {
       box-shadow: inset 0 0 0 1px var(--line-faint);
     }
 
-    [data-slot="otp-input-root"]:has([aria-invalid="true"]) & {
+    [data-slot="otp-input"]:has([aria-invalid="true"]) & {
       box-shadow: inset 0 0 0 1px var(--danger);
 
       &[data-active] {

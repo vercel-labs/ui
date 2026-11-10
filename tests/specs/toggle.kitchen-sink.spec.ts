@@ -28,7 +28,7 @@ test("every kitchen sink variant renders and responds", async ({
     .poll(() => page.locator("[data-variant]:not(:has([data-slot]))").count())
     .toBe(0)
 
-  const toggles = page.locator('[data-slot="toggle-root"]')
+  const toggles = page.locator('[data-slot="toggle"]')
   for (let index = 0; index < (await toggles.count()); index++) {
     const toggle = toggles.nth(index)
     await toggle.evaluate((el) => el.scrollIntoView({ block: "center" }))
@@ -59,9 +59,7 @@ test("every kitchen sink variant renders and responds", async ({
     "button-submit",
     "button-span",
   ]) {
-    const button = page.locator(
-      `[data-variant="${id}"] [data-slot="button-root"]`
-    )
+    const button = page.locator(`[data-variant="${id}"] [data-slot="button"]`)
     await button.scrollIntoViewIfNeeded()
     await button.click()
     if (id !== "button" && id !== "button-span") {

@@ -282,7 +282,7 @@ test.describe("errors", () => {
       }
       customElements.define("third-party-picker", Picker)
       const field = document.querySelector(
-        '[data-slot="field-root"]:has(input[type="email"])'
+        '[data-slot="field"]:has(input[type="email"])'
       )!
       field.append(document.createElement("third-party-picker"))
     })

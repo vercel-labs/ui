@@ -17,7 +17,7 @@ describe("value", () => {
     const input = fileInput({ id: "f" })
     expect(input.api.getValue()).toEqual([])
     expect(attrs(input.part("root"))).toEqual({
-      "data-slot": "file-input-root",
+      "data-slot": "file-input",
     })
     expect(partState(input.part("dropzone", { id: "z" }))).toEqual({
       dragging: false,

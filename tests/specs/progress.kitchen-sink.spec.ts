@@ -27,7 +27,7 @@ test("every progress kitchen sink variant renders its value", async ({
   // Each card mounts its own root, so wait for all of them.
   await expect
     .poll(() =>
-      page.locator("[data-variant]:not(:has([data-slot$='-root']))").count()
+      page.locator("[data-variant]:not(:has([data-slot='progress']))").count()
     )
     .toBe(0)
 
@@ -36,7 +36,7 @@ test("every progress kitchen sink variant renders its value", async ({
     (text ?? "").replace(/\s/g, " ").trim()
   for (const card of await cards.all()) {
     const id = await card.getAttribute("data-variant")
-    const root = card.locator("[data-slot$='-root']")
+    const root = card.locator("[data-slot='progress']")
     const value = card.locator("[data-slot$='-value']")
     await card.scrollIntoViewIfNeeded()
     await expect.soft(root, `${id} renders`).toBeVisible()

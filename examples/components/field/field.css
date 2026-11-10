@@ -1,5 +1,5 @@
 @scope ([data-example]) {
-  [data-slot="field-root"] {
+  [data-slot="field"] {
     display: flex;
     flex-direction: column;
     gap: var(--space-2);
@@ -7,15 +7,15 @@
     min-width: 0;
     max-width: 100%;
 
-    &:has(> :is([data-slot="checkbox-root"], [data-slot="switch-root"])) {
+    &:has(> :is([data-slot="checkbox"], [data-slot="switch"])) {
       flex-direction: row;
       align-items: flex-start;
 
-      & > [data-slot="checkbox-root"] {
+      & > [data-slot="checkbox"] {
         margin-top: 2px;
       }
 
-      & > [data-slot="switch-root"] {
+      & > [data-slot="switch"] {
         margin-top: 0;
       }
 

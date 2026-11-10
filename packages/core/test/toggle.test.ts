@@ -389,7 +389,7 @@ describe("separator", () => {
   test("is a separator with its orientation, or hidden when decorative", () => {
     const root = separator({ id: "s", orientation: "vertical" }).part("root")
     expect(partAttrs(root)).toEqual({
-      "data-slot": "separator-root",
+      "data-slot": "separator",
       role: "separator",
       "aria-orientation": "vertical",
       "data-orientation": "vertical",
@@ -398,7 +398,7 @@ describe("separator", () => {
     expect(
       partAttrs(separator({ id: "s", decorative: true }).part("root"))
     ).toEqual({
-      "data-slot": "separator-root",
+      "data-slot": "separator",
       role: "none",
       "aria-orientation": undefined,
       "data-orientation": "horizontal",

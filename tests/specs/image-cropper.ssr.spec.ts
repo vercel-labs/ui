@@ -21,7 +21,7 @@ const serverCropper = (page: import("@playwright/test").Page) =>
     const content = template.content
     return {
       busy: content
-        .querySelector('[data-slot="image-cropper-root"]')
+        .querySelector('[data-slot="image-cropper"]')
         ?.getAttribute("aria-busy"),
       image: !!content
         .querySelector('img[data-slot="image-cropper-image"]')

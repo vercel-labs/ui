@@ -16,7 +16,7 @@ function Example() {
     )
   }, [log, kind.pointer, kind.hover, kind.anyPointer, kind.anyHover])
   return (
-    <div data-slot="pointer-kind-root">
+    <div data-slot="pointer-kind">
       <button
         type="button"
         aria-expanded={open}

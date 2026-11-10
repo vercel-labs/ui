@@ -64,7 +64,7 @@ describe("server rendering text fields and forms", () => {
     expect(html).toMatch(/<input[^>]*name="email"[^>]*value="ada@example.com"/)
     expect(html).toMatch(/\srequired[\s>]/)
     expect(html).toMatch(/\sdata-filled[\s>]/)
-    expect(html).toContain('data-slot="input-root"')
+    expect(html).toContain('data-slot="input"')
   })
 
   test("a controlled input renders its value", () => {

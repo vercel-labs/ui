@@ -88,7 +88,7 @@ test("rank what someone searches for: the best match comes first, accents and al
   await openExamples(page, url)
   const example = page
     .locator("[data-example]")
-    .filter({ has: page.locator("[data-slot='command-search-root']") })
+    .filter({ has: page.locator("[data-slot='command-search']") })
   const search = example
     .first()
     .getByRole("searchbox", { name: "Search commands" })

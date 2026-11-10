@@ -1,5 +1,5 @@
 @scope ([data-example]) {
-  [data-slot="scroll-area-root"] {
+  [data-slot="scroll-area"] {
     position: relative;
     box-sizing: border-box;
     width: 20rem;
@@ -43,7 +43,7 @@
     }
   }
 
-  [data-slot="stack"]:has(> [data-slot="scroll-area-root"]) {
+  [data-slot="stack"]:has(> [data-slot="scroll-area"]) {
     max-width: 100%;
   }
 
@@ -197,7 +197,7 @@
     background: transparent;
   }
 
-  [data-slot="scroll-area-root"] > [data-slot="hint"] {
+  [data-slot="scroll-area"] > [data-slot="hint"] {
     position: absolute;
     inset-inline: 0;
     bottom: 0;
@@ -207,7 +207,7 @@
     text-align: center;
     pointer-events: none;
 
-    [data-slot="scroll-area-root"]:is(
+    [data-slot="scroll-area"]:is(
         [data-at-end],
         :not([data-overflow-x], [data-overflow-y])
       )
@@ -215,16 +215,14 @@
       display: none;
     }
 
-    [data-slot="scroll-area-root"][data-at-start] > & > [data-show="more"],
-    [data-slot="scroll-area-root"]:not([data-at-start])
-      > &
-      > [data-show="start"] {
+    [data-slot="scroll-area"][data-at-start] > & > [data-show="more"],
+    [data-slot="scroll-area"]:not([data-at-start]) > & > [data-show="start"] {
       display: none;
     }
   }
 
   /* Four equal swatches fill the row at rest, with gaps as wide as the padding and room for the scrollbar. */
-  :scope[data-example="scroll-area/horizontal"] [data-slot="scroll-area-root"] {
+  :scope[data-example="scroll-area/horizontal"] [data-slot="scroll-area"] {
     container-type: inline-size;
     height: auto;
 
@@ -275,7 +273,7 @@
       min-width: 0;
     }
 
-    & [data-slot="scroll-area-root"] {
+    & [data-slot="scroll-area"] {
       width: 100%;
       height: 10rem;
     }
