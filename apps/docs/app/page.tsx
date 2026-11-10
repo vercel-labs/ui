@@ -135,9 +135,9 @@ export default function HomePage() {
                 </p>
                 <p>
                   But what if, instead, we gave it the pieces that make up a
-                  Select? The popup (<code>createPopup</code>), the list (
-                  <code>createListbox</code>), and finding an option by typing (
-                  <code>createTypeahead</code>).
+                  Select? The popup (<code>createPopup</code>), choosing from
+                  the list (<code>createSelection</code>), and finding an option
+                  by typing (<code>createTypeahead</code>).
                 </p>
                 <p>
                   Now not only can it build a Select, but it can build an

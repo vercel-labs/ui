@@ -5,7 +5,7 @@ import * as React from "react"
 
 const behaviors = [
   { name: "createPopup", part: "popup", body: "Open. Position. Dismiss." },
-  { name: "createListbox", part: "listbox", body: "Navigate and select." },
+  { name: "createSelection", part: "listbox", body: "Select one or many." },
   { name: "createTypeahead", part: "typeahead", body: "Type to jump." },
 ]
 
