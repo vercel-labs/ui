@@ -1,6 +1,6 @@
 import { describe, expect, test, vi } from "vitest"
 import { accordion } from "../src/components/accordion/accordion"
-import { chronology } from "../src/components/chronology/chronology"
+import { timeline } from "../src/components/timeline/timeline"
 import { autocomplete } from "../src/components/autocomplete/autocomplete"
 import { combobox } from "../src/components/combobox/combobox"
 import { command } from "../src/components/command/command"
@@ -775,8 +775,8 @@ describe("roving items select on the tab stop", () => {
     )
   })
 
-  test("chronology items, whose inner parts hear none of it", async () => {
-    const instance = chronology({ id: "c" })
+  test("timeline items, whose inner parts hear none of it", async () => {
+    const instance = timeline({ id: "c" })
     const values = ["a", "b", "c"]
     const items = values.map((value) => ({
       slot: "item",

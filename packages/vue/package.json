@@ -39,7 +39,6 @@
     "./calendar": "./src/calendar.ts",
     "./carousel": "./src/carousel.ts",
     "./checkbox": "./src/checkbox.ts",
-    "./chronology": "./src/chronology.ts",
     "./collapsible": "./src/collapsible.ts",
     "./color": "./src/color.ts",
     "./color-picker": "./src/color-picker.ts",
@@ -91,6 +90,7 @@
     "./history": "./src/history.ts",
     "./textarea": "./src/textarea.ts",
     "./time-input": "./src/time-input.ts",
+    "./timeline": "./src/timeline.ts",
     "./toast": "./src/toast.ts",
     "./toggle": "./src/toggle.ts",
     "./token-input": "./src/token-input.ts",
@@ -147,10 +147,6 @@
       "./checkbox": {
         "types": "./dist/checkbox.d.ts",
         "default": "./dist/checkbox.js"
-      },
-      "./chronology": {
-        "types": "./dist/chronology.d.ts",
-        "default": "./dist/chronology.js"
       },
       "./collapsible": {
         "types": "./dist/collapsible.d.ts",
@@ -355,6 +351,10 @@
       "./time-input": {
         "types": "./dist/time-input.d.ts",
         "default": "./dist/time-input.js"
+      },
+      "./timeline": {
+        "types": "./dist/timeline.d.ts",
+        "default": "./dist/timeline.js"
       },
       "./toast": {
         "types": "./dist/toast.d.ts",

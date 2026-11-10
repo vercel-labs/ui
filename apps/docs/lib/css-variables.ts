@@ -128,9 +128,9 @@ const components: Record<string, Group[]> = {
   carousel: [
     { part: "root", variables: ["--carousel-interval", "--carousel-progress"] },
   ],
-  chronology: [
-    { part: "root", variables: ["--chronology-count"] },
-    { part: "item", variables: ["--chronology-index"] },
+  timeline: [
+    { part: "root", variables: ["--timeline-count"] },
+    { part: "item", variables: ["--timeline-index"] },
   ],
   "color-picker": [
     { part: "root", variables: ["--color-picker-color"] },
@@ -313,9 +313,9 @@ const meaning: Record<string, string> = {
     "0 at the second-largest snap point and below, 1 at the largest. With one snap point, the whole travel.",
   "--drawer-stack":
     "How many sheets opened from inside this one are open above it, rising smoothly as each one opens. Push it back with it.",
-  "--chronology-count":
+  "--timeline-count":
     "How many events are in the page. Size a horizontal grid's columns with it.",
-  "--chronology-index":
+  "--timeline-index":
     "The event's place among the events in the page, 0 for the first. It follows them as they move.",
   "--toast-index":
     "The toast's place in the stack, 0 for the newest. A closing toast keeps its place.",

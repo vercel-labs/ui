@@ -39,7 +39,6 @@
     "./calendar": "./src/calendar.tsx",
     "./carousel": "./src/carousel.tsx",
     "./checkbox": "./src/checkbox.tsx",
-    "./chronology": "./src/chronology.tsx",
     "./collapsible": "./src/collapsible.tsx",
     "./color": "./src/color.ts",
     "./color-picker": "./src/color-picker.tsx",
@@ -90,6 +89,7 @@
     "./history": "./src/history.ts",
     "./textarea": "./src/textarea.tsx",
     "./time-input": "./src/time-input.tsx",
+    "./timeline": "./src/timeline.tsx",
     "./toast": "./src/toast.tsx",
     "./toggle": "./src/toggle.tsx",
     "./token-input": "./src/token-input.tsx",
@@ -154,11 +154,6 @@
         "types": "./dist/checkbox.d.ts",
         "solid": "./dist/solid/checkbox.jsx",
         "default": "./dist/checkbox.js"
-      },
-      "./chronology": {
-        "types": "./dist/chronology.d.ts",
-        "solid": "./dist/solid/chronology.jsx",
-        "default": "./dist/chronology.js"
       },
       "./collapsible": {
         "types": "./dist/collapsible.d.ts",
@@ -405,6 +400,11 @@
         "types": "./dist/time-input.d.ts",
         "solid": "./dist/solid/time-input.jsx",
         "default": "./dist/time-input.js"
+      },
+      "./timeline": {
+        "types": "./dist/timeline.d.ts",
+        "solid": "./dist/solid/timeline.jsx",
+        "default": "./dist/timeline.js"
       },
       "./toast": {
         "types": "./dist/toast.d.ts",

@@ -461,11 +461,11 @@ cd packages/core && ../../scripts/test-slot.sh npx vitest run test/store-fanout.
 cd tests && PLAYGROUND_PORT=5310 ../scripts/test-slot.sh npx playwright test specs/toolbar.counts --project react -g 'arrow keys do no work that grows with the item count'
 ```
 
-<a id="chronology-arrow-key"></a>
+<a id="timeline-arrow-key"></a>
 
-### chronology.arrow-key
+### timeline.arrow-key
 
-**Measures:** Work done by 10 ArrowDown presses in a chronology.
+**Measures:** Work done by 10 ArrowDown presses in a timeline.
 
 **Why:** A long activity feed has hundreds of events, each with five parts inside, so a key that reached every part would grow with the feed.
 
@@ -478,12 +478,12 @@ cd tests && PLAYGROUND_PORT=5310 ../scripts/test-slot.sh npx playwright test spe
 
 **Tests:**
 
-- `chronology.counts.spec.ts` › arrow keys do no work that grows with the event count
+- `timeline.counts.spec.ts` › arrow keys do no work that grows with the event count
 
 **Run:**
 
 ```bash
-cd tests && PLAYGROUND_PORT=5310 ../scripts/test-slot.sh npx playwright test specs/chronology.counts --project react -g 'arrow keys do no work that grows with the event count'
+cd tests && PLAYGROUND_PORT=5310 ../scripts/test-slot.sh npx playwright test specs/timeline.counts --project react -g 'arrow keys do no work that grows with the event count'
 ```
 
 <a id="tooltip-focus"></a>

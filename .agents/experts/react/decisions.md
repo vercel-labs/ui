@@ -2,7 +2,7 @@
 
 What's already decided about `@ui-sdk/react`, and what's known and open. The expert never re-raises a **Settled** item as a finding.
 
-Last reviewed: PRs 86 to 92 (2026-10-30, the audit fixes), 158 and 159 (2026-11-01, follow-ups to 89 and 90), and 160 and 161 (2026-11-01, the focus trap fixes), and 175 to 186 (2026-11-02, the pre-launch audit fixes), and 213 (2026-11-03, field control ids on the server), and 214 (2026-11-03, the toast motion fix), and 218 (2026-11-04, the examples and docs review: textarea submitShortcut, token-input custom render, toast swipe from unselectable text, navigation-menu link timing, web shared-element data-slot), and 243 to 249 (2026-11-05, the new components: Label, Segmented Control, Rating, color, Color Picker, image, Image Cropper), and 241 (2026-11-05, date input and time input), and 321 (2026-11-09, `web.css`, the drop-in stylesheet), and 326 (2026-11-09, button attributes before bind), and the Chronology branch (2026-11-10, a timeline of dated events).
+Last reviewed: PRs 86 to 92 (2026-10-30, the audit fixes), 158 and 159 (2026-11-01, follow-ups to 89 and 90), and 160 and 161 (2026-11-01, the focus trap fixes), and 175 to 186 (2026-11-02, the pre-launch audit fixes), and 213 (2026-11-03, field control ids on the server), and 214 (2026-11-03, the toast motion fix), and 218 (2026-11-04, the examples and docs review: textarea submitShortcut, token-input custom render, toast swipe from unselectable text, navigation-menu link timing, web shared-element data-slot), and 243 to 249 (2026-11-05, the new components: Label, Segmented Control, Rating, color, Color Picker, image, Image Cropper), and 241 (2026-11-05, date input and time input), and 321 (2026-11-09, `web.css`, the drop-in stylesheet), and 326 (2026-11-09, button attributes before bind), and the Timeline branch (2026-11-10, a timeline of dated events).
 
 ## Settled
 
@@ -23,8 +23,8 @@ Last reviewed: PRs 86 to 92 (2026-10-30, the audit fixes), 158 and 159 (2026-11-
 - **`web.css` lets parts inherit the page's font.** `--ui-font-sans` is a token a page opts into on `body`; parts never set `font-family` themselves, except `code` and `kbd`, which use `--ui-font-mono`.
 - **`web.css` colors follow the page's `color-scheme` through `light-dark()`.** Builds that rewrite `light-dark()` (Lightning CSS in Next and Vite) read the `--lightningcss-light`/`--lightningcss-dark` defaults `web.css` sets, so they fall back to light unless the build also processes a `color-scheme`.
 - **Button-like parts render `type`, `disabled` and `aria-disabled` together until they bind**, and no role, so server HTML is right for a `<button>` and an `<a>`. On an `<a>` or `<span>`, `type` and `disabled` are invalid but inert until then, and a disabled link still navigates before hydration, since only script can stop the click. Before bind they don't write `tabindex`, so a web component's author tabindex survives the first pass (PR 326, 2026-11-09).
-- **Chronology's server markup holds the tab stop on the first event**, not the current one, until it hydrates. An earlier item can't know a later item is current, so a claim can't move it there without leaving some lists with no stop; the docs say so.
-- **The Chronology feed example doesn't clear its load timeout on unmount.** React 19 ignores the late state update, and the example stays short.
+- **Timeline's server markup holds the tab stop on the first event**, not the current one, until it hydrates. An earlier item can't know a later item is current, so a claim can't move it there without leaving some lists with no stop; the docs say so.
+- **The Timeline feed example doesn't clear its load timeout on unmount.** React 19 ignores the late state update, and the example stays short.
 
 ## Known and open (don't report again, check whether fixed)
 
@@ -55,7 +55,7 @@ Last reviewed: PRs 86 to 92 (2026-10-30, the audit fixes), 158 and 159 (2026-11-
 - **A controlled Image Cropper keeps its crop when `src` changes.** With `crop` passed, a new image shows the old image's crop until the owner sets `crop` to `undefined`. Same in every framework; undecided whether a new `src` should start a fresh crop.
 - **Pure-utility entries are client modules.** `color.ts`, like `date.ts`, builds with `"use client"`, so a Server Component can't call `formatColor` or `parseColor`. Adding them to the build's `--server` list would fix it.
 - **Indicator remeasure after cleanup.** `foundation/selection/indicator.ts` queues a microtask `remeasure` that can run after cleanup and observe again with the disconnected `ResizeObserver`, as Tabs did before it was extracted.
-- **Chronology items have no name or feed position before hydration.** `aria-labelledby`, `aria-describedby`, `aria-posinset` and `aria-setsize` are live attributes written once the parts bind; pointing at a title id on the server would reference ids that may not exist.
+- **Timeline items have no name or feed position before hydration.** `aria-labelledby`, `aria-describedby`, `aria-posinset` and `aria-setsize` are live attributes written once the parts bind; pointing at a title id on the server would reference ids that may not exist.
 
 ## Revisit
 

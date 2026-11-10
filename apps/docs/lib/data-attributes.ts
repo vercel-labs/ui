@@ -1,6 +1,6 @@
 import type { Framework } from "./frameworks"
 import { accordion } from "@ui-sdk/core/accordion"
-import { chronology } from "@ui-sdk/core/chronology"
+import { timeline } from "@ui-sdk/core/timeline"
 import { collapsible } from "@ui-sdk/core/collapsible"
 import { colorPicker } from "@ui-sdk/core/color-picker"
 import { imageCropper } from "@ui-sdk/core/image-cropper"
@@ -858,10 +858,10 @@ const components: Record<
       },
     },
   },
-  chronology: {
+  timeline: {
     instances: () => [
-      chronology({ id: "docs" }),
-      chronology({ id: "docs-feed", feed: true, busy: true }),
+      timeline({ id: "docs" }),
+      timeline({ id: "docs-feed", feed: true, busy: true }),
     ],
     samples: {
       root: [{}],
@@ -898,7 +898,7 @@ const components: Record<
         text: "Present on the last event. Written once it's in the page.",
       },
     },
-    parts: { root: { react: "Chronology", web: "<ui-chronology>" } },
+    parts: { root: { react: "Timeline", web: "<ui-timeline>" } },
   },
   collapsible: {
     instances: () => [

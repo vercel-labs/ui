@@ -133,8 +133,8 @@ const budgets = {
     // Each button notifies only itself when it binds as another element.
     notifiedPerPart: 1,
   },
-  "chronology.arrow-key": {
-    measures: "Work done by 10 ArrowDown presses in a chronology.",
+  "timeline.arrow-key": {
+    measures: "Work done by 10 ArrowDown presses in a timeline.",
     why: "A long activity feed has hundreds of events, each with five parts inside, so a key that reached every part would grow with the feed.",
     // Web components compare the attributes of the parts a move reaches: the
     // event losing the tab stop and the one taking it, about 20 per move.

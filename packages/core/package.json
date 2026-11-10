@@ -53,7 +53,6 @@
     "./accordion": "./src/components/accordion/accordion.ts",
     "./collapsible": "./src/components/collapsible/collapsible.ts",
     "./checkbox": "./src/components/checkbox/checkbox.ts",
-    "./chronology": "./src/components/chronology/chronology.ts",
     "./switch": "./src/components/switch/switch.ts",
     "./radio": "./src/components/radio/radio.ts",
     "./rating": "./src/components/rating/rating.ts",
@@ -95,6 +94,7 @@
     "./number": "./src/foundation/number/number.ts",
     "./date-input": "./src/components/date-input/date-input.ts",
     "./time-input": "./src/components/date-input/time-input.ts",
+    "./timeline": "./src/components/timeline/timeline.ts",
     "./color": "./src/foundation/color/color.ts",
     "./image": "./src/foundation/image/image.ts",
     "./date-picker": "./src/components/date-picker/date-picker.ts",
@@ -204,10 +204,6 @@
       "./checkbox": {
         "types": "./dist/components/checkbox/checkbox.d.ts",
         "default": "./dist/components/checkbox/checkbox.js"
-      },
-      "./chronology": {
-        "types": "./dist/components/chronology/chronology.d.ts",
-        "default": "./dist/components/chronology/chronology.js"
       },
       "./switch": {
         "types": "./dist/components/switch/switch.d.ts",
@@ -372,6 +368,10 @@
       "./time-input": {
         "types": "./dist/components/date-input/time-input.d.ts",
         "default": "./dist/components/date-input/time-input.js"
+      },
+      "./timeline": {
+        "types": "./dist/components/timeline/timeline.d.ts",
+        "default": "./dist/components/timeline/timeline.js"
       },
       "./color": {
         "types": "./dist/foundation/color/color.d.ts",

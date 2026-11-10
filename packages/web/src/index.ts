@@ -156,7 +156,7 @@ export {
   createCheckboxController,
   createCheckboxGroupController,
 } from "@ui-sdk/core/checkbox"
-export { createChronologyController } from "@ui-sdk/core/chronology"
+export { createTimelineController } from "@ui-sdk/core/timeline"
 export { createCollapsibleController } from "@ui-sdk/core/collapsible"
 export { createColorPickerController } from "@ui-sdk/core/color-picker"
 export { createComboboxController } from "@ui-sdk/core/combobox"
@@ -357,7 +357,7 @@ export type {
   UiChangeEvent,
   UiCheckboxElement,
   UiCheckboxGroupElement,
-  UiChronologyElement,
+  UiTimelineElement,
   UiCollapsibleElement,
   UiAutocompleteElement,
   UiColorPickerElement,
