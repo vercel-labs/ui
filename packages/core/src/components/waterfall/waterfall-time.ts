@@ -58,9 +58,10 @@ function spanPlacement(span: Span, range: Range) {
   return { start, size: round(end - start) }
 }
 
-// The smallest step of 1, 2 or 5 times a power of ten that fits the range in `max` ticks.
+// The smallest step of 1, 2 or 5 times a power of ten that fits `max` ticks,
+// each with a step of room after it.
 function tickStep(span: number, max: number) {
-  const rough = span / Math.max(1, max - 1)
+  const rough = span / (max + 1)
   const power = 10 ** Math.floor(Math.log10(rough))
   for (const factor of [1, 2, 5, 10]) {
     if (factor * power >= rough) {
@@ -71,6 +72,8 @@ function tickStep(span: number, max: number) {
 }
 
 // The times of the ticks: round steps, at most `max` of them, inside the range.
+// A label sits after its tick, in the step before the next, so the last tick
+// needs a step of room before the end too.
 function tickTimes([start, end]: Range, max: number) {
   if (!(end > start) || max < 1) {
     return [start]
@@ -79,13 +82,14 @@ function tickTimes([start, end]: Range, max: number) {
   const times: number[] = []
   for (
     let time = Math.ceil(start / step) * step;
-    time <= end + step * 1e-9 && times.length < max;
+    time <= end - step + step * 1e-9 && times.length < max;
     time += step
   ) {
     // Steps like 0.1 add up float error, so each tick is rounded to the step's precision.
     times.push(Number(time.toFixed(Math.max(0, -Math.floor(Math.log10(step))))))
   }
-  return times
+  const first = Math.ceil(start / step) * step
+  return times.length === 0 && first <= end ? [first] : times
 }
 
 // Milliseconds, seconds or minutes, picked by `scale`, so every tick of an axis reads in one unit.

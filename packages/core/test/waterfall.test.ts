@@ -59,9 +59,12 @@ describe("time axis", () => {
   })
 
   test("ticks fall on round times and never pass the limit", () => {
-    expect(tickTimes([0, 2000], 6)).toEqual([0, 500, 1000, 1500, 2000])
-    expect(tickTimes([0, 1], 6)).toEqual([0, 0.2, 0.4, 0.6, 0.8, 1])
-    expect(tickTimes([120, 980], 4)).toEqual([500])
+    expect(tickTimes([0, 2000], 6)).toEqual([0, 500, 1000, 1500])
+    expect(tickTimes([0, 1], 6)).toEqual([0, 0.2, 0.4, 0.6, 0.8])
+    expect(tickTimes([120, 980], 4)).toEqual([200, 400, 600])
+    expect(tickTimes([120, 980], 2)).toEqual([500])
+    expect(tickTimes([0, 820], 6)).toEqual([0, 200, 400, 600])
+    expect(tickTimes([0, 920], 6)).toEqual([0, 200, 400, 600])
     for (const max of [2, 3, 5, 8]) {
       expect(tickTimes([0, 12345], max).length).toBeLessThanOrEqual(max)
     }
@@ -130,6 +133,21 @@ describe("waterfall rows", () => {
     expect(partState(instance.part("root", {}), {})).toEqual({
       range: [500, 1000],
     })
+  })
+
+  test("the axis follows a range changed in place", () => {
+    const range: [number, number] = [0, 1000]
+    const instance = waterfall({ id: "w", items, range })
+    const ticks = () =>
+      (
+        partState(instance.part("axis", { maxTicks: 3 }), {
+          maxTicks: 3,
+        }) as { ticks: { time: number }[] }
+      ).ticks.map((tick) => tick.time)
+    expect(ticks()).toEqual([0, 500])
+    range[1] = 100
+    instance.setOptions({ id: "w", items, range })
+    expect(ticks()).toEqual([0, 50])
   })
 
   test("the visible rows follow the expanded spans", () => {
