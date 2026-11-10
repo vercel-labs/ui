@@ -340,6 +340,44 @@ function fixtureComponents(folder) {
 const isComponent = (name) =>
   existsSync(path.join(root, "packages/core/src/components", name))
 
+const isSpec = (file) => file.endsWith(".spec.ts")
+
+/**
+ * The spec files that import a test helper, like `forms.helpers.ts` or
+ * `perf/budgets.ts`, directly or through another, like `perf/leaks.ts`.
+ */
+function importingSpecs(file) {
+  const testFiles = ["tests/specs", "tests/perf"].flatMap((folder) =>
+    readdirSync(path.join(root, folder))
+      .filter((name) => name.endsWith(".ts"))
+      .map((name) => path.join(folder, name))
+  )
+  const importsOf = new Map(
+    testFiles.map((from) => [
+      from,
+      [
+        ...readFileSync(path.join(root, from), "utf8").matchAll(
+          /from\s*"(\.[^"]+)"/g
+        ),
+      ].map(([, specifier]) =>
+        path.join(path.dirname(from), specifier).replace(/\.ts$/, "")
+      ),
+    ])
+  )
+  const seen = new Set([file])
+  const queue = [file]
+  while (queue.length > 0) {
+    const target = queue.pop().replace(/\.ts$/, "")
+    for (const [from, imports] of importsOf) {
+      if (!seen.has(from) && imports.includes(target)) {
+        seen.add(from)
+        queue.push(from)
+      }
+    }
+  }
+  return [...seen].filter(isSpec).map((spec) => path.basename(spec))
+}
+
 /** Each touched component with the frameworks it runs on, and each framework shared code reaches. */
 function plan(files) {
   const touched = new Map()
@@ -358,13 +396,24 @@ function plan(files) {
   for (const file of files) {
     const parts = file.split("/")
     const reach = frameworksOf(file)
-    if (file.startsWith("tests/specs/")) {
+    if (/^tests\/(specs|perf)\/.*\.ts$/.test(file) && !isSpec(file)) {
+      // A helper or a perf budget runs with every spec that imports it.
+      for (const spec of importingSpecs(file)) {
+        touch(componentOf(spec.split(".")[0]), reach)
+      }
+    } else if (file.startsWith("tests/specs/")) {
       const component = componentOf(parts[2].split(".")[0])
       if (component) {
         touch(component, reach)
       } else {
         share(file, reach)
       }
+    } else if (
+      file === "pnpm-lock.yaml" ||
+      /^packages\/[\w-]+\/package\.json$/.test(file)
+    ) {
+      // A dependency change can move any spec of the frameworks it reaches.
+      share(file, reach)
     } else if (file.startsWith("apps/playground/src/fixtures/")) {
       for (const component of fixtureComponents(parts[4])) {
         touch(component, reach)
