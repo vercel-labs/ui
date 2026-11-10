@@ -78,6 +78,29 @@ describe("direct attributes", () => {
     expect(el.getAttribute("hidden")).toBeNull()
   })
 
+  test("are removed from an element a framework reuses for a part that doesn't have them", () => {
+    const instance = filtered({ id: "f" })
+    const apple = { id: "a", label: "Apple" }
+    const banana = { id: "b", label: "Banana" }
+    attrs(instance.part("item", apple))
+    const el = element({ role: "option" })
+    const unbind = ref(instance.part("item", apple), {
+      by: "framework",
+      attaches: "all",
+    })
+    unbind(el as unknown as HTMLElement)
+    instance.setOptions({ id: "f", query: "pp" })
+    instance.setOptions({ id: "f", query: "x" })
+    expect(el.getAttribute("hidden")).toBe("")
+    unbind(null)
+    instance.setOptions({ id: "f", query: "an" })
+    attrs(instance.part("item", banana))
+    ref(instance.part("item", banana), { by: "framework", attaches: "all" })(
+      el as unknown as HTMLElement
+    )
+    expect(el.getAttribute("hidden")).toBeNull()
+  })
+
   test("are left to elements core renders, like web components, which write every attribute", () => {
     const instance = filtered({ id: "f" })
     const props = { id: "a", label: "Apple" }

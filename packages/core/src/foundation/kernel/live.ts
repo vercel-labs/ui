@@ -58,6 +58,7 @@ type Live<State extends object, Api, Props> = ReturnType<
  * @stable
  */
 function direct(names: readonly string[]) {
+  const written = new WeakMap<HTMLElement, Map<string, string>>()
   return {
     names,
     /** Keeps the attributes current on `el` on every change the part hears. Returns the cleanup. */
@@ -65,6 +66,16 @@ function direct(names: readonly string[]) {
       // What the part last had, so dropping a value removes only that, not
       // one the framework merged in, like a Field's label on a trigger.
       let last = attrs(part)
+      // A framework that reuses the element for another key never saw what
+      // this slot wrote for the last one, so what the new key lacks goes.
+      const own = written.get(el) ?? new Map<string, string>()
+      written.set(el, own)
+      for (const [name, value] of own) {
+        if (last[name] === undefined && el.getAttribute(name) === value) {
+          el.removeAttribute(name)
+        }
+      }
+      own.clear()
       return subscribe(part, () => {
         const values = attrs(part)
         for (const name of names) {
@@ -91,6 +102,7 @@ function direct(names: readonly string[]) {
             continue
           }
           el.setAttribute(name, value)
+          own.set(name, value)
         }
         last = values
       })
