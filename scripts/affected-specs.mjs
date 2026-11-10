@@ -212,7 +212,12 @@ function packageImporters() {
   ).exports
   const importers = new Map()
   for (const file of files) {
-    const text = readFileSync(path.join(root, file), "utf8")
+    // Type-only imports are gone at runtime, so they reach no spec. Web's
+    // `events.ts` imports every component's types.
+    const text = readFileSync(path.join(root, file), "utf8").replace(
+      /^\s*(?:import|export) type [^;]*?from\s*"[^"]+"/gm,
+      ""
+    )
     for (const [, specifier] of text.matchAll(
       /(?:from|import)\s*\(?\s*"([^"]+)"/g
     )) {
@@ -282,9 +287,48 @@ function importingComponents(file, importers) {
   return new Set([...seen].flatMap(packageComponents))
 }
 
-/** Components whose specs open a fixture folder, like `menu-cases` for menu.cases.spec.ts. */
+/**
+ * Spec prefixes by the components their fixtures render, like `forms` and
+ * `field` by Checkbox: a component's change runs them too.
+ */
+function sharedSpecsByComponent() {
+  const byComponent = new Map()
+  const folders = readdirSync(fixtureRoot, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+  for (const folder of folders) {
+    const users = fixtureComponents(folder).filter((user) => user !== "leaks")
+    if (users.length === 0) {
+      continue
+    }
+    const files = readdirSync(path.join(fixtureRoot, folder), {
+      recursive: true,
+    }).filter((file) => /\.(ts|tsx|vue|svelte)$/.test(file))
+    for (const file of files) {
+      const text = readFileSync(path.join(fixtureRoot, folder, file), "utf8")
+      for (const [, entry] of text.matchAll(/"@ui-sdk\/\w+\/([\w-]+)"/g)) {
+        const component = componentOf(entry)
+        if (!component) {
+          continue
+        }
+        if (!byComponent.has(component)) {
+          byComponent.set(component, new Set())
+        }
+        users.forEach((user) => byComponent.get(component).add(user))
+      }
+    }
+  }
+  return byComponent
+}
+
+/**
+ * Components whose specs open a fixture folder, like `menu-cases` for
+ * menu.cases.spec.ts, or list it, like presentation.spec.ts's `fixture: "menu"`.
+ */
 function fixtureComponents(folder) {
-  const opens = new RegExp(`open\\(\\s*"${folder}"|fixture=${folder}\\b`)
+  const opens = new RegExp(
+    `open\\(\\s*"${folder}"|fixture=${folder}\\b|fixture: "${folder}"`
+  )
   const owners = specFiles.filter((file) =>
     opens.test(readFileSync(path.join(specRoot, file), "utf8"))
   )
@@ -292,6 +336,9 @@ function fixtureComponents(folder) {
     ? owners.map((file) => file.split(".")[0])
     : [componentOf(folder)].filter(Boolean)
 }
+
+const isComponent = (name) =>
+  existsSync(path.join(root, "packages/core/src/components", name))
 
 /** Each touched component with the frameworks it runs on, and each framework shared code reaches. */
 function plan(files) {
@@ -307,6 +354,7 @@ function plan(files) {
   }
   const share = (file, reach) => shared.set(file, reach)
   let importers
+  let sharedSpecs
   for (const file of files) {
     const parts = file.split("/")
     const reach = frameworksOf(file)
@@ -340,8 +388,19 @@ function plan(files) {
       const own = packageComponents(file)
       const reached = importingComponents(file, importers)
       if (own.length > 0 && reached.size <= sharedThreshold) {
+        sharedSpecs ??= sharedSpecsByComponent()
         for (const component of reached) {
           touch(component, reach)
+          for (const spec of sharedSpecs.get(component) ?? []) {
+            // Another component's specs, like Field's for Checkbox, run on
+            // `react` like shared code, since every framework's would cost more.
+            touch(
+              spec,
+              isComponent(spec)
+                ? sharedFrameworks(new Map([[file, reach]]))
+                : reach
+            )
+          }
         }
       } else {
         share(file, reach)

@@ -55,6 +55,19 @@ describe("a menu item whose action returns a Promise", () => {
     expect(instance.get().open).toBe(true)
   })
 
+  test("resolving after the menu closed and reopened leaves it open", async () => {
+    const save = deferred()
+    const instance = menu({ id: "reopen", onAction: () => save.promise })
+    instance.api.open()
+    press(instance.part("item", { value: "save" }))?.()
+    instance.api.close()
+    instance.api.open()
+    save.resolve()
+    await save.promise
+    await Promise.resolve()
+    expect(instance.get().open).toBe(true)
+  })
+
   test("a prevented onSelect keeps the menu open after it resolves", async () => {
     const save = deferred()
     const instance = menu({ id: "keep" })

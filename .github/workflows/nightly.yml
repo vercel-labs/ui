@@ -31,15 +31,19 @@ jobs:
       - id: changed
         env:
           GH_TOKEN: ${{ github.token }}
+          EVENT: ${{ github.event_name }}
+          REPO: ${{ github.repository }}
+          BRANCH: ${{ github.ref_name }}
+          SHA: ${{ github.sha }}
         run: |
-          if [ "${{ github.event_name }}" = workflow_dispatch ]; then
+          if [ "$EVENT" = workflow_dispatch ]; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          tested=$(gh run list --repo "${{ github.repository }}" --workflow nightly.yml --branch "${{ github.ref_name }}" --status completed --limit 20 \
+          tested=$(gh run list --repo "$REPO" --workflow nightly.yml --branch "$BRANCH" --status completed --limit 20 \
             --json headSha,conclusion --jq '[.[] | select(.conclusion == "success" or .conclusion == "failure")][0].headSha // ""')
-          if [ "$tested" = "${{ github.sha }}" ]; then
-            echo "Already tested ${{ github.sha }}."
+          if [ "$tested" = "$SHA" ]; then
+            echo "Already tested $SHA."
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"

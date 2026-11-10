@@ -6,6 +6,7 @@
 // difference: the marks change no behavior, style or ARIA, and only the
 // bridge reads them.
 import { checkMarks as warnMarks } from "#dev"
+import { composedClosest } from "../../foundation/platform/platform"
 
 const marks = ["data-agent-confirm", "data-agent-hidden", "data-agent-secret"]
 
@@ -13,9 +14,9 @@ const marks = ["data-agent-confirm", "data-agent-hidden", "data-agent-secret"]
 // cut short, like a label would be.
 function confirmOf(elements: Element[]) {
   for (const el of elements) {
-    const text = el
-      .closest("[data-agent-confirm]")
-      ?.getAttribute("data-agent-confirm")
+    const text = composedClosest(el, "[data-agent-confirm]")?.getAttribute(
+      "data-agent-confirm"
+    )
     if (text != null) {
       return text.trim().slice(0, 200) || "This needs a person."
     }
@@ -23,10 +24,10 @@ function confirmOf(elements: Element[]) {
 }
 
 const isOffLimits = (elements: Element[]) =>
-  elements.some((el) => el.closest("[data-agent-hidden]"))
+  elements.some((el) => composedClosest(el, "[data-agent-hidden]"))
 
 const isSecret = (elements: Element[]) =>
-  elements.some((el) => el.closest("[data-agent-secret]"))
+  elements.some((el) => composedClosest(el, "[data-agent-secret]"))
 
 // An element's text as it reads, with its spaces collapsed, and without the text of the
 // elements in `skip`, like a tree branch's child items, of `data-agent-hidden` or of what a

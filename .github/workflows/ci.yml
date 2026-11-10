@@ -49,6 +49,7 @@ jobs:
       # Full history, so `pnpm lint` finds where the branch left origin/main.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          persist-credentials: false
           fetch-depth: 0
       - uses: ./.github/actions/setup
 
@@ -63,6 +64,11 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
+      # Each framework's own lint rules. Errors from before this check ran are
+      # listed in eslint-suppressions.json, so only new ones fail.
+      - name: Framework lint
+        run: pnpm lint:idioms
+
   unit:
     name: Unit tests
     needs: plan
@@ -71,6 +77,8 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - uses: ./.github/actions/setup
 
       # Only packages/*: a recursive `test` would also start Playwright in tests/.
@@ -85,6 +93,8 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - uses: ./.github/actions/setup
 
       # The docs load the compiled examples in apps/docs/public/examples.
@@ -109,7 +119,7 @@ jobs:
         run: pnpm docs:perf --check
 
       - name: Bundle size
-        run: pnpm size
+        run: pnpm size --strict
 
   # The web components built for pages without a bundler, loaded from another
   # origin like the docs site serves them (tests/browser-build.config.ts).
@@ -121,6 +131,8 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - uses: ./.github/actions/setup
         with:
           browsers: chromium
@@ -192,6 +204,7 @@ jobs:
       # Full history, so the script finds where the changes left their base.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          persist-credentials: false
           fetch-depth: 0
       - uses: ./.github/actions/setup
 
@@ -227,6 +240,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          persist-credentials: false
           fetch-depth: 0
       - uses: ./.github/actions/setup
         with:
@@ -253,6 +267,8 @@ jobs:
         include: ${{ fromJSON(needs.plan.outputs.shards) }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - uses: ./.github/actions/setup
         with:
           browsers: ${{ matrix.engine }}
@@ -289,6 +305,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - uses: ./.github/actions/setup
 
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
@@ -324,6 +342,8 @@ jobs:
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - uses: ./.github/actions/setup
         with:
           browsers: chromium

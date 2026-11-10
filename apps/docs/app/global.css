@@ -1,3 +1,4 @@
+@layer ui-sdk;
 @import "tailwindcss";
 
 @custom-variant dark {
@@ -221,6 +222,14 @@ body {
   }
 }
 
+/* Offscreen previews skip restyles too, which a modal's page lock makes slow
+   on long component pages. A fixed overlay, like a drop zone for the whole
+   page, keeps the viewport, which containment would take away. */
+figure [data-example]:not(:has([data-variant="overlay"])) {
+  content-visibility: auto;
+  contain-intrinsic-block-size: auto 14rem;
+}
+
 [data-code-frame] pre code {
   display: block;
   width: fit-content;
@@ -371,9 +380,9 @@ body {
 
 @keyframes strip-fill {
   from {
-    width: 0;
+    transform: scaleX(0);
   }
   to {
-    width: 100%;
+    transform: scaleX(1);
   }
 }

@@ -537,6 +537,32 @@ describe("data-agent-secret", () => {
   })
 })
 
+describe("a mark on a custom element's host", () => {
+  // A region inside the shadow root of an element with one mark.
+  const shadowRegion = (mark: string) => {
+    const host = region(mark)
+    const inner = document.createElement("div")
+    host.attachShadow({ mode: "open" }).append(inner)
+    return inner
+  }
+
+  test("covers the controls in its shadow root", async () => {
+    const agent = createAgent()
+    mountInput("New password", shadowRegion("data-agent-hidden"))
+    mountInput("Tax ID", shadowRegion("data-agent-secret"))
+    mountButton("Delete", shadowRegion("data-agent-confirm"))
+    expect(onPage(agent).map((component) => component.label)).toEqual([
+      "Tax ID",
+      "Delete",
+    ])
+    expect(onPage(agent)[1]).toMatchObject({ confirm: "This needs a person." })
+    const outcome = await agent.act({
+      steps: [{ ref: "Tax ID", action: "setValue", args: ["12-345"] }],
+    })
+    expect(JSON.stringify(outcome)).not.toContain("12-345")
+  })
+})
+
 describe("mark names", () => {
   test("development warns about a misspelled mark, and not about an app's own data-agent attribute", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {})

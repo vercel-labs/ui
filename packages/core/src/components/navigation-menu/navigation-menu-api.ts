@@ -18,6 +18,7 @@ import { restoreFocus } from "../../foundation/kernel/modality"
 import {
   modalTriple,
   openerOf,
+  prepareReset,
   resetPopoverStyles,
   type PopupOpener,
 } from "../../foundation/popups/popup"
@@ -46,6 +47,7 @@ import type {
 } from "../../foundation/kernel/primitive-types"
 import { createChange } from "../../foundation/kernel/input-source"
 import { elements } from "../../foundation/kernel/elements"
+import { whenKept } from "../../foundation/kernel/keep"
 import type {
   NavigationMenuContentProps,
   NavigationMenuLinkProps,
@@ -130,6 +132,8 @@ function navigationMenuApi(
 ) {
   const { store, options, element } = context
   const change = createChange(context)
+  // Written at the first open, the reset restyles and lays out the whole page.
+  whenKept(() => prepareReset(popupSelectors))
   let closedAt = -Infinity
   // The item the last open asked for, which the viewport opens for, and
   // whether the last open or close went through.

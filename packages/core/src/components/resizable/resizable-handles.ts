@@ -27,6 +27,7 @@ const targets = new Set<HandleTarget>()
 const listening = new WeakSet<Document>()
 let hovered: HandleTarget[] = []
 let active: HandleTarget[] = []
+let activeTouch = false
 
 /** Makes a handle findable by presses and hovers near it. Returns the cleanup. */
 function registerHandle(target: HandleTarget) {
@@ -51,8 +52,16 @@ function releaseHandle(target: HandleTarget) {
 /** The cursor may have changed, like at a limit. */
 const refreshCursor = (doc: Document) => updateCursor(doc)
 
+// What the press landed on must belong to one of these groups. Anything
+// else above them, like a dialog or a popover, owns the press.
+const owns = (target: HandleTarget, top: Element) =>
+  target.el.contains(top) || target.root()?.contains(top)
+
 // The handles at a point: the nearest, plus one of the other axis where two meet.
 function hitTest(x: number, y: number, coarse: boolean, top: Element | null) {
+  if (top && !someOwns(top)) {
+    return []
+  }
   const pad = coarse ? hitSize.coarse : hitSize.fine
   const hits: { target: HandleTarget; axis: "x" | "y"; distance: number }[] = []
   for (const target of targets) {
@@ -72,14 +81,7 @@ function hitTest(x: number, y: number, coarse: boolean, top: Element | null) {
       hits.push({ target, axis, distance: Math.hypot(dx, dy) })
     }
   }
-  // What the press landed on must belong to one of these groups. Anything
-  // else above them, like a dialog or a popover, owns the press.
-  if (
-    top &&
-    !hits.some(
-      ({ target }) => target.el.contains(top) || target.root()?.contains(top)
-    )
-  ) {
+  if (top && !hits.some(({ target }) => owns(target, top))) {
     return []
   }
   hits.sort((a, b) => a.distance - b.distance)
@@ -89,6 +91,16 @@ function hitTest(x: number, y: number, coarse: boolean, top: Element | null) {
   }
   const crossing = hits.find((hit) => hit.axis !== nearest.axis)
   return crossing ? [nearest.target, crossing.target] : [nearest.target]
+}
+
+// Checked before measuring too, so a tap outside every group reads no layout.
+function someOwns(top: Element) {
+  for (const target of targets) {
+    if (owns(target, top)) {
+      return true
+    }
+  }
+  return false
 }
 
 function listen(doc: Document) {
@@ -112,12 +124,8 @@ function listen(doc: Document) {
       return
     }
     const top = event.target as Element | null
-    const hits = hitTest(
-      event.clientX,
-      event.clientY,
-      event.pointerType !== "mouse",
-      top
-    )
+    const mouse = event.pointerType === "mouse"
+    const hits = hitTest(event.clientX, event.clientY, !mouse, top)
     if (
       !hits.length ||
       (top &&
@@ -134,6 +142,7 @@ function listen(doc: Document) {
       swallowNextClick(doc, true)
     }
     active = hits
+    activeTouch = event.pointerType === "touch"
     for (const hit of hits) {
       hit.start(event)
     }
@@ -196,7 +205,9 @@ function setHovered(next: HandleTarget[]) {
 // keeps iframes from swallowing the moves.
 function updateCursor(doc: Document) {
   const shown = active.length ? active : hovered
-  if (!shown.length) {
+  // Each write restyles the whole page. A touch drag skips it: it shows no
+  // cursor, and its pointer is captured, so iframes can't take the moves.
+  if (!shown.length || (active.length && activeTouch)) {
     return setPageStyle(doc, "")
   }
   const cursor = shown.length > 1 ? "move" : shown[0].cursor()

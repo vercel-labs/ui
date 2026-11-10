@@ -404,6 +404,9 @@ function menuApi(
     () => store.get().pending.length > 0
   )
   let hoverTimer: ReturnType<typeof setTimeout> | undefined
+  // Counts closes, so an item's Promise that settles after the menu closed
+  // doesn't close it again once it's reopened.
+  let session = 0
   // NaN until the pointer first moves, so the first move always counts.
   let pointerX = NaN
   let pointerY = NaN
@@ -510,6 +513,7 @@ function menuApi(
           if (open) {
             return
           }
+          session++
           clearTimeout(hoverTimer)
           safeArea.stop()
           children.forEach((child) =>
@@ -790,8 +794,10 @@ function menuApi(
     },
     runAction: (value: string, event?: Event) =>
       options().onAction?.(value, { event }),
-    wait: (key: string, pending: PromiseLike<unknown>, done: () => void) =>
-      wait(store, key, pending, done),
+    wait(key: string, pending: PromiseLike<unknown>, done: () => void) {
+      const started = session
+      wait(store, key, pending, () => started === session && done())
+    },
     isPending: (key: string) => store.get().pending.includes(key),
     clearError(key: string) {
       if (store.get().error?.key === key) {

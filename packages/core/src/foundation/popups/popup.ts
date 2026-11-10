@@ -1321,6 +1321,10 @@ function createPopupLayer<
       const start = () => {
         bound = { el, config }
         if (store.get().mounted) {
+          // Vue mounts a moved part's new element before the old one lets go.
+          if (shown && shown.el !== el) {
+            hide()
+          }
           show()
         }
       }
