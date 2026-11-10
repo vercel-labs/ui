@@ -1,6 +1,5 @@
 import { getContext } from "svelte"
 
-// The row a part belongs to.
 const RowKey = Symbol("waterfall-row")
 
 type RowContext = { partProps: () => { value: string } }

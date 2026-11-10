@@ -25,6 +25,7 @@ const trace: WaterfallData = Array.from({ length: 2000 }, (_, job) => ({
   })),
 }))
 
+const range: [number, number] = [0, 400]
 const row = 32
 const height = 288
 
@@ -47,7 +48,7 @@ function Example() {
       <Waterfall
         aria-label="Build trace"
         items={trace}
-        range={[0, 400]}
+        range={range}
         expanded={expanded}
         onExpandedChange={setExpanded}
         onHighlight={(_value, { index }) => {

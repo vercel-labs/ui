@@ -11,7 +11,7 @@ function lastLog(preview: Locator) {
 
 const row = (preview: Locator, label: string) =>
   preview.getByRole("row").filter({
-    has: preview.getByRole("rowheader", { name: label, exact: true }),
+    has: preview.page().getByRole("rowheader", { name: label, exact: true }),
   })
 
 const checks: Record<string, Check> = {
@@ -31,7 +31,10 @@ const checks: Record<string, Check> = {
     ).toBeFocused()
     await expect(
       row(preview, "app.css").locator('[data-slot="waterfall-bar"]')
-    ).toHaveAttribute("aria-label", "app.css, 8 kB, starts at 190 ms, takes 96 ms")
+    ).toHaveAttribute(
+      "aria-label",
+      "app.css, 8 kB, starts at 190 ms, takes 96 ms"
+    )
     await expect(
       preview.locator('[data-slot="waterfall-tick"]').first()
     ).toBeVisible()

@@ -6,6 +6,7 @@ import {
   type WaterfallState,
   type WaterfallTimeState,
 } from "@ui-sdk/core/waterfall"
+import type { ComponentProps } from "react"
 import {
   createParts,
   readIn,
@@ -126,7 +127,7 @@ const ticks = (state: WaterfallAxisState) =>
 function WaterfallTick({
   children = label,
   ...props
-}: React.ComponentProps<typeof parts.Tick>) {
+}: ComponentProps<typeof parts.Tick>) {
   return <parts.Tick {...props}>{children}</parts.Tick>
 }
 

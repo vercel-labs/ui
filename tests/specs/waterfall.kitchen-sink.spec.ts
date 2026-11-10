@@ -1,9 +1,7 @@
 import { expect, test } from "../fixtures"
 
-// Opens every waterfall kitchen sink variant, checks how many rows show and
-// what the first bar says, then drives the controller and the keyboard. The
-// page is for manual testing, so this only proves every variant renders and
-// responds without errors. Checks are soft, so one run lists every variant that misbehaves.
+// Opens every variant, checks its rows and first bar, then drives the
+// controller and the keyboard. Checks are soft, so one run lists every variant that misbehaves.
 test("every waterfall kitchen sink variant renders its rows", async ({
   page,
   framework,

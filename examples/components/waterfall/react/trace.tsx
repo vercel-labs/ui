@@ -65,6 +65,12 @@ const trace: WaterfallData = [
   },
 ]
 
+const milliseconds = {
+  style: "unit",
+  unit: "millisecond",
+  unitDisplay: "narrow",
+} as const
+
 function Example() {
   const log = useLog()
   const [spans] = React.useState(() => createWaterfallController())
@@ -92,7 +98,7 @@ function Example() {
           setValue(next)
           log(`Selected ${next}`)
         }}
-        format={{ style: "unit", unit: "millisecond", unitDisplay: "narrow" }}
+        format={milliseconds}
       >
         <WaterfallHeaderRow>
           <WaterfallColumnHeader>Span</WaterfallColumnHeader>

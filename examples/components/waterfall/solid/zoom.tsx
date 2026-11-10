@@ -65,9 +65,11 @@ function Example() {
           <WaterfallColumnHeader aria-label="Timeline">
             <WaterfallAxis>
               {(state: WaterfallAxisState) => (
-                <For each={state.ticks}>
+                <For each={state.ticks} keyed={(tick) => tick.time}>
                   {(tick) => (
-                    <WaterfallTick time={tick.time}>{tick.label}</WaterfallTick>
+                    <WaterfallTick time={tick().time}>
+                      {tick().label}
+                    </WaterfallTick>
                   )}
                 </For>
               )}

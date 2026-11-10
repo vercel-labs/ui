@@ -13,6 +13,11 @@ const owner = "ui-waterfall"
 
 // The rows and ticks an element rendered for itself, so a new render replaces them.
 const generated = new WeakSet<Element>()
+// The items each waterfall rendered its rows from, the ticks each axis shows,
+// and the empty ticks that show their time.
+const renderedItems = new WeakMap<HTMLElement, unknown>()
+const shownTicks = new WeakMap<HTMLElement, string>()
+const labeledTicks = new WeakSet<HTMLElement>()
 
 // A row for every span, from a <template> inside the waterfall when it has one.
 function renderRows(api: WaterfallApi, template: HTMLTemplateElement | null) {
@@ -44,13 +49,13 @@ function renderTicks(el: HTMLElement, instance: PrimitiveInstance) {
       instance.part("axis", { maxTicks: max })
     ) as WaterfallAxisState
     const shown = ticks.map((tick) => `${tick.time}:${tick.label}`).join(",")
-    if (axis.dataset.ticks === shown) {
+    if (shownTicks.get(axis) === shown) {
       continue
     }
-    axis.dataset.ticks = shown
+    shownTicks.set(axis, shown)
     axis.replaceChildren(
       ...ticks.map((tick) => {
-        const child = document.createElement("ui-waterfall-tick")
+        const child = axis.ownerDocument.createElement("ui-waterfall-tick")
         child.setAttribute("time", String(tick.time))
         child.textContent = tick.label
         generated.add(child)
@@ -62,11 +67,11 @@ function renderTicks(el: HTMLElement, instance: PrimitiveInstance) {
     if (
       tick.closest(owner) !== el ||
       generated.has(tick) ||
-      (!("text" in tick.dataset) && tick.childNodes.length)
+      (!labeledTicks.has(tick) && tick.childNodes.length)
     ) {
       continue
     }
-    tick.dataset.text = ""
+    labeledTicks.add(tick)
     const { label } = partState(
       instance.part("tick", { time: Number(tick.getAttribute("time")) })
     ) as WaterfallTimeState
@@ -117,21 +122,39 @@ function defineWaterfallElements() {
         "reveal",
         "focus",
       ],
-      // Runs again whenever `items` is set.
+      // Runs again whenever a property like `items` or `range` is set, so
+      // rows are rebuilt only for new `items`.
       render(el, instance) {
         const api = instance.api
-        for (const child of Array.from(el.children)) {
-          if (generated.has(child) && child.localName === "ui-waterfall-row") {
-            child.remove()
+        const items = api.internal.items()
+        if (renderedItems.get(el) !== items) {
+          renderedItems.set(el, items)
+          for (const child of Array.from(el.children)) {
+            if (
+              generated.has(child) &&
+              child.localName === "ui-waterfall-row"
+            ) {
+              child.remove()
+            }
           }
-        }
-        // Rows of its own, like the ones a virtualized list renders, win over the data.
-        if (!el.querySelector(":scope > ui-waterfall-row")) {
-          el.append(...renderRows(api, templateOf(el)))
+          // Rows of its own, like the ones a virtualized list renders, win over the data.
+          if (!el.querySelector(":scope > ui-waterfall-row")) {
+            el.append(...renderRows(api, templateOf(el)))
+          }
         }
         const update = () => renderTicks(el, instance)
         update()
-        return instance.subscribe(update)
+        // An axis's `max-ticks` and a tick's `time` change no state.
+        const observer = new MutationObserver(update)
+        observer.observe(el, {
+          subtree: true,
+          attributeFilter: ["max-ticks", "time"],
+        })
+        const unsubscribe = instance.subscribe(update)
+        return () => {
+          observer.disconnect()
+          unsubscribe()
+        }
       },
     },
     "header-row": { tag: "ui-waterfall-header-row", display: "block" },

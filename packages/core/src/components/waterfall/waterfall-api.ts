@@ -435,7 +435,13 @@ function waterfallApiBody(
       return ticksFor.ticks
     }
     const list = waterfallTicks(now, max, locale, state.format)
-    ticksFor = { range: now, locale, format: state.format, max, ticks: list }
+    ticksFor = {
+      range: [now[0], now[1]],
+      locale,
+      format: state.format,
+      max,
+      ticks: list,
+    }
     return list
   }
 

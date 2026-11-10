@@ -10,7 +10,7 @@ import {
   type WaterfallValueChangeReason,
 } from "@ui-sdk/core/waterfall"
 import type { ChangeDetails } from "@ui-sdk/core"
-import { defineComponent, h, type PropType } from "vue"
+import { computed, defineComponent, h, type PropType } from "vue"
 import { slotContent } from "./children"
 import { createParts, withElement } from "./create-parts"
 import {
@@ -113,22 +113,25 @@ const Waterfall = withElement(
         onHighlight: (value: string, details: ListHighlightDetails) =>
           emit("highlight", value, details),
       }))
+      // The core reads the spans from `items`, so they're read here to stay in sync.
+      const spans = computed(() => {
+        void waterfall.state.items
+        return waterfall.api.internal.all()
+      })
       return usePart(waterfall, "root", undefined, undefined, {
         tag: "div",
         // Without content, it renders a row for every span.
         children: (state) =>
           slotContent(slots.default, { state }) ??
-          waterfall.api.internal
-            .all()
-            .map((item) =>
-              h(WaterfallRow, { key: item.value, value: item.value }, () => [
-                h(WaterfallRowHeader, null, () => [
-                  item.children && h(WaterfallIndicator),
-                  item.label,
-                ]),
-                h(WaterfallBar),
-              ])
-            ),
+          spans.value.map((item) =>
+            h(WaterfallRow, { key: item.value, value: item.value }, () => [
+              h(WaterfallRowHeader, null, () => [
+                item.children && h(WaterfallIndicator),
+                item.label,
+              ]),
+              h(WaterfallBar),
+            ])
+          ),
       })
     },
   })

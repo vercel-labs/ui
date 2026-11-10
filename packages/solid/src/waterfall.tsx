@@ -46,7 +46,6 @@ function Waterfall(props: WaterfallProps) {
 const everySpan = (items: WaterfallDataItem[]): WaterfallDataItem[] =>
   items.flatMap((item) => [item, ...everySpan(item.children ?? [])])
 
-// Every span, parents before children, with its header and bar.
 function WaterfallRows(props: { items: WaterfallDataItem[] }) {
   return (
     <For each={everySpan(props.items)}>
@@ -86,8 +85,8 @@ function WaterfallAxis(props: ComponentProps<typeof parts.Axis>) {
     <parts.Axis {...props}>
       {props.children ??
         ((state: WaterfallAxisState) => (
-          <For each={state.ticks}>
-            {(tick) => <WaterfallTick time={tick.time} />}
+          <For each={state.ticks} keyed={(tick) => tick.time}>
+            {(tick) => <WaterfallTick time={tick().time} />}
           </For>
         ))}
     </parts.Axis>
