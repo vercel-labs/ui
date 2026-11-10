@@ -138,7 +138,7 @@ function MobileNav({
             align="start"
             sideOffset={0}
             collisionPadding={0}
-            className="h-(--available-height) w-(--anchor-width) overflow-y-auto overscroll-contain bg-canvas outline-none [scrollbar-width:none] lg:hidden"
+            className="h-(--available-height) w-(--anchor-width) overflow-x-hidden overflow-y-auto overscroll-y-contain bg-canvas outline-none [scrollbar-width:none] lg:hidden"
           >
             <PopoverTitle className="sr-only">Menu</PopoverTitle>
             <MobileMenu

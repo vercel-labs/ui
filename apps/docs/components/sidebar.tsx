@@ -56,7 +56,7 @@ function Sidebar({
     <div className="flex h-full min-h-0 flex-col">
       <div
         ref={scroller}
-        className="min-h-0 flex-1 p-1 -m-1 overflow-y-auto overscroll-contain pt-10 pe-4 pb-8 scrollbar-none"
+        className="min-h-0 flex-1 p-1 -m-1 overflow-x-hidden overflow-y-auto overscroll-y-contain pt-10 pe-4 pb-8 scrollbar-none"
       >
         <nav aria-label="Docs">
           <Nodes nodes={tree.children} tocs={tocs} current={current} />

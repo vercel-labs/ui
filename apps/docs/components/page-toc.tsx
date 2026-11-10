@@ -15,7 +15,7 @@ function PageToc({ toc, url }: { toc: TableOfContents; url: string }) {
   return (
     <nav
       aria-label="On this page"
-      className="sticky p-1 ps-6 -m-1 top-[4.375rem] ms-auto hidden max-h-[calc(100dvh-4.375rem)] w-64 shrink-0 overflow-y-auto overscroll-contain pt-10 pb-8 scrollbar-none xl:block"
+      className="sticky p-1 ps-6 -m-1 top-[4.375rem] ms-auto hidden max-h-[calc(100dvh-4.375rem)] w-64 shrink-0 overflow-x-hidden overflow-y-auto overscroll-y-contain pt-10 pb-8 scrollbar-none xl:block"
     >
       {items.length > 1 && (
         <AnchorProvider toc={items} single>
