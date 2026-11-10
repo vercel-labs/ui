@@ -278,7 +278,8 @@ printTable(rows)
 if (flags.update) {
   writeBudgets(rows)
 }
-// Growth past a budget is reported, and fails with `--strict`, which CI runs.
+// For now growth past a budget is reported, not failed: `--strict` fails it,
+// as CI will again once sizes settle.
 const overBudget = flags.update ? [] : findBudgetFailures(rows)
 if (overBudget.length && !flags.strict) {
   console.warn(`\n${overBudget.join("\n")}`)
