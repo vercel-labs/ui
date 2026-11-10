@@ -40,7 +40,10 @@ function heading(Tag: "h2" | "h3" | "h4", className: string) {
     return (
       <Tag
         id={id}
-        className={cn("group scroll-mt-28 text-foreground", className)}
+        className={cn(
+          "group scroll-mt-28 lg:scroll-mt-24 text-foreground",
+          className
+        )}
         {...props}
       >
         {id ? (

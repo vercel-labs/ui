@@ -7,7 +7,7 @@ import { HeaderCopyPrompt } from "./copy-prompt"
 
 function SiteHeader({ urls }: { urls: string[] }) {
   return (
-    <header className="sticky top-0 z-10 hidden bg-canvas pt-4 lg:block">
+    <header className="sticky top-0 z-10 hidden bg-canvas lg:block">
       <div className="container flex h-16 items-center">
         <div className="flex shrink-0 items-center gap-4">
           <a
