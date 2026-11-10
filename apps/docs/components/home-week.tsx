@@ -21,6 +21,7 @@ const day = 100
 const hour = 60
 const width = day * 5
 const height = hour * 8
+const tick = 10
 const days = ["Mon", "Tue", "Wed", "Thu", "Fri"]
 
 type Kind = "meeting" | "focus" | "away"
@@ -56,9 +57,13 @@ function clock(minutes: number, twelve: boolean) {
   return `${h % 12 || 12}${m === "00" ? "" : `:${m}`}${h < 12 ? "am" : "pm"}`
 }
 
+function minutes(pixels: number) {
+  return (Math.round(pixels / tick) * tick * 60) / hour
+}
+
 function range(box: ResizeBox, twelve: boolean) {
-  const from = 9 * 60 + (box.y / hour) * 60
-  return `${clock(from, twelve)}–${clock(from + (box.height / hour) * 60, twelve)}`
+  const from = 9 * 60 + minutes(box.y)
+  return `${clock(from, twelve)}–${clock(from + minutes(box.height), twelve)}`
 }
 
 function snap(
@@ -203,14 +208,15 @@ function WeekDemo() {
         width={width}
         height={height}
         scale={scale}
-        step={10}
+        step={tick}
         min={30}
         className="flex flex-col gap-8 select-none"
       >
         {({ boxes: shown, active }) => {
-          const booked = Object.entries(shown)
-            .filter(([id]) => events[id].kind !== "away")
-            .reduce((sum, [, box]) => sum + box.height / hour, 0)
+          const booked =
+            Object.entries(shown)
+              .filter(([id]) => events[id].kind !== "away")
+              .reduce((sum, [, box]) => sum + minutes(box.height), 0) / 60
           return (
             <>
               <div className="flex items-baseline gap-2">
