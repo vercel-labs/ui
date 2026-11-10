@@ -23,7 +23,7 @@ import {
 } from "~/components/ui/dialog"
 
 const tracker = useTracker()
-const issues = useIssues()
+const { data: issues } = useFetch("/api/issues", { default: () => [] })
 const route = useRoute()
 const query = computed(() => parseQuery(route.query))
 const open = ref(false)

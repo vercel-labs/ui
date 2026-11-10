@@ -3,11 +3,6 @@ import { toast } from "~/components/ui/toast"
 
 type Options = NonNullable<Parameters<typeof $fetch>[1]>
 
-function useIssues() {
-  const { data } = useFetch("/api/issues", { key: "issues", default: () => [] })
-  return data
-}
-
 async function send(url: string, options: Options) {
   try {
     await $fetch(url, options)
@@ -16,13 +11,13 @@ async function send(url: string, options: Options) {
     toast.error("Couldn't save your changes. Try again.")
     return false
   } finally {
-    await refreshNuxtData("issues")
+    await refreshNuxtData()
   }
 }
 
 async function createIssue(form: FormData) {
   const issue = await $fetch("/api/issues", { method: "POST", body: form })
-  await refreshNuxtData("issues")
+  await refreshNuxtData()
   return issue
 }
 
@@ -42,11 +37,4 @@ function addComment(id: string, form: FormData) {
   return send(`/api/issues/${id}/comments`, { method: "POST", body: form })
 }
 
-export {
-  addComment,
-  createIssue,
-  deleteIssues,
-  setSubtasksDone,
-  updateIssues,
-  useIssues,
-}
+export { addComment, createIssue, deleteIssues, setSubtasksDone, updateIssues }

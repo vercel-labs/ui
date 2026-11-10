@@ -3,7 +3,7 @@ import SettingsForm from "~/components/settings-form.vue"
 
 useHead({ title: "Settings · Tracker" })
 
-const settings = useSettings()
+const { data: settings } = useFetch("/api/settings")
 </script>
 
 <template>
