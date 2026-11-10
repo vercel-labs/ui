@@ -24,6 +24,7 @@ import { elements } from "../../foundation/kernel/elements"
 type Group = {
   setPanels: (ids: string[], sizes: PanelSizes[], space: number) => void
   setHandles: (handles: Record<string, number>) => void
+  relock: () => void
   setSpace: (space: number) => void
   handleIndex: (key: string) => number | null
   handleDisabled: (key: string) => boolean
@@ -245,9 +246,15 @@ function resizableDom(
         },
       }
       const unregister = registerHandle(target)
+      let disabled = !!(part.props as ResizableHandleProps).disabled
       const unwatch = onProps(part, () => {
+        const next = !!(part.props as ResizableHandleProps).disabled
+        if (next !== disabled) {
+          disabled = next
+          group().relock()
+        }
         const stop = drags.get(key)
-        if (!stop || !(part.props as ResizableHandleProps).disabled) {
+        if (!stop || !disabled) {
           return
         }
         drags.delete(key)

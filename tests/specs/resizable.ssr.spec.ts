@@ -1,3 +1,4 @@
+import AxeBuilder from "@axe-core/playwright"
 import type { Page } from "@playwright/test"
 import { expect, test } from "../fixtures"
 import { editorSpace, panel, sidebarHandle } from "./resizable.helpers"
@@ -54,4 +55,25 @@ test("panels barely move when the page hydrates", async ({ page, open }) => {
     Math.abs((await panel(page, "Main").boundingBox())!.width - before)
   ).toBeLessThan(4)
   expect(await hydrationErrors(page)).toEqual([])
+})
+
+// A separator that takes focus needs a value, which the group has only once it
+// lays its panels out. Until then the server's handles stay out of the tab order.
+test("the server markup has no axe violations before hydration", async ({
+  page,
+  open,
+}) => {
+  await open("resizable", { hydrate: "manual" })
+  await expect(sidebarHandle(page)).not.toHaveAttribute("tabindex")
+  const results = await new AxeBuilder({ page })
+    .disableRules(["region", "landmark-one-main", "page-has-heading-one"])
+    .analyze()
+  expect(
+    results.violations.map((violation) => `${violation.id}: ${violation.help}`)
+  ).toEqual([])
+  await page.evaluate(() =>
+    (window as unknown as { hydrate: () => void }).hydrate()
+  )
+  await expect(sidebarHandle(page)).toHaveAttribute("tabindex", "0")
+  await expect(sidebarHandle(page)).toHaveAttribute("aria-valuenow", "25")
 })

@@ -378,9 +378,9 @@ const resizablePrimitive = /* @__PURE__ */ definePrimitive({
       bind: (_, part) => part.api.internal.bindPanel(part),
     }),
 
-    // The window splitter: a focusable separator whose value is the size of
-    // the panel before it. It runs across the group, so a horizontal group's
-    // separator is vertical.
+    // It runs across the group, so a horizontal group's separator is vertical.
+    // A focusable separator needs aria-valuenow, so it joins the tab order only
+    // once the group lays its panels out, never in the server's HTML.
     handle: slot<ResizableHandleProps, ResizableHandleState>({
       role: "separator",
       focus: "tab-stop",
@@ -412,7 +412,6 @@ const resizablePrimitive = /* @__PURE__ */ definePrimitive({
       attrs: (state, { key, props }) => {
         const disabled = isDisabled(state) || !!props.disabled
         return {
-          tabindex: disabled ? undefined : "0",
           "aria-disabled": disabled ? "true" : undefined,
           "aria-orientation":
             state.orientation === "horizontal" ? "vertical" : "horizontal",
@@ -428,7 +427,9 @@ const resizablePrimitive = /* @__PURE__ */ definePrimitive({
       },
       live: live((state, { key }) => {
         const value = state.handleValues[key]
+        const focusable = !!value && !value.disabled && !isDisabled(state)
         return {
+          tabindex: focusable ? "0" : undefined,
           "aria-controls": value?.panel,
           "aria-valuenow": value ? String(Math.round(value.now)) : undefined,
           "aria-valuemin": value ? String(Math.round(value.min)) : undefined,

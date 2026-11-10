@@ -67,8 +67,15 @@ type State = {
   handleValues: Record<string, HandleValue>
 }
 
-// What a handle's separator says: the panel before it, its size and how far it can go.
-type HandleValue = { panel: string; now: number; min: number; max: number }
+// What a handle's separator says: the panel before it, its size and how far
+// it can go, and whether its own `disabled` prop stops it.
+type HandleValue = {
+  panel: string
+  now: number
+  min: number
+  max: number
+  disabled: boolean
+}
 
 function settings(options: ResizableOptions) {
   return {
@@ -126,7 +133,12 @@ function shownValues(state: State, locked: readonly boolean[]) {
       continue
     }
     const before = state.handleValues[key]
-    const value = { panel: ids[index], now: layout[index], ...range }
+    const value = {
+      panel: ids[index],
+      now: layout[index],
+      ...range,
+      disabled: !!locked[index],
+    }
     handleValues[key] =
       before && sameHandleValue(before, value) ? before : value
   }
@@ -148,7 +160,8 @@ const sameHandleValue = (a: HandleValue, b: HandleValue) =>
   a.panel === b.panel &&
   sameSize(a.now, b.now) &&
   sameSize(a.min, b.min) &&
-  sameSize(a.max, b.max)
+  sameSize(a.max, b.max) &&
+  a.disabled === b.disabled
 
 type Drag = {
   handle: number
@@ -566,6 +579,9 @@ function resizableApiBody(
           store.set({ handles })
         }
       },
+      // A handle's `disabled` prop changed, so what the handles show is
+      // worked out again.
+      relock: () => store.set({ handles: { ...store.get().handles } }),
       handleIndex,
       handleDisabled,
       vertical,
