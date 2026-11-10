@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/tabs"
 import { cn } from "cn"
 import type { Framework } from "@/lib/frameworks"
-import { readExampleModules } from "@/lib/example-modules"
+import { exampleIndex, readExampleModules } from "@/lib/example-modules"
 import { readExampleSources } from "@/lib/example-sources"
 import { preloadModule } from "react-dom"
 import { CodeBlock } from "./code"
@@ -36,6 +36,7 @@ async function ComponentExample({
   compact?: boolean
   tall?: boolean
 }) {
+  const isAtTop = exampleIndex() < 2
   const [sources, modules] = await Promise.all([
     readExampleSources(name, framework),
     readExampleModules(name, framework),
@@ -43,13 +44,18 @@ async function ComponentExample({
   if (!sources) {
     return null
   }
-  modules?.preload.forEach((url) => preloadModule(url))
+  // The rest preload as they near the viewport.
+  if (isAtTop) {
+    modules?.preload.forEach((url) => preloadModule(url))
+  }
 
   const preview = (
     <ExamplePreview
       name={name}
+      framework={framework}
       src={modules?.src}
       mount={modules?.mount}
+      preload={modules?.preload}
       html={modules?.html}
       compact={compact}
       tall={tall}

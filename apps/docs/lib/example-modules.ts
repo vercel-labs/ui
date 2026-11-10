@@ -18,6 +18,13 @@ const readBuilt = cache(async (folder: string, name: string) => {
   return JSON.parse(await readFile(file, "utf8").catch(() => "{}"))
 })
 
+const examplesOnPage = cache(() => ({ count: 0 }))
+
+// Counted when an example starts rendering, which is in page order.
+function exampleIndex() {
+  return examplesOnPage().count++
+}
+
 async function readExampleModules(name: string, framework: Framework) {
   const folder = frameworks[framework].example
   const [manifest, prerendered]: [Manifest, Record<string, string>] =
@@ -54,4 +61,4 @@ async function readExampleModules(name: string, framework: Framework) {
   }
 }
 
-export { readExampleModules }
+export { exampleIndex, readExampleModules }

@@ -1,35 +1,33 @@
-import { AskPoster } from "@/components/home-ask"
 import { BehaviorsPoster } from "@/components/home-behaviors"
 import { CopyPromptButton } from "@/components/copy-prompt"
-import { OperatePoster } from "@/components/home-operate"
 import { PhoneShot, PhoneStrip } from "@/components/home-more"
-import { PatternSlider } from "@/components/home-pattern-slider"
+import { Poster, StartPoster, Title } from "@/components/home-posters"
 import { SelectBlueprint } from "@/components/home-select"
-import { AgentsTile, FlowTile } from "@/components/home-agents"
-import { SheetTile } from "@/components/home-sheet"
-import { CanvasTile, TimelineTile } from "@/components/home-builds"
-import { WeekTile } from "@/components/home-week"
 import {
   AccordionTile,
+  AgentsTile,
+  AskPoster,
   CalendarTile,
+  CanvasTile,
   ColorTile,
   CommandTile,
+  FlowTile,
   NumberInputTile,
-  Numeral,
   OTPTile,
-  Poster,
+  OperatePoster,
   RatingTile,
   ResizableTile,
   SegmentedTile,
+  SheetTile,
   SliderTile,
-  StartPoster,
   SwitchTile,
   TabsTile,
-  Title,
+  TimelineTile,
   TokenInputTile,
   ToolbarTile,
   TreeTile,
-} from "@/components/home-posters"
+  WeekTile,
+} from "@/components/home-tiles"
 import { Logo } from "@/components/logo"
 import { MobileNav } from "@/components/mobile-nav"
 import { Search } from "@/components/search"
@@ -112,7 +110,6 @@ export default function HomePage() {
     <div className="relative flex flex-1 flex-col">
       <MobileNav registry={process.env.NPM_REGISTRY} />
       <Search pages={pages} />
-      <PatternSlider />
       <main data-width="wide" className="container flex-1 pt-6 pb-24 sm:pt-10">
         <h1 className="text-4xl leading-[1.15] font-[450] tracking-[-0.045em] text-balance sm:text-6xl sm:leading-[1.08] lg:text-7xl">
           A library of behaviors for agents to build the next generation of user

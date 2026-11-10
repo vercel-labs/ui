@@ -1,10 +1,14 @@
 import { PageToc } from "@/components/page-toc"
 import { pageDate } from "@/lib/page-date"
 import type { TableOfContents } from "fumadocs-core/toc"
+import { ArrowLeftIcon, ArrowRightIcon } from "lucide-react"
 import Link from "next/link"
 import type { ReactNode } from "react"
 
 type Neighbour = { name: ReactNode; url: string }
+
+const pageButton =
+  "hit-area inline-flex size-8 shrink-0 items-center justify-center bg-foreground/5 text-foreground outline-none transition-colors hover:bg-foreground/10 focus-visible:ring-3 focus-visible:ring-ring/30 md:size-7"
 
 function DocsArticle({
   title,
@@ -38,9 +42,27 @@ function DocsArticle({
                 {pageDate(date)}
               </time>
             )}
-            <h1 className="text-[28px] leading-tight font-medium tracking-[-0.02em] text-balance">
-              {title}
-            </h1>
+            <div className="flex items-start justify-between gap-4">
+              <h1 className="text-[28px] leading-tight font-medium tracking-[-0.02em] text-balance">
+                {title}
+              </h1>
+              {(previous || next) && (
+                <div className="flex h-[35px] shrink-0 items-center gap-2">
+                  {previous && (
+                    <Link href={previous.url} className={pageButton}>
+                      <ArrowLeftIcon aria-hidden="true" className="size-4" />
+                      <span className="sr-only">Previous: {previous.name}</span>
+                    </Link>
+                  )}
+                  {next && (
+                    <Link href={next.url} className={pageButton}>
+                      <ArrowRightIcon aria-hidden="true" className="size-4" />
+                      <span className="sr-only">Next: {next.name}</span>
+                    </Link>
+                  )}
+                </div>
+              )}
+            </div>
             {description && (
               <p className="mt-3 text-[17px] leading-relaxed sm:text-[15px] text-pretty text-subtle">
                 {description}

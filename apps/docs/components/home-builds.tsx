@@ -38,7 +38,7 @@ import {
   MoveHorizontalIcon,
 } from "lucide-react"
 import * as React from "react"
-import { Numeral, Poster, Title } from "./home-posters"
+import { Numeral, Title } from "./home-posters"
 
 const ink = "border border-foreground"
 const ring =
@@ -384,7 +384,7 @@ const CanvasStyle = React.memo(function CanvasStyle({
   )
 })
 
-function CanvasTile({ className, fig }: { className?: string; fig?: string }) {
+function CanvasDemo() {
   const [ref, scale] = useFit(460)
   const [selected, setSelected] = React.useState("circle")
   const [fill, setFill] = React.useState<Record<string, string>>({
@@ -399,13 +399,7 @@ function CanvasTile({ className, fig }: { className?: string; fig?: string }) {
   })
   const [boxes, setBoxes] = React.useState(shapes)
   return (
-    <Poster
-      fig={fig}
-      head={"A SMALL DESIGN TOOL\nDRAG, RESIZE, CHANGE COLORS"}
-      pattern="dots"
-      body="justify-between gap-8"
-      className={className}
-    >
+    <>
       <Title id="canvas" max={6.5} className="-ms-[0.05em]">
         Canvas.
       </Title>
@@ -492,7 +486,7 @@ function CanvasTile({ className, fig }: { className?: string; fig?: string }) {
           )
         }}
       </Board>
-    </Poster>
+    </>
   )
 }
 
@@ -617,13 +611,7 @@ function wave(id: string) {
   })
 }
 
-function TimelineTile({
-  className,
-  fig,
-}: {
-  className?: string
-  fig?: string
-}) {
+function TimelineDemo() {
   const [frame, setFrame] = React.useState(5 * fps)
   const [playing, setPlaying] = React.useState(false)
   const [hidden, setHidden] = React.useState<string[]>([])
@@ -642,14 +630,7 @@ function TimelineTile({
     return () => cancelAnimationFrame(id)
   }, [playing])
   return (
-    <Poster
-      fig={fig}
-      head={"A VIDEO TIMELINE\nDRAG CLIPS, TRIM THE ENDS\nSCRUB TO WATCH"}
-      tone="white"
-      pattern="ruler"
-      body="justify-between gap-8"
-      className={className}
-    >
+    <>
       <Reel defaultClips={clips}>
         {({ clips: live }) => {
           const at = (track: string) =>
@@ -859,8 +840,8 @@ function TimelineTile({
           )
         }}
       </Reel>
-    </Poster>
+    </>
   )
 }
 
-export { Board, BoardBox, BoardHandle, CanvasTile, TimelineTile, useFit }
+export { Board, BoardBox, BoardHandle, CanvasDemo, TimelineDemo, useFit }

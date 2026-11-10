@@ -249,7 +249,7 @@ cd packages/core && ../../scripts/test-slot.sh npx vitest run -t 'notifies two i
 
 ## Docs tests
 
-`tests/docs/*.spec.ts`, with their own config, `tests/docs.config.ts`. Smoke tests against the docs site in every framework (React, Vue, Svelte, Solid and web components): every example renders and its controls work, every framework has the same examples, every public prop appears in at least one React example (`props.spec.ts`), demo links point somewhere real, spec lists say where tests run, and axe passes on the docs shell. Chromium only. Specs take `test` from `docs/docs-test.ts`, whose `page.goto` waits until every example has replaced its prerendered HTML. CI: `main` and `full`.
+`tests/docs/*.spec.ts`, with their own config, `tests/docs.config.ts`. Smoke tests against the docs site in every framework (React, Vue, Svelte, Solid and web components): every example renders and its controls work, every framework has the same examples, every public prop appears in at least one React example (`props.spec.ts`), demo links point somewhere real, spec lists say where tests run, and axe passes on the docs shell. Chromium only. Specs take `test` from `docs/docs-test.ts`, whose `page.goto` scrolls to each example, since examples load as they near the viewport, and waits until every one has replaced its prerendered HTML. CI: `main` and `full`.
 
 The config builds the examples first, then starts `next dev` locally or a production build in CI, on `DOCS_PORT`:
 

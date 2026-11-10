@@ -21,7 +21,7 @@ import { Toggle } from "@ui-sdk/react/toggle"
 import { cn } from "cn"
 import { CheckIcon } from "lucide-react"
 import * as React from "react"
-import { Numeral, Poster, Title } from "./home-posters"
+import { Numeral, Title } from "./home-posters"
 
 const ink = "border border-foreground"
 const ring =
@@ -195,7 +195,7 @@ const Crew = crewParts.Root
 const CrewLane = crewParts.Lane
 const CrewCard = crewParts.Card
 
-function AgentsTile({ className, fig }: { className?: string; fig?: string }) {
+function AgentsDemo() {
   const [lists, setLists] = React.useState(start)
   const [progress, setProgress] = React.useState(progressStart)
   const [running, setRunning] = React.useState(false)
@@ -255,16 +255,7 @@ function AgentsTile({ className, fig }: { className?: string; fig?: string }) {
     setRunning(true)
   }
   return (
-    <Poster
-      fig={fig}
-      head={
-        "A BOARD FOR THREE AGENTS\nDRAG A TASK TO HAND IT OVER\nOR USE SPACE AND THE ARROWS"
-      }
-      touch={"A BOARD FOR THREE AGENTS\nDRAG A TASK TO HAND IT OVER"}
-      pattern="columns"
-      body="justify-between gap-8"
-      className={className}
-    >
+    <>
       <div className="flex flex-wrap items-baseline justify-between gap-x-8 gap-y-4">
         <Title id="agents" max={6.5} className="-ms-[0.05em]">
           Agents.
@@ -391,7 +382,7 @@ function AgentsTile({ className, fig }: { className?: string; fig?: string }) {
           )}
         </Crew>
       </div>
-    </Poster>
+    </>
   )
 }
 
@@ -744,7 +735,7 @@ function order(edges: Wire[]) {
 const port =
   "absolute size-2.5 cursor-crosshair border border-foreground bg-background after:absolute after:-inset-2 data-[connect=candidate]:border-2 data-[connect=source]:bg-foreground data-[connect=target]:bg-foreground"
 
-function FlowTile({ className, fig }: { className?: string; fig?: string }) {
+function FlowDemo() {
   const [edges, setEdges] = React.useState(wired)
   const [run, setRun] = React.useState<Record<string, "running" | "done">>({})
   const [frame, fit] = useFit(layouts.wide.world.width)
@@ -797,16 +788,7 @@ function FlowTile({ className, fig }: { className?: string; fig?: string }) {
         ? "Ready"
         : "Drag from Summarize to Send to Slack"
   return (
-    <Poster
-      fig={fig}
-      head={
-        "WIRE UP A WORKFLOW\nDRAG FROM ONE DOT TO ANOTHER\nOR PRESS C TO CONNECT"
-      }
-      touch={"WIRE UP A WORKFLOW\nDRAG FROM ONE DOT TO ANOTHER"}
-      pattern="plus"
-      body="justify-between gap-8"
-      className={className}
-    >
+    <>
       <div className="flex flex-wrap items-baseline justify-between gap-x-8 gap-y-4">
         <Title id="workflow" max={6.5} className="-ms-[0.05em]">
           Workflow.
@@ -945,8 +927,8 @@ function FlowTile({ className, fig }: { className?: string; fig?: string }) {
           </div>
         </div>
       </div>
-    </Poster>
+    </>
   )
 }
 
-export { AgentsTile, FlowTile }
+export { AgentsDemo, FlowDemo }

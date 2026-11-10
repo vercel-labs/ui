@@ -30,7 +30,6 @@ import { Switch, SwitchThumb } from "@ui-sdk/react/switch"
 import { cn } from "cn"
 import { CheckIcon, ChevronDownIcon, MinusIcon, PlusIcon } from "lucide-react"
 import * as React from "react"
-import { Poster } from "./home-posters"
 
 const agent = typeof window === "undefined" ? undefined : createAgent()
 
@@ -279,7 +278,7 @@ function Prompt({
   ))
 }
 
-function OperatePoster({ fig }: { fig?: string }) {
+function OperateDemo() {
   const [entries, setEntries] = React.useState<Entry[]>([])
   const [running, setRunning] = React.useState(false)
   const [changed, setChanged] = React.useState<string[]>([])
@@ -383,14 +382,7 @@ function OperatePoster({ fig }: { fig?: string }) {
     setForm((current) => current + 1)
   }
   return (
-    <Poster
-      fig={fig}
-      head={"AN AGENT CHANGING SETTINGS\nIT READS THE FORM, THEN FILLS IT IN"}
-      tone="white"
-      pattern="grid"
-      body="gap-6"
-      className="max-sm:gap-6 lg:min-h-0"
-    >
+    <>
       <div
         className={cn(
           "flex min-w-0 flex-col @max-[56rem]:border-0 @[56rem]:bg-background",
@@ -521,8 +513,8 @@ function OperatePoster({ fig }: { fig?: string }) {
           </div>
         </div>
       </div>
-    </Poster>
+    </>
   )
 }
 
-export { OperatePoster }
+export { OperateDemo }

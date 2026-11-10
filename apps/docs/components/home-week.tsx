@@ -10,7 +10,7 @@ import { cn } from "cn"
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react"
 import * as React from "react"
 import { Board, BoardBox, BoardHandle, useFit } from "./home-builds"
-import { Numeral, Poster, Title } from "./home-posters"
+import { Numeral, Title } from "./home-posters"
 
 const ink = "border border-foreground"
 const ring =
@@ -148,7 +148,7 @@ const Event = React.memo(function Event({
   )
 })
 
-function WeekTile({ className, fig }: { className?: string; fig?: string }) {
+function WeekDemo() {
   const [count, setCount] = React.useState(5)
   const [offset, setOffset] = React.useState(0)
   const [ref, scale] = useFit(count * day)
@@ -195,16 +195,7 @@ function WeekTile({ className, fig }: { className?: string; fig?: string }) {
     }
   }
   return (
-    <Poster
-      fig={fig}
-      head={
-        "PLAN YOUR WEEK\nDRAG A MEETING TO ANOTHER DAY\nPULL THE BOTTOM TO MAKE IT LONGER"
-      }
-      tone="white"
-      pattern="grid"
-      body="justify-between gap-8"
-      className={className}
-    >
+    <>
       <Board
         boxes={boxes}
         onBoxesChange={onBoxesChange}
@@ -364,8 +355,8 @@ function WeekTile({ className, fig }: { className?: string; fig?: string }) {
           </span>
         </div>
       </div>
-    </Poster>
+    </>
   )
 }
 
-export { WeekTile }
+export { WeekDemo }
