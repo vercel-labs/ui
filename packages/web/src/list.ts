@@ -208,12 +208,12 @@ function renderData(
   if (!own && renderedData.get(list) === visible) {
     return
   }
-  for (const child of Array.from(list.children)) {
-    if (generatedItems.has(child)) {
-      child.remove()
-    }
-  }
   if (own) {
+    for (const child of Array.from(list.children)) {
+      if (generatedItems.has(child)) {
+        child.remove()
+      }
+    }
     renderedData.delete(list)
     return
   }
@@ -224,15 +224,62 @@ function renderData(
     el.querySelectorAll(`${prefix}-item`).forEach((item) =>
       generatedItems.add(item)
     )
-    if (el.localName === `${prefix}-item`) {
-      generatedItems.add(el)
+  }
+  placeItems(list, fresh, isGenerated, `${prefix}-select-all`)
+}
+
+// What each element rendered from data was copied from.
+const madeFrom = new WeakMap<Element, string>()
+
+// Puts data items into a list after its select-all option. An element whose
+// item renders the same stays where it is, so a filter that narrows the list
+// unbinds and binds again only what it adds or removes.
+function placeItems(
+  list: Element,
+  fresh: Element[],
+  owned: (el: Element) => boolean,
+  selectAll: string
+) {
+  const kept = new Map<string, Element>()
+  for (const child of list.children) {
+    const made = madeFrom.get(child)
+    if (made !== undefined && owned(child) && !kept.has(made)) {
+      kept.set(made, child)
     }
   }
-  const after = Array.from(list.children).find(
-    (child) => child.localName !== `${prefix}-select-all`
-  )
-  for (const el of fresh) {
-    list.insertBefore(el, after ?? null)
+  const items = fresh.map((el) => {
+    const made = el.outerHTML
+    const old = kept.get(made)
+    if (old) {
+      kept.delete(made)
+      return old
+    }
+    madeFrom.set(el, made)
+    return el
+  })
+  const wanted = new Set(items)
+  for (const child of Array.from(list.children)) {
+    if (owned(child) && !wanted.has(child)) {
+      child.remove()
+    }
+  }
+  const current = Array.from(list.children).filter(owned)
+  const end =
+    Array.from(list.children).find(
+      (child) => !owned(child) && child.localName !== selectAll
+    ) ?? null
+  const placed = new Set<Element>()
+  let at = 0
+  for (const el of items) {
+    while (current[at] && placed.has(current[at])) {
+      at++
+    }
+    if (current[at] === el) {
+      at++
+    } else {
+      list.insertBefore(el, current[at] ?? end)
+    }
+    placed.add(el)
   }
 }
 
@@ -243,6 +290,7 @@ export {
   isGenerated,
   itemText,
   listAttribute,
+  placeItems,
   renderData,
   renderListItems,
   stashedEmpty,

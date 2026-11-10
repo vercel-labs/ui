@@ -17,6 +17,7 @@ import {
   element,
   itemText,
   listAttribute,
+  placeItems,
   renderListItems,
   stashedEmpty,
   templateOf,
@@ -385,20 +386,14 @@ function renderData(el: ComboboxElement, api: ComboboxApi) {
       return
     }
     rendered.set(list, visible)
-    for (const child of Array.from(list.children)) {
-      if (generatedItems.has(child)) {
-        child.remove()
-      }
-    }
     const fresh = renderListItems("ui-combobox", visible, toKey, templateOf(el))
     fresh.forEach((item) => generatedItems.add(item))
-    // After any select-all option, which comes first.
-    const after = Array.from(list.children).find(
-      (child) => child.localName !== "ui-combobox-select-all"
+    placeItems(
+      list,
+      fresh,
+      (child) => generatedItems.has(child),
+      "ui-combobox-select-all"
     )
-    for (const item of fresh) {
-      list.insertBefore(item, after ?? null)
-    }
     return
   }
   const template = templateOf(el)
