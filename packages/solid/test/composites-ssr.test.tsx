@@ -195,7 +195,8 @@ describe("server rendering a resizable group", () => {
     expect(html).toContain("flex:0 1 var(--resizable-panel-size, 240px)")
     expect(html).toContain('role="separator"')
     expect(html).toContain('aria-orientation="vertical"')
-    expect(html).toContain('tabindex="0"')
+    expect(html).not.toContain("tabindex")
+    expect(html).not.toContain("aria-valuenow")
   })
 })
 
