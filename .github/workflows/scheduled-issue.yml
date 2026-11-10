@@ -1,0 +1,38 @@
+name: Scheduled issue
+
+# Keeps one open issue while the nightly or weekly suite is red, since GitHub
+# tells only the workflow's last editor. A green run closes it.
+on:
+  workflow_call:
+    inputs:
+      result:
+        type: string
+        required: true
+
+permissions: {}
+
+jobs:
+  issue:
+    name: Report
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    permissions:
+      issues: write
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RESULT: ${{ inputs.result }}
+          RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          WORKFLOW: ${{ github.workflow }}
+          SHA: ${{ github.sha }}
+        run: |
+          title="Scheduled CI is red"
+          open=$(gh issue list --state open --search "\"$title\" in:title" --json number --jq '.[0].number // ""')
+          if [ "$RESULT" = success ]; then
+            if [ -n "$open" ]; then gh issue close "$open" --comment "$WORKFLOW passed on $SHA: $RUN"; fi
+          elif [ -n "$open" ]; then
+            gh issue comment "$open" --body "$WORKFLOW was $RESULT on $SHA: $RUN"
+          else
+            gh issue create --title "$title" --body "$WORKFLOW was $RESULT on $SHA: $RUN"
+          fi

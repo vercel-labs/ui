@@ -59,3 +59,13 @@ jobs:
     uses: ./.github/workflows/ci.yml
     with:
       suite: nightly
+
+  issue:
+    name: Report
+    needs: suite
+    if: always() && needs.suite.result != 'skipped' && needs.suite.result != 'cancelled'
+    permissions:
+      issues: write
+    uses: ./.github/workflows/scheduled-issue.yml
+    with:
+      result: ${{ needs.suite.result }}
