@@ -35,8 +35,7 @@ const sizes: Record<string, string> = {
 const getBarLabel = (
   request: WaterfallDataItem,
   { start, duration }: WaterfallBarLabelDetails
-) =>
-  `${request.label}, ${sizes[request.value]}, starts at ${start}, takes ${duration}`
+) => `${sizes[request.value]}, starts at ${start}, takes ${duration}`
 </script>
 
 <template>

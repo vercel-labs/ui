@@ -128,7 +128,7 @@ You can also render every row and let the waterfall hide the ones inside a colla
 
 ## Large Traces
 
-A trace can have thousands of spans. Render only the rows in view: flatten the open spans with `visibleWaterfallRows`, and render the nearby rows at their offsets. The waterfall still reports every row's level and place among its siblings, so screen readers hear the whole hierarchy.
+A trace can have thousands of spans. Render only the rows in view: flatten the open spans with `visibleWaterfallRows`, and render the nearby rows at their offsets. The waterfall still reports every row's level and place among its siblings, so screen readers hear the whole hierarchy. Give the waterfall `aria-rowcount` with the number of rows that show, and each row `aria-rowindex` with its index plus one, so a screen reader counts rows in the whole trace, not just the ones in the page.
 
 `onHighlight` reports the index of the row the keyboard moves to. Scroll it into view there, so a row that isn't rendered yet takes focus once it is. An arrow key changes only the two rows it moves between, however long the trace is.
 
@@ -305,7 +305,7 @@ Create one with `createWaterfallController()` and pass it as `controller`.
 
 ## Accessibility
 
-The waterfall follows the [WAI-ARIA treegrid pattern](https://www.w3.org/WAI/ARIA/apg/patterns/treegrid/). Rows have the `row` role with `aria-level`, `aria-posinset`, `aria-setsize`, `aria-selected`, and `aria-expanded` on spans with children. `WaterfallRowHeader` is a `rowheader`, so screen readers repeat the span's name as focus moves down a column, and each `WaterfallBar` is a `gridcell` labeled with its span's name, when it starts and how long it lasts, like "GET /api/user, starts at 120 ms, lasts 340 ms". Times are formatted with `Intl` in the page's language.
+The waterfall follows the [WAI-ARIA treegrid pattern](https://www.w3.org/WAI/ARIA/apg/patterns/treegrid/). Rows have the `row` role with `aria-level`, `aria-posinset`, `aria-setsize`, `aria-selected="true"` on the selected row, and `aria-expanded` on spans with children. `WaterfallRowHeader` is a `rowheader`, so screen readers repeat the span's name as focus moves down a column, and each `WaterfallBar` is a `gridcell` labeled with when its span starts and how long it lasts, like "Starts at 120 ms, lasts 340 ms". Times are formatted with `Intl` in the page's language.
 
 ### Keyboard
 

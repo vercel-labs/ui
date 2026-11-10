@@ -65,12 +65,12 @@ type WaterfallDataRow = {
 }
 
 /**
- * Why spans expanded or collapsed: a row was clicked, its indicator was
- * clicked, an arrow key opened or closed it, or a controller changed it.
+ * Why spans expanded or collapsed: an indicator was clicked, an arrow key
+ * opened or closed it, or a controller changed it.
  * @experimental
  */
 type WaterfallExpandedChangeReason =
-  "item-press" | "trigger-press" | "list-navigation" | "imperative"
+  "trigger-press" | "list-navigation" | "imperative"
 
 /**
  * Why the selected span changed: a row was clicked, Enter or Space was
@@ -208,7 +208,7 @@ type WaterfallOptions = {
   locale?: string
   /**
    * What screen readers hear for a span's bar. Set it in the page's language.
-   * @defaultValue "GET /api/user, starts at 120 ms, lasts 340 ms"
+   * @defaultValue "Starts at 120 ms, lasts 340 ms"
    */
   getBarLabel?: (
     item: WaterfallDataItem,
@@ -489,7 +489,7 @@ const waterfallPrimitive = /* @__PURE__ */ definePrimitive({
           "aria-posinset": position && String(position.index),
           "aria-setsize": position && String(position.size),
           "aria-expanded": row.branch ? String(row.expanded) : undefined,
-          "aria-selected": String(row.selected),
+          "aria-selected": row.selected ? "true" : undefined,
           ...rowDataAttrs(row),
           style: css({
             "--waterfall-level": row.level,

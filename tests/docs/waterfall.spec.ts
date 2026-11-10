@@ -31,10 +31,7 @@ const checks: Record<string, Check> = {
     ).toBeFocused()
     await expect(
       row(preview, "app.css").locator('[data-slot="waterfall-bar"]')
-    ).toHaveAttribute(
-      "aria-label",
-      "app.css, 8 kB, starts at 190 ms, takes 96 ms"
-    )
+    ).toHaveAttribute("aria-label", "8 kB, starts at 190 ms, takes 96 ms")
     await expect(
       preview.locator('[data-slot="waterfall-tick"]').first()
     ).toBeVisible()

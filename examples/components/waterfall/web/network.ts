@@ -44,7 +44,7 @@ function mount(root: HTMLElement) {
   `
   const waterfall = root.querySelector("ui-waterfall")!
   waterfall.getBarLabel = (request, { start, duration }) =>
-    `${request.label}, ${sizes[request.value]}, starts at ${start}, takes ${duration}`
+    `${sizes[request.value]}, starts at ${start}, takes ${duration}`
   waterfall.items = requests
 }
 

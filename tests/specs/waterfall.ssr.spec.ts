@@ -45,7 +45,7 @@ test("levels, positions, bars and their labels render on the server", async ({
   )
   await expect(bar(page, "GET /app.js")).toHaveAttribute(
     "aria-label",
-    "GET /app.js, starts at 120 ms, lasts 480 ms"
+    "Starts at 120 ms, lasts 480 ms"
   )
   expect(await hydrationErrors(page)).toEqual([])
 })

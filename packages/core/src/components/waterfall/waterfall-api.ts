@@ -63,9 +63,9 @@ const cellsOf = (row: HTMLElement) =>
   )
 
 const defaultBarLabel = (
-  item: WaterfallDataItem,
+  _item: WaterfallDataItem,
   { start, duration }: { start: string; duration: string }
-) => `${item.label}, starts at ${start}, lasts ${duration}`
+) => `Starts at ${start}, lasts ${duration}`
 
 /**
  * The rows that show when only the spans in `expanded` are open, in order,

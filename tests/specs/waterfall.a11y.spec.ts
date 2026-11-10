@@ -37,21 +37,21 @@ test("the accessibility tree", async ({ page, open }) => {
         - columnheader "Name"
         - columnheader "Status"
         - columnheader "Timeline": DOMContentLoaded
-      - row "GET / 200 GET /, starts at 0 ms, lasts 1 sec" [expanded] [level=1]:
+      - row "GET / 200 Starts at 0 ms, lasts 1 sec" [expanded] [level=1]:
         - rowheader "GET /"
         - gridcell "200"
-        - gridcell "GET /, starts at 0 ms, lasts 1 sec"
-      - row "GET /app.css 200 GET /app.css, starts at 120 ms, lasts 340 ms" [level=2] [selected]:
+        - gridcell "Starts at 0 ms, lasts 1 sec"
+      - row "GET /app.css 200 Starts at 120 ms, lasts 340 ms" [level=2] [selected]:
         - rowheader "GET /app.css"
         - gridcell "200"
-        - gridcell "GET /app.css, starts at 120 ms, lasts 340 ms"
-      - row "GET /app.js 200 GET /app.js, starts at 120 ms, lasts 480 ms" [expanded=false] [level=2]:
+        - gridcell "Starts at 120 ms, lasts 340 ms"
+      - row "GET /app.js 200 Starts at 120 ms, lasts 480 ms" [expanded=false] [level=2]:
         - rowheader "GET /app.js"
         - gridcell "200"
-        - gridcell "GET /app.js, starts at 120 ms, lasts 480 ms"
-      - row "GET /font.woff2 200 GET /font.woff2, starts at 1 sec, lasts 1 sec" [level=1]:
+        - gridcell "Starts at 120 ms, lasts 480 ms"
+      - row "GET /font.woff2 200 Starts at 1 sec, lasts 1 sec" [level=1]:
         - rowheader "GET /font.woff2"
         - gridcell "200"
-        - gridcell "GET /font.woff2, starts at 1 sec, lasts 1 sec"
+        - gridcell "Starts at 1 sec, lasts 1 sec"
   `)
 })

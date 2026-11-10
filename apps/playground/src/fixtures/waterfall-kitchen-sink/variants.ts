@@ -71,7 +71,7 @@ const variants: Variant[] = [
     note: "A row with a header and a bar for every span.",
     options: {},
     rows: 2,
-    bar: "GET /, starts at 0 ms, lasts 1 sec",
+    bar: "Starts at 0 ms, lasts 1 sec",
   },
   {
     id: "columns",
@@ -126,7 +126,7 @@ const variants: Variant[] = [
     options: {},
     format: "seconds",
     rows: 2,
-    bar: "GET /, starts at 0.00 s, lasts 1.00 s",
+    bar: "Starts at 0.00 s, lasts 1.00 s",
   },
   {
     id: "format-options",
@@ -135,7 +135,7 @@ const variants: Variant[] = [
     options: {},
     format: "narrow",
     rows: 2,
-    bar: "GET /, starts at 0ms, lasts 1,000ms",
+    bar: "Starts at 0ms, lasts 1,000ms",
   },
   {
     id: "bar-label",
@@ -152,7 +152,7 @@ const variants: Variant[] = [
     title: 'locale="de-DE"',
     options: { locale: "de-DE" },
     rows: 2,
-    bar: "GET /, starts at 0 ms, lasts 1 Sek.",
+    bar: "Starts at 0 ms, lasts 1 Sek.",
   },
   {
     id: "page-lang",
@@ -162,7 +162,7 @@ const variants: Variant[] = [
     options: {},
     lang: "fr",
     rows: 2,
-    bar: "GET /, starts at 0 ms, lasts 1 s",
+    bar: "Starts at 0 ms, lasts 1 s",
   },
   {
     id: "rtl",

@@ -32,7 +32,7 @@ test.describe("rows", () => {
       .locator('[data-slot="waterfall-indicator"]')
       .click()
     await expect(row(page, "GET /")).toHaveAttribute("aria-expanded", "true")
-    await expect(row(page, "GET /")).toHaveAttribute("aria-selected", "false")
+    await expect(row(page, "GET /")).not.toHaveAttribute("aria-selected")
     await expect(row(page, "GET /app.js")).toHaveAttribute("aria-level", "2")
     await expect(row(page, "GET /app.js")).toHaveAttribute("aria-posinset", "2")
     expect(await lastAction(page)).toBe("expanded document")
@@ -47,7 +47,7 @@ test.describe("rows", () => {
       "aria-selected",
       "true"
     )
-    await expect(row(page, "GET /")).toHaveAttribute("aria-selected", "false")
+    await expect(row(page, "GET /")).not.toHaveAttribute("aria-selected")
     expect(await lastAction(page)).toBe("selected font")
   })
 
@@ -221,10 +221,7 @@ test.describe("keyboard", () => {
       "aria-selected",
       "true"
     )
-    await expect(row(page, "GET /app.css")).toHaveAttribute(
-      "aria-selected",
-      "false"
-    )
+    await expect(row(page, "GET /app.css")).not.toHaveAttribute("aria-selected")
     expect(await lastAction(page)).toBe("selected script")
   })
 
@@ -261,11 +258,11 @@ test.describe("time axis", () => {
     await open("waterfall", { expanded: "document" })
     await expect(bar(page, "GET /app.css")).toHaveAttribute(
       "aria-label",
-      "GET /app.css, starts at 120 ms, lasts 340 ms"
+      "Starts at 120 ms, lasts 340 ms"
     )
     await expect(bar(page, "GET /font.woff2")).toHaveAttribute(
       "aria-label",
-      "GET /font.woff2, starts at 1 sec, lasts 1 sec"
+      "Starts at 1 sec, lasts 1 sec"
     )
   })
 

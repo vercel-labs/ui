@@ -41,9 +41,7 @@ describe("server rendering a waterfall", () => {
     expect(html).toContain('role="treegrid"')
     expect(html).toContain('aria-level="2"')
     expect(html).toContain("--waterfall-start:50%")
-    expect(html).toContain(
-      'aria-label="GET /api, starts at 500 ms, lasts 500 ms"'
-    )
+    expect(html).toContain('aria-label="Starts at 500 ms, lasts 500 ms"')
     expect(html).toContain(">0.5 sec<")
     // The nested row renders hidden while its parent is collapsed.
     expect(html).toMatch(

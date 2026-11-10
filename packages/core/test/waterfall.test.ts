@@ -109,7 +109,7 @@ describe("waterfall rows", () => {
       "aria-posinset": "1",
       "aria-setsize": "2",
       "aria-expanded": "true",
-      "aria-selected": "false",
+      "aria-selected": undefined,
       tabindex: "0",
       style: "--waterfall-level:1;--waterfall-start:0%;--waterfall-size:50%",
     })
@@ -130,7 +130,7 @@ describe("waterfall rows", () => {
         "aria-label"
       ]
     expect(bar(waterfall({ id: "w", items }))).toBe(
-      "GET /api/user, starts at 600 ms, lasts 300 ms"
+      "Starts at 600 ms, lasts 300 ms"
     )
     expect(
       bar(

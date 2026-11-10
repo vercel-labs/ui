@@ -36,7 +36,7 @@ function Example() {
       aria-label="Network requests"
       items={requests}
       getBarLabel={(request, { start, duration }) =>
-        `${request.label}, ${sizes[request.value]}, starts at ${start}, takes ${duration}`
+        `${sizes[request.value]}, starts at ${start}, takes ${duration}`
       }
     >
       <WaterfallHeaderRow>
