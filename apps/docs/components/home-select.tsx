@@ -412,33 +412,33 @@ function SelectBlueprint() {
                 setPreview(null)
               }}
               className={cn(
-                "flex cursor-pointer gap-3 border bg-background px-3 py-2.5 text-start transition-colors duration-200 outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#006bff]",
+                "flex cursor-pointer flex-col gap-1 border bg-background px-3 py-2.5 text-start transition-colors duration-200 outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#006bff]",
                 lit
                   ? "border-[#006bff]"
                   : "border-foreground/15 hover:border-foreground/40"
               )}
             >
-              <span
-                aria-hidden="true"
-                className={cn(
-                  "mt-0.5 flex size-[18px] shrink-0 items-center justify-center font-mono text-[9px] text-background transition-colors duration-200",
-                  lit ? "bg-[#006bff]" : "bg-foreground"
-                )}
-              >
-                {index + 1}
-              </span>
-              <span className="flex flex-col gap-1">
+              <span className="flex items-center gap-2">
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    "flex size-[18px] shrink-0 items-center justify-center font-mono text-[9px] text-background transition-colors duration-200",
+                    lit ? "bg-[#006bff]" : "bg-foreground"
+                  )}
+                >
+                  {index + 1}
+                </span>
                 <code
                   className={cn(
-                    "font-mono text-[17px] leading-tight transition-colors duration-200 @[34rem]:text-[15px] @[44rem]:text-[17px]",
+                    "font-mono text-[17px] leading-tight whitespace-nowrap transition-colors duration-200 @[34rem]:text-[15px] @[44rem]:text-[17px]",
                     lit && "text-[#006bff]"
                   )}
                 >
                   {behavior.name}
                 </code>
-                <span className="text-sm text-muted-foreground">
-                  {behavior.body}
-                </span>
+              </span>
+              <span className="text-sm text-muted-foreground">
+                {behavior.body}
               </span>
             </button>
           )
