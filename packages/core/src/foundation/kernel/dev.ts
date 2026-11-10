@@ -403,6 +403,7 @@ const reasonEvents: Record<string, string[]> = {
   unmount: [],
   "clear-press": ["MouseEvent", "KeyboardEvent"],
   "input-change": ["Event"],
+  "history-key": ["KeyboardEvent"],
   "remove-press": ["MouseEvent", "KeyboardEvent"],
   "input-commit": ["FocusEvent", "KeyboardEvent"],
   "step-key": ["KeyboardEvent"],

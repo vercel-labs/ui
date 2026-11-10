@@ -1,9 +1,9 @@
 ---
 title: Text
-description: Find items by typing, rank search results, highlight matches and format text in the right language.
+description: Find items by typing, rank search results, highlight matches, bring back earlier messages and format text in the right language.
 ---
 
-Use `createTypeahead` to find items as someone types, `fuzzyScore` to rank search results, and `matchRanges` or `matchSegments` to highlight matches.
+Use `createTypeahead` to find items as someone types, `fuzzyScore` to rank search results, `matchRanges` or `matchSegments` to highlight matches, and `createInputHistory` to bring back earlier messages with the arrow keys.
 
 `pageLocale` and `userLocale` read the page's or user's language for matching and formatting.
 
@@ -209,6 +209,62 @@ textarea.addEventListener("keydown", (event) => {
 
 `isComposing` takes React's events too, so the same lines go in `onChange` and `onKeyDown`. It reads the event's `isComposing`, and counts key code 229 as composing, because Safari on macOS ends the composition before that last Enter arrives and reports it as not composing. No state to keep: every event says for itself whether the input method has it. Core's own components already handle both.
 
+## Bring Back Earlier Messages
+
+Use `createInputHistory` to step through what someone sent before, the way a terminal or a chat box does. ArrowUp brings back the previous entry, ArrowDown the next one, and ArrowDown past the newest brings back what they were typing.
+
+Create it in `api` with three functions: one returns the earlier entries, oldest first, and the other two read and write the field's value:
+
+```ts
+import { createInputHistory } from "@ui-sdk/core"
+
+const history = createInputHistory({
+  entries: () => options().history,
+  read: () => store.get().value,
+  write: (value) => store.set({ value }),
+})
+```
+
+Then hand it the field's key presses. `keydown` returns `true` when it brought back an entry, so your own keys, like Enter to send, come after it:
+
+```ts
+root: slot({
+  on: {
+    keydown: (event, { api }) => {
+      if (api.history.keydown(event)) return
+      if (event.key === "Enter" && !event.shiftKey && !isComposing(event)) {
+        event.preventDefault()
+        api.send()
+      }
+    },
+  },
+}),
+```
+
+<ComponentExample
+  name="core/message-history"
+  caption="Press ArrowUp to bring back an earlier message, and ArrowDown to return to what you were typing. Send a message with Enter, and it's the first one ArrowUp brings back."
+/>
+
+In a textarea, the arrow keys move between lines first. An entry comes back only when the caret is on the first line for ArrowUp, or the last line for ArrowDown, counting the lines a long message wraps onto. The caret goes to the end of the entry it brings back.
+
+Edits to an entry you brought back stay while you move through the others. When `entries` changes, like after a send, it starts again from the newest. Call `history.reset()` to do the same yourself.
+
+It leaves the arrow keys alone while a modifier is held, while an input method is composing, while text is selected in a textarea, and on a read-only field. It also leaves them to a popup, like a suggestion menu, while the field's `aria-expanded` is `"true"`. On an input, it works for the `text`, `search`, `url`, `email` and `tel` types, so a number field keeps its steps.
+
+### Report It as a Change
+
+When your component reports value changes with `createChange`, write through it with the reason `"history-key"`. `onValueChange` then hears each entry that comes back, and can cancel it. A canceled change keeps the value as it was and leaves the key to the browser:
+
+```ts
+write: (value, event) =>
+  change("value", value, { reason: "history-key", event }),
+```
+
+### Values That Aren't Text
+
+Entries can be any value, like a list of text and tokens. For an editor that isn't an input or a textarea, pass `atEdge(direction, event)` too: return `true` when the caret is on the first line for `"up"`, or the last line for `"down"`.
+
 ## API Reference
 
 | For                                                                    | Helpers                                                                       |
@@ -219,5 +275,6 @@ textarea.addEventListener("keydown", (event) => {
 | [Highlighting matches](#highlight-what-matched)                        | `matchRanges`, `matchSegments`, `MatchRange`, `MatchSegment`                  |
 | [Choosing a language](#the-pages-language)                             | `pageLocale`, `userLocale`, [`toLocale`](#tags-from-elsewhere)                |
 | [Handling input method editors](#properly-handle-input-method-editors) | `isComposing`                                                                 |
+| [Bringing back earlier messages](#bring-back-earlier-messages)         | `createInputHistory`; the history has `keydown()` and `reset()`.              |
 
 The ranking and highlighting helpers come from `@ui-sdk/core/text-match`. The other helpers come from `@ui-sdk/core`.

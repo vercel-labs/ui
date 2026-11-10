@@ -88,6 +88,8 @@ type ReasonVocabulary = {
   "clear-press": MouseEvent | KeyboardEvent
   /** Typing, pasting or dropping changed a text field's value; in a combobox it can also open or close it, or Enter keeps the typed text as the value. */
   "input-change": Event
+  /** ArrowUp or ArrowDown brought back an earlier value with `createInputHistory`, or what was being typed. */
+  "history-key": KeyboardEvent
   /** A chip's remove part was pressed, or Backspace or Delete removed a chip or a span. */
   "remove-press": MouseEvent | KeyboardEvent
   /** Enter, or leaving a number input, committed what was typed: a number input parses, clamps and snaps it to the step, and an autocomplete closes its suggestions on it. */

@@ -334,4 +334,4 @@ function textFieldAdapter(field: TextField) {
   } satisfies TextEditorAdapter
 }
 
-export { insertText, textDiff, textFieldAdapter }
+export { createCaretRects, insertText, textDiff, textFieldAdapter }

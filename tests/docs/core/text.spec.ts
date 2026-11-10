@@ -13,7 +13,7 @@ const logs = (page: Page, name: string) =>
 
 test("every example renders without errors", async ({ page }) => {
   const { errors } = await openExamples(page, url)
-  await expect(page.locator("[data-example]")).toHaveCount(8)
+  await expect(page.locator("[data-example]")).toHaveCount(9)
   expect(errors).toEqual([])
 })
 
@@ -198,4 +198,36 @@ test("search as you type: results wait for the input method to commit, unless th
   await expect(searches.last()).toHaveText("Search “日本ご”")
   await field.fill("tokyo")
   await expect(searches.last()).toHaveText("Search “tokyo”")
+})
+
+test("bring back earlier messages: arrows step through what was sent, then back to the draft", async ({
+  page,
+}) => {
+  await openExamples(page, url)
+  const message = page.getByRole("textbox", { name: "Message" })
+  await message.fill("Draft")
+  await page.keyboard.press("ArrowUp")
+  await expect(message).toHaveValue("Ship it.")
+  await page.keyboard.press("ArrowUp")
+  await expect(message).toHaveValue(/^Agenda for Thursday:/)
+  await page.keyboard.press("ArrowUp")
+  await expect(message).toHaveValue(/^Agenda for Thursday:/)
+  await page.keyboard.press("ArrowUp")
+  await page.keyboard.press("ArrowUp")
+  await page.keyboard.press("ArrowUp")
+  await expect(message).toHaveValue("Can you review the launch post?")
+  await page.keyboard.press("ArrowDown")
+  await expect(message).toHaveValue(/^Agenda for Thursday:/)
+  await page.keyboard.press("ArrowDown")
+  await expect(message).toHaveValue("Ship it.")
+  await page.keyboard.press("ArrowDown")
+  await expect(message).toHaveValue("Draft")
+  await message.fill("See you there")
+  await page.keyboard.press("Enter")
+  await expect(message).toHaveValue("")
+  await expect(logs(page, "core/message-history").last()).toHaveText(
+    "Sent “See you there”"
+  )
+  await page.keyboard.press("ArrowUp")
+  await expect(message).toHaveValue("See you there")
 })

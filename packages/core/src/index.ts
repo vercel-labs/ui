@@ -297,6 +297,10 @@ export {
 export { keepFocus } from "./foundation/focus/keep-focus"
 export { settleDraft } from "./foundation/kernel/draft"
 export {
+  createInputHistory,
+  type InputHistoryOptions,
+} from "./foundation/text/input-history"
+export {
   createInlineEdit,
   type InlineEdit,
   type InlineEditOptions,
