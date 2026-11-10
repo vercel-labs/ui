@@ -233,14 +233,15 @@ cd tests && PLAYGROUND_PORT=5310 ../scripts/test-slot.sh npx playwright test spe
 `packages/*/test/*.test.ts` and `.test.tsx`, run by vitest in Node, with no browser:
 
 - `packages/core/test`: the core's logic with no framework, like stores, ordering, positioning math, typeahead and each component's state machine. Some read budgets from `tests/perf/budgets.ts`, like `store-fanout.test.ts`.
-- `packages/react/test`: `renderToString` output for each component (`*-ssr.test.tsx`), merged props, and the package's exports.
+- `packages/react/test`, `packages/solid/test` and `packages/svelte/test`: server rendering for each component (`*-ssr.test.tsx`), merged props, and the package's exports.
 - `packages/vue/test`: server rendering for each component (`*-ssr.test.ts`), and which state changes render a part again (`slot-state.test.ts`).
-- `packages/web` has no unit tests. Its behavior is covered by the `web` projects.
+- `packages/web/test`: attributes, properties and lifecycle of the elements, in jsdom. Their behavior in a browser is covered by the `web` projects.
+- `apps/docs` and `apps/registry`: the docs site's helpers, like search and the setup prompts, and the registry and its docs proxy.
 
-They run in the CI check job in the `pr`, `pr-engines`, `main` and `full` tiers, through `pnpm --filter "./packages/*" test`.
+They run in the CI Unit tests job in the `affected`, `affected-engines`, `main` and `full` tiers.
 
 ```bash
-scripts/test-slot.sh pnpm --filter "./packages/*" test                        # Every package.
+scripts/test-slot.sh pnpm --filter "./packages/*" --filter ./apps/docs --filter ./apps/registry test  # Everything CI runs.
 cd packages/core && ../../scripts/test-slot.sh npx vitest run test/order.test.ts  # One file.
 cd packages/core && ../../scripts/test-slot.sh npx vitest run -t 'notifies two items'
 ```

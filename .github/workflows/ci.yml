@@ -81,9 +81,9 @@ jobs:
           persist-credentials: false
       - uses: ./.github/actions/setup
 
-      # Only packages/*: a recursive `test` would also start Playwright in tests/.
+      # Not a recursive `test`, which would also start Playwright in tests/.
       - name: Unit tests
-        run: pnpm --filter "./packages/*" test
+        run: pnpm --filter "./packages/*" --filter ./apps/docs --filter ./apps/registry test
 
   packages:
     name: Build and size
