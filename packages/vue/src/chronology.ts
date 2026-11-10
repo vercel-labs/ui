@@ -41,7 +41,7 @@ const ChronologyMarker = parts.Marker
 const ChronologyConnector = parts.Connector
 
 /**
- * When its event happened, as a `<time>`. Pass `dateTime` so machines can read
+ * When its event happened, as a `<time>`. Pass `datetime` so machines can read
  * it. It describes the event.
  * @experimental
  */

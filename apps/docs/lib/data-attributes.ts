@@ -83,6 +83,10 @@ const coreSource = (file: string) => {
 
 type Description = { text: string; values?: string[] }
 
+const statuses = (["complete", "current", "upcoming"] as const).map(
+  (status) => ({ value: status, status })
+)
+
 // Date Input and Time Input set the same attributes.
 const segmentedDescriptions = (
   kind: "date" | "time"
@@ -861,16 +865,12 @@ const components: Record<
     ],
     samples: {
       root: [{}],
-      item: [
-        { value: "a", status: "complete" },
-        { value: "b", status: "current" },
-        { value: "c", status: "upcoming" },
-      ],
-      marker: [{ value: "a", status: "complete" }],
-      connector: [{ value: "a", status: "complete" }],
-      time: [{ value: "a", status: "complete" }],
-      title: [{ value: "a", status: "complete" }],
-      description: [{ value: "a", status: "complete" }],
+      item: statuses,
+      marker: statuses,
+      connector: statuses,
+      time: statuses,
+      title: statuses,
+      description: statuses,
     },
     interactive: [],
     extra: { item: ["data-first", "data-last"] },

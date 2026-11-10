@@ -11,6 +11,7 @@ import {
 import { render } from "@solidjs/web"
 import { createSignal, For, Show } from "solid-js"
 import {
+  advance,
   chronologyFixture as f,
   chronologyOptions,
   type ChronologyFixtureEvent,
@@ -31,17 +32,19 @@ function Fixture() {
         controller={controller}
         {...chronologyOptions()}
       >
-        <For each={events()}>
+        <For each={events()} keyed={(event) => event.value}>
           {(event) => (
-            <ChronologyItem value={event.value} status={event.status}>
+            <ChronologyItem value={event().value} status={event().status}>
               <ChronologyMarker />
               <ChronologyConnector />
-              <ChronologyTitle>{event.title}</ChronologyTitle>
-              <ChronologyTime datetime={event.dateTime}>
-                {event.time}
+              <ChronologyTitle>{event().title}</ChronologyTitle>
+              <ChronologyTime datetime={event().dateTime}>
+                {event().time}
               </ChronologyTime>
-              <ChronologyDescription>{event.description}</ChronologyDescription>
-              <Show when={event.link}>
+              <ChronologyDescription>
+                {event().description}
+              </ChronologyDescription>
+              <Show when={event().link}>
                 {(link) => <a href={link().href}>{link().label}</a>}
               </Show>
             </ChronologyItem>
@@ -56,6 +59,7 @@ function Fixture() {
         Reverse
       </button>
       <button onClick={() => controller.focus("shipped")}>Focus Current</button>
+      <button onClick={() => setEvents(advance(events()))}>Advance</button>
     </div>
   )
 }

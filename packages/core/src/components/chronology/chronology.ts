@@ -363,7 +363,7 @@ const chronologyPrimitive = /* @__PURE__ */ definePrimitive({
         const unsubscribe = store.subscribe(() => {
           if (store.get().feed !== feed) {
             feed = store.get().feed
-            api.internal.measure()
+            queueMicrotask(api.internal.measure)
           }
         })
         if (typeof MutationObserver === "undefined") {
@@ -378,6 +378,7 @@ const chronologyPrimitive = /* @__PURE__ */ definePrimitive({
         return () => {
           observer.disconnect()
           unsubscribe()
+          el.style.removeProperty("--chronology-count")
         }
       },
     }),
@@ -425,7 +426,13 @@ const chronologyPrimitive = /* @__PURE__ */ definePrimitive({
       on: {
         keydown: (event, { el, api }) => api.internal.keydown(event, el!),
       },
-      bind: (el, part) => part.api.internal.roving.bind(el, part),
+      bind(el, part) {
+        const leave = part.api.internal.roving.bind(el, part)
+        return () => {
+          leave()
+          el.style.removeProperty("--chronology-index")
+        }
+      },
     }),
 
     marker: slot<PartProps, ChronologyMarkerState>({

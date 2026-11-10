@@ -1,4 +1,5 @@
 import {
+  advance,
   chronologyFixture as f,
   chronologyOptions,
   type ChronologyFixtureEvent,
@@ -24,6 +25,7 @@ const markup = () => `
     <button id="add">Add Event</button>
     <button id="reverse">Reverse</button>
     <button id="focus">Focus Current</button>
+    <button id="advance">Advance</button>
   </div>
 `
 
@@ -49,6 +51,15 @@ async function mount(root: HTMLElement) {
   })
   root.querySelector("#reverse")!.addEventListener("click", () => {
     chronology.append(...[...chronology.children].reverse())
+  })
+  root.querySelector("#advance")!.addEventListener("click", () => {
+    const items = [...chronology.children]
+    const statuses = items.map((item) => ({
+      status: item.getAttribute("status") as ChronologyFixtureEvent["status"],
+    }))
+    advance(statuses).forEach(({ status }, index) =>
+      items[index].setAttribute("status", status)
+    )
   })
   root
     .querySelector("#focus")!

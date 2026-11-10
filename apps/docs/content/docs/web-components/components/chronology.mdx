@@ -64,7 +64,7 @@ Import the parts and put them together:
 </ui-chronology>
 ```
 
-`ui-chronology` has the `list` role and each item the `listitem` role, so the same markup can become a feed. Put a `<time>` with `datetime` inside `ui-chronology-time`, so the date is machine readable while the text stays friendly. The part binds to that `<time>`.
+`ui-chronology` has the `list` role and each item the `listitem` role. With `feed`, the same markup becomes a feed of articles. Put a `<time>` with `datetime` inside `ui-chronology-time`, so the date is machine readable while the text stays friendly. The part binds to that `<time>`.
 
 When focus lands on an event, screen readers read its title as its name, then its time and description. Links and buttons inside an event stay in the tab order: Tab moves from the event to them, and arrow keys pressed on them stay with them.
 
@@ -81,7 +81,7 @@ Set `orientation="horizontal"` for a row, like a roadmap. Left and Right move be
 
 Give each item a `status` attribute of `complete`, `current` or `upcoming` for a process, like an order's progress. The current event gets `aria-current="step"`, and Tab lands on it first. Every part of an event shows its status with `data-complete`, `data-current` or `data-upcoming`.
 
-The chronology element's `api` property is its controller. Call its `focus()` with an item's `value` to move focus to it from anywhere.
+The chronology element's `api` property has the controller's methods. Call its `focus()` with an item's `value` to move focus to it from anywhere.
 
 <ComponentExample
   name="chronology/status"

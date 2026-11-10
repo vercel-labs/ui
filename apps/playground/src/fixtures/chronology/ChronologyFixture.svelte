@@ -10,6 +10,7 @@
     createChronologyController,
   } from "@ui-sdk/svelte/chronology"
   import {
+    advance,
     chronologyFixture as f,
     chronologyOptions,
     type ChronologyFixtureEvent,
@@ -44,4 +45,5 @@
   <button onclick={() => (events = [f.added, ...events])}>Add Event</button>
   <button onclick={() => (events = [...events].reverse())}>Reverse</button>
   <button onclick={() => controller.focus("shipped")}>Focus Current</button>
+  <button onclick={() => (events = advance(events))}>Advance</button>
 </div>

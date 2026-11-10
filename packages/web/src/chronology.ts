@@ -15,7 +15,7 @@ function defineChronologyElements() {
     item: { tag: "ui-chronology-item", display: "block" },
     marker: { tag: "ui-chronology-marker", display: "block" },
     connector: { tag: "ui-chronology-connector", display: "block" },
-    // Binds to the <time> inside it, so its `datetime` stays machine readable.
+    // Binds to the `<time>` inside it, so its `datetime` stays machine readable.
     time: {
       tag: "ui-chronology-time",
       display: "block",

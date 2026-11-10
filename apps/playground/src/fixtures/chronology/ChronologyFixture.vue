@@ -11,6 +11,7 @@ import {
 } from "@ui-sdk/vue/chronology"
 import { ref } from "vue"
 import {
+  advance,
   chronologyFixture as f,
   chronologyOptions,
   type ChronologyFixtureEvent,
@@ -50,5 +51,6 @@ const events = ref<readonly ChronologyFixtureEvent[]>(f.events)
     <button @click="events = [f.added, ...events]">Add Event</button>
     <button @click="events = [...events].reverse()">Reverse</button>
     <button @click="controller.focus('shipped')">Focus Current</button>
+    <button @click="events = advance(events)">Advance</button>
   </div>
 </template>

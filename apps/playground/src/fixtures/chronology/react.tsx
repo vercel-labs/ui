@@ -11,6 +11,7 @@ import {
 import * as React from "react"
 import { createRoot } from "react-dom/client"
 import {
+  advance,
   chronologyFixture as f,
   chronologyOptions,
   type ChronologyFixtureEvent,
@@ -52,6 +53,7 @@ function Fixture() {
       <button onClick={() => setEvents([f.added, ...events])}>Add Event</button>
       <button onClick={() => setEvents([...events].reverse())}>Reverse</button>
       <button onClick={() => controller.focus("shipped")}>Focus Current</button>
+      <button onClick={() => setEvents(advance(events))}>Advance</button>
     </div>
   )
 }

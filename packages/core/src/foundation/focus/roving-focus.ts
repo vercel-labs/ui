@@ -304,16 +304,20 @@ function createRovingFocus<State extends object, Props = any>(
       }
       el.addEventListener("focus", focused)
       el.addEventListener("blur", blurred)
-      // An item disabled or enabled after it joined, like a radio a field
-      // around it disables, moves the stop off it or lets it take the stop.
-      // An item that joins with its part gets the props of each render; one
-      // that joins with plain data, like a menubar trigger, never hears any.
+      // An item disabled, enabled or preferred after it joined, like a radio
+      // a field around it disables, can move the stop. An item that joins with
+      // its part hears each render; one joined with plain data never does.
       let wasDisabled = isDisabled(part)
+      let wasPreferred = isPreferred(part)
       const unwatch = onProps(part as Part, () => {
-        if (isDisabled(part) === wasDisabled) {
+        if (
+          isDisabled(part) === wasDisabled &&
+          isPreferred(part) === wasPreferred
+        ) {
           return
         }
-        wasDisabled = !wasDisabled
+        wasDisabled = isDisabled(part)
+        wasPreferred = isPreferred(part)
         queue(false)
       })
       queue(true)

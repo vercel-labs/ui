@@ -12,6 +12,7 @@ import {
   type ChronologyStatus,
 } from "@ui-sdk/react/chronology"
 import { CheckIcon } from "lucide-react"
+import * as React from "react"
 
 const steps: {
   value: string
@@ -55,9 +56,8 @@ const steps: {
   },
 ]
 
-const controller = createChronologyController()
-
 function Example() {
+  const [controller] = React.useState(() => createChronologyController())
   return (
     <div data-slot="stack">
       <div data-slot="controls">

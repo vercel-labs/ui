@@ -53,9 +53,8 @@ const steps: {
   },
 ]
 
-const controller = createChronologyController()
-
 function Example() {
+  const controller = createChronologyController()
   return (
     <div data-slot="stack">
       <div data-slot="controls">

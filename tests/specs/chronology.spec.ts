@@ -193,6 +193,16 @@ test.describe("a list of events", () => {
     await expect.poll(shippedIndex).toBe("3")
   })
 
+  test("the tab stop follows the current step when it moves before focus enters", async ({
+    page,
+  }) => {
+    await page.getByRole("button", { name: "Advance" }).click()
+    const delivered = eventNamed(page, "Delivered")
+    await expect(delivered).toHaveAttribute("aria-current", "step")
+    await expect(delivered).toHaveAttribute("tabindex", "0")
+    await expect(eventNamed(page, "Shipped")).toHaveAttribute("tabindex", "-1")
+  })
+
   test("the controller moves focus to an event", async ({ page }) => {
     await page.getByRole("button", { name: "Focus Current" }).click()
     await expect(eventNamed(page, "Shipped")).toBeFocused()

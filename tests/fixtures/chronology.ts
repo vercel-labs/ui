@@ -59,6 +59,17 @@ type ChronologyFixtureEvent = {
   link?: { label: string; href: string }
 }
 
+// The events with the current step moved to the next one, for the Advance button.
+function advance<Event extends { status: ChronologyFixtureEvent["status"] }>(
+  events: readonly Event[]
+) {
+  const next = events.findIndex((event) => event.status === "current") + 1
+  return events.map((event, index) => ({
+    ...event,
+    status: index < next ? "complete" : index === next ? "current" : "upcoming",
+  }))
+}
+
 // Chronology options a spec can set through the URL:
 // ?orientation=horizontal&loop=false&feed&busy.
 function chronologyOptions() {
@@ -74,4 +85,9 @@ function chronologyOptions() {
   }
 }
 
-export { chronologyFixture, chronologyOptions, type ChronologyFixtureEvent }
+export {
+  advance,
+  chronologyFixture,
+  chronologyOptions,
+  type ChronologyFixtureEvent,
+}
