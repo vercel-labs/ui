@@ -149,7 +149,7 @@ function ownerForm(el: Element | null | undefined, formId: string | undefined) {
   return named instanceof HTMLFormElement ? named : null
 }
 
-function tokenInputApi(
+function tokenInputApiBody(
   context: PrimitiveContext<TokenInputOptions, TokenInputState, string>
 ) {
   const { id, store, options, element } = context
@@ -567,12 +567,16 @@ function tokenInputApi(
   return api
 }
 
+const tokenInputApi: (
+  ...args: Parameters<typeof tokenInputApiBody>
+) => TokenInputApi = tokenInputApiBody
+
 /**
  * `tokenInput`'s api, which its slots and controller call.
  * Adapters expose it as `api`.
  * @stable
  */
-type TokenInputApi = ReturnType<typeof tokenInputApi>
+interface TokenInputApi extends ReturnType<typeof tokenInputApiBody> {}
 
 export {
   initialTokenInputState,

@@ -96,7 +96,7 @@ const syncToastState = (options: ToastRegionInternalOptions) => ({
 /** What a toast region holds. */
 type ToastRegionStoreState = ReturnType<typeof initialToastState>
 
-function toastRegionApi(
+function toastRegionApiBody(
   context: PrimitiveContext<
     ToastRegionInternalOptions,
     ToastRegionStoreState,
@@ -795,8 +795,12 @@ function toastRegionApi(
   }
 }
 
+const toastRegionApi: (
+  ...args: Parameters<typeof toastRegionApiBody>
+) => ToastRegionApi = toastRegionApiBody
+
 /** What a toast region's instance can do. */
-type ToastRegionApi = ReturnType<typeof toastRegionApi>
+interface ToastRegionApi extends ReturnType<typeof toastRegionApiBody> {}
 
 export {
   findItem,

@@ -147,7 +147,7 @@ const sameLevel = (a: TriggerLevel | null, b: TriggerLevel) =>
   a.starts.length === b.starts.length &&
   a.queryStart === b.queryStart
 
-function triggerMenuApi(
+function triggerMenuApiBody(
   context: PrimitiveContext<TriggerMenuOptions<any>, TriggerMenuState, string>
 ) {
   const { id, store, options, element } = context
@@ -776,12 +776,16 @@ function triggerMenuApi(
   }
 }
 
+const triggerMenuApi: (
+  ...args: Parameters<typeof triggerMenuApiBody>
+) => TriggerMenuApi = triggerMenuApiBody
+
 /**
  * `triggerMenu`'s api, which its slots and controller call.
  * Adapters expose it as `api`.
  * @stable
  */
-type TriggerMenuApi = ReturnType<typeof triggerMenuApi>
+interface TriggerMenuApi extends ReturnType<typeof triggerMenuApiBody> {}
 
 export {
   initialTriggerMenuState,

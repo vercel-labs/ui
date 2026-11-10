@@ -217,7 +217,9 @@ const usingKeys = new Set([
   "ArrowRight",
 ])
 
-function toolbarApi(context: PrimitiveContext<ToolbarOptions, State, string>) {
+function toolbarApiBody(
+  context: PrimitiveContext<ToolbarOptions, State, string>
+) {
   const { store, options, props } = context
   const orientation = () => store.get().orientation
 
@@ -368,12 +370,15 @@ function toolbarApi(context: PrimitiveContext<ToolbarOptions, State, string>) {
   }
 }
 
+const toolbarApi: (...args: Parameters<typeof toolbarApiBody>) => ToolbarApi =
+  toolbarApiBody
+
 /**
  * `toolbar`'s api, which its slots and controller call.
  * Adapters expose it as `api`.
  * @stable
  */
-type ToolbarApi = ReturnType<typeof toolbarApi>
+interface ToolbarApi extends ReturnType<typeof toolbarApiBody> {}
 
 // The tab stop and data every item renders.
 function itemAttrs(

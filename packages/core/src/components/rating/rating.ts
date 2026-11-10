@@ -230,7 +230,7 @@ const labelOf = (state: RatingStore, value: number) =>
 const interactive = (state: RadioGroupStore) =>
   !isDisabled(state) && !state.readOnly
 
-function ratingApi(
+function ratingApiBody(
   context: PrimitiveContext<RatingOptions, RatingStore, string>
 ) {
   const { store, options } = context
@@ -269,11 +269,14 @@ function ratingApi(
   }
 }
 
+const ratingApi: (...args: Parameters<typeof ratingApiBody>) => RatingApi =
+  ratingApiBody
+
 /**
  * `rating`'s api, which its slots and controller call. Adapters expose it as `api`.
  * @experimental
  */
-type RatingApi = ReturnType<typeof ratingApi>
+interface RatingApi extends ReturnType<typeof ratingApiBody> {}
 
 const ratingPrimitive = /* @__PURE__ */ definePrimitive({
   name: "rating",

@@ -158,7 +158,7 @@ const keySteps: Record<string, readonly [number, number]> = {
 const wheelUnit = (event: WheelEvent, el: HTMLElement) =>
   event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? el.clientHeight : 1
 
-function imageCropperApi(
+function imageCropperApiBody(
   context: PrimitiveContext<ImageCropperOptions, State, string>
 ) {
   const { store, element } = context
@@ -709,6 +709,10 @@ function imageCropperApi(
   return api
 }
 
+const imageCropperApi: (
+  ...args: Parameters<typeof imageCropperApiBody>
+) => ImageCropperApi = imageCropperApiBody
+
 // A handle's events reach the selection around it too.
 const isHandle = (event: Event) =>
   !!(event.target as Element | null)?.closest?.(
@@ -727,7 +731,7 @@ const spread = (points: { x: number; y: number }[]) =>
  * `imageCropper`'s api, which its slots and controller call. Adapters expose it as `api`.
  * @experimental
  */
-type ImageCropperApi = ReturnType<typeof imageCropperApi>
+interface ImageCropperApi extends ReturnType<typeof imageCropperApiBody> {}
 
 export {
   imageCropperApi,

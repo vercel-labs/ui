@@ -320,10 +320,10 @@ type PopoverState = PopupState & {
  * Adapters expose it as `api`.
  * @stable
  */
-type PopoverApi = ReturnType<typeof popoverApi>
+interface PopoverApi extends ReturnType<typeof popoverApiBody> {}
 
 // A popover is `createPopup` with `popoverPreset`. What's its own: trigger shortcuts.
-function popoverApi(
+function popoverApiBody(
   context: PrimitiveContext<PopoverOptions, PopoverState, string>
 ) {
   const popup = createPopup(context, { preset: popoverPreset })
@@ -336,6 +336,9 @@ function popoverApi(
     }),
   }
 }
+
+const popoverApi: (...args: Parameters<typeof popoverApiBody>) => PopoverApi =
+  popoverApiBody
 
 const popoverPrimitive = /* @__PURE__ */ definePrimitive({
   name: "popover",

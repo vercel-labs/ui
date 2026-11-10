@@ -125,9 +125,9 @@ const warmFor = 300
  * Adapters expose it as `api`.
  * @stable
  */
-type NavigationMenuApi = ReturnType<typeof navigationMenuApi>
+interface NavigationMenuApi extends ReturnType<typeof navigationMenuApiBody> {}
 
-function navigationMenuApi(
+function navigationMenuApiBody(
   context: PrimitiveContext<ApiOptions, NavigationMenuStoreState, string>
 ) {
   const { store, options, element } = context
@@ -872,6 +872,10 @@ function navigationMenuApi(
 
   return api
 }
+
+const navigationMenuApi: (
+  ...args: Parameters<typeof navigationMenuApiBody>
+) => NavigationMenuApi = navigationMenuApiBody
 
 // Whether a content shows in the viewport: open, the last open while the
 // viewport animates out, or animating out after a switch.

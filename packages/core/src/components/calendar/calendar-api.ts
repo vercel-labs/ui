@@ -769,7 +769,9 @@ const calendarSync = (options: CalendarOptions) => ({
   ...(options.today === undefined ? {} : { today: dateOrNull(options.today) }),
 })
 
-type CalendarApi = ReturnType<typeof calendarApi<CalendarOptions, State>>
+interface CalendarApi extends ReturnType<
+  typeof calendarApi<CalendarOptions, State>
+> {}
 
 // A native <select> of the months or years, which turns the first month shown.
 function selectSlot<S extends State, A extends Pick<CalendarApi, "internal">>(

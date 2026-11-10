@@ -113,7 +113,7 @@ function syncAutocompleteState(options: AutocompleteOptions) {
   }
 }
 
-function autocompleteApi(
+function autocompleteApiBody(
   context: PrimitiveContext<AutocompleteOptions, AutocompleteState, string>
 ) {
   const { id, store, options, element } = context
@@ -573,6 +573,10 @@ function autocompleteApi(
   return api
 }
 
+const autocompleteApi: (
+  ...args: Parameters<typeof autocompleteApiBody>
+) => AutocompleteApi = autocompleteApiBody
+
 // What a suggestion registers with: its props, and the group it's in.
 type AutocompleteItemMeta = AutocompleteItemProps & { group?: string }
 
@@ -581,7 +585,7 @@ type AutocompleteItemMeta = AutocompleteItemProps & { group?: string }
  * Adapters expose it as `api`.
  * @stable
  */
-type AutocompleteApi = ReturnType<typeof autocompleteApi>
+interface AutocompleteApi extends ReturnType<typeof autocompleteApiBody> {}
 
 export {
   type AutocompleteApi,

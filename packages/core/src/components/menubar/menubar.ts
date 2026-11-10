@@ -135,7 +135,9 @@ type State = {
   open: string | null
 }
 
-function menubarApi(context: PrimitiveContext<MenubarOptions, State, string>) {
+function menubarApiBody(
+  context: PrimitiveContext<MenubarOptions, State, string>
+) {
   const { store, options, element } = context
   const members = new Map<string, MenubarMember>()
   const typeahead = createTypeahead()
@@ -394,12 +396,15 @@ function menubarApi(context: PrimitiveContext<MenubarOptions, State, string>) {
   return api
 }
 
+const menubarApi: (...args: Parameters<typeof menubarApiBody>) => MenubarApi =
+  menubarApiBody
+
 /**
  * `menubar`'s api, which its slots and controller call.
  * Adapters expose it as `api`.
  * @stable
  */
-type MenubarApi = ReturnType<typeof menubarApi>
+interface MenubarApi extends ReturnType<typeof menubarApiBody> {}
 
 const menubarPrimitive = /* @__PURE__ */ definePrimitive({
   name: "menubar",

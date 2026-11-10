@@ -153,7 +153,7 @@ const same = (a: readonly string[], b: readonly string[]) =>
 const submitted = (state: GroupState) =>
   state.enabled.filter((value) => state.value.includes(value))
 
-function checkboxGroupApi(
+function checkboxGroupApiBody(
   context: PrimitiveContext<CheckboxGroupOptions, GroupState, string>
 ) {
   const { id, store, element } = context
@@ -313,12 +313,16 @@ function checkboxGroupApi(
   return api
 }
 
+const checkboxGroupApi: (
+  ...args: Parameters<typeof checkboxGroupApiBody>
+) => CheckboxGroupApi = checkboxGroupApiBody
+
 /**
  * `checkboxGroup`'s api, which its slots and controller call.
  * Adapters expose it as `api`.
  * @stable
  */
-type CheckboxGroupApi = ReturnType<typeof checkboxGroupApi>
+interface CheckboxGroupApi extends ReturnType<typeof checkboxGroupApiBody> {}
 
 // The checkbox group's types as functions of its value type `T`, so every
 // renderer's `CheckboxGroup` infers `T` from `value`, `defaultValue`,

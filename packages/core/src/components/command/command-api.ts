@@ -96,7 +96,7 @@ function syncCommandState(options: CommandOptions) {
 // The page on top of the stack, or `null` on the first page.
 const currentPage = (state: { pages: string[] }) => state.pages.at(-1) ?? null
 
-function commandApi(
+function commandApiBody(
   context: PrimitiveContext<CommandOptions, CommandStore, string>
 ) {
   const { id, store, options, element } = context
@@ -452,12 +452,15 @@ function commandApi(
   return api
 }
 
+const commandApi: (...args: Parameters<typeof commandApiBody>) => CommandApi =
+  commandApiBody
+
 /**
  * `command`'s api, which its slots and controller call.
  * Adapters expose it as `api`.
  * @stable
  */
-type CommandApi = ReturnType<typeof commandApi>
+interface CommandApi extends ReturnType<typeof commandApiBody> {}
 
 export {
   type CommandApi,

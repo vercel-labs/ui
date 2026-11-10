@@ -223,7 +223,7 @@ function announceRemoved(
   }
 }
 
-function comboboxApi(
+function comboboxApiBody(
   context: PrimitiveContext<ComboboxOptions<any, any>, ComboboxState, string>
 ) {
   const { id, store, options, element } = context
@@ -1113,6 +1113,10 @@ function comboboxApi(
   return api
 }
 
+const comboboxApi: (
+  ...args: Parameters<typeof comboboxApiBody>
+) => ComboboxApi = comboboxApiBody
+
 // What an item part registers with: its props, and the group it's in.
 type ComboboxItemMeta = {
   value: unknown
@@ -1128,7 +1132,7 @@ type ComboboxItemMeta = {
  * Adapters expose it as `api`.
  * @stable
  */
-type ComboboxApi = ReturnType<typeof comboboxApi>
+interface ComboboxApi extends ReturnType<typeof comboboxApiBody> {}
 
 export {
   type ComboboxApi,

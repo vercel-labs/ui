@@ -16,6 +16,7 @@ import {
   itemData,
   itemState,
   radioGroupApi,
+  type RadioGroupApi,
   radioGroupState,
   syncRadioGroup,
 } from "./radio-api"
@@ -157,13 +158,6 @@ type RadioState = {
  * @stable
  */
 type RadioIndicatorState = RadioState
-
-/**
- * `radioGroup`'s api, which its slots and controller call.
- * Adapters expose it as `api`.
- * @stable
- */
-type RadioGroupApi = ReturnType<typeof radioGroupApi>
 
 const radioGroupPrimitive = /* @__PURE__ */ definePrimitive({
   name: "radio",

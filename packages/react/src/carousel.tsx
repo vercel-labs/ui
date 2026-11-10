@@ -109,7 +109,7 @@ type StepProps = Omit<
 const unconnected: CarouselStepState = { disabled: true }
 
 // Previous and Next, which can sit outside their carousel.
-function connectedStep(Step: typeof parts.Previous) {
+function connectedStep(Step: typeof parts.Previous | typeof parts.Next) {
   return function CarouselStep({ controller, ...props }: StepProps) {
     const { render, ...rest } = props
     return (

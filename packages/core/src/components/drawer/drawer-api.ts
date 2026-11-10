@@ -101,7 +101,7 @@ function stepSnapIndex(
   return Math.max(0, index - 1)
 }
 
-function drawerApi(
+function drawerApiBody(
   context: PrimitiveContext<DrawerOptions, DrawerState, string>
 ) {
   const { store, options } = context
@@ -441,12 +441,15 @@ function drawerApi(
   return api
 }
 
+const drawerApi: (...args: Parameters<typeof drawerApiBody>) => DrawerApi =
+  drawerApiBody
+
 /**
  * `drawer`'s api, which its slots and controller call. Adapters
  * expose it as `api`.
  * @stable
  */
-type DrawerApi = ReturnType<typeof drawerApi>
+interface DrawerApi extends ReturnType<typeof drawerApiBody> {}
 
 export {
   defaultSnap,

@@ -114,9 +114,11 @@ const defaultAnnouncement = ({ type, label }: TreeAnnouncement) =>
  * expose it as `api`.
  * @stable
  */
-type TreeApi = ReturnType<typeof treeApi>
+interface TreeApi extends ReturnType<typeof treeApiBody> {}
 
-function treeApi(context: PrimitiveContext<TreeOptions, TreeStore, string>) {
+function treeApiBody(
+  context: PrimitiveContext<TreeOptions, TreeStore, string>
+) {
   const { id, store, options } = context
   announcePending(context, () => store.get().pending.length > 0)
   const change = createChange(context)
@@ -1228,5 +1230,8 @@ function treeApi(context: PrimitiveContext<TreeOptions, TreeStore, string>) {
   }
   return api
 }
+
+const treeApi: (...args: Parameters<typeof treeApiBody>) => TreeApi =
+  treeApiBody
 
 export { type TreeApi, treeApi, type TreeStore }

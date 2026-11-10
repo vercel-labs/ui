@@ -82,7 +82,14 @@ const isNativeButton = (el: HTMLElement | undefined) =>
 
 type RadioSlotNames = { group: string; item: string }
 
-function radioGroupApi(
+/**
+ * `radioGroup`'s api, which its slots and controller call.
+ * Adapters expose it as `api`.
+ * @stable
+ */
+interface RadioGroupApi extends ReturnType<typeof radioGroupApiBody> {}
+
+function radioGroupApiBody(
   context: PrimitiveContext<RadioGroupOptions, RadioGroupStore, string>,
   slots: RadioSlotNames = { group: "group", item: "root" }
 ) {
@@ -259,6 +266,10 @@ function radioGroupApi(
   return api
 }
 
+const radioGroupApi: (
+  ...args: Parameters<typeof radioGroupApiBody>
+) => RadioGroupApi = radioGroupApiBody
+
 function itemState(
   state: RadioGroupStore,
   key: string,
@@ -292,6 +303,7 @@ export {
   itemData,
   itemState,
   radioGroupApi,
+  type RadioGroupApi,
   radioGroupState,
   type RadioGroupStore,
   syncRadioGroup,

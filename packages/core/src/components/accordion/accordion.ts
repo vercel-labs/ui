@@ -291,9 +291,9 @@ type Cause = AccordionChangeOptions
  * Adapters expose it as `api`.
  * @stable
  */
-type AccordionApi = ReturnType<typeof accordionApi>
+interface AccordionApi extends ReturnType<typeof accordionApiBody> {}
 
-function accordionApi(
+function accordionApiBody(
   context: PrimitiveContext<AccordionOptions, AccordionStore, string>
 ) {
   const { id, store, options, element, props } = context
@@ -532,6 +532,10 @@ function accordionApi(
 
   return api
 }
+
+const accordionApi: (
+  ...args: Parameters<typeof accordionApiBody>
+) => AccordionApi = accordionApiBody
 
 const disabledOf = (
   state: AccordionStore,

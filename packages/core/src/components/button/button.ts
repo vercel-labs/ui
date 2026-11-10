@@ -93,7 +93,7 @@ type State = {
   error: unknown
 }
 
-function buttonApi(
+function buttonApiBody(
   context: PrimitiveContext<ButtonInternalOptions, State, string>
 ) {
   const { store, options } = context
@@ -140,12 +140,15 @@ function buttonApi(
   }
 }
 
+const buttonApi: (...args: Parameters<typeof buttonApiBody>) => ButtonApi =
+  buttonApiBody
+
 /**
  * `button`'s api, which its slots and controller call. Adapters
  * expose it as `api`.
  * @stable
  */
-type ButtonApi = ReturnType<typeof buttonApi>
+interface ButtonApi extends ReturnType<typeof buttonApiBody> {}
 
 const buttonPrimitive = /* @__PURE__ */ definePrimitive({
   name: "button",

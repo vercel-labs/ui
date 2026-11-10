@@ -129,7 +129,7 @@ function checkboxSync(options: CheckboxInternalOptions) {
   }
 }
 
-function checkboxApi(
+function checkboxApiBody(
   context: PrimitiveContext<
     CheckboxInternalOptions,
     CheckboxToggleState,
@@ -255,12 +255,16 @@ function checkboxApi(
   }
 }
 
+const checkboxApi: (
+  ...args: Parameters<typeof checkboxApiBody>
+) => CheckboxApi = checkboxApiBody
+
 /**
  * `checkbox`'s api, which its slots and controller call.
  * Adapters expose it as `api`.
  * @stable
  */
-type CheckboxApi = ReturnType<typeof checkboxApi>
+interface CheckboxApi extends ReturnType<typeof checkboxApiBody> {}
 
 const checkboxState = (state: ToggleState) => ({
   ...switchState(state),

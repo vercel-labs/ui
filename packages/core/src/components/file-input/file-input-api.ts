@@ -144,7 +144,7 @@ function describeChange(details: {
   return parts.length ? parts.join(" ") : null
 }
 
-function fileInputApi(
+function fileInputApiBody(
   context: PrimitiveContext<
     FileInputOptions,
     State,
@@ -508,12 +508,16 @@ function fileInputApi(
   return api
 }
 
+const fileInputApi: (
+  ...args: Parameters<typeof fileInputApiBody>
+) => FileInputApi = fileInputApiBody
+
 /**
  * `fileInput`'s api, which its slots and controller call.
  * Adapters expose it as `api`.
  * @stable
  */
-type FileInputApi = ReturnType<typeof fileInputApi>
+interface FileInputApi extends ReturnType<typeof fileInputApiBody> {}
 
 export {
   describeChange,

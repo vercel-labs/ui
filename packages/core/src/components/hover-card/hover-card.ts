@@ -204,14 +204,18 @@ type HoverCardArrowState = {
  * Adapters expose it as `api`.
  * @stable
  */
-type HoverCardApi = ReturnType<typeof hoverCardApi>
+interface HoverCardApi extends ReturnType<typeof hoverCardApiBody> {}
 
 // A hover card is `createPopup` with `hoverCardPreset`, and nothing of its own.
-function hoverCardApi(
+function hoverCardApiBody(
   context: PrimitiveContext<HoverCardOptions, PopupState, string>
 ) {
   return createPopup(context, { preset: hoverCardPreset })
 }
+
+const hoverCardApi: (
+  ...args: Parameters<typeof hoverCardApiBody>
+) => HoverCardApi = hoverCardApiBody
 
 const hoverCardPrimitive = /* @__PURE__ */ definePrimitive({
   name: "hover-card",

@@ -322,7 +322,7 @@ function bindItemShortcuts(
  * expose it as `api`.
  * @stable
  */
-type MenuApi = ReturnType<typeof menuApi>
+interface MenuApi extends ReturnType<typeof menuApiBody> {}
 
 type Show = {
   focus?: Focus
@@ -383,7 +383,7 @@ type MenuNode = {
   }
 }
 
-function menuApi(
+function menuApiBody(
   context: PrimitiveContext<MenuInternalOptions, MenuState, string>
 ) {
   const { id, store, options, element, props } = context
@@ -1215,6 +1215,9 @@ function menuApi(
 
   return api
 }
+
+const menuApi: (...args: Parameters<typeof menuApiBody>) => MenuApi =
+  menuApiBody
 
 type MenuState = {
   open: boolean

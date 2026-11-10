@@ -142,7 +142,7 @@ type EyeDropperWindow = Window & {
   }
 }
 
-function colorPickerApi(
+function colorPickerApiBody(
   context: PrimitiveContext<ColorPickerOptions, State, string>
 ) {
   const { store, element } = context
@@ -539,6 +539,10 @@ function colorPickerApi(
   return api
 }
 
+const colorPickerApi: (
+  ...args: Parameters<typeof colorPickerApiBody>
+) => ColorPickerApi = colorPickerApiBody
+
 const valueText = (value: number, spec: Channel) => {
   const decimals = spec.step < 1 ? String(spec.step).length - 2 : 0
   const rounded = Number(value.toFixed(decimals))
@@ -549,7 +553,7 @@ const valueText = (value: number, spec: Channel) => {
  * `colorPicker`'s api, which its slots and controller call. Adapters expose it as `api`.
  * @experimental
  */
-type ColorPickerApi = ReturnType<typeof colorPickerApi>
+interface ColorPickerApi extends ReturnType<typeof colorPickerApiBody> {}
 
 export {
   colorPickerApi,

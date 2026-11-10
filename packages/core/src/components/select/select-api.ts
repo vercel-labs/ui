@@ -167,7 +167,7 @@ function syncSelectState(options: SelectOptions<any, any>) {
   }
 }
 
-function selectApi(
+function selectApiBody(
   context: PrimitiveContext<SelectOptions<any, any>, SelectState, string>
 ) {
   const { id, store, options, element } = context
@@ -663,6 +663,9 @@ function selectApi(
   return api
 }
 
+const selectApi: (...args: Parameters<typeof selectApiBody>) => SelectApi =
+  selectApiBody
+
 // What an item part registers with: its props, and the group it's in.
 type SelectItemMeta = {
   value: unknown
@@ -677,7 +680,7 @@ type SelectItemMeta = {
  * expose it as `api`.
  * @stable
  */
-type SelectApi = ReturnType<typeof selectApi>
+interface SelectApi extends ReturnType<typeof selectApiBody> {}
 
 export {
   type InitialHighlight,

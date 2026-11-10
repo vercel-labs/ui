@@ -335,12 +335,12 @@ function labelContent(el: HTMLElement) {
  * Adapters expose it as `api`.
  * @stable
  */
-type TooltipApi = ReturnType<typeof tooltipApi>
+interface TooltipApi extends ReturnType<typeof tooltipApiBody> {}
 
 // A tooltip is `createPopup` with `tooltipPreset`, which brings the warm
 // group. What's its own: naming or describing its trigger, a press that
 // closes it or, when toggleable, opens it and announces its text.
-function tooltipApi(
+function tooltipApiBody(
   context: PrimitiveContext<TooltipOptions, TooltipState, string>
 ) {
   const { store, options } = context
@@ -418,6 +418,9 @@ function tooltipApi(
     }),
   }
 }
+
+const tooltipApi: (...args: Parameters<typeof tooltipApiBody>) => TooltipApi =
+  tooltipApiBody
 
 const tooltipPrimitive = /* @__PURE__ */ definePrimitive({
   name: "tooltip",

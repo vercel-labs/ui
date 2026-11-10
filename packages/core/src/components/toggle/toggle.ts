@@ -224,7 +224,7 @@ function toggleState(options: ToggleInternalOptions & { id: string }): State {
   }
 }
 
-function toggleApi(
+function toggleApiBody(
   context: PrimitiveContext<ToggleInternalOptions, State, string>
 ) {
   const { id, store, options, element } = context
@@ -324,12 +324,15 @@ function toggleApi(
   return api
 }
 
+const toggleApi: (...args: Parameters<typeof toggleApiBody>) => ToggleApi =
+  toggleApiBody
+
 /**
  * `toggle`'s api, which its slots and controller call. Adapters
  * expose it as `api`.
  * @stable
  */
-type ToggleApi = ReturnType<typeof toggleApi>
+interface ToggleApi extends ReturnType<typeof toggleApiBody> {}
 
 const togglePrimitive = /* @__PURE__ */ definePrimitive({
   name: "toggle",

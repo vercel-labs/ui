@@ -1089,18 +1089,52 @@ type RootPropsIn<
 type PartOf<P extends Primitive, S extends SlotName<P>, T extends Tag> = [
   GenericOf<P>,
 ] extends [never]
-  ? (props: Props<NamedProps<P, S>, Known<StateOf<P, S>>, T>) => JSX.Element
+  ? PartComponent<P, S, T>
   : GenericOf<P> extends { props: Record<S, unknown> }
-    ? <A extends GenericOf<P>["T"] = DefaultOf<GenericOf<P>, "T">>(
-        props: Props<
-          (Applied<GenericOf<P>, A, unknown>["props"] & Record<S, unknown>)[S],
-          StateIn<P, S, Applied<GenericOf<P>, A, unknown>>,
-          T
-        >
-      ) => JSX.Element
-    : (
-        props: Props<NamedProps<P, S>, StateIn<P, S, GenericOf<P>>, T>
-      ) => JSX.Element
+    ? GenericPartComponent<P, S, T>
+    : PartComponent<P, S, T>
+
+// Interfaces, so declaration files name a part's type instead of spelling out
+// every prop of its element at each part.
+/**
+ * A part's component, from `createParts`: the props of slot `S` of primitive
+ * `P` rendered as a `T`.
+ * @stable
+ */
+interface PartComponent<
+  P extends Primitive,
+  S extends SlotName<P>,
+  T extends Tag,
+> {
+  (
+    props: Props<
+      NamedProps<P, S>,
+      [GenericOf<P>] extends [never]
+        ? Known<StateOf<P, S>>
+        : StateIn<P, S, GenericOf<P>>,
+      T
+    >
+  ): JSX.Element
+}
+
+/**
+ * A part's component whose props take the primitive's type parameter, like an
+ * item's `value`, from `createParts`.
+ * @stable
+ */
+interface GenericPartComponent<
+  P extends Primitive,
+  S extends SlotName<P>,
+  T extends Tag,
+> {
+  <A extends GenericOf<P>["T"] = DefaultOf<GenericOf<P>, "T">>(
+    props: Props<
+      (Applied<GenericOf<P>, A, unknown>["props"] & Record<S, unknown>)[S],
+      StateIn<P, S, Applied<GenericOf<P>, A, unknown>>,
+      T
+    >
+  ): JSX.Element
+}
 
 /**
  * The components `createParts` makes: `Root`, and one per tagged slot, named in Pascal case.
@@ -1224,6 +1258,8 @@ function createParts<
 export {
   callHandler,
   createParts,
+  type GenericPartComponent,
+  type PartComponent,
   type PartProps,
   type Parts,
   type PrimitiveHandle,

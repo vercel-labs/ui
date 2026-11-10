@@ -124,7 +124,9 @@ type FieldErrorState = FieldState & {
 const ownControl = (root: HTMLElement) => (el: HTMLElement) =>
   el.closest('[data-slot="field-root"]') === root
 
-function fieldApi(context: PrimitiveContext<FieldOptions, FieldStore, string>) {
+function fieldApiBody(
+  context: PrimitiveContext<FieldOptions, FieldStore, string>
+) {
   const { id, store, element, parts } = context
   let root: HTMLElement | undefined
 
@@ -449,11 +451,14 @@ function fieldApi(context: PrimitiveContext<FieldOptions, FieldStore, string>) {
   return api
 }
 
+const fieldApi: (...args: Parameters<typeof fieldApiBody>) => FieldApi =
+  fieldApiBody
+
 /**
  * `field`'s api, which its slots call. Adapters expose it as `api`.
  * @stable
  */
-type FieldApi = ReturnType<typeof fieldApi>
+interface FieldApi extends ReturnType<typeof fieldApiBody> {}
 
 const fieldPrimitive = /* @__PURE__ */ definePrimitive({
   name: "field",

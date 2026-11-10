@@ -18,6 +18,7 @@ import type {
 import { definePrimitive } from "../../foundation/kernel/primitive"
 import type {
   Named,
+  PrimitiveContext,
   PrimitiveOptions,
 } from "../../foundation/kernel/primitive-types"
 import {
@@ -393,9 +394,13 @@ type CalendarDayProps = {
  * `calendar`'s api, which its slots and controller call. Adapters expose it as `api`.
  * @stable
  */
-type CalendarApi = ReturnType<
+interface CalendarApi extends ReturnType<
   typeof calendarApi<CalendarOptions, CalendarModelState>
->
+> {}
+
+const calendarPrimitiveApi: (
+  context: PrimitiveContext<CalendarOptions, CalendarModelState, string>
+) => CalendarApi = (context) => calendarApi(context)
 
 const calendarPrimitive = /* @__PURE__ */ definePrimitive({
   name: "calendar",
@@ -433,7 +438,7 @@ const calendarPrimitive = /* @__PURE__ */ definePrimitive({
   state: calendarState,
   controlled: ["value", "month"],
   sync: calendarSync,
-  api: (context) => calendarApi(context),
+  api: calendarPrimitiveApi,
   slots: (slot) => ({
     root: slot<{}, CalendarState>({
       state: (state) => ({

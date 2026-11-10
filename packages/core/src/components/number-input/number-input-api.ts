@@ -163,7 +163,7 @@ function isAndroid() {
   return isBrowser && /Android/i.test(navigator.userAgent)
 }
 
-function numberInputApi(
+function numberInputApiBody(
   context: PrimitiveContext<NumberInputOptions, State, string>
 ) {
   const { store, element } = context
@@ -636,6 +636,10 @@ function numberInputApi(
   return api
 }
 
+const numberInputApi: (
+  ...args: Parameters<typeof numberInputApiBody>
+) => NumberInputApi = numberInputApiBody
+
 function wrap(position: number, size: number) {
   return ((position % size) + size) % size
 }
@@ -645,7 +649,7 @@ function wrap(position: number, size: number) {
  * Adapters expose it as `api`.
  * @stable
  */
-type NumberInputApi = ReturnType<typeof numberInputApi>
+interface NumberInputApi extends ReturnType<typeof numberInputApiBody> {}
 
 export {
   atBound,

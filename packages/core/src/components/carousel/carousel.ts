@@ -1,7 +1,12 @@
 import { dev } from "#dev"
 import { checkName } from "#name-check"
 import type { CarouselAlign, CarouselSlidesPerPage } from "./carousel-layout"
-import { carouselApi, snapType, type State } from "./carousel-api"
+import {
+  carouselApi,
+  type CarouselApi,
+  snapType,
+  type State,
+} from "./carousel-api"
 import { idPart } from "../../foundation/kernel/attrs"
 import { createController } from "../../foundation/kernel/controller"
 import type {
@@ -321,13 +326,6 @@ const checkPartName =
       () => el.isConnected && checkName(el, part, { component: "carousel", id })
     )
   }
-
-/**
- * `carousel`'s api, which its slots and controller call.
- * Adapters expose it as `api`.
- * @stable
- */
-type CarouselApi = ReturnType<typeof carouselApi>
 
 // Inline styles a part needs to work at all, as a `style` attribute.
 function viewportStyle(state: State) {

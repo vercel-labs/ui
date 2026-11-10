@@ -278,9 +278,11 @@ function writeIndicator(
  * expose it as `api`.
  * @stable
  */
-type TabsApi = ReturnType<typeof tabsApi>
+interface TabsApi extends ReturnType<typeof tabsApiBody> {}
 
-function tabsApi(context: PrimitiveContext<TabsOptions, TabsStore, string>) {
+function tabsApiBody(
+  context: PrimitiveContext<TabsOptions, TabsStore, string>
+) {
   const { id, store, options, element, props } = context
   const change = createChange(context)
   const panels = new Set<string>()
@@ -555,6 +557,9 @@ function tabsApi(context: PrimitiveContext<TabsOptions, TabsStore, string>) {
 
   return api
 }
+
+const tabsApi: (...args: Parameters<typeof tabsApiBody>) => TabsApi =
+  tabsApiBody
 
 const findable = (state: TabsStore, props: PanelProps) =>
   props.hiddenUntilFound ?? state.hiddenUntilFound

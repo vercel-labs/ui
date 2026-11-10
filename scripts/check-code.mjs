@@ -70,6 +70,11 @@
 //   declared in its component's own file, or in `<name>-api.ts` once it moves
 //   out of it, so every component splits the same way. An exported `*Api`
 //   lives in a file named for it or ending in `-api.ts`.
+// - named-api: core declares an api's type as an interface, like
+//   `interface ComboboxApi extends ReturnType<typeof comboboxApiBody> {}`,
+//   never `type ComboboxApi = ReturnType<…>`. A `type` is only another name for
+//   the inferred object, so declaration files spell the whole api out again at
+//   every slot that uses it, which made core's types ten times their size.
 // - entry-types: each renderer's entry for a component re-exports every type
 //   core's entry for it exports, and no other type of core's, by name in an
 //   `export type { } from "@ui-sdk/core/<name>"`, so `@ui-sdk/vue/accordion`
@@ -189,6 +194,7 @@ checkPublicNames()
 checkRendererImports()
 checkNuxtImports()
 checkApiFiles()
+checkNamedApi()
 checkInternalExports()
 checkEntryTypes()
 
@@ -1033,6 +1039,29 @@ function checkApiFiles() {
         })
       }
     }
+  }
+}
+
+function checkNamedApi() {
+  const aliasedApi = /^type (\w+Api)\b[^=]*=\s*ReturnType<\s*typeof \w+Api\b/
+  const files = packageSources().filter((file) =>
+    file.startsWith(path.join(root, "packages/core/src/"))
+  )
+  for (const file of files) {
+    readFileSync(file, "utf8")
+      .split("\n")
+      .forEach((text, index) => {
+        const name = text.match(aliasedApi)?.[1]
+        if (!name) {
+          return
+        }
+        violations.push({
+          file: path.relative(root, file),
+          line: index + 1,
+          rule: "named-api",
+          message: `declare \`${name}\` as an interface that extends the return type, so declaration files name it instead of repeating it.`,
+        })
+      })
   }
 }
 

@@ -158,7 +158,7 @@ type Drag = {
   base: number[]
 }
 
-function resizableApi(
+function resizableApiBody(
   context: PrimitiveContext<ResizableOptions, State, string>
 ) {
   const { store, options } = context
@@ -701,11 +701,15 @@ function resizableApi(
   return api
 }
 
+const resizableApi: (
+  ...args: Parameters<typeof resizableApiBody>
+) => ResizableApi = resizableApiBody
+
 /**
  * `resizable`'s api, which its slots and controller call.
  * Adapters expose it as `api`.
  * @stable
  */
-type ResizableApi = ReturnType<typeof resizableApi>
+interface ResizableApi extends ReturnType<typeof resizableApiBody> {}
 
 export { type ResizableApi, resizableApi, settings, type State }

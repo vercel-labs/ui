@@ -179,7 +179,7 @@ function nextValue(
   return inOrder(pressed ? [...others, key] : others, order)
 }
 
-function toggleGroupApi(
+function toggleGroupApiBody(
   context: PrimitiveContext<ToggleGroupInternalOptions, State, string>
 ) {
   const { store, options } = context
@@ -337,12 +337,16 @@ function toggleGroupApi(
   return api
 }
 
+const toggleGroupApi: (
+  ...args: Parameters<typeof toggleGroupApiBody>
+) => ToggleGroupApi = toggleGroupApiBody
+
 /**
  * `toggleGroup`'s api, which its slots and controller call.
  * Adapters expose it as `api`.
  * @stable
  */
-type ToggleGroupApi = ReturnType<typeof toggleGroupApi>
+interface ToggleGroupApi extends ReturnType<typeof toggleGroupApiBody> {}
 
 // The toggle group's types as functions of its value type `T`, so every
 // renderer's `ToggleGroup` infers `T` from `value`, `defaultValue` or

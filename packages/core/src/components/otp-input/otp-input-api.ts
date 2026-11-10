@@ -216,7 +216,7 @@ function hideNativeHighlights(root: Node) {
   root.adoptedStyleSheets = [...root.adoptedStyleSheets, sheet]
 }
 
-function otpInputApi(
+function otpInputApiBody(
   context: PrimitiveContext<
     OTPInputOptions,
     State,
@@ -624,11 +624,15 @@ function otpInputApi(
   }
 }
 
+const otpInputApi: (
+  ...args: Parameters<typeof otpInputApiBody>
+) => OTPInputApi = otpInputApiBody
+
 /**
  * `otpInput`'s api, which its slots and controller call. Adapters expose it as `api`.
  * @stable
  */
-type OTPInputApi = ReturnType<typeof otpInputApi>
+interface OTPInputApi extends ReturnType<typeof otpInputApiBody> {}
 
 function isFocused(el: HTMLElement) {
   const root = el.getRootNode() as Document | ShadowRoot

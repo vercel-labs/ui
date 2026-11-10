@@ -13,6 +13,7 @@ import type {
 import { bindIndicator } from "../../foundation/selection/indicator"
 import {
   radioGroupApi,
+  type RadioGroupApi,
   radioGroupState,
   syncRadioGroup,
 } from "../radio/radio-api"
@@ -179,7 +180,7 @@ const orientation = (options: SegmentedControlOptions) =>
  * expose it as `api`.
  * @experimental
  */
-type SegmentedControlApi = ReturnType<typeof radioGroupApi>
+interface SegmentedControlApi extends RadioGroupApi {}
 
 const segmentedControlPrimitive = /* @__PURE__ */ definePrimitive({
   name: "segmented-control",

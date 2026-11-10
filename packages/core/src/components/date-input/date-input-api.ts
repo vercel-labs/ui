@@ -251,7 +251,9 @@ const optionKinds = {
 
 const separators = /[\s/.,:\-–]/
 
-function dateInputApi(context: PrimitiveContext<SharedOptions, State, string>) {
+function dateInputApiBody(
+  context: PrimitiveContext<SharedOptions, State, string>
+) {
   const { store, element } = context
   const change = createChange(context)
   const format = () => formatOf(store.get())
@@ -648,11 +650,15 @@ function dateInputApi(context: PrimitiveContext<SharedOptions, State, string>) {
   }
 }
 
+const dateInputApi: (
+  ...args: Parameters<typeof dateInputApiBody>
+) => DateInputApi = dateInputApiBody
+
 /**
  * The api of `dateInput` and `timeInput`, which their slots and controllers call. Adapters expose it as `api`.
  * @stable
  */
-type DateInputApi = ReturnType<typeof dateInputApi>
+interface DateInputApi extends ReturnType<typeof dateInputApiBody> {}
 
 export {
   dateInputApi,

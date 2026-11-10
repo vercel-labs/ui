@@ -171,7 +171,9 @@ type Gesture = {
   event: Event | undefined
 }
 
-function sliderApi(context: PrimitiveContext<SliderOptions, State, string>) {
+function sliderApiBody(
+  context: PrimitiveContext<SliderOptions, State, string>
+) {
   const { store, options, element } = context
   const change = createChange(context)
   const commitValue = createCommit(context)
@@ -497,12 +499,15 @@ function sliderApi(context: PrimitiveContext<SliderOptions, State, string>) {
   return api
 }
 
+const sliderApi: (...args: Parameters<typeof sliderApiBody>) => SliderApi =
+  sliderApiBody
+
 /**
  * `slider`'s api, which its slots and controller call. Adapters
  * expose it as `api`.
  * @stable
  */
-type SliderApi = ReturnType<typeof sliderApi>
+interface SliderApi extends ReturnType<typeof sliderApiBody> {}
 
 export {
   formatRange,

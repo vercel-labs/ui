@@ -1046,18 +1046,52 @@ type RootPropsIn<
 type PartOf<P extends Primitive, S extends SlotName<P>, T extends Tag> = [
   GenericOf<P>,
 ] extends [never]
-  ? (props: Props<PropsOf<P, S>, StateOf<P, S>, T>) => React.ReactElement | null
+  ? PartComponent<P, S, T>
   : GenericOf<P> extends { props: Record<S, unknown> }
-    ? <A extends GenericOf<P>["T"] = DefaultOf<GenericOf<P>, "T">>(
-        props: Props<
-          (Applied<GenericOf<P>, A, unknown>["props"] & Record<S, unknown>)[S],
-          StateIn<P, S, Applied<GenericOf<P>, A, unknown>>,
-          T
-        >
-      ) => React.ReactElement | null
-    : (
-        props: Props<PropsOf<P, S>, StateIn<P, S, GenericOf<P>>, T>
-      ) => React.ReactElement | null
+    ? GenericPartComponent<P, S, T>
+    : PartComponent<P, S, T>
+
+// Interfaces, so declaration files name a part's type instead of spelling out
+// every prop of its element at each part.
+/**
+ * A part's component, from `createParts`: the props of slot `S` of primitive
+ * `P` rendered as a `T`.
+ * @stable
+ */
+interface PartComponent<
+  P extends Primitive,
+  S extends SlotName<P>,
+  T extends Tag,
+> {
+  (
+    props: Props<
+      PropsOf<P, S>,
+      [GenericOf<P>] extends [never]
+        ? StateOf<P, S>
+        : StateIn<P, S, GenericOf<P>>,
+      T
+    >
+  ): React.ReactElement | null
+}
+
+/**
+ * A part's component whose props take the primitive's type parameter, like an
+ * item's `value`, from `createParts`.
+ * @stable
+ */
+interface GenericPartComponent<
+  P extends Primitive,
+  S extends SlotName<P>,
+  T extends Tag,
+> {
+  <A extends GenericOf<P>["T"] = DefaultOf<GenericOf<P>, "T">>(
+    props: Props<
+      (Applied<GenericOf<P>, A, unknown>["props"] & Record<S, unknown>)[S],
+      StateIn<P, S, Applied<GenericOf<P>, A, unknown>>,
+      T
+    >
+  ): React.ReactElement | null
+}
 
 /**
  * The components `createParts` makes: `Root`, and one per tagged slot, named in Pascal case.
@@ -1196,6 +1230,8 @@ export {
   HandleScope,
   mergeProps,
   mergeRefs,
+  type GenericPartComponent,
+  type PartComponent,
   type PartProps,
   type Parts,
   presentIn,

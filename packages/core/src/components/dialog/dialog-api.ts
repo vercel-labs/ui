@@ -140,7 +140,7 @@ type DialogRules = {
 // A dialog is `createPopup` with a dialog preset. What's its own: nesting, the
 // dismissal policy, Close actions that keep it open while they run, where
 // focus starts, and trigger shortcuts.
-function dialogApi(
+function dialogApiBody(
   context: PrimitiveContext<DialogSharedOptions, DialogState, string>,
   alert: boolean,
   extra: DialogRules = {}
@@ -373,12 +373,15 @@ function dialogApi(
   }
 }
 
+const dialogApi: (...args: Parameters<typeof dialogApiBody>) => DialogApi =
+  dialogApiBody
+
 /**
  * `dialog`'s api, which its slots and controller call. Adapters
  * expose it as `api`.
  * @stable
  */
-type DialogApi = ReturnType<typeof dialogApi>
+interface DialogApi extends ReturnType<typeof dialogApiBody> {}
 
 export {
   type DialogApi,

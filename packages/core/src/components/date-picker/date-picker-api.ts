@@ -133,9 +133,9 @@ function submitted(state: State) {
  * `datePicker`'s api, which its slots and controller call. Adapters expose it as `api`.
  * @stable
  */
-type DatePickerApi = ReturnType<typeof datePickerApi>
+interface DatePickerApi extends ReturnType<typeof datePickerApiBody> {}
 
-function datePickerApi(
+function datePickerApiBody(
   context: PrimitiveContext<DatePickerOptions, State, string>
 ) {
   const { store, element } = context
@@ -429,6 +429,10 @@ function datePickerApi(
   }
   return api
 }
+
+const datePickerApi: (
+  ...args: Parameters<typeof datePickerApiBody>
+) => DatePickerApi = datePickerApiBody
 
 const initialDatePickerState = (options: DatePickerOptions): State => {
   const calendar = calendarState(options as CalendarOptions)

@@ -120,7 +120,14 @@ function snapType(
   return `${state.orientation === "vertical" ? "y" : "x"} mandatory`
 }
 
-function carouselApi(
+/**
+ * `carousel`'s api, which its slots and controller call.
+ * Adapters expose it as `api`.
+ * @stable
+ */
+interface CarouselApi extends ReturnType<typeof carouselApiBody> {}
+
+function carouselApiBody(
   context: PrimitiveContext<CarouselOptions, State, string>
 ) {
   const { id, store, options, element, onDestroy } = context
@@ -683,4 +690,8 @@ function carouselApi(
   return api
 }
 
-export { carouselApi, snapType, type State }
+const carouselApi: (
+  ...args: Parameters<typeof carouselApiBody>
+) => CarouselApi = carouselApiBody
+
+export { carouselApi, type CarouselApi, snapType, type State }

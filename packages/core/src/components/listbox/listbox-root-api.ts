@@ -97,7 +97,7 @@ function syncListboxStore(options: ListboxOptions<any, any>) {
 /** For a list nobody types into, like Listbox: every item shows. */
 const noFiltering: ListFiltering = { data: (data) => data, matches: () => true }
 
-function listboxApi(
+function listboxApiBody(
   context: PrimitiveContext<ListboxOptions<any, any>, ListboxStore, string>
 ) {
   const { id, store, options, element } = context
@@ -433,6 +433,9 @@ function listboxApi(
   return api
 }
 
+const listboxApi: (...args: Parameters<typeof listboxApiBody>) => ListboxApi =
+  listboxApiBody
+
 // What an item part registers with: its props, and the group it's in.
 type ListboxItemMeta = {
   value: unknown
@@ -446,7 +449,7 @@ type ListboxItemMeta = {
  * Adapters expose it as `api`.
  * @stable
  */
-type ListboxApi = ReturnType<typeof listboxApi>
+interface ListboxApi extends ReturnType<typeof listboxApiBody> {}
 
 export {
   initialListboxStore,
