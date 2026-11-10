@@ -126,7 +126,7 @@ function PhoneStrip({
         {children}
       </div>
       <div className="mt-6 flex items-center justify-center gap-2 sm:hidden">
-        <div className="flex h-10 items-center gap-2 bg-foreground/[0.06] px-4">
+        <div className="flex h-10 items-center bg-foreground/[0.06] px-[7px]">
           {names.map((name, position) => (
             <button
               key={name}
@@ -137,20 +137,22 @@ function PhoneStrip({
                 setPlaying(false)
                 go(position)
               }}
-              className="relative h-1.5 w-1.5 overflow-hidden bg-foreground/25 transition-[width] duration-300 outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#006bff] aria-[current=true]:w-6"
+              className="group flex h-6 items-center px-[9px] outline-none"
             >
-              {position === index && (
-                <span
-                  key={`${index}-${playing}`}
-                  onAnimationEnd={advance}
-                  className="absolute inset-y-0 start-0 w-full origin-left bg-foreground rtl:origin-right"
-                  style={
-                    playing
-                      ? { animation: "strip-fill 4s linear forwards" }
-                      : undefined
-                  }
-                />
-              )}
+              <span className="relative h-1.5 w-1.5 overflow-hidden bg-foreground/25 transition-[width] duration-300 group-focus-visible:outline-2 group-focus-visible:outline-offset-2 group-focus-visible:outline-[#006bff] group-aria-[current=true]:w-6">
+                {position === index && (
+                  <span
+                    key={`${index}-${playing}`}
+                    onAnimationEnd={advance}
+                    className="absolute inset-y-0 start-0 w-full origin-left bg-foreground rtl:origin-right"
+                    style={
+                      playing
+                        ? { animation: "strip-fill 4s linear forwards" }
+                        : undefined
+                    }
+                  />
+                )}
+              </span>
             </button>
           ))}
         </div>
