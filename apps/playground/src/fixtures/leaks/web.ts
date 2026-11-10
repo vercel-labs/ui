@@ -1,4 +1,9 @@
-import { exposeLayers, leakComponent, perfItems } from "tests/fixtures/perf.ts"
+import {
+  exposeLayers,
+  leakComponent,
+  leakWaterfallItems,
+  perfItems,
+} from "tests/fixtures/perf.ts"
 
 // One component for the leak specs, picked with ?component=, and a button
 // that mounts and unmounts it. Each mount inserts new elements. The scroll
@@ -110,6 +115,7 @@ const components = {
           </ui-tree-item>`
       )}
     </ui-tree>`,
+  waterfall: `<ui-waterfall class="waterfall" aria-label="Trace"></ui-waterfall>`,
   resizable: `
     <ui-resizable class="resizable">
       <ui-resizable-panel id="first" default-size="50" class="resizable-panel"></ui-resizable-panel>
@@ -140,7 +146,13 @@ async function mount(root: HTMLElement) {
   `
   const slot = root.querySelector<HTMLElement>(".slot")!
   const markup = components[leakComponent()]
-  const insert = () => (slot.innerHTML = markup)
+  const insert = () => {
+    slot.innerHTML = markup
+    const waterfall = slot.querySelector("ui-waterfall")
+    if (waterfall) {
+      waterfall.items = leakWaterfallItems()
+    }
+  }
   insert()
   root
     .querySelector(".fixture > button:last-child")!
@@ -161,6 +173,7 @@ async function mount(root: HTMLElement) {
   await import("@ui-sdk/web/accordion")
   await import("@ui-sdk/web/collapsible")
   await import("@ui-sdk/web/tree")
+  await import("@ui-sdk/web/waterfall")
   await import("@ui-sdk/web/tabs")
   await import("@ui-sdk/web/toolbar")
   await import("@ui-sdk/web/resizable")

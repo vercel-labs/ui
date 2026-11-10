@@ -56,8 +56,14 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
+  Waterfall,
 } from "@ui-sdk/vue"
-import { leakComponent, leakTreeItems, perfItems } from "tests/fixtures/perf.ts"
+import {
+  leakComponent,
+  leakTreeItems,
+  leakWaterfallItems,
+  perfItems,
+} from "tests/fixtures/perf.ts"
 import { ref } from "vue"
 
 // One component for the leak specs, picked with ?component=, and a button
@@ -211,6 +217,12 @@ const mounted = ref(true)
         class="tree"
         aria-label="Files"
         :items="leakTreeItems()"
+      />
+      <Waterfall
+        v-else-if="component === 'waterfall'"
+        class="waterfall"
+        aria-label="Trace"
+        :items="leakWaterfallItems()"
       />
       <Resizable v-else-if="component === 'resizable'" class="resizable">
         <ResizablePanel id="first" :default-size="50" class="resizable-panel" />

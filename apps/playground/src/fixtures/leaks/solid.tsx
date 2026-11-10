@@ -68,12 +68,14 @@ import {
 import { Toolbar, ToolbarButton } from "@ui-sdk/solid/toolbar"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/solid/tooltip"
 import { Tree } from "@ui-sdk/solid/tree"
+import { Waterfall } from "@ui-sdk/solid/waterfall"
 import { render } from "@solidjs/web"
 import { createSignal, For, Show } from "solid-js"
 import {
   exposeLayers,
   leakComponent,
   leakTreeItems,
+  leakWaterfallItems,
   perfItems,
 } from "tests/fixtures/perf.ts"
 
@@ -218,6 +220,13 @@ const components = {
     </Toolbar>
   ),
   tree: () => <Tree class="tree" aria-label="Files" items={leakTreeItems()} />,
+  waterfall: () => (
+    <Waterfall
+      class="waterfall"
+      aria-label="Trace"
+      items={leakWaterfallItems()}
+    />
+  ),
   resizable: () => (
     <Resizable class="resizable">
       <ResizablePanel id="first" defaultSize={50} class="resizable-panel" />

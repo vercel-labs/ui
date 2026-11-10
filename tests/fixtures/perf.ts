@@ -44,6 +44,23 @@ function leakTreeItems() {
   }))
 }
 
+/** Waterfall data for the leak specs: "Item 1" to "Item 3", each a span with one step in it. */
+function leakWaterfallItems() {
+  return perfItems(3).map((item, index) => ({
+    ...item,
+    start: index * 100,
+    duration: 100,
+    children: [
+      {
+        value: `${item.value}-step`,
+        label: `${item.label} step`,
+        start: index * 100,
+        duration: 50,
+      },
+    ],
+  }))
+}
+
 /** Labels for `n` items: "Item 1" to "Item n". */
 function perfItems(n: number) {
   return Array.from({ length: n }, (_, index) => ({
@@ -133,6 +150,7 @@ const leakComponents = [
   "tabs",
   "toolbar",
   "tree",
+  "waterfall",
   "resizable",
   "scroll-area",
 ] as const
@@ -167,6 +185,7 @@ export {
   exposeLayers,
   leakComponent,
   leakTreeItems,
+  leakWaterfallItems,
   mountWhenAsked,
   perfItems,
   perfModal,

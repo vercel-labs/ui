@@ -68,12 +68,14 @@ import {
 import { Toolbar, ToolbarButton } from "@ui-sdk/react/toolbar"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/react/tooltip"
 import { Tree } from "@ui-sdk/react/tree"
+import { Waterfall } from "@ui-sdk/react/waterfall"
 import { useState } from "react"
 import { createRoot } from "react-dom/client"
 import {
   exposeLayers,
   leakComponent,
   leakTreeItems,
+  leakWaterfallItems,
   perfItems,
 } from "tests/fixtures/perf.ts"
 
@@ -227,6 +229,13 @@ const components = {
   ),
   tree: () => (
     <Tree className="tree" aria-label="Files" items={leakTreeItems()} />
+  ),
+  waterfall: () => (
+    <Waterfall
+      className="waterfall"
+      aria-label="Trace"
+      items={leakWaterfallItems()}
+    />
   ),
   resizable: () => (
     <Resizable className="resizable">

@@ -56,10 +56,12 @@
     Tooltip,
     TooltipContent,
     TooltipTrigger,
+    Waterfall,
   } from "@ui-sdk/svelte"
   import {
     leakComponent,
     leakTreeItems,
+    leakWaterfallItems,
     perfItems,
   } from "tests/fixtures/perf.ts"
 
@@ -184,6 +186,12 @@
       </Toolbar>
     {:else if component === "tree"}
       <Tree class="tree" aria-label="Files" items={leakTreeItems()} />
+    {:else if component === "waterfall"}
+      <Waterfall
+        class="waterfall"
+        aria-label="Trace"
+        items={leakWaterfallItems()}
+      />
     {:else if component === "resizable"}
       <Resizable class="resizable">
         <ResizablePanel id="first" defaultSize={50} class="resizable-panel" />
