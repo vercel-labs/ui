@@ -342,19 +342,40 @@ const isComponent = (name) =>
 
 const isSpec = (file) => file.endsWith(".spec.ts")
 
-/** The spec files that import a test helper, like `forms.helpers.ts` or `perf/budgets.ts`. */
+/**
+ * The spec files that import a test helper, like `forms.helpers.ts` or
+ * `perf/budgets.ts`, directly or through another, like `perf/leaks.ts`.
+ */
 function importingSpecs(file) {
-  const target = file.replace(/\.ts$/, "")
-  return specFiles.filter((spec) =>
-    [
-      ...readFileSync(path.join(specRoot, spec), "utf8").matchAll(
-        /from\s*"(\.[^"]+)"/g
-      ),
-    ].some(
-      ([, specifier]) =>
-        path.join("tests/specs", specifier).replace(/\.ts$/, "") === target
-    )
+  const testFiles = ["tests/specs", "tests/perf"].flatMap((folder) =>
+    readdirSync(path.join(root, folder))
+      .filter((name) => name.endsWith(".ts"))
+      .map((name) => path.join(folder, name))
   )
+  const importsOf = new Map(
+    testFiles.map((from) => [
+      from,
+      [
+        ...readFileSync(path.join(root, from), "utf8").matchAll(
+          /from\s*"(\.[^"]+)"/g
+        ),
+      ].map(([, specifier]) =>
+        path.join(path.dirname(from), specifier).replace(/\.ts$/, "")
+      ),
+    ])
+  )
+  const seen = new Set([file])
+  const queue = [file]
+  while (queue.length > 0) {
+    const target = queue.pop().replace(/\.ts$/, "")
+    for (const [from, imports] of importsOf) {
+      if (!seen.has(from) && imports.includes(target)) {
+        seen.add(from)
+        queue.push(from)
+      }
+    }
+  }
+  return [...seen].filter(isSpec).map((spec) => path.basename(spec))
 }
 
 /** Each touched component with the frameworks it runs on, and each framework shared code reaches. */
