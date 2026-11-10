@@ -605,6 +605,20 @@ const components: Record<string, Component> = {
       debug: "ToolbarOptions",
     },
   },
+  chronology: {
+    source: "chronology/chronology.ts",
+    examples: "chronology",
+    types: [
+      "ChronologyOptions",
+      "ChronologyItemProps",
+      "ChronologyState",
+      "ChronologyItemState",
+    ],
+    allowed: {
+      // Logs every change to the console, which no example should do.
+      debug: "ChronologyOptions",
+    },
+  },
   tree: {
     source: "tree/tree.ts",
     examples: "tree",

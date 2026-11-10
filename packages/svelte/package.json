@@ -41,6 +41,7 @@
     "./calendar": "./src/calendar.ts",
     "./carousel": "./src/carousel.ts",
     "./checkbox": "./src/checkbox.ts",
+    "./chronology": "./src/chronology.ts",
     "./collapsible": "./src/collapsible.ts",
     "./color": "./src/color.ts",
     "./color-picker": "./src/color-picker.ts",
@@ -156,6 +157,11 @@
         "types": "./dist/checkbox.d.ts",
         "svelte": "./dist/checkbox.js",
         "default": "./dist/checkbox.js"
+      },
+      "./chronology": {
+        "types": "./dist/chronology.d.ts",
+        "svelte": "./dist/chronology.js",
+        "default": "./dist/chronology.js"
       },
       "./collapsible": {
         "types": "./dist/collapsible.d.ts",

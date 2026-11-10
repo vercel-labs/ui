@@ -38,6 +38,7 @@
     "./calendar": "./src/entries/calendar.ts",
     "./carousel": "./src/entries/carousel.ts",
     "./checkbox": "./src/entries/checkbox.ts",
+    "./chronology": "./src/entries/chronology.ts",
     "./collapsible": "./src/entries/collapsible.ts",
     "./color-picker": "./src/entries/color-picker.ts",
     "./combobox": "./src/entries/combobox.ts",
@@ -140,6 +141,10 @@
       "./checkbox": {
         "types": "./dist/entries/checkbox.d.ts",
         "default": "./dist/entries/checkbox.js"
+      },
+      "./chronology": {
+        "types": "./dist/entries/chronology.d.ts",
+        "default": "./dist/entries/chronology.js"
       },
       "./collapsible": {
         "types": "./dist/entries/collapsible.d.ts",

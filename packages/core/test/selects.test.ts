@@ -1,5 +1,6 @@
 import { describe, expect, test, vi } from "vitest"
 import { accordion } from "../src/components/accordion/accordion"
+import { chronology } from "../src/components/chronology/chronology"
 import { autocomplete } from "../src/components/autocomplete/autocomplete"
 import { combobox } from "../src/components/combobox/combobox"
 import { command } from "../src/components/command/command"
@@ -772,6 +773,63 @@ describe("roving items select on the tab stop", () => {
         ],
       ]
     )
+  })
+
+  test("chronology items, whose inner parts hear none of it", async () => {
+    const instance = chronology({ id: "c" })
+    const values = ["a", "b", "c"]
+    const items = values.map((value) => ({
+      slot: "item",
+      props: {
+        value,
+        status: value === "c" ? ("current" as const) : undefined,
+      },
+    }))
+    const inner = values.flatMap((value) =>
+      (["marker", "connector", "time", "title", "description"] as const).map(
+        (slot) => ({
+          slot,
+          props: { value },
+        })
+      )
+    )
+    const els = values.map((_, index) => fakeElement(index, "LI"))
+    const unbind: (() => void)[] = []
+    const heard = await expectNoMissedUpdates(
+      instance,
+      [{ slot: "root", props: {} }, ...items, ...inner],
+      [
+        [
+          "bind the items",
+          () =>
+            items.forEach((part, index) =>
+              unbind.push(bind(instance.part("item", part.props), els[index]))
+            ),
+        ],
+        [
+          "bind the titles, times and descriptions",
+          () =>
+            inner
+              .filter(({ slot }) => !["marker", "connector"].includes(slot))
+              .forEach((part, index) =>
+                unbind.push(
+                  bind(
+                    instance.part(part.slot, part.props),
+                    fakeElement(10 + index, "DIV")
+                  )
+                )
+              ),
+        ],
+        ["focus an item", () => els[0].focus()],
+        ["focus another item", () => els[1].focus()],
+        ["become a feed", () => instance.setOptions({ id: "c", feed: true })],
+        ["focus an article", () => els[2].focus()],
+        ["an item leaves", () => unbind[2]()],
+      ]
+    )
+    // The two items the stop moves between. Nothing else hears it.
+    expect(heard["focus another item"]).toBe(2)
+    expect(heard["focus an article"]).toBe(2)
   })
 })
 

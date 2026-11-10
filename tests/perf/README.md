@@ -461,6 +461,31 @@ cd packages/core && ../../scripts/test-slot.sh npx vitest run test/store-fanout.
 cd tests && PLAYGROUND_PORT=5310 ../scripts/test-slot.sh npx playwright test specs/toolbar.counts --project react -g 'arrow keys do no work that grows with the item count'
 ```
 
+<a id="chronology-arrow-key"></a>
+
+### chronology.arrow-key
+
+**Measures:** Work done by 10 ArrowDown presses in a chronology.
+
+**Why:** A long activity feed has hundreds of events, each with five parts inside, so a key that reached every part would grow with the feed.
+
+**Budget:**
+
+- No `compareDocumentPosition` calls.
+- At most 400 `getAttribute` calls.
+
+**Notes:** Web components compare the attributes of the parts a move reaches: the event losing the tab stop and the one taking it, about 20 per move. Parts inside an event never hear a move.
+
+**Tests:**
+
+- `chronology.counts.spec.ts` › arrow keys do no work that grows with the event count
+
+**Run:**
+
+```bash
+cd tests && PLAYGROUND_PORT=5310 ../scripts/test-slot.sh npx playwright test specs/chronology.counts --project react -g 'arrow keys do no work that grows with the event count'
+```
+
 <a id="tooltip-focus"></a>
 
 ### tooltip.focus

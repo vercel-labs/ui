@@ -53,6 +53,7 @@
     "./accordion": "./src/components/accordion/accordion.ts",
     "./collapsible": "./src/components/collapsible/collapsible.ts",
     "./checkbox": "./src/components/checkbox/checkbox.ts",
+    "./chronology": "./src/components/chronology/chronology.ts",
     "./switch": "./src/components/switch/switch.ts",
     "./radio": "./src/components/radio/radio.ts",
     "./rating": "./src/components/rating/rating.ts",
@@ -203,6 +204,10 @@
       "./checkbox": {
         "types": "./dist/components/checkbox/checkbox.d.ts",
         "default": "./dist/components/checkbox/checkbox.js"
+      },
+      "./chronology": {
+        "types": "./dist/components/chronology/chronology.d.ts",
+        "default": "./dist/components/chronology/chronology.js"
       },
       "./switch": {
         "types": "./dist/components/switch/switch.d.ts",
