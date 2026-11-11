@@ -336,10 +336,12 @@ function renderedItems(parts: Bound[]) {
   })
 }
 
-// Whether an element shows, as far as the browser can tell. Without
-// `checkVisibility`, a `hidden` ancestor hides it.
+// Whether an element shows, as far as the browser can tell, and isn't hidden
+// from screen readers, like a decorative avatar. Without `checkVisibility`, a
+// `hidden` ancestor hides it.
 const isShown = (el: HTMLElement) =>
-  el.checkVisibility?.() ?? !el.closest("[hidden]")
+  (el.checkVisibility?.() ?? !el.closest("[hidden]")) &&
+  !el.closest('[aria-hidden="true"]')
 
 // Buttons and menu items inside the component's elements, like a dialog's
 // Cancel and Delete or a menu's Remove, visible, not inert and not inside

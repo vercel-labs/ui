@@ -955,6 +955,21 @@ describe("agent", () => {
     expect(shown.get().checked).toBe(true)
   })
 
+  test("a component inside aria-hidden isn't on the page", () => {
+    const agent = createAgent()
+    mountCheckbox({ id: "shown" }, "Shown")
+    mountCheckbox({ id: "decorative" }, "Decorative")
+    const hidden = document.body.appendChild(document.createElement("div"))
+    hidden.setAttribute("aria-hidden", "true")
+    hidden.append(document.body.querySelectorAll("label")[1])
+    expect(
+      agent
+        .snapshot()
+        .filter((component) => !component.offPage)
+        .map((component) => component.label)
+    ).toEqual(["Shown"])
+  })
+
   test("a reading, like a progress bar's value, is in the snapshot", () => {
     const agent = createAgent()
     const instance = progress({ id: "upload", value: 2, max: 4 })
