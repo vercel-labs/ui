@@ -1,0 +1,161 @@
+{
+  "autocomplete": {
+    "leak": "todo"
+  },
+  "avatar": {
+    "rtl": "Nothing in it depends on direction.",
+    "leak": "Adds no page listeners, frames or popup layers."
+  },
+  "button": {
+    "a11y": "Covered by the form and toggle specs, which render it among other controls.",
+    "rtl": "Covered by the form and toggle specs, which render it among other controls.",
+    "ssr": "Covered by the form and toggle specs, which render it among other controls.",
+    "fixtures": "Covered by the form and toggle specs, which render it among other controls.",
+    "leak": "Adds no page listeners, frames or popup layers."
+  },
+  "calendar": {
+    "leak": "todo"
+  },
+  "carousel": {
+    "leak": "todo"
+  },
+  "checkbox": {
+    "a11y": "Covered by the form and toggle specs, which render it among other controls.",
+    "rtl": "Covered by the form and toggle specs, which render it among other controls.",
+    "ssr": "Covered by the form and toggle specs, which render it among other controls.",
+    "fixtures": "Covered by the form and toggle specs, which render it among other controls.",
+    "leak": "Adds no page listeners, frames or popup layers."
+  },
+  "color-picker": {
+    "a11y": "todo",
+    "rtl": "todo",
+    "leak": "todo"
+  },
+  "command": {
+    "leak": "todo"
+  },
+  "date-input": {
+    "leak": "todo"
+  },
+  "date-picker": {
+    "a11y": "todo",
+    "rtl": "todo",
+    "ssr": "todo",
+    "leak": "todo"
+  },
+  "drawer": {
+    "leak": "todo"
+  },
+  "field": {
+    "rtl": "Covered by the form and toggle specs, which render it among other controls.",
+    "ssr": "Covered by the form and toggle specs, which render it among other controls.",
+    "fixtures": "Covered by the form and toggle specs, which render it among other controls.",
+    "leak": "Adds no page listeners, frames or popup layers."
+  },
+  "file-input": {
+    "rtl": "todo",
+    "leak": "todo"
+  },
+  "hover-card": {
+    "leak": "todo",
+    "unit": "todo"
+  },
+  "image-cropper": {
+    "a11y": "todo",
+    "rtl": "todo",
+    "leak": "todo"
+  },
+  "input": {
+    "a11y": "Covered by the form and toggle specs, which render it among other controls.",
+    "rtl": "Covered by the form and toggle specs, which render it among other controls.",
+    "ssr": "Covered by the form and toggle specs, which render it among other controls.",
+    "fixtures": "Covered by the form and toggle specs, which render it among other controls.",
+    "leak": "Adds no page listeners, frames or popup layers."
+  },
+  "label": {
+    "a11y": "Checked with its control in field.a11y.spec.ts.",
+    "rtl": "Nothing in it depends on direction.",
+    "leak": "Adds no page listeners, frames or popup layers."
+  },
+  "listbox": {
+    "leak": "todo"
+  },
+  "menu": {
+    "docs-spec": "Covered by tests/docs/examples.spec.ts."
+  },
+  "menubar": {
+    "leak": "todo"
+  },
+  "meter": {
+    "leak": "Adds no page listeners, frames or popup layers."
+  },
+  "navigation-menu": {
+    "leak": "todo"
+  },
+  "number-input": {
+    "leak": "todo"
+  },
+  "otp-input": {
+    "leak": "todo"
+  },
+  "pagination": {
+    "leak": "Adds no page listeners, frames or popup layers."
+  },
+  "password-input": {
+    "leak": "Adds no page listeners, frames or popup layers."
+  },
+  "progress": {
+    "leak": "Adds no page listeners, frames or popup layers.",
+    "unit": "todo"
+  },
+  "radio": {
+    "a11y": "Covered by the form and toggle specs, which render it among other controls.",
+    "rtl": "Covered by the form and toggle specs, which render it among other controls.",
+    "ssr": "Covered by the form and toggle specs, which render it among other controls.",
+    "fixtures": "Covered by the form and toggle specs, which render it among other controls.",
+    "leak": "Adds no page listeners, frames or popup layers."
+  },
+  "rating": {
+    "a11y": "todo",
+    "rtl": "todo",
+    "leak": "todo"
+  },
+  "segmented-control": {
+    "a11y": "todo",
+    "rtl": "todo",
+    "leak": "todo"
+  },
+  "separator": {
+    "a11y": "Covered by the form and toggle specs, which render it among other controls.",
+    "rtl": "Covered by the form and toggle specs, which render it among other controls.",
+    "ssr": "Covered by the form and toggle specs, which render it among other controls.",
+    "fixtures": "Covered by the form and toggle specs, which render it among other controls.",
+    "leak": "Adds no page listeners, frames or popup layers.",
+    "unit": "Only sets attributes, which its spec checks."
+  },
+  "switch": {
+    "a11y": "Covered by the form and toggle specs, which render it among other controls.",
+    "rtl": "Covered by the form and toggle specs, which render it among other controls.",
+    "ssr": "Covered by the form and toggle specs, which render it among other controls.",
+    "fixtures": "Covered by the form and toggle specs, which render it among other controls.",
+    "leak": "Adds no page listeners, frames or popup layers."
+  },
+  "timeline": {
+    "leak": "todo"
+  },
+  "toast": {
+    "leak": "todo"
+  },
+  "toggle": {
+    "leak": "Adds no page listeners, frames or popup layers."
+  },
+  "token-input": {
+    "a11y": "todo",
+    "rtl": "todo",
+    "leak": "todo"
+  },
+  "trigger-menu": {
+    "rtl": "todo",
+    "leak": "todo"
+  }
+}

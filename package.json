@@ -8,7 +8,7 @@
     "playground": "pnpm --filter playground dev",
     "review": "node demos/tracker/review/scripts/dev.mjs",
     "typecheck": "node scripts/check-type-imports.mjs && pnpm -r --workspace-concurrency=4 --no-sort typecheck",
-    "lint": "node scripts/check-code.mjs && node scripts/check-comments.mjs && node scripts/check-braces.mjs",
+    "lint": "node scripts/check-code.mjs && node scripts/check-comments.mjs && node scripts/check-braces.mjs && node scripts/check-coverage.mjs",
     "lint:idioms": "eslint packages examples apps/playground/src",
     "format": "prettier --check . --log-level warn",
     "format:write": "node scripts/check-braces.mjs --fix && prettier --write . --log-level warn",

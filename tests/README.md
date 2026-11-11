@@ -280,6 +280,15 @@ pnpm size --update   # Write today's sizes as the budgets.
 pnpm docs:perf --check
 ```
 
+## Coverage
+
+`scripts/check-coverage.mjs`, part of `pnpm lint`, checks that every component in `packages/core/src/components` has a base, `a11y`, `rtl` and `ssr` spec, fixtures in all five frameworks, an entry in the leaks fixture, a core unit test, a docs page for every framework and a docs spec. A component without one lists it in `tests/coverage-exemptions.json` with a reason, or `todo` for coverage still to write. An exemption for something the component now has fails, so remove it in the same change that adds the coverage.
+
+```bash
+node scripts/check-coverage.mjs          # Check.
+node scripts/check-coverage.mjs --list   # What each component is missing.
+```
+
 ## Reading a failure
 
 - **Locally.** The `list` reporter prints each failure with its project, file, line, the assertion's message and the expected and received values. Playwright writes each failed test's output to `tests/test-results/<file>-<title>-<project>/`, with `error-context.md` holding a snapshot of the page. Traces are off locally: add `--trace on`, then open one with `npx playwright show-trace <path>/trace.zip`. For an HTML report, add `--reporter html` and open it with `npx playwright show-report --port 9330`.
