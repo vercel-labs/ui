@@ -319,6 +319,32 @@ describe("agent", () => {
     expect(component?.actions).toContain("setValue")
   })
 
+  test("a number input takes its field's name, not the name of a step button before it", async () => {
+    const agent = createAgent()
+    const instance = numberInput({ id: "people", defaultValue: 2 })
+    const label = document.body.appendChild(document.createElement("label"))
+    label.id = "people-label"
+    label.textContent = "People"
+    const decrement = document.body.appendChild(
+      document.createElement("button")
+    )
+    decrement.setAttribute("aria-label", "One fewer person")
+    const field = document.body.appendChild(document.createElement("input"))
+    field.setAttribute("aria-labelledby", "people-label")
+    cleanups.push(
+      bind(instance.part("decrement"), decrement),
+      bind(instance.part("control"), field),
+      () => instance.destroy()
+    )
+    const shown = agent.snapshot().filter((found) => !found.offPage)
+    expect(shown.map((found) => found.label)).toEqual(["People"])
+    const outcome = await agent.act({
+      steps: [{ ref: "People", action: "setValue", args: [4] }],
+    })
+    expect(outcome.ok, outcome.error?.message).toBe(true)
+    expect(instance.get().value).toBe(4)
+  })
+
   test("a component that leaves the page stays in the snapshot as off the page, with the state it had", async () => {
     const agent = createAgent()
     mountCheckbox({ id: "terms", defaultChecked: true }, "Send a weekly digest")

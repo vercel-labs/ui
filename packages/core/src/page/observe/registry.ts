@@ -252,9 +252,13 @@ function componentLabel(parts: Bound[]) {
     return name
   }
   // Then its field's name, like a date picker's input labelled "Due date",
-  // before a heading that changes with what it shows, like "November 2026".
-  // Not a search field in its popup, which comes and goes.
-  const input = parts.find((part) => part.slot === "input")?.el
+  // before a heading that changes with what it shows, like "November 2026",
+  // and a step button before it. Not a search field in its popup, which comes and goes.
+  const input = parts.find(
+    (part) =>
+      part.slot === "input" ||
+      (part.slot === "control" && part.el.matches("input, textarea"))
+  )?.el
   const popup = parts.find((part) => part.slot === "content")?.el
   const field = input && !popup?.contains(input) && accessibleName(input)
   if (field) {
