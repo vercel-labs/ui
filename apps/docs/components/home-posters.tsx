@@ -78,11 +78,8 @@ const patterns: Record<string, React.CSSProperties> = {
 }
 
 function Poster({
-  fig,
   title,
   meta,
-  head,
-  touch,
   tone = "gray",
   pattern = "grid",
   backdrop,
@@ -91,11 +88,8 @@ function Poster({
   className,
   children,
 }: {
-  fig?: string
   title?: React.ReactNode
   meta?: { label: string; href?: string }[]
-  head?: React.ReactNode
-  touch?: React.ReactNode
   tone?: keyof typeof tones
   pattern?: keyof typeof patterns
   backdrop?: React.ReactNode
@@ -124,23 +118,6 @@ function Poster({
           style={patterns[pattern]}
         />
         {backdrop}
-      </div>
-      <div className="relative flex items-start justify-between gap-6 font-mono text-[11px] leading-4 tracking-[0.06em] text-foreground uppercase">
-        <div className="min-w-0 whitespace-pre-line">
-          {touch ? (
-            <>
-              <span className="pointer-coarse:hidden">{head}</span>
-              <span className="hidden pointer-coarse:inline">{touch}</span>
-            </>
-          ) : (
-            head
-          )}
-        </div>
-        {fig && (
-          <div className="hidden shrink-0 text-foreground/70 @[26rem]:block">
-            {fig}
-          </div>
-        )}
       </div>
       {Island ? (
         <Island className={bodyClassName} />
@@ -252,6 +229,7 @@ function ComponentPoster({
 }) {
   return (
     <Poster {...props} body="gap-8 sm:gap-10">
+      <div aria-hidden="true" className="h-12" />
       <Island className="flex flex-1 items-center justify-center" />
       <Title id={id} max={13} className="-ms-[0.04em]">
         {title}
@@ -260,11 +238,9 @@ function ComponentPoster({
   )
 }
 
-function StartPoster({ fig }: { fig?: string }) {
+function StartPoster() {
   return (
     <Poster
-      fig={fig}
-      head={"THAT'S UI SDK\nNOW BUILD SOMETHING WITH IT"}
       pattern="hatch"
       body="justify-end"
       backdrop={

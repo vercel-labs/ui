@@ -70,10 +70,6 @@ function Rule({ className }: { className?: string }) {
   )
 }
 
-function fig(index: number) {
-  return `FIG. ${String(index).padStart(2, "0")}`
-}
-
 function Section({
   title,
   children,
@@ -111,13 +107,7 @@ export default function HomePage() {
           interfaces.
         </h1>
         <div className="mt-8 grid grid-cols-1 gap-3 sm:mt-10 lg:grid-cols-[4fr_5fr] lg:gap-4">
-          <Poster
-            fig="FIG. 01"
-            head={"WHAT IS UI SDK?\nTHE SHORT VERSION"}
-            tone="gray"
-            pattern="rings"
-            body="gap-10"
-          >
+          <Poster tone="gray" pattern="rings" body="gap-10">
             <p className="-ms-[0.04em] text-[length:clamp(2.75rem,17cqi,6.5rem)] leading-[0.82] font-[450] tracking-[-0.06em]">
               /wait-what
             </p>
@@ -173,8 +163,6 @@ export default function HomePage() {
               </CopyPromptButton>
             </div>
             <Poster
-              fig="FIG. 02"
-              head={"WHAT'S INSIDE A SELECT\nPICK A PART BELOW TO FIND IT"}
               tone="white"
               pattern="blueprint"
               body="justify-between gap-8"
@@ -195,7 +183,7 @@ export default function HomePage() {
           </p>
         </div>
         <div className="mt-8 sm:mt-10">
-          <BehaviorsPoster fig={fig(3)} />
+          <BehaviorsPoster />
         </div>
         <Rule className="mt-20 sm:mt-28" />
         <div className="flex flex-col gap-4 pt-3 sm:gap-5 sm:pt-5">
@@ -210,7 +198,7 @@ export default function HomePage() {
           </p>
         </div>
         <div className="mt-8 sm:mt-10">
-          <AskPoster fig={fig(4)} />
+          <AskPoster />
         </div>
         <Section
           title={
@@ -232,7 +220,6 @@ export default function HomePage() {
           {components.map((item, index) => (
             <item.Tile
               key={item.name}
-              fig={fig(index + 5)}
               className={cn(
                 "max-sm:w-[calc(100vw-5rem)] max-sm:shrink-0 max-sm:snap-center max-sm:gap-8",
                 !item.phone && "max-sm:hidden",
@@ -259,7 +246,7 @@ export default function HomePage() {
         >
           {builds.map((item, index) => (
             <PhoneShot key={item.name} width={720}>
-              <item.Tile fig={fig(index + components.length + 5)} />
+              <item.Tile />
             </PhoneShot>
           ))}
         </PhoneStrip>
@@ -276,10 +263,10 @@ export default function HomePage() {
           </p>
         </div>
         <div className="mt-8 sm:mt-10">
-          <OperatePoster fig={fig(components.length + builds.length + 5)} />
+          <OperatePoster />
         </div>
         <div className="mt-3 lg:mt-4">
-          <StartPoster fig={fig(components.length + builds.length + 6)} />
+          <StartPoster />
         </div>
         <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:mt-4 lg:gap-4">
           <Link

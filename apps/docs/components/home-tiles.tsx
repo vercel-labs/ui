@@ -25,14 +25,12 @@ import {
   WeekIsland,
 } from "./home-islands"
 
-type TileProps = { className?: string; fig?: string }
+type TileProps = { className?: string }
 
 function CalendarTile(props: TileProps) {
   return (
     <ComponentPoster
       {...props}
-      head={"PICK YOUR DATES\nDRAG ACROSS THEM\nOR USE THE ARROWS"}
-      touch={"PICK YOUR DATES\nTAP A START, THEN AN END"}
       tone="white"
       pattern="plus"
       title="Calendar."
@@ -46,8 +44,6 @@ function CommandTile(props: TileProps) {
   return (
     <ComponentPoster
       {...props}
-      head={"SEARCH EVERYTHING\nTYPE, THEN PRESS ENTER"}
-      touch={"SEARCH EVERYTHING\nTYPE, THEN TAP A RESULT"}
       pattern="halftone"
       title="Command."
       id="command"
@@ -60,7 +56,6 @@ function OTPTile(props: TileProps) {
   return (
     <ComponentPoster
       {...props}
-      head={"ENTER THE CODE WE SENT\nPASTING IT WORKS TOO"}
       pattern="rules"
       title="OTP Input."
       id="otp-input"
@@ -73,8 +68,6 @@ function RatingTile(props: TileProps) {
   return (
     <ComponentPoster
       {...props}
-      head={"RATE IT\nHOVER TO PREVIEW A SCORE"}
-      touch={"RATE IT\nTAP A STAR"}
       tone="white"
       pattern="dots"
       title="Rating."
@@ -88,8 +81,6 @@ function NumberInputTile(props: TileProps) {
   return (
     <ComponentPoster
       {...props}
-      head={"PICK A NUMBER\nTYPE IT, CLICK OR USE\nTHE ARROWS"}
-      touch={"PICK A NUMBER\nTYPE IT, TAP OR DRAG\nTHE RULER"}
       pattern="halftone"
       title="Number Input."
       id="number-input"
@@ -102,8 +93,6 @@ function SwitchTile(props: TileProps) {
   return (
     <ComponentPoster
       {...props}
-      head={"TURN THINGS ON AND OFF\nCLICK OR PRESS SPACE"}
-      touch={"TURN THINGS ON AND OFF\nTAP A SWITCH"}
       tone="white"
       pattern="hatch"
       title="Switch."
@@ -117,8 +106,6 @@ function SliderTile(props: TileProps) {
   return (
     <ComponentPoster
       {...props}
-      head={"SET THE VOLUME\nDRAG, CLICK OR USE\nTHE ARROWS"}
-      touch={"SET THE VOLUME\nDRAG OR TAP THE TRACK"}
       tone="white"
       pattern="columns"
       title="Slider."
@@ -132,8 +119,6 @@ function SegmentedTile(props: TileProps) {
   return (
     <ComponentPoster
       {...props}
-      head={"PICK ONE OPTION\nCLICK OR USE THE ARROWS"}
-      touch={"PICK ONE OPTION\nTAP TO SWITCH"}
       tone="white"
       pattern="rings"
       title="Segmented Control."
@@ -147,7 +132,6 @@ function ColorTile(props: TileProps) {
   return (
     <ComponentPoster
       {...props}
-      head={"PICK A COLOR\nDRAG OR TYPE A VALUE"}
       pattern="squares"
       title="Color Picker."
       id="color-picker"
@@ -160,8 +144,6 @@ function TreeTile(props: TileProps) {
   return (
     <ComponentPoster
       {...props}
-      head={"OPEN A FOLDER\nRIGHT ARROW OPENS\nLEFT ARROW CLOSES"}
-      touch={"OPEN A FOLDER\nTAP TO OPEN OR CLOSE IT"}
       pattern="isometric"
       title="Tree."
       id="tree"
@@ -174,8 +156,6 @@ function TabsTile(props: TileProps) {
   return (
     <ComponentPoster
       {...props}
-      head={"SWITCH TABS\nCLICK OR USE THE ARROWS"}
-      touch={"SWITCH TABS\nTAP ONE TO OPEN IT"}
       pattern="ruler"
       title="Tabs."
       id="tabs"
@@ -188,7 +168,6 @@ function TokenInputTile(props: TileProps) {
   return (
     <ComponentPoster
       {...props}
-      head={"WRITE A PROMPT\nADD FILES, SKILLS, A MODEL"}
       tone="white"
       pattern="crosshatch"
       title="Token Input."
@@ -202,8 +181,6 @@ function AccordionTile(props: TileProps) {
   return (
     <ComponentPoster
       {...props}
-      head={"ONE SECTION OPEN AT A TIME\n⌘F FINDS TEXT IN CLOSED ONES"}
-      touch={"ONE SECTION OPEN AT A TIME\nTAP A TITLE TO OPEN IT"}
       tone="white"
       pattern="rules"
       title="Accordion."
@@ -217,8 +194,6 @@ function ResizableTile(props: TileProps) {
   return (
     <ComponentPoster
       {...props}
-      head={"RESIZE THE PANELS\nDRAG THE LINE OR\nUSE THE ARROWS"}
-      touch={"RESIZE THE PANELS\nDRAG THE LINE"}
       pattern="columns"
       title="Resizable."
       id="resizable"
@@ -231,8 +206,6 @@ function ToolbarTile(props: TileProps) {
   return (
     <ComponentPoster
       {...props}
-      head={"FORMAT THE TEXT\nTAB ONCE, THEN USE THE ARROWS"}
-      touch={"FORMAT THE TEXT\nTAP A BUTTON TO TURN IT ON"}
       tone="white"
       pattern="plus"
       title="Toolbar."
@@ -246,10 +219,6 @@ function AgentsTile(props: TileProps) {
   return (
     <Poster
       {...props}
-      head={
-        "A BOARD FOR THREE AGENTS\nDRAG A TASK TO HAND IT OVER\nOR USE SPACE AND THE ARROWS"
-      }
-      touch={"A BOARD FOR THREE AGENTS\nDRAG A TASK TO HAND IT OVER"}
       pattern="columns"
       body="justify-between gap-8"
       island={AgentsIsland}
@@ -261,10 +230,6 @@ function FlowTile(props: TileProps) {
   return (
     <Poster
       {...props}
-      head={
-        "WIRE UP A WORKFLOW\nDRAG FROM ONE DOT TO ANOTHER\nOR PRESS C TO CONNECT"
-      }
-      touch={"WIRE UP A WORKFLOW\nDRAG FROM ONE DOT TO ANOTHER"}
       pattern="plus"
       body="justify-between gap-8"
       island={FlowIsland}
@@ -272,11 +237,9 @@ function FlowTile(props: TileProps) {
   )
 }
 
-function AskPoster({ fig }: { fig?: string }) {
+function AskPoster() {
   return (
     <Poster
-      fig={fig}
-      head={"ASKING YOUR AGENT\nFOR A NEW COMPONENT"}
       tone="white"
       pattern="grid"
       body="gap-10"
@@ -290,7 +253,6 @@ function CanvasTile(props: TileProps) {
   return (
     <Poster
       {...props}
-      head={"A SMALL DESIGN TOOL\nDRAG, RESIZE, CHANGE COLORS"}
       pattern="dots"
       body="justify-between gap-8"
       island={CanvasIsland}
@@ -302,7 +264,6 @@ function TimelineTile(props: TileProps) {
   return (
     <Poster
       {...props}
-      head={"A VIDEO TIMELINE\nDRAG CLIPS, TRIM THE ENDS\nSCRUB TO WATCH"}
       tone="white"
       pattern="ruler"
       body="justify-between gap-8"
@@ -311,11 +272,9 @@ function TimelineTile(props: TileProps) {
   )
 }
 
-function OperatePoster({ fig }: { fig?: string }) {
+function OperatePoster() {
   return (
     <Poster
-      fig={fig}
-      head={"AN AGENT CHANGING SETTINGS\nIT READS THE FORM, THEN FILLS IT IN"}
       tone="white"
       pattern="grid"
       body="gap-6"
@@ -329,8 +288,6 @@ function SheetTile(props: TileProps) {
   return (
     <Poster
       {...props}
-      head={"A SPREADSHEET WITH AI\nSELECT CELLS, THEN PRESS RUN\n⌘Z UNDOES IT"}
-      touch={"A SPREADSHEET WITH AI\nSELECT CELLS, THEN TAP RUN"}
       tone="white"
       pattern="rules"
       body="justify-between gap-8"
@@ -343,9 +300,6 @@ function WeekTile(props: TileProps) {
   return (
     <Poster
       {...props}
-      head={
-        "PLAN YOUR WEEK\nDRAG A MEETING TO ANOTHER DAY\nPULL THE BOTTOM TO MAKE IT LONGER"
-      }
       tone="white"
       pattern="grid"
       body="justify-between gap-8"
