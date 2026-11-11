@@ -721,6 +721,21 @@ function checkPublicDocsPages() {
       message: `\`${name}\` is public, so name it on the docs page that covers it, with what it's for.`,
     })
   }
+  for (const { name, file } of surface.svelteComponents) {
+    if (named.has(name)) {
+      continue
+    }
+    missing.add(name)
+    if (undocumentedExports.has(name)) {
+      continue
+    }
+    violations.push({
+      file: path.relative(root, file),
+      line: 1,
+      rule: "public-docs-pages",
+      message: `\`${name}\` is public, so name it on the docs page that covers it, with what it's for.`,
+    })
+  }
   for (const name of undocumentedExports) {
     if (!missing.has(name)) {
       violations.push({
