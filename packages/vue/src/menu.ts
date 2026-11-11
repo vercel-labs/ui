@@ -233,7 +233,16 @@ function triggerPart<
           () =>
             renderUnbound(
               tag,
-              { ...(tag === "button" && { type: "button" }), ...attrs },
+              {
+                ...(tag === "button" && {
+                  type: "button",
+                  disabled: props.disabled && !props.focusableWhenDisabled,
+                  "aria-disabled":
+                    (props.disabled && props.focusableWhenDisabled) ||
+                    undefined,
+                }),
+                ...attrs,
+              },
               { slots, state: { open: false, disabled: !!props.disabled } }
             )
         )
