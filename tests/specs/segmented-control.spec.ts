@@ -27,6 +27,41 @@ async function coversItem(page: Page, name: string) {
   )
 }
 
+// Read from the variables, since the indicator's own box may be rounded.
+function indicatorMisfit(page: Page, name: string) {
+  return item(page, name).evaluate((el) => {
+    const root = el.closest<HTMLElement>('[data-slot="segmented-control"]')!
+    const box = root.querySelector<HTMLElement>(
+      '[data-slot="segmented-control-indicator"]'
+    )!
+    const read = (edge: string) =>
+      parseFloat(
+        box.style.getPropertyValue(`--segmented-control-indicator-${edge}`)
+      )
+    const rootRect = root.getBoundingClientRect()
+    const rect = el.getBoundingClientRect()
+    const scale = rootRect.width / root.offsetWidth
+    const start = (rect.left - rootRect.left) / scale - root.clientLeft
+    const end = (rect.right - rootRect.left) / scale - root.clientLeft
+    return Math.max(
+      Math.abs(read("left") - start),
+      Math.abs(read("left") + read("width") - end)
+    )
+  })
+}
+
+// Four 47.5px columns put the last item at 154.5px, which offsetLeft rounds.
+function fractionalColumns(page: Page) {
+  return control(page).evaluate((el) => {
+    Object.assign(el.style, {
+      display: "grid",
+      gridTemplateColumns: "repeat(4, 47.5px)",
+      gap: "4px",
+      padding: "0",
+    })
+  })
+}
+
 test.describe("selection", () => {
   test("the default item is checked, and only that one", async ({
     page,
@@ -149,6 +184,33 @@ test.describe("indicator", () => {
     await open("segmented-control", { orientation: "vertical" })
     await item(page, "Grid").click()
     await expect.poll(() => coversItem(page, "Grid")).toBe(true)
+  })
+
+  test("the indicator matches items with fractional widths exactly", async ({
+    page,
+    open,
+  }) => {
+    await open("segmented-control")
+    await fractionalColumns(page)
+    await item(page, "Calendar").click()
+    await expect
+      .poll(() => indicatorMisfit(page, "Calendar"))
+      .toBeLessThan(0.01)
+  })
+
+  test("a scaled ancestor doesn't move the indicator off fractional items", async ({
+    page,
+    open,
+  }) => {
+    await open("segmented-control")
+    await fractionalColumns(page)
+    await control(page).evaluate((el) => {
+      el.parentElement!.style.transform = "scale(0.5)"
+    })
+    await item(page, "Calendar").click()
+    await expect
+      .poll(() => indicatorMisfit(page, "Calendar"))
+      .toBeLessThan(0.01)
   })
 
   test("with nothing checked, the indicator has no box", async ({
