@@ -7,6 +7,8 @@ import { getStarted, source } from "@/lib/source"
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 
+export const dynamicParams = false
+
 // Get Started, at /docs, once per framework like Core's pages.
 export default async function GetStartedPage(
   props: PageProps<"/for/[framework]/docs">

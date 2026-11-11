@@ -5,6 +5,7 @@ import { isSection, sectionIds } from "@/lib/sections"
 import { notFound } from "next/navigation"
 
 export const dynamic = "force-static"
+export const dynamicParams = false
 
 export function generateStaticParams() {
   return sectionIds.map((section) => ({ section }))

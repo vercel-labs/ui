@@ -5,6 +5,7 @@ import { source } from "@/lib/source"
 import { notFound } from "next/navigation"
 
 export const dynamic = "force-static"
+export const dynamicParams = false
 
 export function generateStaticParams() {
   return source.getPages().map((page) => ({ slug: page.slugs }))

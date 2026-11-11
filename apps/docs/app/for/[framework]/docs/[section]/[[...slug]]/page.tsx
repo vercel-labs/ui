@@ -5,6 +5,8 @@ import { source } from "@/lib/source"
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 
+export const dynamicParams = false
+
 // Core's and Agents' pages, once per framework, so a page shows the reader's
 // framework from the first paint. next.config.mjs serves /docs/core/… from here
 // by the `framework` cookie, else React.

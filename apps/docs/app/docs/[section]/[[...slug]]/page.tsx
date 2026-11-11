@@ -4,6 +4,8 @@ import { source } from "@/lib/source"
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 
+export const dynamicParams = false
+
 // Each framework's pages. Core's and Agents' are built once per framework, in
 // app/for/[framework], and next.config.mjs serves the reader's.
 export default async function Page(
