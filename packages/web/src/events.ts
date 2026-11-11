@@ -2438,7 +2438,7 @@ declare global {
     "ui-menu-sub-trigger": UiPartElement<
       typeof menu,
       "trigger",
-      "disabled" | "shortcut",
+      "disabled" | "focusableWhenDisabled" | "shortcut",
       "payload"
     >
     "ui-menu-item": UiPartElement<
