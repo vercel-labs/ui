@@ -872,6 +872,8 @@ const components: Record<string, Component> = {
     allowed: {
       // Logs every change to the console, which no example should do.
       debug: "ListboxOptions",
+      // Only a list something else scrolls turns it off. The Lists behavior page's scroll picker examples show it.
+      scrollIntoView: "ListboxOptions",
     },
   },
   calendar: {

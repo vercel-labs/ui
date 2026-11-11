@@ -1,9 +1,9 @@
 ---
 title: Lists
-description: Search a list of options, render long lists, follow new messages, and edit values in place.
+description: Search a list of options, render long lists, follow new messages, pick by scrolling, and edit values in place.
 ---
 
-Use `createListbox` for options you move through and search, `createVirtualizer` for long lists, `createStickToBottom` for chats and logs, and `createInlineEdit` for editable labels.
+Use `createListbox` for options you move through and search, `createVirtualizer` for long lists, `createStickToBottom` for chats and logs, `bindScrollPicker` for wheels you scroll to pick from, and `createInlineEdit` for editable labels.
 
 Each helper works on its own or alongside [focus](./focus#grids) and [selection](./selection) in a component.
 
@@ -388,6 +388,83 @@ addOlderMessages()
     onChange: "Follow the Newest Line",
     threshold: "Older Messages and Letting Go",
     initial: "Older Messages and Letting Go",
+  }}
+/>
+
+## Wheels You Scroll to Pick From
+
+### Pick by Scrolling
+
+`bindScrollPicker` turns a scrolling listbox into a wheel, like the hour and minute drums of a time picker: the option at the center is the value. Bind it to a [Listbox](/docs/components/listbox) once the list is in the page, and select the option it reports:
+
+```tsx
+import { bindScrollPicker } from "@ui-sdk/core"
+
+const unbind = bindScrollPicker(list, {
+  onSelect: (index) => setHour(hours[index]),
+})
+```
+
+`index` counts every option in the list, disabled ones included, so it matches your array. Call `unbind()` when the list unmounts.
+
+The list stays a listbox with one selection. Scrolling, a flick on a touch screen and a drag with the mouse select the option at the center as it passes, and the list settles on the nearest enabled option once it stops. When the listbox selects an option itself, from a click, an arrow key, Home, End or typing its name, the picker scrolls there smoothly without selecting the options in between. Page Up and Page Down move a screenful of options.
+
+Set the listbox's `scrollIntoView` option to `false`, so it doesn't jump to an option the wheel is about to glide to. Give the list a height, `scroll-snap-type` and room at both ends for the first and last options to reach the center, and give each option `scroll-snap-align: center`:
+
+```css
+[role="listbox"] {
+  height: 180px;
+  padding-block: 72px;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+}
+
+[role="option"] {
+  height: 36px;
+  scroll-snap-align: center;
+}
+```
+
+Snapping is the browser's own, so the list snaps before your JavaScript loads. Options can be any size: the picker measures them, and measures again when they or the list resize.
+
+### Draw a Wheel in CSS
+
+Each option gets `--picker-offset`, its distance from the center in options: `0` at the center, `1` for the next option, `-2` two before it. It's fractional while the list moves between options and updates every frame, so CSS can draw the wheel with no code of your own:
+
+```css
+[role="option"] {
+  transform: rotateX(calc(var(--picker-offset, 0) * -24deg));
+  opacity: calc(1 - abs(var(--picker-offset, 0)) * 0.25);
+}
+```
+
+The fallback of `0` covers the server's HTML, before the picker binds. Give the list `perspective` so the rotation looks round, and fade its ends with a `mask-image`:
+
+<ComponentExample
+  name="behaviors/scroll-picker"
+  caption="Scroll or drag a wheel, or flick it on a touch screen. Click an hour, or focus a wheel and use Up, Down, Home and End. The console logs the time."
+/>
+
+With reduced motion, the wheel jumps to an option instead of gliding there.
+
+### Sideways
+
+For a horizontal wheel, like a strip of page numbers, set the listbox's `orientation` to `"horizontal"`. The picker reads it from `aria-orientation`, so it scrolls and measures sideways, and in right-to-left text the strip runs from the right:
+
+<ComponentExample
+  name="behaviors/scroll-picker-pages"
+  caption="Scroll or drag the strip, or focus it and use Left and Right. The page in the middle is the current one, and the console logs it."
+/>
+
+### Options
+
+<TypeTable
+  path="../../packages/core/src/foundation/lists/scroll-picker.ts"
+  name="ScrollPickerOptions"
+  events={false}
+  examples={{
+    onSelect: "Pick by Scrolling",
+    orientation: "Sideways",
   }}
 />
 

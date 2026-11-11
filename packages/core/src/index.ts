@@ -287,6 +287,11 @@ export {
   type StickToBottomState,
 } from "./foundation/lists/stick-to-bottom"
 export {
+  bindScrollPicker,
+  type ScrollPickerOptions,
+  type ScrollPickerSelectDetails,
+} from "./foundation/lists/scroll-picker"
+export {
   createAutoScroll,
   type AutoScrollOptions,
 } from "./foundation/drag-and-drop/auto-scroll"

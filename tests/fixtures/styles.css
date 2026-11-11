@@ -2118,4 +2118,45 @@
     width: 0;
     outline: 1px solid #d4d4d4;
   }
+  /* Listboxes that pick by scrolling: five 40px rows, or a strip 300px wide,
+     with room at both ends for the first and last options to reach the center. */
+  .picker {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    width: 120px;
+    min-width: 0;
+    height: 200px;
+    max-height: none;
+    padding: 80px 0;
+    overflow: hidden auto;
+    scroll-snap-type: y mandatory;
+    scrollbar-width: none;
+  }
+
+  .picker[aria-orientation="horizontal"] {
+    flex-direction: row;
+    width: 300px;
+    height: auto;
+    padding: 0 150px;
+    overflow: auto hidden;
+    scroll-snap-type: x mandatory;
+  }
+
+  .picker-item {
+    flex: none;
+    height: 40px;
+    padding: 0 12px;
+    line-height: 40px;
+    text-align: center;
+    scroll-snap-align: center;
+  }
+
+  .picker-item[aria-selected="true"] {
+    background: #e0e7ff;
+  }
+
+  .picker-item[aria-disabled="true"] {
+    color: #a3a3a3;
+  }
 }

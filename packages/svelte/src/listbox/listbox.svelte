@@ -36,6 +36,7 @@ An always-visible list to choose one option from, or several with `multiple`.
     deselectable,
     orientation,
     loop,
+    scrollIntoView,
     items,
     itemToValue,
     isItemEqualToValue,
@@ -65,6 +66,8 @@ An always-visible list to choose one option from, or several with `multiple`.
     orientation?: "horizontal" | "vertical"
     /** Whether arrow keys wrap from the last item to the first. */
     loop?: boolean
+    /** Whether the list scrolls the option keys move to into view. */
+    scrollIntoView?: boolean
     /** The items as data. Renders them for you. */
     items?: ListData<any>
     /** The string an item's value submits as and is identified by, for object values. */
@@ -104,6 +107,7 @@ An always-visible list to choose one option from, or several with `multiple`.
     deselectable,
     orientation,
     loop,
+    scrollIntoView,
     items,
     itemToValue,
     isItemEqualToValue,

@@ -11,7 +11,7 @@ const lastLog = (example: Locator) =>
 
 test("every example renders without errors", async ({ page }) => {
   const { errors } = await openBehaviors(page, "lists")
-  await expect(page.locator("[data-example]")).toHaveCount(9)
+  await expect(page.locator("[data-example]")).toHaveCount(12)
   expect(errors).toEqual([])
 })
 
@@ -82,6 +82,32 @@ test("stick to bottom: follows new lines, lets go on scroll up, and jumps back",
   await jump.click()
   await expect.poll(gap).toBeLessThan(4)
   await expect(jump).toBeHidden()
+})
+
+test("scroll picker: keys glide a wheel to an option, scrolling selects the one at the center, and offsets draw the drum", async ({
+  page,
+}) => {
+  await openBehaviors(page, "lists")
+  const hour = page.getByRole("listbox", { name: "Hour" })
+  const option = (name: string) =>
+    hour.getByRole("option", { name, exact: true })
+  const offset = (name: string) =>
+    option(name).evaluate((el) =>
+      Number((el as HTMLElement).style.getPropertyValue("--picker-offset"))
+    )
+  await hour.scrollIntoViewIfNeeded()
+  await expect(option("9")).toHaveAttribute("aria-selected", "true")
+  await expect.poll(() => offset("9")).toBe(0)
+  expect(await offset("10")).toBe(1)
+  await option("9").focus()
+  await page.keyboard.press("ArrowDown")
+  await expect(option("10")).toHaveAttribute("aria-selected", "true")
+  await expect.poll(() => offset("10")).toBe(0)
+  await expect(lastLog(hour)).toHaveText("10:30")
+  await hour.evaluate((el) => el.scrollBy({ top: 72 }))
+  await expect(option("12")).toHaveAttribute("aria-selected", "true")
+  await expect.poll(() => offset("12")).toBe(0)
+  await expect(lastLog(hour)).toHaveText("12:30")
 })
 
 test("inline edit: Enter renames, Escape puts the name back, and typing starts over", async ({
@@ -276,6 +302,7 @@ test("each option links to the example that shows it", async ({ page }) => {
   for (const label of [
     "VirtualizerOptions",
     "StickToBottomOptions",
+    "ScrollPickerOptions",
     "InlineEditOptions",
   ]) {
     const table = page.getByLabel(label, { exact: true })

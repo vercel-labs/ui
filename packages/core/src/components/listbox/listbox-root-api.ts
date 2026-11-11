@@ -37,6 +37,7 @@ type ListboxStore = {
   activation: "automatic" | "manual"
   deselectable: boolean
   orientation: "horizontal" | "vertical"
+  scrollIntoView: boolean
   disabled: boolean
   formDisabled: boolean
   readOnly: boolean
@@ -80,6 +81,7 @@ function syncListboxStore(options: ListboxOptions<any, any>) {
       options.activation ?? (options.multiple ? "manual" : "automatic"),
     deselectable: !!options.deselectable,
     orientation: orientationOf(options.orientation, "vertical"),
+    scrollIntoView: options.scrollIntoView ?? true,
     disabled: !!options.disabled,
     readOnly: !!options.readOnly,
     required: !!options.required,
@@ -130,6 +132,7 @@ function listboxApiBody(
       skipDisabled: true,
       active: () => focusInside,
       container: rootElement,
+      scrollIntoView: () => store.get().scrollIntoView,
       onHighlight: (key, index, event) =>
         options().onHighlight?.(
           key === null ? null : (listbox.valueOf(key) ?? null),
@@ -200,7 +203,7 @@ function listboxApiBody(
     if (!el?.isConnected || !root) {
       return false
     }
-    if (selection.keys().length) {
+    if (selection.keys().length && store.get().scrollIntoView) {
       revealInList(el, root)
     }
     return true

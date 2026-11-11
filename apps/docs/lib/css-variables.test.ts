@@ -170,6 +170,7 @@ const behaviors = [
   "foundation/direct-manipulation/",
   "foundation/drag-and-drop/",
   "foundation/canvas/",
+  "foundation/lists/scroll-picker.ts",
 ]
 
 test("every variable listed for a component is one core writes, with what it holds", () => {

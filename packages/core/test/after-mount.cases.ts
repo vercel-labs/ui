@@ -354,6 +354,7 @@ const cases: Case[] = [
     values: {
       value: ["apple", "banana"],
       deselectable: [false, true],
+      scrollIntoView: [true, false],
       name: ["fruit", "snack"],
       form: ["one", "two"],
       "item.label": ["Banana", "Plantain"],

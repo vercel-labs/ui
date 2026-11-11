@@ -4045,6 +4045,113 @@
     }
   }
 
+  /* ─── Behaviors: Scroll picker ────────────────────────────────────── */
+
+  [data-slot="wheels"] {
+    display: flex;
+    gap: var(--space-2);
+    padding: var(--space-2);
+    border-radius: var(--radius-surface);
+    background: var(--surface-1);
+    box-shadow: var(--shadow-1);
+  }
+
+  /* The band behind the center row, where the value sits. */
+  [data-slot="wheel"] {
+    position: relative;
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 50% 0 auto;
+      height: 36px;
+      translate: 0 -50%;
+      border-radius: var(--radius-row);
+      background: var(--tint);
+    }
+  }
+
+  :is([data-slot="wheel"], [data-slot="thumbwheel"]) [data-slot="listbox"] {
+    position: relative;
+    box-sizing: border-box;
+    padding: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    overflow: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+    outline-offset: 2px;
+  }
+
+  [data-slot="wheel"] [data-slot="listbox"] {
+    gap: 0;
+    width: 4rem;
+    height: 180px;
+    padding-block: 72px;
+    perspective: 400px;
+    scroll-snap-type: y mandatory;
+    mask-image: linear-gradient(transparent, #000 35%, #000 65%, transparent);
+  }
+
+  [data-slot="wheel"] [data-slot="listbox"] [data-slot="listbox-item"] {
+    flex: none;
+    justify-content: center;
+    height: 36px;
+    padding: 0;
+    background: none;
+    box-shadow: none;
+    font-variant-numeric: tabular-nums;
+    scroll-snap-align: center;
+    transform: rotateX(calc(var(--picker-offset, 0) * -24deg));
+    opacity: calc(1 - abs(var(--picker-offset, 0)) * 0.25);
+  }
+
+  [data-slot="thumbwheel"] {
+    width: 20rem;
+    max-width: 100%;
+    border-radius: var(--radius-surface);
+    background: var(--surface-1);
+    box-shadow: var(--shadow-1);
+  }
+
+  [data-slot="thumbwheel"] [data-slot="listbox"][data-orientation] {
+    flex-direction: row;
+    gap: 0;
+    width: 100%;
+    padding-inline: calc(50% - 22px);
+    scroll-snap-type: x mandatory;
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      #000 30%,
+      #000 70%,
+      transparent
+    );
+  }
+
+  [data-slot="thumbwheel"]
+    [data-slot="listbox"][data-orientation]
+    [data-slot="listbox-item"] {
+    flex: none;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    background: none;
+    box-shadow: none;
+    font-variant-numeric: tabular-nums;
+    scroll-snap-align: center;
+    scale: calc(1 - abs(var(--picker-offset, 0)) * 0.12);
+
+    &:is([data-selected], [data-highlighted]) {
+      background: none;
+      box-shadow: none;
+      color: var(--ink);
+      font-weight: 600;
+    }
+  }
+
   /* ─── Behaviors: Viewport ─────────────────────────────────────────── */
 
   :is(
