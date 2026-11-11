@@ -34,7 +34,10 @@ const kinds = {
   },
   leak: (name) =>
     new RegExp(`^\\s+"?${name}"?: \\(\\) =>`, "m").test(leakFixture),
-  unit: (name) => unitTests.some((file) => file.startsWith(`${name}`)),
+  unit: (name) =>
+    unitTests.some((file) =>
+      new RegExp(`^${name}(-.+)?\\.test\\.ts$`).test(file)
+    ),
   docs: (name) =>
     docsFrameworks.every((framework) =>
       existsSync(
