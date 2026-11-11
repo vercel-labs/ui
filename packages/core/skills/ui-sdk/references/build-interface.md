@@ -2,7 +2,7 @@
 
 ## 1. Find the components
 
-Read `node_modules/@ui-sdk/<framework>/docs/llms.txt` for the list, then pick from this table. Read each picked component's page, `docs/components/<name>.md`, before writing it: its Composition shows the parts and how they nest, and its API lists props, state attributes and change reasons.
+Read `node_modules/@ui-sdk/<framework>/docs/llms.txt` for the list, or https://ui-sdk.dev/web.md on a page with no build step, then pick from this table. Read each picked component's page, `docs/components/<name>.md` (the page `web.md` links), before writing it: its Composition shows the parts and how they nest, and its API lists props, state attributes and change reasons.
 
 | The person needs to                                  | Use                                                                      |
 | ---------------------------------------------------- | ------------------------------------------------------------------------ |

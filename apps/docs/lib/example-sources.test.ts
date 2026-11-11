@@ -121,6 +121,32 @@ test("framework llms output reads imports without treating subfolders as source 
   expect(markdown).not.toContain("Example notes")
 })
 
+test("web.md loads web.js and leaves out the imports that define tags", async () => {
+  writeFiles({ "basic.ts": `import "@ui-sdk/web/button"\n` }, "web")
+  const file = path.join(
+    repoRoot,
+    "apps/docs/content/docs/web-components/components/button.mdx"
+  )
+  mkdirSync(path.dirname(file), { recursive: true })
+  mkdirSync(
+    path.join(repoRoot, "apps/docs/content/docs/web-components/utilities"),
+    { recursive: true }
+  )
+  writeFileSync(file, "---\ntitle: Button\n---\n\nPress Save.\n")
+  const link = ({ slugs }: { slugs: string[] }) => `/docs/${slugs.join("/")}`
+  const page = await frameworkLlms("web-components", link, {
+    site: "https://ui-sdk.dev",
+  })
+  expect(page).toContain(
+    '<script type="module" src="https://ui-sdk.dev/web.js"></script>'
+  )
+  expect(page).toContain("- [Button](/docs/web-components/components/button):")
+  expect(page).not.toContain("Defined by")
+  expect(await frameworkLlms("web-components", link)).toContain(
+    'Defined by `import "@ui-sdk/web/button"`.'
+  )
+})
+
 test("lean Markdown keeps the first example's classes and drops the rest", async () => {
   writeFiles({
     "basic.tsx": source,

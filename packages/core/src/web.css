@@ -464,6 +464,7 @@
   }
 
   :is([data-slot="textarea"], [data-slot="trigger-menu-input"]) {
+    height: auto;
     min-height: calc(var(--ui-spacing) * 20);
     padding-block: calc(var(--ui-spacing) * 2);
     resize: vertical;

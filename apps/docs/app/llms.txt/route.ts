@@ -24,6 +24,7 @@ ${frameworkIds
       `- [${frameworks[id].label}](/docs/${id}/llms.txt): its Rendering page, then every component's reference, in one file. Pages: [Rendering](/docs/${id}/rendering), [Components](/docs/${id}/components)`
   )
   .join("\n")}
+- [Web Components on a web page](/web.md): the same, for a page with no build step that loads \`web.js\` and \`web.css\` from this site
 `
   return new Response(text, {
     headers: { "Content-Type": "text/markdown; charset=utf-8" },

@@ -452,6 +452,8 @@ const datePickerPrimitive = /* @__PURE__ */ definePrimitive({
   slots: (slot) => datePickerSlots(slot),
   agent: {
     actions: ["setOpen", "setValue", "clear", "setMonth", "previous", "next"],
+    // Its value is a date, not an item, so a step never opens the calendar to look for one.
+    items: () => [],
   },
 })
 

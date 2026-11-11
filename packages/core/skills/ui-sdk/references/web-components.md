@@ -10,7 +10,14 @@ What the `@ui-sdk/web` types don't say, learned by probing.
 
 ## Without a bundler
 
-A plain HTML page, like an Artifact, loads our elements with `<script type="module" src="https://ui-sdk.dev/web@0.js"></script>`. To build elements of your own there, import the behaviors, `definePrimitive` and `createParts` from `https://ui-sdk.dev/web@0/core.js`. It has everything in `@ui-sdk/core`'s root, but not subpaths like `@ui-sdk/core/tabs` or helpers like `toast()`.
+A plain HTML page, like an Artifact, loads our elements and their default styles with two tags in its `<head>`:
+
+```html
+<script type="module" src="https://ui-sdk.dev/web.js"></script>
+<link rel="stylesheet" href="https://ui-sdk.dev/web.css" />
+```
+
+Read https://ui-sdk.dev/web.md first: the web components docs in one file, for a page like this. `web.js` defines each element the first time its tag appears, so leave out imports that only define elements, like `import "@ui-sdk/web/popover"`. What an entry exports comes from its own file, like `createPopoverController` from `https://ui-sdk.dev/web/popover.js`. To build elements of your own, import the behaviors, `definePrimitive` and `createParts` from `https://ui-sdk.dev/web/core.js`. It has everything in `@ui-sdk/core`'s root, but not subpaths like `@ui-sdk/core/tabs` or helpers like `toast()`. Use the `/web/` paths with `web.js` and the `/web@0/` paths with `web@0.js`, so the page loads one release.
 
 ## Tag names and markup
 
