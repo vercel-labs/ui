@@ -745,6 +745,7 @@ const treePrimitive = /* @__PURE__ */ definePrimitive({
       "setValue",
       "setChecked",
     ],
+    closed: true,
     items: (api) => api.internal.items(),
   },
 })

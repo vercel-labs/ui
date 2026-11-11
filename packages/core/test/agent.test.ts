@@ -937,6 +937,12 @@ describe("agent", () => {
       steps: [{ ref: "Files", action: "setValue", args: ["index.ts"] }],
     })
     expect(nested.get().value).toBe("src/index.ts")
+    // Text that names no node is refused, not stored as a value.
+    const refused = await agent.act({
+      steps: [{ ref: "Files", action: "setValue", args: ["index"] }],
+    })
+    expect(refused.error?.message).toContain('No item "index" in Files')
+    expect(nested.get().value).toBe("src/index.ts")
   })
 
   test("a component whose elements are all hidden, like one in a closed dialog, isn't on the page", async () => {
