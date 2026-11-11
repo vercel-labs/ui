@@ -19,7 +19,7 @@ Read `node_modules/@ui-sdk/<framework>/docs/llms.txt` for the list, then pick fr
 | Mention or tag with @, / or # while typing           | Trigger Menu                                                             |
 | Mix text with tokens for people, files or tags       | Token Input                                                              |
 | Enter text                                           | Input, or Textarea for several lines                                     |
-| Enter a number                                       | Number Input                                                             |
+| Enter a number                                       | Number Input (for money, `step={0.01}`: a step of 1 rounds the cents)    |
 | Enter a password                                     | Password Input                                                           |
 | Enter a one-time code                                | OTP Input                                                                |
 | Enter a date                                         | Date Input, or Date Picker with a calendar                               |
@@ -43,6 +43,8 @@ Read `node_modules/@ui-sdk/<framework>/docs/llms.txt` for the list, then pick fr
 | Switch between panels                                | Tabs                                                                     |
 | Show and hide sections                               | Accordion, or Collapsible for one                                        |
 | Browse a hierarchy                                   | Tree                                                                     |
+| Pick from a grid, like seats                         | Your own component on `createGridFocus`                                  |
+| Drag to reorder a list, or cards between columns     | Your own component on `createReorder` or `createTransfer`                |
 | Show a trace or request timings on a time axis       | Waterfall                                                                |
 | Page through results                                 | Pagination                                                               |
 | Page through slides                                  | Carousel                                                                 |
@@ -54,7 +56,7 @@ Read `node_modules/@ui-sdk/<framework>/docs/llms.txt` for the list, then pick fr
 | A user's image with a fallback                       | Avatar                                                                   |
 | Divide content                                       | Separator                                                                |
 
-If nothing fits, build that one piece with [create-component.md](create-component.md). Don't hand-roll it in markup.
+If nothing fits, build that one piece with [create-component.md](create-component.md), from the behaviors in the Core docs. Don't hand-roll it in markup.
 
 ## 2. Put the parts together
 
@@ -86,7 +88,8 @@ Use the default prop to start (`defaultValue`, `defaultOpen`, `defaultChecked`, 
 
 ## 5. Styles
 
-- Every part has `data-slot`. State shows as attributes like `data-open`, `data-pressed`, `data-disabled`, `data-side="top"`. Each component page lists its attributes and CSS variables.
+- With `web.css`, read [styles.md](styles.md) first: its tokens, the icons it draws and the sizes it sets.
+- Every part has `data-slot`: the component's name on a root (`switch`), `<component>-<part>` on a part (`switch-thumb`). Read it from the rendered DOM before you write a selector, since a few differ. State shows as attributes like `data-open`, `data-pressed`, `data-disabled`, `data-side="top"`. Each component page lists its attributes and CSS variables.
 - Tailwind: `data-pressed:bg-neutral-100`. CSS: `[data-slot="select-trigger"][data-open]`.
 - Popups get `data-starting-style` before they enter and `data-ending-style` while they exit, and stay mounted until the exit finishes. Put exit styles on `data-ending-style`.
 - Popups expose `--anchor-width`, `--available-height` and `--transform-origin`.
