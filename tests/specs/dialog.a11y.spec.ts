@@ -1,6 +1,6 @@
 import AxeBuilder from "@axe-core/playwright"
 import type { Page } from "@playwright/test"
-import { expect, test } from "../fixtures"
+import { expect, patternProblems, test } from "../fixtures"
 
 const dialog = (page: Page) =>
   page.getByRole("dialog", { name: "Profile settings" })
@@ -191,4 +191,24 @@ test("alert dialog accessibility tree", async ({ page, open }) => {
       - button "Cancel"
       - button "Delete"
   `)
+})
+
+test("checkPattern finds no problems with the dialog pattern", async ({
+  page,
+  open,
+}) => {
+  await open("dialog")
+  await trigger(page).click()
+  await expect(dialog(page)).toBeVisible()
+  expect(await patternProblems(page, "dialog")).toBe("")
+})
+
+test("checkPattern finds no problems with the alert dialog pattern", async ({
+  page,
+  open,
+}) => {
+  await open("dialog")
+  await page.getByRole("button", { name: "Delete project" }).click()
+  await expect(alert(page)).toBeVisible()
+  expect(await patternProblems(page, "alertdialog")).toBe("")
 })

@@ -1,5 +1,5 @@
 import AxeBuilder from "@axe-core/playwright"
-import { expect, menuNamed, test } from "../fixtures"
+import { expect, menuNamed, patternProblems, test } from "../fixtures"
 import { toolbar, walkTo } from "./toolbar.helpers"
 
 async function audit(page: import("@playwright/test").Page) {
@@ -71,4 +71,12 @@ test("accessibility tree", async ({ page, open }) => {
       - button "Spellcheck"
       - link "Help"
   `)
+})
+
+test("checkPattern finds no problems with the toolbar pattern", async ({
+  page,
+  open,
+}) => {
+  await open("toolbar")
+  expect(await patternProblems(page, "toolbar")).toBe("")
 })

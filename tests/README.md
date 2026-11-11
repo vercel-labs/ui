@@ -133,7 +133,7 @@ cd tests && PLAYGROUND_PORT=5310 ../scripts/test-slot.sh npx playwright test spe
 
 ### Accessibility
 
-`<name>.a11y.spec.ts`. Axe (`@axe-core/playwright`) in each state, with the rules about page structure turned off (`region`, `landmark-one-main`, `page-has-heading-one`), and ARIA snapshots (`toMatchAriaSnapshot`) of the tree.
+`<name>.a11y.spec.ts`. Axe (`@axe-core/playwright`) in each state, with the rules about page structure turned off (`region`, `landmark-one-main`, `page-has-heading-one`), and ARIA snapshots (`toMatchAriaSnapshot`) of the tree. A component with a WAI-ARIA pattern also runs `checkPattern` from `@ui-sdk/core/testing` on its fixture, through `patternProblems`, the check people run on what they build.
 
 ```bash
 cd tests && PLAYGROUND_PORT=5310 ../scripts/test-slot.sh npx playwright test specs/menu.a11y --project react

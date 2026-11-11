@@ -1,5 +1,5 @@
 import AxeBuilder from "@axe-core/playwright"
-import { expect, test } from "../fixtures"
+import { expect, patternProblems, test } from "../fixtures"
 import { maximum, minimum, volume } from "./slider.helpers"
 
 async function audit(page: import("@playwright/test").Page) {
@@ -62,4 +62,12 @@ test("the accessibility tree", async ({ page, open }) => {
       - slider "Minimum price": "20"
       - slider "Maximum price": "80"
   `)
+})
+
+test("checkPattern finds no problems with the slider pattern", async ({
+  page,
+  open,
+}) => {
+  await open("slider")
+  expect(await patternProblems(page, "slider")).toBe("")
 })

@@ -385,6 +385,26 @@ function tabKey(
   return [...modifiers, "Tab"].join("+")
 }
 
+// checkPattern from @ui-sdk/core/testing, loaded through the page so the keys
+// it sends reach the same copy of core the fixture uses.
+async function patternProblems(page: Page, pattern: string) {
+  return page.evaluate(async (pattern) => {
+    const { checkPattern } = await (
+      window as unknown as {
+        loadTesting: () => Promise<{
+          checkPattern: (root: Element, pattern: string) => Promise<void>
+        }>
+      }
+    ).loadTesting()
+    try {
+      await checkPattern(document.getElementById("root")!, pattern)
+      return ""
+    } catch (error) {
+      return (error as Error).message
+    }
+  }, pattern)
+}
+
 export {
   allowSolidDiagnostic,
   buttonNamed,
@@ -408,6 +428,7 @@ export {
   pageNow,
   panelNamed,
   panelOf,
+  patternProblems,
   recordDialogNamesAtFocus,
   regionNamed,
   shortcutKeys,

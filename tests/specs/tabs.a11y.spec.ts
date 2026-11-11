@@ -1,5 +1,11 @@
 import AxeBuilder from "@axe-core/playwright"
-import { expect, panelNamed, tabNamed, test } from "../fixtures"
+import {
+  expect,
+  panelNamed,
+  patternProblems,
+  tabNamed,
+  test,
+} from "../fixtures"
 
 async function audit(page: import("@playwright/test").Page) {
   // Page structure rules are about the fixture page, not the component.
@@ -83,4 +89,12 @@ test("accessibility tree", async ({ page, open }) => {
   await expect(page.getByRole("tabpanel")).toMatchAriaSnapshot(`
     - tabpanel "Account": Manage your account details.
   `)
+})
+
+test("checkPattern finds no problems with the tabs pattern", async ({
+  page,
+  open,
+}) => {
+  await open("tabs")
+  expect(await patternProblems(page, "tabs")).toBe("")
 })
