@@ -62,8 +62,13 @@ type BindRepeatOptions = {
 
 // Presses without the click listener, for a part that takes clicks through
 // its slot's `on`, where a user's handler runs first and can cancel the step.
-function bindRepeatPresses(el: HTMLElement, options: BindRepeatOptions) {
+function bindRepeatPresses(
+  el: HTMLElement,
+  options: BindRepeatOptions,
+  onRefuse?: (press: HoldDetails) => void
+) {
   const { delay = 400, repeat = 60, keys = [" ", "Enter"] } = options
+  let bound = true
   let count = 0
   let stopped = false
   let inside = true
@@ -106,15 +111,31 @@ function bindRepeatPresses(el: HTMLElement, options: BindRepeatOptions) {
     disabled: options.disabled,
     onPress: (press) => {
       if (options.onPress?.(press) === false) {
+        onRefuse?.(press)
         return false
       }
       count = 0
       stopped = false
-      if (press.input !== "keyboard") {
+      if (press.input === "touch" || press.input === "pen") {
         follow(press.event as PointerEvent)
+        return
       }
-      if (press.input === "mouse" || press.input === "keyboard") {
-        step(press.event, press.input)
+      // The hold starts only once this returns, so a first step that unbinds
+      // or moves focus ends the press here instead of leaving it repeating.
+      let blur: FocusEvent | undefined
+      const unlistenBlur = on(el, "blur", (event) => (blur = event))
+      step(press.event, press.input)
+      unlistenBlur()
+      if (!bound) {
+        return false
+      }
+      if (blur) {
+        onRefuse?.(press)
+        options.onEnd?.({ event: blur, input: press.input, count })
+        return false
+      }
+      if (press.input === "mouse") {
+        follow(press.event as PointerEvent)
       }
     },
     onHold: ({ event, input }) => !inside || step(event, input),
@@ -134,6 +155,7 @@ function bindRepeatPresses(el: HTMLElement, options: BindRepeatOptions) {
   })
 
   return () => {
+    bound = false
     unbindHold()
     reset()
   }
@@ -154,22 +176,49 @@ function bindRepeatPresses(el: HTMLElement, options: BindRepeatOptions) {
  */
 function bindRepeat(el: HTMLElement, options: BindRepeatOptions = {}) {
   let afterKey = false
-  const unbindPresses = bindRepeatPresses(el, {
-    ...options,
-    onEnd: (details) => {
-      // `bindHold` clicks after a short key press, which stepped on keydown.
-      if (details.input === "keyboard") {
-        afterKey = true
-        queueMicrotask(() => (afterKey = false))
-      }
-      options.onEnd?.(details)
+  let refusedKey: (() => void) | undefined
+
+  // A key press that didn't start leaves the browser its click: on keydown
+  // for Enter, on keyup for Space, and once per repeat of a held Enter.
+  function ignoreKeyClicks({ event }: HoldDetails) {
+    refusedKey?.()
+    const { key } = event as KeyboardEvent
+    const view = el.ownerDocument.defaultView ?? window
+    const listeners = [
+      on(el.ownerDocument, "keyup", (up) => {
+        if (up.key === key) {
+          view.setTimeout(() => refusedKey?.())
+        }
+      }),
+      on(el, "blur", () => refusedKey?.()),
+    ]
+    refusedKey = () => {
+      listeners.forEach((remove) => remove())
+      refusedKey = undefined
+    }
+  }
+
+  const unbindPresses = bindRepeatPresses(
+    el,
+    {
+      ...options,
+      onEnd: (details) => {
+        // `bindHold` clicks after a short key press, which stepped on keydown.
+        if (details.input === "keyboard") {
+          afterKey = true
+          queueMicrotask(() => (afterKey = false))
+        }
+        options.onEnd?.(details)
+      },
     },
-  })
+    (press) => press.input === "keyboard" && ignoreKeyClicks(press)
+  )
   const unlistenClick = on(el, "click", (event) => {
     if (
       event.detail !== 0 ||
       event.defaultPrevented ||
       afterKey ||
+      refusedKey ||
       options.disabled?.()
     ) {
       return
@@ -180,6 +229,7 @@ function bindRepeat(el: HTMLElement, options: BindRepeatOptions = {}) {
   return () => {
     unbindPresses()
     unlistenClick()
+    refusedKey?.()
   }
 }
 

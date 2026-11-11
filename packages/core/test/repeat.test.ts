@@ -227,6 +227,69 @@ describe("bindRepeat", () => {
     expect(onStep).not.toHaveBeenCalled()
   })
 
+  test("a first step that moves focus ends the press, for a pointer and a key", async () => {
+    const other = document.createElement("button")
+    document.body.append(other)
+    const { el, onStep, onEnd } = setup({
+      onStep: ({ count }) => {
+        if (count === 1) {
+          other.focus()
+        }
+      },
+    })
+    el.focus()
+    el.dispatchEvent(pointer("pointerdown"))
+    vi.advanceTimersByTime(1000)
+    document.dispatchEvent(pointer("pointerup"))
+    expect(onStep).toHaveBeenCalledOnce()
+    expect(onEnd).toHaveBeenCalledOnce()
+    el.focus()
+    el.dispatchEvent(key("keydown", { key: "Enter" }))
+    el.dispatchEvent(click(0))
+    vi.advanceTimersByTime(1000)
+    expect(onStep).toHaveBeenCalledTimes(2)
+    expect(onEnd).toHaveBeenCalledTimes(2)
+    expect(el.hasAttribute("data-holding")).toBe(false)
+    other.dispatchEvent(key("keyup", { key: "Enter" }))
+    vi.runAllTimers()
+    await Promise.resolve()
+    el.dispatchEvent(click(0))
+    expect(onStep).toHaveBeenCalledTimes(3)
+  })
+
+  test("a first step that unbinds leaves no press behind, for a pointer and a key", () => {
+    for (const press of [
+      pointer("pointerdown"),
+      key("keydown", { key: "Enter" }),
+    ]) {
+      const { el, onStep, onEnd } = setup({ onStep: () => cleanup?.() })
+      el.focus()
+      el.dispatchEvent(press)
+      vi.advanceTimersByTime(1000)
+      expect(onStep).toHaveBeenCalledOnce()
+      expect(onEnd).not.toHaveBeenCalled()
+      expect(el.hasAttribute("data-holding")).toBe(false)
+      cleanup = undefined
+    }
+  })
+
+  test("the click that follows a key press onPress turns down doesn't step, from Enter or Space", () => {
+    const { el, onStep, onEnd } = setup({ onPress: () => false })
+    el.focus()
+    el.dispatchEvent(key("keydown", { key: "Enter" }))
+    el.dispatchEvent(click(0))
+    el.dispatchEvent(key("keyup", { key: "Enter" }))
+    vi.runAllTimers()
+    el.dispatchEvent(key("keydown"))
+    el.dispatchEvent(key("keyup"))
+    el.dispatchEvent(click(0))
+    vi.runAllTimers()
+    expect(onStep).not.toHaveBeenCalled()
+    expect(onEnd).not.toHaveBeenCalled()
+    el.dispatchEvent(click(0))
+    expect(onStep).toHaveBeenCalledOnce()
+  })
+
   test("a disabled element doesn't step from a press, a tap or a click", () => {
     const { el, onStep } = setup({ disabled: () => true })
     el.dispatchEvent(pointer("pointerdown"))
