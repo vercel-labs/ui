@@ -172,8 +172,8 @@ function bindPanel(el: HTMLElement, panel: PanelBinding) {
     size(style.height, style.width)
     // Commits that size, so the change to zero animates from it.
     void el.offsetHeight
+    // `stop` stays set, so reopening before the exit resets clears it at once.
     stop = animateOut(el, () => {
-      stop = undefined
       size("0px")
       panel.exited()
       panel.settled(false)

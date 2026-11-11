@@ -4,6 +4,8 @@
 // from the computed durations so an infinite or stuck animation cannot block it.
 import { measured } from "#dev"
 
+const pendingResets = new WeakMap<HTMLElement, () => void>()
+
 /**
  * Starts an element's enter animation: `data-starting-style` for its first
  * frame, so CSS transitions from it. `done` runs once the animation has
@@ -12,6 +14,7 @@ import { measured } from "#dev"
  * @stable
  */
 function animateIn(el: HTMLElement, done?: () => void) {
+  pendingResets.get(el)?.()
   // An element already shown would transition to its starting style and back,
   // so it jumps there, unless a transition is under way. jsdom has no getAnimations.
   const settled = el
@@ -144,21 +147,40 @@ function writeOpen(el: HTMLElement, open: boolean) {
  * Plays an element's exit animation: `data-ending-style` and `inert` while
  * it animates out, then `done`, once every running animation has finished or
  * a timeout from the computed durations has passed. Unmount the element in
- * `done`. Returns a cleanup that stops it.
+ * `done`: after an animation it keeps `data-ending-style` until then, and
+ * loses it and `inert` two frames later if it stays mounted. Returns a
+ * cleanup that stops it.
  * @stable
  */
 function animateOut(el: HTMLElement, done: () => void) {
+  pendingResets.get(el)?.()
   el.removeAttribute("data-starting-style")
   el.setAttribute("data-ending-style", "")
   el.inert = true
+  let frame = 0
   const reset = () => {
+    cancelAnimationFrame(frame)
+    pendingResets.delete(el)
     el.removeAttribute("data-ending-style")
     el.inert = false
   }
+  let isAnimating = false
+  // Frameworks unmount on their next render, and CSS keyed on the ending style
+  // would show the open look until then. A frame requested as animations
+  // finish can still run before this frame's paint, hence two.
   const stop = whenFinished(el, () => {
-    reset()
+    if (!isAnimating) {
+      reset()
+      return done()
+    }
+    pendingResets.set(el, reset)
+    frame = requestAnimationFrame(() => {
+      frame = requestAnimationFrame(reset)
+    })
     done()
   })
+  // Without animations `done` ran already, before anything painted the ending style.
+  isAnimating = true
   return () => {
     stop()
     reset()

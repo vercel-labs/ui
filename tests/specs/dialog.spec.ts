@@ -813,6 +813,66 @@ test.describe("animation", () => {
     await expect(page.locator(".dialog-backdrop:visible")).toHaveCount(0)
   })
 
+  test("the dialog and its backdrop keep data-ending-style until they unmount", async ({
+    page,
+    open,
+    framework,
+  }) => {
+    await open("dialog", { animate: "" })
+    await trigger(page).click()
+    await entered(page)
+    await page.evaluate(() => {
+      const exiting = [
+        ...document.querySelectorAll(
+          ".dialog[data-open], .dialog-backdrop[data-open]"
+        ),
+      ]
+      const endingStyleAtRemoval = new Map<Element, boolean>()
+      Object.assign(window, { exiting, endingStyleAtRemoval })
+      new MutationObserver((records) => {
+        for (const record of records) {
+          for (const node of record.removedNodes) {
+            for (const el of exiting) {
+              if (node.contains(el)) {
+                endingStyleAtRemoval.set(
+                  el,
+                  el.hasAttribute("data-ending-style")
+                )
+              }
+            }
+          }
+        }
+      }).observe(document.body, { childList: true, subtree: true })
+    })
+    await page.keyboard.press("Escape")
+    // Custom elements stay in the page, hidden.
+    const expected = framework.startsWith("web")
+      ? "hidden and reset"
+      : "removed while exiting"
+    await expect
+      .poll(() =>
+        page.evaluate(() => {
+          const { exiting, endingStyleAtRemoval } = window as unknown as {
+            exiting: HTMLElement[]
+            endingStyleAtRemoval: Map<Element, boolean>
+          }
+          return exiting.map((el) => {
+            if (!el.isConnected) {
+              return endingStyleAtRemoval.get(el)
+                ? "removed while exiting"
+                : "removed without data-ending-style"
+            }
+            return el.checkVisibility() ||
+              el.hasAttribute("data-ending-style") ||
+              el.inert
+              ? "shown or exiting"
+              : "hidden and reset"
+          })
+        })
+      )
+      .toEqual([expected, expected])
+  })
+
   test("exit keyframes keyed on data-closed play before the dialog unmounts", async ({
     page,
   }) => {
