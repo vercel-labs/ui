@@ -2,7 +2,7 @@
 
 What's already decided about `@ui-sdk/react`, and what's known and open. The expert never re-raises a **Settled** item as a finding.
 
-Last reviewed: PRs 86 to 92 (2026-10-30, the audit fixes), 158 and 159 (2026-11-01, follow-ups to 89 and 90), and 160 and 161 (2026-11-01, the focus trap fixes), and 175 to 186 (2026-11-02, the pre-launch audit fixes), and 213 (2026-11-03, field control ids on the server), and 214 (2026-11-03, the toast motion fix), and 218 (2026-11-04, the examples and docs review: textarea submitShortcut, token-input custom render, toast swipe from unselectable text, navigation-menu link timing, web shared-element data-slot), and 243 to 249 (2026-11-05, the new components: Label, Segmented Control, Rating, color, Color Picker, image, Image Cropper), and 241 (2026-11-05, date input and time input), and 321 (2026-11-09, `web.css`, the drop-in stylesheet), and 326 (2026-11-09, button attributes before bind), and the Timeline branch (2026-11-10, a timeline of dated events), and the Waterfall branch (2026-11-10, the new component).
+Last reviewed: PRs 86 to 92 (2026-10-30, the audit fixes), 158 and 159 (2026-11-01, follow-ups to 89 and 90), and 160 and 161 (2026-11-01, the focus trap fixes), and 175 to 186 (2026-11-02, the pre-launch audit fixes), and 213 (2026-11-03, field control ids on the server), and 214 (2026-11-03, the toast motion fix), and 218 (2026-11-04, the examples and docs review: textarea submitShortcut, token-input custom render, toast swipe from unselectable text, navigation-menu link timing, web shared-element data-slot), and 243 to 249 (2026-11-05, the new components: Label, Segmented Control, Rating, color, Color Picker, image, Image Cropper), and 241 (2026-11-05, date input and time input), and 321 (2026-11-09, `web.css`, the drop-in stylesheet), and 326 (2026-11-09, button attributes before bind), and the Timeline branch (2026-11-10, a timeline of dated events), and the Waterfall branch (2026-11-10, the new component), and the bindRepeat branch (2026-11-11, press-and-hold repeat).
 
 ## Settled
 
@@ -30,6 +30,7 @@ Last reviewed: PRs 86 to 92 (2026-10-30, the audit fixes), 158 and 159 (2026-11-
 
 - **Tailwind v4 and `@layer ui-sdk` order** (suspected, from PR 321): whichever layer a page declares first loses. The docs for `web.css` need to say to declare `@layer ui-sdk` before Tailwind's layers.
 - **`InputClear`, and Command items and group labels, are missing from server HTML** and appear only after mount (seen in PR 321's review, older than it).
+- **The `hold-repeat` example drops focus to `<body>` at a bound** (seen in the bindRepeat review, older than it): it sets native `disabled` on the focused button. `aria-disabled` with `bindRepeat`'s `disabled` would keep focus.
 
 - **Hidden popup's later siblings**: the hidden-tree bridge tracks the nodes a portal appends when it mounts, so an element a popup's `render` adds beside it later, or a text or SVG node, stays shown in a hidden `<Activity>`.
 - **Api reads in custom parts**: `handle.state` shows the preview, `handle.api` reads committed state.
