@@ -2,7 +2,7 @@
 
 What's already decided about `@ui-sdk/vue`, and what's known and open. The expert never re-raises a **Settled** item as a finding.
 
-Last reviewed: PRs 86 to 92 (2026-10-30, the audit fixes), 158 and 159 (2026-11-01, follow-ups to 89 and 90), and 160 and 161 (2026-11-01, the focus trap fixes), and 175 to 186 (2026-11-02, the pre-launch audit fixes), and 213 (2026-11-03, field control ids on the server), and 214 (2026-11-03, the toast motion fix), and 218 (2026-11-04, the examples and docs review: textarea submitShortcut, token-input custom render, toast swipe from unselectable text, navigation-menu link timing, web shared-element data-slot), and 243 to 249 (2026-11-05, the new components: Label, Segmented Control, Rating, color, Color Picker, image, Image Cropper), and 241 (2026-11-05, date input and time input), and the Nuxt module branch (2026-11-05, `@ui-sdk/vue/nuxt`), and 321 (2026-11-09, `web.css`, the drop-in stylesheet), and 326 (2026-11-09, button attributes before bind), and the Timeline branch (2026-11-10, a timeline of dated events), and the Waterfall branch (2026-11-10, the new component).
+Last reviewed: PRs 86 to 92 (2026-10-30, the audit fixes), 158 and 159 (2026-11-01, follow-ups to 89 and 90), and 160 and 161 (2026-11-01, the focus trap fixes), and 175 to 186 (2026-11-02, the pre-launch audit fixes), and 213 (2026-11-03, field control ids on the server), and 214 (2026-11-03, the toast motion fix), and 218 (2026-11-04, the examples and docs review: textarea submitShortcut, token-input custom render, toast swipe from unselectable text, navigation-menu link timing, web shared-element data-slot), and 243 to 249 (2026-11-05, the new components: Label, Segmented Control, Rating, color, Color Picker, image, Image Cropper), and 241 (2026-11-05, date input and time input), and the Nuxt module branch (2026-11-05, `@ui-sdk/vue/nuxt`), and 321 (2026-11-09, `web.css`, the drop-in stylesheet), and 326 (2026-11-09, button attributes before bind), and the Timeline branch (2026-11-10, a timeline of dated events), and the Waterfall branch (2026-11-10, the new component), and the scroll picker branch (2026-11-11, `bindScrollPicker` and Listbox's `keepInView`).
 
 ## Settled
 
@@ -26,6 +26,7 @@ Last reviewed: PRs 86 to 92 (2026-10-30, the audit fixes), 158 and 159 (2026-11-
 
 ## Known and open (don't report again, check whether fixed)
 
+- Roots that render hidden inputs beside their element (Listbox, Checkbox, Radio, Rating, Segmented Control items) are fragments, so a component ref's `$el` is a text anchor. Binding `bindScrollPicker` takes a wrapper and `querySelector` until the root exposes its element; exposing `$el` needs a maintainer's sign-off.
 - **A trigger connected through `controller` renders without `data-slot` on the server** (`controller-target.ts`), so `web.css` leaves it unstyled until hydration. Seen in `select/controller`, `dialog/payload`, `menu/payload`, `popover/payload`, `tooltip/shared` (PR 321).
 - **Command groups render `hidden` in server HTML** (`command/demo`), so the list is empty until hydration (older than PR 321).
 
