@@ -5,7 +5,7 @@ import {
   isDrag,
   type PointerSample,
 } from "../../foundation/drag-and-drop/pointer"
-import { bindHold } from "../../foundation/direct-manipulation/hold"
+import { bindRepeatPresses } from "../../foundation/direct-manipulation/repeat"
 import { isBrowser, isIOS } from "../../foundation/platform/env"
 import {
   dispatchChange,
@@ -427,21 +427,11 @@ function numberInputApiBody(
         clearTimeout(wheelTimer)
         wheelTimer = setTimeout(() => commit(event), 300)
       },
-      // A mouse steps at once, then repeats while held. A finger waits, so a
-      // scroll that starts on the button never steps; a tap steps on release.
       bindButton(el: HTMLElement, direction: number, disabled: () => boolean) {
         const reason = direction > 0 ? "increment-press" : "decrement-press"
-        const blocked = () => disabled() || el.hasAttribute("disabled")
-        let size: "large" | "step" = "step"
-        const step = (event: Event) =>
-          stepBy(direction, size, reason, event) &&
-          canStep(store.get(), direction)
-        return bindHold(el, {
-          delay: 400,
-          repeat: 60,
-          tolerance: Infinity,
+        return bindRepeatPresses(el, {
           keys: [],
-          disabled: blocked,
+          disabled: () => disabled() || el.hasAttribute("disabled"),
           onPress: (press) => {
             const event = press.event as PointerEvent
             if (!drags.accepts(event) || !canStep(store.get(), direction)) {
@@ -449,25 +439,18 @@ function numberInputApiBody(
             }
             // Keeps focus where it is, so a phone's keyboard stays as it was.
             event.preventDefault()
-            size = event.shiftKey ? "large" : "step"
-            if (press.input !== "mouse") {
-              return
+            if (press.input === "mouse") {
+              input()?.focus({ preventScroll: true })
             }
-            input()?.focus({ preventScroll: true })
-            step(event)
           },
-          onHold: ({ event }) => step(event),
-          onEnd: (end) => {
-            if (
-              end.input !== "mouse" &&
-              !end.held &&
-              !end.canceled &&
-              !blocked()
-            ) {
-              step(end.event)
-            }
-            commit(end.event)
-          },
+          onStep: ({ event }) =>
+            stepBy(
+              direction,
+              event.shiftKey ? "large" : "step",
+              reason,
+              event
+            ) && canStep(store.get(), direction),
+          onEnd: ({ event }) => commit(event),
         })
       },
       // Keyboard and screen reader presses, which carry no pointer.
