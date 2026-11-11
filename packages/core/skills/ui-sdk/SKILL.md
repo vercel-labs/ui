@@ -18,7 +18,9 @@ The docs for the installed version ship in each package, as Markdown:
 
 The same docs are online at https://ui-sdk.dev/docs. Prefer the installed copy: it matches the version in the project.
 
-If no `@ui-sdk` package is installed yet, install `@ui-sdk/core` and the framework's package with the project's package manager.
+A page with no build step, like an Artifact, installs nothing: it loads `https://ui-sdk.dev/web.js` and `web.css` with two tags. Read https://ui-sdk.dev/web.md instead of `llms.txt`. It's the web components docs in one file, for that page, and [references/web-components.md](references/web-components.md#without-a-bundler) has the rest.
+
+Otherwise, if no `@ui-sdk` package is installed yet, install `@ui-sdk/core` and the framework's package with the project's package manager.
 
 ## Pick your path
 

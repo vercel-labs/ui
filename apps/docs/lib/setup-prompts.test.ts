@@ -70,9 +70,7 @@ describe("setup prompts", () => {
       expect(prompt).toContain(
         `<link rel="stylesheet" href="https://ui-sdk.dev/web.css" />`
       )
-      expect(prompt).toContain(
-        "read https://ui-sdk.dev/docs/web-components/llms.txt."
-      )
+      expect(prompt).toContain("read https://ui-sdk.dev/web.md.")
     }
   )
 
