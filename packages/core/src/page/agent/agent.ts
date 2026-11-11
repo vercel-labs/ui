@@ -1178,6 +1178,15 @@ function createAgent(
     args: unknown[],
     guard?: () => boolean
   ) {
+    // Model output, which can leave a field out.
+    if (typeof ref !== "string" || !ref.trim()) {
+      throw new Error(
+        "A step needs a ref: a component's ref from snapshot, or its label."
+      )
+    }
+    if (typeof action !== "string" || !action) {
+      throw new Error(`A step on "${ref}" needs an action, like "press".`)
+    }
     const { entry, instance, parts } = await reveal(ref, action)
     const { actions, disabled } = describe(entry, instance, parts)
     // A step is asked about before anything it does, and again when finding

@@ -9,6 +9,7 @@ import {
   createAgent,
   registerTools,
   type AgentComponent,
+  type AgentStep,
 } from "../src/page/agent/agent"
 import { button } from "../src/components/button/button"
 import { checkbox } from "../src/components/checkbox/checkbox"
@@ -967,6 +968,25 @@ describe("agent", () => {
       value: 2,
       max: 4,
     })
+  })
+
+  test("a step without a ref or an action fails with a message the model can act on", async () => {
+    const agent = createAgent()
+    mountCheckbox({ id: "terms" })
+    const noRef = await agent.act({
+      steps: [{ action: "press" } as unknown as AgentStep],
+    })
+    expect(noRef.error).toEqual({
+      step: 0,
+      message:
+        "A step needs a ref: a component's ref from snapshot, or its label.",
+    })
+    const noAction = await agent.act({
+      steps: [{ ref: "Accept the terms" } as unknown as AgentStep],
+    })
+    expect(noAction.error?.message).toBe(
+      'A step on "Accept the terms" needs an action, like "press".'
+    )
   })
 
   test("a reading inside data-agent-secret is redacted", () => {
