@@ -14,7 +14,7 @@ import {
 // mount and unmount it 200 times, and nothing it added stays behind. See tests/perf/budgets.ts.
 
 // How each popup or panel opens and closes from the keyboard, from its trigger.
-// A collapsible's panel has no role, so it's found by its class.
+// A collapsible's panel and a hover card have no role, so they're found by class.
 const popups = {
   menu: { trigger: "button", popup: "menu", open: "Enter", close: "Escape" },
   select: {
@@ -24,6 +24,12 @@ const popups = {
     close: "Escape",
   },
   combobox: {
+    trigger: "combobox",
+    popup: "listbox",
+    open: "ArrowDown",
+    close: "Escape",
+  },
+  autocomplete: {
     trigger: "combobox",
     popup: "listbox",
     open: "ArrowDown",
@@ -41,10 +47,23 @@ const popups = {
     open: "Enter",
     close: "Escape",
   },
-  // Keyboard focus shows a tooltip at once, and moving it away hides it.
+  drawer: {
+    trigger: "button",
+    popup: "dialog",
+    open: "Enter",
+    close: "Escape",
+  },
+  // Keyboard focus shows a tooltip at once, and moving it away hides it. The
+  // fixture's hover card has no delay, so it does the same.
   tooltip: {
     trigger: "button",
     popup: "tooltip",
+    open: "Tab",
+    close: "Shift+Tab",
+  },
+  "hover-card": {
+    trigger: "link",
+    popup: ".hover-card-content",
     open: "Tab",
     close: "Shift+Tab",
   },
@@ -66,8 +85,13 @@ const popups = {
 // it opens stops an animation in flight.
 const animated: Name[] = ["accordion", "collapsible"]
 
+// A drawer springs shut over most of a second, too long for 200 rounds.
+// Reduced motion shuts it in a fifth of that.
+const reducedMotion: Name[] = ["drawer"]
+
+// In words, as the affected-spec plan greps for it: "a hover card" for hover-card.
 const withArticle = (name: string) =>
-  `${/^[aeiou]/.test(name) ? "an" : "a"} ${name}`
+  `${/^[aeiou]/.test(name) ? "an" : "a"} ${name.replaceAll("-", " ")}`
 
 type Name = keyof typeof popups
 
@@ -76,15 +100,15 @@ function parts(page: Page, name: Name) {
   return {
     trigger: page.getByRole(trigger, { name: "Open", exact: true }),
     popup:
-      popup === ".collapsible-panel"
+      popup === ".collapsible-panel" || popup === ".hover-card-content"
         ? page.locator(popup)
         : page.getByRole(popup),
   }
 }
 
-// Focus where the open key starts from: the trigger, or before it for a tooltip.
+// Focus where the open key starts from: the trigger, or before it when Tab opens it.
 async function focusTrigger(page: Page, name: Name) {
-  if (name === "tooltip") {
+  if (popups[name].open === "Tab") {
     await page.getByRole("button", { name: "Before" }).focus()
   } else {
     await parts(page, name).trigger.focus()
@@ -246,6 +270,9 @@ test.describe("leaks", () => {
     }) => {
       test.setTimeout(120_000)
       const budget = budgets["leaks.cycles"]
+      if (reducedMotion.includes(name)) {
+        await page.emulateMedia({ reducedMotion: "reduce" })
+      }
       await open("leaks", { component: name })
       const cdp = await page.context().newCDPSession(page)
       // Warm up, so what's made once per page, compiled code included, is
@@ -284,6 +311,9 @@ test.describe("leaks", () => {
     }) => {
       test.setTimeout(120_000)
       const budget = budgets["leaks.unmount-open"]
+      if (reducedMotion.includes(name)) {
+        await page.emulateMedia({ reducedMotion: "reduce" })
+      }
       await open("leaks", {
         component: name,
         ...(animated.includes(name) && { animate: "" }),
@@ -321,6 +351,9 @@ test.describe("leaks", () => {
       page,
       open,
     }) => {
+      if (reducedMotion.includes(name)) {
+        await page.emulateMedia({ reducedMotion: "reduce" })
+      }
       await open("leaks", { component: name })
       const cdp = await page.context().newCDPSession(page)
       await openAndClose(page, name, 1)

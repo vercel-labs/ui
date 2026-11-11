@@ -6,6 +6,13 @@ import {
   AccordionTrigger,
 } from "@ui-sdk/solid/accordion"
 import {
+  Autocomplete,
+  AutocompleteContent,
+  AutocompleteInput,
+  AutocompleteItem,
+  AutocompleteList,
+} from "@ui-sdk/solid/autocomplete"
+import {
   Collapsible,
   CollapsiblePanel,
   CollapsibleTrigger,
@@ -25,6 +32,20 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@ui-sdk/solid/dialog"
+import {
+  Drawer,
+  DrawerBackdrop,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@ui-sdk/solid/drawer"
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@ui-sdk/solid/hover-card"
 import { Menu, MenuContent, MenuItem, MenuTrigger } from "@ui-sdk/solid/menu"
 import {
   Popover,
@@ -132,6 +153,22 @@ const components = {
       </ComboboxContent>
     </Combobox>
   ),
+  autocomplete: () => (
+    <Autocomplete>
+      <AutocompleteInput aria-label="Open" class="input" />
+      <AutocompleteContent class="popup list-popup">
+        <AutocompleteList>
+          <For each={items}>
+            {(item) => (
+              <AutocompleteItem class="item" value={item.label}>
+                {item.label}
+              </AutocompleteItem>
+            )}
+          </For>
+        </AutocompleteList>
+      </AutocompleteContent>
+    </Autocomplete>
+  ),
   popover: () => (
     <Popover>
       <PopoverTrigger>Open</PopoverTrigger>
@@ -153,11 +190,30 @@ const components = {
       </DialogContent>
     </Dialog>
   ),
+  drawer: () => (
+    <Drawer>
+      <DrawerTrigger>Open</DrawerTrigger>
+      <DrawerBackdrop class="backdrop" />
+      <DrawerContent class="dialog">
+        <DrawerTitle class="title">Move goal</DrawerTitle>
+        <DrawerDescription class="description">
+          Set your daily goal.
+        </DrawerDescription>
+        <DrawerClose>Cancel</DrawerClose>
+      </DrawerContent>
+    </Drawer>
+  ),
   tooltip: () => (
     <Tooltip>
       <TooltipTrigger>Open</TooltipTrigger>
       <TooltipContent class="tooltip">A hint.</TooltipContent>
     </Tooltip>
+  ),
+  "hover-card": () => (
+    <HoverCard delay={0}>
+      <HoverCardTrigger href="#profile">Open</HoverCardTrigger>
+      <HoverCardContent class="hover-card-content">A profile.</HoverCardContent>
+    </HoverCard>
   ),
   slider: () => (
     <Slider name="volume" defaultValue={50}>

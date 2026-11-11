@@ -33,7 +33,7 @@ A file filter is a regular expression matched against the path, so `specs/menu` 
 | [Enhancements](#enhancements)         | `<name>.enhancements.spec.ts`, and any test tagged `@enhancement` | Like behavior, without the sheet projects                                            | `pr`      |
 | [Kitchen sinks](#kitchen-sinks)       | `<name>.kitchen-sink.spec.ts`                                     | `react`, `vue`, `web` and their engine projects                                      | `pr`      |
 | [Count gates](#count-gates)           | `<name>.counts.spec.ts`                                           | `react`, `vue`, `web`, engines                                                       | `pr`      |
-| [Leak specs](#leak-specs)             | `leaks.spec.ts`                                                   | `react`, `vue`, `web` and Edge. Chromium only                                        | `pr`      |
+| [Leak specs](#leak-specs)             | `leaks.spec.ts`                                                   | Every framework. Chromium only                                                       | `pr`      |
 | [One-off specs](#one-off-specs)       | `<name>.<topic>.spec.ts`, like `combobox.virtual.spec.ts`         | Like behavior, without the sheet projects                                            | `pr`      |
 | [Unit tests](#unit-tests)             | `packages/*/test/*.test.ts(x)`                                    | Node, vitest                                                                         | `pr`      |
 | [Docs tests](#docs-tests)             | `tests/docs/*.spec.ts`                                            | Chromium, against the docs site                                                      | `nightly` |
@@ -201,10 +201,10 @@ cd tests && PLAYGROUND_PORT=5310 ../scripts/test-slot.sh npx playwright test cou
 
 ### Leak specs
 
-`leaks.spec.ts`. Opens and closes a menu, select, combobox, popover, dialog, tooltip, accordion and collapsible 200 times, then mounts and unmounts it 200 times, and unmounts it while open 50 times. Tabs and a toolbar get arrow keys instead, and unmount right after one; a slider, a resizable group and a scroll area get drags (and keys or the wheel), and unmount in the middle of one. Then the listeners on the window and the document, the pending animation frames, the open popup layers and the detached `[data-slot]` elements must be back to their values after a warmup, and the heap after garbage collection within budget. They read those through the Chrome DevTools Protocol, so they run in Chromium only and leave out the WebKit and Firefox projects. The fixture is `apps/playground/src/fixtures/leaks`, with `?component=`. The budgets are `leaks.cycles` and `leaks.unmount-open` in the [perf catalog](perf/README.md).
+`leaks.spec.ts`. Opens and closes a menu, select, combobox, autocomplete, popover, dialog, drawer, tooltip, hover card, accordion and collapsible 200 times, then mounts and unmounts it 200 times, and unmounts it while open 50 times. Tabs and a toolbar get arrow keys instead, and unmount right after one; a slider, a resizable group and a scroll area get drags (and keys or the wheel), and unmount in the middle of one. Then the listeners on the window and the document, the pending animation frames, the open popup layers and the detached `[data-slot]` elements must be back to their values after a warmup, and the heap after garbage collection within budget. They read those through the Chrome DevTools Protocol, so they run in Chromium only and leave out the WebKit and Firefox projects. The fixture is `apps/playground/src/fixtures/leaks`, with `?component=`. The budgets are `leaks.cycles` and `leaks.unmount-open` in the [perf catalog](perf/README.md).
 
 ```bash
-cd tests && PLAYGROUND_PORT=5310 PERF_REPORT=1 ../scripts/test-slot.sh npx playwright test specs/leaks.spec.ts --project react --project vue --project web --workers 1
+cd tests && PLAYGROUND_PORT=5310 PERF_REPORT=1 ../scripts/test-slot.sh npx playwright test specs/leaks.spec.ts --project react --project vue --project web --project solid --project svelte --workers 1
 ```
 
 ### One-off specs

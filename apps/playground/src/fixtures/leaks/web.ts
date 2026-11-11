@@ -40,6 +40,13 @@ const components = {
         <ui-combobox-list>${list("ui-combobox-item")}</ui-combobox-list>
       </ui-combobox-content>
     </ui-combobox>`,
+  autocomplete: `
+    <ui-autocomplete>
+      <ui-autocomplete-input><input class="input" aria-label="Open" /></ui-autocomplete-input>
+      <ui-autocomplete-content class="popup list-popup">
+        <ui-autocomplete-list>${each((item) => `<ui-autocomplete-item class="item" value="${item.label}">${item.label}</ui-autocomplete-item>`)}</ui-autocomplete-list>
+      </ui-autocomplete-content>
+    </ui-autocomplete>`,
   popover: `
     <ui-popover>
       <ui-popover-trigger><button>Open</button></ui-popover-trigger>
@@ -57,11 +64,26 @@ const components = {
         <ui-dialog-close><button>Cancel</button></ui-dialog-close>
       </ui-dialog-content>
     </ui-dialog>`,
+  drawer: `
+    <ui-drawer>
+      <ui-drawer-trigger><button>Open</button></ui-drawer-trigger>
+      <ui-drawer-backdrop class="backdrop"></ui-drawer-backdrop>
+      <ui-drawer-content class="dialog">
+        <ui-drawer-title class="title">Move goal</ui-drawer-title>
+        <ui-drawer-description class="description">Set your daily goal.</ui-drawer-description>
+        <ui-drawer-close><button>Cancel</button></ui-drawer-close>
+      </ui-drawer-content>
+    </ui-drawer>`,
   tooltip: `
     <ui-tooltip>
       <ui-tooltip-trigger><button>Open</button></ui-tooltip-trigger>
       <ui-tooltip-content class="tooltip">A hint.</ui-tooltip-content>
     </ui-tooltip>`,
+  "hover-card": `
+    <ui-hover-card delay="0">
+      <ui-hover-card-trigger><a href="#profile">Open</a></ui-hover-card-trigger>
+      <ui-hover-card-content class="hover-card-content">A profile.</ui-hover-card-content>
+    </ui-hover-card>`,
   slider: `
     <ui-slider name="volume" default-value="50">
       <ui-slider-control class="slider-control">
@@ -166,9 +188,12 @@ async function mount(root: HTMLElement) {
   await import("@ui-sdk/web/menu")
   await import("@ui-sdk/web/select")
   await import("@ui-sdk/web/combobox")
+  await import("@ui-sdk/web/autocomplete")
   await import("@ui-sdk/web/popover")
   await import("@ui-sdk/web/dialog")
+  await import("@ui-sdk/web/drawer")
   await import("@ui-sdk/web/tooltip")
+  await import("@ui-sdk/web/hover-card")
   await import("@ui-sdk/web/slider")
   await import("@ui-sdk/web/accordion")
   await import("@ui-sdk/web/collapsible")

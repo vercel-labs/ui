@@ -5,6 +5,11 @@
     AccordionItem,
     AccordionPanel,
     AccordionTrigger,
+    Autocomplete,
+    AutocompleteContent,
+    AutocompleteInput,
+    AutocompleteItem,
+    AutocompleteList,
     Collapsible,
     CollapsiblePanel,
     CollapsibleTrigger,
@@ -19,6 +24,16 @@
     DialogDescription,
     DialogTitle,
     DialogTrigger,
+    Drawer,
+    DrawerBackdrop,
+    DrawerClose,
+    DrawerContent,
+    DrawerDescription,
+    DrawerTitle,
+    DrawerTrigger,
+    HoverCard,
+    HoverCardContent,
+    HoverCardTrigger,
     Menu,
     MenuContent,
     MenuItem,
@@ -113,6 +128,19 @@
           </ComboboxList>
         </ComboboxContent>
       </Combobox>
+    {:else if component === "autocomplete"}
+      <Autocomplete>
+        <AutocompleteInput aria-label="Open" class="input" />
+        <AutocompleteContent class="popup list-popup">
+          <AutocompleteList>
+            {#each items as item (item.value)}
+              <AutocompleteItem class="item" value={item.label}
+                >{item.label}</AutocompleteItem
+              >
+            {/each}
+          </AutocompleteList>
+        </AutocompleteContent>
+      </Autocomplete>
     {:else if component === "popover"}
       <Popover>
         <PopoverTrigger>Open</PopoverTrigger>
@@ -132,6 +160,25 @@
           <DialogClose>Cancel</DialogClose>
         </DialogContent>
       </Dialog>
+    {:else if component === "drawer"}
+      <Drawer>
+        <DrawerTrigger>Open</DrawerTrigger>
+        <DrawerBackdrop class="backdrop" />
+        <DrawerContent class="dialog">
+          <DrawerTitle class="title">Move goal</DrawerTitle>
+          <DrawerDescription class="description"
+            >Set your daily goal.</DrawerDescription
+          >
+          <DrawerClose>Cancel</DrawerClose>
+        </DrawerContent>
+      </Drawer>
+    {:else if component === "hover-card"}
+      <HoverCard delay={0}>
+        <HoverCardTrigger href="#profile">Open</HoverCardTrigger>
+        <HoverCardContent class="hover-card-content"
+          >A profile.</HoverCardContent
+        >
+      </HoverCard>
     {:else if component === "slider"}
       <Slider name="volume" defaultValue={50}>
         <SliderControl class="slider-control">

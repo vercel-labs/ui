@@ -1,7 +1,4 @@
 {
-  "autocomplete": {
-    "leak": "todo"
-  },
   "avatar": {
     "rtl": "Nothing in it depends on direction.",
     "leak": "Adds no page listeners, frames or popup layers."
@@ -43,9 +40,6 @@
     "ssr": "todo",
     "leak": "todo"
   },
-  "drawer": {
-    "leak": "todo"
-  },
   "field": {
     "rtl": "Covered by the form and toggle specs, which render it among other controls.",
     "ssr": "Covered by the form and toggle specs, which render it among other controls.",
@@ -57,7 +51,6 @@
     "leak": "todo"
   },
   "hover-card": {
-    "leak": "todo",
     "unit": "todo"
   },
   "image-cropper": {

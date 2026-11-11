@@ -5,6 +5,11 @@ import {
   AccordionItem,
   AccordionPanel,
   AccordionTrigger,
+  Autocomplete,
+  AutocompleteContent,
+  AutocompleteInput,
+  AutocompleteItem,
+  AutocompleteList,
   Collapsible,
   CollapsiblePanel,
   CollapsibleTrigger,
@@ -19,6 +24,16 @@ import {
   DialogDescription,
   DialogTitle,
   DialogTrigger,
+  Drawer,
+  DrawerBackdrop,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerTitle,
+  DrawerTrigger,
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
   Menu,
   MenuContent,
   MenuItem,
@@ -127,6 +142,21 @@ const mounted = ref(true)
           </ComboboxList>
         </ComboboxContent>
       </Combobox>
+      <Autocomplete v-else-if="component === 'autocomplete'">
+        <AutocompleteInput aria-label="Open" class="input" />
+        <AutocompleteContent class="popup list-popup">
+          <AutocompleteList>
+            <AutocompleteItem
+              v-for="item in items"
+              :key="item.value"
+              class="item"
+              :value="item.label"
+            >
+              {{ item.label }}
+            </AutocompleteItem>
+          </AutocompleteList>
+        </AutocompleteContent>
+      </Autocomplete>
       <Popover v-else-if="component === 'popover'">
         <PopoverTrigger>Open</PopoverTrigger>
         <PopoverContent class="popup" aria-label="Details">
@@ -144,6 +174,23 @@ const mounted = ref(true)
           <DialogClose>Cancel</DialogClose>
         </DialogContent>
       </Dialog>
+      <Drawer v-else-if="component === 'drawer'">
+        <DrawerTrigger>Open</DrawerTrigger>
+        <DrawerBackdrop class="backdrop" />
+        <DrawerContent class="dialog">
+          <DrawerTitle class="title">Move goal</DrawerTitle>
+          <DrawerDescription class="description"
+            >Set your daily goal.</DrawerDescription
+          >
+          <DrawerClose>Cancel</DrawerClose>
+        </DrawerContent>
+      </Drawer>
+      <HoverCard v-else-if="component === 'hover-card'" :delay="0">
+        <HoverCardTrigger href="#profile">Open</HoverCardTrigger>
+        <HoverCardContent class="hover-card-content"
+          >A profile.</HoverCardContent
+        >
+      </HoverCard>
       <Slider
         v-else-if="component === 'slider'"
         name="volume"
