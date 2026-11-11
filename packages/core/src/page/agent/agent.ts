@@ -1602,7 +1602,14 @@ function createAgent(
     const state = instance.get() as Record<string, unknown>
     const api = instance.api as { setOpen?: (open: boolean) => void }
     let items = dataOf(entry, instance) ?? renderedItems(bound(instance))
-    if (!items.length && beforeOpen && api.setOpen && !state.open) {
+    // An `agent` key's items are all it has, so opening it shows no more.
+    if (
+      !items.length &&
+      !entry.agent?.items &&
+      beforeOpen &&
+      api.setOpen &&
+      !state.open
+    ) {
       await beforeOpen()
       asAgent(() => api.setOpen!(true))
       for (

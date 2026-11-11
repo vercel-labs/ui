@@ -125,11 +125,8 @@ function webTags(host: string) {
   return `   <script type="module" src="${host}/web.js"></script>\n   <link rel="stylesheet" href="${host}/web.css" />`
 }
 
-function agentsStep(docs: string, { withCore }: { withCore: boolean }) {
-  const core = withCore
-    ? ` To build a new component, also search ${docs}/core.md by heading, and read rendering.md next to it.`
-    : ""
-  return `Add a note to AGENTS.md, creating it if needed: before using ui-sdk, follow the ui-sdk skill if it's installed, and read ${docs}/llms.txt.${core}`
+function agentsStep(docs: string) {
+  return `Add a note to AGENTS.md, creating it if needed: before using ui-sdk, follow the ui-sdk skill if it's installed, and read ${docs}/llms.txt. To build a new component, also search ${docs}/core.md by heading, and read rendering.md next to it.`
 }
 
 function installStep(pkg: string) {
@@ -144,7 +141,7 @@ function quickStartPrompt(stackId: StackId) {
   }
   return `Set up ui-sdk in this ${stack.name} project. ${stack.needs}
 
-${steps([installStep(stack.pkg), agentsStep(`node_modules/@ui-sdk/${stack.pkg}/docs`, { withCore: true }), skillStep])}`
+${steps([installStep(stack.pkg), agentsStep(`node_modules/@ui-sdk/${stack.pkg}/docs`), skillStep])}`
 }
 
 function artifactPrompt(site: string, host: string) {
@@ -152,7 +149,7 @@ function artifactPrompt(site: string, host: string) {
 
 ${steps([
   `Load ui-sdk with these two tags in the <head>. web.css gives every component its default styles:\n${webTags(host)}`,
-  `Before you write any code, read ${site}/docs/web-components/llms.txt.`,
+  `Before you write any code, read ${site}/web.md.`,
   "Keep everything in that one file, with your styles in a <style> tag. Show me the whole file each time.",
 ])}`
 }
@@ -162,7 +159,7 @@ function htmlPrompt(site: string, host: string) {
 
 ${steps([
   `Add these two tags to the <head> of each page. web.css gives every component its default styles:\n${webTags(host)}`,
-  agentsStep(`${site}/docs/web-components`, { withCore: false }),
+  `Add a note to AGENTS.md, creating it if needed: before using ui-sdk, follow the ui-sdk skill if it's installed, and read ${site}/web.md.`,
   skillStep,
 ])}`
 }
@@ -181,7 +178,7 @@ function projectPrompt(
   list.push(
     installStep(stack.pkg),
     `Import the default styles once at the app's entry, before your own CSS: import "@ui-sdk/core/web.css"`,
-    agentsStep(`node_modules/@ui-sdk/${stack.pkg}/docs`, { withCore: true }),
+    agentsStep(`node_modules/@ui-sdk/${stack.pkg}/docs`),
     skillStep
   )
   return `Set up ui-sdk in this ${stack.name} project with ${project.name}. ${project.needs ?? stack.needs}

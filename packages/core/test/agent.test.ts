@@ -1108,6 +1108,23 @@ describe("agent", () => {
     })
   })
 
+  test("a date picker takes a date without opening its calendar to look for an item", async () => {
+    const agent = createAgent()
+    const instance = datePicker({ id: "start" })
+    const label = document.body.appendChild(document.createElement("label"))
+    label.textContent = "Start date"
+    const input = label.appendChild(document.createElement("input"))
+    cleanups.push(bind(instance.part("input"), input), () => instance.destroy())
+    const opened = vi.fn()
+    instance.subscribe(() => instance.get().open && opened())
+    const outcome = await agent.act({
+      steps: [{ ref: "Start date", action: "setValue", args: ["2026-12-01"] }],
+    })
+    expect(outcome.ok, outcome.error?.message).toBe(true)
+    expect(instance.get().value).toBe("2026-12-01")
+    expect(opened).not.toHaveBeenCalled()
+  })
+
   test("a date picker is named by its input's label, not by the month its calendar shows", () => {
     const agent = createAgent()
     const instance = datePicker({ id: "due", defaultMonth: "2026-11" })

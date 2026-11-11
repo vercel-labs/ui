@@ -38,7 +38,10 @@ jobs:
       - id: select-mode
         uses: changesets/action/select-mode@ae32849d5ba541f9ae29e40e22a623bc13562f51 # v2.1.2
 
-  # Commits go through the GitHub API, so GitHub signs them.
+  # Commits go through the GitHub API, so GitHub signs them. The changelog
+  # looks up the commit that added each changeset, so the job needs the full
+  # history: a shallow clone would have to fetch more, and it has no
+  # credentials to fetch with.
   version:
     name: Version
     needs: select-mode
@@ -51,6 +54,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          fetch-depth: 0
           persist-credentials: false
       - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
