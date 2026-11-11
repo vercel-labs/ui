@@ -25,6 +25,7 @@ The button that opens the dialog. A trigger outside the dialog, like one per tab
 
   let {
     disabled,
+    focusableWhenDisabled,
     payload,
     shortcut,
     controller,
@@ -47,14 +48,25 @@ The button that opens the dialog. A trigger outside the dialog, like one per tab
 </script>
 
 {#if dialog}
-  <TriggerBinding owner={dialog} {disabled} {payload} {shortcut} {...rest} />
+  <TriggerBinding
+    owner={dialog}
+    {disabled}
+    {focusableWhenDisabled}
+    {payload}
+    {shortcut}
+    {...rest}
+  />
 {:else}
   <!-- Until the dialog it names mounts, a trigger outside the dialog is a plain button. -->
   <Part
     tag="button"
     part={plainPart(
       { open: false, disabled: !!disabled },
-      { type: "button", disabled }
+      {
+        type: "button",
+        disabled: disabled && !focusableWhenDisabled,
+        "aria-disabled": (disabled && focusableWhenDisabled) || undefined,
+      }
     )}
     props={rest}
   />

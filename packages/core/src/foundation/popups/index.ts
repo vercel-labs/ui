@@ -10,6 +10,7 @@ export { modalAttribute, pointerModalAttribute } from "./modal-attribute"
 export {
   createPopupController,
   deriveOpen,
+  disabledTriggerAttrs,
   type Modal,
   modalTriple,
   openerOf,

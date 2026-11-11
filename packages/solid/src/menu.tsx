@@ -193,7 +193,14 @@ function MenuTrigger(
     () => props.controller,
     useContext(MenuContext)
   )
-  const rest = omit(props, "disabled", "payload", "shortcut", "controller")
+  const rest = omit(
+    props,
+    "disabled",
+    "focusableWhenDisabled",
+    "payload",
+    "shortcut",
+    "controller"
+  )
   return (
     <Show
       when={menu()}
@@ -208,7 +215,10 @@ function MenuTrigger(
         merge(rest, {
           type: "button",
           get disabled() {
-            return props.disabled
+            return props.disabled && !props.focusableWhenDisabled
+          },
+          get "aria-disabled"() {
+            return (props.disabled && props.focusableWhenDisabled) || undefined
           },
         })
       )}
@@ -220,6 +230,7 @@ function MenuTrigger(
           "button",
           () => ({
             disabled: props.disabled,
+            focusableWhenDisabled: props.focusableWhenDisabled,
             payload: props.payload,
             shortcut: props.shortcut,
           }),

@@ -18,6 +18,7 @@ The button that opens the menu. A trigger outside the menu connects through `con
 
   let {
     disabled,
+    focusableWhenDisabled,
     payload,
     shortcut,
     controller,
@@ -37,6 +38,7 @@ The button that opens the menu. A trigger outside the menu connects through `con
     partName="trigger"
     tag="button"
     {disabled}
+    {focusableWhenDisabled}
     {payload}
     {shortcut}
     {...rest}
@@ -47,7 +49,11 @@ The button that opens the menu. A trigger outside the menu connects through `con
     tag="button"
     part={plainPart(
       { open: false, disabled: !!disabled },
-      { type: "button", disabled }
+      {
+        type: "button",
+        disabled: disabled && !focusableWhenDisabled,
+        "aria-disabled": (disabled && focusableWhenDisabled) || undefined,
+      }
     )}
     props={rest}
   />

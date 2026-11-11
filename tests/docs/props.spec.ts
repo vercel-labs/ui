@@ -153,6 +153,8 @@ const components: Record<string, Component> = {
       onDismissAttempt: "MenuOptions",
       // React content renders the payload from its state. The web components payload example listens for it.
       onPayloadChange: "MenuOptions",
+      // Works as it does on Button, whose focusable-when-disabled example shows it.
+      focusableWhenDisabled: "MenuTriggerProps",
       // Menus don't filter. Keywords come with data shared with Command.
       keywords: "MenuDataItem",
     },
@@ -175,6 +177,8 @@ const components: Record<string, Component> = {
       defaultOpen: "PopoverOptions",
       // React content renders the payload from its state. The web components payload example listens for it.
       onPayloadChange: "PopoverOptions",
+      // Works as it does on Button, whose focusable-when-disabled example shows it.
+      focusableWhenDisabled: "PopoverTriggerProps",
     },
   },
   tooltip: {
@@ -267,6 +271,8 @@ const components: Record<string, Component> = {
       onPayloadChange: "DialogOptions",
       // Only changes the words of the polite pending announcement. Button's pending examples show it.
       pendingAnnouncement: "DialogOptions",
+      // Works as it does on Button, whose focusable-when-disabled example shows it.
+      focusableWhenDisabled: "DialogTriggerProps",
     },
   },
   "alert-dialog": {
@@ -291,6 +297,8 @@ const components: Record<string, Component> = {
       onPayloadChange: "AlertDialogOptions",
       // Only changes the words of the polite pending announcement. Button's pending examples show it.
       pendingAnnouncement: "AlertDialogOptions",
+      // Works as it does on Button, whose focusable-when-disabled example shows it.
+      focusableWhenDisabled: "AlertDialogTriggerProps",
     },
   },
   drawer: {

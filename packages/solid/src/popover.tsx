@@ -101,7 +101,14 @@ function PopoverTrigger(props: TriggerPartProps) {
     () => props.controller,
     useContext(PopoverContext)
   )
-  const rest = omit(props, "disabled", "payload", "shortcut", "controller")
+  const rest = omit(
+    props,
+    "disabled",
+    "focusableWhenDisabled",
+    "payload",
+    "shortcut",
+    "controller"
+  )
   return (
     <TriggerContext value={{ shortcut: () => props.shortcut, popover }}>
       <Show
@@ -117,7 +124,12 @@ function PopoverTrigger(props: TriggerPartProps) {
           merge(rest, {
             type: "button",
             get disabled() {
-              return props.disabled
+              return props.disabled && !props.focusableWhenDisabled
+            },
+            get "aria-disabled"() {
+              return (
+                (props.disabled && props.focusableWhenDisabled) || undefined
+              )
             },
           })
         )}
@@ -127,6 +139,7 @@ function PopoverTrigger(props: TriggerPartProps) {
           const trigger = () => ({
             id,
             disabled: props.disabled,
+            focusableWhenDisabled: props.focusableWhenDisabled,
             payload: props.payload,
             shortcut: props.shortcut,
           })

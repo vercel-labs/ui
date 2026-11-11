@@ -21,6 +21,7 @@ The button that opens the drawer. A trigger outside the drawer, like one per tab
 
   let {
     disabled,
+    focusableWhenDisabled,
     payload,
     shortcut,
     controller,
@@ -39,14 +40,25 @@ The button that opens the drawer. A trigger outside the drawer, like one per tab
 </script>
 
 {#if drawer}
-  <TriggerBinding owner={drawer} {disabled} {payload} {shortcut} {...rest} />
+  <TriggerBinding
+    owner={drawer}
+    {disabled}
+    {focusableWhenDisabled}
+    {payload}
+    {shortcut}
+    {...rest}
+  />
 {:else}
   <!-- Until the drawer it names mounts, a trigger outside the drawer is a plain button. -->
   <Part
     tag="button"
     part={plainPart(
       { open: false, disabled: !!disabled },
-      { type: "button", disabled }
+      {
+        type: "button",
+        disabled: disabled && !focusableWhenDisabled,
+        "aria-disabled": (disabled && focusableWhenDisabled) || undefined,
+      }
     )}
     props={rest}
   />

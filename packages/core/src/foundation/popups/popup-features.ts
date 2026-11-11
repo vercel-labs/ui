@@ -20,6 +20,7 @@ import { accessibleName } from "../text/accessible-name"
 import type { PopupCore, PopupState } from "./create-popup"
 import { createHoverIntent } from "./hover"
 import {
+  disabledTriggerAttrs,
   openerOf,
   popupTriggerAttrs,
   prepareReset,
@@ -199,8 +200,7 @@ function pressOpening(core: PopupCore) {
         ...popupTriggerAttrs(state, id, haspopup ?? "", key),
         "aria-haspopup": haspopup,
         type: "button",
-        disabled: props.disabled ? "" : undefined,
-        "data-disabled": props.disabled ? "" : undefined,
+        ...disabledTriggerAttrs(props),
       }
     },
   }

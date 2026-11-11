@@ -280,10 +280,15 @@ type AlertDialogOptions = DialogSharedOptions & {
 
 type TriggerProps = {
   /**
-   * Stops the trigger from opening the dialog. A native button can't be focused or pressed.
+   * Stops the trigger from opening the dialog. A native button can't be focused or pressed, unless `focusableWhenDisabled` is set.
    * @defaultValue false
    */
   disabled?: boolean
+  /**
+   * Keeps a disabled trigger in the tab order with `aria-disabled` instead of the native attribute, so it can host a tooltip that says why. Presses still do nothing.
+   * @defaultValue false
+   */
+  focusableWhenDisabled?: boolean
   /** Data for the content to render when this trigger opens the dialog, like the row it belongs to. */
   payload?: unknown
   /**

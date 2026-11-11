@@ -2060,7 +2060,7 @@ declare global {
     "ui-alert-dialog-trigger": UiPartElement<
       typeof alertDialog,
       "trigger",
-      "disabled" | "shortcut",
+      "disabled" | "focusableWhenDisabled" | "shortcut",
       "payload"
     >
     "ui-alert-dialog-close": UiPartElement<
@@ -2282,7 +2282,7 @@ declare global {
     "ui-dialog-trigger": UiPartElement<
       typeof dialog,
       "trigger",
-      "disabled" | "shortcut",
+      "disabled" | "focusableWhenDisabled" | "shortcut",
       "payload"
     >
     "ui-dialog-close": UiPartElement<
@@ -2304,7 +2304,7 @@ declare global {
     "ui-drawer-trigger": UiPartElement<
       typeof drawer,
       "trigger",
-      "disabled" | "shortcut",
+      "disabled" | "focusableWhenDisabled" | "shortcut",
       "payload"
     >
     "ui-drawer-close": UiPartElement<
@@ -2401,7 +2401,7 @@ declare global {
     "ui-menu-trigger": UiPartElement<
       typeof menu,
       "trigger",
-      "disabled" | "shortcut",
+      "disabled" | "focusableWhenDisabled" | "shortcut",
       "payload"
     >
     "ui-menu-context-trigger": UiPartElement<
@@ -2588,7 +2588,7 @@ declare global {
     "ui-popover-trigger": UiPartElement<
       typeof popover,
       "trigger",
-      "disabled" | "shortcut",
+      "disabled" | "focusableWhenDisabled" | "shortcut",
       "payload"
     >
     "ui-popover-close": UiPartElement<typeof popover, "close">

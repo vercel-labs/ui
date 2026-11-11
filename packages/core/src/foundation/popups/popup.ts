@@ -306,6 +306,18 @@ function popupTriggerAttrs(
   }
 }
 
+function disabledTriggerAttrs(props: {
+  disabled?: boolean
+  focusableWhenDisabled?: boolean
+}) {
+  const focusable = props.disabled && props.focusableWhenDisabled
+  return {
+    disabled: props.disabled && !focusable ? "" : undefined,
+    "aria-disabled": focusable ? "true" : undefined,
+    "data-disabled": props.disabled ? "" : undefined,
+  }
+}
+
 // Attributes every popup carries. `popover` is set when it shows instead, so
 // content rendered open on the server is visible before it hydrates. Content
 // kept mounted while closed is hidden.
@@ -1444,6 +1456,7 @@ export {
   createPopupLayer,
   createPopupController,
   deriveOpen,
+  disabledTriggerAttrs,
   firstUsable,
   initialFocusPlan,
   type Modal,

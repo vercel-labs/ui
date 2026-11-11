@@ -7,6 +7,7 @@ import { opensElsewhere } from "../../foundation/platform/button"
 import { isRTL } from "../../foundation/platform/env"
 import { ariaKeyshortcuts } from "../../foundation/platform/platform"
 import {
+  disabledTriggerAttrs,
   popupContentAttrs,
   popupTriggerAttrs,
 } from "../../foundation/popups/popup"
@@ -72,6 +73,7 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
     props: {
       id: "id",
       disabled: "boolean",
+      focusableWhenDisabled: "boolean",
       payload: "value",
       shortcut: "string",
     },
@@ -116,8 +118,7 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
       return {
         ...popupTriggerAttrs(state, id, "menu", key),
         type: "button",
-        disabled: props.disabled ? "" : undefined,
-        "data-disabled": props.disabled ? "" : undefined,
+        ...disabledTriggerAttrs(props),
         "aria-keyshortcuts": props.shortcut
           ? ariaKeyshortcuts(props.shortcut, state.apple)
           : undefined,

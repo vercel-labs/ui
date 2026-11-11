@@ -22,6 +22,7 @@ The button that opens the popover. A trigger outside the popover connects throug
 
   let {
     disabled,
+    focusableWhenDisabled,
     payload,
     shortcut,
     controller,
@@ -40,14 +41,25 @@ The button that opens the popover. A trigger outside the popover connects throug
 </script>
 
 {#if popover}
-  <TriggerBinding owner={popover} {disabled} {payload} {shortcut} {...rest} />
+  <TriggerBinding
+    owner={popover}
+    {disabled}
+    {focusableWhenDisabled}
+    {payload}
+    {shortcut}
+    {...rest}
+  />
 {:else}
   <!-- Until the popover it names mounts, a trigger outside the popover is a plain button. -->
   <Part
     tag="button"
     part={plainPart(
       { open: false, disabled: !!disabled },
-      { type: "button", disabled }
+      {
+        type: "button",
+        disabled: disabled && !focusableWhenDisabled,
+        "aria-disabled": (disabled && focusableWhenDisabled) || undefined,
+      }
     )}
     props={rest}
   />

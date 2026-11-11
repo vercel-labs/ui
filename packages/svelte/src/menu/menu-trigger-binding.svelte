@@ -15,6 +15,7 @@
     partName,
     tag,
     disabled,
+    focusableWhenDisabled,
     payload,
     shortcut,
     feature,
@@ -50,7 +51,7 @@
   const trigger = useHandlePart(
     () => menu,
     untrack(() => partName) as "trigger",
-    () => ({ id, disabled, payload, shortcut })
+    () => ({ id, disabled, focusableWhenDisabled, payload, shortcut })
   )
 </script>
 

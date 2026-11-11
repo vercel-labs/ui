@@ -174,7 +174,7 @@ Arrow keys wrap by default; `loop` false stops at the ends. Typing finds an item
 
 ## Disabled Items
 
-Disabled items remain focusable so people can discover them, but cannot run or open a submenu. A disabled Trigger is a native disabled button and cannot receive focus.
+Disabled items remain focusable so people can discover them, but cannot run or open a submenu. A disabled Trigger is a native disabled button and cannot receive focus. Add `focusable-when-disabled` to keep it in the tab order, so it can host a tooltip that says why; presses still do nothing.
 
 <ComponentExample
   name="menu/disabled"

@@ -145,6 +145,7 @@ const PopoverTrigger = withElement(
     inheritAttrs: false,
     props: {
       disabled: optionalBoolean,
+      focusableWhenDisabled: optionalBoolean,
       payload: null as unknown as PropType<unknown>,
       // A keyboard shortcut that presses the trigger, like "mod+i".
       shortcut: String,
@@ -165,6 +166,7 @@ const PopoverTrigger = withElement(
       const part = () => ({
         id,
         disabled: props.disabled,
+        focusableWhenDisabled: props.focusableWhenDisabled,
         payload: props.payload,
         shortcut: props.shortcut,
       })
@@ -175,7 +177,13 @@ const PopoverTrigger = withElement(
         () =>
           renderUnbound(
             "button",
-            { type: "button", disabled: props.disabled, ...attrs },
+            {
+              type: "button",
+              disabled: props.disabled && !props.focusableWhenDisabled,
+              "aria-disabled":
+                (props.disabled && props.focusableWhenDisabled) || undefined,
+              ...attrs,
+            },
             { slots, state: { open: false, disabled: !!props.disabled } }
           )
       )

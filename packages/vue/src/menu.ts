@@ -200,6 +200,7 @@ function triggerPart<
       inheritAttrs: false,
       props: {
         disabled: optionalBoolean,
+        focusableWhenDisabled: optionalBoolean,
         payload: null as unknown as PropType<unknown>,
         // A keyboard shortcut that opens the menu, like "mod+j". Root triggers only.
         shortcut: String,
@@ -216,6 +217,7 @@ function triggerPart<
         const part = () => ({
           id,
           disabled: props.disabled,
+          focusableWhenDisabled: props.focusableWhenDisabled,
           payload: props.payload,
           shortcut: props.shortcut,
         })

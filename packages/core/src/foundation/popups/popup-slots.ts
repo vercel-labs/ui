@@ -20,10 +20,15 @@ import type { createPopup, PopupState } from "./create-popup"
  */
 type PopupTriggerProps = {
   /**
-   * Stops the trigger from opening the popup. A native button can't be focused or pressed.
+   * Stops the trigger from opening the popup. A native button can't be focused or pressed, unless `focusableWhenDisabled` is set.
    * @defaultValue false
    */
   disabled?: boolean
+  /**
+   * Keeps a disabled trigger in the tab order with `aria-disabled` instead of the native attribute, so it can host a tooltip that says why. Presses still do nothing.
+   * @defaultValue false
+   */
+  focusableWhenDisabled?: boolean
   /** Data for the content to render when this trigger opens the popup, like the row it belongs to. */
   payload?: unknown
 }
@@ -227,7 +232,12 @@ function popupTrigger<State extends PopupState, Api extends PopupApi>(
   slot: SlotFactory<State, Api>
 ) {
   return slot<PopupTriggerProps, PopupTriggerState>({
-    props: { id: "id", disabled: "boolean", payload: "value" },
+    props: {
+      id: "id",
+      disabled: "boolean",
+      focusableWhenDisabled: "boolean",
+      payload: "value",
+    },
     state: (state, { key, props }) => ({
       open: state.open && (state.trigger === null || state.trigger === key),
       disabled: !!props.disabled,

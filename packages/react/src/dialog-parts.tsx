@@ -95,13 +95,30 @@ function dialogParts(
   }: TriggerPartProps & {
     controller?: DialogController<any, any> | AlertDialogController<any, any>
   }) {
-    const { disabled, payload: _, shortcut, render, ...rest } = props
+    const {
+      disabled,
+      focusableWhenDisabled,
+      payload: _,
+      shortcut,
+      render,
+      ...rest
+    } = props
     // Until the dialog it names mounts, a trigger outside the dialog is a plain button.
     const unconnected = () =>
-      renderElement("button", { type: "button", disabled, ...rest }, render, {
-        open: false,
-        disabled: !!disabled,
-      })
+      renderElement(
+        "button",
+        {
+          type: "button",
+          disabled: disabled && !focusableWhenDisabled,
+          "aria-disabled": (disabled && focusableWhenDisabled) || undefined,
+          ...rest,
+        },
+        render,
+        {
+          open: false,
+          disabled: !!disabled,
+        }
+      )
     return (
       <TriggerContext.Provider value={{ shortcut }}>
         <Connected

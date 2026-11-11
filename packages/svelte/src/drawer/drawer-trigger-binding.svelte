@@ -12,6 +12,7 @@
   let {
     owner,
     disabled,
+    focusableWhenDisabled,
     payload,
     shortcut,
     ...rest
@@ -22,7 +23,7 @@
   const trigger = useHandlePart(
     () => owner.handle,
     "trigger",
-    () => ({ id, disabled, payload, shortcut })
+    () => ({ id, disabled, focusableWhenDisabled, payload, shortcut })
   )
 </script>
 

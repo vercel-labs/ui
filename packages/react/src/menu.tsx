@@ -139,13 +139,30 @@ function MenuTrigger({
   controller,
   ...props
 }: Omit<PartProps<"button", MenuTriggerState>, Clashing> & TriggerProps) {
-  const { disabled, payload: _, shortcut: __, render, ...rest } = props
+  const {
+    disabled,
+    focusableWhenDisabled,
+    payload: _,
+    shortcut: __,
+    render,
+    ...rest
+  } = props
   // Until the menu it names mounts, a trigger outside the menu is a plain button.
   const unconnected = () =>
-    renderElement("button", { type: "button", disabled, ...rest }, render, {
-      open: false,
-      disabled: !!disabled,
-    })
+    renderElement(
+      "button",
+      {
+        type: "button",
+        disabled: disabled && !focusableWhenDisabled,
+        "aria-disabled": (disabled && focusableWhenDisabled) || undefined,
+        ...rest,
+      },
+      render,
+      {
+        open: false,
+        disabled: !!disabled,
+      }
+    )
   return (
     <Connected
       primitive={menuPrimitive}

@@ -189,10 +189,15 @@ type PopoverOptions = PortalProps & {
 
 type TriggerProps = {
   /**
-   * Stops the trigger from opening the popover. A native button can't be focused or pressed.
+   * Stops the trigger from opening the popover. A native button can't be focused or pressed, unless `focusableWhenDisabled` is set.
    * @defaultValue false
    */
   disabled?: boolean
+  /**
+   * Keeps a disabled trigger in the tab order with `aria-disabled` instead of the native attribute, so it can host a tooltip that says why. Presses still do nothing.
+   * @defaultValue false
+   */
+  focusableWhenDisabled?: boolean
   /** Data for the content to render when this trigger opens the popover, like the row it belongs to. */
   payload?: unknown
   /** A keyboard shortcut that presses the trigger, like `"mod+i"`. `mod` is Command on Apple platforms and Control elsewhere. Sets `aria-keyshortcuts`. */
@@ -373,6 +378,7 @@ const popoverPrimitive = /* @__PURE__ */ definePrimitive({
         props: {
           id: "id",
           disabled: "boolean",
+          focusableWhenDisabled: "boolean",
           payload: "value",
           shortcut: "string",
         },

@@ -107,7 +107,14 @@ function createDialogParts(
       () => props.controller,
       useContext(Context)
     )
-    const rest = omit(props, "disabled", "payload", "shortcut", "controller")
+    const rest = omit(
+      props,
+      "disabled",
+      "focusableWhenDisabled",
+      "payload",
+      "shortcut",
+      "controller"
+    )
     return (
       <TriggerContext value={{ shortcut: () => props.shortcut, dialog }}>
         <Show
@@ -123,7 +130,12 @@ function createDialogParts(
             merge(rest, {
               type: "button",
               get disabled() {
-                return props.disabled
+                return props.disabled && !props.focusableWhenDisabled
+              },
+              get "aria-disabled"() {
+                return (
+                  (props.disabled && props.focusableWhenDisabled) || undefined
+                )
               },
             })
           )}
@@ -133,6 +145,7 @@ function createDialogParts(
             const trigger = () => ({
               id,
               disabled: props.disabled,
+              focusableWhenDisabled: props.focusableWhenDisabled,
               payload: props.payload,
               shortcut: props.shortcut,
             })

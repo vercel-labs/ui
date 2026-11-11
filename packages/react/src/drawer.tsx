@@ -84,13 +84,30 @@ function Drawer({ children, container, ...options }: DrawerProps) {
  * @stable
  */
 function DrawerTrigger({ controller, ...props }: TriggerPartProps) {
-  const { disabled, payload: _, shortcut, render, ...rest } = props
+  const {
+    disabled,
+    focusableWhenDisabled,
+    payload: _,
+    shortcut,
+    render,
+    ...rest
+  } = props
   // Until the drawer it names mounts, a trigger outside the drawer is a plain button.
   const unconnected = () =>
-    renderElement("button", { type: "button", disabled, ...rest }, render, {
-      open: false,
-      disabled: !!disabled,
-    })
+    renderElement(
+      "button",
+      {
+        type: "button",
+        disabled: disabled && !focusableWhenDisabled,
+        "aria-disabled": (disabled && focusableWhenDisabled) || undefined,
+        ...rest,
+      },
+      render,
+      {
+        open: false,
+        disabled: !!disabled,
+      }
+    )
   return (
     <TriggerContext.Provider value={{ shortcut }}>
       <Connected

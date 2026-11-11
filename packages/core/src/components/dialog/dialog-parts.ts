@@ -52,6 +52,7 @@ function dialogSlots(
       props: {
         id: "id",
         disabled: "boolean",
+        focusableWhenDisabled: "boolean",
         payload: "value",
         shortcut: "string",
       },
