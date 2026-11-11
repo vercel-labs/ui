@@ -75,93 +75,94 @@ const excerpt: { text: string; behavior?: string }[] = [
 function Glyph({ name }: { name: string }) {
   const stroke = "stroke-foreground fill-none"
   return (
-    <svg
+    <span
       aria-hidden="true"
-      viewBox="0 0 96 56"
-      className="hidden h-12 w-20 shrink-0 overflow-visible @[30rem]:block @[64rem]:h-16 @[64rem]:w-28"
+      className="hidden size-20 shrink-0 items-center justify-center border border-dashed border-foreground/30 @[30rem]:flex @[64rem]:size-28"
     >
-      {name === "createPopup" && (
-        <>
-          <rect
-            x={8}
-            y={4}
-            width={80}
-            height={14}
-            className={cn(stroke, "fill-background")}
-          />
-          <path d="M76,9 l3,3 l3,-3" className={stroke} />
-          <rect
-            x={8}
-            y={22}
-            width={80}
-            height={30}
-            className={cn(stroke, "fill-background")}
-          />
-          <rect
-            x={11}
-            y={25}
-            width={74}
-            height={9}
-            className="fill-foreground"
-          />
-        </>
-      )}
-      {name === "createTypeahead" &&
-        ["G", "R", "A"].map((key, index) => (
-          <g key={key}>
+      <svg viewBox="0 0 96 56" className="h-auto w-[85%] overflow-visible">
+        {name === "createPopup" && (
+          <>
             <rect
-              x={14 + index * 24}
-              y={14}
-              width={20}
-              height={20}
+              x={8}
+              y={4}
+              width={80}
+              height={14}
               className={cn(stroke, "fill-background")}
             />
-            <text
-              x={24 + index * 24}
-              y={28}
-              textAnchor="middle"
-              className="fill-foreground font-mono text-[10px]"
-            >
-              {key}
-            </text>
-          </g>
-        ))}
-      {name === "createRovingFocus" &&
-        ["↑", "↓"].map((key, index) => (
-          <g key={key}>
+            <path d="M76,9 l3,3 l3,-3" className={stroke} />
             <rect
-              x={24 + index * 26}
-              y={16}
-              width={22}
-              height={22}
+              x={8}
+              y={22}
+              width={80}
+              height={30}
               className={cn(stroke, "fill-background")}
             />
-            <text
-              x={35 + index * 26}
-              y={31}
-              textAnchor="middle"
-              className="fill-foreground font-mono text-[11px]"
-            >
-              {key}
-            </text>
-          </g>
-        ))}
-      {name === "createSelection" &&
-        [0, 1, 2].map((row) => (
-          <g key={row}>
-            <path
-              d={`M8,${10 + row * 18} H64`}
-              className={cn(stroke, row === 1 ? "" : "stroke-foreground/30")}
+            <rect
+              x={11}
+              y={25}
+              width={74}
+              height={9}
+              className="fill-foreground"
             />
-            {row === 1 && (
-              <path
-                d="M74,28 l4,4 l8,-9"
-                className={cn(stroke, "[stroke-width:1.5]")}
+          </>
+        )}
+        {name === "createTypeahead" &&
+          ["G", "R", "A"].map((key, index) => (
+            <g key={key}>
+              <rect
+                x={14 + index * 24}
+                y={18}
+                width={20}
+                height={20}
+                className={cn(stroke, "fill-background")}
               />
-            )}
-          </g>
-        ))}
-    </svg>
+              <text
+                x={24 + index * 24}
+                y={32}
+                textAnchor="middle"
+                className="fill-foreground font-mono text-[10px]"
+              >
+                {key}
+              </text>
+            </g>
+          ))}
+        {name === "createRovingFocus" &&
+          ["↑", "↓"].map((key, index) => (
+            <g key={key}>
+              <rect
+                x={24 + index * 26}
+                y={17}
+                width={22}
+                height={22}
+                className={cn(stroke, "fill-background")}
+              />
+              <text
+                x={35 + index * 26}
+                y={32}
+                textAnchor="middle"
+                className="fill-foreground font-mono text-[11px]"
+              >
+                {key}
+              </text>
+            </g>
+          ))}
+        {name === "createSelection" &&
+          [0, 1, 2].map((row) => (
+            <g key={row}>
+              <path
+                d={`M8,${10 + row * 18} H64`}
+                className={cn(stroke, row === 1 ? "" : "stroke-foreground/30")}
+              />
+              {row === 1 && (
+                <path
+                  d="M74,28 l4,4 l8,-9"
+                  className={cn(stroke, "[stroke-width:1.5]")}
+                />
+              )}
+            </g>
+          ))}
+      </svg>
+    </span>
   )
 }
 
@@ -426,7 +427,7 @@ function PromptCard({
         <button
           type="button"
           onClick={onSend}
-          className="inline-flex h-11 shrink-0 items-center gap-3 bg-background px-4 @[26rem]:px-5 font-mono text-[13px] tracking-[0.06em] text-foreground uppercase transition-colors outline-none hover:bg-background/85 focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[#006bff]"
+          className="inline-flex h-11 shrink-0 items-center gap-3 bg-[#006bff] px-4 @[26rem]:px-5 font-mono text-[13px] tracking-[0.06em] text-white uppercase transition-colors outline-none hover:bg-[#0059d6] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[#006bff]"
         >
           Send
         </button>

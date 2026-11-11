@@ -27,6 +27,7 @@ const ink = "border border-foreground"
 const ring =
   "outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[#006bff]"
 const label = "font-mono text-[10px] tracking-[0.06em] uppercase"
+const action = "border-[#006bff] bg-[#006bff] text-white hover:bg-[#0059d6]"
 const press = cn(
   "inline-flex h-7 min-w-7 shrink-0 cursor-default items-center justify-center gap-1.5 bg-background px-2 font-mono text-[10px] tracking-[0.06em] uppercase select-none hover:bg-foreground/[0.06] data-pressed:bg-foreground data-pressed:text-background [&_svg]:size-3.5",
   ink,
@@ -802,7 +803,7 @@ function FlowDemo() {
       </div>
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-2">
-          <button type="button" onClick={go} className={press}>
+          <button type="button" onClick={go} className={cn(press, action)}>
             Run
           </button>
           <span

@@ -46,6 +46,7 @@ const ink = "border border-foreground"
 const ring =
   "outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[#006bff]"
 const label = "font-mono text-[10px] tracking-[0.06em] uppercase"
+const action = "border-[#006bff] bg-[#006bff] text-white hover:bg-[#0059d6]"
 const press = cn(
   "inline-flex h-7 min-w-7 shrink-0 cursor-default items-center justify-center gap-1.5 bg-background px-2 font-mono text-[10px] tracking-[0.06em] uppercase select-none hover:bg-foreground/[0.06] disabled:opacity-40 [&_svg]:size-3.5",
   ink,
@@ -419,7 +420,7 @@ function SheetDemo() {
             <span className="min-w-0 flex-1 truncate font-mono text-[12px]">
               Fill this in from the feedback
             </span>
-            <SheetRun className={press}>Run</SheetRun>
+            <SheetRun className={cn(press, action)}>Run</SheetRun>
           </div>
           <div className="overflow-x-auto [scrollbar-width:none]">
             <SheetGrid

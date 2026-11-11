@@ -47,21 +47,21 @@ function BehaviorsPoster({ fig }: { fig?: string }) {
       head={"HERE ARE SOME BEHAVIORS\nEACH ONE DOES ONE THING"}
       tone="white"
       pattern="none"
-      body="gap-12"
+      body="gap-10"
       className="lg:min-h-0!"
     >
-      <ul className="grid border-t border-foreground @[40rem]:grid-cols-2 @[72rem]:grid-cols-4">
+      <ul className="-mt-6 grid gap-x-4 @[40rem]:grid-cols-2 @[56rem]:grid-cols-4">
         {behaviors.map((behavior, index) => (
           <li
             key={behavior.name}
             className={cn(
-              "grid grid-cols-[1.75rem_minmax(0,1fr)] gap-x-2 border-b border-foreground/15 py-4 @[40rem]:pe-6 @[72rem]:py-5",
+              "flex flex-col gap-6 border-b border-foreground/15 pt-6 pb-8 @[40rem]:gap-10",
               index > 3 && "@max-[40rem]:hidden"
             )}
           >
             <span
               aria-hidden="true"
-              className="pt-0.5 font-mono text-[11px] text-muted-foreground tabular-nums"
+              className="font-mono text-[10px] tracking-[0.06em] text-muted-foreground tabular-nums"
             >
               {String(index + 1).padStart(2, "0")}
             </span>

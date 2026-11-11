@@ -167,12 +167,10 @@ function MobileNav({
       >
         <span
           className={cn(
-            "absolute inset-x-3.5 top-0 h-px",
+            "absolute inset-x-0 top-0 h-px",
             docs ? "bg-foreground/[0.06]" : "bg-foreground"
           )}
         />
-        <span className="pointer-events-none absolute size-[11px] text-foreground group-data-docs/header:text-foreground/30 before:absolute before:inset-x-0 before:top-[5px] before:h-px before:bg-current/40 after:absolute after:inset-y-0 after:start-[5px] after:w-px after:bg-current/40 -start-[5px] -top-[5px] group-data-open/header:hidden" />
-        <span className="pointer-events-none absolute size-[11px] text-foreground group-data-docs/header:text-foreground/30 before:absolute before:inset-x-0 before:top-[5px] before:h-px before:bg-current/40 after:absolute after:inset-y-0 after:start-[5px] after:w-px after:bg-current/40 -end-[5px] -top-[5px] group-data-open/header:hidden" />
       </div>
     </header>
   )

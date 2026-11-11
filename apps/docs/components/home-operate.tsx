@@ -477,7 +477,7 @@ function OperateDemo() {
                     type="button"
                     onClick={sent && !running ? reset : send}
                     disabled={running}
-                    className="inline-flex h-9 items-center gap-2.5 bg-background px-4 font-mono text-[12px] tracking-[0.06em] text-foreground uppercase transition-colors outline-none hover:bg-background/85 focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[#006bff] disabled:opacity-50"
+                    className="inline-flex h-9 items-center gap-2.5 bg-[#006bff] px-4 font-mono text-[12px] tracking-[0.06em] text-white uppercase transition-colors outline-none hover:bg-[#0059d6] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[#006bff] disabled:opacity-50"
                   >
                     {running ? "Working" : sent ? "Reset" : "Send"}
                   </button>
