@@ -155,6 +155,8 @@ const components: Record<string, Component> = {
       onPayloadChange: "MenuOptions",
       // Menus don't filter. Keywords come with data shared with Command.
       keywords: "MenuDataItem",
+      // The focus rule every popup shares. Popover's focus example shows it.
+      finalFocus: "MenuContentProps",
     },
   },
   popover: {

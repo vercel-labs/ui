@@ -9,6 +9,7 @@ import {
   type MenuActionDetails,
   type MenuCheckedChangeDetails,
   type MenuCheckedChangeReason,
+  type MenuContentProps,
   type MenuController,
   type MenuData,
   type MenuDataItem,
@@ -274,6 +275,9 @@ const MenuContent = withPayload(
         collisionPadding: Number,
         arrowPadding: Number,
         anchor: [Object, String] as PropType<Anchor | string | null>,
+        finalFocus: [String, Object, Function] as PropType<
+          MenuContentProps["finalFocus"]
+        >,
         keepMounted: optionalBoolean,
         // Renders the popup into this element instead of in place. Submenus stay
         // inside their parent's popup.

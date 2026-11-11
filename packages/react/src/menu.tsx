@@ -206,6 +206,7 @@ function MenuContent<Payload = unknown>({
   collisionPadding,
   arrowPadding,
   anchor,
+  finalFocus,
   keepMounted,
   container,
   render,
@@ -222,6 +223,7 @@ function MenuContent<Payload = unknown>({
     collisionPadding,
     arrowPadding,
     anchor,
+    finalFocus,
     keepMounted,
   }
   // Submenus render inside their parent's popup.

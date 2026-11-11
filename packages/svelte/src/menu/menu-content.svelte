@@ -30,6 +30,7 @@ The popup that holds the items, positioned against the trigger that opened it.
     collisionPadding,
     arrowPadding,
     anchor,
+    finalFocus,
     keepMounted,
     container,
     fromRoot,
@@ -69,6 +70,7 @@ The popup that holds the items, positioned against the trigger that opened it.
       collisionPadding,
       arrowPadding,
       anchor,
+      finalFocus,
       keepMounted,
     }),
     portalTo(() => (nested || viewport.present ? false : target()))

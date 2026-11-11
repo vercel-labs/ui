@@ -170,6 +170,14 @@ Arrow keys wrap by default; `loop` false stops at the ends. Typing finds an item
 </Menu>
 ```
 
+## Focus After Closing
+
+When the menu closes with focus inside it, focus returns to the trigger. If an action removes the trigger or moves people on to something else, set `finalFocus` on the content to a selector, an element or a function returning one, or to `"none"` to leave focus where the action put it. See [popup focus](../popups#focus) for the shared focus rules.
+
+```svelte
+<MenuContent finalFocus="#file-list" />
+```
+
 ## Disabled Items
 
 Disabled items remain focusable so people can discover them, but cannot run or open a submenu. A disabled Trigger is a native disabled button and cannot receive focus.

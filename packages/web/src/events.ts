@@ -2421,6 +2421,7 @@ declare global {
       | "arrowPadding"
       | "anchor"
       | "container"
+      | "finalFocus"
       | "keepMounted"
     >
     "ui-menu-sub-content": UiPartElement<
