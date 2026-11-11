@@ -291,7 +291,7 @@ function CopyPromptDialog({
         <DialogContent
           instant
           backdropClassName="hidden"
-          className="top-[8vh] max-h-[84vh] max-w-[40rem] gap-5 overflow-y-auto rounded-none p-6"
+          className="top-[12vh] max-h-[80vh] max-w-[40rem] gap-5 overflow-y-auto rounded-none p-6"
         >
           <div className="flex items-start justify-between gap-4">
             <div className="flex flex-col gap-1">
