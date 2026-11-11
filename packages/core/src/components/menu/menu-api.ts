@@ -16,7 +16,6 @@ import {
   deriveOpen,
   modalTriple,
   openerOf,
-  type PopupFocusTarget,
   type PopupOpener,
   type PopupOpenOptions,
   type PopupResult,
@@ -48,6 +47,7 @@ import { elements } from "../../foundation/kernel/elements"
 import type {
   MenuCheckedChangeReason,
   MenuData,
+  MenuFinalFocus,
   MenuOpenChangeReason,
   MenuOptions,
   MenuOpenOptions,
@@ -223,7 +223,7 @@ type ContentProps = PositionProps &
      * Where focus goes when the menu closes while focus is inside it. `"trigger"` returns it to the trigger and `"none"` leaves it. A CSS selector, an element or a function picks a specific element.
      * @defaultValue "trigger"
      */
-    finalFocus?: PopupFocusTarget
+    finalFocus?: MenuFinalFocus
     /**
      * Whether the menu stays in the page, hidden, while closed. For animation libraries that drive the exit from state.
      * @defaultValue false

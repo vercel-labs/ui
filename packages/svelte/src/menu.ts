@@ -33,6 +33,7 @@ export type {
   MenuData,
   MenuDataItem,
   MenuDismissReason,
+  MenuFinalFocus,
   MenuItemIconProps,
   MenuItemIconState,
   MenuItemIndicatorProps,

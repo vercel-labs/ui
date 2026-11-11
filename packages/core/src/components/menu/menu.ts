@@ -2,6 +2,7 @@ import { initialApple } from "../../foundation/platform/platform"
 import {
   createPopupController,
   type Modal,
+  type PopupFocusTarget,
 } from "../../foundation/popups/popup"
 import { pointerModalAttribute } from "../../foundation/popups/modal-attribute"
 import { type PortalProps } from "../../foundation/platform/position"
@@ -334,6 +335,13 @@ type MenuItemIndicatorProps = Omit<IndicatorProps, "item" | "itemKey" | "group">
  */
 type MenuItemIconProps = ItemIconProps
 /**
+ * Where focus goes when the menu closes while focus was inside it.
+ * `"trigger"` returns it to the trigger and `"none"` leaves it. A CSS
+ * selector, an element or a function picks a specific element.
+ * @stable
+ */
+type MenuFinalFocus = PopupFocusTarget
+/**
  * The props the `content` slot of `menu` takes.
  * @stable
  */
@@ -544,6 +552,7 @@ export {
   type MenuData,
   type MenuDataItem,
   type MenuDismissReason,
+  type MenuFinalFocus,
   type MenuItemIconProps,
   type MenuItemIconState,
   type MenuItemIndicatorProps,
