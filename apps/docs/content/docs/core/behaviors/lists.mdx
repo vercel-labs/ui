@@ -395,21 +395,86 @@ addOlderMessages()
 
 ### Pick by Scrolling
 
-`bindScrollPicker` turns a scrolling listbox into a wheel, like the hour and minute drums of a time picker: the option at the center is the value. Bind it to a [Listbox](/docs/components/listbox) once the list is in the page, and select the option it reports:
+Import `bindScrollPicker` from `@ui-sdk/core`. It turns a scrolling listbox into a wheel, like the hour and minute drums of a time picker: the option at the center is the value. Bind it to a [Listbox](/docs/components/listbox) once the list is in the page, and select the option it reports. It returns a cleanup for when the list leaves:
+
+<FrameworkContent value="react">
 
 ```tsx
-import { bindScrollPicker } from "@ui-sdk/core"
+const list = React.useRef<HTMLDivElement>(null)
+const select = React.useEffectEvent((index: number) => setHour(hours[index]))
 
-const unbind = bindScrollPicker(list, {
-  onSelect: (index) => setHour(hours[index]),
+React.useLayoutEffect(
+  () => bindScrollPicker(list.current!, { onSelect: (index) => select(index) }),
+  []
+)
+
+<Listbox ref={list} keepInView={false} value={hour} onValueChange={setHour}>
+```
+
+</FrameworkContent>
+<FrameworkContent value="vue">
+
+```vue
+<script setup lang="ts">
+const holder = useTemplateRef<HTMLElement>("holder")
+let unbind: (() => void) | undefined
+onMounted(() => {
+  const list = holder.value!.querySelector<HTMLElement>('[role="listbox"]')!
+  unbind = bindScrollPicker(list, {
+    onSelect: (index) => (hour.value = hours[index]),
+  })
+})
+onBeforeUnmount(() => unbind?.())
+</script>
+
+<template>
+  <div ref="holder">
+    <Listbox v-model="hour" :keep-in-view="false">…</Listbox>
+  </div>
+</template>
+```
+
+</FrameworkContent>
+<FrameworkContent value="svelte">
+
+```svelte
+<Listbox
+  bind:value={hour}
+  keepInView={false}
+  {@attach (el) =>
+    bindScrollPicker(el, { onSelect: (index) => (hour = hours[index]) })}
+>
+```
+
+</FrameworkContent>
+<FrameworkContent value="solid">
+
+```tsx
+let list: HTMLDivElement | undefined
+onSettled(() =>
+  bindScrollPicker(list!, { onSelect: (index) => setHour(hours[index]) })
+)
+
+<Listbox ref={list} keepInView={false} value={hour()} onValueChange={setHour}>
+```
+
+</FrameworkContent>
+<FrameworkContent value="web-components">
+
+```ts
+const listbox = document.querySelector("ui-listbox")!
+const unbind = bindScrollPicker(listbox, {
+  onSelect: (index) => (listbox.value = hours[index]),
 })
 ```
 
-`index` counts every option in the list, disabled ones included, so it matches your array. Call `unbind()` when the list unmounts.
+</FrameworkContent>
+
+`index` counts every option in the list, disabled ones included, so it matches your array. The picker selects nothing itself, so `onSelect` is where a read-only form or a check of your own decides.
 
 The list stays a listbox with one selection. Scrolling, a flick on a touch screen and a drag with the mouse select the option at the center as it passes, and the list settles on the nearest enabled option once it stops. When the listbox selects an option itself, from a click, an arrow key, Home, End or typing its name, the picker scrolls there smoothly without selecting the options in between. Page Up and Page Down move a screenful of options.
 
-Set the listbox's `scrollIntoView` option to `false`, so it doesn't jump to an option the wheel is about to glide to. Give the list a height, `scroll-snap-type` and room at both ends for the first and last options to reach the center, and give each option `scroll-snap-align: center`:
+Set the listbox's `keepInView` option to `false`, so it doesn't jump to an option the wheel is about to glide to. Give the list a height, `scroll-snap-type` and room at both ends for the first and last options to reach the center, and give each option `scroll-snap-align: center`:
 
 ```css
 [role="listbox"] {

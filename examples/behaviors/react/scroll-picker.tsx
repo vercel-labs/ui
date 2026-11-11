@@ -25,7 +25,7 @@ function Wheel({
     onValueChange(options[index])
   )
 
-  React.useEffect(
+  React.useLayoutEffect(
     () =>
       bindScrollPicker(list.current!, { onSelect: (index) => select(index) }),
     []
@@ -36,7 +36,7 @@ function Wheel({
       <Listbox
         ref={list}
         aria-label={label}
-        scrollIntoView={false}
+        keepInView={false}
         value={value}
         onValueChange={(next) => next && onValueChange(next)}
       >

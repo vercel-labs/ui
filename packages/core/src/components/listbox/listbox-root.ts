@@ -200,7 +200,7 @@ type ListboxSharedOptions<T> = {
    * Whether the list scrolls the option keys move to into view, and the selected option when it first shows. Turn it off when something else scrolls the list, like `bindScrollPicker`.
    * @defaultValue true
    */
-  scrollIntoView?: boolean
+  keepInView?: boolean
   /** The items as data. Renders them for you, and lets typing find items a virtualized list hasn't rendered. */
   items?: ListData<T>
   /** The string an item's value submits as and is identified by, for object values. Strings pass through, and objects use their `value` or `id`. */
@@ -317,7 +317,7 @@ const listboxPrimitive = /* @__PURE__ */ definePrimitive({
     deselectable: "boolean",
     orientation: "string",
     loop: "boolean",
-    scrollIntoView: "boolean",
+    keepInView: "boolean",
     items: "value",
     itemToValue: "value",
     isItemEqualToValue: "value",

@@ -8,7 +8,7 @@ const picker = ({
   defaultValue,
   items,
 }: (typeof pickerFixtures)[number]) => `
-  <ui-listbox class="picker" aria-label="${label}" orientation="${orientation}" scroll-into-view="false" default-value="${defaultValue}">
+  <ui-listbox class="picker" aria-label="${label}" orientation="${orientation}" keep-in-view="false" default-value="${defaultValue}">
     ${items
       .map(
         (item) =>

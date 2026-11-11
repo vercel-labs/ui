@@ -31,7 +31,7 @@ onBeforeUnmount(() => unbind?.())
       class="picker"
       :aria-label="picker.label"
       :orientation="picker.orientation"
-      :scroll-into-view="false"
+      :keep-in-view="false"
       :value="value"
       @update:value="choose"
     >

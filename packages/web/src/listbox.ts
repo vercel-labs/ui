@@ -38,7 +38,7 @@ function defineListboxElements() {
   createParts(listbox, {
     root: {
       tag: owner,
-      defaults: { loop: true, scrollIntoView: true },
+      defaults: { loop: true, keepInView: true },
       formAssociated: true,
       display: "block",
       options: (el) => {

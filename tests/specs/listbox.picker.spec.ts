@@ -3,7 +3,7 @@ import type { Locator, Page } from "@playwright/test"
 import { expect, test } from "../fixtures"
 
 // Listboxes that pick by scrolling, with `bindScrollPicker` and
-// `scrollIntoView` off. See fixtures/listbox-picker.ts.
+// `keepInView` off. See fixtures/listbox-picker.ts.
 
 const hours = (page: Page) => page.getByRole("listbox", { name: "Hour" })
 const pages = (page: Page) => page.getByRole("listbox", { name: "Page" })
@@ -125,6 +125,31 @@ test.describe("scrolling", () => {
       .toBeGreaterThan(6)
   })
 
+  test("a mouse drag puts back the list's own inline snapping and selection styles", async ({
+    page,
+    open,
+  }) => {
+    await open("listbox-picker")
+    await expectCentered(hours(page), "3")
+    await hours(page).evaluate((el) => {
+      el.style.scrollSnapType = "y mandatory"
+      el.style.userSelect = "text"
+    })
+    const { x, y } = await center(hours(page))
+    await page.mouse.move(x, y)
+    await page.mouse.down()
+    await dragBy(page, x, y, -40)
+    await holdStill(page)
+    await page.mouse.up()
+    await expectCentered(hours(page), "4")
+    expect(
+      await hours(page).evaluate((el) => [
+        el.style.scrollSnapType,
+        el.style.userSelect,
+      ])
+    ).toEqual(["y mandatory", "text"])
+  })
+
   test("a mouse drag doesn't press the option it started on", async ({
     page,
     open,
@@ -185,6 +210,20 @@ test.describe("pressing and keys", () => {
     await page.keyboard.press("PageUp")
     await expectCentered(hours(page), "3")
     await expect(changes(page, "Hour")).toHaveText("7,3")
+  })
+
+  test("a key handler on the list that cancels Page Down keeps the picker still", async ({
+    page,
+    open,
+  }) => {
+    await open("listbox-picker")
+    await hours(page).evaluate((el) =>
+      el.addEventListener("keydown", (event) => event.preventDefault())
+    )
+    await option(hours(page), "3").focus()
+    await page.keyboard.press("PageDown")
+    await expect(changes(page, "Hour")).toHaveText("")
+    await expectCentered(hours(page), "3")
   })
 
   test("with reduced motion, a move jumps instead of scrolling smoothly", async ({

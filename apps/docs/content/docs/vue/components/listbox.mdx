@@ -197,7 +197,7 @@ Give a long list a maximum height and `overflow-y: auto`. It starts scrolled to 
 
 For a virtualized list, supply `items` so typeahead knows about unmounted options. `@highlight` reports the focused value and index; each rendered item’s `index` places it in the full collection for screen readers. The [Select virtualization example](./select#virtualized) shows the same data and scrolling approach.
 
-Set `:scroll-into-view="false"` when something else scrolls the list, like a wheel that picks the option at its center with [`bindScrollPicker`](../../core/behaviors/lists#wheels-you-scroll-to-pick-from). The list then leaves its scroll position alone as keys move focus.
+Set `:keep-in-view="false"` when something else scrolls the list, like a wheel that picks the option at its center with [`bindScrollPicker`](../../core/behaviors/lists#wheels-you-scroll-to-pick-from). The list then leaves its scroll position alone as keys move focus.
 
 ## Custom Rendering
 

@@ -29,7 +29,7 @@ function Picker(props: { picker: PickerFixture }) {
         class="picker"
         aria-label={props.picker.label}
         orientation={props.picker.orientation}
-        scrollIntoView={false}
+        keepInView={false}
         value={value()}
         onValueChange={choose}
       >

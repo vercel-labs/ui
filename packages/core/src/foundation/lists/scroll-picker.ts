@@ -4,7 +4,7 @@ import { projectDistance } from "../motion/projection"
 import { createVelocityTracker } from "../motion/velocity"
 import { clamp } from "../number/steps"
 import { isRTL } from "../platform/env"
-import { prefersReducedMotion } from "../platform/platform"
+import { activeElement, prefersReducedMotion } from "../platform/platform"
 
 // No scroll for this long, with no finger down, counts as rest where
 // `scrollend` isn't supported.
@@ -131,7 +131,6 @@ function bindScrollPicker(
   // doesn't select what it passes.
   let target: number | null = null
   let scrolling = false
-  let unsnapped = false
   let touching = false
   let restMissed = false
   let lastEvent: Event | undefined
@@ -145,6 +144,27 @@ function bindScrollPicker(
   } | null = null
   let offDrag: (() => void)[] = []
   const observed = new Set<HTMLElement>()
+  // The list's own inline values, put back after a drag, since a framework
+  // won't rewrite a style prop that didn't change.
+  const overridden = new Map<string, [value: string, priority: string]>()
+
+  function override(name: string, value: string) {
+    if (!overridden.has(name)) {
+      overridden.set(name, [
+        list.style.getPropertyValue(name),
+        list.style.getPropertyPriority(name),
+      ])
+    }
+    list.style.setProperty(name, value)
+  }
+
+  function restore(name: string) {
+    const previous = overridden.get(name)
+    if (previous) {
+      overridden.delete(name)
+      list.style.setProperty(name, ...previous)
+    }
+  }
 
   const scroll = () => {
     if (vertical) {
@@ -228,10 +248,10 @@ function bindScrollPicker(
     const element = items[index]
     options.onSelect?.(index, { element, event })
     // A roving list moves its focus along, so the next key starts here.
-    const active = doc.activeElement
+    const active = activeElement(doc)
     if (
+      active &&
       active !== element &&
-      active instanceof HTMLElement &&
       items.includes(active) &&
       element.hasAttribute("tabindex")
     ) {
@@ -251,10 +271,7 @@ function bindScrollPicker(
 
   function arrive() {
     target = null
-    if (unsnapped) {
-      unsnapped = false
-      list.style.removeProperty("scroll-snap-type")
-    }
+    restore("scroll-snap-type")
   }
 
   function waitForRest() {
@@ -393,9 +410,8 @@ function bindScrollPicker(
       drag.moved = true
       scrolling = true
       // Snapping would pull each write back to an option.
-      unsnapped = true
-      list.style.setProperty("scroll-snap-type", "none")
-      list.style.setProperty("user-select", "none")
+      override("scroll-snap-type", "none")
+      override("user-select", "none")
       doc.getSelection()?.removeAllRanges()
       try {
         list.setPointerCapture(event.pointerId)
@@ -419,7 +435,7 @@ function bindScrollPicker(
     if (!moved) {
       return
     }
-    list.style.removeProperty("user-select")
+    restore("user-select")
     // WebKit sends the click to the option the drag started on.
     swallowNextClick(doc)
     scrolling = false
@@ -443,7 +459,12 @@ function bindScrollPicker(
   function onKeyDown(event: KeyboardEvent) {
     const direction =
       event.key === "PageDown" ? 1 : event.key === "PageUp" ? -1 : 0
-    if (!direction || event.defaultPrevented || items.length < 2) {
+    if (
+      !direction ||
+      event.defaultPrevented ||
+      items.length < 2 ||
+      !list.contains(event.target as Node)
+    ) {
       return
     }
     event.preventDefault()
@@ -514,7 +535,8 @@ function bindScrollPicker(
     on(list, "touchcancel", onTouchEnd, { passive: true }),
     on(list, "pointerdown", onPointerDown),
     on(list, "mousedown", onMouseDown),
-    on(list, "keydown", onKeyDown),
+    // On the document, so handlers React and Svelte delegate to their root run first and can cancel it.
+    on(doc, "keydown", onKeyDown),
   ]
 
   return () => {
@@ -524,9 +546,7 @@ function bindScrollPicker(
     mutations?.disconnect()
     view.cancelAnimationFrame(frame)
     view.clearTimeout(restTimer)
-    if (drag?.moved) {
-      list.style.removeProperty("user-select")
-    }
+    restore("user-select")
     arrive()
     for (const item of items) {
       item.style.removeProperty("--picker-offset")

@@ -101,7 +101,11 @@ describe("bindScrollPicker", () => {
       onSelect: (index) => selected.push(index),
     })
     list.dispatchEvent(
-      new KeyboardEvent("keydown", { key: "PageDown", cancelable: true })
+      new KeyboardEvent("keydown", {
+        key: "PageDown",
+        bubbles: true,
+        cancelable: true,
+      })
     )
     expect(selected).toEqual([2])
     unbind()

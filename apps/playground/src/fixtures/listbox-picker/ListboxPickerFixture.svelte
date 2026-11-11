@@ -23,7 +23,7 @@
       class="picker"
       aria-label={picker.label}
       orientation={picker.orientation}
-      scrollIntoView={false}
+      keepInView={false}
       value={pickers[index].value}
       onValueChange={(next) => choose(index, next)}
       {@attach (el) =>

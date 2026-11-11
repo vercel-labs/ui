@@ -15,7 +15,7 @@ function Example() {
   }
   const select = React.useEffectEvent((index: number) => choose(pages[index]))
 
-  React.useEffect(
+  React.useLayoutEffect(
     () =>
       bindScrollPicker(list.current!, { onSelect: (index) => select(index) }),
     []
@@ -27,7 +27,7 @@ function Example() {
         ref={list}
         aria-label="Page"
         orientation="horizontal"
-        scrollIntoView={false}
+        keepInView={false}
         value={page}
         onValueChange={(next) => next && choose(next)}
       >

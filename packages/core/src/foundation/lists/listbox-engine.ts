@@ -291,7 +291,7 @@ function createListboxEngine(
     // content around the list, so the page never scrolls. Defaults to `container`.
     scrollRoot?: () => HTMLElement | undefined
     // Whether highlighting scrolls the item into view. Defaults to true.
-    scrollIntoView?: () => boolean
+    keepInView?: () => boolean
     // Runs when an item mounts or unmounts, like a highlighted one a virtualizer
     // just rendered, so parts that depend on the list can update.
     onRegister?: (key: string) => void
@@ -580,7 +580,7 @@ function createListboxEngine(
     if (focusMode() === "real" && focus && config.active()) {
       el.focus({ preventScroll: true })
     }
-    if (config.scrollIntoView?.() !== false) {
+    if (config.keepInView?.() !== false) {
       revealInList(el, (config.scrollRoot ?? config.container)?.())
     }
   }
