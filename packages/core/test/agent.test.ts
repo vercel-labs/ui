@@ -2089,6 +2089,35 @@ describe("agent act", () => {
     expect(instance.get().open).toBe(false)
   })
 
+  test("a dialog shared by many triggers lists them, and a press opens it through the one it names", async () => {
+    const agent = createAgent()
+    const instance = dialog({ id: "edit" })
+    const clicked: string[] = []
+    for (const card of ["Alpha", "Beta"]) {
+      const trigger = document.body.appendChild(
+        document.createElement("button")
+      )
+      trigger.textContent = `Edit ${card}`
+      trigger.addEventListener("click", () => clicked.push(card))
+      cleanups.push(
+        bind(instance.part("trigger", { id: card, payload: card }), trigger)
+      )
+    }
+    cleanups.push(() => instance.destroy())
+    const [component] = agent.snapshot().filter((found) => !found.offPage)
+    expect(component).toMatchObject({
+      component: "dialog",
+      buttons: ["Edit Alpha", "Edit Beta"],
+    })
+    expect(component.actions).toContain("press")
+    const outcome = await agent.act({
+      steps: [{ ref: component.ref, action: "press", args: ["Edit Beta"] }],
+    })
+    expect(outcome.ok, outcome.error?.message).toBe(true)
+    expect(clicked).toEqual(["Beta"])
+    expect(instance.get()).toMatchObject({ open: true, payload: "Beta" })
+  })
+
   test("a refused press returns once the dialog it opened has left the page", async () => {
     let unbindOpen: (() => void)[] = []
     const content = Object.assign(document.createElement("div"), {

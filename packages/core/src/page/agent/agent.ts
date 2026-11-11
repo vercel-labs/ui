@@ -375,6 +375,15 @@ function ownButton(parts: Bound[]) {
   }
 }
 
+// The triggers a closed popup shares between many buttons, like an Edit dialog
+// opened from every row, each pressed by its own text, so its click and payload run.
+function triggersOf(parts: Bound[]) {
+  const triggers = parts.filter(
+    (part) => part.slot === "trigger" && isShown(part.el)
+  )
+  return triggers.length > 1 ? triggers.map((part) => part.el) : []
+}
+
 // Any key on it is an adapter's, like a web component's generated id.
 function soleTrigger(parts: Bound[]) {
   const triggers = parts.filter((part) => part.slot === "trigger")
@@ -566,6 +575,10 @@ function describe(entry: Entry, instance: PrimitiveInstance, parts: Bound[]) {
   const buttons = state.open === true ? buttonsOf(parts).map(textOrName) : []
   if (buttons.length) {
     out.buttons = buttons
+  }
+  const triggers = state.open === true ? [] : triggersOf(parts)
+  if (triggers.length) {
+    out.buttons = triggers.map(textOrName)
   }
   if (isComponentDisabled(state, parts)) {
     out.disabled = true
@@ -941,7 +954,8 @@ function createAgent(
     const api = instance.api as { setOpen?: (open: boolean) => void }
     const match = () => {
       const parts = bound(instance)
-      const buttons = buttonsOf(parts)
+      const open = (instance.get() as { open?: boolean }).open === true
+      const buttons = [...buttonsOf(parts), ...(open ? [] : triggersOf(parts))]
       // A popup's own button is its trigger, which opens it like a person's click.
       if (text === undefined) {
         return {
