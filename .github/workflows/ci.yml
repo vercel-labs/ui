@@ -1,15 +1,15 @@
 name: CI
 
 on:
-  # Markdown files don't run the suite; otherwise each one cancels the run in
-  # progress on main.
+  # Markdown files don't run the suite on main. A pull request always runs, so
+  # every one reports the check the main ruleset requires; its affected specs
+  # leave Markdown out.
   push:
     branches: [main]
     paths: ["**", "!**/*.md", "!.claude/**", "tests/perf/README.md"]
   # The engines label adds WebKit and Firefox to a pull request's runs.
   pull_request:
     types: [opened, synchronize, reopened, labeled]
-    paths: ["**", "!**/*.md", "!.claude/**", "tests/perf/README.md"]
   workflow_dispatch:
     inputs:
       suite:
