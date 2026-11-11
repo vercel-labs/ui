@@ -26,6 +26,7 @@ import { select } from "../src/components/select/select"
 import { separator } from "../src/components/separator/separator"
 import { slider } from "../src/components/slider/slider"
 import { tabs } from "../src/components/tabs/tabs"
+import { toolbar } from "../src/components/toolbar/toolbar"
 import { tree } from "../src/components/tree/tree"
 import { triggerMenu } from "../src/components/trigger-menu/trigger-menu"
 
@@ -355,6 +356,31 @@ describe("agent", () => {
     unbind()
     instance.destroy()
     expect(password()).toEqual([])
+  })
+
+  test("a toolbar's buttons are pressed by their text", async () => {
+    const agent = createAgent()
+    const instance = toolbar({ id: "format" })
+    const root = document.body.appendChild(document.createElement("div"))
+    root.setAttribute("aria-label", "Format")
+    cleanups.push(bind(instance.part("root"), root), () => instance.destroy())
+    const pressed: string[] = []
+    for (const text of ["Bold", "Italic"]) {
+      const button = root.appendChild(document.createElement("button"))
+      button.textContent = text
+      button.addEventListener("click", () => pressed.push(text))
+      cleanups.push(bind(instance.part("button", { id: text }), button))
+    }
+    const component = agent.snapshot().find((found) => found.label === "Format")
+    expect(component).toMatchObject({
+      buttons: ["Bold", "Italic"],
+      actions: ["press"],
+    })
+    const outcome = await agent.act({
+      steps: [{ ref: "Format", action: "press", args: ["Italic"] }],
+    })
+    expect(outcome.ok, outcome.error?.message).toBe(true)
+    expect(pressed).toEqual(["Italic"])
   })
 
   test("a password's value never reaches the agent, even while it's shown", async () => {

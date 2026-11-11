@@ -563,7 +563,11 @@ function describe(entry: Entry, instance: PrimitiveInstance, parts: Bound[]) {
   if (confirm) {
     out.confirm = confirm
   }
-  const buttons = state.open === true ? buttonsOf(parts).map(textOrName) : []
+  // An open popup's buttons, and a toolbar's, which are on the page whenever it is.
+  const buttons =
+    state.open === true || parts.some((part) => part.slot === "button")
+      ? buttonsOf(parts).map(textOrName)
+      : []
   if (buttons.length) {
     out.buttons = buttons
   }
