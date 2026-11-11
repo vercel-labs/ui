@@ -12,6 +12,7 @@ import {
 } from "../src/page/agent/agent"
 import { button } from "../src/components/button/button"
 import { checkbox } from "../src/components/checkbox/checkbox"
+import { combobox } from "../src/components/combobox/combobox"
 import { datePicker } from "../src/components/date-picker/date-picker"
 import { dialog } from "../src/components/dialog/dialog"
 import { input, textarea } from "../src/components/input/input"
@@ -486,6 +487,32 @@ describe("agent", () => {
       /^No item "Tokyo" in Region \(c\d+\)\. Its items: Frankfurt, Singapore\.$/
     )
     expect(onValueChange).not.toHaveBeenCalled()
+  })
+
+  test("setValue takes labels in a list of values, like a multiple combobox's", async () => {
+    const agent = createAgent()
+    const instance = combobox({
+      id: "watchers",
+      multiple: true,
+      items: [
+        { value: "theo", label: "Theo Laurent" },
+        { value: "ana", label: "Ana Ruiz" },
+      ],
+    })
+    const el = document.body.appendChild(document.createElement("input"))
+    el.setAttribute("aria-label", "Watchers")
+    cleanups.push(bind(instance.part("input"), el), () => instance.destroy())
+    const outcome = await agent.act({
+      steps: [
+        {
+          ref: "Watchers",
+          action: "setValue",
+          args: [["Theo Laurent", "ana"]],
+        },
+      ],
+    })
+    expect(outcome.ok, outcome.error?.message).toBe(true)
+    expect(instance.get().value).toEqual(["theo", "ana"])
   })
 
   test("setValue refuses a disabled item, by its label or its value, as a person can't choose it", async () => {

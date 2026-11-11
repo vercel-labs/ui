@@ -1331,6 +1331,31 @@ function createAgent(
           }
         }
       }
+      // Each label in a list of values, like a multiple combobox's ["Theo Laurent"], the same way.
+      if (
+        action === "setValue" &&
+        Array.isArray(args[0]) &&
+        args[0].some((value) => typeof value === "string")
+      ) {
+        const items = await listItems(entry, instance, askToOpen, seeOpen)
+        const name = `${entry.label ?? entry.component} (${entry.ref})`
+        const values = (args[0] as unknown[]).map((value) => {
+          if (
+            typeof value !== "string" ||
+            items.some((item) => item.value === value)
+          ) {
+            return value
+          }
+          const found = items.filter((item) => fold(item.label) === fold(value))
+          if (found.length > 1) {
+            throw new Error(
+              `"${value}" names ${found.length} items in ${name}: ${found.map((item) => item.value).join(", ")}. Use a value.`
+            )
+          }
+          return found.length ? found[0].value : value
+        })
+        args = [values, ...args.slice(1)]
+      }
       // A closed list refuses values it doesn't have in a list or an object too.
       const elementOf = internalOf(instance)?.elementOf
       if (
