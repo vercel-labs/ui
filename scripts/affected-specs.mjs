@@ -63,7 +63,6 @@ const maxShards = 12
 
 const frameworks = ["react", "vue", "web", "solid", "svelte"]
 const engineProjects = ["web-webkit", "web-firefox"]
-const leakFrameworks = ["react", "vue", "web"]
 
 /** A framework's Chromium projects, as tests/playwright.config.ts names them. */
 function chromiumProjects(framework) {
@@ -506,7 +505,7 @@ function commands({ touched, shared }) {
   const reached = new Set(
     [...touched.values(), ...shared.values()].flatMap((reach) => [...reach])
   )
-  const leaks = leakFrameworks.filter(
+  const leaks = frameworks.filter(
     (framework) => reached.has(framework) && !whole.includes(framework)
   )
   // Leak tests are named by component in words: "a scroll area" for scroll-area.

@@ -518,22 +518,65 @@ test("hold confirm: letting go early keeps the project, and a held press deletes
   await page.keyboard.up("Space")
 })
 
-test("hold repeat: a press steps once, and holding keeps stepping from the pointer and Space", async ({
+test("hold repeat: a click steps once, and holding keeps stepping until it's released", async ({
   page,
 }) => {
   await openBehaviors(page, "direct-manipulation")
-  const example = page.locator('[data-example="behaviors/hold-repeat"]')
-  const zoom = example.getByRole("status")
+  const zoom = example(page, "hold-repeat").getByRole("status")
+  const zoomIn = example(page, "hold-repeat").getByRole("button", {
+    name: "Zoom In",
+  })
   const level = async () => parseInt((await zoom.textContent())!)
-  await example.getByRole("button", { name: "Zoom In" }).click()
+  await zoomIn.click()
   await expect(zoom).toHaveText("105%")
-  await press(page, example.getByRole("button", { name: "Zoom In" }), 0, 0)
+  await zoomIn.hover()
+  await page.mouse.down()
+  await expect(zoom).toHaveText("110%")
   await expect.poll(level).toBeGreaterThanOrEqual(150)
   await page.mouse.up()
-  const held = await level()
-  await example.getByRole("button", { name: "Zoom Out" }).focus()
+  const released = await level()
+  await page.waitForTimeout(300)
+  expect(await level()).toBe(released)
+})
+
+test("hold repeat: sliding off the button pauses the repeats, and coming back goes on", async ({
+  page,
+}) => {
+  await openBehaviors(page, "direct-manipulation")
+  const zoom = example(page, "hold-repeat").getByRole("status")
+  const zoomIn = example(page, "hold-repeat").getByRole("button", {
+    name: "Zoom In",
+  })
+  const level = async () => parseInt((await zoom.textContent())!)
+  await zoomIn.hover()
+  await page.mouse.down()
+  await expect.poll(level).toBeGreaterThanOrEqual(120)
+  const box = (await zoomIn.boundingBox())!
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height + 80)
+  await page.waitForTimeout(100)
+  const paused = await level()
+  await page.waitForTimeout(300)
+  expect(await level()).toBe(paused)
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
+  await expect.poll(level).toBeGreaterThan(paused)
+  await page.mouse.up()
+})
+
+test("hold repeat: Space steps once per press, and holding it keeps stepping", async ({
+  page,
+}) => {
+  await openBehaviors(page, "direct-manipulation")
+  const zoom = example(page, "hold-repeat").getByRole("status")
+  const zoomOut = example(page, "hold-repeat").getByRole("button", {
+    name: "Zoom Out",
+  })
+  const level = async () => parseInt((await zoom.textContent())!)
+  await zoomOut.focus()
+  await page.keyboard.press("Space")
+  await page.keyboard.press("Enter")
+  await expect(zoom).toHaveText("90%")
   await page.keyboard.down("Space")
-  await expect.poll(level).toBeLessThanOrEqual(held - 25)
+  await expect.poll(level).toBeLessThanOrEqual(60)
   await page.keyboard.up("Space")
 })
 

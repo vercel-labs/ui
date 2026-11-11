@@ -385,6 +385,31 @@ article [data-variant="flat"] {
   }
 }
 
+/* Docs buttons shrink a little while pressed. Unlayered so a `transition-colors`
+   utility can't drop `scale` from the transition. */
+:where(button, [role="button"]):not(
+  :disabled,
+  main[data-width="wide"] *,
+  [data-example] *,
+  [data-press]
+) {
+  transition-property:
+    color, background-color, border-color, outline-color, text-decoration-color,
+    fill, stroke, opacity, box-shadow, scale;
+  transition-duration: 150ms;
+  transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+@media (prefers-reduced-motion: no-preference) {
+  :where(button, [role="button"]):not(
+      :disabled,
+      main[data-width="wide"] *,
+      [data-example] *,
+      [data-press]
+    ):active {
+    scale: 0.97;
+  }
+}
+
 /* Icon buttons grow under the finger and spring back when it lifts. */
 @media (hover: none) {
   [data-press="grow"] {

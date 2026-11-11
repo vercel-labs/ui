@@ -4,6 +4,7 @@
 // the kernel stands in for an adapter.
 import { afterEach, describe, expect, test, vi } from "vitest"
 import {
+  animateOut,
   announce,
   bindPanel,
   createChange,
@@ -518,7 +519,7 @@ describe("createFocusRecovery", () => {
 })
 
 describe("bindPanel", () => {
-  test("a closing panel settles, and an exiting one reports when its exit ends", async () => {
+  test("a closing panel settles, and an exiting one reports when its exit ends", () => {
     let open = true
     let exiting = false
     const listeners = new Set<() => void>()
@@ -559,6 +560,47 @@ describe("bindPanel", () => {
     cleanup()
   })
 })
+
+describe("animateOut", () => {
+  const animating = () => {
+    const el = document.createElement("div")
+    const animation = { finished: Promise.resolve() } as unknown as Animation
+    el.getAnimations = () => [animation]
+    document.body.append(el)
+    return el
+  }
+
+  test("an exited element keeps its ending style until the framework unmounts it", async () => {
+    const el = animating()
+    const exitingAtUnmount: boolean[] = []
+    animateOut(el, () => {
+      queueMicrotask(() => {
+        exitingAtUnmount.push(el.hasAttribute("data-ending-style") && el.inert)
+        el.remove()
+      })
+    })
+    await nextFrames(1)
+    expect(exitingAtUnmount).toEqual([true])
+  })
+
+  test("an element still mounted after its exit loses its ending style and inert", async () => {
+    const el = animating()
+    const exitingAtDone: boolean[] = []
+    animateOut(el, () =>
+      exitingAtDone.push(el.hasAttribute("data-ending-style"))
+    )
+    await nextFrames(3)
+    expect(exitingAtDone).toEqual([true])
+    expect(el.hasAttribute("data-ending-style")).toBe(false)
+    expect(el.inert).toBe(false)
+  })
+})
+
+async function nextFrames(count: number) {
+  for (let index = 0; index < count; index++) {
+    await new Promise((resolve) => requestAnimationFrame(resolve))
+  }
+}
 
 describe("reading parts", () => {
   test("attributes, state and presence, the way adapters read them", () => {

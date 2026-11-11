@@ -263,9 +263,9 @@ function Drawing({
         className="fill-none stroke-foreground"
       />
       <rect
-        x={x + 4}
+        x={x + 6}
         y={row(2)}
-        width={w - 8}
+        width={w - 12}
         height={44}
         className="fill-foreground"
       />

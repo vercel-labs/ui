@@ -3,9 +3,6 @@ import Link from "next/link"
 
 type Island = React.ComponentType<{ className: string }>
 
-const cross =
-  "pointer-events-none absolute size-[11px] text-[oklch(0.145_0_0)] dark:text-[oklch(0.985_0_0)] before:absolute before:inset-x-0 before:top-[5px] before:h-px before:bg-current/40 after:absolute after:inset-y-0 after:start-[5px] after:w-px after:bg-current/40"
-
 const tones = {
   white: "[--poster:var(--background)]",
   gray: "[--poster:oklch(0.965_0_0)] dark:[--poster:oklch(0.2_0_0)]",
@@ -128,15 +125,6 @@ function Poster({
         />
         {backdrop}
       </div>
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -inset-(--poster-border)"
-      >
-        <span className={cn(cross, "-start-[5px] -top-[5px]")} />
-        <span className={cn(cross, "-end-[5px] -top-[5px]")} />
-        <span className={cn(cross, "-start-[5px] -bottom-[5px]")} />
-        <span className={cn(cross, "-end-[5px] -bottom-[5px]")} />
-      </div>
       <div className="relative flex items-start justify-between gap-6 font-mono text-[11px] leading-4 tracking-[0.06em] text-foreground uppercase">
         <div className="min-w-0 whitespace-pre-line">
           {touch ? (
@@ -252,7 +240,6 @@ function Numeral({
 function ComponentPoster({
   title,
   id,
-  name,
   island: Island,
   ...props
 }: Omit<
@@ -261,52 +248,15 @@ function ComponentPoster({
 > & {
   title: string
   id: string
-  name: string
   island: Island
 }) {
   return (
     <Poster {...props} body="gap-8 sm:gap-10">
       <Island className="flex flex-1 items-center justify-center" />
-      <div className="flex flex-col gap-5">
-        <Title id={id} max={13} className="-ms-[0.04em]">
-          {title}
-        </Title>
-        <Keys keys={keyboard[name] ?? []} />
-      </div>
+      <Title id={id} max={13} className="-ms-[0.04em]">
+        {title}
+      </Title>
     </Poster>
-  )
-}
-
-const keyboard: Record<string, string[]> = {
-  calendar: ["←", "→", "↑", "↓", "PgUp", "PgDn"],
-  command: ["↑", "↓", "Enter", "Esc"],
-  "otp-input": ["←", "→", "Backspace"],
-  rating: ["←", "→"],
-  "number-input": ["↑", "↓", "Home", "End"],
-  switch: ["Space"],
-  slider: ["←", "→", "Home", "End"],
-  "segmented-control": ["←", "→"],
-  "color-picker": ["←", "→", "↑", "↓"],
-  tree: ["↑", "↓", "←", "→", "Enter"],
-  tabs: ["←", "→", "Home", "End"],
-  "token-input": ["@", "/", "Tab", "Backspace"],
-  accordion: ["Enter", "Space"],
-  resizable: ["←", "→", "Home", "End"],
-  toolbar: ["←", "→", "Home", "End"],
-}
-
-function Keys({ keys }: { keys: string[] }) {
-  return (
-    <div className="flex flex-wrap items-center gap-1.5 pointer-coarse:hidden">
-      {keys.map((key) => (
-        <kbd
-          key={key}
-          className="inline-flex h-7 min-w-7 items-center justify-center border border-foreground bg-(--poster) px-2 font-mono text-[11px]"
-        >
-          {key}
-        </kbd>
-      ))}
-    </div>
   )
 }
 

@@ -281,6 +281,12 @@ export {
   type HoldInput,
 } from "./foundation/direct-manipulation/hold"
 export {
+  bindRepeat,
+  type BindRepeatOptions,
+  type RepeatDetails,
+  type RepeatEndDetails,
+} from "./foundation/direct-manipulation/repeat"
+export {
   createStickToBottom,
   type StickToBottom,
   type StickToBottomOptions,

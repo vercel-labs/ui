@@ -3,7 +3,7 @@ title: Dragging and Resizing
 description: Move and resize objects, reveal swipe actions, press and hold, pick points, draw ranges, and preview choices.
 ---
 
-`createMove` moves objects, `createResize` changes their bounds, `createSwipeActions` reveals actions behind a row, and `bindHold` responds to a press that's held. `createArea` picks two-dimensional values, `createSpans` edits ranges on tracks, and `createPreview` lets people try a value before choosing it.
+`createMove` moves objects, `createResize` changes their bounds, `createSwipeActions` reveals actions behind a row, `bindHold` responds to a press that's held, and `bindRepeat` keeps stepping while a button is held. `createArea` picks two-dimensional values, `createSpans` edits ranges on tracks, and `createPreview` lets people try a value before choosing it.
 
 Import these helpers from `@ui-sdk/core`. When a helper asks for a `set` callback, connect it to your [change](../kernel/handle-changes#changes). For sorting items into an order, see [Drag and Drop](./drag-and-drop).
 
@@ -297,24 +297,31 @@ It works with a mouse, a finger, a pen, and Space or Enter while the button has 
 
 ### Repeat While Held
 
-Set `repeat` to run `onHold` again at that interval, like a stepper's buttons or a scroll arrow. Return `false` from `onHold` to stop repeating, like at a bound. `count` says which run it is, starting at 1:
+`bindRepeat` steps once when a button is pressed, then keeps stepping while it's held, like a stepper's buttons, a scroll arrow or a remote's volume button. Give it what one step does:
 
 ```ts
-bindHold(button, {
-  delay: 400,
+import { bindRepeat } from "@ui-sdk/core"
+
+const unbind = bindRepeat(button, {
   repeat: 80,
-  onHold: () => zoomBy(5),
+  onStep: () => zoomBy(5),
 })
 ```
 
-A short press still clicks, so keep a click handler for one step. A press that's held or canceled doesn't click, so its release doesn't add another step. A short press of Space or Enter clicks once, however long the keyboard repeats the key.
+After `delay`, 400 milliseconds by default, `onStep` runs again every `repeat` milliseconds, 60 by default, until the press ends. Return `false` from `onStep` to stop repeating, like at a bound. `count` says which step of the press it is, starting at 1, and `onEnd` gets the total once the press ends.
+
+You don't need a click handler. A mouse or a key steps as it goes down, and the click that follows doesn't step again. A finger or a pen steps when it lifts, or once it's held, so a scroll that starts on the button never steps. A click with no press behind it, like a screen reader's, steps once.
 
 <ComponentExample
   name="behaviors/hold-repeat"
-  caption="Press Zoom In once to add 5%. Hold it and the zoom keeps climbing until you let go or it reaches 400%."
+  caption="Press Zoom In once to add 5%. Hold it and the zoom keeps climbing until you let go or it reaches 400%. Slide off the button while holding and it waits until you come back."
 />
 
-`onPress` runs as a press starts, with `input` set to `mouse`, `touch`, `pen` or `keyboard`. Return `false` to ignore it, like a context menu area that opens on a long press only for touch, since a mouse has right-click. Pass `keys: []` to leave keys alone, and `disabled` to refuse presses and stop a hold from repeating. While a finger or pen presses, the browser's own long-press menu and iOS's callout stay closed. The cleanup stops a press under way without calling `onEnd`.
+While held, the repeats wait whenever the pointer is off the button, and go on when it comes back, like a scroll bar's arrows. A short press of Space or Enter steps once; held, they repeat at the same pace as a pointer, however fast the keyboard repeats the key. Pass `keys: []` to leave keys to the browser, and each click it sends steps once. Releasing, a cancel from the browser, Escape, or focus leaving the button or the window ends the press.
+
+`bindRepeat` is built on `bindHold`, so the button has `data-holding` while pressed and `data-held` once it repeats. `bindHold` takes `repeat` too, for an action that waits until the press is held before its first run.
+
+`onPress` runs as a press starts, with `input` set to `mouse`, `touch`, `pen` or `keyboard`. Return `false` to ignore it, like a context menu area that opens on a long press only for touch, since a mouse has right-click. Pass `disabled` to refuse presses and stop a hold from repeating. While a finger or pen presses, the browser's own long-press menu and iOS's callout stay closed. The cleanup stops a press under way without calling `onEnd`.
 
 ## Two-Dimensional Values
 
@@ -629,6 +636,21 @@ The option tables link back to the examples that introduce them.
     onPress: "Repeat While Held",
     keys: "Repeat While Held",
     disabled: "Repeat While Held",
+  }}
+/>
+
+<TypeTable
+  path="../../packages/core/src/foundation/direct-manipulation/repeat.ts"
+  name="BindRepeatOptions"
+  events={false}
+  examples={{
+    delay: "Repeat While Held",
+    repeat: "Repeat While Held",
+    keys: "Repeat While Held",
+    disabled: "Repeat While Held",
+    onPress: "Repeat While Held",
+    onStep: "Repeat While Held",
+    onEnd: "Repeat While Held",
   }}
 />
 

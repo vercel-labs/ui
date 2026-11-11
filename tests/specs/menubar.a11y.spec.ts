@@ -1,5 +1,11 @@
 import AxeBuilder from "@axe-core/playwright"
-import { expect, expectFocus, menuNamed, test } from "../fixtures"
+import {
+  expect,
+  expectFocus,
+  menuNamed,
+  patternProblems,
+  test,
+} from "../fixtures"
 import { enter, menubar, trigger } from "./menubar.helpers"
 
 async function audit(page: import("@playwright/test").Page) {
@@ -76,4 +82,12 @@ test("accessibility tree", async ({ page, open }) => {
         - menuitemradio "Inès" [checked]
         - menuitemradio "Kofi" [checked=false]
   `)
+})
+
+test("checkPattern finds no problems with the menubar pattern", async ({
+  page,
+  open,
+}) => {
+  await open("menubar")
+  expect(await patternProblems(page, "menubar")).toBe("")
 })

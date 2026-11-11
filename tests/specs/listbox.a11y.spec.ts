@@ -1,5 +1,5 @@
 import AxeBuilder from "@axe-core/playwright"
-import { expect, test } from "../fixtures"
+import { expect, patternProblems, test } from "../fixtures"
 import { list, option } from "./listbox.helpers"
 
 async function audit(page: import("@playwright/test").Page) {
@@ -101,4 +101,12 @@ test("accessibility tree with groups", async ({ page, open }) => {
         - option "Onion" [selected]
         - option "Pepper"
   `)
+})
+
+test("checkPattern finds no problems with the listbox pattern", async ({
+  page,
+  open,
+}) => {
+  await open("listbox")
+  expect(await patternProblems(page, "listbox")).toBe("")
 })

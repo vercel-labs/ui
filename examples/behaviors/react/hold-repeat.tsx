@@ -1,5 +1,5 @@
 import * as React from "react"
-import { bindHold } from "@ui-sdk/core"
+import { bindRepeat } from "@ui-sdk/core"
 import { MinusIcon, PlusIcon } from "lucide-react"
 
 const min = 25
@@ -20,12 +20,7 @@ function ZoomButton({
   const step = React.useEffectEvent(onStep)
 
   React.useEffect(
-    () =>
-      bindHold(button.current!, {
-        delay: 400,
-        repeat: 80,
-        onHold: () => step(),
-      }),
+    () => bindRepeat(button.current!, { repeat: 80, onStep: () => step() }),
     []
   )
 
@@ -36,7 +31,6 @@ function ZoomButton({
       data-variant="outline"
       aria-label={label}
       disabled={disabled}
-      onClick={onStep}
     >
       {children}
     </button>

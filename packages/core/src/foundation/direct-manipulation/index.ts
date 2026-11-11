@@ -3,6 +3,7 @@
 // Nothing imports this file, so bundles don't pay for it.
 export { createArea, type Area } from "./area"
 export { bindHold } from "./hold"
+export { bindRepeatPresses } from "./repeat"
 export {
   resizeBox,
   type ResizeBox,

@@ -15,6 +15,7 @@ Object.assign(window, {
     Object.entries(coreModules).find(([file]) =>
       file.endsWith(`/${name}.ts`)
     )![1](),
+  loadTesting: () => import("@ui-sdk/core/testing"),
 })
 
 const params = applyFixtureOptions()

@@ -1,5 +1,5 @@
 import AxeBuilder from "@axe-core/playwright"
-import { expect, menuNamed, test } from "../fixtures"
+import { expect, menuNamed, patternProblems, test } from "../fixtures"
 
 test.beforeEach(async ({ open }) => {
   await open("menu")
@@ -60,4 +60,12 @@ test("accessibility tree", async ({ page }) => {
       - menuitem "Share"
       - menuitem "Delete"
   `)
+})
+
+test("checkPattern finds no problems with the menu pattern", async ({
+  page,
+}) => {
+  await page.getByRole("button", { name: "File" }).click()
+  await expect(menuNamed(page, "File")).toBeVisible()
+  expect(await patternProblems(page, "menu")).toBe("")
 })

@@ -37,7 +37,6 @@ function CalendarTile(props: TileProps) {
       pattern="plus"
       title="Calendar."
       id="calendar"
-      name="calendar"
       island={CalendarIsland}
     />
   )
@@ -52,7 +51,6 @@ function CommandTile(props: TileProps) {
       pattern="halftone"
       title="Command."
       id="command"
-      name="command"
       island={CommandIsland}
     />
   )
@@ -66,7 +64,6 @@ function OTPTile(props: TileProps) {
       pattern="rules"
       title="OTP Input."
       id="otp-input"
-      name="otp-input"
       island={OTPIsland}
     />
   )
@@ -82,7 +79,6 @@ function RatingTile(props: TileProps) {
       pattern="dots"
       title="Rating."
       id="rating"
-      name="rating"
       island={RatingIsland}
     />
   )
@@ -97,7 +93,6 @@ function NumberInputTile(props: TileProps) {
       pattern="halftone"
       title="Number Input."
       id="number-input"
-      name="number-input"
       island={NumberInputIsland}
     />
   )
@@ -113,7 +108,6 @@ function SwitchTile(props: TileProps) {
       pattern="hatch"
       title="Switch."
       id="switch"
-      name="switch"
       island={SwitchIsland}
     />
   )
@@ -129,7 +123,6 @@ function SliderTile(props: TileProps) {
       pattern="columns"
       title="Slider."
       id="slider"
-      name="slider"
       island={SliderIsland}
     />
   )
@@ -145,7 +138,6 @@ function SegmentedTile(props: TileProps) {
       pattern="rings"
       title="Segmented Control."
       id="segmented-control"
-      name="segmented-control"
       island={SegmentedIsland}
     />
   )
@@ -159,7 +151,6 @@ function ColorTile(props: TileProps) {
       pattern="squares"
       title="Color Picker."
       id="color-picker"
-      name="color-picker"
       island={ColorIsland}
     />
   )
@@ -174,7 +165,6 @@ function TreeTile(props: TileProps) {
       pattern="isometric"
       title="Tree."
       id="tree"
-      name="tree"
       island={TreeIsland}
     />
   )
@@ -189,7 +179,6 @@ function TabsTile(props: TileProps) {
       pattern="ruler"
       title="Tabs."
       id="tabs"
-      name="tabs"
       island={TabsIsland}
     />
   )
@@ -204,7 +193,6 @@ function TokenInputTile(props: TileProps) {
       pattern="crosshatch"
       title="Token Input."
       id="token-input"
-      name="token-input"
       island={TokenInputIsland}
     />
   )
@@ -220,7 +208,6 @@ function AccordionTile(props: TileProps) {
       pattern="rules"
       title="Accordion."
       id="accordion"
-      name="accordion"
       island={AccordionIsland}
     />
   )
@@ -235,7 +222,6 @@ function ResizableTile(props: TileProps) {
       pattern="columns"
       title="Resizable."
       id="resizable"
-      name="resizable"
       island={ResizableIsland}
     />
   )
@@ -251,7 +237,6 @@ function ToolbarTile(props: TileProps) {
       pattern="plus"
       title="Toolbar."
       id="toolbar"
-      name="toolbar"
       island={ToolbarIsland}
     />
   )

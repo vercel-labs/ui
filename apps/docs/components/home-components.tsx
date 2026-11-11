@@ -31,7 +31,6 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-  CommandShortcut,
 } from "@ui-sdk/react/command"
 import {
   NumberInput,
@@ -283,9 +282,9 @@ const commands = [
   { group: "Pages", value: "dashboard", label: "Dashboard" },
   { group: "Pages", value: "projects", label: "Projects" },
   { group: "Pages", value: "calendar", label: "Calendar" },
-  { group: "Account", value: "profile", label: "Profile", shortcut: "mod+p" },
-  { group: "Account", value: "billing", label: "Billing", shortcut: "mod+b" },
-  { group: "Account", value: "settings", label: "Settings", shortcut: "mod+s" },
+  { group: "Account", value: "profile", label: "Profile" },
+  { group: "Account", value: "billing", label: "Billing" },
+  { group: "Account", value: "settings", label: "Settings" },
 ]
 
 function CommandDemo() {
@@ -308,11 +307,14 @@ function CommandDemo() {
         <CommandEmpty className="flex flex-1 items-center justify-center font-mono text-[11px] tracking-[0.06em] text-muted-foreground uppercase empty:hidden">
           Nothing found
         </CommandEmpty>
-        <CommandList className="min-h-0 flex-1 overflow-y-auto py-1">
+        <CommandList className="min-h-0 flex-1 overflow-y-auto p-1.5">
           {["Pages", "Account"].map((group) => (
             <CommandGroup key={group}>
               <CommandGroupLabel
-                className={cn(label, "px-4 pt-3 pb-1.5 text-muted-foreground")}
+                className={cn(
+                  label,
+                  "px-2.5 pt-3 pb-1.5 text-muted-foreground"
+                )}
               >
                 {group}
               </CommandGroupLabel>
@@ -322,11 +324,9 @@ function CommandDemo() {
                   <CommandItem
                     key={command.value}
                     value={command.value}
-                    shortcut={command.shortcut}
-                    className="flex h-9 cursor-default items-center justify-between gap-3 px-4 text-[15px] outline-none select-none data-highlighted:bg-foreground data-highlighted:text-background"
+                    className="flex h-9 cursor-default items-center justify-between gap-3 px-2.5 text-[15px] outline-none select-none data-highlighted:bg-foreground data-highlighted:text-background"
                   >
                     {command.label}
-                    <CommandShortcut className="border border-current/30 px-1.5 font-mono text-[11px] leading-5 tracking-widest empty:hidden" />
                   </CommandItem>
                 ))}
             </CommandGroup>

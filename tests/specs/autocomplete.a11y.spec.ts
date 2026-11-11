@@ -1,6 +1,6 @@
 import AxeBuilder from "@axe-core/playwright"
 import type { Page } from "@playwright/test"
-import { expect, test } from "../fixtures"
+import { expect, patternProblems, test } from "../fixtures"
 
 const input = (page: Page) => page.getByRole("combobox", { name: "Fruit" })
 const listbox = (page: Page) => page.getByRole("listbox")
@@ -61,4 +61,12 @@ test("accessibility tree", async ({ page, open }) => {
       - option "Blackberry"
       - option "Blueberry"
   `)
+})
+
+test("checkPattern finds no problems with the combobox pattern", async ({
+  page,
+  open,
+}) => {
+  await open("autocomplete")
+  expect(await patternProblems(page, "combobox")).toBe("")
 })

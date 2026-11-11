@@ -62,15 +62,10 @@ const builds = [
   { name: "Workflow", Tile: FlowTile },
 ]
 
-const cross =
-  "absolute top-0 size-[11px] before:absolute before:inset-x-0 before:top-[5px] before:h-px before:bg-foreground after:absolute after:inset-y-0 after:start-[5px] after:w-px after:bg-foreground"
-
 function Rule({ className }: { className?: string }) {
   return (
     <div aria-hidden="true" className={cn("relative mb-4 h-[11px]", className)}>
-      <span className="absolute inset-x-3.5 top-[5px] h-px bg-foreground" />
-      <span className={cn(cross, "-start-[5px]")} />
-      <span className={cn(cross, "-end-[5px]")} />
+      <span className="absolute inset-x-0 top-[5px] h-px bg-foreground" />
     </div>
   )
 }

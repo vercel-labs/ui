@@ -34,6 +34,10 @@
 //   types, or someone hovering a component in their editor, learns what each
 //   one is for. A Svelte component takes a `<!-- @component -->` comment
 //   instead, which Svelte's tooling shows the same way.
+// - public-docs-pages: every one of those exports but its types and its
+//   primitives (which their component's page covers) is named on a docs page
+//   in apps/docs/content/docs, so nothing public is only in the types. The
+//   ones not on a page yet are in `undocumentedExports`, which only shrinks.
 // - name-only-docs: a field or method's JSDoc in packages/*/src says more
 //   than its name and its type's name, so "Whether the item is selected." on
 //   `ItemState.selected` fails, and so do "The orientation." and "Whether
@@ -136,6 +140,21 @@ const importLayersAllowlist = {
     "`toast()` renders through the overlay host.",
 }
 
+// Public exports public-docs-pages lets through until a docs page names them.
+const undocumentedExports = new Set([
+  "AutocompleteItems",
+  "ComboboxItems",
+  "CommandItems",
+  "ListboxItems",
+  "MenuItems",
+  "SelectItems",
+  "TreeItems",
+  "TriggerMenuItems",
+  "createOverlays",
+  "defaultCodec",
+  "ratingItemValues",
+])
+
 // Core's public functions that public-names lets through, each with why.
 const publicNameAllowlist = {
   on: "Adds a listener and returns its cleanup, like the DOM's own `on…` handlers. Kept short on purpose.",
@@ -186,6 +205,7 @@ checkSlotRoles()
 checkImportLayers()
 const surface = publicExports(root)
 checkPublicDocs()
+checkPublicDocsPages()
 checkNameOnlyDocs()
 checkStability()
 checkInternalStability()
@@ -660,6 +680,71 @@ function checkPublicDocs() {
       rule: "public-docs",
       message: `\`${name}\` is public, so give it a \`<!-- @component -->\` comment that says what it's for.`,
     })
+  }
+}
+
+function checkPublicDocsPages() {
+  const docs = path.join(root, "apps/docs/content/docs")
+  const text = readdirSync(docs, { recursive: true })
+    .filter((file) => file.endsWith(".mdx"))
+    .map((file) => readFileSync(path.join(docs, file), "utf8"))
+    .join("\n")
+  const named = new Set(text.match(/\b[A-Za-z_$][\w$]*\b/g))
+  const isPrimitive = (declaration) => {
+    if (!ts.isVariableDeclaration(declaration)) {
+      return false
+    }
+    const { type, initializer } = declaration
+    const annotated =
+      type ??
+      (initializer && ts.isAsExpression(initializer) ? initializer.type : null)
+    return /Primitive$/.test(annotated?.getText() ?? "")
+  }
+  const missing = new Set()
+  for (const { name, declaration, file } of surface.declarations) {
+    if (
+      ts.isInterfaceDeclaration(declaration) ||
+      ts.isTypeAliasDeclaration(declaration) ||
+      isPrimitive(declaration) ||
+      named.has(name)
+    ) {
+      continue
+    }
+    missing.add(name)
+    if (undocumentedExports.has(name)) {
+      continue
+    }
+    violations.push({
+      file: path.relative(root, file),
+      line: lineOf(declaration),
+      rule: "public-docs-pages",
+      message: `\`${name}\` is public, so name it on the docs page that covers it, with what it's for.`,
+    })
+  }
+  for (const { name, file } of surface.svelteComponents) {
+    if (named.has(name)) {
+      continue
+    }
+    missing.add(name)
+    if (undocumentedExports.has(name)) {
+      continue
+    }
+    violations.push({
+      file: path.relative(root, file),
+      line: 1,
+      rule: "public-docs-pages",
+      message: `\`${name}\` is public, so name it on the docs page that covers it, with what it's for.`,
+    })
+  }
+  for (const name of undocumentedExports) {
+    if (!missing.has(name)) {
+      violations.push({
+        file: "scripts/check-code.mjs",
+        line: 1,
+        rule: "public-docs-pages",
+        message: `\`${name}\` is on a docs page now, or isn't checked, so remove it from \`undocumentedExports\`.`,
+      })
+    }
   }
 }
 

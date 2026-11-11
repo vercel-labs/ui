@@ -1,5 +1,11 @@
 import AxeBuilder from "@axe-core/playwright"
-import { expect, regionNamed, test, triggerNamed } from "../fixtures"
+import {
+  expect,
+  patternProblems,
+  regionNamed,
+  test,
+  triggerNamed,
+} from "../fixtures"
 
 async function audit(page: import("@playwright/test").Page) {
   // Page structure rules are about the fixture page, not the component.
@@ -98,4 +104,12 @@ test("accessibility tree", async ({ page, open }) => {
     - button "After"
     - status "Last action"
   `)
+})
+
+test("checkPattern finds no problems with the accordion pattern", async ({
+  page,
+  open,
+}) => {
+  await open("accordion")
+  expect(await patternProblems(page, "accordion")).toBe("")
 })

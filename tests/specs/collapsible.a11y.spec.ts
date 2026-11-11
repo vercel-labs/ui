@@ -1,6 +1,6 @@
 import AxeBuilder from "@axe-core/playwright"
 import { collapsibleFixture as fixture } from "../fixtures/collapsible"
-import { expect, test } from "../fixtures"
+import { expect, patternProblems, test } from "../fixtures"
 
 async function audit(page: import("@playwright/test").Page) {
   // Page structure rules are about the fixture page, not the component.
@@ -45,4 +45,12 @@ test("accessibility tree", async ({ page, open }) => {
     - status "Last action"
     - button "${fixture.controller}"
   `)
+})
+
+test("checkPattern finds no problems with the disclosure pattern", async ({
+  page,
+  open,
+}) => {
+  await open("collapsible")
+  expect(await patternProblems(page, "disclosure")).toBe("")
 })

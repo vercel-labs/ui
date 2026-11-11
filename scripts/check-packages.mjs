@@ -20,6 +20,7 @@
 // entry whose `types` file isn't in the tarball is listed with that path: a
 // build that stopped or a wrong `publishConfig.exports` path, which look the
 // same from here.
+// Node then imports every core, React and Vue entry, as an app's server would.
 //
 // TypeScript runs with `strict` and `skipLibCheck: false`, so an error in a
 // shipped declaration fails here as it does in an app that checks its
@@ -159,7 +160,9 @@ if (errorCount || missingCount) {
   console.error(`\n${problems.join(" and ")} in the packed packages.`)
   process.exit(1)
 }
-console.log("\nEvery packed entry typechecks.")
+console.log(
+  "\nEvery packed entry typechecks, and every core, React and Vue entry imports in Node."
+)
 
 // Packs a package as it's published and unpacks it into the app's node_modules.
 function install(name) {
@@ -199,6 +202,7 @@ function checkPackage(name, manifest, manifests, reported) {
     ...findMissingDocs(name, manifest),
     ...findBundledSiblings(name, manifest),
     ...findUnpublishedImports(name, manifest, manifests),
+    ...findImportFailures(name, manifest, subpaths),
   ]
   const checks = [
     writeEntryImports(name, manifest.name, subpaths, "entries.ts"),
@@ -323,6 +327,38 @@ function findUnpublishedImports(name, manifest, manifests) {
     }
   }
   return [...problems]
+}
+
+// Each entry that throws when Node imports it from the packed package, as an
+// app's server does. Svelte ships components to compile, web components need
+// a DOM, and Solid's server build comes through the `solid` condition.
+function findImportFailures(name, manifest, subpaths) {
+  if (!["core", "react", "vue"].includes(name)) {
+    return []
+  }
+  const specifiers = subpaths.map((subpath) =>
+    path.posix.join(manifest.name, subpath)
+  )
+  const file = path.join(app, name, "imports.mjs")
+  mkdirSync(path.dirname(file), { recursive: true })
+  writeFileSync(
+    file,
+    `const failed = []
+for (const specifier of ${JSON.stringify(specifiers)}) {
+  try {
+    await import(specifier)
+  } catch (error) {
+    failed.push([specifier, String(error?.message ?? error).split("\\n")[0]])
+  }
+}
+console.log(JSON.stringify(failed))
+`
+  )
+  const output = execFileSync("node", [file], { cwd: app, encoding: "utf8" })
+  return JSON.parse(output).map(
+    ([specifier, message]) =>
+      `${specifier} throws when Node imports it: ${message}`
+  )
 }
 
 // The subpaths whose source in the workspace's manifest is outside `src`.

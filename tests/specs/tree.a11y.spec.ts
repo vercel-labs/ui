@@ -1,6 +1,6 @@
 import AxeBuilder from "@axe-core/playwright"
 import type { Page } from "@playwright/test"
-import { expect, test } from "../fixtures"
+import { expect, patternProblems, test } from "../fixtures"
 
 async function audit(page: Page) {
   // Page structure rules are about the fixture page, not the component.
@@ -75,4 +75,12 @@ test("the accessibility tree", async ({ page, open }) => {
       - treeitem "docs" [level=1]
       - treeitem "package.json" [level=1]
   `)
+})
+
+test("checkPattern finds no problems with the tree pattern", async ({
+  page,
+  open,
+}) => {
+  await open("tree")
+  expect(await patternProblems(page, "tree")).toBe("")
 })
