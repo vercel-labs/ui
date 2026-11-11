@@ -290,7 +290,12 @@ const commands = [
 function CommandDemo() {
   return (
     <Measure full>
-      <Command className={cn("flex h-[25.5rem] flex-col bg-background", ink)}>
+      <Command
+        className={cn(
+          "flex h-[25.5rem] flex-col bg-background max-sm:h-80",
+          ink
+        )}
+      >
         <div className="flex items-center gap-3 border-b border-foreground px-4 has-focus-visible:outline-2 has-focus-visible:outline-solid has-focus-visible:-outline-offset-2 has-focus-visible:outline-[#006bff]">
           <span
             aria-hidden="true"

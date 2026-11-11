@@ -247,8 +247,9 @@ function PhoneShot({
     >
       <div
         ref={inner}
+        data-shot
         style={{ "--shot-width": `${width}px` } as React.CSSProperties}
-        className="sm:contents max-sm:flex max-sm:w-(--shot-width) max-sm:min-h-[62rem] max-sm:origin-top-left max-sm:[&>section>div:nth-child(4)]:justify-center max-sm:[&>section>div:nth-child(4)]:gap-10 max-sm:scale-(--shot-scale,0.45) max-sm:flex-col max-sm:*:flex-1"
+        className="sm:contents max-sm:flex max-sm:w-(--shot-width) max-sm:[--title-max:12cqi] max-sm:min-h-[62rem] max-sm:origin-top-left max-sm:scale-(--shot-scale,0.45) max-sm:flex-col max-sm:*:flex-1"
       >
         {children}
       </div>

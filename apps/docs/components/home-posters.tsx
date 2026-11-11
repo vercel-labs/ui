@@ -98,7 +98,11 @@ function Poster({
   className?: string
   children?: React.ReactNode
 }) {
-  const bodyClassName = cn("relative flex min-w-0 flex-1 flex-col", body)
+  const bodyClassName = cn(
+    "relative flex min-w-0 flex-1 flex-col",
+    body,
+    "max-sm:in-data-shot:justify-center max-sm:in-data-shot:gap-10"
+  )
   return (
     <section
       id={typeof title === "string" ? slug(title) : undefined}
@@ -181,7 +185,7 @@ function Title({
         className
       )}
       style={{
-        fontSize: `max(min(2.25rem, ${fit.toFixed(2)}cqi), min(${max}cqi, ${fit.toFixed(2)}cqi))`,
+        fontSize: `max(min(2.25rem, ${fit.toFixed(2)}cqi), min(var(--title-max, ${max}cqi), ${fit.toFixed(2)}cqi))`,
       }}
     >
       {children}
@@ -229,7 +233,7 @@ function ComponentPoster({
 }) {
   return (
     <Poster {...props} body="gap-8 sm:gap-10">
-      <div aria-hidden="true" className="h-12" />
+      <div aria-hidden="true" className="h-12 max-sm:hidden" />
       <Island className="flex flex-1 items-center justify-center" />
       <Title id={id} max={13} className="-ms-[0.04em]">
         {title}
