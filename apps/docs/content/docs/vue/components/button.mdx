@@ -175,6 +175,18 @@ Use the `#render` slot to render an `<a>`, and bind the supplied `props` to it. 
   caption="Choose Get Started to jump to Installation on this page. Changelog is disabled and does not navigate."
 />
 
+With Vue Router or Nuxt, use the `custom` form of `RouterLink` or `NuxtLink`, and bind `navigate` after the props. The button's click then runs first and stops the router when the button is disabled or pending. Bound directly, as `<RouterLink v-bind="props">`, a disabled link still navigates.
+
+```vue
+<Button>
+  <template #render="{ props }">
+    <RouterLink v-slot="{ href, navigate }" to="/settings" custom>
+      <a v-bind="props" :href="href" @click="navigate">Settings</a>
+    </RouterLink>
+  </template>
+</Button>
+```
+
 For your own components, see [Parts and Composition](/docs/vue/parts-and-composition).
 
 ## Forms
