@@ -50,10 +50,15 @@ function Button({
     debug,
   })
   // React hands the handler its own event, so the part runs the press itself.
-  const press = (event: React.MouseEvent<HTMLElement>) =>
+  const press = (event: React.MouseEvent<HTMLElement>) => {
     button.api.internal.press(event.nativeEvent, (details) =>
       onClick?.(event, details)
     )
+    // A router link's own onClick, like Next.js's, reads React's event.
+    if (event.nativeEvent.defaultPrevented && !event.isDefaultPrevented()) {
+      event.preventDefault()
+    }
+  }
   return usePart(
     button,
     "root",

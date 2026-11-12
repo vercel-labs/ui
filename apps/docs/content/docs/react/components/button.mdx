@@ -163,6 +163,12 @@ Pass an `<a>` to `render` to make a link. It keeps its `href` and link semantics
 <Button render={<a href="/docs/react" />}>Get started</Button>
 ```
 
+A router's link works the same way, like Next.js's `Link`. The button's click runs first and stops the router when the button is disabled or pending.
+
+```tsx
+<Button render={<Link href="/settings" />}>Settings</Button>
+```
+
 <ComponentExample
   name="button/link"
   caption="Choose Get Started to jump to Installation on this page. Changelog is disabled and does not navigate."
