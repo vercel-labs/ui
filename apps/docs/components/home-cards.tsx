@@ -35,7 +35,7 @@ function Card({
     <section
       aria-labelledby={id}
       className={cn(
-        "@container relative min-w-0 border border-foreground/10 bg-background text-foreground dark:border-foreground/15",
+        "@container relative isolate min-w-0 border border-foreground/10 bg-background text-foreground dark:border-foreground/15",
         className
       )}
     >
@@ -126,7 +126,7 @@ function Frame({ className }: { className?: string }) {
     <div
       aria-hidden="true"
       className={cn(
-        "pointer-events-none absolute inset-[5cqi] border border-dashed border-foreground/20",
+        "pointer-events-none absolute inset-[5cqi] border border-dashed border-[color-mix(in_oklab,var(--foreground)_20%,var(--background))]",
         className
       )}
     />
@@ -144,9 +144,9 @@ function ColorCard(props: CardProps) {
       />
       <div className="mt-[3cqi] -mx-[4cqi] flex justify-between gap-[0.18em] text-[length:18.5cqi] @[24rem]:-mx-[8cqi]">
         <Display look="outline">Color</Display>
-        <Display>Picker</Display>
+        <Display className="relative z-10">Picker</Display>
       </div>
-      <ColorIsland className={cn(island, "z-10 -mt-[1.2cqi]")} />
+      <ColorIsland className={cn(island, "-mt-[3cqi]")} />
     </Card>
   )
 }

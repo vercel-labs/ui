@@ -171,7 +171,7 @@ function Measure({
   const rule = (
     <div
       aria-hidden="true"
-      className="flex h-2 items-center text-foreground/35 dark:text-foreground/45"
+      className="flex h-2 items-center text-[color-mix(in_oklab,var(--foreground)_35%,var(--background))] dark:text-[color-mix(in_oklab,var(--foreground)_45%,var(--background))]"
     >
       <span className="h-full w-px bg-current" />
       <span className="h-px flex-1 bg-current" />
