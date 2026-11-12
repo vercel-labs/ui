@@ -267,7 +267,9 @@ function Drawing({
         className="fill-foreground"
       />
       <text x={x + 16} y={row(2) + 26} className="fill-background text-[14px]">
-        <tspan className={cn(fade, active === 3 && "fill-blue")}>Pro</tspan>
+        <tspan className={cn(fade, active === 3 && "fill-blue-inverse")}>
+          Pro
+        </tspan>
         duction
       </text>
       <path
@@ -275,7 +277,7 @@ function Drawing({
         className={cn(
           fade,
           "fill-none",
-          active === 3 ? "stroke-blue" : "stroke-transparent"
+          active === 3 ? "stroke-blue-inverse" : "stroke-transparent"
         )}
       />
       <rect
