@@ -108,7 +108,7 @@ function Poster({
       id={typeof title === "string" ? slug(title) : undefined}
       data-poster
       className={cn(
-        "@container relative scroll-mt-24 flex min-w-0 flex-col gap-10 border-(length:--poster-border) [--poster-border:1px] lg:min-h-[36rem] text-foreground border-foreground/10 bg-(--poster) p-6 sm:p-8 lg:p-10",
+        "@container relative scroll-mt-24 flex min-w-0 flex-col gap-10 border-(length:--poster-border) [--poster-border:1px] lg:min-h-[36rem] text-foreground border-frame bg-(--poster) p-6 sm:p-8 lg:p-10",
         tones[tone],
         className
       )}
