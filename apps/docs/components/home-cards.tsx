@@ -424,13 +424,10 @@ function ToolbarCard(props: CardProps) {
       <Patch className="start-[36cqi] top-[36cqi] size-[31cqi]" />
       <Patch className="start-[5cqi] bottom-[5cqi] size-[31cqi]" />
       <ToolbarIsland className={cn(island, "mt-[36cqi]")} />
-      <Caption
-        lines={["Format the text", "Tap a button to turn it on"]}
-        className="mt-auto ms-[34%] pt-[10cqi]"
-      />
-      <Display className="relative -me-[6cqi] mt-[4cqi] text-end text-[length:17cqi]">
-        Toolbar
-      </Display>
+      <div className="relative mt-auto ms-[calc(39cqi-var(--card-x))] pt-[10cqi]">
+        <Caption lines={["Format the text", "Tap a button to turn it on"]} />
+        <Display className="mt-[4cqi] text-[length:17cqi]">Toolbar</Display>
+      </div>
     </Card>
   )
 }
