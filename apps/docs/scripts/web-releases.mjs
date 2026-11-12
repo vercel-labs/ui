@@ -81,10 +81,11 @@ const commit = (
 const { version } = JSON.parse(
   readFileSync(path.join(packageDir, "package.json"), "utf8")
 )
-const source = `${version}-g${commit}`
+// The leading 0 ranks it below every release of its version, betas too.
+const source = `${version.split("-")[0]}-0.g${commit}`
 // An earlier commit's build, from a local run, would compete for `/web@0.js`.
 for (const file of readdirSync(publicDir)) {
-  if (/^web@\d+\.\d+\.\d+-g[0-9a-f]{7}(\.js|\.css)?$/.test(file)) {
+  if (/^web@\d+\.\d+\.\d+-0\.g[0-9a-f]{7}(\.js|\.css)?$/.test(file)) {
     rmSync(path.join(publicDir, file), { recursive: true })
   }
 }

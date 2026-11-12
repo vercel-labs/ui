@@ -48,6 +48,13 @@ describe("web releases", () => {
     expect(newestByMajor(stamps)).toEqual(new Map([["0", stamps[1]]]))
   })
 
+  test("points a major at a published beta over the commit's own build", () => {
+    expect(newestByMajor(["0.1.0-0.g1dc2c96", "0.1.0-beta.1"])).toEqual(
+      new Map([["0", "0.1.0-beta.1"]])
+    )
+    expect(newestRelease(["0.1.0-0.g1dc2c96"])).toBe("0.1.0-0.g1dc2c96")
+  })
+
   test("lists only the releases that have a file of the extension", () => {
     const dir = mkdtempSync(path.join(tmpdir(), "web-releases-"))
     try {
