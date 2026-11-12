@@ -31,13 +31,13 @@ async function renderOgImage({
         src={`data:image/png;base64,${background.toString("base64")}`}
       />
       <div tw="absolute flex flex-col left-[56px] top-[146px] w-[560px]">
-        <div tw="flex text-[56px] leading-[1.04] tracking-[-2.52px] text-[#fafafa]">
+        <div tw="flex text-[56px] leading-[1.04] tracking-[-2.52px] text-[#0a0a0a]">
           {title}
         </div>
         {description && (
           <div
             style={{ fontWeight: 300, textWrap: "balance" }}
-            tw="mt-[20px] max-w-[500px] text-[26px] leading-[1.32] tracking-[-0.52px] text-[#a1a1a1]"
+            tw="mt-[20px] max-w-[500px] text-[26px] leading-[1.32] tracking-[-0.52px] text-[#6e6e6e]"
           >
             {description}
           </div>
