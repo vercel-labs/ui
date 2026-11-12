@@ -1,3 +1,4 @@
+import { plainTokens } from "@/lib/plain-tokens"
 import { cn } from "cn"
 import { getHighlighter } from "fumadocs-core/highlight"
 import { CheckIcon, XIcon } from "lucide-react"
@@ -140,6 +141,7 @@ async function toHtml(code: string, lang: BundledLanguage) {
           )
         },
       },
+      plainTokens,
     ],
   })
   return {

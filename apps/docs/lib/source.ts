@@ -5,6 +5,7 @@ import { metaSchema, pageSchema } from "fumadocs-core/source/schema"
 import { applyMdxPreset } from "fumadocs-mdx/config"
 import { defineDocs } from "fumadocs-mdx/macro"
 import { highlightLines } from "./highlight-lines"
+import { plainTokens } from "./plain-tokens"
 import { remarkInstall } from "./remark-install"
 import { textBlocks } from "./text-blocks"
 
@@ -22,6 +23,7 @@ const docs = defineDocs({
           ...(rehypeCodeDefaultOptions.transformers ?? []),
           highlightLines,
           textBlocks,
+          plainTokens,
         ],
       },
       remarkPlugins: (plugins) => [remarkInstall, ...plugins],
