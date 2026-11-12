@@ -53,6 +53,28 @@ describe("an instance that starts asleep", () => {
     expect(built).toHaveBeenCalledTimes(2)
   })
 
+  test("a part made while asleep reads the api once it wakes", () => {
+    const { primitive } = hint()
+    const instance = primitive({ id: "h" })
+    const part = instance.part("trigger")
+    expect(part.api).toBeUndefined()
+    instance.api.show()
+    expect(part.api).toBe(instance.api)
+  })
+
+  test("gives a part swept while it slept the api it woke with", async () => {
+    const { primitive, calls } = hint()
+    const instance = primitive({ id: "h" })
+    const part = instance.part("trigger")
+    const host = { by: "framework", attaches: "all" } as const
+    bind(part, standIn(), host)()
+    await Promise.resolve()
+    void instance.api
+    bind(part, standIn(), host)
+    handlers(part).pointerenter!(new Event("pointerenter"))
+    expect(calls).toEqual(["asleep", "asleep", "bind", "show"])
+  })
+
   test("never sleeps with options that need it awake", () => {
     const { primitive, built } = hint()
     primitive({ id: "h", open: true })

@@ -222,7 +222,10 @@ function definePrimitive<
             slot,
             key,
             id,
-            api,
+            // Read when used, since an asleep instance builds its api later.
+            get api() {
+              return api
+            },
             store,
             props,
             el: undefined,
@@ -296,9 +299,6 @@ function definePrimitive<
       }
       owner.sleeping = undefined
       extendLifecycle(instance, build)
-      for (const part of [...parts.values(), ...owner.released]) {
-        ;(part as { api: Api }).api = api
-      }
       for (const bind of [...sleeping.binds]) {
         bind()
       }
