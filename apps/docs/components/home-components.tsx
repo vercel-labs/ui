@@ -125,6 +125,7 @@ import {
   MoveHorizontalIcon,
 } from "lucide-react"
 import * as React from "react"
+import { hatch } from "./home-patterns"
 import { slug } from "./home-posters"
 
 const ink = "border border-foreground"
@@ -141,88 +142,67 @@ const item =
 const label = "font-mono text-[11px] tracking-[0.06em] uppercase"
 const description = "text-[13px] text-muted-foreground"
 
-const tick = "absolute size-2 border-foreground/50"
-
+// A dimension line with the component's width, above or below it.
 function Measure({
   full = false,
+  side = "top",
+  shadow = false,
   className,
   children,
 }: {
   full?: boolean
+  side?: "top" | "bottom"
+  shadow?: boolean
   className?: string
   children: React.ReactNode
 }) {
   const box = React.useRef<HTMLDivElement>(null)
-  const [size, setSize] = React.useState<{
-    width: number
-    height: number
-  } | null>(null)
+  const [width, setWidth] = React.useState<number | null>(null)
   React.useEffect(() => {
     const element = box.current
     if (!element) {
       return
     }
     const observer = new ResizeObserver(([entry]) => {
-      const border = entry.borderBoxSize[0]
-      setSize({
-        width: Math.round(border.inlineSize),
-        height: Math.round(border.blockSize),
-      })
+      setWidth(Math.round(entry.borderBoxSize[0].inlineSize))
     })
     observer.observe(element)
     return () => observer.disconnect()
   }, [])
+  const rule = (
+    <div
+      aria-hidden="true"
+      className="flex h-2 items-center text-foreground/35 dark:text-foreground/45"
+    >
+      <span className="h-full w-px bg-current" />
+      <span className="h-px flex-1 bg-current" />
+      <span className="min-w-8 px-2 text-center font-mono text-[9px] leading-none text-muted-foreground tabular-nums">
+        {width ?? ""}
+      </span>
+      <span className="h-px flex-1 bg-current" />
+      <span className="h-full w-px bg-current" />
+    </div>
+  )
   return (
     <div
       className={cn(
-        "relative ps-7 pt-7",
+        "flex flex-col gap-[3cqi]",
         full ? "w-full" : "w-fit max-w-full",
         className
       )}
     >
-      <div
-        aria-hidden="true"
-        className="absolute start-7 end-0 top-0 flex h-3 items-center"
-      >
-        <span className="absolute inset-y-0 start-0 w-px bg-foreground/40" />
-        <span className="h-px flex-1 bg-foreground/40" />
-        <span className="bg-(--poster) px-1.5 font-mono text-[10px] text-muted-foreground tabular-nums">
-          {size?.width ?? ""}
-        </span>
-        <span className="h-px flex-1 bg-foreground/40" />
-        <span className="absolute inset-y-0 end-0 w-px bg-foreground/40" />
-      </div>
-      <div
-        aria-hidden="true"
-        className="absolute start-0 top-7 bottom-0 flex w-3 flex-col items-center"
-      >
-        <span className="absolute inset-x-0 top-0 h-px bg-foreground/40" />
-        <span className="w-px flex-1 bg-foreground/40" />
-        <span className="rotate-180 bg-(--poster) py-1.5 font-mono text-[10px] text-muted-foreground tabular-nums [writing-mode:vertical-rl]">
-          {size?.height ?? ""}
-        </span>
-        <span className="w-px flex-1 bg-foreground/40" />
-        <span className="absolute inset-x-0 bottom-0 h-px bg-foreground/40" />
-      </div>
-      <div ref={box} className="relative">
-        <span
-          aria-hidden="true"
-          className={cn(tick, "-start-2 -top-2 border-e border-b")}
-        />
-        <span
-          aria-hidden="true"
-          className={cn(tick, "-end-2 -top-2 border-s border-b")}
-        />
-        <span
-          aria-hidden="true"
-          className={cn(tick, "-start-2 -bottom-2 border-e border-t")}
-        />
-        <span
-          aria-hidden="true"
-          className={cn(tick, "-end-2 -bottom-2 border-s border-t")}
-        />
+      {side === "top" && rule}
+      <div ref={box} className="relative isolate">
+        {shadow && (
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 -z-10 translate-[2.5cqi]"
+            style={hatch}
+          />
+        )}
         {children}
       </div>
+      {side === "bottom" && rule}
     </div>
   )
 }
@@ -234,7 +214,7 @@ const range: [string, string] = [rangeStart, addDays(rangeStart, 4)]
 
 function CalendarDemo() {
   return (
-    <Measure>
+    <Measure shadow>
       <Calendar
         mode="range"
         fixedWeeks
@@ -264,7 +244,7 @@ function CalendarDemo() {
               <CalendarDay
                 value={cell.date}
                 className={cn(
-                  "size-9 text-center text-sm tabular-nums transition-colors @[22rem]:size-11 @[22rem]:text-base @[30rem]:size-13 @[30rem]:text-lg hover:bg-foreground/[0.06] data-outside:text-muted-foreground data-today:underline data-today:underline-offset-4",
+                  "size-[clamp(2rem,9.2cqi,3.25rem)] text-center text-[length:clamp(0.8125rem,3.5cqi,1.125rem)] tabular-nums transition-colors hover:bg-foreground/[0.06] data-outside:text-muted-foreground data-today:underline data-today:underline-offset-4",
                   "data-range-middle:bg-foreground/[0.08]",
                   "[&[data-selected]:not([data-range-middle])]:bg-foreground [&[data-selected]:not([data-range-middle])]:text-background",
                   ring
@@ -282,19 +262,16 @@ const commands = [
   { group: "Pages", value: "dashboard", label: "Dashboard" },
   { group: "Pages", value: "projects", label: "Projects" },
   { group: "Pages", value: "calendar", label: "Calendar" },
-  { group: "Account", value: "profile", label: "Profile" },
-  { group: "Account", value: "billing", label: "Billing" },
-  { group: "Account", value: "settings", label: "Settings" },
+  { group: "Account", value: "profile", label: "Profile", keys: "⌘P" },
+  { group: "Account", value: "billing", label: "Billing", keys: "⌘B" },
+  { group: "Account", value: "settings", label: "Settings", keys: "⌘S" },
 ]
 
 function CommandDemo() {
   return (
-    <Measure full>
+    <Measure full side="bottom" shadow>
       <Command
-        className={cn(
-          "flex h-[25.5rem] flex-col bg-background max-sm:h-80",
-          ink
-        )}
+        className={cn("flex h-[max(22rem,82cqi)] flex-col bg-background", ink)}
       >
         <div className="flex items-center gap-3 border-b border-foreground px-4 has-focus-visible:outline-2 has-focus-visible:outline-solid has-focus-visible:-outline-offset-2 has-focus-visible:outline-[#006bff]">
           <span
@@ -306,7 +283,7 @@ function CommandDemo() {
           <CommandInput
             aria-label="Search commands"
             placeholder="Go to..."
-            className="h-14 w-full min-w-0 bg-transparent text-lg tracking-[-0.01em] outline-none placeholder:text-muted-foreground"
+            className="h-[max(2.75rem,12cqi)] w-full min-w-0 bg-transparent text-[length:clamp(1rem,4cqi,1.25rem)] tracking-[-0.01em] outline-none placeholder:text-muted-foreground"
           />
         </div>
         <CommandEmpty className="flex flex-1 items-center justify-center font-mono text-[11px] tracking-[0.06em] text-muted-foreground uppercase empty:hidden">
@@ -329,9 +306,17 @@ function CommandDemo() {
                   <CommandItem
                     key={command.value}
                     value={command.value}
-                    className="flex h-9 cursor-default items-center justify-between gap-3 px-2.5 text-[15px] outline-none select-none data-highlighted:bg-foreground data-highlighted:text-background"
+                    className="group/item flex h-[max(2rem,7.4cqi)] cursor-default items-center justify-between gap-3 px-2.5 text-[length:clamp(0.875rem,3.4cqi,1rem)] outline-none select-none data-highlighted:bg-foreground data-highlighted:text-background"
                   >
                     {command.label}
+                    {command.keys && (
+                      <kbd
+                        aria-hidden="true"
+                        className="flex h-5 min-w-6 items-center justify-center border border-foreground/30 px-1 font-mono text-[9px] text-muted-foreground group-data-highlighted/item:border-background/40 group-data-highlighted/item:text-background"
+                      >
+                        {command.keys}
+                      </kbd>
+                    )}
                   </CommandItem>
                 ))}
             </CommandGroup>
@@ -351,29 +336,29 @@ function CommandDemo() {
 }
 
 const slot = cn(
-  "relative -ms-px flex h-16 min-w-0 flex-1 items-center justify-center bg-background text-3xl tabular-nums @[24rem]:h-24 @[24rem]:text-5xl first:ms-0 data-active:z-10 data-active:outline-2 data-active:outline-offset-0 data-active:outline-[#006bff]",
+  "relative -ms-px flex aspect-[5/6] min-w-0 flex-1 items-center justify-center bg-background text-[length:max(1.5rem,9cqi)] tabular-nums first:ms-0 data-active:z-10 data-active:outline-2 data-active:outline-offset-0 data-active:outline-[#006bff]",
   ink,
   "[&[data-fake-caret]:empty]:after:h-4 [&[data-fake-caret]:empty]:after:w-px [&[data-fake-caret]:empty]:after:animate-caret-blink [&[data-fake-caret]:empty]:after:bg-foreground [&[data-fake-caret]:empty]:after:content-['']"
 )
 
 function OTPDemo() {
   return (
-    <Measure full>
+    <Measure full side="bottom">
       <OTPInput
         maxLength={6}
         defaultValue="482"
         aria-label="Verification code"
-        className="flex w-full items-center gap-2"
+        className="grid w-full grid-cols-[1fr_2rem_1fr] items-center"
       >
-        <OTPInputGroup className="flex flex-1">
+        <OTPInputGroup className="flex">
           {[0, 1, 2].map((index) => (
             <OTPInputSlot key={index} index={index} className={slot} />
           ))}
         </OTPInputGroup>
-        <OTPInputSeparator className="text-muted-foreground">
-          <MinusIcon aria-hidden="true" className="size-4" />
+        <OTPInputSeparator className="flex justify-center text-muted-foreground">
+          <MinusIcon aria-hidden="true" className="size-3" />
         </OTPInputSeparator>
-        <OTPInputGroup className="flex flex-1">
+        <OTPInputGroup className="flex">
           {[3, 4, 5].map((index) => (
             <OTPInputSlot key={index} index={index} className={slot} />
           ))}
@@ -384,14 +369,14 @@ function OTPDemo() {
 }
 
 const step =
-  "flex size-20 shrink-0 items-center justify-center @[24rem]:size-24 hover:bg-foreground/[0.06] disabled:text-muted-foreground/50 [&_svg]:size-6"
+  "flex h-full w-[22%] shrink-0 items-center justify-center hover:bg-foreground/[0.06] disabled:text-muted-foreground/50 [&_svg]:size-[max(1rem,4cqi)]"
 
 function Star() {
   return (
     <svg
       aria-hidden="true"
       viewBox="0 0 24 24"
-      className="size-[15cqi] fill-current"
+      className="size-[11cqi] fill-current"
     >
       <polygon points="12 1.4 14.58 9.35 22.94 9.35 16.18 14.26 18.76 22.2 12 17.29 5.24 22.2 7.82 14.26 1.06 9.35 9.42 9.35" />
     </svg>
@@ -406,7 +391,7 @@ function RatingDemo() {
         aria-label="Your stay"
         value={value}
         onValueChange={setValue}
-        className="flex justify-between"
+        className="flex justify-between gap-[2.5cqi]"
       >
         <RatingItem className="group/star relative inline-flex cursor-default text-foreground/15 has-focus-visible:outline-2 has-focus-visible:outline-solid has-focus-visible:outline-offset-2 has-focus-visible:outline-[#006bff]">
           <Star />
@@ -421,7 +406,7 @@ function RatingDemo() {
 
 function NumberInputDemo() {
   return (
-    <Measure full>
+    <Measure full side="bottom">
       <NumberInput defaultValue={2} min={1} max={100}>
         <NumberInputScrubArea
           pixelsPerStep={16}
@@ -451,7 +436,7 @@ function NumberInputDemo() {
         </NumberInputScrubArea>
         <NumberInputGroup
           className={cn(
-            "flex h-20 w-full items-center bg-background @[24rem]:h-24",
+            "flex h-[max(4.5rem,17cqi)] w-full items-center bg-background",
             ink,
             "has-focus-visible:outline-2 has-focus-visible:outline-solid has-focus-visible:outline-offset-2 has-focus-visible:outline-[#006bff]"
           )}
@@ -464,7 +449,7 @@ function NumberInputDemo() {
           </NumberInputDecrement>
           <NumberInputControl
             aria-label="Guests"
-            className="w-full min-w-0 flex-1 bg-transparent text-center text-5xl tracking-tight tabular-nums outline-none @[24rem]:text-[4rem]"
+            className="w-full min-w-0 flex-1 bg-transparent text-center text-[length:max(2.5rem,11cqi)] tracking-tight tabular-nums outline-none"
           />
           <NumberInputIncrement
             aria-label="More guests"
@@ -539,48 +524,107 @@ function SwitchDemo() {
   )
 }
 
+// A leader line runs from the thumb to a numbered note, like a callout on a
+// drawing, and follows the thumb as it moves.
 function SliderDemo() {
+  const [value, setValue] = React.useState(20)
+  const frame = React.useRef<HTMLDivElement>(null)
+  const note = React.useRef<HTMLSpanElement>(null)
+  const [path, setPath] = React.useState("")
+
+  React.useLayoutEffect(() => {
+    const element = frame.current
+    const marker = note.current
+    if (!element || !marker) {
+      return
+    }
+    const draw = () => {
+      const thumb = element.querySelector("[data-slot=slider-thumb]")
+      if (!thumb) {
+        return
+      }
+      const origin = element.getBoundingClientRect()
+      const end = thumb.getBoundingClientRect()
+      const box = marker.getBoundingClientRect()
+      const rtl = getComputedStyle(element).direction === "rtl"
+      const x = end.left + end.width / 2 - origin.left
+      const y = end.top - origin.top
+      const boxX = (rtl ? box.right : box.left) - origin.left
+      const boxY = box.top + box.height / 2 - origin.top
+      const elbow = boxX + (rtl ? 1 : -1) * Math.max(16, box.height * 2.4)
+      setPath(`M ${x} ${y} L ${elbow} ${boxY} L ${boxX} ${boxY}`)
+    }
+    draw()
+    const observer = new ResizeObserver(draw)
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [value])
+
   return (
-    <Measure full>
-      <Slider
-        defaultValue={60}
-        className={cn("flex flex-col gap-4 bg-background p-4", ink)}
+    <div ref={frame} className="relative flex w-full flex-col gap-[16cqi]">
+      <svg
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-10 size-full overflow-visible text-foreground"
       >
-        <div className="flex items-center justify-between">
-          <span aria-hidden="true" className={label}>
-            Volume
-          </span>
-          <SliderValue className="font-mono text-[11px] text-muted-foreground tabular-nums" />
-        </div>
-        <SliderControl className="flex h-6 items-center">
-          <SliderTrack className="relative h-px w-full bg-foreground/25">
-            <SliderIndicator className="h-0.5 -translate-y-[0.5px] bg-foreground" />
-            <SliderThumb
-              aria-label="Volume"
-              className={cn(
-                "size-4 bg-background data-dragging:bg-foreground",
-                ink,
-                ring
-              )}
-            />
-          </SliderTrack>
-        </SliderControl>
-        <div
+        {path && (
+          <path d={path} fill="none" stroke="currentColor" strokeWidth={1} />
+        )}
+      </svg>
+      <div className="flex items-start gap-2 ps-[42%]">
+        <span
+          ref={note}
           aria-hidden="true"
-          className="flex justify-between font-mono text-[10px] text-muted-foreground"
+          className="flex size-4 shrink-0 items-center justify-center border border-foreground font-mono text-[9px] leading-none"
         >
-          {[0, 25, 50, 75, 100].map((mark) => (
-            <span
-              key={mark}
-              className="flex w-0 flex-col items-center gap-1 first:items-start last:items-end"
-            >
-              <span className="h-1.5 w-px bg-foreground/30" />
-              {mark}
+          1
+        </span>
+        <p className="font-mono text-[9px] leading-[1.55] tracking-[0.08em] text-muted-foreground uppercase @[26rem]:text-[10px] @[36rem]:text-[11px]">
+          <span className="block">Set the volume</span>
+          <span className="block">Drag or tap the track</span>
+        </p>
+      </div>
+      <Measure full shadow>
+        <Slider
+          value={value}
+          onValueChange={setValue}
+          className={cn("flex flex-col gap-4 bg-background p-4", ink)}
+        >
+          <div className="flex items-center justify-between">
+            <span aria-hidden="true" className={label}>
+              Volume
             </span>
-          ))}
-        </div>
-      </Slider>
-    </Measure>
+            <SliderValue className="font-mono text-[11px] text-muted-foreground tabular-nums" />
+          </div>
+          <SliderControl className="flex h-6 items-center">
+            <SliderTrack className="relative h-px w-full bg-foreground/25">
+              <SliderIndicator className="h-0.5 -translate-y-[0.5px] bg-foreground" />
+              <SliderThumb
+                aria-label="Volume"
+                className={cn(
+                  "size-4 bg-background data-dragging:bg-foreground",
+                  ink,
+                  ring
+                )}
+              />
+            </SliderTrack>
+          </SliderControl>
+          <div
+            aria-hidden="true"
+            className="flex justify-between font-mono text-[10px] text-muted-foreground"
+          >
+            {[0, 25, 50, 75, 100].map((mark) => (
+              <span
+                key={mark}
+                className="flex w-0 flex-col items-center gap-1 first:items-start last:items-end"
+              >
+                <span className="h-1.5 w-px bg-foreground/30" />
+                {mark}
+              </span>
+            ))}
+          </div>
+        </Slider>
+      </Measure>
+    </div>
   )
 }
 
@@ -598,7 +642,7 @@ function SegmentedDemo() {
             key={view}
             value={view.toLowerCase()}
             className={cn(
-              "relative h-16 min-w-0 flex-1 px-2 text-lg font-medium @[22rem]:px-4 @[22rem]:text-xl @[24rem]:h-20 @[24rem]:text-2xl text-muted-foreground transition-colors data-checked:text-background",
+              "relative h-[max(3.5rem,14.5cqi)] min-w-0 flex-1 px-2 text-[length:max(1.125rem,4.6cqi)] font-medium text-muted-foreground transition-colors data-checked:text-background",
               ring
             )}
           >
@@ -637,18 +681,18 @@ function ColorDemo() {
     React.useState<(typeof formats)[number]["value"]>("hex")
   const [value, setValue] = React.useState("#6366f1")
   return (
-    <Measure>
+    <Measure side="bottom">
       <ColorPicker
         aria-label="Brand color"
         value={value}
         onValueChange={setValue}
         format={format}
         className={cn(
-          "flex w-64 max-w-full flex-col gap-3 bg-background p-3 @[20rem]:w-80 [&_[data-slot=color-picker-area-canvas]]:grayscale [&_[data-slot=color-picker-area-thumb]]:grayscale [&_[data-slot=color-picker-slider]]:grayscale [&_[data-slot=color-picker-swatch-item]]:grayscale [&_[data-slot=color-picker-swatch]]:grayscale",
+          "flex w-[max(15rem,64cqi)] max-w-full flex-col gap-3 bg-background p-3 [&_[data-slot=color-picker-area-canvas]]:grayscale [&_[data-slot=color-picker-area-thumb]]:grayscale [&_[data-slot=color-picker-slider]]:grayscale [&_[data-slot=color-picker-swatch-item]]:grayscale [&_[data-slot=color-picker-swatch]]:grayscale",
           ink
         )}
       >
-        <ColorPickerArea className="relative h-32 cursor-crosshair border border-foreground @[20rem]:h-44">
+        <ColorPickerArea className="relative h-[max(7rem,35cqi)] cursor-crosshair border border-foreground">
           <ColorPickerAreaCanvas className="absolute inset-0 size-full" />
           <ColorPickerAreaThumb className={cn(thumb, "-translate-1/2")} />
         </ColorPickerArea>
@@ -748,7 +792,7 @@ function Files({ items }: { items: Node[] }) {
       value={node.value}
       className="group/item outline-none"
     >
-      <TreeItemLabel className="flex h-9 items-center gap-2 ps-[calc(0.5rem+(var(--tree-level,1)-1)*1rem)] pe-3 text-[15px] whitespace-nowrap select-none [:focus-visible>&]:outline-2 [:focus-visible>&]:outline-solid [:focus-visible>&]:-outline-offset-2 [:focus-visible>&]:outline-[#006bff] hover:bg-foreground/[0.06] data-selected:bg-foreground data-selected:text-background [&>svg]:size-4 [&>svg]:shrink-0">
+      <TreeItemLabel className="flex h-[max(2rem,7.4cqi)] items-center gap-2 ps-[calc(0.5rem+(var(--tree-level,1)-1)*1rem)] pe-3 text-[length:clamp(0.875rem,3.4cqi,1rem)] whitespace-nowrap select-none [:focus-visible>&]:outline-2 [:focus-visible>&]:outline-solid [:focus-visible>&]:-outline-offset-2 [:focus-visible>&]:outline-[#006bff] hover:bg-foreground/[0.06] data-selected:bg-foreground data-selected:text-background [&>svg]:size-4 [&>svg]:shrink-0">
         {node.children ? (
           <TreeItemIndicator className="flex size-4 items-center justify-center transition-transform data-expanded:rotate-90 rtl:-scale-x-100">
             <ChevronRightIcon aria-hidden="true" className="size-3.5" />
@@ -774,7 +818,7 @@ function Files({ items }: { items: Node[] }) {
 
 function TreeDemo() {
   return (
-    <Measure full>
+    <Measure full side="bottom">
       <Tree
         aria-label="Files"
         defaultExpanded={["app", "components"]}
@@ -811,13 +855,13 @@ const periods = [
   },
 ]
 const tab = cn(
-  "h-11 min-w-0 flex-1 px-2 text-sm font-medium text-muted-foreground @[22rem]:px-3 transition-colors select-none hover:text-foreground data-selected:bg-foreground data-selected:text-background",
+  "h-[max(2.25rem,9cqi)] min-w-0 flex-1 px-2 text-[length:clamp(0.8125rem,3.2cqi,1rem)] font-medium text-muted-foreground transition-colors select-none hover:text-foreground data-selected:bg-foreground data-selected:text-background",
   ring
 )
 
 function TabsDemo() {
   return (
-    <Measure full>
+    <Measure full side="bottom">
       <Tabs
         defaultValue="week"
         className={cn("flex flex-col bg-background", ink)}
@@ -848,7 +892,7 @@ function TabsDemo() {
             </div>
             <div
               aria-hidden="true"
-              className="flex h-40 items-end gap-1.5 @[28rem]:h-52"
+              className="flex h-[max(8rem,30cqi)] items-end gap-[1.6cqi]"
             >
               {period.bars.map((height, index) => (
                 <div
@@ -908,7 +952,7 @@ const token =
 
 function TokenInputDemo() {
   return (
-    <Measure full>
+    <Measure full side="bottom">
       <TokenInput
         renderToken={(entry) => {
           return (
@@ -934,7 +978,7 @@ function TokenInputDemo() {
           aria-label="Prompt"
           placeholder="Type @ to pick a file, or / for a skill or model"
           className={cn(
-            "relative min-h-40 bg-background p-5 text-xl leading-10 outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[#006bff] data-empty:before:pointer-events-none data-empty:before:absolute data-empty:before:text-muted-foreground data-empty:before:content-[attr(aria-placeholder)]",
+            "relative min-h-[max(8rem,32cqi)] bg-background p-[max(1rem,4cqi)] text-[length:clamp(1rem,3.8cqi,1.25rem)] leading-[1.75] outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[#006bff] data-empty:before:pointer-events-none data-empty:before:absolute data-empty:before:text-muted-foreground data-empty:before:content-[attr(aria-placeholder)]",
             ink
           )}
         />
@@ -1017,7 +1061,7 @@ function AccordionDemo() {
             <AccordionHeader>
               <AccordionTrigger
                 className={cn(
-                  "flex h-12 w-full items-center justify-between gap-4 px-4 text-start text-[15px] font-medium hover:bg-foreground/[0.04] aria-disabled:cursor-default aria-expanded:[&>svg]:rotate-180",
+                  "flex h-[max(2.75rem,10.5cqi)] w-full items-center justify-between gap-4 px-4 text-start text-[length:clamp(0.875rem,3.4cqi,1rem)] font-medium hover:bg-foreground/[0.04] aria-disabled:cursor-default aria-expanded:[&>svg]:rotate-180",
                   ring,
                   "focus-visible:-outline-offset-2"
                 )}
@@ -1042,7 +1086,7 @@ function AccordionDemo() {
 function ResizableDemo() {
   return (
     <Measure full>
-      <Resizable className={cn("flex h-52 bg-background", ink)}>
+      <Resizable className={cn("flex h-[max(10rem,41cqi)] bg-background", ink)}>
         <ResizablePanel
           defaultSize={38}
           minSize={20}
@@ -1149,7 +1193,7 @@ function ToolbarDemo() {
         </Toolbar>
         <p
           className={cn(
-            "p-5 text-lg leading-relaxed",
+            "p-[max(1rem,4.5cqi)] text-[length:clamp(0.875rem,3.6cqi,1.125rem)] leading-relaxed",
             marked.includes("bold") && "font-semibold",
             marked.includes("italic") && "italic",
             marked.includes("underline") && "underline underline-offset-4",

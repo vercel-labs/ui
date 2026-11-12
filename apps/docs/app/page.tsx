@@ -4,28 +4,31 @@ import { PhoneShot, PhoneStrip } from "@/components/home-more"
 import { Poster, StartPoster } from "@/components/home-posters"
 import { SelectBlueprint } from "@/components/home-select"
 import {
-  AccordionTile,
+  AccordionCard,
+  CalendarCard,
+  ColorCard,
+  CommandCard,
+  NumberInputCard,
+  OTPCard,
+  RatingCard,
+  ResizableCard,
+  SegmentedCard,
+  SliderCard,
+  SwitchCard,
+  TabsCard,
+  TokenInputCard,
+  ToolbarCard,
+  TreeCard,
+} from "@/components/home-cards"
+import { hatch } from "@/components/home-patterns"
+import {
   AgentsTile,
   AskPoster,
-  CalendarTile,
   CanvasTile,
-  ColorTile,
-  CommandTile,
   FlowTile,
-  NumberInputTile,
-  OTPTile,
   OperatePoster,
-  RatingTile,
-  ResizableTile,
-  SegmentedTile,
   SheetTile,
-  SliderTile,
-  SwitchTile,
-  TabsTile,
   TimelineTile,
-  TokenInputTile,
-  ToolbarTile,
-  TreeTile,
   WeekTile,
 } from "@/components/home-tiles"
 import { Logo } from "@/components/logo"
@@ -35,22 +38,23 @@ import { sectionPages, sectionTree } from "@/lib/section-tree"
 import { cn } from "cn"
 import Link from "next/link"
 
+// Three to a row. Phones show the six marked `phone` in a strip.
 const components = [
-  { name: "Color Picker", Tile: ColorTile, phone: true },
-  { name: "Token Input", Tile: TokenInputTile, phone: true },
-  { name: "Calendar", Tile: CalendarTile, phone: true },
-  { name: "Number Input", Tile: NumberInputTile, phone: true },
-  { name: "Command", Tile: CommandTile, phone: true },
-  { name: "Resizable", Tile: ResizableTile, phone: true },
-  { name: "Switch", Tile: SwitchTile },
-  { name: "Tabs", Tile: TabsTile },
-  { name: "Slider", Tile: SliderTile },
-  { name: "Accordion", Tile: AccordionTile },
-  { name: "Rating", Tile: RatingTile },
-  { name: "Tree", Tile: TreeTile },
-  { name: "Segmented Control", Tile: SegmentedTile },
-  { name: "OTP Input", Tile: OTPTile },
-  { name: "Toolbar", Tile: ToolbarTile },
+  { name: "Color Picker", Card: ColorCard, phone: true },
+  { name: "Token Input", Card: TokenInputCard, phone: true },
+  { name: "Number Input", Card: NumberInputCard, phone: true },
+  { name: "Switch", Card: SwitchCard },
+  { name: "Resizable", Card: ResizableCard, phone: true },
+  { name: "Slider", Card: SliderCard },
+  { name: "Command", Card: CommandCard, phone: true },
+  { name: "Accordion", Card: AccordionCard },
+  { name: "Rating", Card: RatingCard },
+  { name: "Segmented Control", Card: SegmentedCard },
+  { name: "Calendar", Card: CalendarCard, phone: true },
+  { name: "Tabs", Card: TabsCard },
+  { name: "OTP Input", Card: OTPCard },
+  { name: "Tree", Card: TreeCard },
+  { name: "Toolbar", Card: ToolbarCard },
 ]
 
 const builds = [
@@ -215,19 +219,23 @@ export default function HomePage() {
           names={components
             .filter((item) => item.phone)
             .map((item) => item.name)}
-          className="relative grid grid-cols-1 gap-3 max-sm:-mx-6 max-sm:flex max-sm:gap-6 max-sm:snap-x max-sm:snap-mandatory max-sm:-my-2 max-sm:overflow-x-auto max-sm:overflow-y-hidden max-sm:overscroll-x-contain max-sm:px-6 max-sm:py-2 max-sm:[scrollbar-width:none] lg:grid-cols-2 lg:gap-4 min-[90rem]:grid-cols-3"
+          className="relative grid grid-cols-1 gap-3 max-sm:-mx-6 max-sm:flex max-sm:gap-6 max-sm:snap-x max-sm:snap-mandatory max-sm:-my-2 max-sm:overflow-x-auto max-sm:overflow-y-hidden max-sm:overscroll-x-contain max-sm:px-6 max-sm:py-2 max-sm:[scrollbar-width:none] sm:grid-cols-2 min-[80rem]:grid-cols-3"
         >
-          {components.map((item, index) => (
-            <item.Tile
+          {components.map((item) => (
+            <item.Card
               key={item.name}
               className={cn(
-                "max-sm:w-[calc(100vw-5rem)] max-sm:shrink-0 max-sm:snap-center max-sm:gap-8",
-                !item.phone && "max-sm:hidden",
-                index === components.length - 1 &&
-                  "lg:col-span-2 min-[90rem]:col-span-1"
+                "max-sm:w-[calc(100vw-5rem)] max-sm:shrink-0 max-sm:snap-center",
+                !item.phone && "max-sm:hidden"
               )}
             />
           ))}
+          {/* Fills the last cell when two to a row leaves one empty. */}
+          <div
+            aria-hidden="true"
+            className="hidden border border-foreground/10 sm:block min-[80rem]:hidden dark:border-foreground/15"
+            style={hatch}
+          />
         </PhoneStrip>
         <Section
           title={
