@@ -1,6 +1,6 @@
 import type * as React from "react"
 
-const line = "color-mix(in oklab, var(--foreground) 16%, var(--background))"
+const line = "color-mix(in oklab, var(--foreground) 9%, var(--background))"
 
 const hatch: React.CSSProperties = {
   backgroundImage: `repeating-linear-gradient(-45deg, ${line} 0 1px, transparent 1px 6px)`,
