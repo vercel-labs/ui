@@ -8,7 +8,7 @@ import {
 import { cn } from "cn"
 import type { Framework } from "@/lib/frameworks"
 import { exampleIndex, readExampleModules } from "@/lib/example-modules"
-import { readExampleSources } from "@/lib/example-sources"
+import { hasExample, readExampleSources } from "@/lib/example-sources"
 import { preloadModule } from "react-dom"
 import { CodeBlock } from "./code"
 import { ExamplePreview } from "./example-preview"
@@ -21,7 +21,8 @@ import { Frame } from "./frame"
 
 async function ComponentExample({
   name,
-  framework,
+  framework: wanted,
+  fallback,
   caption,
   hideCode = false,
   hideTabs = false,
@@ -30,6 +31,8 @@ async function ComponentExample({
 }: {
   name: string
   framework: Framework
+  /** The framework to show when `framework` has no copy of the example. */
+  fallback?: Framework
   caption?: string
   hideCode?: boolean
   hideTabs?: boolean
@@ -37,6 +40,7 @@ async function ComponentExample({
   tall?: boolean
 }) {
   const isAtTop = exampleIndex() < 2
+  const framework = fallback && !hasExample(name, wanted) ? fallback : wanted
   const [sources, modules] = await Promise.all([
     readExampleSources(name, framework),
     readExampleModules(name, framework),

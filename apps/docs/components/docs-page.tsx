@@ -74,7 +74,8 @@ function DocsPage({
             isFramework(section) || section === "guides"
               ? framework
               : undefined,
-            resolve
+            resolve,
+            isFramework(section) ? undefined : framework
           )}
         />
       </DocsArticle>

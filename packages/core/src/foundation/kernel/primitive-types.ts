@@ -190,6 +190,16 @@ type SlotFields<State extends object, Api, Props, Public> = {
    */
   bind?: (el: HTMLElement, part: Part<State, Api, Props>) => (() => void) | void
   /**
+   * Client only, web only. Like `bind`, but runs at once while the instance
+   * is asleep, for what a part can't wait for, like naming its trigger. Its
+   * `part.api` is undefined until the instance wakes.
+   * @experimental
+   */
+  asleep?: (
+    el: HTMLElement,
+    part: Part<State, Api, Props>
+  ) => (() => void) | void
+  /**
    * Client only. Runs while the element is in the page, present or not, for
    * adapters that keep parts that aren't present, like custom elements. A
    * popup's content registers here, so shortcuts inside a closed one don't run.

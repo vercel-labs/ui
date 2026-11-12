@@ -1,6 +1,0 @@
-export { default as SelectContent } from "./select-content.svelte"
-export { default as SelectItem } from "./select-item.svelte"
-export { default as SelectItemIcon } from "./select-item-icon.svelte"
-export { default as SelectLabel } from "./select-label.svelte"
-export { default as SelectTrigger } from "./select-trigger.svelte"
-export { Select } from "@ui-sdk/svelte/select"

@@ -6,7 +6,6 @@
   "scripts": {
     "dev": "bash scripts/docs-dev.sh",
     "playground": "pnpm --filter playground dev",
-    "review": "node demos/tracker/review/scripts/dev.mjs",
     "typecheck": "node scripts/check-type-imports.mjs && pnpm -r --workspace-concurrency=4 --no-sort typecheck",
     "lint": "node scripts/check-code.mjs && node scripts/check-comments.mjs && node scripts/check-braces.mjs && node scripts/check-coverage.mjs",
     "lint:idioms": "eslint packages examples apps/playground/src",
@@ -19,7 +18,6 @@
     "test:browser-build": "cd tests && playwright test --config browser-build.config.ts",
     "build": "pnpm -r --filter \"./packages/**\" build",
     "check:packages": "node scripts/check-packages.mjs",
-    "release": "pnpm --filter registry release",
     "size": "node scripts/size.mjs",
     "docs:packages": "node scripts/package-docs.mjs",
     "docs:perf": "node scripts/perf-docs.mjs",

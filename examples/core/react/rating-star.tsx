@@ -1,7 +1,7 @@
 import * as React from "react"
 import { StarIcon } from "lucide-react"
 import { createParts } from "@ui-sdk/react/primitive"
-import { rating } from "./rating-stages/star"
+import { rating } from "../rating-stages/star"
 
 const { Root: Rating, Star: RatingStar } = createParts(rating, {
   root: "div",

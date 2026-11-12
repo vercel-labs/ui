@@ -236,12 +236,12 @@ cd tests && PLAYGROUND_PORT=5310 ../scripts/test-slot.sh npx playwright test spe
 - `packages/react/test`, `packages/solid/test` and `packages/svelte/test`: server rendering for each component (`*-ssr.test.tsx`), merged props, and the package's exports.
 - `packages/vue/test`: server rendering for each component (`*-ssr.test.ts`), and which state changes render a part again (`slot-state.test.ts`).
 - `packages/web/test`: attributes, properties and lifecycle of the elements, in jsdom. Their behavior in a browser is covered by the `web` projects.
-- `apps/docs` and `apps/registry`: the docs site's helpers, like search and the setup prompts, and the registry and its docs proxy.
+- `apps/docs`: the docs site's helpers, like search and the setup prompts.
 
 They run in the CI Unit tests job in the `affected`, `affected-engines`, `main` and `full` tiers.
 
 ```bash
-scripts/test-slot.sh pnpm --filter "./packages/*" --filter ./apps/docs --filter ./apps/registry test  # Everything CI runs.
+scripts/test-slot.sh pnpm --filter "./packages/*" --filter ./apps/docs test  # Everything CI runs.
 cd packages/core && ../../scripts/test-slot.sh npx vitest run test/order.test.ts  # One file.
 cd packages/core && ../../scripts/test-slot.sh npx vitest run -t 'notifies two items'
 ```

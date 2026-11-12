@@ -44,57 +44,19 @@ describe("setup prompts", () => {
     )
   })
 
-  test("adds the .npmrc step only with a registry", () => {
-    expect(setupPrompt({ stackId: "vue", site })).not.toContain(".npmrc")
-    expect(
-      setupPrompt({
-        stackId: "vue",
-        site,
-        registry: "https://registry.example.com/",
-      })
-    ).toContain(
-      "1. Add this line to .npmrc in the project root, creating it if needed:\n   @ui-sdk:registry=https://registry.example.com/"
+  test.each([
+    ["web-components", "html"],
+    ["artifacts", undefined],
+  ])("loads web.js and web.css from the site for %s", (stackId, projectId) => {
+    const prompt = setupPrompt({ stackId, projectId, site })
+    expect(prompt).toContain(
+      `<script type="module" src="https://ui-sdk.dev/web.js"></script>`
     )
+    expect(prompt).toContain(
+      `<link rel="stylesheet" href="https://ui-sdk.dev/web.css" />`
+    )
+    expect(prompt).toContain("read https://ui-sdk.dev/web.md.")
   })
-
-  test.each([
-    ["web-components", "html"],
-    ["artifacts", undefined],
-  ])(
-    "loads web.js and web.css from the site for %s without a registry",
-    (stackId, projectId) => {
-      const prompt = setupPrompt({ stackId, projectId, site })
-      expect(prompt).toContain(
-        `<script type="module" src="https://ui-sdk.dev/web.js"></script>`
-      )
-      expect(prompt).toContain(
-        `<link rel="stylesheet" href="https://ui-sdk.dev/web.css" />`
-      )
-      expect(prompt).toContain("read https://ui-sdk.dev/web.md.")
-    }
-  )
-
-  test.each([
-    ["web-components", "html"],
-    ["artifacts", undefined],
-  ])(
-    "loads web.js and web.css from the registry for %s",
-    (stackId, projectId) => {
-      const prompt = setupPrompt({
-        stackId,
-        projectId,
-        site,
-        registry: "https://registry.example.com/",
-      })
-      expect(prompt).toContain(
-        `<script type="module" src="https://registry.example.com/web.js"></script>`
-      )
-      expect(prompt).toContain(
-        `<link rel="stylesheet" href="https://registry.example.com/web.css" />`
-      )
-      expect(prompt).not.toContain(".npmrc")
-    }
-  )
 
   test("asks what to build once the setup is done", () => {
     expect(setupPrompt({ stackId: "solid", projectId: "start", site })).toMatch(

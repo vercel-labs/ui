@@ -85,7 +85,7 @@ jobs:
 
       # Not a recursive `test`, which would also start Playwright in tests/.
       - name: Unit tests
-        run: pnpm --filter "./packages/*" --filter ./apps/docs --filter ./apps/registry test
+        run: pnpm --filter "./packages/*" --filter ./apps/docs test
 
   packages:
     name: Build and size

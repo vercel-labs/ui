@@ -85,7 +85,8 @@ const frameworkHref = new RegExp(`^/docs/(${frameworkPages.join("|")})\\b`)
 // framework, and the reader's on Guides. Core and Agents pages have none.
 function getMDXComponents(
   framework: Framework = "react",
-  resolve: (href: string) => string = (href) => href
+  resolve: (href: string) => string = (href) => href,
+  reader?: Framework
 ) {
   return {
     h2: heading(
@@ -240,10 +241,7 @@ function getMDXComponents(
       </Frame>
     ),
     CopyPrompt: () => (
-      <CopyPromptButton
-        registry={process.env.NPM_REGISTRY}
-        className="inline-flex h-8 shrink-0 items-center bg-foreground px-3 text-sm font-medium whitespace-nowrap text-background outline-none hover:bg-foreground/85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#006bff] focus-visible:outline-solid"
-      >
+      <CopyPromptButton className="inline-flex h-8 shrink-0 items-center bg-foreground px-3 text-sm font-medium whitespace-nowrap text-background outline-none hover:bg-foreground/85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#006bff] focus-visible:outline-solid">
         Copy Prompt
       </CopyPromptButton>
     ),
@@ -253,7 +251,13 @@ function getMDXComponents(
       hideCode?: boolean
       hideTabs?: boolean
       compact?: boolean
-    }) => <ComponentExample {...props} framework={framework} />,
+    }) =>
+      // Core's and Agents' examples show the reader's framework where one is written, else React's.
+      reader ? (
+        <ComponentExample {...props} framework={reader} fallback="react" />
+      ) : (
+        <ComponentExample {...props} framework={framework} />
+      ),
     SpecList,
     DataAttributes: (props: { component?: string; part?: string }) => (
       <DataAttributes {...props} framework={framework} />

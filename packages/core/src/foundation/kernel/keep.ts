@@ -98,6 +98,33 @@ function whenKept(start: Start) {
   }
 }
 
+/**
+ * Runs `run` as part of making `instance`, after it was made, like an api
+ * built once the instance wakes. What it registers with `whenKept` starts at
+ * once while the instance is kept.
+ */
+function extendLifecycle(instance: object, run: () => void) {
+  const outer = making
+  const added: Lifecycle = { starts: [] }
+  making = added
+  try {
+    run()
+  } finally {
+    making = outer
+  }
+  const lifecycle = lifecycles.get(instance)
+  if (!lifecycle) {
+    return
+  }
+  lifecycle.starts.push(...added.starts)
+  for (const start of lifecycle.stops ? added.starts : []) {
+    const stop = start()
+    if (stop) {
+      lifecycle.stops!.push(stop)
+    }
+  }
+}
+
 /** Starts what waits on the framework keeping an instance. Safe to call again. */
 function keep(instance: object) {
   const lifecycle = lifecycles.get(instance)
@@ -136,6 +163,7 @@ function discard(instance: object) {
 
 export {
   discard,
+  extendLifecycle,
   isDestroying,
   keep,
   release,

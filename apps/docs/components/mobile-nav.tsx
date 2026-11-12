@@ -8,7 +8,15 @@ import {
   PopoverTitle,
   PopoverTrigger,
 } from "@ui-sdk/react/popover"
-import { frameworkIds, frameworks } from "@/lib/frameworks"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { frameworkIds, frameworks, isFramework } from "@/lib/frameworks"
+import { useFramework } from "@/lib/preferences"
 import { menu } from "@/lib/menu"
 import type { Section } from "@/lib/sections"
 import type * as PageTree from "fumadocs-core/page-tree"
@@ -19,10 +27,9 @@ import * as React from "react"
 import { BetaCard } from "./beta-card"
 import { HeaderCopyPrompt } from "./copy-prompt"
 import { GitHubLink } from "./github-link"
-import { FrameworkCheck } from "./site-preferences"
 import { Logo, VercelLogo } from "./logo"
 import { SearchTrigger, setSearchOpen, useSearchOpen } from "./search"
-import { useCurrentUrl, useFrameworkLink, useMenuLink } from "./section-nav"
+import { useCurrentUrl, useFrameworkSwitch, useMenuLink } from "./section-nav"
 
 // The header on small screens. The menu fills the screen below it. Pages outside
 // the docs, like the homepage, have no section and list only the menu.
@@ -31,13 +38,11 @@ function MobileNav({
   tree,
   urls = [],
   docs = !!section,
-  registry,
 }: {
   section?: Section
   tree?: PageTree.Root
   urls?: string[]
   docs?: boolean
-  registry?: string
 }) {
   const [open, setOpen] = React.useState(false)
   const searching = useSearchOpen()
@@ -110,10 +115,7 @@ function MobileNav({
         <Logo className="h-[18px] w-auto" />
       </Link>
       <div className="ms-auto flex items-center gap-1">
-        <HeaderCopyPrompt
-          registry={registry}
-          className="me-1.5 h-7 px-2.5 text-[13px]"
-        />
+        <HeaderCopyPrompt className="me-1.5 h-7 px-2.5 text-[13px]" />
         {/* Phones show the icon alone, so the breadcrumb fits. */}
         <SearchTrigger
           grow
@@ -226,12 +228,12 @@ function MobileMenu({
 }) {
   const currentUrl = useCurrentUrl(tree)
   const link = useMenuLink(section)
-  const frameworkLink = useFrameworkLink(urls)
   const groups = tree ? groupPages(tree.children, String(tree.name)) : []
 
   return (
     // Two landmarks, like the header and sidebar on large screens.
     <div className="flex flex-col gap-12 px-6 pt-6 pb-12 sm:px-8">
+      <FrameworkSelect section={section} urls={urls} onNavigate={onNavigate} />
       <nav aria-label="Sections" className="flex flex-col gap-12">
         <MenuGroup label="Menu">
           {menu.map((item) => {
@@ -266,21 +268,6 @@ function MobileMenu({
             )
           })}
         </MenuGroup>
-        <MenuGroup label="Frameworks">
-          {frameworkIds.map((framework) => (
-            <MenuLink
-              key={framework}
-              href={frameworkLink(framework)}
-              current={section === framework}
-              onNavigate={onNavigate}
-            >
-              <span className="flex items-center gap-3">
-                {frameworks[framework].label}
-                <FrameworkCheck framework={framework} className="size-6" />
-              </span>
-            </MenuLink>
-          ))}
-        </MenuGroup>
       </nav>
       {groups.length > 0 && (
         <nav aria-label="Docs" className="flex flex-col gap-12">
@@ -301,6 +288,67 @@ function MobileMenu({
         </nav>
       )}
       {section && <BetaCard />}
+    </div>
+  )
+}
+
+const frameworkItems = frameworkIds.map((value) => ({
+  value,
+  label: frameworks[value].label,
+}))
+
+// The framework the docs are in, first, so a reader switches before choosing a
+// page. It keeps the page being read, like the header's menu.
+function FrameworkSelect({
+  section,
+  urls,
+  onNavigate,
+}: {
+  section?: Section
+  urls: string[]
+  onNavigate: () => void
+}) {
+  const [saved] = useFramework()
+  const frameworkSwitch = useFrameworkSwitch(urls)
+  const value = section && isFramework(section) ? section : saved
+  const labelId = React.useId()
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div
+        id={labelId}
+        className="font-mono text-[11px] tracking-[0.06em] text-muted-foreground uppercase"
+      >
+        Framework
+      </div>
+      <Select
+        items={frameworkItems}
+        value={value}
+        onValueChange={(next) => {
+          if (next && isFramework(next) && next !== value) {
+            frameworkSwitch.select(next)
+            onNavigate()
+          }
+        }}
+      >
+        <SelectTrigger
+          aria-labelledby={labelId}
+          className="h-12 rounded-2xl px-4 text-lg font-medium tracking-tight"
+        >
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent align="start" sideOffset={6}>
+          {frameworkItems.map(({ value, label }) => (
+            <SelectItem
+              key={value}
+              value={value}
+              className="min-h-11 text-base"
+            >
+              {label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   )
 }

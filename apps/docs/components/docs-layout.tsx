@@ -80,12 +80,7 @@ function DocsLayout({
           </div>
         </aside>
         <div className="min-w-0 flex-1">
-          <MobileNav
-            section={section}
-            tree={tree}
-            urls={urls}
-            registry={process.env.NPM_REGISTRY}
-          />
+          <MobileNav section={section} tree={tree} urls={urls} />
           <main className="flex">{children}</main>
         </div>
       </div>

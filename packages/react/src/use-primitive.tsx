@@ -269,7 +269,10 @@ function usePrimitive<P extends Primitive>(
       get state() {
         return stateIn(this)
       },
-      api: instance.api as TypesOf<P>["api"],
+      // Read when used, since reading it wakes an asleep instance.
+      get api() {
+        return instance.api as TypesOf<P>["api"]
+      },
     }
     return handle
   }, [instance])
@@ -372,18 +375,17 @@ function within<T>(outers: Outer[] | undefined, read: () => T) {
 }
 
 // A copy of a handle with `extra` keys, like a context that adds the field
-// around it. A plain spread would freeze `state` and lose the preview.
+// around it. A plain spread would freeze `state` and lose the preview, and
+// read `api`, which wakes an asleep instance.
 function extendHandle<
   H extends { instance: PrimitiveInstance },
   E extends object,
 >(handle: H, extra: E) {
-  const copy: H & E = {
-    ...handle,
-    ...extra,
-    get state() {
-      return stateIn(copy)
-    },
-  }
+  const copy: H & E = Object.defineProperties({} as H & E, {
+    ...Object.getOwnPropertyDescriptors(handle),
+    ...Object.getOwnPropertyDescriptors(extra),
+    state: { get: () => stateIn(copy), enumerable: true },
+  })
   const preview = previews.get(handle)
   if (preview) {
     previews.set(copy, preview)

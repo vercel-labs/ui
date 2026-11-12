@@ -15,7 +15,6 @@
 //   node scripts/web-releases.mjs   Runs before `next build`.
 //
 // WEB_RELEASES_REGISTRY  The registry to read, npm's by default.
-// WEB_RELEASES_TOKEN     A token for a private registry.
 import { execFileSync } from "node:child_process"
 import {
   cpSync,
@@ -33,12 +32,10 @@ import path from "node:path"
 const registry = (
   process.env.WEB_RELEASES_REGISTRY ?? "https://registry.npmjs.org"
 ).replace(/\/$/, "")
-const token = process.env.WEB_RELEASES_TOKEN
 const publicDir = path.join(import.meta.dirname, "../public")
 const packageDir = path.join(import.meta.dirname, "../../../packages/web")
-const headers = token ? { authorization: `Bearer ${token}` } : {}
 
-const response = await fetch(`${registry}/@ui-sdk%2fweb`, { headers })
+const response = await fetch(`${registry}/@ui-sdk%2fweb`)
 if (!response.ok && response.status !== 404) {
   throw new Error(`${registry} answered ${response.status} for @ui-sdk/web.`)
 }
@@ -112,7 +109,7 @@ console.log(`Built @ui-sdk/web ${source} from source into public/.`)
 
 // Unpacks a release's `browser/` folder, or returns nothing when it has none.
 async function download(version, tarball) {
-  const file = await fetch(tarball, { headers })
+  const file = await fetch(tarball)
   if (!file.ok) {
     throw new Error(`${tarball} answered ${file.status}.`)
   }

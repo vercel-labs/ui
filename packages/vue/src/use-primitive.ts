@@ -285,7 +285,10 @@ function usePrimitive<P extends Primitive>(
   const value: PrimitiveHandle<P> = {
     primitive,
     instance,
-    api: instance.api as TypesOf<P>["api"],
+    // Read when used, since reading it wakes an asleep instance.
+    get api() {
+      return instance.api as TypesOf<P>["api"]
+    },
     // Reading it inside a render tracks every change that affects rendering.
     get state() {
       version.value
