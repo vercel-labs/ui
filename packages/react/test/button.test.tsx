@@ -32,7 +32,7 @@ test("a press hands the handler its event and how the button was pressed", async
   expect(calls).toEqual([["click", "agent"]])
 })
 
-test("a disabled button tells a router link that runs after it not to navigate", async () => {
+test("a disabled or pending button tells a router link that runs after it not to navigate", async () => {
   const navigations: string[] = []
   // Like Next.js's Link: it calls the onClick it was given, then reads React's event.
   function RouterLink({ onClick, ...props }: React.ComponentProps<"a">) {
@@ -59,11 +59,18 @@ test("a disabled button tells a router link that runs after it not to navigate",
         <Button disabled render={<RouterLink href="/disabled" />}>
           Disabled
         </Button>
+        <Button
+          onClick={() => new Promise(() => {})}
+          render={<RouterLink href="/pending" />}
+        >
+          Pending
+        </Button>
       </>
     )
   )
   for (const link of host.querySelectorAll("a")) {
     await React.act(async () => link.click())
   }
-  expect(navigations).toEqual(["/enabled"])
+  await React.act(async () => host.querySelectorAll("a")[2]!.click())
+  expect(navigations).toEqual(["/enabled", "/pending"])
 })
