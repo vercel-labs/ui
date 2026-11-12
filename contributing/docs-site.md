@@ -12,7 +12,7 @@
 
 - `apps/docs/content/docs/` has one folder per section: `core` and `agents`, which are shared across frameworks, and `react`, `vue`, `svelte`, `solid` and `web-components`, one full copy of the docs per framework.
 - A framework's docs have no `<Framework only>` blocks. A page differs per framework in its own copy, so an edit that holds for every framework is made in each copy. A component a framework doesn't have gets no page there.
-- Core and Agents link to a framework's pages without naming one, like `/docs/components/field`, which redirects to the framework the reader last read (a cookie its pages set), else React. The sidebar's section switcher keeps the page between frameworks.
+- Core and Agents link to a framework's pages without naming one, like `/docs/components/field`, which redirects to the framework the reader last read (a cookie its pages set), else React. Switching framework keeps the page: a framework's page goes to its copy in the other, and Get Started, Core, Agents and Guides stay put and fetch the page built for the new one (`FollowFramework` in `site-preferences.tsx`). On phones the switch is a select at the top of the menu.
 - Get Started, Core and Agents are built once per framework, under `app/for/[framework]`, and `next.config.mjs` rewrites each request to the reader's by that same cookie. Their `<FrameworkContent>`, framework tabs and links render the reader's framework on the server, so nothing changes once the page loads, and the pages stay static. Read the path with `useDocsPathname`, which drops the `/for/<framework>` prefix the server renders under.
 - Each section's order is its `meta.json`.
 

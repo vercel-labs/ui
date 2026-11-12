@@ -85,7 +85,8 @@ const frameworkHref = new RegExp(`^/docs/(${frameworkPages.join("|")})\\b`)
 // framework, and the reader's on Guides. Core and Agents pages have none.
 function getMDXComponents(
   framework: Framework = "react",
-  resolve: (href: string) => string = (href) => href
+  resolve: (href: string) => string = (href) => href,
+  reader?: Framework
 ) {
   return {
     h2: heading(
@@ -253,7 +254,13 @@ function getMDXComponents(
       hideCode?: boolean
       hideTabs?: boolean
       compact?: boolean
-    }) => <ComponentExample {...props} framework={framework} />,
+    }) =>
+      // Core's and Agents' examples show the reader's framework where one is written, else React's.
+      reader ? (
+        <ComponentExample {...props} framework={reader} fallback="react" />
+      ) : (
+        <ComponentExample {...props} framework={framework} />
+      ),
     SpecList,
     DataAttributes: (props: { component?: string; part?: string }) => (
       <DataAttributes {...props} framework={framework} />

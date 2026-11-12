@@ -14,6 +14,7 @@ import { isSection, utilitiesFolder } from "@/lib/sections"
 import { Preferences } from "@ui-sdk/react/preferences"
 import { CheckIcon } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useDocsPathname } from "@/lib/pathname"
 import * as React from "react"
 
@@ -79,7 +80,28 @@ function PageFramework({
   framework: Framework
   children: React.ReactNode
 }) {
-  return <RenderedFramework value={framework}>{children}</RenderedFramework>
+  return (
+    <RenderedFramework value={framework}>
+      <FollowFramework rendered={framework} />
+      {children}
+    </RenderedFramework>
+  )
+}
+
+// Get Started, Core, Agents and Guides are built per framework. When the reader
+// picks another, or the router kept a copy built for the one before, fetch the
+// page for the new one. Framework pages stay their own, whatever was picked.
+function FollowFramework({ rendered }: { rendered: Framework }) {
+  const section = useSection()
+  const [framework] = useFramework()
+  const router = useRouter()
+  const shared = !(section && isFramework(section))
+  React.useEffect(() => {
+    if (shared && framework !== rendered) {
+      router.refresh()
+    }
+  }, [shared, framework, rendered, router])
+  return null
 }
 
 function FrameworkLink({

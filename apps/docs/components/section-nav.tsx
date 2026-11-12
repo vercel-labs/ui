@@ -2,10 +2,12 @@
 
 import { type Framework, isFramework } from "@/lib/frameworks"
 import { menu } from "@/lib/menu"
-import { useSavedFramework } from "@/lib/preferences"
-import { frameworkHref, type Section } from "@/lib/sections"
+import { setFramework, useSavedFramework } from "@/lib/preferences"
+import { frameworkHref, sharedSections, type Section } from "@/lib/sections"
 import { flattenTree, type Root } from "fumadocs-core/page-tree"
 import { useDocsPathname } from "@/lib/pathname"
+import { useRouter } from "next/navigation"
+import type * as React from "react"
 
 function useMenuLink(section?: Section) {
   const saved = useSavedFramework()
@@ -38,15 +40,41 @@ function useMenuLink(section?: Section) {
   }
 }
 
-// Each framework's link from the page being read: the same page in that framework
-// on a framework's page, else the framework's introduction.
-function useFrameworkLink(urls: string[]) {
+// Switching framework keeps the page: a framework's page goes to its copy in the
+// other, and Get Started, Core, Agents and Guides stay put, as they're built for
+// every framework. Anywhere else goes to the framework's introduction.
+function useFrameworkSwitch(urls: string[]) {
   const pathname = useDocsPathname()
-  const onFramework = isFramework(pathname.split("/")[2] ?? "")
-  return (framework: Framework) =>
-    onFramework
+  const router = useRouter()
+  const section = pathname.split("/")[2] ?? ""
+  const shared = pathname === "/docs" || section in sharedSections
+  const href = (framework: Framework) =>
+    isFramework(section)
       ? frameworkHref(pathname, framework, urls)
-      : `/docs/${framework}`
+      : shared
+        ? pathname
+        : `/docs/${framework}`
+  // A shared page stays put: saving the choice is enough, and `PageFramework`
+  // fetches the page built for it.
+  const select = (framework: Framework) =>
+    shared ? setFramework(framework) : router.push(href(framework))
+  // For a link: a press with a modifier key opens a new tab, as links do.
+  const onClick =
+    (framework: Framework) => (event: React.MouseEvent<HTMLElement>) => {
+      if (
+        !shared ||
+        event.button !== 0 ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey
+      ) {
+        return
+      }
+      event.preventDefault()
+      setFramework(framework)
+    }
+  return { href, select, onClick }
 }
 
 // The sidebar link for the page being read. A page the sidebar doesn't list,
@@ -62,4 +90,4 @@ function useCurrentUrl(tree?: Root) {
     .sort((a, b) => b.length - a.length)[0]
 }
 
-export { useCurrentUrl, useFrameworkLink, useMenuLink }
+export { useCurrentUrl, useFrameworkSwitch, useMenuLink }

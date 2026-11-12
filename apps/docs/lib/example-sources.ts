@@ -4,6 +4,21 @@ import path from "node:path"
 import { exampleFolder } from "./example-folder"
 import { frameworks, type Framework } from "./frameworks"
 
+function examplePath(name: string, framework: Framework) {
+  const { example, ext } = frameworks[framework]
+  const [component, base] = name.split("/")
+  return path.join(
+    /* turbopackIgnore: true */ exampleFolder(component),
+    example,
+    `${base}.${ext}`
+  )
+}
+
+/** Whether `framework` has its own copy of the example. */
+function hasExample(name: string, framework: Framework) {
+  return existsSync(examplePath(name, framework))
+}
+
 async function readExampleSources(name: string, framework: Framework) {
   const { example, ext, lang } = frameworks[framework]
   const [component, base] = name.split("/")
@@ -61,4 +76,4 @@ async function readExampleSources(name: string, framework: Framework) {
   return { files, log }
 }
 
-export { readExampleSources }
+export { hasExample, readExampleSources }

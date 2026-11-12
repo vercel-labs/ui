@@ -13,7 +13,7 @@ import { frameworkIds, frameworks } from "@/lib/frameworks"
 import { menu } from "@/lib/menu"
 import { ChevronDownIcon } from "lucide-react"
 import Link from "next/link"
-import { useFrameworkLink, useMenuLink } from "./section-nav"
+import { useFrameworkSwitch, useMenuLink } from "./section-nav"
 import { FrameworkCheck, useSection } from "./site-preferences"
 
 const itemClassName =
@@ -22,7 +22,7 @@ const itemClassName =
 function HeaderMenu({ urls }: { urls: string[] }) {
   const section = useSection()
   const link = useMenuLink(section)
-  const frameworkLink = useFrameworkLink(urls)
+  const frameworkSwitch = useFrameworkSwitch(urls)
 
   return (
     <NavigationMenu aria-label="Sections">
@@ -54,7 +54,12 @@ function HeaderMenu({ urls }: { urls: string[] }) {
                       <li key={framework}>
                         <NavigationMenuLink
                           current={section === framework}
-                          render={<Link href={frameworkLink(framework)} />}
+                          render={
+                            <Link
+                              href={frameworkSwitch.href(framework)}
+                              onClick={frameworkSwitch.onClick(framework)}
+                            />
+                          }
                           className="relative flex min-h-7 items-center rounded-xl py-1.5 ps-2 pe-8 outline-none hover:bg-accent hover:text-accent-foreground focus-visible:bg-accent focus-visible:text-accent-foreground"
                         >
                           {frameworks[framework].label}
