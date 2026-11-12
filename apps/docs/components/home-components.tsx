@@ -262,9 +262,9 @@ const commands = [
   { group: "Pages", value: "dashboard", label: "Dashboard" },
   { group: "Pages", value: "projects", label: "Projects" },
   { group: "Pages", value: "calendar", label: "Calendar" },
-  { group: "Account", value: "profile", label: "Profile", keys: "⌘P" },
-  { group: "Account", value: "billing", label: "Billing", keys: "⌘B" },
-  { group: "Account", value: "settings", label: "Settings", keys: "⌘S" },
+  { group: "Account", value: "profile", label: "Profile" },
+  { group: "Account", value: "billing", label: "Billing" },
+  { group: "Account", value: "settings", label: "Settings" },
 ]
 
 function CommandDemo() {
@@ -306,17 +306,9 @@ function CommandDemo() {
                   <CommandItem
                     key={command.value}
                     value={command.value}
-                    className="group/item flex h-[max(2rem,7.4cqi)] cursor-default items-center justify-between gap-3 px-2.5 text-[length:clamp(0.875rem,3.4cqi,1rem)] outline-none select-none data-highlighted:bg-foreground data-highlighted:text-background"
+                    className="flex h-[max(2rem,7.4cqi)] cursor-default items-center px-2.5 text-[length:clamp(0.875rem,3.4cqi,1rem)] outline-none select-none data-highlighted:bg-foreground data-highlighted:text-background"
                   >
                     {command.label}
-                    {command.keys && (
-                      <kbd
-                        aria-hidden="true"
-                        className="flex h-5 min-w-6 items-center justify-center border border-foreground/30 px-1 font-mono text-[9px] text-muted-foreground group-data-highlighted/item:border-background/40 group-data-highlighted/item:text-background"
-                      >
-                        {command.keys}
-                      </kbd>
-                    )}
                   </CommandItem>
                 ))}
             </CommandGroup>
