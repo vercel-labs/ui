@@ -421,7 +421,7 @@
     background: var(--surface-1);
     box-shadow: var(--shadow-1);
 
-    &:is(label, a, button):hover {
+    &:is(label, a, button):hover:not(:has([data-checked])) {
       box-shadow: 0 0 0 1px
         color-mix(in oklab, var(--ink) 45%, var(--surface-1));
     }
