@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 })
 
 const DESCRIPTION =
-  "An open source library of behaviors that an agent can use to build components. Written in TypeScript. Available for all frameworks."
+  "A library of behaviors for agents to build the next generation of user interfaces."
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://ui-sdk.dev"),
