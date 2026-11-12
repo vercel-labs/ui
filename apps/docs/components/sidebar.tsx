@@ -29,6 +29,27 @@ function revealCurrent(list: Element) {
 
 const noSubscribe = () => () => {}
 
+// The router opens a plain click inside a transition, so its page can take a moment.
+// The clicked link is marked at once instead, and React confirms it with the new page.
+function markOpening(event: React.MouseEvent<HTMLAnchorElement>) {
+  if (
+    event.button !== 0 ||
+    event.defaultPrevented ||
+    event.metaKey ||
+    event.ctrlKey ||
+    event.shiftKey ||
+    event.altKey
+  ) {
+    return
+  }
+  const link = event.currentTarget
+  link
+    .closest("nav")
+    ?.querySelector('[aria-current="page"]')
+    ?.removeAttribute("aria-current")
+  link.setAttribute("aria-current", "page")
+}
+
 function Sidebar({
   tree,
   tocs,
@@ -39,16 +60,26 @@ function Sidebar({
   const current = useCurrentUrl(tree)
   const scroller = React.useRef<HTMLDivElement>(null)
   // The script below only belongs in the server's HTML. A script React adds in the browser
-  // never runs, so those renders leave it out and rely on the layout effect.
+  // never runs, so those renders leave it out and rely on the effect.
   const hydrated = React.useSyncExternalStore(
     noSubscribe,
     () => true,
     () => false
   )
 
-  React.useLayoutEffect(() => {
-    if (scroller.current) {
-      revealCurrent(scroller.current)
+  React.useEffect(() => {
+    const list = scroller.current
+    if (!list) {
+      return
+    }
+    // Measured once the page has painted, so the new page isn't laid out early.
+    let timeout: ReturnType<typeof setTimeout>
+    const frame = requestAnimationFrame(() => {
+      timeout = setTimeout(() => revealCurrent(list))
+    })
+    return () => {
+      cancelAnimationFrame(frame)
+      clearTimeout(timeout)
     }
   }, [current])
 
@@ -164,13 +195,9 @@ function PageLink({
     <>
       <Link
         href={page.url}
+        onClick={markOpening}
         aria-current={active ? "page" : undefined}
-        className={cn(
-          "block rounded-md py-1 text-sm outline-none transition-colors focus-visible:ring-3 focus-visible:ring-ring/30",
-          active
-            ? "text-foreground font-medium"
-            : "text-subtle hover:text-foreground"
-        )}
+        className="block rounded-md py-1 text-sm text-subtle outline-none transition-colors hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/30 aria-[current=page]:font-medium aria-[current=page]:text-foreground"
       >
         {page.name}
       </Link>

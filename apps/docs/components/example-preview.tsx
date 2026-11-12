@@ -276,7 +276,9 @@ class ExampleBoundary extends React.Component<
 function ExampleConsole({ entries }: { entries: string[] }) {
   const list = React.useRef<HTMLOListElement>(null)
   React.useLayoutEffect(() => {
-    list.current?.scrollTo({ top: list.current.scrollHeight })
+    if (entries.length > 0) {
+      list.current?.scrollTo({ top: list.current.scrollHeight })
+    }
   }, [entries])
 
   return (

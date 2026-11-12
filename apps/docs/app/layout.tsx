@@ -1,3 +1,4 @@
+import { IconTooltip } from "@/components/icon-tooltip"
 import { SiteFooter } from "@/components/site-footer"
 import { SiteHeader } from "@/components/site-header"
 import { SitePreferences } from "@/components/site-preferences"
@@ -49,6 +50,7 @@ export default function Layout({ children }: LayoutProps<"/">) {
           <SiteHeader urls={urls} />
           {children}
           <SiteFooter />
+          <IconTooltip />
         </SitePreferences>
         <Analytics />
         <SpeedInsights />

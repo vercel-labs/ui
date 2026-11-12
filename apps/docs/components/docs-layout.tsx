@@ -1,6 +1,7 @@
 import { MobileNav } from "@/components/mobile-nav"
 import { Search } from "@/components/search"
 import { Sidebar } from "@/components/sidebar"
+import { StylingNotePopover } from "@/components/styling-note"
 import { isFramework } from "@/lib/frameworks"
 import type { Section } from "@/lib/sections"
 import { frameworkTree, sectionPages, sectionTree } from "@/lib/section-tree"
@@ -89,6 +90,7 @@ function DocsLayout({
         </div>
       </div>
       <Search section={section} pages={pages} />
+      <StylingNotePopover />
     </div>
   )
 }

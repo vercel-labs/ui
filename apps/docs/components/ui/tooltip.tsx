@@ -23,4 +23,8 @@ function TooltipContent({
 }
 
 export { TooltipContent }
-export { Tooltip, TooltipTrigger } from "@ui-sdk/react/tooltip"
+export {
+  createTooltipController,
+  Tooltip,
+  TooltipTrigger,
+} from "@ui-sdk/react/tooltip"

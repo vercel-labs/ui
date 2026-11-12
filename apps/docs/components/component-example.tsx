@@ -63,12 +63,14 @@ async function ComponentExample({
     />
   )
   const single = sources.files.length === 1
+  const deferred = !hideCode && !hideTabs
   // Several files show one at a time, so the code panel stays as tall as one file.
   const source = single ? (
     <CodeBlock
       code={sources.files[0].code}
       lang={sources.files[0].lang}
       copy={false}
+      deferred={deferred}
     />
   ) : (
     <Tabs defaultValue={sources.files[0].name}>
@@ -87,7 +89,12 @@ async function ComponentExample({
       </TabBar>
       {sources.files.map((file) => (
         <TabsPanel key={file.name} value={file.name}>
-          <CodeBlock code={file.code} lang={file.lang} copy={false} />
+          <CodeBlock
+            code={file.code}
+            lang={file.lang}
+            copy={false}
+            deferred={deferred}
+          />
         </TabsPanel>
       ))}
     </Tabs>

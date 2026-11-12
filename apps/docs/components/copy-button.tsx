@@ -1,10 +1,7 @@
 "use client"
 
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
+import { iconTooltip } from "@/components/icon-tooltip"
+import { TooltipTrigger } from "@/components/ui/tooltip"
 import { cn } from "cn"
 import { CheckIcon, CopyIcon } from "lucide-react"
 import * as React from "react"
@@ -65,23 +62,22 @@ function CopyButton({
   }
 
   return (
-    <Tooltip>
-      <TooltipTrigger
-        aria-label={copied ? "Copied" : "Copy code"}
-        onClick={copy}
-        className={cn(
-          "inline-flex size-8 shrink-0 items-center justify-center rounded-frame-control text-subtle outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/30",
-          className
-        )}
-      >
-        {copied ? (
-          <CheckIcon className="size-3.5" />
-        ) : (
-          <CopyIcon className="size-3.5" />
-        )}
-      </TooltipTrigger>
-      <TooltipContent>{copied ? "Copied" : "Copy"}</TooltipContent>
-    </Tooltip>
+    <TooltipTrigger
+      controller={iconTooltip}
+      payload={copied ? "Copied" : "Copy"}
+      aria-label={copied ? "Copied" : "Copy code"}
+      onClick={copy}
+      className={cn(
+        "inline-flex size-8 shrink-0 items-center justify-center rounded-frame-control text-subtle outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/30",
+        className
+      )}
+    >
+      {copied ? (
+        <CheckIcon className="size-3.5" />
+      ) : (
+        <CopyIcon className="size-3.5" />
+      )}
+    </TooltipTrigger>
   )
 }
 

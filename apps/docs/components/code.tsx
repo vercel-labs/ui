@@ -10,6 +10,7 @@ import {
 } from "react"
 import type { BundledLanguage } from "shiki"
 import { CopyButton } from "./copy-button"
+import { DeferredPre } from "./deferred-pre"
 import { Frame } from "./frame"
 
 const themes = {
@@ -29,8 +30,14 @@ function Pre({
   title,
   icon,
   copy = true,
+  deferred = false,
   ...props
-}: ComponentProps<"pre"> & { icon?: string; copy?: boolean }) {
+}: ComponentProps<"pre"> & {
+  icon?: string
+  copy?: boolean
+  deferred?: boolean
+}) {
+  const Code = deferred ? DeferredPre : "pre"
   const prompt = "data-prompt" in props
   const Mark = typeof title === "string" ? marks[title] : undefined
   return (
@@ -61,7 +68,7 @@ function Pre({
           <CopyButton label="Copy Prompt" className="ms-auto" />
         </div>
       )}
-      <pre
+      <Code
         {...props}
         style={
           {
@@ -148,12 +155,14 @@ async function CodeBlock({
   title,
   className,
   copy,
+  deferred,
 }: {
   code: string
   lang: BundledLanguage
   title?: string
   className?: string
   copy?: boolean
+  deferred?: boolean
 }) {
   const key = `${lang}\n${code}`
   let result = highlighted.get(key)
@@ -170,6 +179,7 @@ async function CodeBlock({
     <Pre
       title={title}
       copy={copy}
+      deferred={deferred}
       className={cn(shiki, className)}
       style={style}
       tabIndex={0}
