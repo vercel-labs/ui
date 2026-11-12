@@ -53,7 +53,7 @@ function Card({
 // instead of blending with them.
 const looks = {
   solid: "text-foreground",
-  ghost: "text-[color-mix(in_oklab,var(--foreground)_35%,var(--background))]",
+  ghost: "text-[color-mix(in_oklab,var(--foreground)_42%,var(--background))]",
   dim: "text-[color-mix(in_oklab,var(--foreground)_60%,var(--background))]",
   outline:
     "text-background [-webkit-text-stroke:2px_var(--outline)] [paint-order:stroke_fill]",
@@ -72,7 +72,7 @@ function Display({
     <span
       aria-hidden="true"
       className={cn(
-        "pointer-events-none block font-[450] tracking-[-0.055em] [line-height:0.86] whitespace-nowrap select-none [--outline:color-mix(in_oklab,var(--foreground)_80%,var(--background))] dark:[--outline:color-mix(in_oklab,var(--foreground)_32%,var(--background))]",
+        "pointer-events-none block font-[450] tracking-[-0.055em] [line-height:0.86] whitespace-nowrap select-none [--outline:color-mix(in_oklab,var(--foreground)_80%,var(--background))] dark:[--outline:color-mix(in_oklab,var(--foreground)_42%,var(--background))]",
         looks[look],
         className
       )}
