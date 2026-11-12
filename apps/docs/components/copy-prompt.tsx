@@ -192,16 +192,10 @@ function CopyButton({ text }: { text: string }) {
   )
 }
 
-function CopyPromptForm({
-  registry,
-  close,
-}: {
-  registry?: string
-  close: React.ReactNode
-}) {
+function CopyPromptForm({ close }: { close: React.ReactNode }) {
   const site = useSite()
   const { stack, projectId } = useSelection()
-  const prompt = setupPrompt({ stackId: stack.id, projectId, site, registry })
+  const prompt = setupPrompt({ stackId: stack.id, projectId, site })
   const id = React.useId()
 
   return (
@@ -278,11 +272,9 @@ const description =
 function CopyPromptDialog({
   open,
   onOpenChange,
-  registry,
 }: {
   open: boolean
   onOpenChange: (open: boolean) => void
-  registry?: string
 }) {
   const wide = useWide()
   if (wide) {
@@ -310,7 +302,6 @@ function CopyPromptDialog({
             </DialogClose>
           </div>
           <CopyPromptForm
-            registry={registry}
             close={<DialogClose className={secondaryButton}>Close</DialogClose>}
           />
         </DialogContent>
@@ -334,7 +325,6 @@ function CopyPromptDialog({
           </DrawerDescription>
         </div>
         <CopyPromptForm
-          registry={registry}
           close={<DrawerClose className={secondaryButton}>Close</DrawerClose>}
         />
       </DrawerContent>
@@ -344,11 +334,9 @@ function CopyPromptDialog({
 
 function CopyPromptButton({
   className,
-  registry,
   children,
 }: {
   className?: string
-  registry?: string
   children: React.ReactNode
 }) {
   const [open, setOpen] = React.useState(false)
@@ -362,22 +350,12 @@ function CopyPromptButton({
       >
         {children}
       </button>
-      <CopyPromptDialog
-        open={open}
-        onOpenChange={setOpen}
-        registry={registry}
-      />
+      <CopyPromptDialog open={open} onOpenChange={setOpen} />
     </>
   )
 }
 
-function HeaderCopyPrompt({
-  registry,
-  className,
-}: {
-  registry?: string
-  className?: string
-}) {
+function HeaderCopyPrompt({ className }: { className?: string }) {
   const [open, setOpen] = React.useState(false)
   return (
     <>
@@ -391,11 +369,7 @@ function HeaderCopyPrompt({
       >
         Quickstart
       </button>
-      <CopyPromptDialog
-        open={open}
-        onOpenChange={setOpen}
-        registry={registry}
-      />
+      <CopyPromptDialog open={open} onOpenChange={setOpen} />
     </>
   )
 }

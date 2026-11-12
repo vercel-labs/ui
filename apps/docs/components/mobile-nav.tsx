@@ -31,13 +31,11 @@ function MobileNav({
   tree,
   urls = [],
   docs = !!section,
-  registry,
 }: {
   section?: Section
   tree?: PageTree.Root
   urls?: string[]
   docs?: boolean
-  registry?: string
 }) {
   const [open, setOpen] = React.useState(false)
   const searching = useSearchOpen()
@@ -110,10 +108,7 @@ function MobileNav({
         <Logo className="h-[18px] w-auto" />
       </Link>
       <div className="ms-auto flex items-center gap-1">
-        <HeaderCopyPrompt
-          registry={registry}
-          className="me-1.5 h-7 px-2.5 text-[13px]"
-        />
+        <HeaderCopyPrompt className="me-1.5 h-7 px-2.5 text-[13px]" />
         {/* Phones show the icon alone, so the breadcrumb fits. */}
         <SearchTrigger
           grow

@@ -121,8 +121,8 @@ function steps(list: string[]) {
   return list.map((step, index) => `${index + 1}. ${step}`).join("\n")
 }
 
-function webTags(host: string) {
-  return `   <script type="module" src="${host}/web.js"></script>\n   <link rel="stylesheet" href="${host}/web.css" />`
+function webTags(site: string) {
+  return `   <script type="module" src="${site}/web.js"></script>\n   <link rel="stylesheet" href="${site}/web.css" />`
 }
 
 function agentsStep(docs: string) {
@@ -144,47 +144,36 @@ function quickStartPrompt(stackId: StackId) {
 ${steps([installStep(stack.pkg), agentsStep(`node_modules/@ui-sdk/${stack.pkg}/docs`), skillStep])}`
 }
 
-function artifactPrompt(site: string, host: string) {
+function artifactPrompt(site: string) {
   return `Build this as a single HTML page with ui-sdk web components. Each component registers its tags the first time they appear on the page.
 
 ${steps([
-  `Load ui-sdk with these two tags in the <head>. web.css gives every component its default styles:\n${webTags(host)}`,
+  `Load ui-sdk with these two tags in the <head>. web.css gives every component its default styles:\n${webTags(site)}`,
   `Before you write any code, read ${site}/web.md.`,
   "Keep everything in that one file, with your styles in a <style> tag. Show me the whole file each time.",
 ])}`
 }
 
-function htmlPrompt(site: string, host: string) {
+function htmlPrompt(site: string) {
   return `Set up ui-sdk in this HTML project, with no build step. Each component registers its tags the first time they appear on the page.
 
 ${steps([
-  `Add these two tags to the <head> of each page. web.css gives every component its default styles:\n${webTags(host)}`,
+  `Add these two tags to the <head> of each page. web.css gives every component its default styles:\n${webTags(site)}`,
   `Add a note to AGENTS.md, creating it if needed: before using ui-sdk, follow the ui-sdk skill if it's installed, and read ${site}/web.md.`,
   skillStep,
 ])}`
 }
 
-function projectPrompt(
-  stack: Stack & { pkg: string },
-  project: Project,
-  registry: string
-) {
-  const list = []
-  if (registry) {
-    list.push(
-      `Add this line to .npmrc in the project root, creating it if needed:\n   @ui-sdk:registry=${registry}/`
-    )
-  }
-  list.push(
-    installStep(stack.pkg),
-    `Import the default styles once at the app's entry, before your own CSS: import "@ui-sdk/core/web.css"`,
-    agentsStep(`node_modules/@ui-sdk/${stack.pkg}/docs`),
-    skillStep
-  )
+function projectPrompt(stack: Stack & { pkg: string }, project: Project) {
   return `Set up ui-sdk in this ${stack.name} project with ${project.name}. ${project.needs ?? stack.needs}
 If the folder is empty, create the project first: ${project.create}
 
-${steps(list)}`
+${steps([
+  installStep(stack.pkg),
+  `Import the default styles once at the app's entry, before your own CSS: import "@ui-sdk/core/web.css"`,
+  agentsStep(`node_modules/@ui-sdk/${stack.pkg}/docs`),
+  skillStep,
+])}`
 }
 
 /**
@@ -195,23 +184,20 @@ function setupPrompt({
   stackId,
   projectId,
   site,
-  registry = "",
 }: {
   stackId: string
   projectId?: string
   site: string
-  registry?: string
 }) {
   const stack = findStack(stackId)
   const siteUrl = site.replace(/\/+$/, "")
-  const registryUrl = registry.replace(/\/+$/, "")
   const project =
     stack.projects.find((item) => item.id === projectId) ?? stack.projects[0]
   const body = !stack.pkg
-    ? artifactPrompt(siteUrl, registryUrl || siteUrl)
+    ? artifactPrompt(siteUrl)
     : project.id === "html"
-      ? htmlPrompt(siteUrl, registryUrl || siteUrl)
-      : projectPrompt(stack, project, registryUrl)
+      ? htmlPrompt(siteUrl)
+      : projectPrompt(stack, project)
   return `${body}\n\n${closing}`
 }
 

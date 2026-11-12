@@ -34,7 +34,7 @@ function SiteHeader({ urls }: { urls: string[] }) {
           <HeaderMenu urls={urls} />
         </div>
         <div className="ms-auto flex items-center gap-4">
-          <HeaderCopyPrompt registry={process.env.NPM_REGISTRY} />
+          <HeaderCopyPrompt />
           <SearchTrigger
             label="Search the docs"
             shortcut
