@@ -56,7 +56,7 @@ const looks = {
   ghost: "text-[color-mix(in_oklab,var(--foreground)_35%,var(--background))]",
   dim: "text-[color-mix(in_oklab,var(--foreground)_60%,var(--background))]",
   outline:
-    "text-background [-webkit-text-stroke:max(2px,0.024em)_var(--outline)] [paint-order:stroke_fill]",
+    "text-background [-webkit-text-stroke:2px_var(--outline)] [paint-order:stroke_fill]",
 }
 
 function Display({
