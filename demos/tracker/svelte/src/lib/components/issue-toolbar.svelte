@@ -15,7 +15,11 @@
   import { cn } from "cn"
   import { href, type Query } from "tracker-data"
 
-  let { query }: { query: Query } = $props()
+  interface Props {
+    query: Query
+  }
+
+  let { query }: Props = $props()
 
   const filtered = $derived(Boolean(query.priority || query.assignee))
 

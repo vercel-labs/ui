@@ -194,7 +194,12 @@ export function load({ cookies }) {
     type ResizableStorage,
   } from "@ui-sdk/svelte/resizable"
 
-  let { sidebar, main }: { sidebar: number; main: number } = $props()
+  interface Props {
+    sidebar: number
+    main: number
+  }
+
+  let { sidebar, main }: Props = $props()
 
   const cookieStorage: ResizableStorage = {
     getItem: (key) => {

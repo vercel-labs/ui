@@ -16,7 +16,11 @@
   import { toast } from "#ui/toast"
   import type { Settings } from "tracker-data"
 
-  let { settings }: { settings: Settings } = $props()
+  interface Props {
+    settings: Settings
+  }
+
+  let { settings }: Props = $props()
 
   let pending = $state(false)
 

@@ -17,10 +17,11 @@
   import { cn } from "cn"
   import type { ComponentProps } from "svelte"
 
-  let {
-    class: className,
-    ...rest
-  }: ComponentProps<typeof DatePickerPrimitive> & { class?: string } = $props()
+  interface Props extends ComponentProps<typeof DatePickerPrimitive> {
+    class?: string
+  }
+
+  let { class: className, ...rest }: Props = $props()
 
   const iconButton =
     "inline-flex size-8 shrink-0 cursor-default items-center justify-center rounded-2xl outline-none select-none transition-colors hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/30 data-disabled:opacity-50 motion-reduce:transition-none [&_svg]:size-4"

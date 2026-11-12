@@ -3,14 +3,12 @@
   import { cn } from "cn"
   import type { ComponentProps, Snippet } from "svelte"
 
-  let {
-    class: className,
-    children,
-    ...rest
-  }: ComponentProps<typeof TabsList> & {
+  interface Props extends ComponentProps<typeof TabsList> {
     class?: string
     children?: Snippet
-  } = $props()
+  }
+
+  let { class: className, children, ...rest }: Props = $props()
 </script>
 
 <TabsList

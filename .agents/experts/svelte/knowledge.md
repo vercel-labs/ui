@@ -12,7 +12,8 @@ Last checked: 2026-10-28, against `node_modules/svelte` 5.57.2 (exports checked:
 - `$derived(expr)` and `$derived.by(fn)` for anything computed. Deriveds are lazy and only notify when their value changes. Since 5.25 a derived can be written to temporarily (optimistic UI).
 - `$effect` runs after the DOM updates, `$effect.pre` before. Effects don't run on the server. `$effect.tracking()` says whether code runs in a tracking context; `$effect.root` makes an effect outside a component's lifetime.
 - **Effects are an escape hatch.** Writing `$state` in an effect to keep it in sync with other state is the classic mistake: use `$derived`. `untrack` reads without depending; using it to hide a real dependency is a bug waiting.
-- `$props()` destructures props, with defaults and `...rest`. Props stay reactive when destructured. `$props.id()` (5.20) gives an id stable across server and client.
+- `$props()` destructures props, with defaults and `...rest`. Props stay reactive when destructured. `$props.id()` (5.20) gives an id stable across server and client. Type them with an `interface Props` declared above, `let { a, b }: Props = $props()`, so Prettier doesn't wrap an inline type around `$props()`.
+- Declaration tags (5.56) declare a value inside a block: `{const label = $derived(labelOf(id))}`. They replace `{@const}`, which still works but is on its way out. Without `$derived` the value is computed once and doesn't follow `id`. `packages/svelte` keeps `{@const}` while its peer range is `svelte >=5.33`.
 - `$bindable()` marks a prop the parent can `bind:`. Without `bind:`, the parent's value only flows down, and a local write diverges until the parent passes a new value.
 - `$host()` in custom-element components; `$inspect` in development.
 

@@ -2,7 +2,11 @@
   import { Avatar } from "#ui/avatar"
   import { personOf } from "tracker-data"
 
-  let { id }: { id: string | null } = $props()
+  interface Props {
+    id: string | null
+  }
+
+  let { id }: Props = $props()
 
   const person = $derived(personOf(id))
 </script>

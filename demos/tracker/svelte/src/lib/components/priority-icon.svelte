@@ -20,11 +20,13 @@
   import { cn } from "cn"
   import { priorityOf, type Priority } from "tracker-data"
 
-  let {
-    priority,
-    label = false,
-    class: className,
-  }: { priority: Priority; label?: boolean; class?: string } = $props()
+  interface Props {
+    priority: Priority
+    label?: boolean
+    class?: string
+  }
+
+  let { priority, label = false, class: className }: Props = $props()
 
   const Icon = $derived(icons[priority])
 </script>

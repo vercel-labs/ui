@@ -3,10 +3,11 @@
   import { cn } from "cn"
   import type { ComponentProps } from "svelte"
 
-  let {
-    class: className,
-    ...rest
-  }: ComponentProps<typeof FieldError> & { class?: string } = $props()
+  interface Props extends ComponentProps<typeof FieldError> {
+    class?: string
+  }
+
+  let { class: className, ...rest }: Props = $props()
 </script>
 
 <FieldError class={cn("text-sm text-destructive", className)} {...rest} />

@@ -32,7 +32,11 @@
   import { cn } from "cn"
   import { href, parseQuery } from "tracker-data"
 
-  let { issues }: { issues: { id: string; title: string }[] } = $props()
+  interface Props {
+    issues: { id: string; title: string }[]
+  }
+
+  let { issues }: Props = $props()
 
   const tracker = getTracker()
   const query = $derived(parseQuery(Object.fromEntries(page.url.searchParams)))

@@ -4,7 +4,11 @@
   import { Tree, TreeItem, type TreeItemData } from "#ui/tree"
   import { leaves, type Issue, type Subtask } from "tracker-data"
 
-  let { issue }: { issue: Issue } = $props()
+  interface Props {
+    issue: Issue
+  }
+
+  let { issue }: Props = $props()
 
   const all = $derived(leaves(issue.subtasks))
   let checked = $derived(

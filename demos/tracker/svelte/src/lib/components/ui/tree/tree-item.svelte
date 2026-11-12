@@ -8,17 +8,14 @@
   import type { Snippet } from "svelte"
   import TreeGroup from "./tree-group.svelte"
 
-  let {
-    value,
-    label,
-    class: className,
-    children,
-  }: {
+  interface Props {
     value: string
     label: string
     class?: string
     children?: Snippet
-  } = $props()
+  }
+
+  let { value, label, class: className, children }: Props = $props()
 </script>
 
 <TreeItemPrimitive

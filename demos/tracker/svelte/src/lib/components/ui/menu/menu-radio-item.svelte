@@ -5,14 +5,12 @@
   import type { ComponentProps, Snippet } from "svelte"
   import { item } from "./styles"
 
-  let {
-    class: className,
-    children,
-    ...rest
-  }: ComponentProps<typeof MenuRadioItem> & {
+  interface Props extends ComponentProps<typeof MenuRadioItem> {
     class?: string
     children?: Snippet
-  } = $props()
+  }
+
+  let { class: className, children, ...rest }: Props = $props()
 </script>
 
 <MenuRadioItem class={cn(item, "pe-8", className)} {...rest}>

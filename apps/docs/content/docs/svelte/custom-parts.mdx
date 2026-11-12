@@ -21,14 +21,11 @@ Here's a replacement for the generated `RatingRoot`. `usePrimitive` creates its 
   import { setContext } from "svelte"
   import { rating, type RatingOptions } from "./rating"
 
-  let {
-    value,
-    defaultValue,
-    onValueChange,
-    ...props
-  }: RatingOptions &
-    Omit<PartProps<"div", StateOf<typeof rating, "root">>, "defaultValue"> =
-    $props()
+  type RootProps = PartProps<"div", StateOf<typeof rating, "root">>
+
+  interface Props extends RatingOptions, Omit<RootProps, "defaultValue"> {}
+
+  let { value, defaultValue, onValueChange, ...props }: Props = $props()
   const id = $props.id()
   const handle = usePrimitive(rating, () => ({
     id,
@@ -60,10 +57,11 @@ Pass the primitive itself to `usePart` to find the instance shared by the root a
   import { Part, usePart, type PartProps } from "@ui-sdk/svelte/primitive"
   import { rating } from "./rating"
 
-  let {
-    value,
-    ...props
-  }: { value: string } & Omit<PartProps<"button">, "value"> = $props()
+  interface Props extends Omit<PartProps<"button">, "value"> {
+    value: string
+  }
+
+  let { value, ...props }: Props = $props()
   const star = usePart(rating, "star", () => ({ value }))
 </script>
 

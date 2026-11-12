@@ -2,13 +2,17 @@
   import { Badge } from "#ui/badge"
   import { labelOf } from "tracker-data"
 
-  let { labels, class: className }: { labels: string[]; class?: string } =
-    $props()
+  interface Props {
+    labels: string[]
+    class?: string
+  }
+
+  let { labels, class: className }: Props = $props()
 </script>
 
 <ul class={className} aria-label="Labels">
   {#each labels as id (id)}
-    {@const label = labelOf(id)}
+    {const label = $derived(labelOf(id))}
     {#if label}
       <li>
         <Badge>

@@ -4,10 +4,11 @@
   import { cn } from "cn"
   import type { ComponentProps } from "svelte"
 
-  let {
-    class: className,
-    ...rest
-  }: ComponentProps<typeof ComboboxTrigger> & { class?: string } = $props()
+  interface Props extends ComponentProps<typeof ComboboxTrigger> {
+    class?: string
+  }
+
+  let { class: className, ...rest }: Props = $props()
 </script>
 
 <ComboboxTrigger

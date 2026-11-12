@@ -33,7 +33,7 @@ Read the expert's knowledge file for every framework you touch: `.agents/experts
 
 - **React 19**: pure render, no `forwardRef`, `ref` as a prop, no effect where an event handler or a derived value belongs, code the React Compiler compiles without a bailout.
 - **Vue 3.5**: `<script setup lang="ts">`, `v-model` on parts, `defineModel` when a component you write takes one, typed `defineProps` and `defineSlots`, no options API.
-- **Svelte 5**: runes only (`$state`, `$derived`, `$props`, `$bindable`), snippets, `onclick` attributes, attachments. No `$:`, `on:`, `<slot>` or `createEventDispatcher`.
+- **Svelte 5**: runes only (`$state`, `$derived`, `$props`, `$bindable`), snippets, `onclick` attributes, attachments. No `$:`, `on:`, `<slot>` or `createEventDispatcher`. Props typed with an `interface Props`. Outside `packages/svelte`, declaration tags (`{const x = $derived(...)}`) instead of `{@const}`.
 - **Solid 2**: props read where they're used, never destructured; derive with memos, not effects; Solid 2 APIs only.
 - **Web components**: platform first. Options reflect as attributes the way built-ins do, public events are `composed` and don't bubble (listen with `{ capture: true }`), and the user's markup stays in light DOM.
 

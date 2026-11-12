@@ -4,13 +4,11 @@
   import type { ComponentProps } from "svelte"
   import { buttonVariants, type ButtonVariants } from "./variants"
 
-  let {
-    variant,
-    size,
-    class: className,
-    ...rest
-  }: ComponentProps<typeof Button> &
-    ButtonVariants & { class?: string } = $props()
+  interface Props extends ComponentProps<typeof Button>, ButtonVariants {
+    class?: string
+  }
+
+  let { variant, size, class: className, ...rest }: Props = $props()
 </script>
 
 <Button class={cn(buttonVariants({ variant, size }), className)} {...rest} />

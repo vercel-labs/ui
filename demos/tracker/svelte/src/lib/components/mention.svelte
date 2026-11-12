@@ -3,7 +3,12 @@
   import { HoverCard, HoverCardContent, HoverCardTrigger } from "#ui/hover-card"
   import { personOf } from "tracker-data"
 
-  let { id, label }: { id: string; label: string } = $props()
+  interface Props {
+    id: string
+    label: string
+  }
+
+  let { id, label }: Props = $props()
 
   const person = $derived(personOf(id))
 </script>

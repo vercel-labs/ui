@@ -3,10 +3,11 @@
   import { cn } from "cn"
   import type { ComponentProps } from "svelte"
 
-  let {
-    class: className,
-    ...rest
-  }: ComponentProps<typeof DrawerTitle> & { class?: string } = $props()
+  interface Props extends ComponentProps<typeof DrawerTitle> {
+    class?: string
+  }
+
+  let { class: className, ...rest }: Props = $props()
 </script>
 
 <DrawerTitle class={cn("text-base font-medium", className)} {...rest} />

@@ -4,17 +4,14 @@
   import { cn } from "cn"
   import type { Snippet } from "svelte"
 
-  let {
-    value,
-    label,
-    class: className,
-    children,
-  }: {
+  interface Props {
     value: string
     label: string
     class?: string
     children?: Snippet
-  } = $props()
+  }
+
+  let { value, label, class: className, children }: Props = $props()
 </script>
 
 <ComboboxChip

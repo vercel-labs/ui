@@ -10,10 +10,11 @@
   import { cn } from "cn"
   import type { ComponentProps } from "svelte"
 
-  let {
-    class: className,
-    ...rest
-  }: ComponentProps<typeof NumberInputPrimitive> & { class?: string } = $props()
+  interface Props extends ComponentProps<typeof NumberInputPrimitive> {
+    class?: string
+  }
+
+  let { class: className, ...rest }: Props = $props()
 
   const step =
     "inline-flex size-6 shrink-0 cursor-default items-center justify-center rounded-xl text-muted-foreground outline-none select-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/30 data-disabled:pointer-events-none data-disabled:opacity-50 motion-reduce:transition-none"

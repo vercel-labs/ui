@@ -47,7 +47,12 @@
     type Query,
   } from "tracker-data"
 
-  let { issue, query }: { issue: Issue; query: Query } = $props()
+  interface Props {
+    issue: Issue
+    query: Query
+  }
+
+  let { issue, query }: Props = $props()
 
   function save(fields: Record<string, string | string[] | null>) {
     act("update", { id: issue.id, ...fields })

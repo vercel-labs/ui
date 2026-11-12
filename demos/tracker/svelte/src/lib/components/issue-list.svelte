@@ -43,11 +43,13 @@
     type Status,
   } from "tracker-data"
 
-  let {
-    issues,
-    query,
-    pageSize,
-  }: { issues: Issue[]; query: Query; pageSize: number } = $props()
+  interface Props {
+    issues: Issue[]
+    query: Query
+    pageSize: number
+  }
+
+  let { issues, query, pageSize }: Props = $props()
 
   const { confirm } = getTracker()
   const menu = createMenuController<Issue>()

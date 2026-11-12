@@ -3,14 +3,12 @@
   import { cn } from "cn"
   import type { ComponentProps, Snippet } from "svelte"
 
-  let {
-    class: className,
-    children,
-    ...rest
-  }: ComponentProps<typeof DrawerContent> & {
+  interface Props extends ComponentProps<typeof DrawerContent> {
     class?: string
     children?: Snippet
-  } = $props()
+  }
+
+  let { class: className, children, ...rest }: Props = $props()
 </script>
 
 <DrawerBackdrop

@@ -3,10 +3,11 @@
   import { cn } from "cn"
   import type { ComponentProps } from "svelte"
 
-  let {
-    class: className,
-    ...rest
-  }: ComponentProps<typeof DialogContent> & { class?: string } = $props()
+  interface Props extends ComponentProps<typeof DialogContent> {
+    class?: string
+  }
+
+  let { class: className, ...rest }: Props = $props()
 </script>
 
 <DialogContent

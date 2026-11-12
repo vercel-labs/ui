@@ -4,14 +4,12 @@
   import type { ComponentProps } from "svelte"
   import { item } from "./styles"
 
-  let {
-    variant = "default",
-    class: className,
-    ...rest
-  }: ComponentProps<typeof MenuItem> & {
+  interface Props extends ComponentProps<typeof MenuItem> {
     variant?: "default" | "destructive"
     class?: string
-  } = $props()
+  }
+
+  let { variant = "default", class: className, ...rest }: Props = $props()
 </script>
 
 <MenuItem

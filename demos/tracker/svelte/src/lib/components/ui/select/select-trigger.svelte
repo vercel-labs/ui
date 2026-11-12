@@ -8,14 +8,12 @@
   import { cn } from "cn"
   import type { ComponentProps } from "svelte"
 
-  let {
-    icon = false,
-    class: className,
-    ...rest
-  }: ComponentProps<typeof SelectTrigger> & {
+  interface Props extends ComponentProps<typeof SelectTrigger> {
     icon?: boolean
     class?: string
-  } = $props()
+  }
+
+  let { icon = false, class: className, ...rest }: Props = $props()
 </script>
 
 <SelectTrigger

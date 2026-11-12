@@ -11,9 +11,11 @@
   import type { DialogContentState } from "@ui-sdk/svelte/dialog"
   import { buttonVariants } from "../button"
 
-  let {
-    confirm,
-  }: { confirm: ReturnType<typeof createConfirm<ConfirmOptions>> } = $props()
+  interface Props {
+    confirm: ReturnType<typeof createConfirm<ConfirmOptions>>
+  }
+
+  let { confirm }: Props = $props()
 </script>
 
 <AlertDialog controller={confirm.controller}>

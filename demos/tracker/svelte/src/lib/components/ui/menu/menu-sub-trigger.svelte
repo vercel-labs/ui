@@ -5,14 +5,12 @@
   import type { ComponentProps, Snippet } from "svelte"
   import { item } from "./styles"
 
-  let {
-    class: className,
-    children,
-    ...rest
-  }: ComponentProps<typeof MenuSubTrigger> & {
+  interface Props extends ComponentProps<typeof MenuSubTrigger> {
     class?: string
     children?: Snippet
-  } = $props()
+  }
+
+  let { class: className, children, ...rest }: Props = $props()
 </script>
 
 <MenuSubTrigger class={cn(item, "data-open:bg-accent", className)} {...rest}>

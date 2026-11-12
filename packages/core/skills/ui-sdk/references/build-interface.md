@@ -101,7 +101,7 @@ Use the default prop to start (`defaultValue`, `defaultOpen`, `defaultChecked`, 
 
 **Vue.** Props and events are kebab-case in templates (`default-value`, `@open-change`). Use `v-model` for the main value.
 
-**Svelte.** Use `bind:` for values the parent keeps. Share state between components through `setContext` and `getContext`, created in a parent. Never put `$state` at module level: on the server it's shared across every request.
+**Svelte.** Use `bind:` for values the parent keeps. Share state between components through `setContext` and `getContext`, created in a parent. Never put `$state` at module level: on the server it's shared across every request. Type props with an `interface Props` above `let { ... }: Props = $props()`, not an inline object type. On Svelte 5.56 or later, declare a value inside a block with a declaration tag, `{const label = $derived(labelOf(id))}`, not `{@const}`.
 
 **Solid.** Keep reads reactive: read signals and props in JSX or a getter, never save their value in a variable first. `@ui-sdk/solid` needs Solid 2. With Vite, add `optimizeDeps: { exclude: ["@ui-sdk/core"] }` to the config, so the app and `@ui-sdk/solid` share one copy of the core in development.
 

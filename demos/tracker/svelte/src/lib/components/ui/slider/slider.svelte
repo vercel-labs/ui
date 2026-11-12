@@ -10,14 +10,12 @@
   import { cn } from "cn"
   import type { ComponentProps, Snippet } from "svelte"
 
-  let {
-    label,
-    class: className,
-    ...rest
-  }: ComponentProps<typeof SliderPrimitive> & {
+  interface Props extends ComponentProps<typeof SliderPrimitive> {
     label: Snippet
     class?: string
-  } = $props()
+  }
+
+  let { label, class: className, ...rest }: Props = $props()
 </script>
 
 <SliderPrimitive class={cn("flex flex-col gap-2", className)} {...rest}>

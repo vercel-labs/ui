@@ -26,7 +26,11 @@
   import { cn } from "cn"
   import { people, personOf, type Issue } from "tracker-data"
 
-  let { issue }: { issue: Issue } = $props()
+  interface Props {
+    issue: Issue
+  }
+
+  let { issue }: Props = $props()
 
   const mentions = people.map((person) => ({
     value: person.id,
@@ -67,7 +71,7 @@
       {#if issue.comments.length > 0}
         <ul class="grid gap-5">
           {#each issue.comments as comment (comment.id)}
-            {@const author = personOf(comment.author)}
+            {const author = $derived(personOf(comment.author))}
             <li class="flex gap-3">
               <Avatar name={author?.name ?? "Unknown"} decorative />
               <div class="grid min-w-0 flex-1 gap-1">

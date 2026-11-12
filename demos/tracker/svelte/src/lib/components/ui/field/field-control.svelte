@@ -4,10 +4,11 @@
   import type { ComponentProps } from "svelte"
   import { control } from "./styles"
 
-  let {
-    class: className,
-    ...rest
-  }: ComponentProps<typeof FieldControl> & { class?: string } = $props()
+  interface Props extends ComponentProps<typeof FieldControl> {
+    class?: string
+  }
+
+  let { class: className, ...rest }: Props = $props()
 </script>
 
 <FieldControl class={cn(control, className)} {...rest} />

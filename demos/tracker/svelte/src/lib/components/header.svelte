@@ -16,7 +16,11 @@
   } from "#ui/menu"
   import { viewer } from "tracker-data"
 
-  let { issues }: { issues: { id: string; title: string }[] } = $props()
+  interface Props {
+    issues: { id: string; title: string }[]
+  }
+
+  let { issues }: Props = $props()
 </script>
 
 <header

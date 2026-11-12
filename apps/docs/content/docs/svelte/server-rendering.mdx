@@ -71,7 +71,11 @@ A preference kept in a cookie can render on the server too, content included. Re
   import { setContext } from "svelte"
   import Page from "./page.svelte"
 
-  let { cookie }: { cookie: string | null } = $props()
+  interface Props {
+    cookie: string | null
+  }
+
+  let { cookie }: Props = $props()
   // svelte-ignore state_referenced_locally
   const skinTone = createPreference({
     values: ["default", "light", "medium", "dark"],

@@ -2,8 +2,12 @@
   import { Tabs, TabsList, TabsTab } from "#ui/tabs"
   import { href, tabs, type Query, type Tab } from "tracker-data"
 
-  let { query, counts }: { query: Query; counts: Record<Tab, number> } =
-    $props()
+  interface Props {
+    query: Query
+    counts: Record<Tab, number>
+  }
+
+  let { query, counts }: Props = $props()
 </script>
 
 <Tabs value={query.tab}>

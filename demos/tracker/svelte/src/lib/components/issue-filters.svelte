@@ -19,15 +19,13 @@
   } from "#ui/select"
   import { people, personOf, priorities, type Query } from "tracker-data"
 
-  let {
-    query,
-    onChange,
-    stacked = false,
-  }: {
+  interface Props {
     query: Query
     onChange: (patch: Partial<Query>) => void
     stacked?: boolean
-  } = $props()
+  }
+
+  let { query, onChange, stacked = false }: Props = $props()
 
   const priorityItems = [{ value: "any", label: "Any priority" }, ...priorities]
   const label = $derived(stacked ? undefined : "sr-only")

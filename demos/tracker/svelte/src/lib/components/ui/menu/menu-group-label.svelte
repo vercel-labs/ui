@@ -3,10 +3,11 @@
   import { cn } from "cn"
   import type { ComponentProps } from "svelte"
 
-  let {
-    class: className,
-    ...rest
-  }: ComponentProps<typeof MenuGroupLabel> & { class?: string } = $props()
+  interface Props extends ComponentProps<typeof MenuGroupLabel> {
+    class?: string
+  }
+
+  let { class: className, ...rest }: Props = $props()
 </script>
 
 <MenuGroupLabel

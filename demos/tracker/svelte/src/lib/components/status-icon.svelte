@@ -20,11 +20,13 @@
   import { cn } from "cn"
   import { statusOf, type Status } from "tracker-data"
 
-  let {
-    status,
-    label = false,
-    class: className,
-  }: { status: Status; label?: boolean; class?: string } = $props()
+  interface Props {
+    status: Status
+    label?: boolean
+    class?: string
+  }
+
+  let { status, label = false, class: className }: Props = $props()
 
   const Icon = $derived(icons[status])
 </script>

@@ -5,7 +5,12 @@
   import StatusIcon from "#lib/components/status-icon.svelte"
   import { href, statusOf, tabs, type Issue, type Query } from "tracker-data"
 
-  let { issues, query }: { issues: Issue[]; query: Query } = $props()
+  interface Props {
+    issues: Issue[]
+    query: Query
+  }
+
+  let { issues, query }: Props = $props()
 
   const columns = $derived(
     tabs.find((tab) => tab.value === query.tab)!.statuses
@@ -14,7 +19,7 @@
 
 <div class="flex min-h-0 flex-1 gap-3 overflow-x-auto p-3">
   {#each columns as status (status)}
-    {@const cards = issues.filter((issue) => issue.status === status)}
+    {const cards = $derived(issues.filter((issue) => issue.status === status))}
     <section
       aria-labelledby={`column-${status}`}
       class="flex w-72 shrink-0 flex-col gap-2 rounded-3xl bg-muted/60 p-2"

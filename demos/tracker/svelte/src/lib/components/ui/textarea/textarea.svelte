@@ -4,10 +4,11 @@
   import type { ComponentProps } from "svelte"
   import { control } from "../field/styles"
 
-  let {
-    class: className,
-    ...rest
-  }: ComponentProps<typeof Textarea> & { class?: string } = $props()
+  interface Props extends ComponentProps<typeof Textarea> {
+    class?: string
+  }
+
+  let { class: className, ...rest }: Props = $props()
 </script>
 
 <Textarea

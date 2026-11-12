@@ -11,17 +11,19 @@
     lg: "size-10 text-sm",
   }
 
+  interface Props {
+    name: string
+    size?: keyof typeof sizes
+    decorative?: boolean
+    class?: string
+  }
+
   let {
     name,
     size = "default",
     decorative = false,
     class: className,
-  }: {
-    name: string
-    size?: keyof typeof sizes
-    decorative?: boolean
-    class?: string
-  } = $props()
+  }: Props = $props()
 
   const initials = $derived(
     name

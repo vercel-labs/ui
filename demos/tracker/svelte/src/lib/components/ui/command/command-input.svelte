@@ -4,10 +4,11 @@
   import { cn } from "cn"
   import type { ComponentProps } from "svelte"
 
-  let {
-    class: className,
-    ...rest
-  }: ComponentProps<typeof CommandInput> & { class?: string } = $props()
+  interface Props extends ComponentProps<typeof CommandInput> {
+    class?: string
+  }
+
+  let { class: className, ...rest }: Props = $props()
 </script>
 
 <div class="flex items-center gap-2 border-b border-border px-4">

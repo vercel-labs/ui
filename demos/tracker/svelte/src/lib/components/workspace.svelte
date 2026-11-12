@@ -2,17 +2,14 @@
   import { Resizable, ResizableHandle, ResizablePanel } from "#ui/resizable"
   import type { Snippet } from "svelte"
 
-  let {
-    sizes,
-    open,
-    list,
-    detail,
-  }: {
+  interface Props {
     sizes: [number, number]
     open: boolean
     list: Snippet
     detail: Snippet
-  } = $props()
+  }
+
+  let { sizes, open, list, detail }: Props = $props()
 
   const cookieStorage = {
     getItem: (key: string) => {

@@ -59,7 +59,11 @@ Import the parts and put them together:
     ImageCropperViewport,
   } from "@ui-sdk/svelte/image-cropper"
 
-  let { src }: { src: string } = $props()
+  interface Props {
+    src: string
+  }
+
+  let { src }: Props = $props()
 </script>
 
 <ImageCropper aria-label="Cover photo" {src} aspectRatio={3}>
@@ -135,7 +139,11 @@ Bind `crop` with `bind:crop`, and pass `onCropChange` for the details. Each chan
     ImageCropperViewport,
   } from "@ui-sdk/svelte/image-cropper"
 
-  let { src }: { src: string } = $props()
+  interface Props {
+    src: string
+  }
+
+  let { src }: Props = $props()
 
   const controller = createImageCropperController()
 </script>

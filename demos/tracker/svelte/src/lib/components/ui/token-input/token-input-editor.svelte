@@ -3,10 +3,11 @@
   import { cn } from "cn"
   import type { ComponentProps } from "svelte"
 
-  let {
-    class: className,
-    ...rest
-  }: ComponentProps<typeof TokenInputEditor> & { class?: string } = $props()
+  interface Props extends ComponentProps<typeof TokenInputEditor> {
+    class?: string
+  }
+
+  let { class: className, ...rest }: Props = $props()
 </script>
 
 <TokenInputEditor

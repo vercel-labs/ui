@@ -9,19 +9,15 @@
   import { cn } from "cn"
   import type { ComponentProps } from "svelte"
 
-  let {
-    value,
-    max,
-    format,
-    label,
-    class: className,
-  }: {
+  interface Props {
     value: number
     max?: number
     format?: ComponentProps<typeof ProgressPrimitive>["format"]
     label: string
     class?: string
-  } = $props()
+  }
+
+  let { value, max, format, label, class: className }: Props = $props()
 </script>
 
 <ProgressPrimitive
