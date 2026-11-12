@@ -391,6 +391,29 @@ test.describe("opening from anywhere", { tag: "@enhancement" }, () => {
     expect(await answer).toBe(false)
   })
 
+  test("a confirm opened from inside a modal dialog takes focus and stays usable", async ({
+    page,
+    open,
+  }) => {
+    await open("dialog")
+    await openWithKeyboard(page)
+    const answer = page.evaluate(() =>
+      (
+        window as unknown as { confirmDelete: () => Promise<boolean> }
+      ).confirmDelete()
+    )
+    await expect(alert(page)).toBeVisible()
+    await expect(
+      alert(page).getByRole("button", { name: "Cancel" })
+    ).toBeFocused()
+    await alert(page)
+      .getByRole("button", { name: "Delete", exact: true })
+      .click()
+    expect(await answer).toBe(true)
+    await expect(dialog(page)).toBeVisible()
+    await expect(field(page)).toBeFocused()
+  })
+
   test("closing reports why, for every way a dialog closes", async ({
     page,
     open,

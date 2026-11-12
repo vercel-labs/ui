@@ -963,7 +963,9 @@ function createPopupLayer<
     }
 
     const own: Layer = {
-      parent: options.parent?.() ?? (trigger && findLayer(trigger)),
+      parent:
+        options.parent?.() ??
+        ((trigger && findLayer(trigger)) || (before && findLayer(before))),
       active: () => store.get().open,
       exiting: () => !store.get().open && store.get().mounted,
       modal: modal.consumeOutsidePress,
