@@ -2,13 +2,11 @@
 
 import {
   createChange,
+  createListbox,
   createPopup,
-  createRovingFocus,
   createSelection,
-  createTypeahead,
   definePrimitive,
-  isTypeaheadKey,
-  labelOf,
+  elements,
   popupContent,
   popupState,
   popupTrigger,
@@ -37,7 +35,7 @@ type UserPickerOptions = {
 
 type UserPickerState = ReturnType<typeof popupState> & {
   value: string[]
-  stop: string | null
+  highlighted: string | null
 }
 
 const userPicker = definePrimitive({
@@ -53,7 +51,7 @@ const userPicker = definePrimitive({
   state: (options: UserPickerOptions): UserPickerState => ({
     ...popupState(options),
     value: options.value ?? options.defaultValue ?? [],
-    stop: null,
+    highlighted: null,
   }),
   sync: (options) => ({
     ...(options.open === undefined ? {} : { open: options.open }),
@@ -62,19 +60,14 @@ const userPicker = definePrimitive({
   api: (context) => {
     const popup = createPopup(context, { preset: popoverPreset })
     const change = createChange(context)
-    const roving = createRovingFocus<UserPickerState, { value: string }>(
-      context,
-      {
-        slot: "option",
-        key: "stop",
-      }
-    )
+    const listbox = createListbox<UserPickerState>(context, {
+      key: "highlighted",
+    })
     const selection = createSelection(context, {
       key: "value",
       set: (value, details) => change("value", value, details),
-      order: () => roving.items().map((item) => item.key),
+      order: () => elements(context, "option").map((item) => item.key),
     })
-    const typeahead = createTypeahead()
     let wasOpen = context.store.get().open
     context.store.subscribe(() => {
       const { open, value } = context.store.get()
@@ -82,8 +75,10 @@ const userPicker = definePrimitive({
         return
       }
       wasOpen = open
-      if (open) {
-        context.store.set({ stop: value[0] ?? null })
+      if (open && value[0] !== undefined) {
+        listbox.highlight(value[0])
+      } else if (open) {
+        listbox.move("first")
       }
     })
     const pick = (key: string, event?: Event) => {
@@ -92,28 +87,15 @@ const userPicker = definePrimitive({
     }
     return {
       ...popup,
-      roving,
+      listbox,
       pick,
-      keydown(event: KeyboardEvent, el: HTMLElement, key: string) {
-        if (
-          event.key === "Enter" ||
-          (event.key === " " && !typeahead.active())
-        ) {
-          event.preventDefault()
-          return pick(key, event)
-        }
-        if (roving.keydown(event, el) || !isTypeaheadKey(event)) {
+      keydown(event: KeyboardEvent, key: string) {
+        if (listbox.keydown(event) !== undefined) {
           return
         }
-        const items = roving.items()
-        const labels = items.map((item) => labelOf(item.el))
-        const index = typeahead(
-          event.key,
-          labels,
-          items.findIndex((item) => item.el === el)
-        )
-        if (index !== -1) {
-          roving.focus(items[index].key)
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault()
+          pick(key, event)
         }
       },
     }
@@ -124,15 +106,16 @@ const userPicker = definePrimitive({
     option: slot<{ value: string }>({
       props: { value: "string" },
       attrs: (state, part) => ({
+        ...part.api.listbox.attrs(state, part),
         role: "option",
-        tabindex: part.api.roving.tabIndex(state, part),
+        tabindex: state.highlighted === part.key ? "0" : "-1",
         "aria-selected": String(state.value.includes(part.key)),
       }),
       press: ({ api, key }, event) => api.pick(key, event),
       on: {
-        keydown: (event, { el, api, key }) => api.keydown(event, el!, key),
+        keydown: (event, { api, key }) => api.keydown(event, key),
       },
-      bind: (el, part) => part.api.roving.bind(el, part),
+      bind: (el, part) => part.api.listbox.bind(el, part),
     }),
   }),
 })

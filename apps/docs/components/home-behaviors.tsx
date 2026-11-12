@@ -3,8 +3,8 @@ import { Poster } from "./home-posters"
 
 const behaviors = [
   {
-    name: "createListbox",
-    body: "Arrow keys move through options, and typing filters them.",
+    name: "createRovingFocus",
+    body: "Arrow keys move through a list, with one Tab stop.",
   },
   {
     name: "createTypeahead",

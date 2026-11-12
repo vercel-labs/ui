@@ -22,32 +22,28 @@ const behaviors = [
     body: "Opens next to the button and closes on Escape.",
   },
   {
-    name: "createRovingFocus",
-    body: "Arrow keys move from one person to the next.",
-  },
-  {
-    name: "createTypeahead",
-    body: "Type a few letters of a name to jump to them.",
+    name: "createListbox",
+    body: "Arrow keys or typing move from one person to the next.",
   },
   { name: "createSelection", body: "Remembers who you picked and marks them." },
+  { name: "createChange", body: "Tells your app who you picked." },
 ]
 
 const excerpt: { text: string; behavior?: string }[] = [
   { text: "const userPicker = definePrimitive({" },
   { text: '  name: "user-picker",' },
   { text: "  api: (context) => {" },
-  { text: "    const change = createChange(context)" },
+  {
+    text: "    const change = createChange(context)",
+    behavior: "createChange",
+  },
   {
     text: "    const popup = createPopup(context, { preset: popoverPreset })",
     behavior: "createPopup",
   },
   {
-    text: '    const roving = createRovingFocus(context, { slot: "option", key: "stop" })',
-    behavior: "createRovingFocus",
-  },
-  {
-    text: "    const typeahead = createTypeahead()",
-    behavior: "createTypeahead",
+    text: '    const listbox = createListbox(context, { key: "highlighted" })',
+    behavior: "createListbox",
   },
   {
     text: "    const selection = createSelection(context, {",
@@ -59,14 +55,14 @@ const excerpt: { text: string; behavior?: string }[] = [
     behavior: "createSelection",
   },
   { text: "    })", behavior: "createSelection" },
-  { text: "    return { ...popup, roving, typeahead, selection }" },
+  { text: "    return { ...popup, listbox, selection }" },
   { text: "  }," },
   { text: "  slots: (slot) => ({" },
   { text: "    trigger: popupTrigger(slot),", behavior: "createPopup" },
   { text: "    content: popupContent(slot),", behavior: "createPopup" },
   {
-    text: "    option: slot({ bind: (el, part) => part.api.roving.bind(el, part) }),",
-    behavior: "createRovingFocus",
+    text: "    option: slot({ bind: (el, part) => part.api.listbox.bind(el, part) }),",
+    behavior: "createListbox",
   },
   { text: "  })," },
   { text: "})" },
@@ -106,27 +102,26 @@ function Glyph({ name }: { name: string }) {
             />
           </>
         )}
-        {name === "createTypeahead" &&
-          ["G", "R", "A"].map((key, index) => (
-            <g key={key}>
-              <rect
-                x={14 + index * 24}
-                y={18}
-                width={20}
-                height={20}
-                className={cn(stroke, "fill-background")}
-              />
-              <text
-                x={24 + index * 24}
-                y={32}
-                textAnchor="middle"
-                className="fill-foreground font-mono text-[10px]"
-              >
-                {key}
-              </text>
-            </g>
-          ))}
-        {name === "createRovingFocus" &&
+        {name === "createChange" && (
+          <>
+            <rect
+              x={8}
+              y={17}
+              width={30}
+              height={22}
+              className={cn(stroke, "fill-background")}
+            />
+            <path d="M44,28 H66 m-5,-5 l5,5 l-5,5" className={stroke} />
+            <rect
+              x={72}
+              y={17}
+              width={16}
+              height={22}
+              className="fill-foreground"
+            />
+          </>
+        )}
+        {name === "createListbox" &&
           ["↑", "↓"].map((key, index) => (
             <g key={key}>
               <rect
