@@ -142,7 +142,6 @@ const item =
 const label = "font-mono text-[11px] tracking-[0.06em] uppercase"
 const description = "text-[13px] text-muted-foreground"
 
-// A dimension line with the component's width, above or below it.
 function Measure({
   full = false,
   side = "top",
@@ -516,8 +515,6 @@ function SwitchDemo() {
   )
 }
 
-// A leader line runs from the thumb to a numbered note, like a callout on a
-// drawing, and follows the thumb as it moves.
 function SliderDemo() {
   const [value, setValue] = React.useState(20)
   const frame = React.useRef<HTMLDivElement>(null)

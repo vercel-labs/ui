@@ -20,8 +20,6 @@ import { grid, hatch } from "./home-patterns"
 
 type CardProps = { className?: string }
 
-// A tall card with a hairline border. Everything inside is sized in container
-// units, so a card keeps its composition from a phone to a wide screen.
 function Card({
   id,
   name,
@@ -57,7 +55,6 @@ const looks = {
   dim: "text-foreground/60",
   outline:
     "text-transparent [-webkit-text-stroke:max(1px,0.012em)_var(--outline)]",
-  // Filled with the card's color, so it hides whatever sits under it.
   cover:
     "text-background [-webkit-text-stroke:max(2px,0.024em)_var(--outline)] [paint-order:stroke_fill]",
 }

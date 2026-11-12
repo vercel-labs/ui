@@ -38,7 +38,6 @@ import { sectionPages, sectionTree } from "@/lib/section-tree"
 import { cn } from "cn"
 import Link from "next/link"
 
-// Three to a row. Phones show the six marked `phone` in a strip.
 const components = [
   { name: "Color Picker", Card: ColorCard, phone: true },
   { name: "Token Input", Card: TokenInputCard, phone: true },
