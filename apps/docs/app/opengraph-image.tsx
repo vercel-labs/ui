@@ -7,7 +7,7 @@ const contentType = "image/png"
 export default function Image() {
   return renderOgImage({
     title:
-      "A library of behaviors for agents to build the next generation of user interfaces.",
+      "A library of behaviors for agents to build the next generation of user interfaces",
   })
 }
 

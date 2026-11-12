@@ -2,8 +2,8 @@ import { ImageResponse } from "next/og"
 import { readFile } from "node:fs/promises"
 import { join } from "node:path"
 
-// The background already holds the logo and the Select blueprint from the
-// homepage, rendered at twice the size. Only the text is drawn here. The
+// The background already holds the logo and a Select drawn with its behaviors,
+// rendered at twice the size. Only the text is drawn here. The
 // fonts have no kerning table: Satori spaces words unevenly with one.
 const folder = join(process.cwd(), "app/og")
 
@@ -30,14 +30,14 @@ async function renderOgImage({
         height={size.height}
         src={`data:image/png;base64,${background.toString("base64")}`}
       />
-      <div tw="absolute flex flex-col left-[64px] top-[196px] w-[560px]">
-        <div tw="flex text-[62px] leading-[1.02] tracking-[-2.79px] text-[#0a0a0a]">
+      <div tw="absolute flex flex-col left-[64px] top-[186px] w-[500px]">
+        <div tw="flex text-[56px] leading-[0.99] tracking-[-2.52px] text-[#0a0a0a]">
           {title}
         </div>
         {description && (
           <div
             style={{ fontWeight: 300, textWrap: "balance" }}
-            tw="mt-[20px] max-w-[500px] text-[26px] leading-[1.32] tracking-[-0.52px] text-[#6e6e6e]"
+            tw="mt-[22px] max-w-[460px] text-[26px] leading-[1.32] tracking-[-0.52px] text-[#6e6e6e]"
           >
             {description}
           </div>
