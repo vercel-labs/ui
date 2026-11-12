@@ -1,6 +1,8 @@
 # UI SDK
 
-A library of UI behaviors for building accessible interfaces: keyboard navigation, focus, selection, dismissal, popups, drag and drop and the ARIA they need, in `@ui-sdk/core`, with adapters for React, Vue, Svelte, Solid and Web Components.
+A library of behaviors for agents to build the next generation of user interfaces.
+
+Keyboard navigation, focus, selection, dismissal, popups, drag and drop and the ARIA they need live in `@ui-sdk/core`, with adapters for React, Vue, Svelte, Solid and Web Components.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./assets/behaviors-dark.svg">
@@ -9,11 +11,27 @@ A library of UI behaviors for building accessible interfaces: keyboard navigatio
 
 **[Read the docs](https://ui-sdk.dev/docs)**
 
+## Install
+
+UI SDK is in beta. Install core and the adapter for your framework:
+
+```bash
+npm install @ui-sdk/react @ui-sdk/core
+```
+
+For other frameworks, swap `@ui-sdk/react` for `@ui-sdk/vue`, `@ui-sdk/svelte`, `@ui-sdk/solid` or `@ui-sdk/web`.
+
+Then give your agent the UI SDK skill:
+
+```bash
+npx skills add vercel-labs/ui --skill ui-sdk
+```
+
 ## Example
 
-Every component in ui-sdk is built from behaviors. You start by creating the primitive with behaviors.
+Every component in UI SDK is built from behaviors. You start by creating the primitive with behaviors.
 
-Don't worry you don't need to learn how to write this. Your agents will. And we made them really good at it.
+Don't worry, you don't need to learn how to write this. Your agents will. And we made them really good at it.
 
 ```ts
 import { createFocusRecovery, definePrimitive } from "@ui-sdk/core"
@@ -165,7 +183,7 @@ Then use them in your HTML:
 
 Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) to get the repo
 running locally and land a change, and use
-[issues](https://github.com/vercel-labs/ui/issues) for issues. By
+[issues](https://github.com/vercel-labs/ui/issues) to report bugs. By
 participating, you agree to our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## Security
