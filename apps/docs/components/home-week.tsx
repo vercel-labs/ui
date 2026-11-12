@@ -14,7 +14,7 @@ import { Numeral, Title } from "./home-posters"
 
 const ink = "border border-foreground"
 const ring =
-  "outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[#006bff]"
+  "outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-blue"
 const label = "font-mono text-[10px] tracking-[0.06em] uppercase"
 
 const day = 100
@@ -110,7 +110,7 @@ const Event = React.memo(function Event({
       data-day={Math.round(box.x / day)}
       aria-label={`${name}, ${range(box, twelve)}, ${days[Math.round(box.x / day)]}. Arrow keys move it.`}
       className={cn(
-        "group/box cursor-move p-[3px] outline-none focus-visible:z-20 data-dragging:z-20 focus-visible:[&>div]:outline-2 focus-visible:[&>div]:outline-solid focus-visible:[&>div]:outline-offset-1 focus-visible:[&>div]:outline-[#006bff]",
+        "group/box cursor-move p-[3px] outline-none focus-visible:z-20 data-dragging:z-20 focus-visible:[&>div]:outline-2 focus-visible:[&>div]:outline-solid focus-visible:[&>div]:outline-offset-1 focus-visible:[&>div]:outline-blue",
         active && "z-20"
       )}
     >

@@ -35,7 +35,7 @@ const agent = typeof window === "undefined" ? undefined : createAgent()
 
 const ink = "border border-foreground"
 const ring =
-  "outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[#006bff]"
+  "outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-blue"
 const label = "font-mono text-[10px] tracking-[0.06em] uppercase"
 
 const regions = [
@@ -96,9 +96,9 @@ function Field({
       className={cn(
         "flex flex-col gap-2 outline-offset-[6px] transition-[outline-color,outline-width] duration-300",
         active
-          ? "outline-2 outline-solid outline-[#006bff]"
+          ? "outline-2 outline-solid outline-blue"
           : changed
-            ? "outline-1 outline-dashed outline-[#006bff]"
+            ? "outline-1 outline-dashed outline-blue"
             : "outline-1 outline-dashed outline-transparent"
       )}
     >
@@ -204,7 +204,7 @@ function Settings({
             className={cn(
               "flex h-11 w-full items-center bg-background",
               ink,
-              "has-focus-visible:outline-2 has-focus-visible:outline-solid has-focus-visible:outline-offset-2 has-focus-visible:outline-[#006bff]"
+              "has-focus-visible:outline-2 has-focus-visible:outline-solid has-focus-visible:outline-offset-2 has-focus-visible:outline-blue"
             )}
           >
             <NumberInputDecrement
@@ -266,11 +266,11 @@ function Prompt({
       key={index}
       className={cn(
         "box-decoration-clone transition-colors duration-300",
-        part.ref && active === part.ref && "bg-[#006bff] text-white",
+        part.ref && active === part.ref && "bg-blue-solid text-white",
         part.ref &&
           changed.includes(part.ref) &&
           active !== part.ref &&
-          "underline decoration-[#006bff] decoration-dashed underline-offset-4"
+          "underline decoration-blue decoration-dashed underline-offset-4"
       )}
     >
       {part.text}
@@ -424,7 +424,7 @@ function OperateDemo() {
                       className={cn(
                         "flex flex-col gap-1 border-s-2 ps-3 font-mono text-[11.5px] leading-[1.55] transition-colors duration-300",
                         entry.type === "act" && active === entry.ref
-                          ? "border-[#006bff]"
+                          ? "border-blue"
                           : "border-foreground/20"
                       )}
                     >
@@ -433,7 +433,7 @@ function OperateDemo() {
                           "w-fit box-decoration-clone break-words transition-colors duration-300",
                           entry.type === "act" &&
                             active === entry.ref &&
-                            "bg-[#006bff] text-white"
+                            "bg-blue-solid text-white"
                         )}
                       >
                         <span aria-hidden="true" className="opacity-50">
@@ -477,7 +477,7 @@ function OperateDemo() {
                     type="button"
                     onClick={sent && !running ? reset : send}
                     disabled={running}
-                    className="inline-flex h-9 items-center gap-2.5 bg-[#006bff] px-4 font-mono text-[12px] tracking-[0.06em] text-white uppercase transition-colors outline-none hover:bg-[#0059d6] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[#006bff] disabled:opacity-50"
+                    className="inline-flex h-9 items-center gap-2.5 bg-blue-solid px-4 font-mono text-[12px] tracking-[0.06em] text-white uppercase transition-colors outline-none hover:bg-blue-solid-hover focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-blue disabled:opacity-50"
                   >
                     {running ? "Working" : sent ? "Reset" : "Send"}
                   </button>

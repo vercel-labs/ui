@@ -232,7 +232,7 @@ function StartPoster() {
     >
       <Link
         href="/docs"
-        className="w-fit text-[length:clamp(2.5rem,11cqi,11rem)] leading-[0.82] after:absolute after:inset-0 font-[450] tracking-[-0.06em] whitespace-nowrap underline-offset-[0.08em] outline-none hover:underline focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-4 focus-visible:outline-[#006bff]"
+        className="w-fit text-[length:clamp(2.5rem,11cqi,11rem)] leading-[0.82] after:absolute after:inset-0 font-[450] tracking-[-0.06em] whitespace-nowrap underline-offset-[0.08em] outline-none hover:underline focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-4 focus-visible:outline-blue"
       >
         Start building.
       </Link>

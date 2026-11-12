@@ -34,7 +34,7 @@ function TabsTab({
   return (
     <TabsTabPrimitive
       className={cn(
-        "group/tabs-tab inline-flex h-7 shrink-0 items-center border border-transparent px-2.5 font-mono text-[11px] tracking-[0.06em] whitespace-nowrap text-muted-foreground uppercase outline-none transition-colors select-none hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#006bff] data-selected:border-foreground data-selected:text-foreground",
+        "group/tabs-tab inline-flex h-7 shrink-0 items-center border border-transparent px-2.5 font-mono text-[11px] tracking-[0.06em] whitespace-nowrap text-muted-foreground uppercase outline-none transition-colors select-none hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue data-selected:border-foreground data-selected:text-foreground",
         className
       )}
       {...props}

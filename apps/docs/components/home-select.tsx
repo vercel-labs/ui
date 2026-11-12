@@ -98,7 +98,7 @@ function Tag({
         cx={from[0]}
         cy={from[1]}
         r={2.5}
-        className={cn(fade, lit ? "fill-[#006bff]" : "fill-foreground")}
+        className={cn(fade, lit ? "fill-blue" : "fill-foreground")}
       />
       <path
         d={
@@ -109,7 +109,7 @@ function Tag({
         className={cn(
           fade,
           "fill-none",
-          lit ? "stroke-[#006bff]" : "stroke-foreground"
+          lit ? "stroke-blue" : "stroke-foreground"
         )}
       />
       <rect
@@ -117,7 +117,7 @@ function Tag({
         y={y - 9}
         width={18}
         height={18}
-        className={cn(fade, lit ? "fill-[#006bff]" : "fill-foreground")}
+        className={cn(fade, lit ? "fill-blue" : "fill-foreground")}
       />
       <text
         x={x + 9}
@@ -134,7 +134,7 @@ function Tag({
           className={cn(
             mono,
             fade,
-            lit ? "fill-[#006bff]" : "fill-muted-foreground"
+            lit ? "fill-blue" : "fill-muted-foreground"
           )}
         >
           {behaviors[index - 1]!.part}
@@ -162,7 +162,7 @@ function Drawing({
   const keys = x + w - 88
   const keyY = bottom + 22
   const edge = (index: number) =>
-    cn(fade, active === index ? "stroke-[#006bff]" : "stroke-foreground")
+    cn(fade, active === index ? "stroke-blue" : "stroke-foreground")
   return (
     <svg
       viewBox={layout.viewBox}
@@ -243,10 +243,7 @@ function Drawing({
         y={popup + 4}
         width={w - 8}
         height={136}
-        className={cn(
-          fade,
-          active === 2 ? "fill-[#006bff]/10" : "fill-transparent"
-        )}
+        className={cn(fade, active === 2 ? "fill-blue/10" : "fill-transparent")}
       />
       {options.map((option, index) => (
         <text
@@ -270,9 +267,7 @@ function Drawing({
         className="fill-foreground"
       />
       <text x={x + 16} y={row(2) + 26} className="fill-background text-[14px]">
-        <tspan className={cn(fade, active === 3 && "fill-[#006bff]")}>
-          Pro
-        </tspan>
+        <tspan className={cn(fade, active === 3 && "fill-blue")}>Pro</tspan>
         duction
       </text>
       <path
@@ -280,7 +275,7 @@ function Drawing({
         className={cn(
           fade,
           "fill-none",
-          active === 3 ? "stroke-[#006bff]" : "stroke-transparent"
+          active === 3 ? "stroke-blue" : "stroke-transparent"
         )}
       />
       <rect
@@ -291,7 +286,7 @@ function Drawing({
         className={cn(
           fade,
           "fill-none",
-          active === 2 ? "stroke-[#006bff]" : "stroke-transparent"
+          active === 2 ? "stroke-blue" : "stroke-transparent"
         )}
       />
 
@@ -325,7 +320,7 @@ function Drawing({
             className={cn(
               mono,
               fade,
-              active === 3 ? "fill-[#006bff]" : "fill-foreground"
+              active === 3 ? "fill-blue" : "fill-foreground"
             )}
           >
             {key}
@@ -412,9 +407,9 @@ function SelectBlueprint() {
                 setPreview(null)
               }}
               className={cn(
-                "flex flex-col gap-1 border bg-background px-3 py-2.5 text-start transition-colors duration-200 outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#006bff]",
+                "flex flex-col gap-1 border bg-background px-3 py-2.5 text-start transition-colors duration-200 outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue",
                 lit
-                  ? "border-[#006bff]"
+                  ? "border-blue"
                   : "border-foreground/15 hover:border-foreground/40"
               )}
             >
@@ -423,7 +418,7 @@ function SelectBlueprint() {
                   aria-hidden="true"
                   className={cn(
                     "flex size-[18px] shrink-0 items-center justify-center font-mono text-[9px] text-background transition-colors duration-200",
-                    lit ? "bg-[#006bff]" : "bg-foreground"
+                    lit ? "bg-blue" : "bg-foreground"
                   )}
                 >
                   {index + 1}
@@ -431,7 +426,7 @@ function SelectBlueprint() {
                 <code
                   className={cn(
                     "font-mono text-[17px] leading-tight whitespace-nowrap transition-colors duration-200 @[35rem]:text-[15px] @[44rem]:text-[17px]",
-                    lit && "text-[#006bff]"
+                    lit && "text-blue"
                   )}
                 >
                   {behavior.name}

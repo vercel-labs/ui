@@ -302,7 +302,7 @@ function Picker() {
       <UserPicker value={value} onValueChange={setValue}>
         <UserPickerTrigger
           className={cn(
-            "flex h-12 w-full items-center gap-3 bg-background px-3 text-start text-base outline-none hover:bg-foreground/[0.03] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[#006bff]",
+            "flex h-12 w-full items-center gap-3 bg-background px-3 text-start text-base outline-none hover:bg-foreground/[0.03] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-blue",
             ink
           )}
         >
@@ -332,7 +332,7 @@ function Picker() {
 }
 
 const tab =
-  "h-10 shrink-0 px-3 font-mono text-[11px] tracking-[0.06em] text-muted-foreground uppercase transition-colors outline-none select-none hover:text-foreground focus-visible:outline-2 focus-visible:outline-solid focus-visible:-outline-offset-2 focus-visible:outline-[#006bff] data-selected:bg-foreground data-selected:text-background"
+  "h-10 shrink-0 px-3 font-mono text-[11px] tracking-[0.06em] text-muted-foreground uppercase transition-colors outline-none select-none hover:text-foreground focus-visible:outline-2 focus-visible:outline-solid focus-visible:-outline-offset-2 focus-visible:outline-blue data-selected:bg-foreground data-selected:text-background"
 
 const panelHeight = (lines: number) =>
   `calc(${lines} * 1.6 * 13px + 8.5rem + 1px)`
@@ -369,7 +369,7 @@ function Code({
         <TabsPanel
           key={entry.value}
           value={entry.value}
-          className="overflow-x-auto overflow-y-hidden outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:-outline-offset-2 focus-visible:outline-[#006bff]"
+          className="overflow-x-auto overflow-y-hidden outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:-outline-offset-2 focus-visible:outline-blue"
           style={{ height: panelHeight(lines) }}
         >
           {([entry.parts, entry.usage] as const).map((part, index) => (
@@ -427,7 +427,7 @@ function PromptCard({
         <button
           type="button"
           onClick={onSend}
-          className="inline-flex h-11 shrink-0 items-center gap-3 bg-[#006bff] px-4 @[26rem]:px-5 font-mono text-[13px] tracking-[0.06em] text-white uppercase transition-colors outline-none hover:bg-[#0059d6] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[#006bff]"
+          className="inline-flex h-11 shrink-0 items-center gap-3 bg-blue-solid px-4 @[26rem]:px-5 font-mono text-[13px] tracking-[0.06em] text-white uppercase transition-colors outline-none hover:bg-blue-solid-hover focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-blue"
         >
           Send
         </button>
@@ -464,7 +464,7 @@ function Behaviors({
           className={cn(
             "flex cursor-default items-center gap-4 bg-background p-4 transition-shadow duration-300 [&>*]:transition-[opacity,translate] [&>*]:duration-300 @[64rem]:flex-col @[64rem]:items-start @[64rem]:p-5 @[64rem]:outline @[64rem]:outline-foreground",
             lit === behavior.name &&
-              "shadow-[inset_0_0_0_2px_#006bff] [&_code]:text-[#006bff]",
+              "shadow-[inset_0_0_0_2px_var(--blue)] [&_code]:text-blue",
             !(step >= 1 && step * 1.5 > index) &&
               "[&>*]:translate-y-1 [&>*]:opacity-25"
           )}
@@ -555,7 +555,7 @@ function AskDemo() {
               }}
               className={cn(
                 label,
-                "flex h-10 items-center justify-center gap-1.5 border-s border-foreground text-muted-foreground transition-colors outline-none first:border-s-0 focus-visible:outline-2 focus-visible:outline-solid focus-visible:-outline-offset-2 focus-visible:outline-[#006bff] aria-pressed:bg-foreground aria-pressed:text-background"
+                "flex h-10 items-center justify-center gap-1.5 border-s border-foreground text-muted-foreground transition-colors outline-none first:border-s-0 focus-visible:outline-2 focus-visible:outline-solid focus-visible:-outline-offset-2 focus-visible:outline-blue aria-pressed:bg-foreground aria-pressed:text-background"
               )}
             >
               <span className="tabular-nums opacity-60">{index + 1}</span>
@@ -620,7 +620,7 @@ function AskDemo() {
                         "block px-4 transition-colors duration-200",
                         line.behavior &&
                           lit === line.behavior &&
-                          "bg-[#006bff] text-white",
+                          "bg-blue-solid text-white",
                         line.behavior &&
                           lit &&
                           lit !== line.behavior &&

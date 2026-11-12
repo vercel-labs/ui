@@ -130,7 +130,7 @@ import { slug } from "./home-posters"
 
 const ink = "border border-foreground"
 const ring =
-  "outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[#006bff] has-focus-visible:outline-2 has-focus-visible:outline-solid has-focus-visible:outline-offset-2 has-focus-visible:outline-[#006bff]"
+  "outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-blue has-focus-visible:outline-2 has-focus-visible:outline-solid has-focus-visible:outline-offset-2 has-focus-visible:outline-blue"
 const control = cn("h-8 bg-background text-sm transition-colors", ink, ring)
 const button = cn(
   control,
@@ -272,7 +272,7 @@ function CommandDemo() {
       <Command
         className={cn("flex h-[max(22rem,82cqi)] flex-col bg-background", ink)}
       >
-        <div className="flex items-center gap-3 border-b border-foreground px-4 has-focus-visible:outline-2 has-focus-visible:outline-solid has-focus-visible:-outline-offset-2 has-focus-visible:outline-[#006bff]">
+        <div className="flex items-center gap-3 border-b border-foreground px-4 has-focus-visible:outline-2 has-focus-visible:outline-solid has-focus-visible:-outline-offset-2 has-focus-visible:outline-blue">
           <span
             aria-hidden="true"
             className="font-mono text-sm text-muted-foreground"
@@ -327,7 +327,7 @@ function CommandDemo() {
 }
 
 const slot = cn(
-  "relative -ms-px flex aspect-[5/6] min-w-0 flex-1 items-center justify-center bg-background text-[length:max(1.5rem,9cqi)] tabular-nums first:ms-0 data-active:z-10 data-active:outline-2 data-active:outline-offset-0 data-active:outline-[#006bff]",
+  "relative -ms-px flex aspect-[5/6] min-w-0 flex-1 items-center justify-center bg-background text-[length:max(1.5rem,9cqi)] tabular-nums first:ms-0 data-active:z-10 data-active:outline-2 data-active:outline-offset-0 data-active:outline-blue",
   ink,
   "[&[data-fake-caret]:empty]:after:h-4 [&[data-fake-caret]:empty]:after:w-px [&[data-fake-caret]:empty]:after:animate-caret-blink [&[data-fake-caret]:empty]:after:bg-foreground [&[data-fake-caret]:empty]:after:content-['']"
 )
@@ -384,7 +384,7 @@ function RatingDemo() {
         onValueChange={setValue}
         className="flex justify-between gap-[2.5cqi]"
       >
-        <RatingItem className="group/star relative inline-flex cursor-default text-foreground/15 has-focus-visible:outline-2 has-focus-visible:outline-solid has-focus-visible:outline-offset-2 has-focus-visible:outline-[#006bff]">
+        <RatingItem className="group/star relative inline-flex cursor-default text-foreground/15 has-focus-visible:outline-2 has-focus-visible:outline-solid has-focus-visible:outline-offset-2 has-focus-visible:outline-blue">
           <Star />
           <span className="absolute inset-y-0 start-0 w-[calc(var(--rating-fill)*100%)] overflow-hidden text-foreground group-data-highlighted/star:text-foreground/50">
             <Star />
@@ -429,7 +429,7 @@ function NumberInputDemo() {
           className={cn(
             "flex h-[max(4.5rem,17cqi)] w-full items-center bg-background",
             ink,
-            "has-focus-visible:outline-2 has-focus-visible:outline-solid has-focus-visible:outline-offset-2 has-focus-visible:outline-[#006bff]"
+            "has-focus-visible:outline-2 has-focus-visible:outline-solid has-focus-visible:outline-offset-2 has-focus-visible:outline-blue"
           )}
         >
           <NumberInputDecrement
@@ -742,7 +742,7 @@ function ColorDemo() {
             <ColorPickerSwatchItem
               key={preset}
               value={preset}
-              className="aspect-square bg-(--color-picker-color) outline-offset-2 data-selected:outline-2 data-selected:outline-foreground data-selected:focus-visible:outline-[#006bff] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-[#006bff]"
+              className="aspect-square bg-(--color-picker-color) outline-offset-2 data-selected:outline-2 data-selected:outline-foreground data-selected:focus-visible:outline-blue focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-blue"
             />
           ))}
         </ColorPickerSwatches>
@@ -781,7 +781,7 @@ function Files({ items }: { items: Node[] }) {
       value={node.value}
       className="group/item outline-none"
     >
-      <TreeItemLabel className="flex h-[max(2rem,7.4cqi)] items-center gap-2 ps-[calc(0.5rem+(var(--tree-level,1)-1)*1rem)] pe-3 text-[length:clamp(0.875rem,3.4cqi,1rem)] whitespace-nowrap select-none [:focus-visible>&]:outline-2 [:focus-visible>&]:outline-solid [:focus-visible>&]:-outline-offset-2 [:focus-visible>&]:outline-[#006bff] hover:bg-foreground/[0.06] data-selected:bg-foreground data-selected:text-background [&>svg]:size-4 [&>svg]:shrink-0">
+      <TreeItemLabel className="flex h-[max(2rem,7.4cqi)] items-center gap-2 ps-[calc(0.5rem+(var(--tree-level,1)-1)*1rem)] pe-3 text-[length:clamp(0.875rem,3.4cqi,1rem)] whitespace-nowrap select-none [:focus-visible>&]:outline-2 [:focus-visible>&]:outline-solid [:focus-visible>&]:-outline-offset-2 [:focus-visible>&]:outline-blue hover:bg-foreground/[0.06] data-selected:bg-foreground data-selected:text-background [&>svg]:size-4 [&>svg]:shrink-0">
         {node.children ? (
           <TreeItemIndicator className="flex size-4 items-center justify-center transition-transform data-expanded:rotate-90 rtl:-scale-x-100">
             <ChevronRightIcon aria-hidden="true" className="size-3.5" />
@@ -868,7 +868,7 @@ function TabsDemo() {
           <TabsPanel
             key={period.value}
             value={period.value}
-            className="flex flex-col gap-4 p-4 outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:-outline-offset-2 focus-visible:outline-[#006bff]"
+            className="flex flex-col gap-4 p-4 outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:-outline-offset-2 focus-visible:outline-blue"
           >
             <div>
               <p className={cn(label, "text-muted-foreground")}>Visitors</p>
@@ -967,7 +967,7 @@ function TokenInputDemo() {
           aria-label="Prompt"
           placeholder="Type @ to pick a file, or / for a skill or model"
           className={cn(
-            "relative min-h-[max(8rem,32cqi)] bg-background p-[max(1rem,4cqi)] text-[length:clamp(1rem,3.8cqi,1.25rem)] leading-[1.75] outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[#006bff] data-empty:before:pointer-events-none data-empty:before:absolute data-empty:before:text-muted-foreground data-empty:before:content-[attr(aria-placeholder)]",
+            "relative min-h-[max(8rem,32cqi)] bg-background p-[max(1rem,4cqi)] text-[length:clamp(1rem,3.8cqi,1.25rem)] leading-[1.75] outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-blue data-empty:before:pointer-events-none data-empty:before:absolute data-empty:before:text-muted-foreground data-empty:before:content-[attr(aria-placeholder)]",
             ink
           )}
         />
@@ -1094,7 +1094,7 @@ function ResizableDemo() {
         </ResizablePanel>
         <ResizableHandle
           aria-label="Resize files"
-          className="relative w-px shrink-0 bg-foreground outline-none after:absolute after:inset-y-0 after:-start-2 after:w-4 after:cursor-col-resize pointer-coarse:after:-start-5 pointer-coarse:after:w-11 focus-visible:bg-foreground focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-[#006bff] data-dragging:outline-2 data-dragging:outline-[#006bff]"
+          className="relative w-px shrink-0 bg-foreground outline-none after:absolute after:inset-y-0 after:-start-2 after:w-4 after:cursor-col-resize pointer-coarse:after:-start-5 pointer-coarse:after:w-11 focus-visible:bg-foreground focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-blue data-dragging:outline-2 data-dragging:outline-blue"
         >
           <span className="absolute top-1/2 left-1/2 h-8 w-2 -translate-1/2 border border-foreground bg-background" />
         </ResizableHandle>

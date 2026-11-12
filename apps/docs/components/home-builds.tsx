@@ -42,7 +42,7 @@ import { Numeral, Title } from "./home-posters"
 
 const ink = "border border-foreground"
 const ring =
-  "outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[#006bff] has-focus-visible:outline-2 has-focus-visible:outline-solid has-focus-visible:outline-offset-2 has-focus-visible:outline-[#006bff]"
+  "outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-blue has-focus-visible:outline-2 has-focus-visible:outline-solid has-focus-visible:outline-offset-2 has-focus-visible:outline-blue"
 const label = "font-mono text-[10px] tracking-[0.06em] uppercase"
 const press = cn(
   "inline-flex h-7 min-w-7 shrink-0 cursor-default items-center justify-center gap-1.5 bg-background px-2 font-mono text-[10px] tracking-[0.06em] uppercase select-none hover:bg-foreground/[0.06] data-pressed:bg-foreground data-pressed:text-background [&_svg]:size-3.5",
@@ -244,7 +244,7 @@ const Shape = React.memo(function Shape({
         "group/box cursor-move outline-none",
         selected &&
           "z-10 outline-1 outline-offset-0 outline-foreground [outline-style:dashed]",
-        "focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-[#006bff]"
+        "focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-blue"
       )}
       style={{ opacity: opacity / 100 }}
     >
@@ -453,7 +453,7 @@ function CanvasDemo() {
                           [selected]: { ...current[selected], [key]: value },
                         }))
                       }
-                      className="flex items-center gap-1 bg-background has-focus-visible:outline-2 has-focus-visible:outline-solid has-focus-visible:-outline-offset-2 has-focus-visible:outline-[#006bff]"
+                      className="flex items-center gap-1 bg-background has-focus-visible:outline-2 has-focus-visible:outline-solid has-focus-visible:-outline-offset-2 has-focus-visible:outline-blue"
                     >
                       <NumberInputScrubArea
                         pixelsPerStep={2}
@@ -794,7 +794,7 @@ function TimelineDemo() {
                                 key={clip.id}
                                 value={clip.id}
                                 className={cn(
-                                  "inset-y-1 flex cursor-grab items-center overflow-hidden border border-foreground px-1.5 font-mono text-[10px] whitespace-nowrap outline-none select-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-1 focus-visible:outline-[#006bff] data-dragging:cursor-grabbing",
+                                  "inset-y-1 flex cursor-grab items-center overflow-hidden border border-foreground px-1.5 font-mono text-[10px] whitespace-nowrap outline-none select-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-1 focus-visible:outline-blue data-dragging:cursor-grabbing",
                                   track.value.startsWith("v")
                                     ? "bg-foreground text-background"
                                     : "bg-background",

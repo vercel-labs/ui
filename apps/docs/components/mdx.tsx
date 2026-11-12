@@ -241,7 +241,7 @@ function getMDXComponents(
       </Frame>
     ),
     CopyPrompt: () => (
-      <CopyPromptButton className="inline-flex h-8 shrink-0 items-center bg-foreground px-3 text-sm font-medium whitespace-nowrap text-background outline-none hover:bg-foreground/85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#006bff] focus-visible:outline-solid">
+      <CopyPromptButton className="inline-flex h-8 shrink-0 items-center bg-foreground px-3 text-sm font-medium whitespace-nowrap text-background outline-none hover:bg-foreground/85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue focus-visible:outline-solid">
         Copy Prompt
       </CopyPromptButton>
     ),

@@ -154,11 +154,11 @@ export default function HomePage() {
             <div className="grid grid-cols-2 gap-3 max-lg:order-first lg:gap-4">
               <Link
                 href="/docs"
-                className="group/docs flex h-16 items-center justify-between gap-4 bg-foreground px-4 text-lg font-[450] tracking-[-0.03em] whitespace-nowrap text-background transition-colors outline-none hover:bg-foreground/85 focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[#006bff] max-[359px]:px-3 max-[359px]:text-base sm:h-20 sm:px-8 sm:text-2xl"
+                className="group/docs flex h-16 items-center justify-between gap-4 bg-foreground px-4 text-lg font-[450] tracking-[-0.03em] whitespace-nowrap text-background transition-colors outline-none hover:bg-foreground/85 focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-blue max-[359px]:px-3 max-[359px]:text-base sm:h-20 sm:px-8 sm:text-2xl"
               >
                 Read the Docs
               </Link>
-              <CopyPromptButton className="flex h-16 items-center justify-between gap-4 bg-[#006bff] px-4 text-start text-lg font-[450] tracking-[-0.03em] whitespace-nowrap text-white transition-colors outline-none hover:bg-[#0059d6] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[#006bff] max-[359px]:px-3 max-[359px]:text-base sm:h-20 sm:px-8 sm:text-2xl">
+              <CopyPromptButton className="flex h-16 items-center justify-between gap-4 bg-blue-solid px-4 text-start text-lg font-[450] tracking-[-0.03em] whitespace-nowrap text-white transition-colors outline-none hover:bg-blue-solid-hover focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-blue max-[359px]:px-3 max-[359px]:text-base sm:h-20 sm:px-8 sm:text-2xl">
                 Copy Prompt
               </CopyPromptButton>
             </div>
@@ -275,11 +275,11 @@ export default function HomePage() {
         <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:mt-4 lg:gap-4">
           <Link
             href="/docs/components"
-            className="flex h-16 items-center bg-foreground px-6 text-xl font-[450] tracking-[-0.03em] whitespace-nowrap text-background transition-colors outline-none hover:bg-foreground/85 focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[#006bff] sm:h-20 sm:px-8 sm:text-2xl"
+            className="flex h-16 items-center bg-foreground px-6 text-xl font-[450] tracking-[-0.03em] whitespace-nowrap text-background transition-colors outline-none hover:bg-foreground/85 focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-blue sm:h-20 sm:px-8 sm:text-2xl"
           >
             Browse Components
           </Link>
-          <CopyPromptButton className="flex h-16 items-center justify-between gap-4 bg-[#006bff] px-6 text-start text-xl font-[450] tracking-[-0.03em] whitespace-nowrap text-white transition-colors outline-none hover:bg-[#0059d6] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[#006bff] sm:h-20 sm:px-8 sm:text-2xl">
+          <CopyPromptButton className="flex h-16 items-center justify-between gap-4 bg-blue-solid px-6 text-start text-xl font-[450] tracking-[-0.03em] whitespace-nowrap text-white transition-colors outline-none hover:bg-blue-solid-hover focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-blue sm:h-20 sm:px-8 sm:text-2xl">
             Copy Prompt
           </CopyPromptButton>
         </div>

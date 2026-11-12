@@ -110,6 +110,9 @@
   --input: light-dark(oklch(0.922 0 0), oklch(1 0 0 / 15%));
   --ring: light-dark(oklch(0.708 0 0), oklch(0.556 0 0));
   --brand: light-dark(#100000, oklch(0.72 0.12 255));
+  --blue: light-dark(#006bff, oklch(0.7 0.14 255));
+  --blue-solid: light-dark(#006bff, oklch(0.52 0.16 258));
+  --blue-solid-hover: light-dark(#0059d6, oklch(0.47 0.14 258));
   --hairline: light-dark(oklch(0.94 0 0), oklch(0.22 0 0));
   --frame: light-dark(oklch(0.833 0 0), oklch(0.31 0 0));
 }
@@ -122,6 +125,9 @@
   --color-canvas: var(--canvas);
   --color-subtle: var(--subtle);
   --color-brand: var(--brand);
+  --color-blue: var(--blue);
+  --color-blue-solid: var(--blue-solid);
+  --color-blue-solid-hover: var(--blue-solid-hover);
   --color-hairline: var(--hairline);
   --color-frame: var(--frame);
   --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;

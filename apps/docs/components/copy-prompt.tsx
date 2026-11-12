@@ -81,7 +81,7 @@ const ruled = "ring-1 ring-foreground/15 ring-inset dark:ring-foreground/10"
 
 const card = cn(
   ruled,
-  "relative flex h-11 cursor-pointer items-center gap-2 px-2.5 text-sm sm:gap-2.5 sm:px-3 transition-colors select-none hover:bg-foreground/[0.03] has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-[#006bff] has-focus-visible:outline-solid"
+  "relative flex h-11 cursor-pointer items-center gap-2 px-2.5 text-sm sm:gap-2.5 sm:px-3 transition-colors select-none hover:bg-foreground/[0.03] has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-blue has-focus-visible:outline-solid"
 )
 
 function StackCard({
@@ -175,7 +175,7 @@ function CopyButton({ text }: { text: string }) {
     <button
       type="button"
       onClick={copy}
-      className="inline-flex h-9 items-center bg-[#006bff] px-4 text-sm font-medium whitespace-nowrap text-white outline-none hover:bg-[#0059d6] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#006bff] focus-visible:outline-solid"
+      className="inline-flex h-9 items-center bg-blue-solid px-4 text-sm font-medium whitespace-nowrap text-white outline-none hover:bg-blue-solid-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue focus-visible:outline-solid"
     >
       <span className="grid justify-items-center">
         <span className={cn("col-start-1 row-start-1", copied && "invisible")}>
@@ -250,7 +250,7 @@ function CopyPromptForm({ close }: { close: React.ReactNode }) {
         <pre
           tabIndex={0}
           aria-label="Prompt"
-          className="h-40 scrollbar-none overflow-auto overscroll-contain px-4 py-3.5 font-mono text-[14px] leading-[1.7] break-words whitespace-pre-wrap outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[#006bff] focus-visible:outline-solid sm:h-56 sm:text-[13px]"
+          className="h-40 scrollbar-none overflow-auto overscroll-contain px-4 py-3.5 font-mono text-[14px] leading-[1.7] break-words whitespace-pre-wrap outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-blue focus-visible:outline-solid sm:h-56 sm:text-[13px]"
         >
           {prompt}
         </pre>
@@ -264,7 +264,7 @@ function CopyPromptForm({ close }: { close: React.ReactNode }) {
 }
 
 const secondaryButton =
-  "inline-flex h-9 items-center px-4 text-sm font-medium whitespace-nowrap ring-1 ring-foreground/15 outline-none ring-inset hover:bg-foreground/[0.04] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#006bff] focus-visible:outline-solid dark:ring-foreground/10"
+  "inline-flex h-9 items-center px-4 text-sm font-medium whitespace-nowrap ring-1 ring-foreground/15 outline-none ring-inset hover:bg-foreground/[0.04] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue focus-visible:outline-solid dark:ring-foreground/10"
 
 const description =
   "Pick your framework and project, then copy this prompt into your agent."
@@ -296,7 +296,7 @@ function CopyPromptDialog({
             </div>
             <DialogClose
               aria-label="Close"
-              className="hit-area inline-flex size-8 shrink-0 items-center justify-center outline-none hover:bg-foreground/[0.06] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-[#006bff]"
+              className="hit-area inline-flex size-8 shrink-0 items-center justify-center outline-none hover:bg-foreground/[0.06] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-blue"
             >
               <XIcon aria-hidden="true" strokeWidth={1.5} className="size-4" />
             </DialogClose>
@@ -363,7 +363,7 @@ function HeaderCopyPrompt({ className }: { className?: string }) {
         type="button"
         onClick={() => setOpen(true)}
         className={cn(
-          "relative inline-flex h-8 shrink-0 items-center bg-foreground px-3 text-sm font-medium whitespace-nowrap text-background outline-none after:absolute after:-inset-1.5 hover:bg-foreground/85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#006bff] focus-visible:outline-solid",
+          "relative inline-flex h-8 shrink-0 items-center bg-foreground px-3 text-sm font-medium whitespace-nowrap text-background outline-none after:absolute after:-inset-1.5 hover:bg-foreground/85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue focus-visible:outline-solid",
           className
         )}
       >

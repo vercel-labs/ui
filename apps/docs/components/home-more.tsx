@@ -44,7 +44,7 @@ function PhoneMore({
           type="button"
           onClick={() => setOpen(true)}
           className={cn(
-            "flex h-12 w-full items-center justify-center gap-2 border border-foreground bg-background font-mono text-[12px] tracking-[0.06em] uppercase transition-colors outline-none hover:bg-foreground/[0.06] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[#006bff] sm:hidden"
+            "flex h-12 w-full items-center justify-center gap-2 border border-foreground bg-background font-mono text-[12px] tracking-[0.06em] uppercase transition-colors outline-none hover:bg-foreground/[0.06] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-blue sm:hidden"
           )}
         >
           {label}
@@ -139,7 +139,7 @@ function PhoneStrip({
               }}
               className="group flex h-6 items-center px-[9px] outline-none"
             >
-              <span className="relative h-1.5 w-1.5 overflow-hidden bg-foreground/25 transition-[width] duration-300 group-focus-visible:outline-2 group-focus-visible:outline-offset-2 group-focus-visible:outline-[#006bff] group-aria-[current=true]:w-6">
+              <span className="relative h-1.5 w-1.5 overflow-hidden bg-foreground/25 transition-[width] duration-300 group-focus-visible:outline-2 group-focus-visible:outline-offset-2 group-focus-visible:outline-blue group-aria-[current=true]:w-6">
                 {position === index && (
                   <span
                     key={`${index}-${playing}`}
@@ -164,7 +164,7 @@ function PhoneStrip({
             }
             setPlaying(!playing)
           }}
-          className="relative grid h-10 place-items-center bg-foreground/[0.06] px-4 text-[13px] font-medium transition-colors outline-none hover:bg-foreground/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#006bff] *:[grid-area:1/1]"
+          className="relative grid h-10 place-items-center bg-foreground/[0.06] px-4 text-[13px] font-medium transition-colors outline-none hover:bg-foreground/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue *:[grid-area:1/1]"
         >
           <span className={playing ? "invisible" : undefined}>Play</span>
           <span className={playing ? undefined : "invisible"}>Pause</span>
