@@ -229,7 +229,7 @@ export default function HomePage() {
           {/* Fills the last cell when two to a row leaves one empty. */}
           <div
             aria-hidden="true"
-            className="hidden sm:block min-[80rem]:hidden"
+            className="hidden border border-foreground/10 sm:block min-[80rem]:hidden dark:border-foreground/15"
             style={hatch}
           />
         </PhoneStrip>
