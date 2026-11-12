@@ -110,7 +110,7 @@ export default function HomePage() {
           interfaces.
         </h1>
         <div className="mt-8 grid grid-cols-1 gap-3 sm:mt-10 lg:grid-cols-[4fr_5fr] lg:gap-4">
-          <Poster tone="gray" pattern="rings" body="gap-6 sm:gap-10">
+          <Poster tone="gray" pattern="none" body="gap-6 sm:gap-10">
             <p className="-ms-[0.04em] text-[length:clamp(2.75rem,17cqi,6.5rem)] leading-[0.82] font-[450] tracking-[-0.06em]">
               /wait-what
             </p>
