@@ -46,7 +46,7 @@ function SiteHeader({ urls }: { urls: string[] }) {
       </div>
       <div aria-hidden="true" className="container">
         <div className="relative h-[6px]">
-          <span className="absolute inset-x-0 top-[5px] h-px bg-foreground [header:has(~[data-docs])_&]:bg-foreground/[0.06]" />
+          <span className="absolute inset-x-0 top-[5px] h-px bg-[color-mix(in_oklab,var(--foreground)_30%,var(--canvas))] [header:has(~[data-docs])_&]:bg-foreground/[0.06]" />
         </div>
       </div>
     </header>

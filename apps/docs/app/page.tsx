@@ -68,7 +68,7 @@ const builds = [
 function Rule({ className }: { className?: string }) {
   return (
     <div aria-hidden="true" className={cn("relative mb-4 h-[11px]", className)}>
-      <span className="absolute inset-x-0 top-[5px] h-px bg-foreground" />
+      <span className="absolute inset-x-0 top-[5px] h-px bg-[color-mix(in_oklab,var(--foreground)_30%,var(--canvas))]" />
     </div>
   )
 }

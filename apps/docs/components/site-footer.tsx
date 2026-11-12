@@ -5,7 +5,7 @@ function SiteFooter() {
   return (
     <footer className="container">
       <div aria-hidden="true" className="relative h-px">
-        <span className="absolute inset-x-0 top-0 h-px bg-foreground [[data-docs]~footer_&]:bg-foreground/[0.06]" />
+        <span className="absolute inset-x-0 top-0 h-px bg-[color-mix(in_oklab,var(--foreground)_30%,var(--canvas))] [[data-docs]~footer_&]:bg-foreground/[0.06]" />
       </div>
       <div className="flex items-center justify-between gap-4 py-8">
         <div className="flex items-center gap-4">
