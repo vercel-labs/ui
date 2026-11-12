@@ -56,6 +56,8 @@ type PartOwner = {
   // One record per part, by `slot:key`. Binding moves a part to the end, so
   // `element(slot)` finds the part of a slot that bound first.
   readonly parts: Map<string, PartRecord>
+  // While the instance is asleep: what wakes it, and the binds that wait for it.
+  sleeping?: { wake: () => void; binds: Set<() => void> }
   // A part stays while something leases it: its bound element or a
   // subscription. Once released, it's dropped a microtask later unless leased
   // again, so StrictMode's unmount and remount in one task, or Suspense hiding
@@ -336,12 +338,14 @@ function handlers(part: Part) {
       if (event.defaultPrevented || composing(event)) {
         return
       }
+      ownerOf(part).sleeping?.wake()
       handler(event, context(part))
     }
   }
   if (typeof activate === "function" && !result.click) {
     result.click = (event) => {
       if (!event.defaultPrevented) {
+        ownerOf(part).sleeping?.wake()
         activate(context(part), event)
       }
     }
@@ -372,7 +376,10 @@ function propsRendered(part: PartRecord) {
 function press(part: Part, props = part.props) {
   const handler = definitionOf(part).press
   return typeof handler === "function"
-    ? () => handler(context(part, props))
+    ? () => {
+        ownerOf(part).sleeping?.wake()
+        handler(context(part, props))
+      }
     : undefined
 }
 
@@ -454,9 +461,22 @@ function bind(part: Part, el: HTMLElement, host: Host = { by: "core" }) {
     cleanups.push(definition.direct.attach(part, el))
   }
 
-  const cleanup = definition.bind?.(el, part)
-  if (cleanup) {
-    cleanups.push(cleanup)
+  const early = definition.asleep?.(el, part)
+  if (early) {
+    cleanups.push(early)
+  }
+  const late = () => {
+    const cleanup = definition.bind?.(el, part)
+    if (cleanup) {
+      cleanups.push(cleanup)
+    }
+  }
+  const { sleeping } = kept.owner
+  if (sleeping && definition.bind) {
+    sleeping.binds.add(late)
+    cleanups.push(() => sleeping.binds.delete(late))
+  } else {
+    late()
   }
   // Stand-ins that unit tests bind in Node have no ids to follow.
   if (definition.attrs && typeof MutationObserver !== "undefined") {

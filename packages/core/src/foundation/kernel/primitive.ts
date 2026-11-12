@@ -12,7 +12,12 @@ import {
 import { connectController } from "./controller"
 import { withDerived } from "./derive"
 import { withSource, type ChangeSource } from "./details"
-import { discard, whileDestroying, withLifecycle } from "./keep"
+import {
+  discard,
+  extendLifecycle,
+  whileDestroying,
+  withLifecycle,
+} from "./keep"
 import {
   propsRendered,
   provisional,
@@ -79,6 +84,14 @@ function definePrimitive<
     state: (options: Options) => State
     /** State keys that change often and never affect rendering, like a highlighted item. */
     live?: (keyof State)[]
+    /**
+     * Whether an instance with these options starts asleep: its parts render
+     * and run `asleep`, while its api and each part's `bind` wait for the first
+     * event a part handles or the first read of `instance.api`. Like a closed
+     * tooltip, which costs little until its trigger is hovered or focused.
+     * @experimental
+     */
+    asleep?: (options: Options) => boolean
     /** Maps controlled options onto state. Runs whenever options change. */
     sync?: (options: Options) => Partial<State>
     /**
@@ -166,6 +179,7 @@ function definePrimitive<
       }
       used.add(feature)
       Object.assign(own, feature.slots)
+      wake()
       feature.extend?.(api)
     }
 
@@ -258,18 +272,41 @@ function definePrimitive<
           : parts.get(`${slot}:${key}`)?.props
       },
     }
-    const api = definition.api(context)
-    connectController(context, api)
-
-    if (dev) {
-      for (const action of definition.agent?.actions ?? []) {
-        if (typeof (api as Record<string, unknown>)[action] !== "function") {
-          warn(
-            `lists \`${action}\` in \`agent.actions\`, but its api has no such method.`,
-            from
-          )
+    let api = undefined as unknown as Api
+    function build() {
+      api = definition.api(context)
+      connectController(context, api)
+      if (dev) {
+        for (const action of definition.agent?.actions ?? []) {
+          if (typeof (api as Record<string, unknown>)[action] !== "function") {
+            warn(
+              `lists \`${action}\` in \`agent.actions\`, but its api has no such method.`,
+              from
+            )
+          }
         }
       }
+    }
+    // Asleep, parts render and run `asleep`, and the api and each `bind` wait
+    // for the first event a part handles, or the first read of the api.
+    function wake() {
+      const { sleeping } = owner
+      if (!sleeping) {
+        return
+      }
+      owner.sleeping = undefined
+      extendLifecycle(instance, build)
+      for (const part of [...parts.values(), ...owner.released]) {
+        ;(part as { api: Api }).api = api
+      }
+      for (const bind of [...sleeping.binds]) {
+        bind()
+      }
+    }
+    if (definition.asleep?.(options)) {
+      owner.sleeping = { wake, binds: new Set() }
+    } else {
+      build()
     }
 
     // Whether `setOptions` is handing options over, and whether a framework
@@ -293,7 +330,10 @@ function definePrimitive<
       id,
       get: store.get,
       subscribe: store.subscribe,
-      api,
+      get api() {
+        wake()
+        return api
+      },
       part,
       use,
       // The state `next` would make, or undefined when it makes none new, so
@@ -329,6 +369,10 @@ function definePrimitive<
         options = arriving
         if (dev) {
           checkControlled(from, controlled, options)
+        }
+        // Options that need it awake, like a controller attached once React commits.
+        if (owner.sleeping && !definition.asleep!(options)) {
+          wake()
         }
         const synced = syncFrom(options, held)
         if (dev && shown) {

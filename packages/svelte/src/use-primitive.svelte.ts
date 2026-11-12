@@ -153,7 +153,10 @@ function usePrimitive<P extends Primitive>(
   })
   const handle: PrimitiveHandle<P> = {
     instance,
-    api: instance.api as TypesOf<P>["api"],
+    // Read when used, since reading it wakes an asleep instance.
+    get api() {
+      return instance.api as TypesOf<P>["api"]
+    },
     controls: bindable.controls,
     get state() {
       return instance.get() as TypesOf<P>["state"]

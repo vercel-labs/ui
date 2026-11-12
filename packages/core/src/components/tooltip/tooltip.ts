@@ -1,11 +1,16 @@
 import { dev, warn } from "#dev"
-import { nameFrom } from "#name-check"
+import { checkName, nameFrom } from "#name-check"
+import { trackInput } from "../../foundation/kernel/modality"
 import { announce } from "../../foundation/platform/announce"
 import {
   ariaKeyshortcuts,
   initialApple,
 } from "../../foundation/platform/platform"
-import { createPopupController, openerOf } from "../../foundation/popups/popup"
+import {
+  createPopupController,
+  openerOf,
+  popupContentAttrs,
+} from "../../foundation/popups/popup"
 import {
   type PortalProps,
   type PositionProps,
@@ -18,6 +23,7 @@ import {
 } from "../../foundation/popups/create-popup"
 import { tooltipPreset } from "../../foundation/popups/popup-hover-presets"
 import {
+  bindTrigger,
   popupArrow,
   popupContent,
   popupTrigger,
@@ -330,6 +336,13 @@ function labelContent(el: HTMLElement) {
   }
 }
 
+// A slot whose `bind` runs while the tooltip is asleep.
+const asleepToo = <Slot extends { bind?: unknown }>(slot: Slot) => ({
+  ...slot,
+  asleep: slot.bind,
+  bind: undefined,
+})
+
 /**
  * `tooltip`'s api, which its slots and controller call.
  * Adapters expose it as `api`.
@@ -448,6 +461,9 @@ const tooltipPrimitive = /* @__PURE__ */ definePrimitive({
     shortcut: options.shortcut,
     apple: initialApple(),
   }),
+  // Closed and on its own, it waits for its trigger to be hovered or focused.
+  asleep: (options) =>
+    options.open === undefined && !options.defaultOpen && !options.controller,
   sync: (options) => ({
     ...(options.open !== undefined && { open: options.open }),
     type: options.type,
@@ -487,10 +503,16 @@ const tooltipPrimitive = /* @__PURE__ */ definePrimitive({
         },
         press: ({ api, key, props }, event) =>
           api.internal.tooltipPress(key, props.payload, event),
-        bind(el, part) {
-          const { key, store, id } = part
-          const unbind = trigger.bind!(el, part)
+        // Asleep too, since the trigger is named or described before it's hovered or focused.
+        bind: undefined,
+        asleep(el, { key, store, id }) {
+          if (dev) {
+            checkName(el, "The trigger", { component: "tooltip", id })
+          }
+          const unbind = bindTrigger(store, key)
           adoptPlatform(store)
+          // Focus that wakes it opens it only from the keyboard, which this tells from the start.
+          trackInput()
           // The client knows the trigger's name now. A microtask lets hydration finish first.
           queueMicrotask(() => {
             if (store.get().trigger === key) {
@@ -512,7 +534,7 @@ const tooltipPrimitive = /* @__PURE__ */ definePrimitive({
           }
           return () => {
             unname?.()
-            unbind?.()
+            unbind()
           }
         },
       }),
@@ -536,25 +558,26 @@ const tooltipPrimitive = /* @__PURE__ */ definePrimitive({
           instant: state.instant,
           payload: state.payload,
         }),
-        attrs: (state, part) => ({
-          ...content.attrs!(state, part),
+        // Read without the api, which an asleep tooltip doesn't have yet.
+        role: "tooltip",
+        present: () => true,
+        attrs: (state, { id }) => ({
+          ...popupContentAttrs(state, id),
+          tabindex: undefined,
           "data-instant": state.instant ? "" : undefined,
         }),
+        asleep: (el) => labelContent(el),
         bind(el, part) {
           part.api.internal.group?.join()
-          const unbind = content.bind!(el, part)
-          const unlabel = labelContent(el)
-          return () => {
-            unlabel()
-            unbind?.()
-          }
+          return content.bind!(el, part)
         },
       }),
 
       arrow: popupArrow(slot),
 
-      // Without keys of its own, it shows the tooltip's shortcut.
-      shortcut: shortcutSlot(slot, (state) => state.shortcut),
+      // Without keys of its own, it shows the tooltip's shortcut, which names its
+      // trigger before the tooltip wakes, and so writes its keys asleep too.
+      shortcut: asleepToo(shortcutSlot(slot, (state) => state.shortcut)),
     }
   },
   agent: { actions: ["setOpen"] },

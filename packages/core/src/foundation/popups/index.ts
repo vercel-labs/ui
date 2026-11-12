@@ -47,6 +47,7 @@ export {
 } from "./popup-presets"
 export {
   bindPopupContent,
+  bindTrigger,
   popupArrow,
   popupBackdrop,
   popupClose,

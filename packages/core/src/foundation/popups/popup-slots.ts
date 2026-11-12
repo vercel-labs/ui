@@ -455,6 +455,7 @@ function popupSlots<State extends PopupState, Api extends PopupApi>(
 
 export {
   bindPopupContent,
+  bindTrigger,
   popupArrow,
   popupBackdrop,
   popupClose,
