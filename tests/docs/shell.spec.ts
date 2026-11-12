@@ -44,9 +44,12 @@ for (const [label, width] of [
   }) => {
     await page.setViewportSize({ width, height: 900 })
     await page.goto("/docs/core")
-    // On a phone the sections open from the menu, which lists the frameworks on their own.
+    // On a phone the sections open from the menu, which picks the framework with a select.
     if (label === "mobile") {
       await page.getByRole("button", { name: "Menu", exact: true }).click()
+      await expect(
+        page.getByRole("combobox", { name: "Framework" })
+      ).toBeVisible()
     }
     const sections = page
       .getByRole("navigation", { name: "Sections" })
@@ -59,18 +62,7 @@ for (const [label, width] of [
     )
     await expect(
       sections.getByRole("listitem").filter({ hasNot: page.locator("li li") })
-    ).toHaveText(
-      label === "mobile"
-        ? [
-            ...items.map((item) => item.title),
-            "React",
-            "Vue",
-            "Svelte",
-            "Web Components",
-            "Solid",
-          ]
-        : items.map((item) => item.title)
-    )
+    ).toHaveText(items.map((item) => item.title))
     // Core shares its sidebar with Get Started, so Docs covers it.
     await expect(
       sections.getByRole("link", { name: "Docs", exact: true })

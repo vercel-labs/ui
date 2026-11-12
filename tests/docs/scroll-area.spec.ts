@@ -2,8 +2,11 @@ import { expect, type Locator } from "@playwright/test"
 import { test } from "./docs-test"
 import { testExamples, type Check } from "./docs-helpers"
 
-// Scrolls an example to its end with the wheel, over its first item, as a user would.
+// Scrolls an example to its end with the wheel, over its first item, as a user
+// would. Hovering that item scrolls only it into view, which can leave the last
+// one below the page's fold, so the example is centered first.
 async function scrollToEnd(preview: Locator, first: string, last: string) {
+  await preview.evaluate((el) => el.scrollIntoView({ block: "center" }))
   await preview.getByText(first, { exact: true }).first().hover()
   const item = preview.getByText(last, { exact: true }).first()
   await expect(async () => {

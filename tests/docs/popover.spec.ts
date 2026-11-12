@@ -366,11 +366,12 @@ test("every popover prop appears in an example", () => {
     ),
     "utf8"
   )
-  // A type's own fields, after any types it extends, like `PortalProps & {`.
+  // A type's own fields, after any types it extends, like `PortalProps & {`,
+  // and before any it adds after, like `} & DismissOptions`.
   const block = (name: string) =>
     source
       .slice(source.search(new RegExp(`type ${name} = [^{]*\\{`)))
-      .split(/\n\s*\}\n/)[0]
+      .split(/\n\s*\}[\s&]/)[0]
   // A popover that starts open would cover the docs page as it loads.
   const props = [
     ...`${block("PopoverOptions")}${block("ContentProps")}`.matchAll(

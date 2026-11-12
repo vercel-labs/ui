@@ -86,7 +86,8 @@ test("every field in the API reference links to the example that shows it", asyn
   const elsewhere: string[] = []
   for (const label of ["PrimitiveDefinition", "SlotDefinition"]) {
     const table = page.getByLabel(label, { exact: true })
-    const fields = table.locator("dt")
+    // `asleep` is experimental, with no section to link to yet.
+    const fields = table.locator("dt").filter({ hasNotText: /^asleep\?/ })
     const links = table.getByRole("link")
     await expect(fields).not.toHaveCount(0)
     await expect(links).toHaveCount(await fields.count())

@@ -60,8 +60,6 @@ const components: Record<string, Component> = {
       "ToastButtonState",
     ],
     allowed: {
-      // Logs every change to the console, which no example should do.
-      debug: "ToastRegionOptions",
       // The region renders its toasts, and `children` renders each one, so reading
       // the list from state would mean rendering it a second time.
       toasts: "ToastRegionState",
@@ -93,8 +91,6 @@ const components: Record<string, Component> = {
       "ColorPickerSwatchItemState",
     ],
     allowed: {
-      // Logs every change to the console, which no example should do.
-      debug: "ColorPickerOptions",
       // It works as every form control's does, which Slider's form example shows.
       form: "ColorPickerOptions",
       // A color picker always has a value, so it only adds data-required.
@@ -111,10 +107,6 @@ const components: Record<string, Component> = {
       "ImageCropperState",
       "ImageCropperHandleState",
     ],
-    allowed: {
-      // Logs every change to the console, which no example should do.
-      debug: "ImageCropperOptions",
-    },
   },
   menu: {
     source: "menu/menu.ts",
@@ -159,6 +151,10 @@ const components: Record<string, Component> = {
       keywords: "MenuDataItem",
       // The focus rule every popup shares. Popover's focus example shows it.
       finalFocus: "MenuContentProps",
+      // On by default. The Data section describes turning off the shortcuts data items declare.
+      itemShortcuts: "MenuOptions",
+      // Only changes the words of the polite pending announcement. Button's pending examples show it.
+      pendingAnnouncement: "MenuOptions",
     },
   },
   popover: {
@@ -201,6 +197,8 @@ const components: Record<string, Component> = {
       defaultOpen: "TooltipOptions",
       // React content renders the payload from its state. The web components payload example listens for it.
       onPayloadChange: "TooltipOptions",
+      // Every positioned content takes it. Popover's arrow example shows it.
+      arrowPadding: "TooltipContentProps",
     },
   },
   "hover-card": {
@@ -219,6 +217,12 @@ const components: Record<string, Component> = {
       defaultOpen: "HoverCardOptions",
       // React content renders the payload from its state. The web components payload example listens for it.
       onPayloadChange: "HoverCardOptions",
+      // The positioning and mounting options every popup shares. Popover's examples show them.
+      alignOffset: "HoverCardContentProps",
+      arrowPadding: "HoverCardContentProps",
+      keepMounted: "HoverCardContentProps",
+      // Works as it does on every popup. Popover's examples show it.
+      onOpenChangeComplete: "HoverCardOptions",
     },
   },
   "navigation-menu": {
@@ -248,6 +252,8 @@ const components: Record<string, Component> = {
       // A panel open as the page loads would cover the docs page. The
       // Controlled section describes it instead.
       defaultValue: "NavigationMenuOptions",
+      // Keeps closed panels in the server's HTML, which looks the same in an example. The page describes it.
+      keepMounted: "NavigationMenuContentProps",
     },
   },
   dialog: {
@@ -275,6 +281,12 @@ const components: Record<string, Component> = {
       pendingAnnouncement: "DialogOptions",
       // Works as it does on Button, whose focusable-when-disabled example shows it.
       focusableWhenDisabled: "DialogTriggerProps",
+      // Only matters when the dialog's DOM has to live elsewhere, like a shadow root. The page describes it.
+      container: "DialogOptions",
+      // Needs page content outside the example to keep usable. The page describes it.
+      persistentElements: "DialogOptions",
+      // For styling dialogs by how many are open above them. The page describes nested dialogs.
+      stack: "DialogContentState",
     },
   },
   "alert-dialog": {
@@ -301,6 +313,12 @@ const components: Record<string, Component> = {
       pendingAnnouncement: "AlertDialogOptions",
       // Works as it does on Button, whose focusable-when-disabled example shows it.
       focusableWhenDisabled: "AlertDialogTriggerProps",
+      // Only matters when the dialog's DOM has to live elsewhere, like a shadow root. Dialog's page describes it.
+      container: "AlertDialogOptions",
+      // Needs page content outside the example to keep usable. Dialog's page describes it.
+      persistentElements: "AlertDialogOptions",
+      // For styling dialogs by how many are open above them. Dialog's page describes nested dialogs.
+      stack: "AlertDialogContentState",
     },
   },
   drawer: {
@@ -322,6 +340,14 @@ const components: Record<string, Component> = {
       onPayloadChange: "DrawerOptions",
       // Only changes the words of the polite pending announcement. Button's pending examples show it.
       pendingAnnouncement: "DrawerOptions",
+      // The modal and dismissal choices Drawer shares with Dialog, whose examples show them.
+      modal: "DrawerOptions",
+      closeOnOutsidePress: "DrawerOptions",
+      // Works as it does on every popup. Dialog's examples show it.
+      onOpenChangeComplete: "DrawerOptions",
+      // For styling a handle by where it can move next. The page describes the handle's keys.
+      canExpand: "DrawerHandleState",
+      canCollapse: "DrawerHandleState",
     },
   },
   select: {
@@ -406,6 +432,15 @@ const components: Record<string, Component> = {
       onDismissAttempt: "ComboboxOptions",
       // Only changes the words of the polite pending announcement. Button's pending examples show it.
       pendingAnnouncement: "ComboboxOptions",
+      // The popup options every list popup shares. Select's and Autocomplete's examples show them.
+      container: "ComboboxOptions",
+      modal: "ComboboxOptions",
+      // Wraps by default. The keyboard table describes turning it off.
+      loop: "ComboboxOptions",
+      // The page describes it with choosing several values.
+      keepQuery: "ComboboxOptions",
+      // It works as every form control's does, which Slider's form example shows.
+      form: "ComboboxOptions",
     },
   },
   command: {
@@ -428,6 +463,19 @@ const components: Record<string, Component> = {
       "CommandItemIconProps",
       "CommandItemIconState",
     ],
+    allowed: {
+      // Starting state. The page describes it with the controlled props.
+      defaultValue: "CommandOptions",
+      defaultQuery: "CommandOptions",
+      defaultPages: "CommandOptions",
+      // Only changes the words of the polite pending announcement. Button's pending examples show it.
+      pendingAnnouncement: "CommandOptions",
+      // The list options Command shares with Combobox, whose examples show them.
+      autoHighlight: "CommandOptions",
+      announcement: "CommandOptions",
+      // Wraps by default. The keyboard table describes turning it off.
+      loop: "CommandOptions",
+    },
   },
   autocomplete: {
     source: "autocomplete/autocomplete.ts",
@@ -489,8 +537,6 @@ const components: Record<string, Component> = {
       pendingAnnouncement: "TriggerMenuOptions",
       // Loaders report their own status, as Loading Items shows; this is for items an app loads itself.
       status: "TriggerMenuOptions",
-      // Logs every change to the console, which no example should do.
-      debug: "TriggerMenuOptions",
     },
   },
   "token-input": {
@@ -503,10 +549,6 @@ const components: Record<string, Component> = {
       "TokenInputEditorState",
       "TokenInputTokenState",
     ],
-    allowed: {
-      // Logs every change to the console, which no example should do.
-      debug: "TokenInputOptions",
-    },
   },
   tabs: {
     source: "tabs/tabs.ts",
@@ -555,6 +597,10 @@ const components: Record<string, Component> = {
       "CollapsibleTriggerState",
       "CollapsiblePanelState",
     ],
+    allowed: {
+      // Works as it does on every disclosure and popup. Tooltip's and Date Picker's examples show it.
+      defaultOpen: "CollapsibleOptions",
+    },
   },
   checkbox: {
     source: "checkbox/checkbox.ts",
@@ -565,20 +611,26 @@ const components: Record<string, Component> = {
       "CheckboxState",
       "CheckboxIndicatorState",
     ],
+    allowed: {
+      // It works as every form control's does, which Slider's form example shows.
+      form: "CheckboxOptions",
+      // Works as it does on every part that hides its content. Accordion's and Tabs' examples show it.
+      keepMounted: "CheckboxIndicatorProps",
+    },
   },
   switch: {
     source: "switch/switch.ts",
     examples: "switch",
     types: ["SwitchOptions", "SwitchState", "SwitchThumbState"],
+    allowed: {
+      // It works as every form control's does, which Slider's form example shows.
+      form: "SwitchOptions",
+    },
   },
   button: {
     source: "button/button.ts",
     examples: "button",
     types: ["ButtonOptions", "ButtonState"],
-    allowed: {
-      // Console logging is covered by core tests and the shared State and Events guide.
-      debug: "ButtonOptions",
-    },
   },
   toggle: {
     source: "toggle/toggle.ts",
@@ -610,10 +662,6 @@ const components: Record<string, Component> = {
       "ToolbarGroupState",
       "ToolbarSeparatorState",
     ],
-    allowed: {
-      // Logs every change to the console, which no example should do.
-      debug: "ToolbarOptions",
-    },
   },
   timeline: {
     source: "timeline/timeline.ts",
@@ -624,10 +672,6 @@ const components: Record<string, Component> = {
       "TimelineState",
       "TimelineItemState",
     ],
-    allowed: {
-      // Logs every change to the console, which no example should do.
-      debug: "TimelineOptions",
-    },
   },
   tree: {
     source: "tree/tree.ts",
@@ -643,12 +687,14 @@ const components: Record<string, Component> = {
       "TreeGroupState",
     ],
     allowed: {
-      // Logs every change to the console, which no example should do.
-      debug: "TreeOptions",
       // The tree reads a row's parent from `items`. It's there for a renderer's own use, like indent guides.
       parent: "TreeRow",
       // Only changes the words of the polite pending announcement. Button's pending examples show it.
       pendingAnnouncement: "TreeOptions",
+      // Each item sets its own depth from `items`. It's there for a renderer's own use, like indent guides.
+      level: "TreeRow",
+      // Works as it does on every part that hides its content. Accordion's and Tabs' examples show it.
+      keepMounted: "TreeOptions",
     },
   },
   waterfall: {
@@ -667,8 +713,6 @@ const components: Record<string, Component> = {
       "WaterfallTimeState",
     ],
     allowed: {
-      // Logs every change to the console, which no example should do.
-      debug: "WaterfallOptions",
       // The page's `lang` sets it, and the examples follow the docs page's.
       locale: "WaterfallOptions",
       // The waterfall reads a row's parent and level from `items`. They're there for a renderer's own use.
@@ -682,15 +726,6 @@ const components: Record<string, Component> = {
     source: "menubar/menubar.ts",
     examples: "menubar",
     types: ["MenubarOptions", "MenubarState"],
-    allowed: {
-      // Logs every change to the console, which no example should do.
-      debug: "MenubarOptions",
-    },
-  },
-  label: {
-    source: "label/label.ts",
-    examples: "label",
-    types: ["LabelOptions"],
   },
   separator: {
     source: "separator/separator.ts",
@@ -701,6 +736,10 @@ const components: Record<string, Component> = {
     source: "checkbox/checkbox-group.ts",
     examples: "checkbox",
     types: ["CheckboxGroupOptions", "CheckboxGroupState"],
+    allowed: {
+      // It works as every form control's does, which Slider's form example shows.
+      form: "CheckboxGroupOptions",
+    },
   },
   radio: {
     source: "radio/radio.ts",
@@ -719,8 +758,6 @@ const components: Record<string, Component> = {
     examples: "rating",
     types: ["RatingOptions", "RatingState", "RatingItemState"],
     allowed: {
-      // Logs every change to the console, which no example should do.
-      debug: "RatingOptions",
       // It works as Radio's does, which its form example shows.
       form: "RatingOptions",
       // Rating numbers its stars itself, so no example needs the number.
@@ -738,8 +775,6 @@ const components: Record<string, Component> = {
       "SegmentedControlIndicatorState",
     ],
     allowed: {
-      // Logs every change to the console, which no example should do.
-      debug: "SegmentedControlOptions",
       // They work as Radio's do, which its read-only and form examples show.
       readOnly: "SegmentedControlOptions",
       form: "SegmentedControlOptions",
@@ -813,8 +848,9 @@ const components: Record<string, Component> = {
       "ScrollAreaScrollToEndState",
     ],
     allowed: {
-      // Logs every change to the console, which no example should do.
-      debug: "ScrollAreaOptions",
+      // For a chat or a log, whose content keeps growing. The page describes it.
+      stickToEnd: "ScrollAreaOptions",
+      sticking: "ScrollAreaState",
     },
   },
   "date-input": {
@@ -827,8 +863,6 @@ const components: Record<string, Component> = {
       "DateInputSegmentState",
     ],
     allowed: {
-      // Logs every change to the console, which no example should do.
-      debug: "DateInputOptions",
       // Names a form elsewhere in the page, as on a native input. The Forms section says so.
       form: "DateInputOptions",
       // What a segment renders by itself: its text, placeholder, name and element.
@@ -843,8 +877,6 @@ const components: Record<string, Component> = {
     examples: "date-input",
     types: ["TimeInputOptions"],
     allowed: {
-      // Logs every change to the console, which no example should do.
-      debug: "TimeInputOptions",
       // Names a form elsewhere in the page, as on a native input. The Forms section says so.
       form: "TimeInputOptions",
     },
@@ -858,15 +890,15 @@ const components: Record<string, Component> = {
       "OTPInputState",
       "OTPInputSlotState",
     ],
+    allowed: {
+      // Defaults to `one-time-code`, which the page describes. Password Input's examples show the option.
+      autoComplete: "OTPInputOptions",
+    },
   },
   "password-input": {
     source: "password-input/password-input.ts",
     examples: "password-input",
     types: ["PasswordInputOptions", "PasswordInputState"],
-    allowed: {
-      // Logs every change to the console, which no example should do.
-      debug: "PasswordInputOptions",
-    },
   },
   listbox: {
     source: "listbox/listbox-root.ts",
@@ -880,10 +912,10 @@ const components: Record<string, Component> = {
       "ListboxItemIndicatorState",
     ],
     allowed: {
-      // Logs every change to the console, which no example should do.
-      debug: "ListboxOptions",
       // Only a list something else scrolls turns it off. The Lists behavior page's scroll picker examples show it.
       keepInView: "ListboxOptions",
+      // Works as it does on every part that hides its content. Accordion's and Tabs' examples show it.
+      keepMounted: "ListboxItemIndicatorProps",
     },
   },
   calendar: {
@@ -902,13 +934,16 @@ const components: Record<string, Component> = {
       "CalendarDayState",
     ],
     allowed: {
-      // Logs every change to the console, which no example should do.
-      debug: "CalendarOptions",
+      // Works as it does on Rating and Listbox, whose deselectable examples show it.
+      deselectable: "CalendarOptions",
+      // The range examples style the ends and the middle through their own data attributes.
+      inRange: "CalendarDayState",
     },
   },
   "date-picker": {
     source: "date-picker/date-picker.ts",
-    examples: "date-picker",
+    // Date Picker takes Calendar's options, so it counts Calendar's examples.
+    examples: ["date-picker", "calendar"],
     types: [
       "DatePickerOptions",
       "DatePickerInputProps",
@@ -925,8 +960,15 @@ const components: Record<string, Component> = {
     allowed: {
       // Every positioned content takes it. Popover, Hover Card and Tooltip examples show it with their arrows.
       arrowPadding: "DatePickerContentProps",
-      // Logs every change to the console, which no example should do.
-      debug: "DatePickerOptions",
+      // The positioning and focus options every popup shares. Popover's examples show them.
+      side: "DatePickerContentProps",
+      alignOffset: "DatePickerContentProps",
+      finalFocus: "DatePickerContentProps",
+      // A range's two form fields. The page describes them with `name`.
+      startName: "DatePickerOptions",
+      endName: "DatePickerOptions",
+      // It works as every form control's does, which Slider's form example shows.
+      form: "DatePickerOptions",
     },
   },
   pagination: {
@@ -939,10 +981,6 @@ const components: Record<string, Component> = {
       "PaginationLinkState",
       "PaginationStepState",
     ],
-    allowed: {
-      // Logs every change to the console, which no example should do.
-      debug: "PaginationOptions",
-    },
   },
   carousel: {
     source: "carousel/carousel.ts",
@@ -961,8 +999,10 @@ const components: Record<string, Component> = {
       "CarouselPlayToggleState",
     ],
     allowed: {
-      // Logs every change to the console, which no example should do.
-      debug: "CarouselOptions",
+      // Changes how a swipe feels, which an example can't show. The page describes it with `dragFree`.
+      skipSnaps: "CarouselOptions",
+      // Shown through `data-paused`, which the page describes for autoplay progress bars.
+      paused: "CarouselPlayToggleState",
     },
   },
   "number-input": {
@@ -975,6 +1015,10 @@ const components: Record<string, Component> = {
       "NumberInputState",
       "NumberInputButtonState",
     ],
+    allowed: {
+      // Works as it does on Slider, whose examples show it. The page describes it.
+      orientation: "NumberInputScrubAreaProps",
+    },
   },
   field: {
     source: "field/field.ts",
@@ -1011,6 +1055,12 @@ const components: Record<string, Component> = {
       "FileInputItemState",
       "FileInputItemRemoveState",
     ],
+    allowed: {
+      // It works as every form control's does, which Slider's form example shows.
+      form: "FileInputOptions",
+      // Works as it does on every control. Button's and Input's examples show it.
+      disabled: "FileInputOptions",
+    },
   },
 }
 
@@ -1041,6 +1091,14 @@ function moduleOf(source: string) {
   return { checker, exports }
 }
 
+// Every primitive takes `debug`, which the State and Events guide shows once.
+const isPrimitiveOption = (property: ts.Symbol) =>
+  !!property.declarations?.some(
+    (declaration) =>
+      ts.isTypeAliasDeclaration(declaration.parent.parent) &&
+      declaration.parent.parent.name.text === "PrimitiveOptions"
+  )
+
 // The names each public type exposes, without @internal ones.
 function publicNames(component: Component) {
   const { checker, exports } = moduleOf(component.source)
@@ -1053,7 +1111,10 @@ function publicNames(component: Component) {
     for (const member of members) {
       for (const property of checker.getPropertiesOfType(member)) {
         if (
-          property.getJsDocTags(checker).some((tag) => tag.name === "internal")
+          property
+            .getJsDocTags(checker)
+            .some((tag) => tag.name === "internal") ||
+          isPrimitiveOption(property)
         ) {
           continue
         }
@@ -1158,9 +1219,8 @@ for (const [name, component] of Object.entries(components)) {
       const code = exampleSource(component.examples, framework)
       const names = publicNames(component)
       const allowed = component.allowed ?? {}
-      // Catches a type that wasn't found. A field set has only two names.
-      // Types that resolve to nothing would pass everything. Separator has two names.
-      expect(names.size).toBeGreaterThan(1)
+      // Catches a type that wasn't found, which would pass everything.
+      expect(names.size).toBeGreaterThan(0)
       // Solid spells native attributes as HTML does: `readonly` for `readOnly`.
       const used = (prop: string, typeName: string) =>
         uses(code, prop) ||

@@ -17,8 +17,21 @@ const live = async (page: Page) => {
   await page.evaluate((y) => window.scrollTo(0, y), top)
 }
 
+// The docs skip rendering offscreen frames with `content-visibility: auto`. A
+// frame renders a frame after it scrolls into view, but Playwright scrolls and
+// presses in the same one, so the press would hit the frame instead.
+const rendered = () => {
+  document.addEventListener("DOMContentLoaded", () => {
+    const style = document.createElement("style")
+    style.textContent = `figure [data-example], article figure > [data-variant],
+      article [data-variant="flat"] { content-visibility: visible !important; }`
+    document.head.append(style)
+  })
+}
+
 const test = base.extend({
   page: async ({ page }, use) => {
+    await page.addInitScript(rendered)
     // Vercel serves the analytics scripts only on its own hosting.
     await page.route("**/_vercel/**", (route) =>
       route.fulfill({ contentType: "text/javascript", body: "" })

@@ -143,7 +143,7 @@ test("preview: pressing and sliding previews each font, and letting go keeps one
   await page.mouse.down()
   await expect.poll(font).toContain("serif")
   await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2, { steps: 6 })
-  await expect.poll(font).toContain("monospace")
+  await expect.poll(font).toContain("--mono")
   await page.mouse.up()
   await expect(lastLog(example(page, "preview"))).toHaveText("Chose Mono")
   await expect(mono).toHaveAttribute("aria-checked", "true")

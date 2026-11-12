@@ -108,9 +108,7 @@ const checks: Record<string, (context: Context) => Promise<void>> = {
       "We send a POST request here for every new order."
     )
     // Below the whole field, lined up with its start rather than the small button.
-    const field = await box(
-      preview.getByRole("textbox", { name: "Webhook URL" }).locator("..")
-    )
+    const field = await box(preview.locator('[data-slot="row"]'))
     const content = await box(tooltip)
     expect(Math.abs(content.x - field.x)).toBeLessThan(2)
     expect(content.y).toBeGreaterThan(field.y + field.height)

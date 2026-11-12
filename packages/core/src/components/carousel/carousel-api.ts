@@ -386,10 +386,12 @@ function carouselApiBody(
     if (!loop.isActive()) {
       return maxScroll > 0 ? clamp(at / maxScroll, 0, 1) : 0
     }
+    // Positions keep sub-pixel offsets, but Firefox can stop the scroll a hair
+    // short of one, which read as the slide before it, all but finished.
     let step = 0
     while (
       step < visual.length - 1 &&
-      layout[visual[step + 1]].position <= at
+      layout[visual[step + 1]].position <= at + 0.5
     ) {
       step++
     }
