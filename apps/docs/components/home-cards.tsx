@@ -348,7 +348,7 @@ function OTPGuides() {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none absolute inset-x-(--card-x) inset-y-[5cqi] grid grid-cols-[1fr_2rem_1fr]"
+      className="pointer-events-none absolute inset-x-(--card-x) inset-y-0 grid grid-cols-[1fr_2rem_1fr]"
     >
       {[0, 2].map((column) => (
         <div
@@ -359,7 +359,7 @@ function OTPGuides() {
           {[0, 1, 2].map((index) => (
             <span
               key={index}
-              className="-ms-px border-x border-dashed border-foreground/20 first:ms-0"
+              className="-ms-px border-x border-dashed border-[color-mix(in_oklab,var(--foreground)_20%,var(--background))] first:ms-0"
             />
           ))}
         </div>
@@ -373,7 +373,7 @@ function OTPCard(props: CardProps) {
     <Card {...props} id="otp-input" name="OTP Input">
       <OTPGuides />
       <div className="relative mt-[5cqi]">
-        <Display look="outline" className="-ms-[1.5cqi] text-[length:27cqi]">
+        <Display look="cover" className="-ms-[1.5cqi] text-[length:27cqi]">
           OTP
         </Display>
         <div className="-mt-[5cqi] flex items-end justify-between gap-4">
