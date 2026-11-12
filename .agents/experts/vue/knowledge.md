@@ -101,3 +101,4 @@ Tests that show where the project stands: `packages/vue/test/v-model.test.ts`, `
 6. SSR: nothing touches `window` in setup, nothing outside the instance (a controller, a subscription) starts in setup, same HTML on server and client, `useId` ids, server HTML that uses author-given ids (a tab's `id` in its panel's `aria-labelledby`), locale-independent text.
 7. Provide and inject: a part outside its root prints an error naming the root, except Field parts outside a Field, which render plain elements.
 8. Docs and examples teach the idiomatic way: `v-model`, `<script setup>`, no watchers that sync props, `#render` for custom elements.
+9. Router links: `RouterLink` renders `<a onClick={navigate}>` and Vue merges fallthrough listeners after it, so a part's `preventDefault()` comes too late. In the `custom` form, RouterLink's `navigate` checks `defaultPrevented`, but `NuxtLink`'s `navigate` for an external URL or a hash doesn't.
