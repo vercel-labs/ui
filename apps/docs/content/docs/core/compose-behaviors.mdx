@@ -337,34 +337,16 @@ star: slot<{ value: string }>({
 
 ## Move with the Arrow Keys
 
-`createRovingFocus` already handles arrow keys along one axis, Home and End, and right-to-left layouts. Its `loop` option adds wrapping.
+`createRovingFocus` handles the arrow keys, Home and End, and right-to-left layouts. By default it uses Up and Down, like a vertical list.
 
-For this rating, we want all four arrows. Add a custom `move` function to the `createRovingFocus` options:
+For this rating, we want all four arrows, and the last star should wrap around to the first. Add `orientation` and `loop` to the `createRovingFocus` options:
 
 ```ts
-move(event, { from, items, rtl }) {
-  if (event.ctrlKey || event.metaKey) {
-    return
-  }
-  if (event.key === "Home") {
-    return items[0]?.key
-  }
-  if (event.key === "End") {
-    return items[items.length - 1]?.key
-  }
-
-  const next = event.key === "ArrowDown" || event.key === (rtl ? "ArrowLeft" : "ArrowRight")
-  const previous = event.key === "ArrowUp" || event.key === (rtl ? "ArrowRight" : "ArrowLeft")
-  if (!next && !previous) {
-    return
-  }
-
-  const index = items.indexOf(from)
-  return items[(index + (next ? 1 : -1) + items.length) % items.length]?.key
-},
+orientation: () => "both",
+loop: () => true,
 ```
 
-`items` contains the stars in document order, and `from` is the focused star. We return the key to move to. `rtl` swaps Left and Right for right-to-left layouts. Home and End go to the first and last star.
+Down and Right move to the next star, and Up and Left move to the previous one. Left and Right swap in right-to-left layouts. Home and End go to the first and last star.
 
 The behavior moves focus; the rating decides what to select. Add `keydown` beside `rate` in the object returned from `api`:
 
@@ -461,31 +443,8 @@ const rating = definePrimitive({
       preferred: (star) => Number(star.key) === context.store.get().value,
       claims: (state, star) =>
         state.value ? Number(star.key) === state.value : star.key === "1",
-      move(event, { from, items, rtl }) {
-        if (event.ctrlKey || event.metaKey) {
-          return
-        }
-        if (event.key === "Home") {
-          return items[0]?.key
-        }
-        if (event.key === "End") {
-          return items[items.length - 1]?.key
-        }
-
-        const next =
-          event.key === "ArrowDown" ||
-          event.key === (rtl ? "ArrowLeft" : "ArrowRight")
-        const previous =
-          event.key === "ArrowUp" ||
-          event.key === (rtl ? "ArrowRight" : "ArrowLeft")
-        if (!next && !previous) {
-          return
-        }
-
-        const index = items.indexOf(from)
-        return items[(index + (next ? 1 : -1) + items.length) % items.length]
-          ?.key
-      },
+      orientation: () => "both",
+      loop: () => true,
     })
 
     return {

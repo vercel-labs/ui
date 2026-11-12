@@ -11,7 +11,7 @@ Import them from `@ui-sdk/core`. [Compose Behaviors](../compose-behaviors#give-t
 
 ### One Tab Stop
 
-The rating used a custom `move` function for all four arrows. For a row of buttons, `createRovingFocus` can handle the keys for you:
+The rating used `orientation: () => "both"` for all four arrows. A row of buttons only needs Left and Right:
 
 ```ts
 const roving = createRovingFocus(context, {

@@ -13,12 +13,19 @@ const orientationOf = (value: unknown, fallback: "horizontal" | "vertical") =>
 type Direction = "none" | "left" | "right" | "up" | "down"
 
 // How many items a key moves focus by, or "first" and "last". Undefined for
-// keys the list doesn't handle, including arrows along the other axis.
+// keys the list doesn't handle, including arrows along the other axis. With
+// "both", every arrow works, like radios: Down and the inline end go forward.
 function stepFor(
   key: string,
-  orientation: "horizontal" | "vertical",
+  orientation: "horizontal" | "vertical" | "both",
   rtl: boolean
 ) {
+  if (orientation === "both") {
+    return (
+      radioStep(key, rtl) ??
+      (key === "Home" ? "first" : key === "End" ? "last" : undefined)
+    )
+  }
   const forward =
     orientation === "vertical" ? "ArrowDown" : rtl ? "ArrowLeft" : "ArrowRight"
   const backward =

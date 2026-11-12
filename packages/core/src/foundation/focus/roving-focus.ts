@@ -47,8 +47,8 @@ type RovingFocusOptions<State extends object, Props = any> = {
   slot: string
   /** The state key that holds the key of the item with the tab stop. Start it at `null`. */
   key: keyof State & string
-  /** Which arrows move focus when there's no `move`: Up and Down, or Left and Right. Defaults to `"vertical"`. */
-  orientation?: () => RovingOrientation
+  /** Which arrows move focus when there's no `move`: Up and Down, Left and Right, or `"both"` for all four, like a rating. Defaults to `"vertical"`. */
+  orientation?: () => RovingOrientation | "both"
   /** Whether moving past either end wraps around. Defaults to `false`. */
   loop?: () => boolean
   /** Whether the item focused last keeps the stop, like a toolbar, rather than the preferred one, like tabs. Defaults to `true`. */

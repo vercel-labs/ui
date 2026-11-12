@@ -28,7 +28,7 @@ type ListOptions = {
     details: ChangeDetails<"item-press" | "list-navigation">
   ) => void
   multiple?: boolean
-  orientation?: "horizontal" | "vertical"
+  orientation?: "horizontal" | "vertical" | "both"
   columns?: number
   onItemsChange?: () => void
   /** Where PageDown goes from each item, like a calendar paging to a day of next month. */
@@ -272,6 +272,31 @@ describe("createRovingFocus", () => {
     expect(focused()).toBe("b")
     press("ArrowDown")
     expect(focused()).toBe("b")
+  })
+
+  test("both orientations use every arrow, with Left and Right swapped right to left", async () => {
+    const container = document.createElement("div")
+    container.style.direction = "rtl"
+    document.body.append(container)
+    const { els, press, focused } = render(
+      { orientation: "both" },
+      abc,
+      container
+    )
+    await tick()
+    els.get("a")!.focus()
+    press("ArrowDown")
+    expect(focused()).toBe("b")
+    press("ArrowLeft")
+    expect(focused()).toBe("c")
+    press("ArrowUp")
+    expect(focused()).toBe("b")
+    press("ArrowRight")
+    expect(focused()).toBe("a")
+    press("End")
+    expect(focused()).toBe("c")
+    press("Home")
+    expect(focused()).toBe("a")
   })
 
   test("a custom move serves any shape, like a grid", async () => {

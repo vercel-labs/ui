@@ -36,29 +36,8 @@ const rating = definePrimitive({
     const roving = createRovingFocus(context, {
       slot: "star",
       key: "focused",
-      move(event, { from, items, rtl }) {
-        if (event.ctrlKey || event.metaKey) {
-          return
-        }
-        if (event.key === "Home") {
-          return items[0]?.key
-        }
-        if (event.key === "End") {
-          return items[items.length - 1]?.key
-        }
-        const next =
-          event.key === "ArrowDown" ||
-          event.key === (rtl ? "ArrowLeft" : "ArrowRight")
-        const previous =
-          event.key === "ArrowUp" ||
-          event.key === (rtl ? "ArrowRight" : "ArrowLeft")
-        if (!next && !previous) {
-          return
-        }
-        const index = items.indexOf(from)
-        return items[(index + (next ? 1 : -1) + items.length) % items.length]
-          ?.key
-      },
+      orientation: () => "both",
+      loop: () => true,
       remember: false,
       preferred: (star) => Number(star.key) === context.store.get().value,
       claims: (state, star) =>
