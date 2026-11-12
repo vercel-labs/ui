@@ -6,7 +6,7 @@ type Island = React.ComponentType<{ className: string }>
 const tones = {
   white: "[--poster:var(--background)]",
   gray: "[--poster:oklch(0.965_0_0)] dark:[--poster:oklch(0.2_0_0)]",
-  ink: "[--background:oklch(0.145_0_0)] [--foreground:oklch(0.985_0_0)] [--muted-foreground:oklch(0.708_0_0)] dark:[--background:oklch(1_0_0)] dark:[--foreground:oklch(0.145_0_0)] dark:[--muted-foreground:oklch(0.54_0_0)] [--poster:var(--background)] border-transparent",
+  ink: "[--background:oklch(0.145_0_0)] [--foreground:oklch(0.985_0_0)] [--muted-foreground:oklch(0.708_0_0)] dark:[--background:oklch(1_0_0)] dark:[--foreground:oklch(0.145_0_0)] dark:[--muted-foreground:oklch(0.54_0_0)] [--poster:var(--background)]",
 }
 
 const line = "color-mix(in oklab, var(--foreground) 7%, transparent)"
@@ -108,7 +108,7 @@ function Poster({
       id={typeof title === "string" ? slug(title) : undefined}
       data-poster
       className={cn(
-        "@container relative scroll-mt-24 flex min-w-0 flex-col gap-10 border-(length:--poster-border) [--poster-border:1px] lg:min-h-[36rem] text-foreground border-foreground/10 bg-(--poster) p-6 sm:p-8 lg:p-10",
+        "@container relative scroll-mt-24 flex min-w-0 flex-col gap-10 lg:min-h-[36rem] text-foreground bg-(--poster) p-6 sm:p-8 lg:p-10",
         tones[tone],
         className
       )}

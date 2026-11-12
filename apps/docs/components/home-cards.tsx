@@ -35,7 +35,7 @@ function Card({
     <section
       aria-labelledby={id}
       className={cn(
-        "@container relative isolate min-w-0 border border-foreground/10 bg-background text-foreground dark:border-foreground/15",
+        "@container relative isolate min-w-0 bg-background text-foreground",
         className
       )}
     >
