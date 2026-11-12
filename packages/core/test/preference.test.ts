@@ -169,6 +169,30 @@ test("the script reads a cookie, for a global preference the server can't put on
   expect(document.documentElement.dataset.skinTone).toBe("dark")
 })
 
+test("the script and the storage read the same cookie when two share a name", () => {
+  // Two cookies named alike, like one for the host and one for its domain.
+  // The browser lists the most specific first, and both readers take it.
+  Object.defineProperty(document, "cookie", {
+    configurable: true,
+    get: () => "skin-tone=dark; other=1; skin-tone=light",
+  })
+  try {
+    const storage = createCookieStorage("skin-tone")
+    const skinTone = createPreference({
+      values: tones,
+      defaultValue: "default",
+      attribute: "data-skin-tone",
+      storage,
+      global: true,
+    })
+    load(preferencesScript([skinTone]))
+    expect(document.documentElement.dataset.skinTone).toBe("dark")
+    expect(storage.get()).toBe("dark")
+  } finally {
+    delete (document as { cookie?: string }).cookie
+  }
+})
+
 test("follow keeps a primitive's key in step after a microtask", async () => {
   localStorage.setItem("skin-tone", "dark")
   const skinTone = createPreference({

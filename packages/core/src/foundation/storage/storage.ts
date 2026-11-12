@@ -63,7 +63,7 @@ type Kind = "local" | "session" | "cookie"
 // What every script reads with: the value saved under an ID, read once per
 // kind and ID however many scripts ask, and cached on the window. ES5, since
 // it runs before any bundle and any polyfill.
-const readSaved = `function(k,i){var c=window.__uiSdkStorage||(window.__uiSdkStorage={}),n=k+":"+i;if(!(n in c)){var s=null;try{if(k==="cookie"){var m=("; "+document.cookie).split("; "+encodeURIComponent(i)+"=");if(m.length>1)s=decodeURIComponent(m.pop().split(";")[0])}else s=(k==="local"?localStorage:sessionStorage).getItem(i)}catch(e){}c[n]=s}return c[n]}`
+const readSaved = `function(k,i){var c=window.__uiSdkStorage||(window.__uiSdkStorage={}),n=k+":"+i;if(!(n in c)){var s=null;try{if(k==="cookie"){var m=("; "+document.cookie).split("; "+encodeURIComponent(i)+"=");if(m.length>1)s=decodeURIComponent(m[1].split(";")[0])}else s=(k==="local"?localStorage:sessionStorage).getItem(i)}catch(e){}c[n]=s}return c[n]}`
 
 // Puts a value it allows on the element right before the script.
 const seed = `function(k,i,a,v){try{var s=(${readSaved})(k,i),t=document.currentScript,r=t&&t.previousElementSibling;if(r&&s!==null&&v.indexOf(s)>-1)r.setAttribute(a,s)}catch(e){}}`
