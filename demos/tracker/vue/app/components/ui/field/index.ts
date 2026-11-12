@@ -1,5 +1,0 @@
-export { default as Field } from "./field.vue"
-export { default as FieldControl } from "./field-control.vue"
-export { default as FieldDescription } from "./field-description.vue"
-export { default as FieldError } from "./field-error.vue"
-export { default as FieldLabel } from "./field-label.vue"

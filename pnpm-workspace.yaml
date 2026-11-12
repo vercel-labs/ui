@@ -1,7 +1,6 @@
 packages:
   - packages/*
   - apps/*
-  - demos/*/*
   - tests
   - examples
   - scripts/typescript7

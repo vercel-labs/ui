@@ -1,6 +1,6 @@
 // Writes the docs as Markdown into each package's docs folder, which the
-// registry's tarballs ship, so the docs reach whoever installs a package.
-// `pnpm release` runs it; run it alone to read what a release will ship.
+// published tarballs ship, so the docs reach whoever installs a package.
+// The release workflow runs it; run it alone to read what a release will ship.
 //
 //   node scripts/package-docs.mjs                   Every package.
 //   node scripts/package-docs.mjs react vue         Some.
