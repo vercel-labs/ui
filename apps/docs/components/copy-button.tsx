@@ -1,7 +1,5 @@
 "use client"
 
-import { iconTooltip } from "@/components/icon-tooltip"
-import { TooltipTrigger } from "@/components/ui/tooltip"
 import { cn } from "cn"
 import { CheckIcon, CopyIcon } from "lucide-react"
 import * as React from "react"
@@ -62,9 +60,8 @@ function CopyButton({
   }
 
   return (
-    <TooltipTrigger
-      controller={iconTooltip}
-      payload={copied ? "Copied" : "Copy"}
+    <button
+      type="button"
       aria-label={copied ? "Copied" : "Copy code"}
       onClick={copy}
       className={cn(
@@ -77,7 +74,7 @@ function CopyButton({
       ) : (
         <CopyIcon className="size-3.5" />
       )}
-    </TooltipTrigger>
+    </button>
   )
 }
 
