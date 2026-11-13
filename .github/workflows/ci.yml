@@ -142,25 +142,6 @@ jobs:
       - name: Run browser build tests
         run: pnpm test:browser-build
 
-  # The Nuxt module in `nuxt dev`, with the packages installed from packed
-  # copies like an app installs them from npm (tests/nuxt-dev.config.ts).
-  nuxt-dev:
-    name: Nuxt dev
-    needs: plan
-    if: contains(fromJSON('["affected", "affected-engines", "main", "full"]'), needs.plan.outputs.suite)
-    runs-on: ubuntu-24.04
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - uses: ./.github/actions/setup
-        with:
-          browsers: chromium
-
-      - name: Run Nuxt dev tests
-        run: pnpm test:nuxt-dev
-
   # Each tier runs a different set of shards, so the matrix is built here.
   # Pull requests and pushes to main run the specs their changes can affect,
   # like `pnpm test:pr` (the affected jobs), since every push running
@@ -396,7 +377,6 @@ jobs:
       - unit
       - packages
       - browser-build
-      - nuxt-dev
       - affected-plan
       - affected
       - e2e

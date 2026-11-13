@@ -40,7 +40,3 @@ apps/docs/public/examples/
 
 # DeepSec scan workspace and results.
 .deepsec/
-
-# The Nuxt dev test installs packed copies of the packages (tests/nuxt-dev/prepare.mjs).
-tests/nuxt-dev/.vendor/
-tests/nuxt-dev/app/.nuxt/
