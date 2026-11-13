@@ -40,14 +40,14 @@ describe("setup prompts", () => {
   test("imports web.css after installing", () => {
     const prompt = setupPrompt({ stackId: "react", projectId: "next", site })
     expect(prompt).toContain(
-      `2. Import the default styles once at the app's entry, before your own CSS: import "@ui-sdk/core/web.css"`
+      `2. Import the default styles once at the app's entry: import "@ui-sdk/core/web.css". If the app uses Tailwind CSS, import them in its global stylesheet instead, right after Tailwind, so its base styles don't reset them: @import "@ui-sdk/core/web.css" layer(components);\n`
     )
   })
 
   test("adds the module and web.css to nuxt.config.ts for Nuxt", () => {
     const prompt = setupPrompt({ stackId: "vue", projectId: "nuxt", site })
     expect(prompt).toContain(
-      `2. Add "@ui-sdk/vue" to modules in nuxt.config.ts.\n3. Add the default styles once to css in nuxt.config.ts, before your own CSS: css: ["@ui-sdk/core/web.css"]\n`
+      `2. Add "@ui-sdk/vue" to modules in nuxt.config.ts.\n3. Add the default styles once to css in nuxt.config.ts: css: ["@ui-sdk/core/web.css"]. If the app uses Tailwind CSS`
     )
   })
 

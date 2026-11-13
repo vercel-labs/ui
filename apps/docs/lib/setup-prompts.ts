@@ -51,7 +51,7 @@ const stacks = [
         name: "Nuxt",
         create: "npm create nuxt@latest .",
         steps: [`Add "@ui-sdk/vue" to modules in nuxt.config.ts.`],
-        styles: `Add the default styles once to css in nuxt.config.ts, before your own CSS: css: ["@ui-sdk/core/web.css"]`,
+        styles: `Add the default styles once to css in nuxt.config.ts: css: ["@ui-sdk/core/web.css"]`,
       },
       {
         id: "vite",
@@ -123,6 +123,7 @@ type StackId = (typeof stacks)[number]["id"]
 
 const skillStep =
   "If you support skills, run: npx skills add vercel-labs/ui --skill ui-sdk"
+const tailwindStyles = `If the app uses Tailwind CSS, import them in its global stylesheet instead, right after Tailwind, so its base styles don't reset them: @import "@ui-sdk/core/web.css" layer(components);`
 const closing = "When you're done, ask me what I'd like to build."
 
 function findStack(id: string) {
@@ -183,8 +184,7 @@ If the folder is empty, create the project first: ${project.create}
 ${steps([
   installStep(stack.pkg),
   ...(project.steps ?? []),
-  project.styles ??
-    `Import the default styles once at the app's entry, before your own CSS: import "@ui-sdk/core/web.css"`,
+  `${project.styles ?? `Import the default styles once at the app's entry: import "@ui-sdk/core/web.css"`}. ${tailwindStyles}`,
   agentsStep(`node_modules/@ui-sdk/${stack.pkg}/docs`),
   skillStep,
 ])}`
