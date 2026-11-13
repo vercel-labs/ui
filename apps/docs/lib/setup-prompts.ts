@@ -72,6 +72,8 @@ const stacks = [
         id: "vite",
         name: "Vite",
         create: "npm create vite@latest . -- --template solid-ts",
+        needs:
+          'It needs Solid 2: solid-js and @solidjs/web 2.0.0-rc.14 or newer. Replace vite-plugin-solid, which only supports Solid 1, with @solidjs/vite-plugin, and add optimizeDeps: { exclude: ["@ui-sdk/core"] } to vite.config.ts.',
       },
       {
         id: "start",

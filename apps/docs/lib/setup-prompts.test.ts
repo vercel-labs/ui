@@ -37,6 +37,13 @@ describe("setup prompts", () => {
     )
   })
 
+  test("switches a Solid Vite app to Solid 2's plugin", () => {
+    const prompt = setupPrompt({ stackId: "solid", projectId: "vite", site })
+    expect(prompt).toContain(
+      `with @solidjs/vite-plugin, and add optimizeDeps: { exclude: ["@ui-sdk/core"] } to vite.config.ts.`
+    )
+  })
+
   test("imports web.css after installing", () => {
     const prompt = setupPrompt({ stackId: "react", projectId: "next", site })
     expect(prompt).toContain(
