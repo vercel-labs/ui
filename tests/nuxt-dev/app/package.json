@@ -5,7 +5,12 @@
   "dependencies": {
     "@ui-sdk/core": "file:../.vendor/ui-sdk-core.tgz",
     "@ui-sdk/vue": "file:../.vendor/ui-sdk-vue.tgz",
-    "nuxt": "^4.5.2",
-    "vue": "^3.5.43"
+    "nuxt": "4.6.4",
+    "vue": "3.5.45"
+  },
+  "pnpm": {
+    "overrides": {
+      "vite": "8.3.8"
+    }
   }
 }

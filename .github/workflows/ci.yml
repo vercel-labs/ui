@@ -143,11 +143,12 @@ jobs:
         run: pnpm test:browser-build
 
   # The Nuxt module in `nuxt dev`, with the packages installed from packed
-  # copies like an app installs them from npm (tests/nuxt-dev.config.ts).
+  # copies like an app installs them from npm (tests/nuxt-dev.config.ts). The
+  # affected tiers run it only when the core, the Vue package or the test change.
   nuxt-dev:
     name: Nuxt dev
-    needs: plan
-    if: contains(fromJSON('["affected", "affected-engines", "main", "full"]'), needs.plan.outputs.suite)
+    needs: [plan, affected-plan]
+    if: ${{ !cancelled() && (needs.affected-plan.outputs.nuxt == 'true' || contains(fromJSON('["main", "full"]'), needs.plan.outputs.suite)) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
@@ -221,6 +222,7 @@ jobs:
       base: ${{ steps.size.outputs.base }}
       shards: ${{ steps.size.outputs.shards }}
       count: ${{ steps.size.outputs.count }}
+      nuxt: ${{ steps.size.outputs.nuxt }}
     steps:
       # Full history, so the script finds where the changes left their base.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -246,6 +248,9 @@ jobs:
           echo "base=$(git rev-parse "$BASE")" >> "$GITHUB_OUTPUT"
           echo "count=$count" >> "$GITHUB_OUTPUT"
           echo "shards=[$(seq -s, 1 "$count")]" >> "$GITHUB_OUTPUT"
+          if git diff --name-only "$BASE"...HEAD | grep -qE '^(packages/(core|vue)/|scripts/build/|tests/nuxt-dev)'; then
+            echo "nuxt=true" >> "$GITHUB_OUTPUT"
+          fi
 
   affected:
     name: Playwright affected specs ${{ matrix.shard }}/${{ needs.affected-plan.outputs.count }}
