@@ -3,6 +3,8 @@ type Project = {
   name: string
   create?: string
   needs?: string
+  steps?: string[]
+  styles?: string
 }
 
 type Stack = {
@@ -11,6 +13,7 @@ type Stack = {
   pkg?: string
   needs?: string
   note?: string
+  quickStart?: string[]
   projects: Project[]
 }
 
@@ -39,8 +42,17 @@ const stacks = [
     name: "Vue",
     pkg: "vue",
     needs: "It needs Vue 3.5 or newer.",
+    quickStart: [
+      `If it's a Nuxt app, add "@ui-sdk/vue" to modules in nuxt.config.ts.`,
+    ],
     projects: [
-      { id: "nuxt", name: "Nuxt", create: "npm create nuxt@latest ." },
+      {
+        id: "nuxt",
+        name: "Nuxt",
+        create: "npm create nuxt@latest .",
+        steps: [`Add "@ui-sdk/vue" to modules in nuxt.config.ts.`],
+        styles: `Add the default styles once to css in nuxt.config.ts, before your own CSS: css: ["@ui-sdk/core/web.css"]`,
+      },
       {
         id: "vite",
         name: "Vite",
@@ -141,7 +153,7 @@ function quickStartPrompt(stackId: StackId) {
   }
   return `Set up ui-sdk in this ${stack.name} project. ${stack.needs}
 
-${steps([installStep(stack.pkg), agentsStep(`node_modules/@ui-sdk/${stack.pkg}/docs`), skillStep])}`
+${steps([installStep(stack.pkg), ...(stack.quickStart ?? []), agentsStep(`node_modules/@ui-sdk/${stack.pkg}/docs`), skillStep])}`
 }
 
 function artifactPrompt(site: string) {
@@ -170,7 +182,9 @@ If the folder is empty, create the project first: ${project.create}
 
 ${steps([
   installStep(stack.pkg),
-  `Import the default styles once at the app's entry, before your own CSS: import "@ui-sdk/core/web.css"`,
+  ...(project.steps ?? []),
+  project.styles ??
+    `Import the default styles once at the app's entry, before your own CSS: import "@ui-sdk/core/web.css"`,
   agentsStep(`node_modules/@ui-sdk/${stack.pkg}/docs`),
   skillStep,
 ])}`

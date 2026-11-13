@@ -44,6 +44,13 @@ describe("setup prompts", () => {
     )
   })
 
+  test("adds the module and web.css to nuxt.config.ts for Nuxt", () => {
+    const prompt = setupPrompt({ stackId: "vue", projectId: "nuxt", site })
+    expect(prompt).toContain(
+      `2. Add "@ui-sdk/vue" to modules in nuxt.config.ts.\n3. Add the default styles once to css in nuxt.config.ts, before your own CSS: css: ["@ui-sdk/core/web.css"]\n`
+    )
+  })
+
   test.each([
     ["web-components", "html"],
     ["artifacts", undefined],
