@@ -304,11 +304,11 @@ const SelectTrigger = withElement(
             required: false,
             placeholder: true,
           }
-          return renderUnbound(
-            "button",
-            { type: "button", ...attrs },
-            { slots, state }
-          )
+          const own = { type: "button", ...attrs }
+          // Without the field's ref, which would adopt it before it's a
+          // combobox and never read its role again.
+          const { ref: _, ...merged } = field ? field.props(own) : own
+          return renderUnbound("button", merged, { slots, state })
         }
       )
     },
