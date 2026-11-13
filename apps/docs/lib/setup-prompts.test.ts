@@ -40,7 +40,7 @@ describe("setup prompts", () => {
   test("imports web.css after installing", () => {
     const prompt = setupPrompt({ stackId: "react", projectId: "next", site })
     expect(prompt).toContain(
-      `2. Import the default styles once at the app's entry: import "@ui-sdk/core/web.css". If the app uses Tailwind CSS, import them in its global stylesheet instead, right after Tailwind, so its base styles don't reset them: @import "@ui-sdk/core/web.css" layer(components);\n`
+      `2. Import the default styles once at the app's entry: import "@ui-sdk/core/web.css". If the app uses Tailwind CSS, start its global stylesheet with these lines instead, in place of its own @import "tailwindcss", so Tailwind's base styles don't reset them:\n   @layer ui-sdk;\n   @import "tailwindcss";\n   @import "@ui-sdk/core/web.css" layer(components);\n`
     )
   })
 
@@ -63,6 +63,16 @@ describe("setup prompts", () => {
       `<link rel="stylesheet" href="https://ui-sdk.dev/web.css" />`
     )
     expect(prompt).toContain("read https://ui-sdk.dev/web.md.")
+  })
+
+  test("creates the project without prompts and checks the build", () => {
+    const prompt = setupPrompt({ stackId: "vue", projectId: "nuxt", site })
+    expect(prompt).toContain(
+      "create the project first: npm create nuxt@latest . -- --template minimal --packageManager npm --no-gitInit --force\n"
+    )
+    expect(prompt).toMatch(
+      /\n\d\. Run the project's build and make sure it passes\.\n\nWhen you're done/
+    )
   })
 
   test("asks what to build once the setup is done", () => {

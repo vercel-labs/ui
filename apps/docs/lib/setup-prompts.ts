@@ -24,7 +24,11 @@ const stacks = [
     pkg: "react",
     needs: "It needs React 19 or newer.",
     projects: [
-      { id: "next", name: "Next.js", create: "npx create-next-app@latest ." },
+      {
+        id: "next",
+        name: "Next.js",
+        create: "npx create-next-app@latest . --yes",
+      },
       {
         id: "vite",
         name: "Vite",
@@ -49,7 +53,8 @@ const stacks = [
       {
         id: "nuxt",
         name: "Nuxt",
-        create: "npm create nuxt@latest .",
+        create:
+          "npm create nuxt@latest . -- --template minimal --packageManager npm --no-gitInit --force",
         steps: [`Add "@ui-sdk/vue" to modules in nuxt.config.ts.`],
         styles: `Add the default styles once to css in nuxt.config.ts: css: ["@ui-sdk/core/web.css"]`,
       },
@@ -66,7 +71,12 @@ const stacks = [
     pkg: "svelte",
     needs: "It needs Svelte 5.33 or newer.",
     projects: [
-      { id: "sveltekit", name: "SvelteKit", create: "npx sv create ." },
+      {
+        id: "sveltekit",
+        name: "SvelteKit",
+        create:
+          "npx sv create . --template minimal --types ts --no-add-ons --install npm",
+      },
       {
         id: "vite",
         name: "Vite",
@@ -123,7 +133,10 @@ type StackId = (typeof stacks)[number]["id"]
 
 const skillStep =
   "If you support skills, run: npx skills add vercel-labs/ui --skill ui-sdk"
-const tailwindStyles = `If the app uses Tailwind CSS, import them in its global stylesheet instead, right after Tailwind, so its base styles don't reset them: @import "@ui-sdk/core/web.css" layer(components);`
+const tailwindStyles = `If the app uses Tailwind CSS, start its global stylesheet with these lines instead, in place of its own @import "tailwindcss", so Tailwind's base styles don't reset them:
+   @layer ui-sdk;
+   @import "tailwindcss";
+   @import "@ui-sdk/core/web.css" layer(components);`
 const closing = "When you're done, ask me what I'd like to build."
 
 function findStack(id: string) {
@@ -143,7 +156,7 @@ function agentsStep(docs: string) {
 }
 
 function installStep(pkg: string) {
-  return `Install @ui-sdk/${pkg} and @ui-sdk/core with the project's package manager.`
+  return `Install @ui-sdk/${pkg} and @ui-sdk/core with the project's package manager. If a release-age policy blocks the install, stop and ask me instead of changing it.`
 }
 
 /** The Quick Start prompt for a framework, as content/shared/setup-prompt has it. */
@@ -187,6 +200,7 @@ ${steps([
   `${project.styles ?? `Import the default styles once at the app's entry: import "@ui-sdk/core/web.css"`}. ${tailwindStyles}`,
   agentsStep(`node_modules/@ui-sdk/${stack.pkg}/docs`),
   skillStep,
+  "Run the project's build and make sure it passes.",
 ])}`
 }
 
