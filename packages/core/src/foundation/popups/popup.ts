@@ -963,9 +963,7 @@ function createPopupLayer<
     }
 
     const own: Layer = {
-      parent:
-        options.parent?.() ??
-        ((trigger && findLayer(trigger)) || (before && findLayer(before))),
+      parent: options.parent?.() ?? (trigger && findLayer(trigger)),
       active: () => store.get().open,
       exiting: () => !store.get().open && store.get().mounted,
       modal: modal.consumeOutsidePress,
@@ -1044,12 +1042,15 @@ function createPopupLayer<
       if (trigger && behavior.keepTrigger) {
         keep.push(trigger)
       }
-      // A layer opened from this one before it turned modal stays usable too.
+      // A layer opened from this one, or after it, stays usable too. The page
+      // freezes a paint after opening, so a confirm opened in between is newer.
       for (const layer of activeLayers()) {
-        for (let up = layer.parent; up; up = up.parent) {
-          if (up === own) {
-            keep.push(...(layerParts.get(layer) ?? []))
-          }
+        let keeps = layer !== own && (layer.order ?? 0) > (own.order ?? 0)
+        for (let up = layer.parent; up && !keeps; up = up.parent) {
+          keeps = up === own
+        }
+        if (keeps) {
+          keep.push(...(layerParts.get(layer) ?? []))
         }
       }
       // The lock measures the page, so it goes before the page turns inert,
@@ -1104,10 +1105,17 @@ function createPopupLayer<
       modal = next
     }
     cleanups.push(thawPage, () => (remodal = undefined))
+    // Every open modal spares a newer layer, not only the ones it opened from,
+    // like a confirm opened from code over a dialog: it shows above them.
+    const keeping = new Set(activeLayers())
     for (let up = own.parent; up; up = up.parent) {
-      if (up.keep) {
+      keeping.add(up)
+    }
+    keeping.delete(own)
+    for (const layer of keeping) {
+      if (layer.keep) {
         for (const part of [el, ...(backdrop ? [backdrop] : [])]) {
-          cleanups.push(up.keep(part))
+          cleanups.push(layer.keep(part))
         }
       }
     }
