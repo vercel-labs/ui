@@ -45,9 +45,11 @@ For a default look to start from, import `@ui-sdk/core/web.css` once, at the top
 import "@ui-sdk/core/web.css"
 ```
 
-With Tailwind CSS, import it in your global stylesheet instead, after Tailwind. `layer(components)` puts it above Tailwind's base styles, so they don't reset it, and below its utilities, so a class still wins:
+With Tailwind CSS, import it in your global stylesheet instead, after Tailwind. `layer(components)` puts it above Tailwind's base styles, so they don't reset it, and below its utilities, so a class still wins. Declare [the ui-sdk layer](./styling-and-animation#the-ui-sdk-layer) above both:
 
 ```css
+@layer ui-sdk;
+
 @import "tailwindcss";
 @import "@ui-sdk/core/web.css" layer(components);
 ```
