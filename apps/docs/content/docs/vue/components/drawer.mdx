@@ -235,6 +235,8 @@ This recipe uses a media query to choose a Drawer on a narrow screen and a Dialo
 
 ```vue
 <script setup lang="ts">
+import { useMediaQuery } from "@vueuse/core"
+
 const isDesktop = useMediaQuery("(min-width: 768px)")
 </script>
 

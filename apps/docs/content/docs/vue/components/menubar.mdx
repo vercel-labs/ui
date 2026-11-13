@@ -149,6 +149,9 @@ Create a `createMenubarController()` and pass it to the bar. `focus()` moves foc
 
 ```vue
 <script setup lang="ts">
+import { createMenubarController, Menubar } from "@ui-sdk/vue/menubar"
+import { useShortcut } from "@ui-sdk/vue/shortcuts"
+
 const menubar = createMenubarController()
 useShortcut("alt+m", () => menubar.focus())
 </script>

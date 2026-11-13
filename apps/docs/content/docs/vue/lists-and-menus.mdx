@@ -19,9 +19,9 @@ import {
 
 <template>
   <Select :items="['Apple', 'Banana', 'Pear']">
-    <SelectTrigger aria-label="Fruit"
-      ><SelectValue placeholder="Choose a fruit"
-    /></SelectTrigger>
+    <SelectTrigger aria-label="Fruit">
+      <SelectValue placeholder="Choose a fruit" />
+    </SelectTrigger>
     <SelectContent />
   </Select>
 </template>
@@ -63,9 +63,9 @@ const fruits = [
 
 <template>
   <Select :items="fruits">
-    <SelectTrigger aria-label="Fruit" class="…"
-      ><SelectValue placeholder="Choose a fruit"
-    /></SelectTrigger>
+    <SelectTrigger aria-label="Fruit" class="…">
+      <SelectValue placeholder="Choose a fruit" />
+    </SelectTrigger>
     <SelectContent class="…">
       <SelectItem
         v-for="fruit in fruits"

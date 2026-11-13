@@ -53,9 +53,9 @@ const editor = createPopoverController<string>()
     >Edit Tasks</PopoverTrigger
   >
   <Popover :controller="editor">
-    <PopoverContent v-slot="{ state }"
-      ><PopoverTitle>Edit {{ state.payload }}</PopoverTitle></PopoverContent
-    >
+    <PopoverContent v-slot="{ state }">
+      <PopoverTitle>Edit {{ state.payload }}</PopoverTitle>
+    </PopoverContent>
   </Popover>
 </template>
 ```
