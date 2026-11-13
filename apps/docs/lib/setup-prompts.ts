@@ -43,7 +43,7 @@ const stacks = [
     pkg: "vue",
     needs: "It needs Vue 3.5 or newer.",
     quickStart: [
-      `If it's a Nuxt app, add "@ui-sdk/vue" to modules in nuxt.config.ts.`,
+      `If it's a Nuxt 4 or newer app, add "@ui-sdk/vue" to modules in nuxt.config.ts.`,
     ],
     projects: [
       {
