@@ -307,7 +307,8 @@ const SelectTrigger = withElement(
           const own = { type: "button", ...attrs }
           // Without the field's ref, which would adopt it before it's a
           // combobox and never read its role again.
-          const { ref: _, ...merged } = field ? field.props(own) : own
+          const joined: Record<string, unknown> = field ? field.props(own) : own
+          const { ref: _, ...merged } = joined
           return renderUnbound("button", merged, { slots, state })
         }
       )
