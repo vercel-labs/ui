@@ -131,7 +131,7 @@ function usePreference<State>(preference: {
     state.value = preference.get()
   })
   onScopeDispose(() => stop())
-  return computed(() => state.value)
+  return computed<State>(() => state.value)
 }
 
 export { Preferences, usePreference }
