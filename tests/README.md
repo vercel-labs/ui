@@ -264,9 +264,9 @@ cd tests && DOCS_PORT=5410 ../scripts/test-slot.sh npx playwright test --config 
 
 ## Nuxt dev
 
-`tests/nuxt-dev/*.spec.ts`, with their own config, `tests/nuxt-dev.config.ts`. A Nuxt app in `tests/nuxt-dev/app` loads `@ui-sdk/vue` as a module and imports from `@ui-sdk/core` in a page. The spec checks that the page hydrates, its components work, and the browser loads the core from one place, pre-bundled or not, never both. Chromium only. CI: pull requests and pushes that change `packages/core`, `packages/vue`, `scripts/build` or this test, and `main` and `full`.
+`tests/nuxt-dev/*.spec.ts`, with their own config, `tests/nuxt-dev.config.ts`. A Nuxt app in `tests/nuxt-dev/app` loads `@ui-sdk/vue` as a module and imports from `@ui-sdk/core` in a page. The spec checks that the page hydrates, its components work, and the browser loads the core from one place, pre-bundled or not, never both. Chromium only. CI: `pr`.
 
-The config builds and packs `@ui-sdk/core` and `@ui-sdk/vue`, installs the packed copies in the app outside the workspace, then starts `nuxt dev` on `NUXT_DEV_PORT`. Vite never pre-bundles a linked workspace package, so a linked app couldn't show the second copy. The app pins `nuxt`, `vue` and `vite`, so a new release can't fail a run on its own: bump them in `tests/nuxt-dev/app/package.json` on purpose.
+The config builds and packs `@ui-sdk/core` and `@ui-sdk/vue`, installs the packed copies in the app outside the workspace, then starts `nuxt dev` on `NUXT_DEV_PORT`. Vite never pre-bundles a linked workspace package, so a linked app couldn't show the second copy.
 
 ```bash
 NUXT_DEV_PORT=5600 scripts/test-slot.sh pnpm test:nuxt-dev
