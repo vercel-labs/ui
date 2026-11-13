@@ -39,6 +39,12 @@ Each [component page](./components) lists the parts you can use.
 
 Components are unstyled, so you style them with your app's CSS or with Tailwind CSS. [Styling and Animation](./styling-and-animation) covers both.
 
+For a default look to start from, import `@ui-sdk/core/web.css` once, before your own CSS, at the top of your app's entry, like `index.tsx` in a Vite app:
+
+```ts
+import "@ui-sdk/core/web.css"
+```
+
 You can render your first component without setting up a provider, importing a UI SDK stylesheet, or adding a portal root. [Server Rendering](./server-rendering) covers rendering initial HTML and hydrating it in the browser.
 
 Continue with [First Component](./first-component) to add a working toggle to your app.

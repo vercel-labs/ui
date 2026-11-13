@@ -41,6 +41,12 @@ There is no root import from `@ui-sdk/react`. Each [component page](./components
 
 Components are unstyled, so you style them with your app's CSS or with Tailwind CSS. [Styling and Animation](./styling-and-animation) covers both.
 
+For a default look to start from, import `@ui-sdk/core/web.css` once, before your own CSS. In Next.js, import it at the top of `app/layout.tsx`. In a Vite app, import it at the top of `main.tsx`:
+
+```ts
+import "@ui-sdk/core/web.css"
+```
+
 You can render your first component without setting up a provider or importing a UI SDK stylesheet. If you use Next.js, [Server Rendering](./server-rendering) explains when your own components need `"use client"`.
 
 Continue with [First Component](./first-component) to add a working toggle to your app.

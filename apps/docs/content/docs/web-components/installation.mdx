@@ -30,12 +30,19 @@ import "@ui-sdk/web/dialog"
 
 Load these imports from your app's browser entry. The root entry, `@ui-sdk/web`, exports helpers and types but registers no elements. Each [component page](./components) shows the tags you can use.
 
+Components are unstyled. For a default look to start from, import `@ui-sdk/core/web.css` once in the same entry, before your own CSS:
+
+```ts
+import "@ui-sdk/core/web.css"
+```
+
 ## Without a Build Step
 
-A plain HTML page can load the components from ui-sdk.dev, with nothing to install. Add one script, and each component loads the first time its tags appear on the page:
+A plain HTML page can load the components from ui-sdk.dev, with nothing to install. Add one script, and each component loads the first time its tags appear on the page. The stylesheet is optional and gives the default look:
 
 ```html
 <script type="module" src="https://ui-sdk.dev/web@0.js"></script>
+<link rel="stylesheet" href="https://ui-sdk.dev/web@0.css" />
 
 <ui-toggle><button>Bold</button></ui-toggle>
 ```
