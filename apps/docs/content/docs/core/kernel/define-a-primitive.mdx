@@ -190,6 +190,9 @@ item: slot({
   role: "option",
   focus: "roving",
   press: ({ api, key }) => api.choose(key),
+  attrs: (state, part) => ({
+    "aria-selected": String(state.value === part.key),
+  }),
 }),
 ```
 

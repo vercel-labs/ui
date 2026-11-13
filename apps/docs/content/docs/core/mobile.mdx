@@ -95,6 +95,8 @@ A phone picks its keyboard from the field: `inputmode` chooses the keys, like a 
 
 `createPointerKind` reports whether the main pointer is a finger or a mouse and whether it can hover, from the `pointer` and `hover` media features, plus `anyPointer` and `anyHover` for every pointer attached, like a trackpad on a tablet. Read it like a preference, with `usePreference` in each framework:
 
+<FrameworkContent value="react">
+
 ```tsx
 import { createPointerKind } from "@ui-sdk/core"
 import { usePreference } from "@ui-sdk/react/preferences"
@@ -104,6 +106,59 @@ const pointerKind = createPointerKind()
 const { hover } = usePreference(pointerKind)
 // "hover" with a mouse, "none" on a phone, "unknown" on the server
 ```
+
+</FrameworkContent>
+<FrameworkContent value="vue">
+
+```ts
+import { createPointerKind } from "@ui-sdk/core"
+import { usePreference } from "@ui-sdk/vue/preferences"
+
+const pointerKind = createPointerKind()
+
+const pointer = usePreference(pointerKind)
+// pointer.value.hover: "hover" with a mouse, "none" on a phone, "unknown" on the server
+```
+
+</FrameworkContent>
+<FrameworkContent value="svelte">
+
+```ts
+import { createPointerKind } from "@ui-sdk/core"
+import { usePreference } from "@ui-sdk/svelte/preferences"
+
+const pointerKind = createPointerKind()
+
+const pointer = usePreference(pointerKind)
+// pointer.current.hover: "hover" with a mouse, "none" on a phone, "unknown" on the server
+```
+
+</FrameworkContent>
+<FrameworkContent value="solid">
+
+```tsx
+import { createPointerKind } from "@ui-sdk/core"
+import { usePreference } from "@ui-sdk/solid/preferences"
+
+const pointerKind = createPointerKind()
+
+const pointer = usePreference(pointerKind)
+// pointer().hover: "hover" with a mouse, "none" on a phone, "unknown" on the server
+```
+
+</FrameworkContent>
+<FrameworkContent value="web-components">
+
+```ts
+import { createPointerKind } from "@ui-sdk/core"
+
+const pointerKind = createPointerKind()
+
+const { hover } = pointerKind.get()
+// "hover" with a mouse, "none" on a phone, "unknown" on the server
+```
+
+</FrameworkContent>
 
 It's for behavior and content, like opening on tap where nothing can hover. Style with the media queries themselves, `@media (hover: hover)` or Tailwind's `pointer-coarse:`, which are right from the first paint.
 

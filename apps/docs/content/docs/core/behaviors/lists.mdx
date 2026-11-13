@@ -36,7 +36,11 @@ option: slot<{ value: string }>({
     ...part.api.listbox.attrs(state, part),
     "aria-selected": String(state.value === part.key),
   }),
-  on: { pointermove: (event, { key, api }) => api.listbox.highlight(key, { event }) },
+  press: ({ key, api }, event) => api.choose(key, event),
+  on: {
+    pointerdown: (event) => event.preventDefault(),
+    pointermove: (event, { key, api }) => api.listbox.highlight(key, { event }),
+  },
   bind: (el, part) => part.api.listbox.bind(el, part),
 }),
 ```
