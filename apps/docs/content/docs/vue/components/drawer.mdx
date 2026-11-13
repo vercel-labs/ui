@@ -236,6 +236,18 @@ This recipe uses a media query to choose a Drawer on a narrow screen and a Dialo
 ```vue
 <script setup lang="ts">
 import { useMediaQuery } from "@vueuse/core"
+import {
+  Dialog,
+  DialogBackdrop,
+  DialogContent,
+  DialogTrigger,
+} from "@ui-sdk/vue/dialog"
+import {
+  Drawer,
+  DrawerBackdrop,
+  DrawerContent,
+  DrawerTrigger,
+} from "@ui-sdk/vue/drawer"
 
 const isDesktop = useMediaQuery("(min-width: 768px)")
 </script>

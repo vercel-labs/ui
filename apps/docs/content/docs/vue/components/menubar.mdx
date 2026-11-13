@@ -90,6 +90,9 @@ Each Menu can take `items` and register its shortcuts while closed. The [Menu da
 
 ```vue
 <script setup lang="ts">
+import { Menu, MenuContent, MenuTrigger, type MenuData } from "@ui-sdk/vue/menu"
+import { Menubar } from "@ui-sdk/vue/menubar"
+
 const file: MenuData = [
   { value: "new", label: "New File", shortcut: "mod+alt+n" },
   { value: "open", label: "Open…" },
