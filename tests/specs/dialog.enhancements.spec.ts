@@ -434,6 +434,8 @@ test.describe("opening from anywhere", { tag: "@enhancement" }, () => {
       .click()
     expect(await answer).toBe(true)
     await expect(dialog(page)).toBeVisible()
+    await field(page).focus()
+    await expect(field(page)).toBeFocused()
   })
 
   test("a confirm opened as a modal dialog shows, before the page freezes, stays usable", async ({
@@ -449,6 +451,10 @@ test.describe("opening from anywhere", { tag: "@enhancement" }, () => {
       target.dialog.open()
       await new Promise<void>((resolve) => {
         const shown = () => document.querySelector('[role="dialog"][data-open]')
+        if (shown()) {
+          resolve()
+          return
+        }
         const observer = new MutationObserver(() => {
           if (shown()) {
             observer.disconnect()
@@ -471,6 +477,8 @@ test.describe("opening from anywhere", { tag: "@enhancement" }, () => {
       .click()
     expect(await answer).toBe(true)
     await expect(dialog(page)).toBeVisible()
+    await field(page).focus()
+    await expect(field(page)).toBeFocused()
   })
 
   test("closing reports why, for every way a dialog closes", async ({
