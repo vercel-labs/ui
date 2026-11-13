@@ -8,6 +8,7 @@ import {
   shallowRef,
   watch,
   type PropType,
+  type ShallowRef,
   type SlotsType,
   type VNode,
 } from "vue"
@@ -123,7 +124,7 @@ function usePreference<State>(preference: {
   initialState: State
   subscribe: (listener: () => void) => () => void
 }) {
-  const state = shallowRef(preference.initialState)
+  const state: ShallowRef<State> = shallowRef(preference.initialState)
   let stop = () => {}
   onMounted(() => {
     // Subscribing first reads back what was saved.
@@ -131,7 +132,7 @@ function usePreference<State>(preference: {
     state.value = preference.get()
   })
   onScopeDispose(() => stop())
-  return computed<State>(() => state.value)
+  return computed(() => state.value)
 }
 
 export { Preferences, usePreference }
