@@ -77,7 +77,7 @@ A list that searches still filters the items you render, and hides the ones that
 
 Searchable components accept a `filter` to change how typing narrows their items. [Async Options](./utilities/async-options) handles server results, debouncing, and stale requests.
 
-Data lists can virtualize large collections. You don't need to render every item yourself.
+For a large list, pass every option through `items` and render only the visible rows. [Select](./components/select#virtualized) shows how.
 
 ## Describe a Menu
 
