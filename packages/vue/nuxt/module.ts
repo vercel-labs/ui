@@ -26,8 +26,8 @@ const uiSdk: NuxtModule<ModuleOptions> = defineNuxtModule<ModuleOptions>({
   },
   defaults: { prefix: "" },
   setup(options, nuxt) {
-    // Vite pre-bundles each core entry an app imports with its own copy of the
-    // core's internals. Every entry in one pass shares them with this package.
+    // Nuxt transpiles this package, so it imports the core's own files unless the
+    // entry was pre-bundled up front. Listing every entry gives it and the app one copy.
     const optimizeDeps = (nuxt.options.vite.optimizeDeps ??= {})
     optimizeDeps.include = [
       ...(optimizeDeps.include ?? []),
