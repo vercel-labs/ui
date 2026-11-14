@@ -200,7 +200,7 @@ const unregister = registerTools(agent, {
 })
 ```
 
-`allow` is required. It decides each step the browser's agent asks for, after the bridge's own `allow`, and works the same way: return `false` to refuse the step, or `true` to let every step run. It returns a cleanup function. In a browser without WebMCP, registration does nothing. See [WebMCP](./webmcp) for registration, cleanup, and tool annotations.
+`allow` is required. It decides each step the browser's agent asks for, after the bridge's own `allow`, and works the same way: return `false` to refuse the step, or `true` to let it run. A step with `confirm` is one you marked for a person, and `true` answers for them. It returns a cleanup function. In a browser without WebMCP, registration does nothing. See [WebMCP](./webmcp) for registration, cleanup, and tool annotations.
 
 ## Custom Primitives
 
