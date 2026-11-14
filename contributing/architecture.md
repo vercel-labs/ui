@@ -74,7 +74,12 @@ export const thing = definePrimitive({
       // Typed per-slot props, and their kinds, required when the slot takes props.
       props: { value: "string", disabled: "boolean" },
       present: (state) => state.open, // Element should exist. Custom elements bind and unbind on it.
-      attrs: (state, { id, key, props, api }) => ({ role: "option" }),
+      role: "menuitem", // Core writes it. Declared on the slot, never in attrs, so TypeScript asks for what the role needs.
+      focus: "roving", // How the part takes focus, which a menuitem has to say.
+      press: ({ api }, event) => api.toggle(event),
+      attrs: (state, { id, key, props, api }) => ({
+        "aria-disabled": props.disabled ? "true" : undefined,
+      }), // Only the ARIA the role takes.
       live: live((state, { key }) => ({
         "data-highlighted": state.highlighted === key ? "" : undefined,
       })),
