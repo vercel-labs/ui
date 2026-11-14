@@ -130,6 +130,6 @@ Put value checks in these change callbacks. Actions such as `setValue` call the 
 
 `allow` checks actions. Components and their actions remain visible in `snapshot()`, and the agent can still read choices with `query()`. Use `data-agent-hidden` to keep a region out of view.
 
-Finding a component or its choices can open a section or popup before the requested action is checked. `query()` may also briefly open a popup to read its choices. Use the component's `onOpenChange` or equivalent callback if you need to reject those changes too.
+Finding a component or its choices can open a section or popup before the requested action is checked. Use the component's `onOpenChange` or equivalent callback if you need to reject those changes too.
 
 The [Reference](./reference) lists the fields passed to `allow` and the results returned by `act`.
