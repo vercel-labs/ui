@@ -119,6 +119,22 @@ type RenderProp<State = {}> =
   | React.ReactElement<Record<string, any>>
   | ((props: Record<string, any>, state: State) => React.ReactElement)
 
+// React hands a client component a lazy wrapper in place of an element a
+// Server Component passed it while that element's client module loads.
+// Reading it suspends until the element is there.
+function resolveLazy<Render>(render: Render) {
+  const lazy = render as
+    | {
+        $$typeof?: symbol
+        _payload: unknown
+        _init: (payload: unknown) => Render
+      }
+    | undefined
+  return lazy?.$$typeof === Symbol.for("react.lazy")
+    ? lazy._init(lazy._payload)
+    : render
+}
+
 /**
  * Renders an element with no primitive behind it that takes a `render` prop,
  * like a wrapper of your own: the tag, or the element or function passed as
@@ -150,14 +166,15 @@ function renderElement<State>(
   if (typeof render === "function") {
     return render(props, state)
   }
-  if (render) {
+  const element = resolveLazy(render)
+  if (element) {
     // The element's own props merge in: its handlers run before the part's.
     return React.cloneElement(
-      render,
-      mergeProps(props, render.props as Record<string, any>)
+      element,
+      mergeProps(props, element.props as Record<string, any>)
     )
   }
   return React.createElement(tag, props)
 }
 
-export { mergeProps, mergeRefs, renderElement, type RenderProp }
+export { mergeProps, mergeRefs, renderElement, resolveLazy, type RenderProp }
