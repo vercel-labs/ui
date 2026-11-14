@@ -36,6 +36,7 @@ import {
   mergeProps,
   mergeRefs,
   renderElement,
+  resolveLazy,
   type RenderProp,
 } from "./render-element"
 
@@ -941,18 +942,21 @@ function usePart<
   const part = owner.instance.part(slot, slotProps, true)
   // Removed with its component, a part lets go in this commit, not a microtask later.
   React.useLayoutEffect(() => () => ref(part, host)(null), [part])
-  // An id on a `render` element wins its merge, so the part takes that one as
-  // it renders. A render function's can't be read until it runs.
-  const renderId = React.isValidElement<{ id?: string }>(render)
-    ? render.props.id
-    : undefined
-  const user = renderId === undefined ? rest : { ...rest, id: renderId }
   const merged = readIn(
     owner,
-    (showing) =>
-      present(part, slotProps, showing)
-        ? elementProps(part, slotProps, user, showing)
-        : undefined,
+    (showing) => {
+      if (!present(part, slotProps, showing)) {
+        return undefined
+      }
+      // An id on a `render` element wins its merge, so the part takes that one
+      // as it renders. A render function's can't be read until it runs.
+      const rendered = resolveLazy(render)
+      const renderId = React.isValidElement<{ id?: string }>(rendered)
+        ? rendered.props.id
+        : undefined
+      const user = renderId === undefined ? rest : { ...rest, id: renderId }
+      return elementProps(part, slotProps, user, showing)
+    },
     provided.shown
   )
   const element = merged ? renderElement(tag, merged, render, state) : null
