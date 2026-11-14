@@ -76,6 +76,29 @@ test("an id on a lazy render element is the part's id", async () => {
   ).toBe("account-tab")
 })
 
+test("a part that isn't in the page doesn't wait for its lazy render element", async () => {
+  const host = await mount(
+    <React.Suspense fallback="Loading">
+      <Tabs defaultValue="account">
+        <TabsList aria-label="Settings">
+          <TabsTab value="account">Account</TabsTab>
+          <TabsTab value="billing">Billing</TabsTab>
+        </TabsList>
+        <TabsPanel value="account">Account settings</TabsPanel>
+        <TabsPanel
+          value="billing"
+          render={lazyElement(<section />, new Promise(() => {}))}
+        >
+          Billing settings
+        </TabsPanel>
+      </Tabs>
+    </React.Suspense>
+  )
+  expect(host.querySelector('[role="tabpanel"]')!.textContent).toBe(
+    "Account settings"
+  )
+})
+
 test("a description on a lazy render element stays ahead of the field's", async () => {
   const host = await mount(
     <Field>
