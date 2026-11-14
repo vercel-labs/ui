@@ -942,7 +942,6 @@ function usePart<
   const part = owner.instance.part(slot, slotProps, true)
   // Removed with its component, a part lets go in this commit, not a microtask later.
   React.useLayoutEffect(() => () => ref(part, host)(null), [part])
-  let rendered = render
   const merged = readIn(
     owner,
     (showing) => {
@@ -951,7 +950,7 @@ function usePart<
       }
       // An id on a `render` element wins its merge, so the part takes that one
       // as it renders. A render function's can't be read until it runs.
-      rendered = resolveLazy(render)
+      const rendered = resolveLazy(render)
       const renderId = React.isValidElement<{ id?: string }>(rendered)
         ? rendered.props.id
         : undefined
@@ -960,7 +959,7 @@ function usePart<
     },
     provided.shown
   )
-  const element = merged ? renderElement(tag, merged, rendered, state) : null
+  const element = merged ? renderElement(tag, merged, render, state) : null
   if (provided === scope) {
     return element
   }
