@@ -153,6 +153,38 @@ describe("data-agent-confirm", () => {
     expect(onValueChange).not.toHaveBeenCalled()
   })
 
+  test("through WebMCP, a refusal by registerTools' allow isn't reported as the person's", async () => {
+    const tools = new Map<
+      string,
+      { execute: (input: object) => Promise<{ ok: boolean }> }
+    >()
+    const registerTool = async (tool: {
+      name: string
+      execute: (input: object) => Promise<{ ok: boolean }>
+    }) => {
+      tools.set(tool.name, tool)
+    }
+    Object.assign(document, { modelContext: { registerTool } })
+    const agent = createAgent({ allow: () => true })
+    const { el, onClick } = mountButton("Buy credits")
+    el.setAttribute("data-agent-confirm", "Charges $20")
+    cleanups.push(
+      registerTools(agent, { allow: (step) => step.action !== "press" }),
+      () => Reflect.deleteProperty(document, "modelContext")
+    )
+    expect(
+      await tools
+        .get("act")!
+        .execute({ steps: [{ ref: "Buy credits", action: "press" }] })
+    ).toMatchObject({
+      ok: false,
+      error: {
+        message: expect.stringMatching(/^The app refused press on c\d+\.$/),
+      },
+    })
+    expect(onClick).not.toHaveBeenCalled()
+  })
+
   test("through WebMCP, registerTools' allow answers for the person", async () => {
     const tools = new Map<
       string,

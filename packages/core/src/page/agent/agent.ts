@@ -1155,6 +1155,10 @@ function createAgent(
   // `registerTools`' own `allow`, for the calls the browser's agent makes.
   let callerAllow: Allow | undefined
 
+  // The check that last refused a step, so a refusal by `registerTools`' own
+  // isn't reported as the person's.
+  let refusedBy: Allow | undefined
+
   // The answer of `allow` and then `registerTools`' own, or a failed step when
   // they take longer than `timeout`, since calls run one at a time and a
   // confirm nobody answers would hold every later one.
@@ -1172,6 +1176,7 @@ function createAgent(
     const answer = async () => {
       for (const check of checks) {
         if (!(await check(step, { signal: controller.signal }))) {
+          refusedBy = check
           return false
         }
       }
@@ -1240,7 +1245,7 @@ function createAgent(
       }
       if (!(await allowed(step))) {
         throw new Error(
-          confirm
+          confirm && refusedBy === options.allow
             ? `The person said no to "${confirm}".`
             : `The app refused ${action} on ${entry.ref}.`
         )
