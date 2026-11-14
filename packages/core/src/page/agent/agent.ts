@@ -1181,7 +1181,10 @@ function createAgent(
     })
     const answer = async () => {
       for (const check of checks) {
-        if (!(await check(step, { signal: controller.signal }))) {
+        if (
+          controller.signal.aborted ||
+          !(await check(step, { signal: controller.signal }))
+        ) {
           return false
         }
       }
