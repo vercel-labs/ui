@@ -20,7 +20,9 @@ const unregister = registerTools(agent, {
 })
 ```
 
-The browser's agent can now read components and call their actions. You didn't write that agent, so `registerTools` asks for an `allow` of its own. It runs for every step the browser's agent asks for, after your bridge's [permissions](./permissions), and works the same way: return `false` to refuse a step. Here it asks you before every press. To let every step run, pass `allow: () => true`. Your change callbacks still apply.
+The browser's agent can now read components and call their actions. You didn't write that agent, so `registerTools` asks for an `allow` of its own. It runs for every step the browser's agent asks for, after your bridge's [permissions](./permissions), and works the same way: return `false` to refuse a step. Here it asks you before every press. Your change callbacks still apply.
+
+A step on a control you marked with [`data-agent-confirm`](./permissions#mark-what-needs-a-person) arrives with `step.confirm`, and this `allow` answers for the person. To let every other step run and leave those to the person, pass `allow: (step) => !step.confirm`.
 
 Registration requires a browser that provides `document.modelContext.registerTool`. In a browser without it, `registerTools` does nothing.
 
@@ -37,5 +39,7 @@ This removes the browser tools. You can still call methods on `agent` directly.
 ## Tool Annotations
 
 `snapshot` and `query` have `readOnlyHint: true`. All three tools have `untrustedContentHint: true` because their results include page content, such as labels and text people entered.
+
+`act` has `consequentialHint: true` because a step can press any button, including one whose action can't be undone. A browser can use it to ask the person before it runs `act`.
 
 These are hints for the tool consumer. `snapshot` and `query` never open a component. Use [Permissions](./permissions) to decide which requested actions your app accepts.

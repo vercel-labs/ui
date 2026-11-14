@@ -50,7 +50,7 @@ For your own confirmation UI, return a `Promise<boolean>` that resolves with the
 
 ## Mark What Needs a Person
 
-Some controls should always wait for the person, whatever your `allow` rules say. Add `data-agent-confirm` with a sentence that says what the control does:
+Some controls should always wait for the person. Add `data-agent-confirm` with a sentence that says what the control does:
 
 ```tsx
 <Button
@@ -78,6 +78,8 @@ const agent = createAgent({
 
 If the person says no, the step fails with `The person said no to "…"`.
 
+An `allow` that returns `true` without reading `step.confirm` answers yes for the person. Check it in every `allow` you write, including the one you pass to [`registerTools`](./webmcp).
+
 The mark covers its element and everything inside it, for any action. Put it on a form or section to cover every control in it, or on a dialog's content to cover the buttons inside, wherever the dialog renders.
 
 ## Keep Parts of the Page from the Agent
@@ -100,7 +102,7 @@ Two more marks change what the agent sees:
 </Field>
 ```
 
-Changes inside `data-agent-hidden` still reach [Observe](./observe-changes), so your own logs see them, while `agent.subscribe` stays quiet. A secret value stays out of `snapshot`, `act` results and change events, and the field's error text reads `"[redacted]"` too. Password, card and one-time-code fields are treated as secret without a mark.
+Changes inside `data-agent-hidden` still reach [Observe](./observe-changes), so your own logs see them, while `agent.subscribe` stays quiet. A secret value stays out of `snapshot`, `act` results and change events, and the field's error text reads `"[redacted]"` too. Password, card and one-time-code fields are treated as secret without a mark. A hidden input is left out without one.
 
 In development, a misspelled mark such as `data-agent-confim` logs a warning with the name it meant.
 

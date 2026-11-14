@@ -1152,8 +1152,10 @@ function createAgent(
     return { pending: pending(), error }
   }
 
-  // `registerTools`' own `allow`, for the calls the browser's agent makes.
+  // `registerTools`' own `allow`, for the calls the browser's agent makes,
+  // and the signal that agent aborts when it gives a call up.
   let callerAllow: Allow | undefined
+  let callerSignal: AbortSignal | undefined
 
   // The answer of `allow` and then `registerTools`' own, or a failed step when
   // they take longer than `timeout`, since calls run one at a time and a
@@ -1169,22 +1171,35 @@ function createAgent(
     const late = new Promise<"late">(
       (resolve) => (timer = setTimeout(() => resolve("late"), wait))
     )
+    const cancelled = new Promise<"cancelled">((resolve) => {
+      if (callerSignal?.aborted) {
+        resolve("cancelled")
+      }
+      callerSignal?.addEventListener("abort", () => resolve("cancelled"), {
+        once: true,
+      })
+    })
     const answer = async () => {
       for (const check of checks) {
-        if (!(await check(step, { signal: controller.signal }))) {
+        if (
+          controller.signal.aborted ||
+          !(await check(step, { signal: controller.signal }))
+        ) {
           return false
         }
       }
       return true
     }
     try {
-      const ok = await Promise.race([answer(), late])
-      if (ok !== "late") {
+      const ok = await Promise.race([answer(), late, cancelled])
+      if (typeof ok === "boolean") {
         return ok
       }
       controller.abort()
       throw new Error(
-        `No answer to ${step.action} on ${step.ref} in ${Math.round(wait / 1000)} seconds.`
+        ok === "cancelled"
+          ? `${step.action} on ${step.ref} was cancelled.`
+          : `No answer to ${step.action} on ${step.ref} in ${Math.round(wait / 1000)} seconds.`
       )
     } finally {
       clearTimeout(timer)
@@ -1862,13 +1877,15 @@ function createAgent(
   guardedActions.set(agent.act, (steps, guard) =>
     inTurn(() => act(steps, guard))
   )
-  allowing.set(agent, (input, allow) =>
+  allowing.set(agent, (input, allow, signal) =>
     inTurn(async () => {
       callerAllow = allow
+      callerSignal = signal
       try {
         return await act(input.steps ?? [])
       } finally {
         callerAllow = undefined
+        callerSignal = undefined
       }
     })
   )
@@ -1885,7 +1902,8 @@ const allowing = new WeakMap<
   object,
   (
     input: { steps: AgentStep[] },
-    allow: Allow
+    allow: Allow,
+    signal?: AbortSignal
   ) => ReturnType<ReturnType<typeof createAgent>["act"]>
 >()
 
@@ -1895,8 +1913,8 @@ const allowing = new WeakMap<
  * does nothing where it doesn't. Returns a function that unregisters them.
  *
  * The browser's agent isn't one you wrote, so `allow` is required: it decides
- * each step that agent asks for, after the agent's own `allow`. Return `true`
- * to let every step run.
+ * each step that agent asks for, after the agent's own `allow`. A step with
+ * `confirm` is one the page marked for a person, and `true` answers for them.
  *
  * @example
  * registerTools(agent, { allow: (step) => step.action !== "press" || confirm(`Press ${step.args[0]}?`) })
@@ -1924,14 +1942,16 @@ function registerTools(
       ?.registerTool(
         {
           ...tool,
-          // Labels and text come from the page, which can hold what users wrote.
+          // Labels and text come from the page, which can hold what users
+          // wrote, and `act` can press any button, like one that deletes.
           annotations: {
             readOnlyHint: tool.name !== "act",
             untrustedContentHint: true,
+            consequentialHint: tool.name === "act",
           },
-          execute: (input: never) =>
+          execute: (input: never, context?: { signal?: AbortSignal }) =>
             tool.name === "act"
-              ? allowing.get(agent)!(input, allow)
+              ? allowing.get(agent)!(input, allow, context?.signal)
               : agent[tool.name as "act"](input),
         },
         { signal: controller.signal }

@@ -187,6 +187,53 @@ describe("data-agent-confirm", () => {
     expect(onClick).toHaveBeenCalledTimes(1)
   })
 
+  test("through WebMCP, a call the browser cancels stops waiting and frees the next call", async () => {
+    const tools = new Map<
+      string,
+      {
+        execute: (
+          input: object,
+          context?: { signal: AbortSignal }
+        ) => Promise<{ ok: boolean; error?: { message: string } }>
+      }
+    >()
+    Object.assign(document, {
+      modelContext: {
+        registerTool: async (tool: { name: string }) => {
+          tools.set(tool.name, tool as never)
+        },
+      },
+    })
+    let signal: AbortSignal | undefined
+    const { onClick } = mountButton("Buy credits")
+    cleanups.push(
+      registerTools(createAgent(), {
+        allow: (_step, context) => {
+          signal = context.signal
+          return new Promise<boolean>(() => {})
+        },
+      }),
+      () => Reflect.deleteProperty(document, "modelContext")
+    )
+    const browser = new AbortController()
+    const call = tools
+      .get("act")!
+      .execute(
+        { steps: [{ ref: "Buy credits", action: "press" }] },
+        { signal: browser.signal }
+      )
+    await vi.waitFor(() => expect(signal).toBeDefined())
+    browser.abort()
+    expect((await call).error?.message).toMatch(
+      /^press on c\d+ was cancelled\.$/
+    )
+    expect(signal?.aborted).toBe(true)
+    expect(onClick).not.toHaveBeenCalled()
+    expect(await tools.get("query")!.execute({ kind: "button" })).toEqual(
+      expect.any(Array)
+    )
+  })
+
   test("a step nobody answers fails after the timeout, aborts allow's signal and frees the next call", async () => {
     let signal: AbortSignal | undefined
     const agent = createAgent({
@@ -436,6 +483,16 @@ describe("data-agent-hidden", () => {
     )
     await agent.act({ steps: [{ ref: "Rotate keys", action: "press" }] })
     expect(onClick).not.toHaveBeenCalled()
+  })
+
+  test("a hidden input is left out too, and isn't kept after it leaves", () => {
+    const agent = createAgent()
+    const { instance, unmount } = mountInput("Session token")
+    document.querySelector("input")!.type = "hidden"
+    instance.api.setValue("tok_123")
+    expect(onPage(agent)).toEqual([])
+    unmount()
+    expect(JSON.stringify(agent.snapshot())).not.toContain("tok_123")
   })
 
   test("the agent doesn't hear its changes, and the app's observe does", () => {
