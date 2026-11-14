@@ -13,6 +13,28 @@ npm install @ui-sdk/solid @ui-sdk/core
 
 `@ui-sdk/solid` provides the Solid components. `@ui-sdk/core` provides their behavior and is a peer dependency. Install both so the components and any helpers you use share one copy of the core.
 
+With Vite, use Solid 2's plugin, `@solidjs/vite-plugin`, in place of `vite-plugin-solid`, which only supports Solid 1. Also leave `@ui-sdk/core` out of Vite's dependency pre-bundling. Otherwise a core entry your app imports, like `@ui-sdk/core/tabs`, is bundled apart from the copy `@ui-sdk/solid` loads, and `@ui-sdk/solid`'s components throw in development:
+
+```ts title="vite.config.ts"
+import solid from "@solidjs/vite-plugin"
+import { defineConfig } from "vite"
+
+export default defineConfig({
+  plugins: [solid()],
+  optimizeDeps: { exclude: ["@ui-sdk/core"] },
+})
+```
+
+The Vite template starts on Solid 1. Move it to Solid 2 and swap the plugin:
+
+```bash
+npm uninstall vite-plugin-solid
+npm install solid-js@next @solidjs/web@next
+npm install -D @solidjs/vite-plugin
+```
+
+Then import `render` from `@solidjs/web` instead of `solid-js/web` in `src/index.tsx`, and set `"jsxImportSource": "@solidjs/web"` in `tsconfig.app.json`.
+
 ## Import a Component
 
 Import each component from its own entry:
