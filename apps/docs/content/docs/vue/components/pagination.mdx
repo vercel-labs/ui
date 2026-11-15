@@ -127,6 +127,16 @@ Read the page from the URL, like your router's search params, so the route [cont
 
 ```vue
 <script setup lang="ts">
+import { computed } from "vue"
+import { RouterLink, useRoute } from "vue-router"
+import {
+  Pagination,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationList,
+} from "@ui-sdk/vue/pagination"
+
 const route = useRoute()
 const page = computed(() => Number(route.query.page ?? 1))
 </script>
@@ -142,10 +152,14 @@ const page = computed(() => Number(route.query.page ?? 1))
       <PaginationItem v-for="item in state.items" :key="item">
         <PaginationLink v-if="typeof item === 'number'" :page="item">
           <template #render="{ props, children }">
-            <RouterLink v-slot="{ href, navigate }" :to="props.href" custom>
-              <a v-bind="props" :href="href" @click="navigate"
-                ><component :is="children"
-              /></a>
+            <RouterLink
+              v-slot="{ href, navigate }"
+              :to="{ query: { page: item } }"
+              custom
+            >
+              <a v-bind="props" :href="href" @click="navigate">
+                <component :is="children" />
+              </a>
             </RouterLink>
           </template>
         </PaginationLink>

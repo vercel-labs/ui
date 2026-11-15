@@ -469,10 +469,12 @@ describe("agent", () => {
     expect(tools.get("snapshot")?.annotations).toEqual({
       readOnlyHint: true,
       untrustedContentHint: true,
+      consequentialHint: false,
     })
     expect(tools.get("act")?.annotations).toEqual({
       readOnlyHint: false,
       untrustedContentHint: true,
+      consequentialHint: true,
     })
     await tools.get("act")?.execute({
       steps: [{ ref: "Weekly digest", action: "setChecked", args: [true] }],

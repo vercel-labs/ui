@@ -20,6 +20,7 @@ Here's the rating's primitive. Its API has one method, `rate`:
 ```ts title="rating.ts"
 const rating = definePrimitive({
   name: "rating",
+  options: { defaultValue: "number" },
   state: (options: { defaultValue?: number }) => ({
     value: options.defaultValue ?? 0,
   }),

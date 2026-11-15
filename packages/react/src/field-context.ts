@@ -1,6 +1,7 @@
 import type { field } from "@ui-sdk/core/field"
 import { fieldControlId, madeLabel, renderVersion } from "@ui-sdk/core/renderer"
 import * as React from "react"
+import { resolveLazy } from "./render-element"
 import {
   renderElement,
   slotIn,
@@ -83,13 +84,14 @@ function ownDescription<Props extends Record<string, any>, Render>(
   props: Props,
   render: Render
 ) {
-  const own = React.isValidElement<{ "aria-describedby"?: string }>(render)
-    ? render.props["aria-describedby"]
+  const rendered = resolveLazy(render)
+  const own = React.isValidElement<{ "aria-describedby"?: string }>(rendered)
+    ? rendered.props["aria-describedby"]
     : undefined
-  if (own === undefined || !React.isValidElement(render)) {
-    return [props, render] as const
+  if (own === undefined || !React.isValidElement(rendered)) {
+    return [props, rendered] as const
   }
-  const element = React.cloneElement(render, {
+  const element = React.cloneElement(rendered, {
     "aria-describedby": undefined,
   } as object) as Render
   return [{ ...props, "aria-describedby": own } as Props, element] as const

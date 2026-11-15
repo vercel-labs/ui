@@ -38,13 +38,25 @@ The value is already part of the root's accessible description. The visible valu
 Import the parts and put them together:
 
 ```vue
-<Progress :value="40">
-  <ProgressLabel />
-  <ProgressValue />
-  <ProgressTrack>
-    <ProgressIndicator />
-  </ProgressTrack>
-</Progress>
+<script setup lang="ts">
+import {
+  Progress,
+  ProgressIndicator,
+  ProgressLabel,
+  ProgressTrack,
+  ProgressValue,
+} from "@ui-sdk/vue/progress"
+</script>
+
+<template>
+  <Progress :value="40">
+    <ProgressLabel />
+    <ProgressValue />
+    <ProgressTrack>
+      <ProgressIndicator />
+    </ProgressTrack>
+  </Progress>
+</template>
 ```
 
 ## Build Your Own

@@ -299,9 +299,13 @@ function createValueSelection(config: {
     // do, unless something sets the value first.
     restore(saved: string, write: (value: unknown) => void) {
       stopRestoring()
+      // A browser's autofill restores a plain value, like "5", not the saved keys.
       let keys: string[] = []
       try {
-        keys = JSON.parse(saved)
+        const parsed = JSON.parse(saved)
+        if (Array.isArray(parsed)) {
+          keys = parsed
+        }
       } catch {}
       const { multiple } = store.get()
       if (!multiple) {

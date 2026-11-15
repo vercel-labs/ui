@@ -56,8 +56,8 @@ type Entry = {
   // A password, card or one-time code, or a field inside `data-agent-secret`,
   // whose value is redacted and isn't kept once it leaves the page.
   secret?: boolean
-  // Inside `data-agent-hidden`: the agent never sees it, and it isn't kept
-  // once it leaves the page. The app's own `observe` still hears it.
+  // Inside `data-agent-hidden`, or a hidden input: the agent never sees it, and it
+  // isn't kept once it leaves the page. The app's own `observe` still hears it.
   offLimits?: boolean
   component: string
   // What its primitive's `agent` key declares.
@@ -202,7 +202,10 @@ function remember(entry: Entry, parts: Bound[]) {
       )
     )
   // A region can turn off-limits and back, like a panel an app locks while it's busy.
-  entry.offLimits = isOffLimits(elements)
+  // A hidden input holds what the page keeps from people, like a token.
+  entry.offLimits =
+    isOffLimits(elements) ||
+    elements.every((el) => (el as HTMLInputElement).type === "hidden")
   entry.key = `${entry.component}|${entry.label}|${entry.row}`
   if (!first) {
     return

@@ -134,6 +134,16 @@ describe("the browser's restore", () => {
     }
   }
 
+  for (const [name, create] of lists) {
+    test(`of a value that isn't a list of keys selects nothing in a ${name}`, () => {
+      const instance = create({ multiple: false })
+      for (const saved of ["5", "null", "{}"]) {
+        instance.api.internal.restore(saved)
+        expect(instance.get().value).toBeNull()
+      }
+    })
+  }
+
   for (const [name, create] of toggles) {
     for (const guard of ["disabled", "readOnly", "formDisabled"] as const) {
       test(`lands on a ${guard} ${name}`, () => {

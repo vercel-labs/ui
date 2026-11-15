@@ -104,7 +104,7 @@ api.roving.remember("Underline")
 
 ### Any Layout
 
-The rating's `move` function stepped through stars. A keypad can use the same hook to move three items at a time for Up and Down:
+`move` decides where each key goes. A keypad can use it to move three items at a time for Up and Down:
 
 ```ts
 move: (event, { from, items, rtl }) => {

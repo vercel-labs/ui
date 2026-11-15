@@ -20,6 +20,7 @@ Last checked: 2026-10-28, against `node_modules/vue` 3.5.43.
 
 - `ref` and `reactive` are deep: objects put in them become proxies. Passing a proxy into code outside Vue (a store, `structuredClone`, `===` against the raw object, a `WeakMap` key) can surprise; `toRaw` gets the original.
 - `shallowRef` and `shallowReactive` track only the top level; replace the value to trigger.
+- `ref(x)` and `shallowRef(x)`, where `x` has a bare type parameter's type, return an unresolved conditional whose `.value` is `any`, even with an explicit type argument. Annotate it: `const state: ShallowRef<T> = shallowRef(x)`.
 - `markRaw` keeps an object from ever becoming reactive; right for class instances and library objects.
 - Arrays and objects from the parent may be reactive proxies. A library that compares values by identity should compare raw values.
 
