@@ -142,7 +142,11 @@ A failed step stops the call. Earlier steps stay applied; there is no rollback. 
 Finds components and their choices without listing the page, and returns a promise:
 
 ```ts
-const [region] = await agent.query({ within: "Region", text: "Europe" })
+const found = await agent.query({ within: "Region", text: "Europe" })
+if ("error" in found) {
+  throw new Error(found.error)
+}
+const [region] = found
 ```
 
 | Input    | What It Does                                                                                                                                           |

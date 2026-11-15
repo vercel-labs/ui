@@ -101,10 +101,14 @@ Put several steps in one call to run them in order. If a step fails, `result.ok`
 For components with choices, such as a Select or Combobox, `query` with `within` lists the available values. For a Select labeled **Region**:
 
 ```ts
-const [region] = await agent.query({ within: "Region", text: "Europe" })
+const found = await agent.query({ within: "Region", text: "Europe" })
+if ("error" in found) {
+  throw new Error(found.error)
+}
+const [region] = found
 ```
 
-`region.items` holds up to 50 matching choices, each with a `value` and `label`, and `region.more` says how many matched beyond that. Leave out `text` to list the first 50. `query()` never opens anything. When a list's items only show while it's open, `items` is empty and `note` says so.
+`query` returns `{ error }` when nothing on the page is named **Region**. Otherwise `region.items` holds up to 50 matching choices, each with a `value` and `label`, and `region.more` says how many matched beyond that. Leave out `text` to list the first 50. `query()` never opens anything. When a list's items only show while it's open, `items` is empty and `note` says so.
 
 `query` also finds components without listing the page. `agent.query({ text: "Europe" })` returns the components whose label or row text has that word, and lists whose choices match, with those choices under them. `kind` keeps one kind, such as `"select"`.
 
