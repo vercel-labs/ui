@@ -611,6 +611,32 @@ describe("createTransfer", () => {
     })
   })
 
+  test("focus on a card's handle follows the card into another list, where a framework renders it as a new element", async () => {
+    const instance = board({ id: "k", lists: { todo: ["a"], doing: [] } })
+    cleanups.push(() => instance.destroy())
+    const { transfer } = instance.api
+    const render = (badge = false) => {
+      const card = document.body.appendChild(document.createElement("div"))
+      if (badge) {
+        card.appendChild(document.createElement("span")).textContent = "Doing"
+      }
+      const title = card.appendChild(document.createElement("span"))
+      title.textContent = "Card"
+      const handle = card.appendChild(document.createElement("button"))
+      const unbind = transfer.bindItem(card, "a")
+      return { card, handle, unbind }
+    }
+    const first = render()
+    first.handle.focus()
+    transfer.keydown(key(" "), "a")
+    transfer.keydown(key("ArrowRight"), "a")
+    first.unbind()
+    first.card.remove()
+    const second = render(true)
+    await new Promise((resolve) => setTimeout(resolve))
+    expect(document.activeElement).toBe(second.handle)
+  })
+
   test("Escape puts it back, and a full list is skipped", () => {
     const instance = board({
       id: "k",

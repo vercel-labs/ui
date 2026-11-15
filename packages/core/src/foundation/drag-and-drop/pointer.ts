@@ -58,7 +58,8 @@ type BindDragOptions = {
  * own: a slider, a splitter, an item dragged to a new place. Uses pointer
  * capture, and listens on the document too, so the gesture keeps going
  * outside the element, outside the window, and when the element moves in the
- * document. Moves arrive at most once per frame. A release after the pointer
+ * document. With a `threshold`, the capture waits until the pointer passes
+ * it. Moves arrive at most once per frame. A release after the pointer
  * moved past `dragThreshold` swallows the click it sends, so a drag never
  * presses what it ends on, like a link. Returns a cleanup that ends it
  * without calling `onEnd`; call it when the component is destroyed.
@@ -97,10 +98,17 @@ function bindDrag(
   let started = !options.threshold && !options.onStart
   let dragged = false
 
-  try {
-    el.setPointerCapture(pointerId)
-  } catch {
-    // Synthetic events have no active pointer to capture.
+  const capture = () => {
+    try {
+      el.setPointerCapture(pointerId)
+    } catch {
+      // Synthetic events have no active pointer to capture.
+    }
+  }
+  // A captured press sends its click to `el`, so with a threshold the capture
+  // waits for the drag: a press that lifts first clicks what was pressed, like a handle.
+  if (!options.threshold) {
+    capture()
   }
   // Lock is granted later, or refused, so each move checks.
   const locked = () => el.ownerDocument.pointerLockElement === el
@@ -134,6 +142,9 @@ function bindDrag(
       started = true
       if (options.onStart?.(event) === false) {
         return stop()
+      }
+      if (threshold) {
+        capture()
       }
       if (options.cancelOnEscape) {
         el.ownerDocument.addEventListener("keydown", onEscape, true)

@@ -351,7 +351,7 @@ function createTransfer<State extends object>(
         preview.el.removeAttribute("data-moving")
         preview.el.removeAttribute("data-dragging")
         dragging = true
-        focused = start.ownerDocument.activeElement === start
+        focused = start.contains(start.ownerDocument.activeElement)
       },
       onMove: ({ x, y, event: moveEvent }) => {
         moveEvent.preventDefault()

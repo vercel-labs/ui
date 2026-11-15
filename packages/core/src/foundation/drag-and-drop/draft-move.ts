@@ -4,6 +4,7 @@
 // puts it back. Focus follows a keyboard move, since the framework moving the
 // focused element drops its focus.
 import { keepFocus } from "../focus/keep-focus"
+import { focusables } from "../focus/tabbable"
 import { deriveState } from "../kernel/derive"
 import { settleDraft } from "../kernel/draft"
 import type { Store } from "../kernel/store"
@@ -51,12 +52,33 @@ function createDraftMove<
   // A dropped draft waits for its value without being held.
   let held = false
   let moved = false
+  // Where focus is in an item: on it (-1), or on which of the elements
+  // inside it that take focus, like its drag handle.
+  const focusIn = (key: string) => {
+    const item = element(key)
+    const active = item?.ownerDocument.activeElement
+    return item && active && item.contains(active)
+      ? [...item.querySelectorAll(focusables)].indexOf(active)
+      : undefined
+  }
+  // Read when the item is picked up, since a drag can render it as a new element before it ends.
+  let grabbedAt: number | undefined
   const setDraft = (next: Draft | null) => {
+    if (next && !draft()) {
+      grabbedAt = focusIn(next.key)
+    }
     moved = !!next && !!draft()
     held = !!next
     store.set({ [draftKey]: next } as Partial<State>)
   }
-  const focusLater = (key: string) => keepFocus(() => element(key))
+  // A framework that renders the item as a new element gets focus in the same place.
+  const focusLater = (key: string) => {
+    const at = focusIn(key) ?? grabbedAt ?? -1
+    keepFocus(() => {
+      const item = element(key)
+      return item?.querySelectorAll<HTMLElement>(focusables)[at] ?? item
+    })
+  }
 
   deriveState({ store }, [draftKey], (state) => {
     const current = state[draftKey] as Draft | null

@@ -530,3 +530,25 @@ test("a swipe startOnMove picks swallows the click its release sends, like any d
   )
   expect(clicked).not.toHaveBeenCalled()
 })
+
+test("a drag with a threshold captures the pointer once it starts, so a press that lifts first clicks what was pressed", () => {
+  const { drags, el } = session()
+  el.setPointerCapture = vi.fn()
+  const down = press("pointerdown", { pointerType: "mouse", clientX: 0 })
+  drags.accepts(down)
+  drags.start(el, down, { threshold: 3, onMove: () => {}, onEnd: () => {} })
+  document.dispatchEvent(
+    press("pointermove", { pointerType: "mouse", clientX: 2 })
+  )
+  expect(el.setPointerCapture).not.toHaveBeenCalled()
+  document.dispatchEvent(
+    press("pointermove", { pointerType: "mouse", clientX: 4 })
+  )
+  expect(el.setPointerCapture).toHaveBeenCalledWith(1)
+  document.dispatchEvent(press("pointerup", { pointerType: "mouse" }))
+
+  const slide = press("pointerdown", { pointerType: "mouse", pointerId: 2 })
+  drags.accepts(slide)
+  drags.start(el, slide, { onMove: () => {}, onEnd: () => {} })
+  expect(el.setPointerCapture).toHaveBeenLastCalledWith(2)
+})
