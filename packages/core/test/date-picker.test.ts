@@ -421,6 +421,30 @@ describe("datePicker", () => {
     expect(range.setValue(["2026-10-20", "2026-10-22"])).toBe(true)
   })
 
+  test("a controller can't set text that isn't a date, and the value stays", () => {
+    const changes: unknown[] = []
+    const controller = createDatePickerController()
+    const picker = mount({
+      controller,
+      defaultValue: "2026-10-16",
+      onValueChange: (value) => changes.push(value),
+    })
+    for (const text of ["25/12/2026", "2026-02-30", "tomorrow"]) {
+      expect(controller.setValue(text as never)).toBe(false)
+    }
+    expect([picker.instance.get().value, changes]).toEqual(["2026-10-16", []])
+    expect(controller.setValue(null)).toBe(true)
+
+    const range = createDatePickerController()
+    const ranged = mount({
+      controller: range,
+      mode: "range",
+      defaultValue: ["2026-10-20", "2026-10-22"],
+    })
+    expect(range.setValue(["2026-10-21"] as never)).toBe(false)
+    expect(ranged.instance.get().value).toEqual(["2026-10-20", "2026-10-22"])
+  })
+
   test("a controller can't change a disabled or read-only picker, but the browser's restore can", () => {
     for (const locked of [{ disabled: true }, { readOnly: true }]) {
       const controller = createDatePickerController()

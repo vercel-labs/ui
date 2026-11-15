@@ -1002,6 +1002,34 @@ describe("calendar", () => {
     expect(instance.api.setValue("2026-10-23")).toBe(true)
   })
 
+  test("a controller can't select text that isn't a date, and the value stays", () => {
+    const changes: unknown[] = []
+    const { instance } = mount({
+      defaultValue: "2026-10-20",
+      onValueChange: (value) => changes.push(value),
+    })
+    for (const text of ["25/12/2026", "2026-02-30", "tomorrow"]) {
+      expect(instance.api.setValue(text as never)).toBe(false)
+    }
+    expect([instance.api.getValue(), changes]).toEqual(["2026-10-20", []])
+    expect(instance.api.setValue(null)).toBe(true)
+
+    const range = mount({
+      mode: "range",
+      defaultValue: ["2026-10-20", "2026-10-22"],
+    }).instance
+    expect(range.api.setValue(["2026-10-21"] as never)).toBe(false)
+    expect(range.api.getValue()).toEqual(["2026-10-20", "2026-10-22"])
+
+    const multiple = mount({
+      mode: "multiple",
+      defaultValue: ["2026-10-20"],
+    }).instance
+    expect(multiple.api.setValue(["2026-10-21", "soon"] as never)).toBe(false)
+    expect(multiple.api.getValue()).toEqual(["2026-10-20"])
+    expect(multiple.api.setValue([])).toBe(true)
+  })
+
   test("a controller can't select on a disabled or read-only calendar", () => {
     for (const locked of [{ disabled: true }, { readOnly: true }]) {
       const { instance } = mount(locked)

@@ -148,13 +148,18 @@ const rangeRules = (state: State) => ({
   allowUnavailable: state.allowUnavailable,
   isUnavailable: (date: ISODate) => unavailableDate(state, date),
 })
-// Whether people could pick a value now: the calendar isn't disabled or read-only, no date is blocked, and the rules allow a range.
-function isPickable(state: State, value: CalendarValue) {
+// Whether people could pick a value now: the calendar isn't disabled or read-only, the value fits the mode, no date is blocked, and the rules allow a range.
+function isPickable(state: State, value: unknown) {
   if (isDisabled(state) || state.readOnly) {
     return false
   }
-  const dates = selectedDates(value)
-  if (dates.some((date) => blockedDate(state, date))) {
+  const dates = selectedDates(normalizeValue(state.mode, value))
+  if (
+    [value]
+      .flat()
+      .some((date) => date != null && !dates.includes(date as ISODate)) ||
+    dates.some((date) => blockedDate(state, date))
+  ) {
     return false
   }
   return (
@@ -591,9 +596,7 @@ function calendarApi<
         reason = "imperative",
         event,
       }: CalendarChangeOptions<ValueChangeReason> = {}
-    ) =>
-      isPickable(store.get(), normalizeValue(store.get().mode, value)) &&
-      setValue(value, reason, event),
+    ) => isPickable(store.get(), value) && setValue(value, reason, event),
     getMonth: () => store.get().month,
     setMonth: (
       month: ISOMonth,

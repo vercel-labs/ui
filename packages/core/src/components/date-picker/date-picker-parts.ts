@@ -76,7 +76,7 @@ function triggerLabel(state: State) {
 }
 
 const presetDisabled = (state: State, value: DatePickerValue) =>
-  !isPickable(state, normalizeValue(state.mode, value))
+  !isPickable(state, value)
 
 const datePickerSlots = (slot: SlotFactory<State, DatePickerApi>) => ({
   root: slot<{}, DatePickerState>({

@@ -307,10 +307,10 @@ function datePickerApiBody(
     event?: Event
   ) {
     const state = store.get()
-    const normalized = normalizeValue(state.mode, value) as DatePickerValue
-    if (!isPickable(state, normalized)) {
+    if (!isPickable(state, value)) {
       return false
     }
+    const normalized = normalizeValue(state.mode, value) as DatePickerValue
     store.set({ anchor: null, hover: null })
     clearDrafts()
     const changed = setValue(normalized, reason, event)
@@ -351,7 +351,7 @@ function datePickerApiBody(
         event,
       }: DatePickerChangeOptions<DatePickerValueChangeReason> = {}
     ) => {
-      if (!isPickable(store.get(), normalizeValue(store.get().mode, value))) {
+      if (!isPickable(store.get(), value)) {
         return false
       }
       store.set({ anchor: null, hover: null })
