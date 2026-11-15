@@ -734,7 +734,10 @@ const comboboxPrimitive = /* @__PURE__ */ definePrimitive({
   api: comboboxApi,
   // An arrow function, so TypeScript infers the slot names before it checks the parts.
   slots: (slot) => comboboxSlots(slot),
-  agent: { actions: ["setOpen", "setValue", "clear", "setQuery"] },
+  agent: {
+    actions: ["setOpen", "setValue", "clear", "setQuery"],
+    closed: true,
+  },
 })
 
 /**

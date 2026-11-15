@@ -544,6 +544,50 @@ describe("agent", () => {
     expect(onValueChange).not.toHaveBeenCalled()
   })
 
+  test("a combobox refuses a value that isn't in its list, unless it allows custom values", async () => {
+    const agent = createAgent()
+    const items = [
+      { value: "fra", label: "Frankfurt" },
+      { value: "sin", label: "Singapore" },
+    ]
+    const mount = (options: Parameters<typeof combobox>[0], label: string) => {
+      const instance = combobox(options)
+      const el = document.body.appendChild(document.createElement("input"))
+      el.setAttribute("aria-label", label)
+      cleanups.push(bind(instance.part("input"), el), () => instance.destroy())
+      return instance
+    }
+    const region = mount({ id: "region", items }, "Region")
+    const refused = await agent.act({
+      steps: [{ ref: "Region", action: "setValue", args: ["Tokyo"] }],
+    })
+    expect(refused.error?.message).toMatch(
+      /^No item "Tokyo" in Region \(c\d+\)\. Its items: Frankfurt, Singapore\.$/
+    )
+    expect(region.get().value).toBeNull()
+
+    const city = mount({ id: "city", items, allowCustomValue: true }, "City")
+    const custom = await agent.act({
+      steps: [{ ref: "City", action: "setValue", args: ["Tokyo"] }],
+    })
+    expect(custom.ok, custom.error?.message).toBe(true)
+    expect(city.get().value).toBe("Tokyo")
+
+    const stops = mount(
+      { id: "stops", items, multiple: true, defaultValue: ["ber"] },
+      "Stops"
+    )
+    const kept = await agent.act({
+      steps: [{ ref: "Stops", action: "setValue", args: [["ber", "sin"]] }],
+    })
+    expect(kept.ok, kept.error?.message).toBe(true)
+    expect(stops.get().value).toEqual(["ber", "sin"])
+    const unknown = await agent.act({
+      steps: [{ ref: "Stops", action: "setValue", args: [["ber", "tok"]] }],
+    })
+    expect(unknown.error?.message).toMatch(/^No item "tok" in Stops/)
+  })
+
   test("setValue takes labels in a list of values, like a multiple combobox's", async () => {
     const agent = createAgent()
     const instance = combobox({

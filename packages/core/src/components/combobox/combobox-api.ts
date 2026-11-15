@@ -849,6 +849,8 @@ function comboboxApiBody(
     // Internal. Used by slots and adapters.
     internal: {
       options,
+      // Read by the agent bridge, which takes text that isn't an item only with it.
+      allowCustomValue: () => !!options().allowCustomValue,
       listbox,
       selection,
       hooks,

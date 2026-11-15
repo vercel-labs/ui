@@ -151,6 +151,7 @@ const internalOf = (instance: PrimitiveInstance) =>
       internal?: {
         keyOf?: (value: unknown) => string
         elementOf?: (key: string) => Element | undefined
+        allowCustomValue?: () => boolean
       }
     }
   ).internal
@@ -1314,6 +1315,9 @@ function createAgent(
           `${entry.component} ${entry.ref} takes no ${action} now. It takes: ${actions.join(", ") || "nothing"}.${actions.includes("press") ? pressable(instance) : ""}`
         )
       }
+      // A combobox with `allowCustomValue` takes text that isn't an item.
+      const closed =
+        entry.agent?.closed && !internalOf(instance)?.allowCustomValue?.()
       // A number from text, like "90 days" on a slider, since a slider or number field given text would hold no number.
       const state = instance.get() as {
         value?: unknown
@@ -1366,11 +1370,7 @@ function createAgent(
           if (found.length === 1) {
             args = [found[0].value, ...args.slice(1)]
             named = true
-          } else if (
-            items.length &&
-            entry.agent?.closed &&
-            action !== "setQuery"
-          ) {
+          } else if (items.length && closed && action !== "setQuery") {
             throw new Error(
               `No item "${args[0]}" in ${name}. Its items: ${items
                 .slice(0, 20)
@@ -1409,7 +1409,7 @@ function createAgent(
       const elementOf = internalOf(instance)?.elementOf
       if (
         action === "setValue" &&
-        entry.agent?.closed &&
+        closed &&
         args[0] != null &&
         typeof args[0] !== "string"
       ) {
@@ -1420,6 +1420,12 @@ function createAgent(
           known.add(item.value)
         }
         const key = keyFor(instance)
+        // A value it already holds stays, like a chip whose item the list no longer shows.
+        for (const held of [state.value].flat()) {
+          if (held != null) {
+            known.add(key(held))
+          }
+        }
         const unknown = (Array.isArray(args[0]) ? args[0] : [args[0]]).find(
           (value) => !known.has(key(value)) && !elementOf?.(key(value))
         )
