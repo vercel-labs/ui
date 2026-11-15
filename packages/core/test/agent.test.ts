@@ -544,20 +544,24 @@ describe("agent", () => {
     expect(onValueChange).not.toHaveBeenCalled()
   })
 
+  function mountCombobox(
+    options: Parameters<typeof combobox>[0],
+    label: string
+  ) {
+    const instance = combobox(options)
+    const el = document.body.appendChild(document.createElement("input"))
+    el.setAttribute("aria-label", label)
+    cleanups.push(bind(instance.part("input"), el), () => instance.destroy())
+    return instance
+  }
+
   test("a combobox refuses a value that isn't in its list, unless it allows custom values", async () => {
     const agent = createAgent()
     const items = [
       { value: "fra", label: "Frankfurt" },
       { value: "sin", label: "Singapore" },
     ]
-    const mount = (options: Parameters<typeof combobox>[0], label: string) => {
-      const instance = combobox(options)
-      const el = document.body.appendChild(document.createElement("input"))
-      el.setAttribute("aria-label", label)
-      cleanups.push(bind(instance.part("input"), el), () => instance.destroy())
-      return instance
-    }
-    const region = mount({ id: "region", items }, "Region")
+    const region = mountCombobox({ id: "region", items }, "Region")
     const refused = await agent.act({
       steps: [{ ref: "Region", action: "setValue", args: ["Tokyo"] }],
     })
@@ -566,14 +570,17 @@ describe("agent", () => {
     )
     expect(region.get().value).toBeNull()
 
-    const city = mount({ id: "city", items, allowCustomValue: true }, "City")
+    const city = mountCombobox(
+      { id: "city", items, allowCustomValue: true },
+      "City"
+    )
     const custom = await agent.act({
       steps: [{ ref: "City", action: "setValue", args: ["Tokyo"] }],
     })
     expect(custom.ok, custom.error?.message).toBe(true)
     expect(city.get().value).toBe("Tokyo")
 
-    const stops = mount(
+    const stops = mountCombobox(
       { id: "stops", items, multiple: true, defaultValue: ["ber"] },
       "Stops"
     )
@@ -586,6 +593,90 @@ describe("agent", () => {
       steps: [{ ref: "Stops", action: "setValue", args: [["ber", "tok"]] }],
     })
     expect(unknown.error?.message).toMatch(/^No item "tok" in Stops/)
+  })
+
+  test("a combobox takes an item it shows while its query is empty, by its value or its label", async () => {
+    const agent = createAgent()
+    const region = mountCombobox(
+      {
+        id: "region",
+        items: [{ value: "fra", label: "Frankfurt" }],
+        emptyItems: [
+          { value: "fra", label: "Frankfurt" },
+          { value: "tok", label: "Tokyo" },
+        ],
+      },
+      "Region"
+    )
+    const [found] = (await agent.query({ within: "Region" })) as {
+      items: unknown[]
+    }[]
+    expect(found.items).toEqual([
+      { value: "fra", label: "Frankfurt" },
+      { value: "tok", label: "Tokyo" },
+    ])
+    for (const text of ["tok", "fra", "Tokyo"]) {
+      const outcome = await agent.act({
+        steps: [{ ref: "Region", action: "setValue", args: [text] }],
+      })
+      expect(outcome.ok, outcome.error?.message).toBe(true)
+    }
+    expect(region.get().value).toBe("tok")
+  })
+
+  test("a combobox or select whose data has no items refuses any value", async () => {
+    const agent = createAgent()
+    const region = mountCombobox(
+      { id: "region", items: [], filter: false },
+      "Region"
+    )
+    const stops = mountCombobox(
+      { id: "stops", items: [], multiple: true },
+      "Stops"
+    )
+    const plan = select({ id: "plan", items: [] })
+    const trigger = document.body.appendChild(document.createElement("button"))
+    trigger.setAttribute("aria-label", "Plan")
+    cleanups.push(bind(plan.part("trigger"), trigger), () => plan.destroy())
+    for (const [ref, value] of [
+      ["Region", "Tokyo"],
+      ["Stops", ["tok"]],
+      ["Plan", "Pro"],
+    ] as const) {
+      const outcome = await agent.act({
+        steps: [{ ref, action: "setValue", args: [value] }],
+      })
+      expect(outcome.error?.message).toMatch(
+        new RegExp(`^No item "${value}" in ${ref} `)
+      )
+    }
+    expect(region.get().value).toBeNull()
+    expect(stops.get().value).toEqual([])
+    expect(plan.get().value).toBeNull()
+  })
+
+  test("a combobox takes the value it holds, even one its list no longer has", async () => {
+    const agent = createAgent()
+    const onValueChange = vi.fn()
+    const region = mountCombobox(
+      {
+        id: "region",
+        items: [{ value: "fra", label: "Frankfurt" }],
+        defaultValue: "ber",
+        onValueChange,
+      },
+      "Region"
+    )
+    const outcome = await agent.act({
+      steps: [{ ref: "Region", action: "setValue", args: ["ber"] }],
+    })
+    expect(outcome.ok, outcome.error?.message).toBe(true)
+    expect(region.get().value).toBe("ber")
+    const other = await agent.act({
+      steps: [{ ref: "Region", action: "setValue", args: ["tok"] }],
+    })
+    expect(other.error?.message).toMatch(/^No item "tok" in Region/)
+    expect(onValueChange).not.toHaveBeenCalled()
   })
 
   test("setValue takes labels in a list of values, like a multiple combobox's", async () => {
