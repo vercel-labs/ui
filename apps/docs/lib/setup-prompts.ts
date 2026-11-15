@@ -93,9 +93,11 @@ const stacks = [
       {
         id: "vite",
         name: "Vite",
-        create: "npm create vite@latest . -- --template solid-ts",
-        needs:
-          'It needs Solid 2: install solid-js@next and @solidjs/web@next, 2.0.0-rc.14 or newer. Replace vite-plugin-solid, which only supports Solid 1, with @solidjs/vite-plugin, and add optimizeDeps: { exclude: ["@ui-sdk/core"] } to vite.config.ts. Import render from @solidjs/web in src/index.tsx, and set jsxImportSource to @solidjs/web in tsconfig.app.json.',
+        create:
+          "npm init solid@latest . -- --solid --ts --template bare --no-devtools",
+        steps: [
+          `Add optimizeDeps: { exclude: ["@ui-sdk/core"] } to vite.config.ts, so the app and @ui-sdk/solid share one copy of the core in development.`,
+        ],
       },
       {
         id: "start",
