@@ -1,0 +1,37 @@
+{
+  "name": "agent-benchmark",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port ${BENCHMARK_PORT:-5410} --strictPort",
+    "bench": "node harness/bench.mjs",
+    "typecheck": "vue-tsc --noEmit && svelte-check --tsconfig ./tsconfig.svelte.json --fail-on-warnings"
+  },
+  "dependencies": {
+    "@ark-ui/react": "^5.40.0",
+    "@base-ui/react": "^1.9.0",
+    "@ui-sdk/core": "workspace:*",
+    "@ui-sdk/react": "workspace:*",
+    "@ui-sdk/svelte": "workspace:*",
+    "@ui-sdk/vue": "workspace:*",
+    "bits-ui": "^2.21.0",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "reka-ui": "^2.11.0",
+    "svelte": "catalog:",
+    "vue": "catalog:"
+  },
+  "devDependencies": {
+    "@playwright/test": "catalog:",
+    "@sveltejs/vite-plugin-svelte": "catalog:",
+    "@types/node": "^24.0.0",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@vitejs/plugin-react": "catalog:",
+    "@vitejs/plugin-vue": "catalog:",
+    "svelte-check": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vue-tsc": "catalog:"
+  }
+}

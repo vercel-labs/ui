@@ -76,16 +76,62 @@ You can give these tools to your own agent, or register them with a supported br
 
 ## Benchmark
 
-In a project-settings benchmark, agents renamed a project, updated members and notification settings, then saved. One used browser tools on a page built with another component library; the other used the agent bridge on the same screen built with ui-sdk.
+We gave an agent one task on a project settings screen: rename the project, change its visibility, update two members and the notification settings, then save. We built the same screen with ui-sdk and with other component libraries, in React, Vue and Svelte.
 
-|            | Browser tools | ui-sdk + agent bridge | Delta |
-| ---------- | ------------- | --------------------- | ----- |
-| Tool calls | 16            | <Won>5</Won>          | −69%  |
-| Text read  | 39.8k         | <Won>6.8k</Won>       | −83%  |
-| Time       | 41 s          | <Won>16 s</Won>       | −61%  |
-| Cost       | $0.073        | <Won>$0.032</Won>     | −56%  |
+On the other libraries, the agent used browser tools: it reads the page's accessibility tree, then clicks and types. On ui-sdk, it used the agent bridge.
 
-These are medians from three runs per approach. Both agents used Sonnet through Claude Code with the same task and system prompt, plus instructions for their available tools. Every run completed the task. Text read counts characters returned by the tools. Time and cost are what Claude Code reported for those runs.
+### React
+
+|            | Base UI + browser tools | Ark UI + browser tools | ui-sdk + agent bridge | Delta       |
+| ---------- | ----------------------- | ---------------------- | --------------------- | ----------- |
+| Tool calls | 17                      | 19                     | <Won>7</Won>          | 59% fewer   |
+| Tokens     | 291.7k                  | 330.9k                 | <Won>69.5k</Won>      | 76% fewer   |
+| Time       | 53 s                    | 65 s                   | <Won>31 s</Won>       | 41% faster  |
+| Cost       | $0.139                  | $0.144                 | <Won>$0.044</Won>     | 68% cheaper |
+
+### Vue
+
+|            | Reka UI + browser tools | ui-sdk + agent bridge | Delta       |
+| ---------- | ----------------------- | --------------------- | ----------- |
+| Tool calls | 16                      | <Won>9</Won>          | 44% fewer   |
+| Tokens     | 226.5k                  | <Won>90.2k</Won>      | 60% fewer   |
+| Time       | 56 s                    | <Won>34 s</Won>       | 39% faster  |
+| Cost       | $0.113                  | <Won>$0.051</Won>     | 55% cheaper |
+
+### Svelte
+
+|            | Bits UI + browser tools | ui-sdk + agent bridge | Delta       |
+| ---------- | ----------------------- | --------------------- | ----------- |
+| Tool calls | 17                      | <Won>8</Won>          | 53% fewer   |
+| Tokens     | 259.1k                  | <Won>92.8k</Won>      | 64% fewer   |
+| Time       | 56 s                    | <Won>30 s</Won>       | 45% faster  |
+| Cost       | $0.123                  | <Won>$0.056</Won>     | 54% cheaper |
+
+These are medians from three runs per column. Every agent used Sonnet through Claude Code with the same task and system prompt, plus instructions for its tools. Every run completed the task. Time runs from the agent's start to its last message. Tokens and cost are what Claude Code reported for the run. Delta compares ui-sdk with the best other result in the row.
+
+We also ran the ui-sdk screen with browser tools. It took about as much as the other libraries, so the difference comes from the tools.
+
+### Run It Yourself
+
+The benchmark is in the repo, in [`benchmarks/agent`](https://github.com/vercel-labs/ui/tree/main/benchmarks/agent). It runs its agents with [Claude Code](https://claude.com/claude-code), so install it and sign in first.
+
+```sh
+git clone https://github.com/vercel-labs/ui
+cd ui
+pnpm install
+pnpm exec playwright install chromium
+pnpm --filter agent-benchmark bench
+```
+
+This opens every version of the React screen in its own browser window and starts one agent in each. When they finish, it prints a table with each run's tool calls, text read, time, tokens and cost, and whether the agent saved the right settings.
+
+Pass `--framework vue` or `--framework svelte` for the other frameworks, and `--runs 3` for medians:
+
+```sh
+pnpm --filter agent-benchmark bench --framework vue --runs 3
+```
+
+The [README](https://github.com/vercel-labs/ui/tree/main/benchmarks/agent#readme) explains the task, what's measured, and how to add another library.
 
 ## Where to Start
 
