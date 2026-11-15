@@ -1,5 +1,11 @@
 # @ui-sdk/core
 
+## 0.1.0-beta.4
+
+### Patch Changes
+
+- 4e529d2: An agent's `press` takes a button's own text, like `press "Save"` on a Save button.
+
 ## 0.1.0-beta.3
 
 ### Patch Changes
