@@ -166,7 +166,7 @@ function isAndroid() {
 function numberInputApiBody(
   context: PrimitiveContext<NumberInputOptions, State, string>
 ) {
-  const { store, element } = context
+  const { store, element, options } = context
   const drags = createDragSession(context.onDestroy)
   const change = createChange(context)
   const commitValue = createCommit(context)
@@ -356,23 +356,23 @@ function numberInputApiBody(
           return commit(event)
         }
         edited = false
-        // A controlled value arrives after this event, so the commit reports
+        // A controlled value arrives after this event, so its commit reports
         // the value just asked for.
-        let value = state.value
+        let asked = state.value
         if (state.text.trim() !== "") {
           const parsed = parseNumber(state.text, localeOf(state), state.format)
           const next =
             parsed === null
-              ? value
+              ? asked
               : snapToStep(clamp(parsed, state.min, state.max), rangeOf(state))
           if (setValue(next, "input-commit", event)) {
-            value = next
+            asked = next
           }
         } else if (setValue(null, "input-commit", event)) {
-          value = null
+          asked = null
         }
         showValue()
-        commit(event, value)
+        commit(event, options().value === undefined ? undefined : asked)
       },
       keydown(event: KeyboardEvent) {
         const state = store.get()

@@ -235,6 +235,27 @@ describe("number input", () => {
     ])
   })
 
+  test("an uncontrolled value commits what onValueChange replaced it with", () => {
+    const onValueCommit = vi.fn()
+    const instance = numberInput({
+      id: "n",
+      defaultValue: 4,
+      min: 1,
+      max: 12,
+      locale: "en-US",
+      onValueChange: (value) => {
+        if (value === 12) {
+          instance.api.setValue(10)
+        }
+      },
+      onValueCommit,
+    })
+    instance.api.internal.type("20")
+    instance.api.internal.commitText()
+    expect(instance.api.getValue()).toBe(10)
+    expect(onValueCommit.mock.calls.map(([value]) => value)).toEqual([10])
+  })
+
   test("a controller step leaves nothing for the next blur to commit", () => {
     const onValueCommit = vi.fn()
     const instance = numberInput({ id: "n", defaultValue: 1, onValueCommit })
