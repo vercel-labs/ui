@@ -253,6 +253,36 @@ describe("agent", () => {
     }
   )
 
+  test.each([
+    ["input", input],
+    ["textarea", textarea],
+  ] as const)(
+    "a read-only %s takes no actions, and a required one says so",
+    async (tag, make) => {
+      const agent = createAgent()
+      const instance = make({ id: "note", defaultValue: "Kept" })
+      const el = document.createElement(tag)
+      el.setAttribute("aria-label", "Note")
+      document.body.append(el)
+      cleanups.push(
+        bind(instance.part("root", { readOnly: true, required: true }), el),
+        () => instance.destroy()
+      )
+      const [component] = agent.snapshot()
+      expect(component).toMatchObject({
+        label: "Note",
+        disabled: true,
+        required: true,
+        actions: [],
+      })
+      const outcome = await agent.act({
+        steps: [{ ref: "Note", action: "setValue", args: ["Changed"] }],
+      })
+      expect(outcome.error?.message).toContain("takes no setValue now")
+      expect(instance.get().value).toBe("Kept")
+    }
+  )
+
   test("a date picker whose input a disabled fieldset disables takes no actions", async () => {
     const agent = createAgent()
     const instance = datePicker({ id: "due", defaultMonth: "2026-11" })

@@ -393,7 +393,14 @@ function soleTrigger(parts: Bound[]) {
 }
 
 // The root part's state counts a group around the component, like a toggle's
-// in a disabled toggle group.
+// in a disabled toggle group, and a field's own props, like an Input's `readOnly`.
+function rootState(parts: Bound[]) {
+  const root = parts.find(
+    (part) => /^(root|group|set)$/.test(part.slot) && !part.key
+  )
+  return (root ? partState(root) : {}) as Record<string, unknown>
+}
+
 function isComponentDisabled(state: Record<string, unknown>, parts: Bound[]) {
   if (
     state.disabled === true ||
@@ -402,10 +409,8 @@ function isComponentDisabled(state: Record<string, unknown>, parts: Bound[]) {
   ) {
     return true
   }
-  const root = parts.find(
-    (part) => /^(root|group|set)$/.test(part.slot) && !part.key
-  )
-  if (root && (partState(root) as { disabled?: unknown }).disabled === true) {
+  const root = rootState(parts)
+  if (root.disabled === true || root.readOnly === true) {
     return true
   }
   const button = ownButton(parts)
@@ -527,8 +532,9 @@ function describe(entry: Entry, instance: PrimitiveInstance, parts: Bound[]) {
   }
   // The rest only when they say something, like `required: true`. A secret
   // field's search text and errors can repeat its value.
+  const root = rootState(parts)
   for (const key of shown) {
-    const value = state[key]
+    const value = state[key] ?? root[key]
     const empty = value === "" || value == null || value === false
     if (empty || (typeof value === "object" && !Object.keys(value).length)) {
       continue
