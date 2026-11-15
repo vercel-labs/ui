@@ -1,5 +1,13 @@
 # @ui-sdk/core
 
+## 0.1.0-beta.3
+
+### Patch Changes
+
+- a6dc4e0: A step marked `data-agent-confirm` that `registerTools`' `allow` refuses now fails with `The app refused …`. It no longer reports that the person said no.
+- 220c1a0: A Select, Combobox or Listbox no longer throws when the browser restores a value that isn't the list of keys it saved, like a number. It selects nothing.
+- adc59ce: `registerTools` marks `act` with `consequentialHint` and ends a step that is waiting on `allow` when the browser cancels its call. The bridge no longer keeps a hidden input's value after the input leaves the page.
+
 ## 0.1.0-beta.2
 
 ### Patch Changes

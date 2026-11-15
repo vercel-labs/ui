@@ -1,5 +1,15 @@
 # @ui-sdk/react
 
+## 0.1.0-beta.3
+
+### Patch Changes
+
+- c0a383f: A part given a `render` element from a Server Component no longer throws "Element type is invalid" when React passes the element before its client module has loaded.
+- Updated dependencies [a6dc4e0]
+- Updated dependencies [220c1a0]
+- Updated dependencies [adc59ce]
+  - @ui-sdk/core@0.1.0-beta.3
+
 ## 0.1.0-beta.2
 
 ### Patch Changes
