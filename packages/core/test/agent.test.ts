@@ -1363,6 +1363,36 @@ describe("agent", () => {
     })
   })
 
+  test("a press takes a button's own text", async () => {
+    const agent = createAgent()
+    const action = vi.fn()
+    const instance = button({ id: "save", action } as Parameters<
+      typeof button
+    >[0])
+    const el = document.createElement("button")
+    el.textContent = "Save settings"
+    document.body.append(el)
+    cleanups.push(bind(instance.part("root"), el), () => instance.destroy())
+    const saved = await agent.act({
+      steps: [
+        { ref: "Save settings", action: "press", args: ["Save settings"] },
+      ],
+    })
+    expect(saved).toMatchObject({
+      ok: true,
+      steps: [{ result: 'Pressed "Save settings".' }],
+    })
+    expect(action).toHaveBeenCalledTimes(1)
+    const missed = await agent.act({
+      steps: [{ ref: "Save settings", action: "press", args: ["Publish"] }],
+    })
+    expect(missed).toMatchObject({
+      ok: false,
+      error: { message: expect.stringContaining("Buttons: Save settings.") },
+    })
+    expect(action).toHaveBeenCalledTimes(1)
+  })
+
   test("a closed select's items come from its data, without opening it", async () => {
     const agent = createAgent()
     const onOpenChange = vi.fn()

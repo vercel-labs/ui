@@ -972,10 +972,12 @@ function createAgent(
       }
       // Exact text first, then whole words, like "Delete" for "Delete project". Two that match the same
       // way are refused, not guessed.
+      const own = ownButton(parts)
+      const all = own && !buttons.includes(own) ? [own, ...buttons] : buttons
       const needle = fold(text)
       const words = wordsOf(text)
-      const exact = buttons.filter((el) => fold(textOrName(el)) === needle)
-      const near = buttons.filter(
+      const exact = all.filter((el) => fold(textOrName(el)) === needle)
+      const near = all.filter(
         (el) => words.trim() && wordsOf(textOrName(el)).includes(words)
       )
       const matches = exact.length ? exact : near
@@ -984,7 +986,7 @@ function createAgent(
           `"${text}" names ${matches.length} buttons in ${entry.ref}. Use the whole text of one.`
         )
       }
-      return { buttons, button: matches[0] }
+      return { buttons: all, button: matches[0] }
     }
     let found = match()
     let opened = false
