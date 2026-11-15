@@ -1,5 +1,15 @@
 # @ui-sdk/core
 
+## 0.1.0-beta.5
+
+### Patch Changes
+
+- 75c3588: An agent's `setValue` on a Combobox now refuses a value that isn't one of its items, as a Select does, unless the Combobox has `allowCustomValue`.
+- 452f851: An agent can no longer change a read-only `Input` or `Textarea`. Its snapshot shows `disabled: true` with no actions, and `required: true` for a required one.
+- 2b4ed26: An agent's `setValue` now refuses numeric text with grouped digits, like `"1,499.5"`, which used to set `1`. One value or label for a component that holds a list, like a multiple Select or a Checkbox Group, now sets a list of one.
+- 8228013: A Calendar or Date Picker's `setValue` given text that isn't a date, or a range with one end, now returns `false` and keeps the value. It no longer clears the selection.
+- 7bb89c2: A drag with a `threshold`, like `createReorder`'s and `createTransfer`'s, now captures the pointer once the pointer passes it. A press that lifts first clicks what was pressed, like a handle or a button inside the item, and no longer the item. Focus on an element inside a moved item, like its drag handle, now follows the item when a framework renders it as a new element in another list.
+
 ## 0.1.0-beta.4
 
 ### Patch Changes

@@ -1,5 +1,16 @@
 # @ui-sdk/web
 
+## 0.1.0-beta.5
+
+### Patch Changes
+
+- Updated dependencies [75c3588]
+- Updated dependencies [452f851]
+- Updated dependencies [2b4ed26]
+- Updated dependencies [8228013]
+- Updated dependencies [7bb89c2]
+  - @ui-sdk/core@0.1.0-beta.5
+
 ## 0.1.0-beta.4
 
 ### Patch Changes
