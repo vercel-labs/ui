@@ -570,6 +570,31 @@ describe("agent", () => {
     expect(instance.get().value).toEqual(["theo", "ana"])
   })
 
+  test("setValue takes one value or label for a list, like a multiple combobox's", async () => {
+    const agent = createAgent()
+    const instance = combobox({
+      id: "watchers",
+      multiple: true,
+      items: [
+        { value: "theo", label: "Theo Laurent" },
+        { value: "ana", label: "Ana Ruiz" },
+      ],
+    })
+    const el = document.body.appendChild(document.createElement("input"))
+    el.setAttribute("aria-label", "Watchers")
+    cleanups.push(bind(instance.part("input"), el), () => instance.destroy())
+    for (const [text, value] of [
+      ["ana", ["ana"]],
+      ["Theo Laurent", ["theo"]],
+    ] as const) {
+      const outcome = await agent.act({
+        steps: [{ ref: "Watchers", action: "setValue", args: [text] }],
+      })
+      expect(outcome.ok, outcome.error?.message).toBe(true)
+      expect(instance.get().value).toEqual(value)
+    }
+  })
+
   test("setValue refuses a disabled item, by its label or its value, as a person can't choose it", async () => {
     const agent = createAgent()
     const onValueChange = vi.fn()
@@ -1976,6 +2001,25 @@ describe("agent act", () => {
       steps: [{ ref: "Data retention", action: "setValue", args: ["a lot"] }],
     })
     expect(outcome.error?.message).toMatch(/takes a number/)
+  })
+
+  test("a number field refuses text with grouped digits, which would read as the first group", async () => {
+    const agent = createAgent()
+    const instance = numberInput({ id: "price", defaultValue: 10 })
+    const el = document.body.appendChild(document.createElement("input"))
+    el.setAttribute("aria-label", "Price")
+    cleanups.push(bind(instance.part("input"), el), () => instance.destroy())
+    for (const text of ["1,499.5", "1 499", "1.499,5"]) {
+      const outcome = await agent.act({
+        steps: [{ ref: "Price", action: "setValue", args: [text] }],
+      })
+      expect(outcome.error?.message).toMatch(/takes a number/)
+    }
+    expect(instance.get().value).toBe(10)
+    await agent.act({
+      steps: [{ ref: "Price", action: "setValue", args: ["1499"] }],
+    })
+    expect(instance.get().value).toBe(1499)
   })
 
   test("a select with a few items shows them", () => {

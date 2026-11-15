@@ -1326,13 +1326,25 @@ function createAgent(
         typeof state.value === "number"
       if (action === "setValue" && numeric && typeof args[0] === "string") {
         const number = Number.parseFloat(args[0])
-        if (Number.isNaN(number)) {
+        // Grouped digits, like "1,499.5", would read as their first group.
+        const rest = args[0]
+          .trim()
+          .replace(/^[-+]?(\d+\.?\d*|\.\d+)(e[-+]?\d+)?/i, "")
+        if (Number.isNaN(number) || /^[\s,.']*\d/.test(rest)) {
           throw new Error(`${entry.component} ${entry.ref} takes a number.`)
         }
         args = [
           Array.isArray(state.value) ? [number] : number,
           ...args.slice(1),
         ]
+      }
+      // One value for a component that holds a list, like a multiple select's, is a list of one.
+      if (
+        action === "setValue" &&
+        Array.isArray(state.value) &&
+        typeof args[0] === "string"
+      ) {
+        args = [[args[0]], ...args.slice(1)]
       }
       // The disabled items this step saw while it opened the list, if it did.
       let whileOpen: Set<string> | undefined
