@@ -2031,7 +2031,7 @@ describe("agent act", () => {
     const instance = numberInput({ id: "price", defaultValue: 10 })
     const el = document.body.appendChild(document.createElement("input"))
     el.setAttribute("aria-label", "Price")
-    cleanups.push(bind(instance.part("input"), el), () => instance.destroy())
+    cleanups.push(bind(instance.part("control"), el), () => instance.destroy())
     for (const text of ["1,499.5", "1 499", "1.499,5"]) {
       const outcome = await agent.act({
         steps: [{ ref: "Price", action: "setValue", args: [text] }],
