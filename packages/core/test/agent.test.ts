@@ -28,6 +28,7 @@ import { select } from "../src/components/select/select"
 import { separator } from "../src/components/separator/separator"
 import { slider } from "../src/components/slider/slider"
 import { tabs } from "../src/components/tabs/tabs"
+import { tokenInput } from "../src/components/token-input/token-input"
 import { toolbar } from "../src/components/toolbar/toolbar"
 import { tree } from "../src/components/tree/tree"
 import { triggerMenu } from "../src/components/trigger-menu/trigger-menu"
@@ -593,6 +594,28 @@ describe("agent", () => {
       expect(outcome.ok, outcome.error?.message).toBe(true)
       expect(instance.get().value).toEqual(value)
     }
+  })
+
+  test("setValue reads a token input's text as tokens, not as a list of one", async () => {
+    const agent = createAgent()
+    const instance = tokenInput({ id: "prompt" })
+    const el = document.body.appendChild(document.createElement("div"))
+    el.setAttribute("aria-label", "Prompt")
+    cleanups.push(bind(instance.part("editor"), el), () => instance.destroy())
+    const outcome = await agent.act({
+      steps: [
+        {
+          ref: "Prompt",
+          action: "setValue",
+          args: ["Ask [@Ada](mention:ada)"],
+        },
+      ],
+    })
+    expect(outcome.ok, outcome.error?.message).toBe(true)
+    expect(instance.api.getValue()).toMatchObject([
+      "Ask ",
+      { type: "mention", label: "Ada" },
+    ])
   })
 
   test("setValue refuses a disabled item, by its label or its value, as a person can't choose it", async () => {

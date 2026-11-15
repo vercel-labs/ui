@@ -1339,10 +1339,12 @@ function createAgent(
         ]
       }
       // One value for a component that holds a list, like a multiple select's, is a list of one.
+      // A token input reads its own text.
       if (
         action === "setValue" &&
         Array.isArray(state.value) &&
-        typeof args[0] === "string"
+        typeof args[0] === "string" &&
+        typeof entry.options?.value !== "function"
       ) {
         args = [[args[0]], ...args.slice(1)]
       }
