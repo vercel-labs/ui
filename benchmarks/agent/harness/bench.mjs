@@ -1,5 +1,6 @@
 // pnpm --filter agent-benchmark bench --framework react --runs 3
 import { spawn } from "node:child_process"
+import { randomUUID } from "node:crypto"
 import { mkdtempSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import path from "node:path"
@@ -43,6 +44,7 @@ if (!arms) {
 }
 const out = flags.out ?? mkdtempSync(path.join(tmpdir(), "agent-benchmark-"))
 const width = Number(flags.width)
+const token = randomUUID()
 const children = []
 const stop = () => children.forEach((child) => child.kill())
 for (const signal of ["SIGINT", "SIGTERM"]) {
@@ -122,6 +124,7 @@ async function operate(arm, round, app) {
   const screen = await openScreen({
     app,
     port,
+    token,
     screen: arm.screen,
     tools: arm.tools,
     dir: path.join(out, `${round}`, `${arm.screen}-${arm.tools}`),
@@ -144,7 +147,10 @@ async function operate(arm, round, app) {
       "--allowedTools",
       `Bash(node ${toolPath}:*)`,
     ],
-    { cwd: mkdtempSync(path.join(tmpdir(), "agent-benchmark-cwd-")) }
+    {
+      cwd: mkdtempSync(path.join(tmpdir(), "agent-benchmark-cwd-")),
+      env: { ...process.env, AGENT_BENCHMARK_TOKEN: token },
+    }
   )
   const usage = result.usage ?? {}
   const measured = {

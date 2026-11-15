@@ -38,14 +38,16 @@ function agentTools(page, tools) {
 }
 
 /**
- * Opens one screen in its own browser and serves its tools over HTTP, so an
- * agent's tool call is one short command. `tools` is "browser" or "agent".
+ * Opens one screen in its own browser and serves its tools on this machine
+ * only, to requests that carry `token`, so an agent's tool call is one short
+ * command. `tools` is "browser" or "agent".
  */
 async function openScreen({
   app,
   screen,
   tools,
   port,
+  token,
   dir,
   label,
   headed = false,
@@ -71,7 +73,7 @@ async function openScreen({
   const started = Date.now()
   const stats = { calls: 0, chars: 0, done: false, saved: [] }
 
-  const server = createServer(async (request, response) => {
+  async function answer(request) {
     let body = ""
     for await (const chunk of request) {
       body += chunk
@@ -82,12 +84,11 @@ async function openScreen({
     if (tool === "done") {
       stats.saved = await page.evaluate(() => window.__saved ?? [])
       stats.done = true
-      response.end("Done.")
-      return
+      return "Done."
     }
     let result
     try {
-      if (!available[tool]) {
+      if (!Object.hasOwn(available, tool)) {
         const names = [...Object.keys(available), "done"].join(", ")
         throw new Error(`Unknown tool ${tool}. Tools: ${names}`)
       }
@@ -101,9 +102,21 @@ async function openScreen({
       path.join(dir, "calls.jsonl"),
       `${JSON.stringify({ at: at - started, ms: Date.now() - at, tool, args, chars: text.length })}\n`
     )
-    response.end(text)
+    return text
+  }
+
+  const server = createServer(async (request, response) => {
+    if (request.headers.authorization !== `Bearer ${token}`) {
+      response.writeHead(401).end("Unauthorized.")
+      return
+    }
+    try {
+      response.end(await answer(request))
+    } catch {
+      response.writeHead(400).end("Bad request.")
+    }
   })
-  await new Promise((resolve) => server.listen(port, resolve))
+  await new Promise((resolve) => server.listen(port, "127.0.0.1", resolve))
 
   return {
     stats,
