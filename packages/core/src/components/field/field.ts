@@ -159,7 +159,7 @@ function fieldApiBody(
 
   // The first error that shows takes `${id}-error`, which the control points
   // at before binding; parts are made in render order, so server and
-  // hydration agree. An error in the page keeps it, so it never moves.
+  // hydration agree. An error in the page keeps it until it leaves.
   let holder: string | undefined
   const errorId = (state: FieldStore, key: string) => {
     const first =
@@ -265,11 +265,14 @@ function fieldApiBody(
           return () => {}
         }
         holder = key
-        return () => {
-          if (holder === key) {
-            holder = undefined
-          }
-        }
+        // A hidden error, like one in React's `<Activity>`, keeps its element
+        // and its id, so it lets go only once that element leaves the page.
+        return () =>
+          queueMicrotask(() => {
+            if (holder === key && !el.isConnected) {
+              holder = undefined
+            }
+          })
       },
       // The browser's message for the current problem, which an empty error shows.
       message: () => store.get().validity.message,
