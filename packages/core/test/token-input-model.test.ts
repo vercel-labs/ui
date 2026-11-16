@@ -201,6 +201,15 @@ describe("codec", () => {
     }
   })
 
+  test("a long run of backslashes round-trips without stalling", () => {
+    const slashes = "\\".repeat(200_000)
+    const value = normalizeValue([`${slashes}x[@`, alice])
+    const start = performance.now()
+    const text = toText(value)
+    expect(performance.now() - start).toBeLessThan(500)
+    expect(fromText(text)[0]).toBe(value[0])
+  })
+
   test("a custom codec writes and reads its own format", () => {
     const slack = {
       format: (token: Token) => `<@${token.value}>`,

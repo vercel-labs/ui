@@ -236,13 +236,14 @@ const defaultCodec: TokenCodec = {
     `[@${escapeIn(token.label, /[\\[\]]/g)}](${token.type}:${escapeIn(token.value, /[\\()]/g)})`,
   // Backslashes before `[@` double, plus one more when the bracket is literal.
   // A run of backslashes at the end of text before a token doubles too.
+  // Matching from a run's first backslash only keeps a long run linear.
   escape(text, next) {
     let result = text.replace(
-      /(\\*)\[@/g,
+      /(?<!\\)(\\*)\[@/g,
       (_, slashes: string) => `${slashes}${slashes}\\[@`
     )
     if (next) {
-      result = result.replace(/(\\+)$/, "$1$1")
+      result = result.replace(/(?<!\\)(\\+)$/, "$1$1")
     }
     return result
   },

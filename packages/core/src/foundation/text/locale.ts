@@ -11,7 +11,7 @@ function toLocale(tag: string | null | undefined) {
   // A POSIX locale's encoding and modifier go, as in `de_DE.UTF-8@euro`.
   try {
     return Intl.getCanonicalLocales(
-      tag ? tag.replace(/[.@].*$/, "").replaceAll("_", "-") : []
+      tag ? tag.split(/[.@]/)[0].replaceAll("_", "-") : []
     )[0]
   } catch {}
 }
