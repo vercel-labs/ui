@@ -7,6 +7,7 @@ import {
   bindInternals,
   bindValueInput,
   isDisabled,
+  typedBeforeBind,
 } from "../../foundation/forms/form"
 import { css } from "../../foundation/kernel/inline-style"
 import type { SlotFactory } from "../../foundation/kernel/primitive-types"
@@ -441,7 +442,7 @@ function colorPickerSlots(slot: SlotFactory<State, ColorPickerApi>) {
         },
         focusout: (event, { api }) => api.internal.commitText(event),
       },
-      bind(el, { store }) {
+      bind(el, { api, store }) {
         const input = el as HTMLInputElement
         // The text is written here, so the framework never fights the caret.
         const write = () => {
@@ -449,6 +450,13 @@ function colorPickerSlots(slot: SlotFactory<State, ColorPickerApi>) {
           const next = text ?? value
           if (input.value !== next) {
             input.value = next
+          }
+        }
+        const { text, value } = store.get()
+        if (typedBeforeBind(input, text ?? value)) {
+          api.internal.setText(input.value)
+          if (!input.matches(":focus")) {
+            api.internal.commitText()
           }
         }
         write()

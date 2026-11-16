@@ -1,4 +1,8 @@
-import { bindValueInput, bindInternals } from "../../foundation/forms/form"
+import {
+  bindValueInput,
+  bindInternals,
+  typedBeforeBind,
+} from "../../foundation/forms/form"
 import {
   atBound,
   canStep,
@@ -403,6 +407,12 @@ const numberInputPrimitive = /* @__PURE__ */ definePrimitive({
         const write = () => {
           if (input.value !== store.get().text) {
             input.value = store.get().text
+          }
+        }
+        if (typedBeforeBind(input, store.get().text)) {
+          api.internal.type(input.value)
+          if (!input.matches(":focus")) {
+            api.internal.commitText()
           }
         }
         write()

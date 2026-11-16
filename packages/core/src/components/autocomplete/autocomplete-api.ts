@@ -283,16 +283,16 @@ function autocompleteApiBody(
   // The user typed. The text filters, the suggestions open, and with
   // `inlineComplete` an insertion at the end completes the first match,
   // keeping the case the user typed, with the rest selected.
-  function typed(input: HTMLInputElement, event: Event) {
+  function typed(input: HTMLInputElement, event?: Event) {
     if (!editable()) {
       return
     }
     const text = input.value
-    const insertion = event as InputEvent
+    const insertion = event as InputEvent | undefined
     const completing =
       completes() &&
-      !insertion.isComposing &&
-      !!insertion.inputType?.startsWith("insert") &&
+      !insertion?.isComposing &&
+      !!insertion?.inputType?.startsWith("insert") &&
       insertion.inputType !== "insertReplacementText" &&
       input.selectionEnd === text.length
     const match = completing ? completionFor(text, core.listbox) : undefined
@@ -304,7 +304,8 @@ function autocompleteApiBody(
       input.value = completed
       input.setSelectionRange(text.length, completed.length)
     }
-    if (!store.get().open) {
+    // Text typed before the script ran opens the list only while it has focus.
+    if (!store.get().open && (event || input.matches(":focus"))) {
       if (text) {
         pendingHighlight = "first"
       }

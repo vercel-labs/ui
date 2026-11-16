@@ -551,6 +551,12 @@ function labelledBy(
   return () => watch.removeEventListener("focusin", update)
 }
 
+// Text typed before the page's script ran, which neither the server's markup
+// nor what the field would show now has, goes in as typing.
+function typedBeforeBind(input: HTMLInputElement, shown: string) {
+  return input.value !== input.defaultValue && input.value !== shown
+}
+
 export {
   associate,
   type Association,
@@ -577,6 +583,7 @@ export {
   onValidityChange,
   setComponentValidity,
   submitImplicitly,
+  typedBeforeBind,
   validityChanged,
   valueMissingMessage,
   watchFieldsets,

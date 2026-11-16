@@ -6,6 +6,7 @@
 // selected value.
 import { type AsyncOptionsStatus } from "./async-options"
 import { pressKeepsFocus } from "../focus/press-keeps-focus"
+import { typedBeforeBind } from "../forms/form"
 import { isApple } from "../platform/platform"
 import { fuzzyFilter } from "../text/fuzzy"
 import {
@@ -333,7 +334,7 @@ type CoreApi = {
     activeDescendant: (state: never) => string | undefined
     // The text the field shows.
     text: (state: never) => string
-    typed: (el: HTMLInputElement, event: Event) => void
+    typed: (el: HTMLInputElement, event?: Event) => void
     onInputKeyDown: (event: KeyboardEvent) => void
     press: (key: string, event?: Event) => void
   }
@@ -382,6 +383,9 @@ function fieldPart<State extends AutocompleteCoreState, Api extends CoreApi>() {
         if (input.value !== value) {
           input.value = value
         }
+      }
+      if (typedBeforeBind(input, text(api, store.get()))) {
+        api.internal.typed(input)
       }
       write()
       return store.subscribe(write)

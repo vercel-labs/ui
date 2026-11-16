@@ -68,6 +68,7 @@ import { formatLabels, listOf } from "../../foundation/lists/listbox-value"
 import { selects } from "../../foundation/kernel/selects"
 import { direct, live } from "../../foundation/kernel/live"
 import { pressKeepsFocus } from "../../foundation/focus/press-keeps-focus"
+import { typedBeforeBind } from "../../foundation/forms/form"
 
 type ItemProps = ComboboxItemProps<unknown> & {
   /** @internal The group the item is in. */
@@ -296,6 +297,14 @@ const comboboxSlots = (slot: SlotFactory<ComboboxState, ComboboxApi>) => ({
         shown = query
         if (input.value !== query) {
           input.value = query
+        }
+      }
+      // Opening the list for text typed before the script ran waits for focus.
+      if (typedBeforeBind(input, store.get().query)) {
+        if (input.matches(":focus")) {
+          api.internal.typed(input.value)
+        } else {
+          api.setQuery(input.value, { reason: "input-change" })
         }
       }
       write()

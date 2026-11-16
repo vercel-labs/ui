@@ -14,6 +14,7 @@ import {
   bindInternals,
   bindValueInput,
   setComponentValidity,
+  typedBeforeBind,
 } from "../../foundation/forms/form"
 import {
   openerOf,
@@ -188,6 +189,12 @@ const datePickerSlots = (slot: SlotFactory<State, DatePickerApi>) => ({
           input,
           invalidAt(state, indexOf(props)) ? invalidDateMessage : ""
         )
+      }
+      if (typedBeforeBind(input, textOf(store.get(), indexOf(props)))) {
+        api.internal.setText(indexOf(props), input.value)
+        if (!input.matches(":focus")) {
+          api.internal.commit(indexOf(props))
+        }
       }
       write()
       const unsubscribe = store.subscribe(write)
