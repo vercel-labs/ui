@@ -679,6 +679,8 @@ function createPopupLayer<
       markClosed(returnTarget())
     }
     const from = upstream
+    const range = caret
+    caret = undefined
     if (!el || !isBrowser) {
       options.onOpenChange?.(false, closed)
       store.set({ mounted: false } as Partial<State>)
@@ -726,11 +728,10 @@ function createPopupLayer<
     releaseWatcher?.()
     releaseWatcher = undefined
     if (!mode || !hadFocus) {
-      caret = undefined
       return
     }
     if (mode === true) {
-      return returnFocus(el, from)
+      return returnFocus(el, from, false, range)
     }
     if (mode === "unless-moved") {
       queueMicrotask(() => {
@@ -738,7 +739,7 @@ function createPopupLayer<
         const moved =
           !!now && now !== el.ownerDocument.body && !composedContains(el, now)
         if (!moved && !openedSince(order)) {
-          returnFocus(el, from)
+          returnFocus(el, from, false, range)
         }
       })
       return
@@ -749,7 +750,7 @@ function createPopupLayer<
       setTimeout(() => {
         const active = activeElement()
         if (!active || active === el.ownerDocument.body) {
-          returnFocus(el, from)
+          returnFocus(el, from, false, range)
         }
       })
     }
@@ -862,10 +863,13 @@ function createPopupLayer<
     }
   }
 
-  function returnFocus(el: HTMLElement, from: typeof upstream, strict = false) {
+  function returnFocus(
+    el: HTMLElement,
+    from: typeof upstream,
+    strict = false,
+    range?: Range
+  ) {
     const setting = options.finalFocus?.() ?? "trigger"
-    const range = caret
-    caret = undefined
     if (setting === "none") {
       return
     }
@@ -875,14 +879,21 @@ function createPopupLayer<
       if (!usable(target) || el.contains(target)) {
         return false
       }
+      // A caret the app placed in it while open wins over the saved one.
+      const selection = target.ownerDocument.getSelection()
+      const kept =
+        range && target === before
+          ? selection?.rangeCount && target.contains(selection.anchorNode)
+            ? selection.getRangeAt(0).cloneRange()
+            : range
+          : undefined
       restoreFocus(target)
       if (activeElement() !== target) {
         return false
       }
-      if (range && target === before && target.contains(range.startContainer)) {
-        const selection = target.ownerDocument.getSelection()
+      if (kept && target.contains(kept.startContainer)) {
         selection?.removeAllRanges()
-        selection?.addRange(range)
+        selection?.addRange(kept)
       }
       return true
     }
@@ -1437,9 +1448,11 @@ function createPopupLayer<
           // while it's open, focus goes back to what opened it. New content
           // in its place keeps it, and what replaced the opener isn't a neighbour.
           if (held) {
+            const range = caret
+            caret = undefined
             queueMicrotask(() => {
               if (!bound && !el.isConnected && focusIsLost()) {
-                returnFocus(el, from, true)
+                returnFocus(el, from, true, range)
               }
             })
           }

@@ -776,6 +776,28 @@ describe("our popups on the kit", () => {
     expect(document.getSelection()!.anchorOffset).toBe(11)
   })
 
+  test("Popover opened from a contenteditable keeps a caret the app placed in it while open", async () => {
+    const view = mount(
+      popover,
+      {},
+      `<div><div contenteditable="true">Hello world</div><trigger>Link</trigger><content><input aria-label="URL"></content></div>`
+    )
+    mounts.push(view)
+    const editor = document.querySelector<HTMLElement>("[contenteditable]")!
+    Object.defineProperty(editor, "isContentEditable", { value: true })
+    editor.tabIndex = 0
+    editor.focus()
+    document.getSelection()!.collapse(editor.firstChild!, 11)
+    view.api.open()
+    await view.settle()
+    const link = editor.appendChild(document.createTextNode(" link"))
+    document.getSelection()!.collapse(link, 5)
+    await view.keys("Escape")
+    expect(document.activeElement).toBe(editor)
+    expect(document.getSelection()!.anchorNode).toBe(link)
+    expect(document.getSelection()!.anchorOffset).toBe(5)
+  })
+
   test("Popover opened from code after the trigger that opened it last is gone returns focus to its other trigger", async () => {
     const view = mount(
       popover,
