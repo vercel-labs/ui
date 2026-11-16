@@ -292,7 +292,10 @@ function buildSelectState(
       const month = `${year}-${String(value).padStart(2, "0")}`
       return {
         value,
-        label: months ? names[index] : format.format(Date.UTC(value, 0, 1)),
+        // `setUTCFullYear` keeps years below 100 as they are, which `Date.UTC` doesn't.
+        label: months
+          ? names[index]
+          : format.format(new Date(0).setUTCFullYear(value, 0, 1)),
         disabled:
           months && ((!!first && month < first) || (!!last && month > last)),
       }
