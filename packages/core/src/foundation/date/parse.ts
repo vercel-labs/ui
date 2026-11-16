@@ -119,19 +119,33 @@ function parseDate(
   if (!normalized) {
     return undefined
   }
-  if (dateParts(normalized)) {
+  const { fields, separator } = datePattern(locale)
+  // Kyrgyz writes numeric dates year, day, month with dashes, so there a
+  // "yyyy-mm-dd" shape is the locale's own and not ISO.
+  if (
+    !(separator === "-" && fields[0] === "year" && fields[1] !== "month") &&
+    dateParts(normalized)
+  ) {
     return normalized
   }
-  const { fields } = datePattern(locale)
   const referenceYear =
     Number((options.referenceDate ?? "").slice(0, 4)) ||
     new Date().getFullYear()
 
   let namedMonth: number | undefined
+  let words = normalized.toLocaleLowerCase(locale)
+  // Names with a space, apostrophe or number in them, like Irish "deireadh
+  // fómhair" or Vietnamese "tháng 10", are found before the text splits.
+  for (const [name, month] of months(locale).spaced) {
+    const at = wordIndex(words, name)
+    if (at >= 0) {
+      namedMonth = month
+      words = `${words.slice(0, at)} ${words.slice(at + name.length)}`
+      break
+    }
+  }
   const numbers: string[] = []
-  for (const token of normalized
-    .toLocaleLowerCase(locale)
-    .match(/\p{N}+|\p{L}+/gu) ?? []) {
+  for (const token of words.match(/\p{N}+|[\p{L}\p{M}]+/gu) ?? []) {
     if (/^\d+$/.test(token)) {
       numbers.push(token)
       continue
@@ -146,7 +160,7 @@ function parseDate(
 
   const values: Partial<Record<DateField, string>> = {}
   if (namedMonth !== undefined) {
-    const rest = fields.filter((field) => field !== "month")
+    const rest = namedOrder(locale).filter((field) => field !== "month")
     if (numbers.length > 2 || numbers.length === 0) {
       return undefined
     }
@@ -166,8 +180,16 @@ function parseDate(
       values[field] = digits.slice(offset, (offset += length))
     }
   } else if (numbers.length === 2 || numbers.length === 3) {
+    // Zulu writes "2026-10-16" in numbers but "10/16/26" short, so a date
+    // typed with the short date's separator reads in the short date's order.
+    const short = shortPattern(locale)
+    const typed = normalized.match(/\d(\D+)\d/)?.[1]?.trim()
+    const all =
+      typed === short.separator && short.separator !== separator.trim()
+        ? short.fields
+        : fields
     const order =
-      numbers.length === 3 ? fields : fields.filter((field) => field !== "year")
+      numbers.length === 3 ? all : all.filter((field) => field !== "year")
     order.forEach((field, index) => (values[field] = numbers[index]))
   } else {
     return undefined
@@ -221,19 +243,99 @@ function fullYear(text: string, referenceYear: number) {
     : century + year
 }
 
-const monthLookups = new Map<string, Map<string, number>>()
+const fieldOrders = new Map<
+  string,
+  { named: DateField[]; short: DatePattern }
+>()
+
+function fieldOrdersOf(locale: string | undefined) {
+  const key = locale ?? ""
+  let orders = fieldOrders.get(key)
+  if (!orders) {
+    const fieldsOf = (options: Intl.DateTimeFormatOptions) =>
+      dateFormatter(locale, options)
+        .formatToParts(Date.UTC(2026, 9, 16))
+        .filter((part): part is Intl.DateTimeFormatPart & { type: DateField } =>
+          ["year", "month", "day"].includes(part.type)
+        )
+    const shortParts = dateFormatter(locale, {
+      dateStyle: "short",
+    }).formatToParts(Date.UTC(2026, 9, 16))
+    const firstField = shortParts.findIndex((part) =>
+      ["year", "month", "day"].includes(part.type)
+    )
+    orders = {
+      named: fieldsOf({ year: "numeric", month: "long", day: "numeric" }).map(
+        (part) => part.type
+      ),
+      short: {
+        ...datePattern(locale),
+        fields: fieldsOf({ dateStyle: "short" }).map((part) => part.type),
+        separator:
+          shortParts[firstField + 1]?.value
+            .replace(directionMarks, "")
+            .trim() ?? "",
+      },
+    }
+    fieldOrders.set(key, orders)
+  }
+  return orders
+}
+
+// The order a date with a month name writes its numbers in, like Swedish
+// "16 oktober 2026", though its numeric dates go year first.
+const namedOrder = (locale: string | undefined) => fieldOrdersOf(locale).named
+const shortPattern = (locale: string | undefined) => fieldOrdersOf(locale).short
+
+// Where a name stands in the text as whole words, or -1.
+function wordIndex(text: string, name: string) {
+  for (let at = text.indexOf(name); at >= 0; at = text.indexOf(name, at + 1)) {
+    const after = text[at + name.length] ?? ""
+    if (
+      !/[\p{L}\p{M}\p{N}]/u.test(after) &&
+      !/[\p{L}\p{M}]/u.test(text[at - 1] ?? "")
+    ) {
+      return at
+    }
+  }
+  return -1
+}
+
+const monthLookups = new Map<
+  string,
+  { lookup: Map<string, number>; spaced: [string, number][] }
+>()
+
+function months(locale: string | undefined) {
+  const key = locale ?? ""
+  let found = monthLookups.get(key)
+  if (!found) {
+    const lookup = monthLookup(locale)
+    const spaced = [...lookup]
+      .filter(([name]) => /[^\p{L}\p{M}]/u.test(name))
+      .sort(([a], [b]) => b.length - a.length)
+    monthLookups.set(key, (found = { lookup, spaced }))
+  }
+  return found
+}
 
 // The month a word names, matching the locale's long and short names in both
-// grammatical forms, and any unambiguous start of three letters or more.
+// grammatical forms, and any unambiguous start of three letters or more. A
+// word the locale writes onto the name, like Hebrew "ב" in "באוקטובר", counts.
 function monthFromName(word: string, locale: string | undefined) {
-  const key = locale ?? ""
-  let lookup = monthLookups.get(key)
-  if (!lookup) {
-    monthLookups.set(key, (lookup = monthLookup(locale)))
-  }
+  const { lookup } = months(locale)
   const exact = lookup.get(word)
-  if (exact !== undefined || word.length < 3) {
+  if (exact !== undefined) {
     return exact
+  }
+  for (let index = 1; index < word.length - 2; index++) {
+    const month = lookup.get(word.slice(index))
+    if (month !== undefined && isPatternWord(word.slice(0, index), locale)) {
+      return month
+    }
+  }
+  if (word.length < 3) {
+    return undefined
   }
   let found: number | undefined
   for (const [name, month] of lookup) {
@@ -279,7 +381,9 @@ function isPatternWord(word: string, locale: string | undefined) {
     words = new Set()
     for (const options of [
       { dateStyle: "short" },
+      { dateStyle: "medium" },
       { dateStyle: "long" },
+      { dateStyle: "full" },
     ] as const) {
       for (const part of dateFormatter(locale, options).formatToParts(
         Date.UTC(2026, 9, 16)
@@ -287,7 +391,7 @@ function isPatternWord(word: string, locale: string | undefined) {
         if (part.type === "literal") {
           for (const literal of part.value
             .toLocaleLowerCase(locale)
-            .match(/\p{L}+/gu) ?? []) {
+            .match(/[\p{L}\p{M}]+/gu) ?? []) {
             words.add(literal)
           }
         }

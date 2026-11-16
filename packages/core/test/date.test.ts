@@ -381,6 +381,24 @@ describe("typing a date", () => {
     expect(parseDate("2026년 10월 16일", "ko")).toBe("2026-10-16")
   })
 
+  test("reads the long date each locale shows, with its month name as written there", () => {
+    for (const locale of ["sv", "th", "hi", "ga", "he", "ca", "vi", "da"]) {
+      const shown = formatDate("2026-10-16", locale, { dateStyle: "long" })
+      expect(parseDate(shown, locale), `${locale} ${shown}`).toBe("2026-10-16")
+    }
+    expect(parseDate("fredag den 16. oktober 2026", "da")).toBe("2026-10-16")
+    expect(parseDate("16 tháng 1, 2026", "vi")).toBe("2026-01-16")
+  })
+
+  test("reads a locale's own order before the ISO shape, and the short date's order when typed with its separator", () => {
+    expect(parseDate("2026-05-01", "ky-KG")).toBe("2026-01-05")
+    expect(parseDate("2026-05-01", "en-US")).toBe("2026-05-01")
+    expect(parseDate("1/5/26", "zu-ZA", { referenceDate: "2026-01-01" })).toBe(
+      "2026-01-05"
+    )
+    expect(parseDate("2026-01-05", "zu-ZA")).toBe("2026-01-05")
+  })
+
   test("reads years in the calendar the locale writes them in", () => {
     const shown = formatDate("2026-10-16", "th-TH", {
       year: "numeric",
