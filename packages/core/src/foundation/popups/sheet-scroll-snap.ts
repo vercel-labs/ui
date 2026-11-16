@@ -68,7 +68,9 @@ function createScrollSnapDriver(options: SheetDriverOptions) {
   let restTimer = 0
   let frame = 0
   let targetId: string | null = null
-  let scrollAreas: HTMLElement[] = []
+  // Each scroll area with its own inline overflow-y, put back at the largest
+  // snap point, since frameworks don't write a style again that didn't change.
+  const scrollAreas = new Map<HTMLElement, [string, string]>()
   // A snap marker where a finger caught a moving sheet, so mandatory snapping
   // doesn't pull it to a snap point before the finger moves it.
   let caught: HTMLElement | null = null
@@ -144,7 +146,19 @@ function createScrollSnapDriver(options: SheetDriverOptions) {
     markers = targets.map((extent) => marker(extent - extentAtTop, "start"))
     markers.push(marker(maxScroll() + host.clientHeight - 1, "none"))
     host.append(...markers)
-    scrollAreas = findScrollAreas(sheet)
+    for (const area of scrollAreas.keys()) {
+      if (!sheet.contains(area)) {
+        scrollAreas.delete(area)
+      }
+    }
+    for (const area of findScrollAreas(sheet)) {
+      if (!scrollAreas.has(area)) {
+        scrollAreas.set(area, [
+          area.style.getPropertyValue("overflow-y"),
+          area.style.getPropertyPriority("overflow-y"),
+        ])
+      }
+    }
   }
 
   function marker(top: number, align: string) {
@@ -333,8 +347,12 @@ function createScrollSnapDriver(options: SheetDriverOptions) {
     targetId = id
     host.style.pointerEvents = options.isInteractive(id) ? "none" : "auto"
     const atLargest = index === config.snapPoints.length - 1
-    for (const area of scrollAreas) {
-      area.style.overflowY = atLargest ? "" : "hidden"
+    for (const [area, [value, priority]] of scrollAreas) {
+      if (atLargest) {
+        area.style.setProperty("overflow-y", value, priority)
+      } else {
+        area.style.overflowY = "hidden"
+      }
     }
     options.onRest(id)
     trackScroll()
@@ -481,8 +499,8 @@ function createScrollSnapDriver(options: SheetDriverOptions) {
       for (const marker of markers) {
         marker.remove()
       }
-      for (const area of scrollAreas) {
-        area.style.removeProperty("overflow-y")
+      for (const [area, [value, priority]] of scrollAreas) {
+        area.style.setProperty("overflow-y", value, priority)
       }
       if (dragging) {
         options.onDragChange(false)
