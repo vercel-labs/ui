@@ -80,7 +80,19 @@ function formatNumber(
   if (typeof format === "function") {
     return format(value)
   }
-  return numberFormatter(locale, format).format(value)
+  const formatter = numberFormatter(locale, format)
+  const text = formatter.format(value)
+  // Some locales write a small number as a word alone and drop its sign, like
+  // Arabic "يومان" for 2 and -2 days, so the locale's minus sign goes first.
+  if (value < 0 && !/\p{Nd}/u.test(text)) {
+    const parts = formatter.formatToParts(-3)
+    const sign = parts.findIndex((part) => part.type === "minusSign")
+    return `${parts
+      .slice(0, sign + 1)
+      .map((part) => part.value)
+      .join("")}${text}`
+  }
+  return text
 }
 
 /**
@@ -104,9 +116,11 @@ function formatNumberRange(
   const formatter = numberFormatter(locale, format) as Intl.NumberFormat & {
     formatRange?: (start: number, end: number) => string
   }
-  return formatter.formatRange
+  // Both ends negative share one minus sign in `formatRange`, so -5% to -2%
+  // would read "-5–2%", like -5% to 2%.
+  return formatter.formatRange && !(start < 0 && end < 0)
     ? formatter.formatRange(start, end)
-    : `${formatter.format(start)}–${formatter.format(end)}`
+    : `${formatter.format(start)} – ${formatter.format(end)}`
 }
 
 /**

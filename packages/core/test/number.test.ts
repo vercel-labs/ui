@@ -266,6 +266,48 @@ describe("@ui-sdk/core/number", () => {
     expect(formatNumberRange(1, Number.NaN, "en-US")).toBe("")
   })
 
+  test("a long unit or currency name reads back in every plural form", () => {
+    const km = {
+      style: "unit",
+      unit: "kilometer",
+      unitDisplay: "long",
+    } as const
+    for (const [locale, values] of [
+      ["ru", [1, 2, 5, 21, 50, 1.5]],
+      ["pl", [1, 2, 5, 22, 1.5]],
+    ] as const) {
+      for (const value of values) {
+        expect(parseNumber(formatNumber(value, locale, km), locale, km)).toBe(
+          value
+        )
+      }
+    }
+    const euro = {
+      style: "currency",
+      currency: "EUR",
+      currencyDisplay: "name",
+    } as const
+    expect(parseNumber(formatNumber(2, "lt", euro), "lt", euro)).toBe(2)
+  })
+
+  test("a value a locale writes as a word alone reads back, with its sign", () => {
+    const days = { style: "unit", unit: "day", unitDisplay: "long" } as const
+    for (const locale of ["ar", "he"]) {
+      for (const value of [2, -2, 3]) {
+        const text = formatNumber(value, locale, days)
+        expect(parseNumber(text, locale, days)).toBe(value)
+        expect(isPartialNumber(text, locale, days)).toBe(true)
+      }
+    }
+    expect(formatNumber(-2, "ar", days)).not.toBe(formatNumber(2, "ar", days))
+  })
+
+  test("formatNumberRange writes both ends whole when both are negative", () => {
+    expect(formatNumberRange(-0.05, -0.02, "en-US", { style: "percent" })).toBe(
+      "-5% – -2%"
+    )
+  })
+
   test("formatNumberToParts splits a value into its digits and symbols", () => {
     const parts = formatNumberToParts(1234.5, "en-US", {
       style: "currency",

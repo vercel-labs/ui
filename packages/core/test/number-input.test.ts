@@ -143,6 +143,22 @@ describe("number input", () => {
     ])
   })
 
+  test("text shown with the step's decimals reads back, like a currency by name", () => {
+    const instance = numberInput({
+      id: "n",
+      defaultValue: 1.5,
+      step: 0.01,
+      locale: "ru",
+      format: { style: "currency", currency: "JPY", currencyDisplay: "name" },
+    })
+    const shown = attrs(instance.part("control")).value as string
+    instance.api.internal.type(shown)
+    instance.api.internal.commitText()
+    expect(instance.get().value).toBe(1.5)
+    instance.api.internal.type(shown.replace("1,5", "2,5"))
+    expect(instance.get().value).toBe(2.5)
+  })
+
   test("a percent without a step keeps a typed percent and steps by one percent", () => {
     const instance = numberInput({
       id: "n",

@@ -23,6 +23,8 @@ type Symbols = {
   digits: Map<string, string>
   // Divides parsed values, like 100 for percents, which format 0.5 as 50%.
   divisor: number
+  // Values some locales write as a word alone, like Arabic "يومان" for 2 days.
+  words: Map<string, number>
 }
 
 const symbolCache = new Map<string, Symbols>()
@@ -38,12 +40,17 @@ function symbolsOf(
     return cached
   }
   const formatter = numberFormatter(locale, options)
-  const parts = [
-    ...formatter.formatToParts(-12345.6),
-    ...formatter.formatToParts(12345.6),
-    // Long currency names differ between one and many.
-    ...formatter.formatToParts(1),
-  ]
+  // Long unit and currency names change with the number, in up to six plural
+  // forms, and some locales write a small number as a word alone.
+  const samples = [-12345.6, 12345.6, 0, 1, 2, 3, 5, 11, 21, 22, 1.5, 0.1]
+  const words = new Map<string, number>()
+  const parts = samples.flatMap((sample) => {
+    const sampleParts = formatter.formatToParts(sample)
+    if (sample > 0 && !sampleParts.some((part) => part.type === "integer")) {
+      words.set(wordKey(formatter.format(sample)), sample)
+    }
+    return sampleParts
+  })
   const find = (type: string) => parts.find((part) => part.type === type)?.value
   // Formats that show no decimals or no grouping, like percents, yen or
   // `useGrouping: false`, still read the locale's own separators.
@@ -77,9 +84,24 @@ function symbolsOf(
     strip: [...new Set(strip)].sort((a, b) => b.length - a.length),
     digits,
     divisor: options.style === "percent" ? 100 : 1,
+    words,
   }
   symbolCache.set(key, symbols)
   return symbols
+}
+
+const wordKey = (text: string) =>
+  text
+    .replace(formatCharacters, "")
+    .replace(minusSigns, "-")
+    .replace(spaces, "")
+
+// A value written as a word alone, with the minus sign `formatNumber` adds.
+function wordValue(text: string, symbols: Symbols) {
+  const key = wordKey(text)
+  const negative = key.startsWith("-")
+  const value = symbols.words.get(negative ? key.slice(1) : key)
+  return value === undefined ? undefined : negative ? -value : value
 }
 
 // Accounting formats wrap negatives in parentheses, like ($1,234.56).
@@ -137,6 +159,10 @@ function parseNumber(
   format?: Intl.NumberFormatOptions
 ) {
   const symbols = symbolsOf(locale, format ?? {})
+  const word = wordValue(text, symbols)
+  if (word !== undefined) {
+    return word / symbols.divisor
+  }
   const normalized = normalize(text, symbols)
   if (!complete.test(normalized)) {
     return null
@@ -158,7 +184,12 @@ function isPartialNumber(
   format?: Intl.NumberFormatOptions,
   { allowNegative = true } = {}
 ) {
-  const normalized = normalize(text, symbolsOf(locale, format ?? {}))
+  const symbols = symbolsOf(locale, format ?? {})
+  const word = wordValue(text, symbols)
+  if (word !== undefined) {
+    return allowNegative || word >= 0
+  }
+  const normalized = normalize(text, symbols)
   if (!partial.test(normalized)) {
     return false
   }
