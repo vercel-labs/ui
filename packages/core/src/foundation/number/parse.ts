@@ -46,8 +46,14 @@ function symbolsOf(
   const words = new Map<string, number>()
   const parts = samples.flatMap((sample) => {
     const sampleParts = formatter.formatToParts(sample)
-    if (sample > 0 && !sampleParts.some((part) => part.type === "integer")) {
-      words.set(wordKey(formatter.format(sample)), sample)
+    const key = wordKey(formatter.format(sample))
+    if (
+      Number.isInteger(sample) &&
+      sample > 0 &&
+      !words.has(key) &&
+      !sampleParts.some((part) => part.type === "integer")
+    ) {
+      words.set(key, sample)
     }
     return sampleParts
   })

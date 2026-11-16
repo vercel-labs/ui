@@ -84,7 +84,10 @@ function formatNumber(
   const text = formatter.format(value)
   // Some locales write a small number as a word alone and drop its sign, like
   // Arabic "يومان" for 2 and -2 days, so the locale's minus sign goes first.
-  if (value < 0 && !/\p{Nd}/u.test(text)) {
+  if (
+    value < 0 &&
+    !formatter.formatToParts(value).some((part) => part.type === "integer")
+  ) {
     const parts = formatter.formatToParts(-3)
     const sign = parts.findIndex((part) => part.type === "minusSign")
     return `${parts

@@ -300,6 +300,12 @@ describe("@ui-sdk/core/number", () => {
       }
     }
     expect(formatNumber(-2, "ar", days)).not.toBe(formatNumber(2, "ar", days))
+    const whole = { ...days, maximumFractionDigits: 0 }
+    expect(parseNumber(formatNumber(2, "ar", whole), "ar", whole)).toBe(2)
+    const hanidec = { numberingSystem: "hanidec" }
+    expect(formatNumber(-2, "zh", hanidec)).toBe(
+      new Intl.NumberFormat("zh", hanidec).format(-2)
+    )
   })
 
   test("formatNumberRange writes both ends whole when both are negative", () => {
