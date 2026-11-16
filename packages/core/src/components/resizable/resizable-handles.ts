@@ -28,6 +28,7 @@ const listening = new WeakSet<Document>()
 let hovered: HandleTarget[] = []
 let active: HandleTarget[] = []
 let activeTouch = false
+let releaseTouch = () => {}
 
 /** Makes a handle findable by presses and hovers near it. Returns the cleanup. */
 function registerHandle(target: HandleTarget) {
@@ -143,6 +144,9 @@ function listen(doc: Document) {
     }
     active = hits
     activeTouch = event.pointerType === "touch"
+    if (activeTouch) {
+      holdTouch(doc)
+    }
     for (const hit of hits) {
       hit.start(event)
     }
@@ -184,6 +188,27 @@ function listen(doc: Document) {
     setHovered([])
     updateCursor(doc)
   })
+}
+
+// A press in the touch hit area but beside the handle lands where the page
+// can pan, and the browser would cancel the drag to scroll.
+function holdTouch(doc: Document) {
+  releaseTouch()
+  const hold = (event: TouchEvent) => event.preventDefault()
+  const end = (event: TouchEvent) => {
+    if (!event.touches.length) {
+      releaseTouch()
+    }
+  }
+  releaseTouch = () => {
+    doc.removeEventListener("touchmove", hold)
+    doc.removeEventListener("touchend", end)
+    doc.removeEventListener("touchcancel", end)
+    releaseTouch = () => {}
+  }
+  doc.addEventListener("touchmove", hold, { passive: false })
+  doc.addEventListener("touchend", end)
+  doc.addEventListener("touchcancel", end)
 }
 
 function setHovered(next: HandleTarget[]) {

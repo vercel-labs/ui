@@ -545,3 +545,46 @@ test.describe("pages around a group", () => {
     expect(first).toBeCloseTo(editorSpace * 0.35, 0)
   })
 })
+
+test.describe("touch", () => {
+  test.use({ hasTouch: true })
+
+  test("a touch drag that starts beside the handle, in its touch hit area, resizes without scrolling", async ({
+    page,
+    open,
+    context,
+    browserName,
+  }) => {
+    test.skip(browserName !== "chromium", "Only Chromium can send touches.")
+    await open("resizable")
+    await page.evaluate(() => {
+      document.body.style.minHeight = "4000px"
+    })
+    const before = Number(
+      await terminalHandle(page).getAttribute("aria-valuenow")
+    )
+    const box = (await terminalHandle(page).boundingBox())!
+    const x = box.x + box.width / 2
+    const y = box.y + box.height + 10
+    const cdp = await context.newCDPSession(page)
+    await cdp.send("Input.dispatchTouchEvent", {
+      type: "touchStart",
+      touchPoints: [{ x, y, radiusX: 1, radiusY: 1 }],
+    })
+    for (let step = 1; step <= 12; step++) {
+      await cdp.send("Input.dispatchTouchEvent", {
+        type: "touchMove",
+        touchPoints: [{ x, y: y - (80 * step) / 12, radiusX: 1, radiusY: 1 }],
+      })
+    }
+    await cdp.send("Input.dispatchTouchEvent", {
+      type: "touchEnd",
+      touchPoints: [],
+    })
+    const after = Number(
+      await terminalHandle(page).getAttribute("aria-valuenow")
+    )
+    expect(before - after).toBeGreaterThan(10)
+    expect(await page.evaluate(() => window.scrollY)).toBe(0)
+  })
+})
