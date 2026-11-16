@@ -1884,6 +1884,20 @@
       & [data-slot="date-picker-trigger"] {
         margin-inline-start: 0;
       }
+
+      /* Written trigger first, the trigger takes the offset and the clear button follows it. */
+      &:has(
+        > :is([data-slot="date-picker-trigger"], ui-date-picker-trigger)
+          ~ :is([data-slot="date-picker-clear"], ui-date-picker-clear)
+      ) {
+        & [data-slot="date-picker-trigger"] {
+          margin-inline-start: calc(var(--ui-spacing) * -13);
+        }
+
+        & [data-slot="date-picker-clear"] {
+          margin-inline-start: 0;
+        }
+      }
     }
   }
 
