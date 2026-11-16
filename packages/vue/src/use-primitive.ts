@@ -31,6 +31,7 @@ import {
   defineComponent,
   getCurrentInstance,
   h,
+  hasInjectionContext,
   inject,
   normalizeClass,
   normalizeStyle,
@@ -58,6 +59,16 @@ import { useBindings } from "./lifecycle"
 
 // Booleans default to undefined so "not passed" stays different from false.
 const optionalBoolean = { type: Boolean, default: undefined }
+
+// Vue sets up a Vapor component with an instance that only `inject` sees.
+// Without vaporInteropPlugin, a Vapor app sets up ui-sdk's parts that way.
+function refuseVapor(subject: string) {
+  if (!getCurrentInstance() && hasInjectionContext()) {
+    throw new Error(
+      `${subject} is set up as a Vapor component, but ui-sdk parts are VDOM components. In a Vapor app, install vaporInteropPlugin. Define your own parts with defineComponent.`
+    )
+  }
+}
 
 // A component's main value, from its own prop or from `v-model`. `null` is a
 // value, like a navigation menu with nothing open, so only `undefined` falls back.
@@ -252,6 +263,7 @@ function usePrimitive<P extends Primitive>(
   primitive: P,
   options: () => OptionsOf<P>
 ) {
+  refuseVapor("A ui-sdk root")
   // Prefixed so a page using ui-sdk is recognizable from its HTML. Part ids
   // stay unprefixed, since some are keys, like saved resizable layouts.
   const id = `ui-sdk-${useId()}`
@@ -730,6 +742,7 @@ function usePart<P extends Primitive, S extends SlotName<P>>(
   props?: () => Record<string, unknown>,
   element: string | PartElement<StateOf<P, S>> = "div"
 ) {
+  refuseVapor(`The ${slot} part`)
   const component = getCurrentInstance()
   if (!component) {
     throw new Error(`The ${slot} part must call usePart in its setup.`)

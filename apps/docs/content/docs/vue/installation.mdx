@@ -94,4 +94,17 @@ You can render your first component without setting up a provider or adding a po
 
 Set `dir="rtl"` on the page or a container. Arrow keys and popup placement follow that direction without a provider. Use logical CSS properties, such as `padding-inline-start`, for your styles.
 
+## Use with Vapor Mode
+
+The components are VDOM components. To use them in a Vapor app, install Vue's `vaporInteropPlugin`, which lets Vapor components render them:
+
+```ts title="main.ts"
+import { createVaporApp, vaporInteropPlugin } from "vue"
+import App from "./App.vue"
+
+createVaporApp(App).use(vaporInteropPlugin).mount("#app")
+```
+
+Without the plugin, a component throws an error that says to install it. Inside a Vapor parent, a Select or Combobox can't read its items' labels from the slot, so it mounts them hidden to find the selected one. Pass `item-to-label` to keep a closed list unmounted.
+
 Continue with [First Component](./first-component) to add a working toggle to your app.
