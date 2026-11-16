@@ -389,13 +389,15 @@ test.describe("forms", () => {
     open,
   }) => {
     await open("select", { value: "banana" })
-    await page.getByRole("button", { name: "Submit" }).evaluate((button) => {
-      button.form!.insertAdjacentHTML(
-        "beforeend",
-        `<input aria-label="Note" name="note">`
-      )
-      button.remove()
-    })
+    await page
+      .getByRole("button", { name: "Submit" })
+      .evaluate((button: HTMLButtonElement) => {
+        button.form!.insertAdjacentHTML(
+          "beforeend",
+          `<input aria-label="Note" name="note">`
+        )
+        button.remove()
+      })
     await page.getByRole("textbox", { name: "Note" }).press("Enter")
     await expect(page.getByRole("status", { name: "Submitted" })).toContainText(
       "fruit=banana"
