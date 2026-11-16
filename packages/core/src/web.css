@@ -114,7 +114,7 @@
     font-size: 0.85em;
   }
 
-  [data-slot]:focus-visible {
+  :where([data-slot]):focus-visible {
     outline: 4px solid var(--ui-ring);
     outline-offset: 0;
   }
