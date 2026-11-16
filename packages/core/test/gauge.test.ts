@@ -5,7 +5,8 @@ import {
   percentBetween,
 } from "../src/foundation/gauge/gauge"
 import { progress } from "../src/components/progress/progress"
-import { attrs, partState } from "../src/foundation/kernel/part"
+import { attrs, bind, partState } from "../src/foundation/kernel/part"
+import { fakeElement } from "./selects"
 
 describe("gauge values", () => {
   test("places a value between the bounds, clamped", () => {
@@ -98,8 +99,10 @@ describe("progress parts", () => {
 })
 
 describe("progress labels", () => {
-  test("the bar stays named while any of its labels is on the page", () => {
+  test("the bar stays named while any of its labels is on the page", async () => {
     const instance = progress({ id: "p", value: 40 })
+    bind(instance.part("root"), fakeElement(0, "DIV"))
+    await Promise.resolve()
     const first = instance.api.internal.label()
     const second = instance.api.internal.label()
     expect(attrs(instance.part("root"))["aria-labelledby"]).toBe("p-label")

@@ -12,6 +12,7 @@ export {
   gaugeApi,
   indicatorStyle,
   labelId,
+  labelledBy,
   type NumberFormat,
   percentBetween,
   roundPercent,

@@ -3,9 +3,12 @@ import { checkName } from "#name-check"
 import { orientationOf } from "../../foundation/focus/collection"
 import { createRovingFocus } from "../../foundation/focus/roving-focus"
 import { idPart } from "../../foundation/kernel/attrs"
-import { keyWhileBound } from "../../foundation/kernel/bound-keys"
+import {
+  flagWhileBound,
+  keyWhileBound,
+} from "../../foundation/kernel/bound-keys"
 import { createController } from "../../foundation/kernel/controller"
-import { live } from "../../foundation/kernel/live"
+import { direct, live } from "../../foundation/kernel/live"
 import { definePrimitive } from "../../foundation/kernel/primitive"
 import type {
   Named,
@@ -165,6 +168,8 @@ type State = {
   titles: readonly string[]
   times: readonly string[]
   descriptions: readonly string[]
+  // Until the root binds, like on a server, each item has a title.
+  bound: boolean
 }
 
 const noPositions: Record<string, number> = {}
@@ -293,6 +298,7 @@ const insideItem = selects<State, TimelineApi, PartProps>({
   titles: [],
   times: [],
   descriptions: [],
+  bound: [],
 })
 
 const itemProps = {
@@ -319,16 +325,9 @@ const timelinePrimitive = /* @__PURE__ */ definePrimitive({
     titles: [],
     times: [],
     descriptions: [],
+    bound: false,
   }),
-  live: [
-    "first",
-    "last",
-    "positions",
-    "size",
-    "titles",
-    "times",
-    "descriptions",
-  ],
+  live: ["first", "last", "positions", "size", "times", "descriptions"],
   sync: fromOptions,
   api: timelineApi,
   slots: (slot) => ({
@@ -344,6 +343,7 @@ const timelinePrimitive = /* @__PURE__ */ definePrimitive({
         titles: [],
         times: [],
         descriptions: [],
+        bound: [],
       }),
       state: (state) => ({
         orientation: state.orientation,
@@ -362,6 +362,7 @@ const timelinePrimitive = /* @__PURE__ */ definePrimitive({
         }
         api.internal.measure()
         let feed = store.get().feed
+        const unflag = flagWhileBound(store, "bound")
         const unsubscribe = store.subscribe(() => {
           if (store.get().feed !== feed) {
             feed = store.get().feed
@@ -369,7 +370,10 @@ const timelinePrimitive = /* @__PURE__ */ definePrimitive({
           }
         })
         if (typeof MutationObserver === "undefined") {
-          return unsubscribe
+          return () => {
+            unflag()
+            unsubscribe()
+          }
         }
         // Events moved in the page, like a list sorted newest first, change places
         // without binding again, also inside a wrapper. The roving group sorts again first.
@@ -389,6 +393,7 @@ const timelinePrimitive = /* @__PURE__ */ definePrimitive({
         observer.observe(el, { childList: true, subtree: true })
         return () => {
           observer.disconnect()
+          unflag()
           unsubscribe()
           el.style.removeProperty("--timeline-count")
         }
@@ -409,11 +414,17 @@ const timelinePrimitive = /* @__PURE__ */ definePrimitive({
         descriptions: ({ key }) => [key],
       }),
       state: (state, { props }) => itemState(state, props),
-      attrs: (state, { key, props, api }) => ({
+      attrs: (state, { id, key, props, api }) => ({
         tabindex: api.internal.roving.tabIndex(state, { key, props }),
         "aria-current": props.status === "current" ? "step" : undefined,
+        "aria-labelledby":
+          !state.bound || state.titles.includes(key)
+            ? partId(id, "title", key)
+            : undefined,
         ...itemPartAttrs(state, props),
       }),
+      // A title binding moves the name without rendering the item again.
+      direct: direct(["aria-labelledby"]),
       live: live((state, { id, key }) => {
         const position = state.positions[key]
         const described = [
@@ -421,9 +432,6 @@ const timelinePrimitive = /* @__PURE__ */ definePrimitive({
           state.descriptions.includes(key) && partId(id, "description", key),
         ].filter(Boolean)
         return {
-          "aria-labelledby": state.titles.includes(key)
-            ? partId(id, "title", key)
-            : undefined,
           "aria-describedby": described.length
             ? described.join(" ")
             : undefined,

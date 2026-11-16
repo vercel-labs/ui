@@ -159,6 +159,11 @@ function roundPercent(percent: number) {
 // The id a Label part takes, which the root's `aria-labelledby` points at.
 const labelId = (id: string) => `${id}-label`
 
+// Until the root binds, like on a server, it points at a label wherever one
+// renders, so the server's HTML names it. Binding keeps it only with a label.
+const labelledBy = (state: { labels: number; bound: boolean }, id: string) =>
+  state.labels || !state.bound ? labelId(id) : undefined
+
 // What Progress and Meter set up: Label parts name the root while any is on the page.
 function gaugeApi(store: {
   get: () => { labels: number }
@@ -192,6 +197,7 @@ export {
   gaugeApi,
   indicatorStyle,
   labelId,
+  labelledBy,
   percentBetween,
   roundPercent,
 }

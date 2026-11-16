@@ -6,6 +6,7 @@ import {
   formatGaugeValue,
   indicatorStyle,
   labelId,
+  labelledBy,
   percentBetween,
   roundPercent,
   type GaugeLabelDetails,
@@ -14,7 +15,9 @@ import {
 } from "../../foundation/gauge/gauge"
 import { dev } from "#dev"
 import { checkName } from "#name-check"
+import { flagWhileBound } from "../../foundation/kernel/bound-keys"
 import { css } from "../../foundation/kernel/inline-style"
+import { direct } from "../../foundation/kernel/live"
 import { bindPageLocale } from "../../foundation/text/locale"
 import { definePrimitive } from "../../foundation/kernel/primitive"
 import type {
@@ -65,6 +68,7 @@ type State = GaugeSettings & {
   value: number
   // How many Label parts are on the page. Any of them names the meter.
   labels: number
+  bound: boolean
 }
 
 const percentOf = (state: State) =>
@@ -95,6 +99,7 @@ const meterPrimitive = /* @__PURE__ */ definePrimitive({
   state: (options: MeterOptions): State => ({
     ...settings(options),
     labels: 0,
+    bound: false,
     pageLocale: null,
   }),
   sync: settings,
@@ -107,7 +112,7 @@ const meterPrimitive = /* @__PURE__ */ definePrimitive({
       state: meterState,
       attrs: (state, { id }) => ({
         ...gaugeAria(state.value, state),
-        "aria-labelledby": state.labels ? labelId(id) : undefined,
+        "aria-labelledby": labelledBy(state, id),
         // For anything else that should follow the value, like a ring's sweep.
         style: css({ "--meter-value": `${roundPercent(percentOf(state))}%` }),
       }),
@@ -117,7 +122,10 @@ const meterPrimitive = /* @__PURE__ */ definePrimitive({
         if (dev) {
           checkName(el, "Meter", { component: "meter", id })
         }
+        return flagWhileBound(store, "bound")
       },
+      // Settling that there's no label drops the reference without rendering the root again.
+      direct: direct(["aria-labelledby"]),
     }),
     track: slot<{}, MeterState>({ state: meterState }),
     // Placed with inline styles, from the track's start, as wide as the value.

@@ -449,9 +449,9 @@ cd tests && PLAYGROUND_PORT=5310 ../scripts/test-slot.sh npx playwright test spe
 **Budget:**
 
 - No `compareDocumentPosition` calls.
-- At most 12 `getAttribute` calls.
+- At most 21 `getAttribute` calls.
 
-**Notes:** Web components read back the opened collapsible's parts, 11 at any size.
+**Notes:** Web components read back the opened collapsible's parts, 21 at any size: once as it opens, and again as its panel mounts and the trigger points at it.
 
 **Tests:**
 

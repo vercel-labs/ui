@@ -107,8 +107,8 @@ describe("timeline", () => {
     bind(instance.part("title", { value: "a" }), fakeElement(1, "DIV"))
     bind(instance.part("time", { value: "a" }), fakeElement(2, "TIME"))
     await Promise.resolve()
+    expect(partAttrs(item)["aria-labelledby"]).toBe("c-title-a")
     expect(liveAttrs(item)).toMatchObject({
-      "aria-labelledby": "c-title-a",
       "aria-describedby": "c-time-a",
       "data-first": "",
       "data-last": "",

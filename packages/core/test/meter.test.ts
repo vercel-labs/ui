@@ -1,5 +1,6 @@
 import { describe, expect, test } from "vitest"
-import { attrs, partState } from "../src/foundation/kernel/part"
+import { attrs, bind, partState } from "../src/foundation/kernel/part"
+import { fakeElement } from "./selects"
 import { meter } from "../src/components/meter/meter"
 
 describe("meter parts", () => {
@@ -104,8 +105,10 @@ describe("meter parts", () => {
 })
 
 describe("meter labels", () => {
-  test("the meter stays named while any of its labels is on the page", () => {
+  test("the meter stays named while any of its labels is on the page", async () => {
     const instance = meter({ id: "m", value: 40 })
+    bind(instance.part("root"), fakeElement(0, "DIV"))
+    await Promise.resolve()
     const first = instance.api.internal.label()
     const second = instance.api.internal.label()
     expect(attrs(instance.part("label")).id).toBe("m-label")

@@ -138,8 +138,9 @@ const budgets = {
   "collapsible.toggle": {
     measures: "Work done by opening one of a long list of collapsibles.",
     why: "Each collapsible is its own instance, so opening one must not reach the others, as a shared store or a document listener would.",
-    // Web components read back the opened collapsible's parts, 11 at any size.
-    counts: { compareDocumentPosition: 0, getAttribute: 12 },
+    // Web components read back the opened collapsible's parts, 21 at any size:
+    // once as it opens, and again as its panel mounts and the trigger points at it.
+    counts: { compareDocumentPosition: 0, getAttribute: 21 },
   },
   "toolbar.arrow-key": {
     measures: "Work done by 10 ArrowRight presses in a toolbar.",

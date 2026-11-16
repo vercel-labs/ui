@@ -9,6 +9,7 @@ import {
 } from "../../foundation/disclosure/disclosure"
 import { isDisabled, watchFormDisabled } from "../../foundation/forms/form"
 import { stateAndRenders } from "../../foundation/motion/panel"
+import { settleFlag } from "../../foundation/kernel/bound-keys"
 import { createController } from "../../foundation/kernel/controller"
 import { deriveFromOptions } from "../../foundation/kernel/derive"
 import type {
@@ -20,7 +21,7 @@ import type {
   Named,
   PrimitiveOptions,
 } from "../../foundation/kernel/primitive-types"
-import { live } from "../../foundation/kernel/live"
+import { direct } from "../../foundation/kernel/live"
 import { createChange } from "../../foundation/kernel/input-source"
 
 /**
@@ -166,10 +167,10 @@ const collapsiblePrimitive = /* @__PURE__ */ definePrimitive({
     formDisabled: false,
     // Shown while it animates out.
     exiting: false,
-    // Whether the panel is in the page, so the trigger can point at it.
-    panel: false,
+    // Whether the panel is in the page, so the trigger can point at it. Null
+    // until the trigger binds, like on a server, where an open one is.
+    panel: null as boolean | null,
   }),
-  live: ["panel"],
   sync: (options) => ({
     disabled: options.disabled ?? false,
     ...(options.open === undefined ? {} : { open: options.open }),
@@ -187,7 +188,7 @@ const collapsiblePrimitive = /* @__PURE__ */ definePrimitive({
     // closing `open` from options.
     deriveFromOptions(context, ["exiting"], (synced, state) =>
       "open" in synced && synced.open !== state.open
-        ? { exiting: !synced.open && state.panel }
+        ? { exiting: !synced.open && state.panel === true }
         : undefined
     )
     let previous = store.get().open
@@ -201,7 +202,7 @@ const collapsiblePrimitive = /* @__PURE__ */ definePrimitive({
       const why = reason.take()
       openedBy = open ? why : undefined
       // A panel in the page animates out before it goes.
-      store.set({ exiting: !open && store.get().panel })
+      store.set({ exiting: !open && store.get().panel === true })
     })
 
     function setOpen(
@@ -265,14 +266,14 @@ const collapsiblePrimitive = /* @__PURE__ */ definePrimitive({
         id: `${id}-trigger`,
         type: "button",
         "aria-expanded": String(state.open),
+        "aria-controls":
+          (state.panel ?? state.open) ? `${id}-panel` : undefined,
         "aria-disabled": isDisabled(state) ? "true" : undefined,
         ...openAttrs(state.open),
         "data-disabled": isDisabled(state) ? "" : undefined,
       }),
-      // Only a panel in the page can be pointed at.
-      live: live((state, { id }) => ({
-        "aria-controls": state.panel ? `${id}-panel` : undefined,
-      })),
+      // The panel coming and going moves the reference without rendering the trigger again.
+      direct: direct(["aria-controls"]),
       press({ api, el, store }, event) {
         if (isDisabled(store.get())) {
           // A disabled link must not navigate either.
@@ -283,7 +284,10 @@ const collapsiblePrimitive = /* @__PURE__ */ definePrimitive({
         api.toggle({ reason: "trigger-press", event })
       },
       on: { keydown: (event, { el }) => triggerKeydown(event, el) },
-      bind: (el) => bindTriggerElement(el),
+      bind(el, { store }) {
+        settleFlag(store, "panel")
+        return bindTriggerElement(el)
+      },
     }),
 
     panel: slot<CollapsiblePanelProps, CollapsiblePanelState>({
