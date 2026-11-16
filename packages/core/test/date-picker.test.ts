@@ -588,3 +588,20 @@ describe("datePicker", () => {
     expect(picker.day("2026-10-16").hasAttribute("tabindex")).toBe(false)
   })
 })
+
+test("a field a framework rendered before its root read the page's language keeps its date", () => {
+  const instance = datePicker({ id: "due", defaultValue: "2026-10-16" })
+  const root = document.body.appendChild(document.createElement("div"))
+  root.lang = "de"
+  const input = root.appendChild(document.createElement("input"))
+  input.value = String(attrs(instance.part("input", {}), {}).value)
+  expect(input.value).toBe("10/16/2026")
+  cleanups.push(
+    bind(instance.part("root"), root),
+    bind(instance.part("input", {}), input),
+    () => instance.destroy()
+  )
+  expect(input.value).toBe("16.10.2026")
+  expect(input.hasAttribute("aria-invalid")).toBe(false)
+  expect(instance.get().value).toBe("2026-10-16")
+})

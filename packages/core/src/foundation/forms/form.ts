@@ -552,9 +552,10 @@ function labelledBy(
 }
 
 // Text typed before the page's script ran, which neither the server's markup
-// nor what the field would show now has, goes in as typing.
-function typedBeforeBind(input: HTMLInputElement, shown: string) {
-  return input.value !== input.defaultValue && input.value !== shown
+// nor what the field shows has, goes in as typing. A field can show more than one
+// text, like a date before and after its root reads the page's language.
+function typedBeforeBind(input: HTMLInputElement, ...shown: string[]) {
+  return input.value !== input.defaultValue && !shown.includes(input.value)
 }
 
 export {

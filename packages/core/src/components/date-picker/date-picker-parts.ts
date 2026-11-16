@@ -191,7 +191,14 @@ const datePickerSlots = (slot: SlotFactory<State, DatePickerApi>) => ({
           invalidAt(state, indexOf(props)) ? invalidDateMessage : ""
         )
       }
-      if (typedBeforeBind(input, textOf(store.get(), indexOf(props)))) {
+      const state = store.get()
+      if (
+        typedBeforeBind(
+          input,
+          textOf(state, indexOf(props)),
+          textOf({ ...state, pageLocale: null }, indexOf(props))
+        )
+      ) {
         // The root reads the page's language after its parts bind, and the text parses in it.
         if (store.get().pageLocale === null) {
           store.set({ pageLocale: pageLocale(input) ?? null })
