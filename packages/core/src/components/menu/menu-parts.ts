@@ -622,9 +622,13 @@ const menuContextTrigger = /* @__PURE__ */ (() => ({
           }
           event.preventDefault()
           const pointer = (event as PointerEvent).pointerType
-          // Shift+F10 and the context menu key fire this with no pointer.
+          // Shift+F10 and the context menu key fire this with no pointer. A
+          // Control-click on macOS fires it with the main button.
           const keyboard =
-            event.button !== 2 && pointer !== "touch" && pointer !== "pen"
+            event.button !== 2 &&
+            !(event as MouseEvent).ctrlKey &&
+            pointer !== "touch" &&
+            pointer !== "pen"
           const target = event.target as HTMLElement
           api.internal.contextOpen(
             keyboard ? target : { x: event.clientX, y: event.clientY },

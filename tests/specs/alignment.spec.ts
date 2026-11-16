@@ -130,6 +130,35 @@ test.describe("context menus", () => {
     await expect(output(page, "Last action")).toHaveText("copy")
   })
 
+  test("a Control-click, macOS's right-click, opens the menu at the pointer", async ({
+    page,
+    open,
+  }) => {
+    await open("alignment")
+    const canvas = page.locator(".canvas")
+    const box = (await canvas.boundingBox())!
+    await canvas.evaluate(
+      (el, { x, y }) => {
+        el.dispatchEvent(
+          new PointerEvent("contextmenu", {
+            bubbles: true,
+            cancelable: true,
+            button: 0,
+            ctrlKey: true,
+            pointerType: "mouse",
+            clientX: x,
+            clientY: y,
+          })
+        )
+      },
+      { x: box.x + 10, y: box.y + 10 }
+    )
+    const menu = page.getByRole("menu")
+    await expect(menu).toBeVisible()
+    const opened = (await menu.boundingBox())!
+    expect(Math.abs(opened.x - (box.x + 10))).toBeLessThan(2)
+  })
+
   test("the context menu points aria-labelledby at no missing element", async ({
     page,
     open,
