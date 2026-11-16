@@ -59,6 +59,8 @@ function createStickToBottom(options: StickToBottomOptions = {}) {
   let lastHeight = 0
   // The distance from the end saved by `prepend`, kept until content grows.
   let anchor: number | null = null
+  // The first row in view while not following, and where it sits in the content.
+  let pinned: { row: Element; top: number } | undefined
 
   const threshold = () => options.threshold ?? 24
   const distance = (el: HTMLElement) =>
@@ -83,6 +85,49 @@ function createStickToBottom(options: StickToBottomOptions = {}) {
     }
   }
 
+  // In content coordinates, so a scroll the page makes itself isn't a row moving.
+  const offset = (el: HTMLElement, row: Element) =>
+    row.getBoundingClientRect().top -
+    el.getBoundingClientRect().top +
+    el.scrollTop
+
+  function pin(el: HTMLElement) {
+    pinned = undefined
+    if (state.following) {
+      return
+    }
+    const rows = el.children
+    const box = el.getBoundingClientRect()
+    let found: { row: Element; rect: DOMRect } | undefined
+    let low = 0
+    let high = rows.length - 1
+    while (low <= high) {
+      const middle = (low + high) >> 1
+      // A row that draws no box, like a hidden one, can't say where it is.
+      let probe = middle
+      while (probe <= high && !rows[probe].getClientRects().length) {
+        probe++
+      }
+      if (probe > high) {
+        high = middle - 1
+        continue
+      }
+      const rect = rows[probe].getBoundingClientRect()
+      if (rect.bottom <= box.top) {
+        low = probe + 1
+      } else {
+        found = { row: rows[probe], rect }
+        high = middle - 1
+      }
+    }
+    if (found && found.rect.top < box.bottom) {
+      pinned = {
+        row: found.row,
+        top: found.rect.top - box.top + el.scrollTop,
+      }
+    }
+  }
+
   function toEnd(el: HTMLElement, behavior?: ScrollBehavior) {
     const top = el.scrollHeight - el.clientHeight
     ours = Math.max(0, Math.round(top))
@@ -98,7 +143,6 @@ function createStickToBottom(options: StickToBottomOptions = {}) {
     if (!el) {
       return
     }
-    const grew = el.scrollHeight > lastHeight
     let unseen = false
     if (anchor !== null && el.scrollHeight !== lastHeight) {
       // Older content went in above: keep the same distance from the end.
@@ -108,10 +152,18 @@ function createStickToBottom(options: StickToBottomOptions = {}) {
     } else if (state.following) {
       toEnd(el)
     } else {
-      unseen = grew
+      // The browser's own anchoring is off, and Safari has none.
+      const moved =
+        pinned?.row.parentNode === el ? offset(el, pinned.row) - pinned.top : 0
+      if (Math.abs(moved) >= 1) {
+        ours = Math.round(el.scrollTop + moved)
+        el.scrollTop = ours
+      }
+      unseen = el.scrollHeight - moved > lastHeight
     }
     lastHeight = el.scrollHeight
     lastTop = el.scrollTop
+    pin(el)
     // One change, so content that pushes the end out of view stays unseen.
     set({ atBottom: distance(el) <= threshold(), ...(unseen && { unseen }) })
   }
@@ -136,6 +188,7 @@ function createStickToBottom(options: StickToBottomOptions = {}) {
     }
     lastTop = top
     set({ atBottom })
+    pin(el)
   }
 
   const api = {
@@ -222,6 +275,9 @@ function createStickToBottom(options: StickToBottomOptions = {}) {
     /** Stops following, as if the reader scrolled up. */
     release() {
       set({ following: false })
+      if (scroller) {
+        pin(scroller)
+      }
     },
     /**
      * Call right before adding content above, like older messages: the next

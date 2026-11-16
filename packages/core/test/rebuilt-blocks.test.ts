@@ -524,6 +524,46 @@ describe("createStickToBottom", () => {
     expect(log.get()).toMatchObject({ atBottom: false, unseen: true })
   })
 
+  test("rows removed or added above keep the rows in view still while not following", async () => {
+    const el = scroller(100, () => el.children.length * 50)
+    el.getBoundingClientRect = () => new DOMRect(0, 0, 300, 100)
+    const row = () => {
+      const p = document.createElement("p")
+      p.getBoundingClientRect = () => {
+        const top = [...el.children].indexOf(p) * 50 - el.scrollTop
+        return new DOMRect(0, top, 300, 50)
+      }
+      p.getClientRects = () =>
+        [p.getBoundingClientRect()] as unknown as DOMRectList
+      return p
+    }
+    for (let i = 0; i < 10; i++) {
+      el.append(row())
+    }
+    const log = createStickToBottom()
+    cleanups.push(log.connect(el))
+    el.dispatchEvent(new WheelEvent("wheel", { deltaY: -50 }))
+    el.scrollTop = 220
+    el.dispatchEvent(new Event("scroll"))
+    const first = el.children[4]
+    el.children[0].remove()
+    el.children[0].remove()
+    el.append(row())
+    await Promise.resolve()
+    expect(el.scrollTop).toBe(120)
+    expect(first.getBoundingClientRect().top).toBe(-20)
+    expect(log.get()).toMatchObject({ following: false, unseen: true })
+    el.prepend(row())
+    await Promise.resolve()
+    expect(first.getBoundingClientRect().top).toBe(-20)
+    expect(log.get().unseen).toBe(true)
+    // The page's own scroll as a row arrives stays where it went.
+    el.scrollTop = 50
+    el.append(row())
+    await Promise.resolve()
+    expect(el.scrollTop).toBe(50)
+  })
+
   test("prepend keeps the distance from the end", () => {
     let content = 500
     const el = scroller(100, () => content)
