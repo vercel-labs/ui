@@ -227,6 +227,15 @@ const unescape = (text: string) => text.replace(/\\([\s\S])/g, "$1")
 const linkPattern =
   /\[@((?:\\[\s\S]|[^\\\]])*)\]\(([\w-]+):((?:\\[\s\S]|[^\\()])*)\)/y
 
+// Counted by hand: a regex for a run at the end retries from every backslash in it.
+function trailingSlashes(text: string) {
+  let end = text.length
+  while (end > 0 && text[end - 1] === "\\") {
+    end--
+  }
+  return text.slice(end)
+}
+
 /**
  * The codec TokenInput uses unless you pass your own: `[@label](type:value)`. A type is letters, digits, `_` and `-`; any other type is written but reads back as text.
  * @stable
@@ -236,15 +245,15 @@ const defaultCodec: TokenCodec = {
     `[@${escapeIn(token.label, /[\\[\]]/g)}](${token.type}:${escapeIn(token.value, /[\\()]/g)})`,
   // Backslashes before `[@` double, plus one more when the bracket is literal.
   // A run of backslashes at the end of text before a token doubles too.
-  // Each run is matched once, from its first backslash, so a long one stays linear.
-  escape: (text, next) =>
-    text.replace(/\\*\[@|\\+/g, (match: string, offset: number) =>
-      match.endsWith("[@")
-        ? `${match.slice(0, -2).repeat(2)}\\[@`
-        : next && offset + match.length === text.length
-          ? match + match
-          : match
-    ),
+  escape(text, next) {
+    const parts = text.split("[@")
+    const last = parts.pop()!
+    return (
+      parts.map((part) => `${part}${trailingSlashes(part)}\\[@`).join("") +
+      last +
+      (next ? trailingSlashes(last) : "")
+    )
+  },
   parse(text) {
     const value: TokenInputValue = []
     let plain = ""
