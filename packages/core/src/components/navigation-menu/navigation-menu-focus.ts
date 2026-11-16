@@ -1,7 +1,7 @@
 // Where keys move focus in a navigation menu: the APG's optional arrow keys
 // along the top-level items and through a panel's links, into a panel an
-// arrow key opened, and Shift+Tab back into a panel that renders elsewhere.
-// Tab itself stays the browser's, except where the popup layer hands it over.
+// arrow key opened, and Tab around a panel that renders elsewhere. Tab
+// itself stays the browser's, except where the popup layer hands it over.
 import { documentOrder, isAfter } from "../../foundation/kernel/order"
 import { isRTL } from "../../foundation/platform/env"
 import { nextTabbable, tabbables } from "../../foundation/focus/tabbable"
