@@ -1521,14 +1521,20 @@ function createAgent(
           action === "setChecked" ? "checked" : "value"
         ]
         const held = (Array.isArray(value) ? value : [value]).map(key)
-        // Options that render only while the list is open are read by opening it, now. Only
-        // a choice opens it: a popup's open() takes a payload, not an item.
-        if (!whileOpen && (action === "setValue" || action === "select")) {
-          await listItems(entry, instance, askToOpen, seeOpen)
-        }
         const chosen = named
           ? [args[0] as string]
           : (Array.isArray(args[0]) ? args[0] : [args[0]]).map(key)
+        // Options that render only while the list is open are read by opening it, now. Only
+        // a choice opens it: a popup's open() takes a payload, not an item.
+        if (!whileOpen && (action === "setValue" || action === "select")) {
+          await listItems(
+            entry,
+            instance,
+            askToOpen,
+            seeOpen,
+            chosen.filter((item) => !held.includes(item))
+          )
+        }
         // Read again once `allow` answers, since an item can turn disabled while the person decides.
         refuseBlocked = () => {
           const disabled = new Set([
@@ -1689,21 +1695,34 @@ function createAgent(
   }
 
   // A list's items: from its data, from the page, or, for a step that
-  // `beforeOpen` lets, by opening it for a moment.
+  // `beforeOpen` lets, by opening it for a moment. `chosen` are the items the
+  // step is about to choose.
   async function listItems(
     entry: Entry,
     instance: PrimitiveInstance,
     beforeOpen?: () => Promise<unknown>,
-    whileOpen?: (disabled: Set<string>, parts: Bound[]) => void
+    whileOpen?: (disabled: Set<string>, parts: Bound[]) => void,
+    chosen: string[] = []
   ) {
     const state = instance.get() as Record<string, unknown>
     const api = instance.api as { setOpen?: (open: boolean) => void }
-    const data = dataOf(entry, instance)
+    const known = new Set<string>()
+    const data = dataOf(entry, instance, undefined, known)
     let items = data ?? renderedItems(bound(instance))
-    // Data or an `agent` key's items are all it has, so opening it shows no more.
+    // Data says what the items are, not what the page marked on them: a mark,
+    // like `data-agent-confirm`, is on an item's element. So a chosen item
+    // with no element in the page is looked for by opening the list too.
+    const elementOf = internalOf(instance)?.elementOf
+    const unseen = () =>
+      chosen.some(
+        (item) =>
+          known.has(item) &&
+          !elementOf?.(item) &&
+          !bound(instance).some((part) => part.key === item)
+      )
+    // An `agent` key's items are all it has, so opening it shows no more.
     if (
-      !data &&
-      !items.length &&
+      ((!data && !items.length) || unseen()) &&
       !entry.agent?.items &&
       beforeOpen &&
       api.setOpen &&
@@ -1711,16 +1730,16 @@ function createAgent(
     ) {
       await beforeOpen()
       asAgent(() => api.setOpen!(true))
-      for (
-        let tries = 0;
-        tries < 60 && !(items = renderedItems(bound(instance))).length;
-        tries++
-      ) {
+      let shown = renderedItems(bound(instance))
+      // Items that load can take a while. Ones the data already lists mount with the list.
+      for (let tries = 0; tries < (data ? 4 : 60) && !shown.length; tries++) {
         await frames()
+        shown = renderedItems(bound(instance))
       }
-      if (items.length) {
+      if (shown.length) {
         whileOpen?.(disabledItems(entry, instance), bound(instance))
       }
+      items = data ?? shown
       asAgent(() => api.setOpen!(false))
       await frames()
     }

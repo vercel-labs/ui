@@ -5,6 +5,7 @@
 // stands in for an adapter.
 import { afterEach, describe, expect, test, vi } from "vitest"
 import { button } from "../src/components/button/button"
+import { combobox } from "../src/components/combobox/combobox"
 import { dialog } from "../src/components/dialog/dialog"
 import { input } from "../src/components/input/input"
 import { listbox } from "../src/components/listbox/listbox-root"
@@ -449,6 +450,78 @@ describe("data-agent-confirm on items", () => {
       /^Needs a person: "Charges \$20 a month"/
     )
     expect(instance.get().value).toBeNull()
+  })
+
+  // Options, "Pro" marked, that are in the page only while their list is open.
+  function optionsWhileOpen(part: (value: string) => never) {
+    const content = document.body.appendChild(document.createElement("div"))
+    const unbinds: (() => void)[] = []
+    cleanups.push(() => unbinds.forEach((unbind) => unbind()))
+    return (open: boolean) => {
+      unbinds.splice(0).forEach((unbind) => unbind())
+      content.replaceChildren()
+      for (const value of open ? ["Free", "Pro"] : []) {
+        const item = content.appendChild(document.createElement("div"))
+        item.textContent = value
+        if (value === "Pro") {
+          item.setAttribute("data-agent-confirm", "Charges $20 a month")
+        }
+        unbinds.push(bind(part(value), item))
+      }
+    }
+  }
+
+  async function choose(agent: ReturnType<typeof createAgent>, value: string) {
+    return agent.act({
+      steps: [{ ref: "Plan", action: "setValue", args: [value] }],
+    })
+  }
+
+  test("a select with items data still reads the mark on an option that renders while it's open", async () => {
+    const agent = createAgent()
+    const instance: ReturnType<typeof select> = select({
+      id: "plan",
+      items: ["Free", "Pro"],
+      onOpenChange: optionsWhileOpen(
+        (value) => instance.part("item", { value }) as never
+      ),
+    })
+    const trigger = document.body.appendChild(document.createElement("button"))
+    trigger.setAttribute("aria-label", "Plan")
+    cleanups.push(bind(instance.part("trigger"), trigger), () =>
+      instance.destroy()
+    )
+    const marked = await choose(agent, "Pro")
+    expect(marked.error?.message).toMatch(
+      /^Needs a person: "Charges \$20 a month"/
+    )
+    expect(instance.get().value).toBeNull()
+    const free = await choose(agent, "Free")
+    expect(free.ok, free.error?.message).toBe(true)
+    expect(instance.get()).toMatchObject({ value: "Free", open: false })
+  })
+
+  test("a combobox's empty-query suggestion still reads the mark on its option, with no items of its own", async () => {
+    const agent = createAgent()
+    const instance: ReturnType<typeof combobox> = combobox({
+      id: "plan",
+      items: [],
+      emptyItems: ["Free", "Pro"],
+      onOpenChange: optionsWhileOpen(
+        (value) => instance.part("item", { value }) as never
+      ),
+    })
+    const field = document.body.appendChild(document.createElement("input"))
+    field.setAttribute("aria-label", "Plan")
+    cleanups.push(bind(instance.part("input"), field), () => instance.destroy())
+    const marked = await choose(agent, "Pro")
+    expect(marked.error?.message).toMatch(
+      /^Needs a person: "Charges \$20 a month"/
+    )
+    expect(instance.get().value).toBeNull()
+    const free = await choose(agent, "Free")
+    expect(free.ok, free.error?.message).toBe(true)
+    expect(instance.get()).toMatchObject({ value: "Free", open: false })
   })
 })
 
