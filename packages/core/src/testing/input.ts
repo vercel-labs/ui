@@ -4,6 +4,7 @@
 // layout, so Tab follows tab order here and parts have boxes (`mount.ts`).
 import { dragThreshold } from "../foundation/drag-and-drop/pointer"
 import { trustSent } from "../foundation/kernel/trusted"
+import { isRtl } from "./aria"
 
 // The events this file sends, which core treats as a person's.
 const sent = new WeakSet<Event>()
@@ -176,6 +177,80 @@ const activates = (el: Element | null, key: string) =>
       (el instanceof HTMLButtonElement ||
         (el instanceof HTMLInputElement && /^(checkbox|radio)$/.test(el.type))))
 
+const rendered = (el: Element) => {
+  for (let at: Element | null = el; at; at = at.parentElement) {
+    if (getComputedStyle(at).display === "none") {
+      return false
+    }
+  }
+  return !isHidden(el)
+}
+
+function changed(el: HTMLInputElement) {
+  el.dispatchEvent(
+    markTrusted(new Event("input", { bubbles: true, composed: true }))
+  )
+  el.dispatchEvent(markTrusted(new Event("change", { bubbles: true })))
+}
+
+// What a browser does for a key on a native range input or radio, which an
+// event sent from script never does.
+function nativeKey(el: HTMLInputElement, key: string) {
+  const inline = isRtl(el)
+    ? ["ArrowLeft", "ArrowRight"]
+    : ["ArrowRight", "ArrowLeft"]
+  if (el.type === "radio" && el.name) {
+    const by = [inline[0], "ArrowDown"].includes(key)
+      ? 1
+      : [inline[1], "ArrowUp"].includes(key)
+        ? -1
+        : 0
+    const group = [
+      ...(
+        el.getRootNode() as Document | ShadowRoot
+      ).querySelectorAll<HTMLInputElement>("input[type=radio]"),
+    ].filter(
+      (radio) =>
+        radio === el ||
+        (radio.name === el.name &&
+          radio.form === el.form &&
+          !radio.matches(":disabled") &&
+          rendered(radio))
+    )
+    const next = group.at((group.indexOf(el) + by) % group.length)
+    if (by && next && next !== el) {
+      next.focus()
+      next.checked = true
+      changed(next)
+    }
+  } else if (el.type === "range") {
+    const min = Number.parseFloat(el.min) || 0
+    const max = el.max === "" ? 100 : Number.parseFloat(el.max)
+    const step = Number.parseFloat(el.step) || 1
+    const value = Number.parseFloat(el.value)
+    const page = Math.max(step, (max - min) / 10)
+    const next = [inline[0], "ArrowUp"].includes(key)
+      ? value + step
+      : [inline[1], "ArrowDown"].includes(key)
+        ? value - step
+        : (
+            {
+              PageUp: value + page,
+              PageDown: value - page,
+              Home: min,
+              End: max,
+            } as Record<string, number>
+          )[key]
+    if (next === undefined) {
+      return
+    }
+    el.value = String(Math.min(max, Math.max(min, next)))
+    if (Number.parseFloat(el.value) !== value) {
+      changed(el)
+    }
+  }
+}
+
 /**
  * Presses keys one after another on the focused element, like `keys("Tab", "ArrowDown", "Enter")`.
  * Tab from outside `scope` goes into it.
@@ -191,6 +266,9 @@ async function keys(doc: Document, names: string[], scope?: Element) {
     const printable = init.key.length === 1 && !init.ctrlKey && !init.metaKey
     if (proceeds && printable && isEditable(target)) {
       insert(target, init.key)
+    }
+    if (proceeds && target instanceof HTMLInputElement) {
+      nativeKey(target, init.key)
     }
     if (proceeds && init.key === "Enter" && activates(target, "Enter")) {
       keyClick(target)
