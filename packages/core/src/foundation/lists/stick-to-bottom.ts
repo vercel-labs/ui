@@ -264,6 +264,7 @@ function createStickToBottom(options: StickToBottomOptions = {}) {
         el.removeEventListener("keydown", intent)
         if (scroller === el) {
           scroller = undefined
+          pinned = undefined
         }
       }
     },
