@@ -80,6 +80,19 @@ test("Escape closes the menu and focuses its trigger", async ({
   await expectFocus(page, "Edit")
 })
 
+test("Escape in a menu reached with ArrowRight returns focus to its trigger", async ({
+  page,
+  tab,
+}) => {
+  await enter(page, tab)
+  await page.keyboard.press("ArrowDown")
+  await page.keyboard.press("ArrowRight")
+  await expectFocus(page, "Undo")
+  await page.keyboard.press("Escape")
+  await closed(page, "Edit")
+  await expectFocus(page, "Edit")
+})
+
 test("Tab in an open menu closes it and moves past the menubar", async ({
   page,
   tab,

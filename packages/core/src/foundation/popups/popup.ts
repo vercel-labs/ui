@@ -644,13 +644,16 @@ function createPopupLayer<
         active && active !== active.ownerDocument.body ? active : undefined
       )
       // A key pressed away from the trigger, like its shortcut in a field,
-      // opened it from where focus was, which is where focus goes back.
+      // opened it from where focus was, unless that was a popup that just
+      // closed, like the last menu of a menubar.
+      const trigger = returnTrigger()
       openedWithoutTrigger =
         opener === "imperative" ||
         (openedByKey &&
           !!before &&
           !findLayer(before) &&
-          !returnTrigger()?.contains(before))
+          !lastClosed() &&
+          !(trigger && composedContains(trigger, before)))
       const exiting = !!shown
       store.set({ mounted: true } as Partial<State>)
       // Reopened while animating out, it attaches again: the close already let
