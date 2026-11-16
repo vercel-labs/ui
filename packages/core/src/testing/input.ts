@@ -183,7 +183,7 @@ const rendered = (el: Element) => {
       return false
     }
   }
-  return !isHidden(el)
+  return getComputedStyle(el).visibility !== "hidden" && !isHidden(el)
 }
 
 function changed(el: HTMLInputElement) {
@@ -220,15 +220,16 @@ function nativeKey(el: HTMLInputElement, key: string) {
     const next = group.at((group.indexOf(el) + by) % group.length)
     if (by && next && next !== el) {
       next.focus()
-      next.checked = true
-      changed(next)
+      keyClick(next)
     }
   } else if (el.type === "range") {
     const min = Number.parseFloat(el.min) || 0
     const max = el.max === "" ? 100 : Number.parseFloat(el.max)
-    const step = Number.parseFloat(el.step) || 1
+    const any = el.step.toLowerCase() === "any"
+    const step = any ? (max - min) / 100 : Number.parseFloat(el.step) || 1
     const value = Number.parseFloat(el.value)
     const page = Math.max(step, (max - min) / 10)
+    const top = any ? max : min + Math.floor((max - min) / step) * step
     const next = [inline[0], "ArrowUp"].includes(key)
       ? value + step
       : [inline[1], "ArrowDown"].includes(key)
@@ -244,7 +245,10 @@ function nativeKey(el: HTMLInputElement, key: string) {
     if (next === undefined) {
       return
     }
-    el.value = String(Math.min(max, Math.max(min, next)))
+    const snapped = any ? next : min + Math.round((next - min) / step) * step
+    el.value = String(
+      Number.parseFloat(Math.min(top, Math.max(min, snapped)).toPrecision(12))
+    )
     if (Number.parseFloat(el.value) !== value) {
       changed(el)
     }
