@@ -180,13 +180,15 @@ const blocksImplicitSubmission = new Set([
 const segments = new WeakSet<HTMLInputElement>()
 const nudged = new WeakSet<Event>()
 
-const defaultButton = (elements: Element[]) =>
-  elements.find(
-    (el) =>
-      (el instanceof HTMLButtonElement && el.type === "submit") ||
-      (el instanceof HTMLInputElement &&
-        (el.type === "submit" || el.type === "image"))
-  ) as HTMLButtonElement | HTMLInputElement | undefined
+// `form.elements` leaves out image buttons, so this reads the form's tree.
+const defaultButton = (form: HTMLFormElement) =>
+  Array.from(
+    (form.getRootNode() as ParentNode).querySelectorAll<
+      HTMLButtonElement | HTMLInputElement
+    >("button, input[type=submit], input[type=image]")
+  ).find(
+    (el) => el.form === form && (el.type === "submit" || el.type === "image")
+  )
 
 const blocking = (elements: Element[]) =>
   elements.filter(
@@ -201,15 +203,17 @@ function submitImplicitly(form: HTMLFormElement | null | undefined) {
   if (!form) {
     return
   }
-  const elements = Array.from(form.elements)
-  const button = defaultButton(elements)
+  const button = defaultButton(form)
   if (button) {
     if (!button.disabled) {
       button.click()
     }
     return
   }
-  if (blocking(elements).filter((el) => !segments.has(el)).length <= 1) {
+  if (
+    blocking(Array.from(form.elements)).filter((el) => !segments.has(el))
+      .length <= 1
+  ) {
     form.requestSubmit()
   }
 }
@@ -220,7 +224,7 @@ function bindSegmentSubmit(input: HTMLInputElement) {
   segments.add(input)
   const doc = input.ownerDocument
   const onKeydown = (event: KeyboardEvent) => {
-    const target = event.target
+    const target = event.composedPath()[0]
     const form = input.form
     if (
       !form ||
@@ -235,10 +239,9 @@ function bindSegmentSubmit(input: HTMLInputElement) {
       return
     }
     nudged.add(event)
-    const elements = Array.from(form.elements)
-    const fields = blocking(elements)
+    const fields = blocking(Array.from(form.elements))
     if (
-      !defaultButton(elements) &&
+      !defaultButton(form) &&
       fields.length > 1 &&
       fields.filter((el) => !segments.has(el)).length <= 1
     ) {

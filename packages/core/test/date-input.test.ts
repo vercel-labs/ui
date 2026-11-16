@@ -23,6 +23,7 @@ import {
 import type { DateInputState } from "../src/components/date-input/date-input-parts"
 import type { PrimitiveInstance } from "../src/foundation/kernel/primitive-types"
 import { attrs, bind, partState } from "../src/foundation/kernel/part"
+import { bindSegmentSubmit } from "../src/foundation/forms/form"
 
 const cleanups: (() => void)[] = []
 afterEach(() => {
@@ -632,5 +633,42 @@ describe("time input", () => {
       max: "17:30",
     })
     expect(container.firstElementChild!.hasAttribute("data-invalid")).toBe(true)
+  })
+})
+
+describe("Enter beside segments", () => {
+  const formWith = (root: ParentNode, extra = "") => {
+    const form = document.createElement("form")
+    form.innerHTML = `<input class="segment"><input class="segment"><input class="note">${extra}`
+    root.append(form)
+    const unbinds = Array.from(
+      form.querySelectorAll<HTMLInputElement>(".segment"),
+      bindSegmentSubmit
+    )
+    cleanups.push(() => unbinds.forEach((unbind) => unbind()))
+    const submit = vi.spyOn(form, "requestSubmit").mockImplementation(() => {})
+    const enter = () =>
+      form.querySelector(".note")!.dispatchEvent(
+        new KeyboardEvent("keydown", {
+          key: "Enter",
+          bubbles: true,
+          composed: true,
+        })
+      )
+    return { submit, enter }
+  }
+
+  test("submits a form inside a shadow root", () => {
+    const host = document.createElement("div")
+    document.body.append(host)
+    const { submit, enter } = formWith(host.attachShadow({ mode: "open" }))
+    enter()
+    expect(submit).toHaveBeenCalledTimes(1)
+  })
+
+  test("leaves a form with an image button to the browser", () => {
+    const { submit, enter } = formWith(document.body, '<input type="image">')
+    enter()
+    expect(submit).not.toHaveBeenCalled()
   })
 })
