@@ -265,13 +265,15 @@ test("Enter submits a form with no submit button, in a segment or the form's one
   open,
 }) => {
   await open("date-input", { date: "2026-11-02", time: "09:30" })
-  await page.getByRole("button", { name: "Save" }).evaluate((button) => {
-    button.form!.insertAdjacentHTML(
-      "beforeend",
-      `<input aria-label="Note" name="note">`
-    )
-    button.remove()
-  })
+  await page
+    .getByRole("button", { name: "Save" })
+    .evaluate((button: HTMLButtonElement) => {
+      button.form!.insertAdjacentHTML(
+        "beforeend",
+        `<input aria-label="Note" name="note">`
+      )
+      button.remove()
+    })
   await segment(page, "month").click()
   await page.keyboard.press("Enter")
   await expect(submitted(page)).toContainText('["start","2026-11-02"]')
