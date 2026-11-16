@@ -57,6 +57,30 @@ test("a part renders a lazy render element once it has loaded", async () => {
   expect(link.textContent).toBe("Docs")
 })
 
+test("a part renders a render element inside two lazy wrappers", async () => {
+  let loaded = () => {}
+  const loading = new Promise<void>((resolve) => (loaded = resolve))
+  const host = await mount(
+    <React.Suspense fallback="Loading">
+      <Tabs defaultValue="docs">
+        <TabsList aria-label="Pages">
+          <TabsTab
+            value="docs"
+            render={lazyElement(lazyElement(<a href="/docs" />, loading))}
+          >
+            Docs
+          </TabsTab>
+        </TabsList>
+      </Tabs>
+    </React.Suspense>
+  )
+  expect(host.textContent).toBe("Loading")
+  await React.act(async () => loaded())
+  const link = host.querySelector("a")!
+  expect(link.getAttribute("href")).toBe("/docs")
+  expect(link.getAttribute("role")).toBe("tab")
+})
+
 test("an id on a lazy render element is the part's id", async () => {
   const host = await mount(
     <Tabs defaultValue="account">

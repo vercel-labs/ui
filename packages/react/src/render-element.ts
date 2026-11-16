@@ -120,19 +120,22 @@ type RenderProp<State = {}> =
   | ((props: Record<string, any>, state: State) => React.ReactElement)
 
 // React hands a client component a lazy wrapper in place of an element a
-// Server Component passed it while that element's client module loads.
-// Reading it suspends until the element is there.
+// Server Component passed it while that element's client module loads, two
+// deep in development. Reading it suspends until the element is there.
 function resolveLazy<Render>(render: Render) {
-  const lazy = render as
+  let value = render
+  let lazy = value as
     | {
         $$typeof?: symbol
         _payload: unknown
         _init: (payload: unknown) => Render
       }
     | undefined
-  return lazy?.$$typeof === Symbol.for("react.lazy")
-    ? lazy._init(lazy._payload)
-    : render
+  while (lazy?.$$typeof === Symbol.for("react.lazy")) {
+    value = lazy._init(lazy._payload)
+    lazy = value as typeof lazy
+  }
+  return value
 }
 
 /**
