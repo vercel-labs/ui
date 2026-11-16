@@ -9,7 +9,7 @@ Without text content, it shows the item's label.
     combobox as comboboxPrimitive,
     type ComboboxItemTextState,
   } from "@ui-sdk/core/combobox"
-  import { getContext } from "svelte"
+  import { getContext, untrack } from "svelte"
   import { createAttachmentKey, type Attachment } from "svelte/attachments"
   import Part from "../part.svelte"
   import { useHandle } from "../instance"
@@ -32,15 +32,32 @@ Without text content, it shows the item's label.
     id: item().key,
     text: text ?? item().label ?? "",
   }))
+  // The content shows unless a search marks part of it, and is read again
+  // when it changes, like a reused item's or a count in its label.
+  const searching = $derived(
+    text !== undefined && part.state.segments.some((segment) => segment.match)
+  )
   const learn: Attachment<HTMLElement> = (el) => {
-    if (!children || text !== undefined) {
+    if (!children) {
       return
     }
-    const nodes = [...el.childNodes]
-    if (nodes.some((node) => node.nodeType === Node.ELEMENT_NODE)) {
-      return
+    const read = () => {
+      if (searching) {
+        return
+      }
+      const nodes = [...el.childNodes]
+      text = nodes.some((node) => node.nodeType === Node.ELEMENT_NODE)
+        ? undefined
+        : (el.textContent ?? "").replace(/\s+/g, " ").trim()
     }
-    text = (el.textContent ?? "").replace(/\s+/g, " ").trim()
+    untrack(read)
+    const observer = new MutationObserver(read)
+    observer.observe(el, {
+      childList: true,
+      characterData: true,
+      subtree: true,
+    })
+    return () => observer.disconnect()
   }
   const learnKey = createAttachmentKey()
 </script>
@@ -56,7 +73,7 @@ Without text content, it shows the item's label.
   {part}
   props={{
     ...rest,
-    children: text === undefined && children ? children : marked,
+    children: children && !searching ? children : marked,
     [learnKey]: learn,
   }}
 />
