@@ -726,6 +726,7 @@ function createPopupLayer<
     releaseWatcher?.()
     releaseWatcher = undefined
     if (!mode || !hadFocus) {
+      caret = undefined
       return
     }
     if (mode === true) {
