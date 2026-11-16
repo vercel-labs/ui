@@ -76,7 +76,7 @@ function direct(names: readonly string[]) {
         }
       }
       own.clear()
-      return subscribe(part, () => {
+      const update = () => {
         const values = attrs(part)
         for (const name of names) {
           const value = values[name]
@@ -105,7 +105,11 @@ function direct(names: readonly string[]) {
           own.set(name, value)
         }
         last = values
-      })
+      }
+      // Vue hydrates a part from the vnode it rendered before a sibling bound
+      // and changed what it reads, so the element can start out behind.
+      update()
+      return subscribe(part, update)
     },
   }
 }
