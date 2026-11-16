@@ -149,6 +149,20 @@ describe("bindScrollPicker", () => {
     unbind()
   })
 
+  test("a value set from outside moves focus from the old option to the new one", async () => {
+    const list = render()
+    const options = [...list.querySelectorAll<HTMLElement>('[role="option"]')]
+    options.forEach((option) => option.setAttribute("tabindex", "-1"))
+    layOut(list)
+    const unbind = bindScrollPicker(list)
+    options[1].focus()
+    options[1].setAttribute("aria-selected", "false")
+    options[0].setAttribute("aria-selected", "true")
+    await Promise.resolve()
+    expect(document.activeElement).toBe(options[0])
+    unbind()
+  })
+
   test("a Page Down reports the option it moves to", () => {
     const list = render()
     const selected: number[] = []

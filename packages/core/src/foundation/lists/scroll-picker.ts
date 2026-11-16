@@ -246,11 +246,9 @@ function bindScrollPicker(
     }
   }
 
-  function select(index: number, event?: Event) {
-    selected = index
-    const element = items[index]
-    options.onSelect?.(index, { element, event })
-    // A roving list moves its focus along, so the next key starts here.
+  // A roving list moves its focus along, so the next key starts here, and
+  // nothing that reveals the focused option scrolls back to the old one.
+  function focusAlong(element: HTMLElement) {
     const active = activeElement(doc)
     if (
       active &&
@@ -260,6 +258,13 @@ function bindScrollPicker(
     ) {
       element.focus({ preventScroll: true })
     }
+  }
+
+  function select(index: number, event?: Event) {
+    selected = index
+    const element = items[index]
+    options.onSelect?.(index, { element, event })
+    focusAlong(element)
   }
 
   function centerOn(index: number, animate = true) {
@@ -500,6 +505,7 @@ function bindScrollPicker(
       // A list whose options bind after it, like custom elements, starts there at once.
       const animate = selected !== -1
       selected = index
+      focusAlong(items[index])
       centerOn(index, animate)
     }
   }
