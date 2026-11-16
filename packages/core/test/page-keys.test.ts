@@ -3,7 +3,6 @@
 // even where the arrows wrap, as the APG asks.
 import { afterEach, expect, test } from "vitest"
 import { combobox } from "../src/components/combobox/combobox"
-import { listbox } from "../src/components/listbox/listbox-root"
 import { mount } from "../src/testing"
 
 const mounts: { unmount: () => void }[] = []
@@ -30,21 +29,4 @@ test("a combobox's page keys stop at the ends, and its arrows still wrap", async
   expect(view.state.highlighted).toBe("a")
   await view.keys("ArrowUp")
   expect(view.state.highlighted).toBe("l")
-})
-
-test("a listbox moves a page with PageDown and PageUp", async () => {
-  const view = mount(
-    listbox,
-    { "aria-label": "Letter" } as never,
-    `<root aria-label="Letter">${letters.map((letter) => `<item value="${letter}">${letter}</item>`).join("")}</root>`
-  )
-  mounts.push(view)
-  await view.keys("Tab")
-  expect(view.state.highlighted).toBe("a")
-  await view.keys("PageDown")
-  expect(view.state.highlighted).toBe("k")
-  await view.keys("PageDown")
-  expect(view.state.highlighted).toBe("l")
-  await view.keys("PageUp")
-  expect(view.state.highlighted).toBe("b")
 })

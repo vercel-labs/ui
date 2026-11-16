@@ -43,7 +43,7 @@ export {
   toListItem,
 } from "./listbox"
 export { createListboxEngine, type ListFiltering } from "./listbox-engine"
-export { PAGE, listKeyDown, listStep } from "./listbox-keyboard"
+export { listKeyDown, listStep } from "./listbox-keyboard"
 export { isSelectAll, optionId } from "./listbox-keys"
 export { keepListing, type Listing, noListing } from "./listbox-listing"
 export {
