@@ -118,9 +118,12 @@ function formatNumberRange(
   }
   // Both ends negative share one minus sign in `formatRange`, so -5% to -2%
   // would read "-5–2%", like -5% to 2%.
-  return formatter.formatRange && !(start < 0 && end < 0)
+  if (start < 0 && end < 0) {
+    return `${formatter.format(start)} – ${formatter.format(end)}`
+  }
+  return formatter.formatRange
     ? formatter.formatRange(start, end)
-    : `${formatter.format(start)} – ${formatter.format(end)}`
+    : `${formatter.format(start)}–${formatter.format(end)}`
 }
 
 /**
