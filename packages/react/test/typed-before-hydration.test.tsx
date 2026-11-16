@@ -76,10 +76,15 @@ test("a combobox keeps text typed before hydration, and opens while focused", as
   expect(onOpenChange).toHaveBeenCalledWith(true, expect.anything())
 })
 
-test("a combobox that lost focus keeps the text and stays closed", async () => {
+test("a combobox that lost focus settles the text as a blur would, and stays closed", async () => {
+  const onValueChange = vi.fn()
   const onOpenChange = vi.fn()
   const app = (
-    <Combobox onOpenChange={onOpenChange}>
+    <Combobox
+      allowCustomValue
+      onValueChange={onValueChange}
+      onOpenChange={onOpenChange}
+    >
       <ComboboxInput aria-label="Fruit" />
       <ComboboxContent>
         <ComboboxList>
@@ -88,8 +93,9 @@ test("a combobox that lost focus keeps the text and stays closed", async () => {
       </ComboboxContent>
     </Combobox>
   )
-  const input = await typeThenHydrate(app, "Ap")
-  expect(input.value).toBe("Ap")
+  const input = await typeThenHydrate(app, "Kiwi")
+  expect(input.value).toBe("Kiwi")
+  expect(onValueChange).toHaveBeenCalledWith("Kiwi", expect.anything())
   expect(onOpenChange).not.toHaveBeenCalled()
 })
 
@@ -165,4 +171,38 @@ test("a color picker keeps text typed before hydration", async () => {
   await typeThenHydrate(app, "#00ff00")
   expect(onValueChange).toHaveBeenCalled()
   expect(onValueChange.mock.calls.at(-1)?.[0]).toMatch(/^#00ff00/)
+})
+
+test("a number input reads text typed before hydration in the page's language", async () => {
+  const onValueChange = vi.fn()
+  const app = (
+    <div lang="de">
+      <NumberInput onValueChange={onValueChange}>
+        <NumberInputControl aria-label="Menge" />
+      </NumberInput>
+    </div>
+  )
+  await typeThenHydrate(app, "1.234")
+  expect(onValueChange).toHaveBeenLastCalledWith(1234, expect.anything())
+})
+
+test("a combobox emptied before hydration clears its value, even without focus", async () => {
+  const onValueChange = vi.fn()
+  const app = (
+    <Combobox defaultValue="Apple" onValueChange={onValueChange}>
+      <ComboboxInput aria-label="Fruit" />
+      <ComboboxContent>
+        <ComboboxList>
+          {fruits.map((fruit) => (
+            <ComboboxItem key={fruit} value={fruit}>
+              {fruit}
+            </ComboboxItem>
+          ))}
+        </ComboboxList>
+      </ComboboxContent>
+    </Combobox>
+  )
+  const input = await typeThenHydrate(app, "")
+  expect(input.value).toBe("")
+  expect(onValueChange).toHaveBeenCalledWith(null, expect.anything())
 })

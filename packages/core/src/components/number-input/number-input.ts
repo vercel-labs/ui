@@ -25,7 +25,7 @@ import type {
   PrimitiveOptions,
 } from "../../foundation/kernel/primitive-types"
 import { orientationOf } from "../../foundation/focus/collection"
-import { bindPageLocale } from "../../foundation/text/locale"
+import { bindPageLocale, pageLocale } from "../../foundation/text/locale"
 import { live } from "../../foundation/kernel/live"
 
 /**
@@ -410,6 +410,10 @@ const numberInputPrimitive = /* @__PURE__ */ definePrimitive({
           }
         }
         if (typedBeforeBind(input, store.get().text)) {
+          // The root reads the page's language after its parts bind, and the text parses in it.
+          if (store.get().pageLocale === null) {
+            store.set({ pageLocale: pageLocale(input) ?? null })
+          }
           api.internal.type(input.value)
           if (!input.matches(":focus")) {
             api.internal.commitText()

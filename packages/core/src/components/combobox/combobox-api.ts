@@ -747,7 +747,9 @@ function comboboxApiBody(
   }
 
   // The user typed: the text filters, the list opens, and an emptied single combobox selects nothing.
-  function typed(text: string, event?: Event) {
+  // Text typed before the script ran, in an input that already lost focus,
+  // settles as a blur would instead of opening the list.
+  function typed(text: string, event?: Event, focused = true) {
     const state = store.get()
     if (!editable()) {
       return
@@ -770,7 +772,9 @@ function comboboxApiBody(
     ) {
       clearedValue = { value: selected }
     }
-    if (!store.get().open) {
+    if (!focused) {
+      revertQuery("focus-out")
+    } else if (!store.get().open) {
       // Items that mount with the list get the first highlight once they have.
       if (options().autoHighlight && text) {
         pendingHighlight = "first"

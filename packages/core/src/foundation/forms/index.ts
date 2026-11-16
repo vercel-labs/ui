@@ -34,6 +34,7 @@ export {
   onValidityChange,
   setComponentValidity,
   submitImplicitly,
+  typedBeforeBind,
   valueMissingMessage,
   watchFieldsets,
   watchFormDisabled,

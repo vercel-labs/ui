@@ -299,13 +299,8 @@ const comboboxSlots = (slot: SlotFactory<ComboboxState, ComboboxApi>) => ({
           input.value = query
         }
       }
-      // Opening the list for text typed before the script ran waits for focus.
       if (typedBeforeBind(input, store.get().query)) {
-        if (input.matches(":focus")) {
-          api.internal.typed(input.value)
-        } else {
-          api.setQuery(input.value, { reason: "input-change" })
-        }
+        api.internal.typed(input.value, undefined, input.matches(":focus"))
       }
       write()
       if (dev) {
