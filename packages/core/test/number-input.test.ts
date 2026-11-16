@@ -256,6 +256,33 @@ describe("number input", () => {
     expect(onValueCommit.mock.calls.map(([value]) => value)).toEqual([10])
   })
 
+  test.each([
+    ["isn't a number", "-", 5],
+    ["is empty", "", 1],
+    ["is the value", "4", 5],
+  ])(
+    "a step keeps its value when onValueChange blurs the field and the text %s",
+    (_name, text, stepped) => {
+      const instance = numberInput({
+        id: "n",
+        defaultValue: 4,
+        min: -10,
+        locale: "en-US",
+        onValueChange: (_value, details) => {
+          if (details.reason === "step-key") {
+            instance.api.internal.commitText()
+          }
+        },
+      })
+      instance.api.internal.type(text)
+      instance.api.internal.keydown({
+        key: "ArrowUp",
+        preventDefault() {},
+      } as KeyboardEvent)
+      expect(instance.api.getValue()).toBe(stepped)
+    }
+  )
+
   test("a controller step leaves nothing for the next blur to commit", () => {
     const onValueCommit = vi.fn()
     const instance = numberInput({ id: "n", defaultValue: 1, onValueCommit })

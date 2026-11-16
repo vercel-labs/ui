@@ -359,17 +359,20 @@ function numberInputApiBody(
         // A controlled value arrives after this event, so its commit reports
         // the value just asked for.
         let asked = state.value
-        if (state.text.trim() !== "") {
-          const parsed = parseNumber(state.text, localeOf(state), state.format)
-          const next =
-            parsed === null
-              ? asked
-              : snapToStep(clamp(parsed, state.min, state.max), rangeOf(state))
-          if (setValue(next, "input-commit", event)) {
-            asked = next
-          }
-        } else if (setValue(null, "input-commit", event)) {
-          asked = null
+        const isEmpty = state.text.trim() === ""
+        const parsed = isEmpty
+          ? null
+          : parseNumber(state.text, localeOf(state), state.format)
+        const next =
+          parsed !== null
+            ? snapToStep(clamp(parsed, state.min, state.max), rangeOf(state))
+            : isEmpty
+              ? null
+              : asked
+        // Asking for the value it has would stand over a change in progress,
+        // like a step whose `onValueChange` moved focus away.
+        if (!sameValue(next, asked) && setValue(next, "input-commit", event)) {
+          asked = next
         }
         showValue()
         commit(event, options().value === undefined ? undefined : asked)
