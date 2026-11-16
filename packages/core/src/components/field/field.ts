@@ -160,14 +160,19 @@ function fieldApiBody(
   // The first error that shows without an id of its own takes `${id}-error`,
   // which the control points at before the field binds. Parts are made in
   // render order, so the server and hydration agree on which one it is.
+  // An error in the page keeps it once it has it, so it never moves to
+  // another error that starts to show.
+  let holder: string | undefined
   const errorId = (state: FieldStore, key: string) => {
-    const first = [...parts()].find(
-      (part) =>
-        part.slot === "error" &&
-        (part.props as { id?: string }).id === undefined &&
-        errorShown(state, api, part.props as FieldErrorProps)
-    )
-    return !key || first?.key === key ? `${id}-error` : `${id}-error-${key}`
+    const first =
+      holder ??
+      [...parts()].find(
+        (part) =>
+          part.slot === "error" &&
+          (part.props as { id?: string }).id === undefined &&
+          errorShown(state, api, part.props as FieldErrorProps)
+      )?.key
+    return !key || first === key ? `${id}-error` : `${id}-error-${key}`
   }
 
   // The controls the field last read, so one leaving the page reads them again.
@@ -237,25 +242,37 @@ function fieldApiBody(
       },
       // Parts register a microtask after they bind: Vue binds them in the middle
       // of hydrating, when a render would be lost.
+      // Each takes out only its own entry, so two parts that share an id for a
+      // moment, like errors trading the field's, don't drop each other.
       register(list: "labels" | "descriptions" | "errors", partId: string) {
         let active = true
+        let added = false
         queueMicrotask(() => {
           if (active) {
-            store.set({
-              [list]: [
-                ...store.get()[list].filter((item) => item !== partId),
-                partId,
-              ],
-            })
+            added = true
+            store.set({ [list]: [...store.get()[list], partId] })
           }
         })
         return () => {
           active = false
-          queueMicrotask(() =>
-            store.set({
-              [list]: store.get()[list].filter((item) => item !== partId),
-            })
-          )
+          queueMicrotask(() => {
+            const items = store.get()[list]
+            const index = items.indexOf(partId)
+            if (added && index !== -1) {
+              store.set({ [list]: items.filter((_, at) => at !== index) })
+            }
+          })
+        }
+      },
+      holdError(el: HTMLElement, key: string) {
+        if (el.id !== `${id}-error`) {
+          return () => {}
+        }
+        holder = key
+        return () => {
+          if (holder === key) {
+            holder = undefined
+          }
         }
       },
       // The browser's message for the current problem, which an empty error shows.
@@ -566,13 +583,15 @@ const fieldPrimitive = /* @__PURE__ */ definePrimitive({
         id: props.id ?? api.internal.errorId(state, key),
         ...dataAttrs(state, api),
       }),
-      bind: (el, { api }) => {
+      bind: (el, { api, key }) => {
         const unregister = registerById(el, (id) =>
           api.internal.register("errors", id)
         )
+        const unhold = api.internal.holdError(el, key)
         const unannounce = api.internal.announce(el)
         return () => {
           unregister()
+          unhold()
           unannounce()
         }
       },
