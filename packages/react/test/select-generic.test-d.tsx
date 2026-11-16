@@ -66,3 +66,15 @@ function Controlled() {
   )
 }
 void Controlled
+// An inline list of objects with `multiple` still makes `T` the object.
+;<Select
+  multiple
+  value={[{ id: 1 }]}
+  onValueChange={(value) => {
+    const known: { id: number }[] = value
+    // @ts-expect-error `value` is a list of objects, not a list of lists.
+    const wrong: { id: number }[][] = value
+    void known
+    void wrong
+  }}
+/>

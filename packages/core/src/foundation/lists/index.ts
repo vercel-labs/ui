@@ -92,6 +92,7 @@ export { type ListSelectAllState, selectAllFeature } from "./listbox-select-all"
 export {
   createValueSelection,
   formatLabels,
+  type ItemsOf,
   listOf,
   type ValueSelection,
 } from "./listbox-value"

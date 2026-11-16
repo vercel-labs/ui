@@ -353,4 +353,15 @@ type Restoring = { value: unknown; keys: ReadonlyMap<number, string> }
 
 type ValueSelection = ReturnType<typeof createValueSelection>
 
-export { createValueSelection, formatLabels, listOf, type ValueSelection }
+// Resolves to nothing. It gives TypeScript a list to infer `T` from in a
+// single value's options, so an inline list of objects passed to a multiple
+// one infers `T` as the object, not as the object or a list of them.
+type ItemsOf<T> = T extends unknown ? never : T[]
+
+export {
+  createValueSelection,
+  formatLabels,
+  type ItemsOf,
+  listOf,
+  type ValueSelection,
+}
