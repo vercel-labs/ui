@@ -17,7 +17,6 @@ import { dev } from "#dev"
 import { checkName } from "#name-check"
 import { flagWhileBound } from "../../foundation/kernel/bound-keys"
 import { css } from "../../foundation/kernel/inline-style"
-import { direct } from "../../foundation/kernel/live"
 import { bindPageLocale } from "../../foundation/text/locale"
 import { definePrimitive } from "../../foundation/kernel/primitive"
 import type {
@@ -124,8 +123,6 @@ const meterPrimitive = /* @__PURE__ */ definePrimitive({
         }
         return flagWhileBound(store, "bound")
       },
-      // Settling that there's no label drops the reference without rendering the root again.
-      direct: direct(["aria-labelledby"]),
     }),
     track: slot<{}, MeterState>({ state: meterState }),
     // Placed with inline styles, from the track's start, as wide as the value.

@@ -2,10 +2,11 @@
 
 What's already decided about `@ui-sdk/web`, and what's known and open. The expert never re-raises a **Settled** item as a finding.
 
-Last reviewed: PRs 86 to 92 (2026-10-30, the audit fixes), 158 and 159 (2026-11-01, follow-ups to 89 and 90), and 160 and 161 (2026-11-01, the focus trap fixes), and 175 to 186 (2026-11-02, the pre-launch audit fixes), and 213 (2026-11-03, field control ids on the server), and 214 (2026-11-03, the toast motion fix), and 218 (2026-11-04, the examples and docs review: textarea submitShortcut, token-input custom render, toast swipe from unselectable text, navigation-menu link timing, web shared-element data-slot), and 243 to 249 (2026-11-05, the new components: Label, Segmented Control, Rating, color, Color Picker, image, Image Cropper), and 241 (2026-11-05, date input and time input), and 321 (2026-11-09, `web.css`, the drop-in stylesheet), and 326 (2026-11-09, button attributes before bind), and the Timeline branch (2026-11-10, a timeline of dated events), and the Waterfall branch (2026-11-10, the new component), and the bindRepeat branch (2026-11-11, press-and-hold repeat), and the scroll picker branch (2026-11-11, `bindScrollPicker` and Listbox's `keepInView`).
+Last reviewed: PRs 86 to 92 (2026-10-30, the audit fixes), 158 and 159 (2026-11-01, follow-ups to 89 and 90), and 160 and 161 (2026-11-01, the focus trap fixes), and 175 to 186 (2026-11-02, the pre-launch audit fixes), and 213 (2026-11-03, field control ids on the server), and 214 (2026-11-03, the toast motion fix), and 218 (2026-11-04, the examples and docs review: textarea submitShortcut, token-input custom render, toast swipe from unselectable text, navigation-menu link timing, web shared-element data-slot), and 243 to 249 (2026-11-05, the new components: Label, Segmented Control, Rating, color, Color Picker, image, Image Cropper), and 241 (2026-11-05, date input and time input), and 321 (2026-11-09, `web.css`, the drop-in stylesheet), and 326 (2026-11-09, button attributes before bind), and the Timeline branch (2026-11-10, a timeline of dated events), and the Waterfall branch (2026-11-10, the new component), and the bindRepeat branch (2026-11-11, press-and-hold repeat), and the scroll picker branch (2026-11-11, `bindScrollPicker` and Listbox's `keepInView`), and the server references branch (2026-11-16, Collapsible, Progress, Meter and Timeline references before bind).
 
 ## Settled
 
+- **Server references point at the part a component expects.** Until the root or trigger binds, an open Collapsible points at its panel, a Progress or Meter at its label and a Timeline item at its title, so server HTML names them. A part left out dangles until binding drops it; accname falls back to `aria-label` meanwhile (#517, #524, #506).
 - **Light DOM.** The elements render into the user's light DOM; inside a user's shadow root the hiding rules are adopted into that root.
 - **Every attribute option reflects as a property**, by the built-ins' rules: default-off booleans by presence, default-on as `"true"`/`"false"`, text as written, rich data property-only.
 - **Events don't bubble**; listen with `{ capture: true }`. Public events are `composed`.
@@ -31,6 +32,7 @@ Last reviewed: PRs 86 to 92 (2026-10-30, the audit fixes), 158 and 159 (2026-11-
 
 ## Known and open (don't report again, check whether fixed)
 
+- **An author's `aria-controls` on an open Collapsible with no panel part is erased.** The trigger guesses `-panel` before bind and the guess replaces it; settling removes the attribute without putting the author's back. Restoring a found reference on removal changes a core rule, so it waits.
 - An option named after a native element member gets no reflecting property, and jsdom-only tests don't show it (Listbox's picker option was renamed `keepInView` for this). A manifest check against browser element members would catch it.
 - **Before the elements upgrade, closed popup content and inactive panels show inline**, then collapse. Writing `hidden` on content parts avoids it; the popover and menu `basic` examples don't (PR 321).
 - **Core's popover reset (`resetPopoverStyles`) is written to the document only**, so a popup in a user's shadow root keeps the browser's `[popover]` styles for anything the page doesn't set. `web.css` now resets its backdrops itself (PR 321).
@@ -66,7 +68,7 @@ Last reviewed: PRs 86 to 92 (2026-10-30, the audit fixes), 158 and 159 (2026-11-
 - **Date input segments** removed by a page morph stay gone until the locale or the clock changes.
 - **A rating filled after it connects has no stars.** `createElement("ui-rating")`, appended, then given its `<template>` renders once at connect and never sees the template. Rare; a fix would watch `childList` for a `:scope > template`.
 - **A label for a Color Picker with no text input focuses nothing.** `activateControl` focuses a group's first input. Same in every framework; focusing the area thumb would be more useful.
-- **Timeline items have no name or feed position before hydration.** `aria-labelledby`, `aria-describedby`, `aria-posinset` and `aria-setsize` are live attributes written once the parts bind; pointing at a title id on the server would reference ids that may not exist.
+- **Timeline items have no description or feed position before hydration.** `aria-describedby`, `aria-posinset` and `aria-setsize` are live attributes written once the parts bind. `aria-labelledby` renders on the server, pointing at the title id until the root binds.
 - `<ui-waterfall>` walks its subtree for axes and empty ticks on every store change, arrow keys included. Unmeasured on a fully rendered 10,000-row trace.
 
 ## Revisit
