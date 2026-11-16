@@ -39,14 +39,18 @@ function registerHandle(target: HandleTarget) {
     if (hovered.includes(target)) {
       setHovered(hovered.filter((other) => other !== target))
     }
-    active = active.filter((other) => other !== target)
-    updateCursor(target.el.ownerDocument)
+    releaseHandle(target)
   }
 }
 
 /** Ends a handle's drag in the page's eyes: its cursor and the drag styles go. */
 function releaseHandle(target: HandleTarget) {
   active = active.filter((other) => other !== target)
+  // A handle removed mid-drag never hears its touchend, so the drag's end,
+  // not the finger's, lets the page pan again.
+  if (!active.length) {
+    releaseTouch()
+  }
   updateCursor(target.el.ownerDocument)
 }
 
@@ -201,14 +205,15 @@ function holdTouch(doc: Document) {
     }
   }
   releaseTouch = () => {
-    doc.removeEventListener("touchmove", hold)
-    doc.removeEventListener("touchend", end)
-    doc.removeEventListener("touchcancel", end)
+    doc.removeEventListener("touchmove", hold, true)
+    doc.removeEventListener("touchend", end, true)
+    doc.removeEventListener("touchcancel", end, true)
     releaseTouch = () => {}
   }
-  doc.addEventListener("touchmove", hold, { passive: false })
-  doc.addEventListener("touchend", end)
-  doc.addEventListener("touchcancel", end)
+  // Capturing, so a page handler that stops the event can't keep it held.
+  doc.addEventListener("touchmove", hold, { capture: true, passive: false })
+  doc.addEventListener("touchend", end, true)
+  doc.addEventListener("touchcancel", end, true)
 }
 
 function setHovered(next: HandleTarget[]) {
