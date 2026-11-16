@@ -92,6 +92,8 @@ A few behaviors need a little CSS, like keeping a closed popup hidden or giving 
 @layer ui-sdk;
 ```
 
+The same layer takes the browser's own popover border, padding and background off Popover, Dialog, Drawer, Tooltip and Hover Card content. Menu, Select, Combobox and Date Picker content keep them, so give those parts a `border`, `padding` and `background` of your own. `web.css` already does.
+
 ## Content Security Policy
 
 A Content Security Policy without `'unsafe-inline'` in `style-src` blocks the CSS ui-sdk adds to the page. Give ui-sdk your policy's nonce with a meta tag in the page's `<head>`, next to where your server writes the policy:
