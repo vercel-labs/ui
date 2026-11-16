@@ -135,6 +135,43 @@ describe("keepFocus", () => {
     expect(document.activeElement).toBe(current)
   })
 
+  test("moves focus off a button disabled while it has focus", async () => {
+    const button = document.createElement("button")
+    const next = document.createElement("button")
+    document.body.append(button, next)
+    button.focus()
+    button.disabled = true
+    keepFocus(() => next)
+    await tick()
+    expect(document.activeElement).toBe(next)
+  })
+
+  test("moves focus off an element made inert while it has focus", async () => {
+    const panel = document.createElement("div")
+    const button = document.createElement("button")
+    const next = document.createElement("button")
+    panel.append(button)
+    document.body.append(panel, next)
+    button.focus()
+    panel.inert = true
+    panel.setAttribute("inert", "")
+    keepFocus(() => next)
+    await tick()
+    expect(document.activeElement).toBe(next)
+  })
+
+  test("takes focus from an ancestor that a click focused instead", async () => {
+    const main = document.createElement("main")
+    main.tabIndex = -1
+    const next = document.createElement("button")
+    main.append(next)
+    document.body.append(main)
+    main.focus()
+    keepFocus(() => next)
+    await tick()
+    expect(document.activeElement).toBe(next)
+  })
+
   test("leaves focus that went somewhere else", async () => {
     const a = document.createElement("button")
     const b = document.createElement("button")
