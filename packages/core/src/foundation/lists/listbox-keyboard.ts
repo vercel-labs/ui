@@ -82,4 +82,4 @@ function listKeyDown(
   }
 }
 
-export { listKeyDown, listStep }
+export { PAGE, listKeyDown, listStep }

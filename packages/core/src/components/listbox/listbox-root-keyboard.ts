@@ -4,6 +4,7 @@
 // range from the anchor, Ctrl or ⌘ moves or toggles without replacing, and
 // Ctrl or ⌘ with A selects everything. Typing finds an option by its label.
 import { stepFor } from "../../foundation/focus/collection"
+import { PAGE } from "../../foundation/lists/listbox-keyboard"
 import { sourceOf } from "../../foundation/kernel/modality"
 import { isRTL } from "../../foundation/platform/env"
 import { isTypeaheadKey } from "../../foundation/text/typeahead"
@@ -153,7 +154,9 @@ function createListboxKeyboard({
       event.preventDefault()
       return toggleAll({ reason: "list-navigation", event })
     }
-    const step = stepFor(event.key, state.orientation, isRTL(root))
+    const step =
+      stepFor(event.key, state.orientation, isRTL(root)) ??
+      { PageDown: PAGE, PageUp: -PAGE }[event.key as string]
     if (step !== undefined) {
       return navigate(event, step, current)
     }

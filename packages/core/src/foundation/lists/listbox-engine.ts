@@ -618,7 +618,8 @@ function createListboxEngine(
   // item is disabled while it skips them.
   function stepKey(
     step: number | "first" | "last",
-    { loop = config.loop() } = {}
+    // A page stops at the ends, as the APG asks, though the arrows wrap.
+    { loop = config.loop() && Math.abs(Number(step)) === 1 } = {}
   ) {
     const all = entries()
     const list = config.skipDisabled
