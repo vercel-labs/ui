@@ -157,6 +157,19 @@ describe("server rendering form controls", () => {
     expect(html).toContain(`for="${id}"`)
     expect(html).not.toContain('data-slot="field-error"')
   })
+
+  test("an error shown with match is the one the control's description names", () => {
+    const html = renderToString(() => (
+      <Field invalid>
+        <FieldLabel>Handle</FieldLabel>
+        <FieldControl />
+        <FieldError match>That handle is taken.</FieldError>
+      </Field>
+    ))
+    const error = idOf(html, "field-error")
+    const described = html.match(/<input[^>]*aria-describedby="([^"]+)"/)![1]
+    expect(described.split(" ")).toContain(error)
+  })
 })
 
 // Opening tags, and an attribute of one.
@@ -351,3 +364,9 @@ describe("server rendering a select", () => {
     expect(html).toMatch(/data-slot="select-value"[^>]*>pro</)
   })
 })
+
+// The id of the element with this `data-slot`, wherever the attributes fall.
+const idOf = (html: string, slot: string) =>
+  html
+    .match(new RegExp(`<[^>]*data-slot="${slot}"[^>]*>`))![0]
+    .match(/\sid="([^"]+)"/)![1]

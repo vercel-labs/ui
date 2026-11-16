@@ -42,6 +42,19 @@ describe("server rendering text fields and forms", () => {
     expect(html).not.toContain("data-valid")
   })
 
+  test("an error shown with match is the one the control's description names", () => {
+    const html = renderToString(
+      <Field name="email" invalid>
+        <FieldLabel>Email</FieldLabel>
+        <Input type="email" />
+        <FieldError match>This email bounced.</FieldError>
+      </Field>
+    )
+    const error = idOf(html, "field-error")
+    const described = html.match(/<input[^>]*aria-describedby="([^"]+)"/)![1]
+    expect(described.split(" ")).toContain(error)
+  })
+
   test("a field shows no errors before a submit, and none with invalid={false}", () => {
     for (const invalid of [undefined, false]) {
       const html = renderToString(
@@ -77,3 +90,9 @@ describe("server rendering text fields and forms", () => {
     expect(html).not.toContain("Clear")
   })
 })
+
+// The id of the element with this `data-slot`, wherever the attributes fall.
+const idOf = (html: string, slot: string) =>
+  html
+    .match(new RegExp(`<[^>]*data-slot="${slot}"[^>]*>`))![0]
+    .match(/\sid="([^"]+)"/)![1]

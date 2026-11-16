@@ -194,11 +194,12 @@ const FieldError = withElement(
           fieldOutsideErrorShown({ match: props.match })
         )
       }
-      // Only an error with `match` needs an id of its own. One without takes the
-      // field's, which the control points at before the field binds.
+      // An error without `match`, or with `match` true, takes the field's id, which
+      // the control points at before the field binds. One that follows a validity
+      // flag needs an id of its own.
       const id = () =>
         (attrs.id as string | undefined) ??
-        (props.match === undefined ? undefined : made)
+        (props.match === undefined || props.match === true ? undefined : made)
       return usePart(
         field,
         "error",

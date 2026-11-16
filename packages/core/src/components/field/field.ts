@@ -538,10 +538,9 @@ const fieldPrimitive = /* @__PURE__ */ definePrimitive({
     }),
 
     error: slot<FieldErrorProps, FieldErrorState>({
-      // Each error with `match` is a part of its own, with an id made for it
-      // when left out, so an invalid submit reads every error's own `match`.
-      // One without takes `${id}-error`, which the control points at before
-      // the field binds.
+      // Each error is a part of its own, so an invalid submit reads its `match`.
+      // One without `match`, or with `match` true, takes `${id}-error`, which
+      // the control points at before the field binds.
       props: { id: "id", match: matchAttribute },
       present: (state, { props, api }) => errorShown(state, api, props),
       state: (state, { api }) => errorState(state, api),

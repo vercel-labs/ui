@@ -19,11 +19,14 @@ browser's message for the current problem.
 
   const field = useField()
   const uid = $props.id()
-  // Only an error with `match` needs an id of its own. One without takes the
-  // field's, which the control points at before the field binds.
+  // An error without `match`, or with `match` true, takes the field's id, which
+  // the control points at before the field binds. One that follows a validity
+  // flag needs an id of its own.
   const error = field
     ? useHandlePart(field, "error", () => ({
-        id: rest.id ?? (match === undefined ? undefined : `ui-sdk-${uid}`),
+        id:
+          rest.id ??
+          (match === undefined || match === true ? undefined : `ui-sdk-${uid}`),
         match,
       }))
     : undefined

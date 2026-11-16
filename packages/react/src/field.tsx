@@ -176,9 +176,11 @@ function FieldError({
       ? outside("error", "div", { ...props, children })
       : null
   }
-  // Only an error with `match` needs an id of its own. One without takes the
-  // field's, which the control points at before the field binds.
-  const id = props.id ?? (match === undefined ? undefined : made)
+  // An error without `match`, or with `match` true, takes the field's id, which
+  // the control points at before the field binds. One that follows a validity
+  // flag needs an id of its own.
+  const id =
+    props.id ?? (match === undefined || match === true ? undefined : made)
   return (
     <InField
       field={field}
