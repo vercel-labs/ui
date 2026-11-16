@@ -63,11 +63,20 @@ function tabbables(root: ParentNode) {
 }
 
 // Tab order through open shadow roots and their slots too, which
-// `querySelectorAll` doesn't see into.
+// `querySelectorAll` doesn't see into. Tab skips a whole shadow tree whose
+// host is inert or has a negative tabindex.
 function composedTabbables(root: ParentNode) {
   const found: HTMLElement[] = []
   const walk = (nodes: Iterable<Element>) => {
     for (const el of nodes) {
+      if (
+        el.hasAttribute("inert") ||
+        (el.shadowRoot &&
+          el.hasAttribute("tabindex") &&
+          (el as HTMLElement).tabIndex < 0)
+      ) {
+        continue
+      }
       if (
         el.matches(candidates) &&
         !el.shadowRoot?.delegatesFocus &&

@@ -335,6 +335,29 @@ test.describe("focus", () => {
     expect(await focusedText(page)).toBe("Inner end")
   })
 
+  test("Tab wraps past a shadow root that Tab skips, under an inert or tabindex -1 host", async ({
+    page,
+    tab,
+  }) => {
+    await defineElement(
+      page,
+      "x-skipped",
+      `<button type="button">Skipped</button>`
+    )
+    await openWithKeyboard(page)
+    await dialog(page).evaluate((el) =>
+      el.insertAdjacentHTML(
+        "beforeend",
+        `<button type="button">Real end</button><x-skipped tabindex="-1"></x-skipped><div inert><x-skipped></x-skipped></div>`
+      )
+    )
+    await page.getByRole("button", { name: "Real end" }).focus()
+    await tab()
+    await expect(field(page)).toBeFocused()
+    await tab({ shift: true })
+    await expect(page.getByRole("button", { name: "Real end" })).toBeFocused()
+  })
+
   test("opening focuses the first field even when a later one has a positive tabindex", async ({
     page,
   }) => {
