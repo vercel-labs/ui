@@ -130,16 +130,26 @@ function createFocus(config: {
     },
 
     // Shift+Tab from the item after an open panel goes back into the panel,
-    // as it would if the panel sat right after its trigger in the page.
+    // as it would if the panel sat right after its trigger in the page. Tab
+    // past the last item skips the panel it already went through.
     rootKeydown(event: KeyboardEvent) {
       const value = config.value()
-      if (event.key !== "Tab" || !event.shiftKey || value === null) {
+      if (event.key !== "Tab" || value === null) {
         return
       }
       const panel = config.panel()
       const trigger = config.trigger(value)
       const target = event.target as HTMLElement
       if (!panel || !trigger || panel.contains(target)) {
+        return
+      }
+      if (!event.shiftKey) {
+        const next = nextTabbable(target)
+        const after = nextTabbable(panel, panel)
+        if (next && panel.contains(next) && isAfter(trigger, target) && after) {
+          event.preventDefault()
+          after.focus()
+        }
         return
       }
       // Already between the trigger and here, the browser gets there on its own.

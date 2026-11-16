@@ -319,6 +319,21 @@ test.describe("keyboard", () => {
     await expect(link(page, "Guides")).toBeFocused()
   })
 
+  test("Tab from the last item past an open panel leaves the navigation and closes it", async ({
+    page,
+    tab,
+  }) => {
+    await trigger(page, "Resources").focus()
+    await page.keyboard.press("Enter")
+    await expect(link(page, "Blog")).toBeVisible()
+    await link(page, "Pricing").focus()
+    await tab()
+    await expect(link(page, "Blog")).toBeHidden()
+    expect(
+      await page.evaluate(() => !!document.activeElement?.closest("nav"))
+    ).toBe(false)
+  })
+
   test("Escape inside a panel closes it and returns focus to its trigger", async ({
     page,
     tab,
