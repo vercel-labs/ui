@@ -42,18 +42,30 @@ describe("server rendering text fields and forms", () => {
     expect(html).not.toContain("data-valid")
   })
 
-  test("an error shown with match is the one the control's description names", () => {
-    const html = renderToString(
-      <Field name="email" invalid>
-        <FieldLabel>Email</FieldLabel>
-        <Input type="email" />
-        <FieldError match>This email bounced.</FieldError>
-      </Field>
-    )
-    const error = idOf(html, "field-error")
-    const described = html.match(/<input[^>]*aria-describedby="([^"]+)"/)![1]
-    expect(described.split(" ")).toContain(error)
-  })
+  test.each([
+    [[true]],
+    [["valueMissing", true]],
+    [[true, true]],
+    [[undefined, true]],
+  ] as const)(
+    "errors shown on a server keep their own ids, and the first is described (%j)",
+    (matches) => {
+      const html = renderToString(
+        <Field name="email" invalid>
+          <FieldLabel>Email</FieldLabel>
+          <Input type="email" />
+          {matches.map((match, index) => (
+            <FieldError key={index} match={match}>
+              Error {index}
+            </FieldError>
+          ))}
+        </Field>
+      )
+      const { errors: ids, described } = errorIds(html)
+      expect(new Set(ids).size).toBe(ids.length)
+      expect(described).toContain(ids[0])
+    }
+  )
 
   test("a field shows no errors before a submit, and none with invalid={false}", () => {
     for (const invalid of [undefined, false]) {
@@ -91,8 +103,10 @@ describe("server rendering text fields and forms", () => {
   })
 })
 
-// The id of the element with this `data-slot`, wherever the attributes fall.
-const idOf = (html: string, slot: string) =>
-  html
-    .match(new RegExp(`<[^>]*data-slot="${slot}"[^>]*>`))![0]
-    .match(/\sid="([^"]+)"/)![1]
+// The ids of the field's errors and of what its control's description names.
+const errorIds = (html: string) => ({
+  errors: [...html.matchAll(/<[^>]*data-slot="field-error"[^>]*>/g)].map(
+    ([tag]) => tag.match(/\sid="([^"]+)"/)![1]
+  ),
+  described: html.match(/<input[^>]*aria-describedby="([^"]+)"/)![1].split(" "),
+})

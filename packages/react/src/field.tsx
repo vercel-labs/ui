@@ -176,16 +176,13 @@ function FieldError({
       ? outside("error", "div", { ...props, children })
       : null
   }
-  // An error without `match`, or with `match` true, takes the field's id, which
-  // the control points at before the field binds. One that follows a validity
-  // flag needs an id of its own.
-  const id =
-    props.id ?? (match === undefined || match === true ? undefined : made)
+  // Each error is its own part, keyed by a made value. Core gives the first one
+  // that shows the id the control points at before the field binds.
   return (
     <InField
       field={field}
       slot="error"
-      part={{ id, match }}
+      part={{ id: props.id, value: made, match }}
       props={{ ...props, children }}
       tag="div"
     />

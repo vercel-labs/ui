@@ -157,6 +157,19 @@ function fieldApiBody(
     return false
   }
 
+  // The first error that shows without an id of its own takes `${id}-error`,
+  // which the control points at before the field binds. Parts are made in
+  // render order, so the server and hydration agree on which one it is.
+  const errorId = (state: FieldStore, key: string) => {
+    const first = [...parts()].find(
+      (part) =>
+        part.slot === "error" &&
+        (part.props as { id?: string }).id === undefined &&
+        errorShown(state, api, part.props as FieldErrorProps)
+    )
+    return !key || first?.key === key ? `${id}-error` : `${id}-error-${key}`
+  }
+
   // The controls the field last read, so one leaving the page reads them again.
   let wired: HTMLElement[] = []
 
@@ -217,6 +230,7 @@ function fieldApiBody(
       }
     },
     internal: {
+      errorId,
       bindRoot(el: HTMLElement) {
         root = el
         return bindRoot(el)
@@ -537,15 +551,19 @@ const fieldPrimitive = /* @__PURE__ */ definePrimitive({
         registerById(el, (id) => api.internal.register("descriptions", id)),
     }),
 
-    error: slot<FieldErrorProps, FieldErrorState>({
-      // Each error is a part of its own, so an invalid submit reads its `match`.
-      // One without `match`, or with `match` true, takes `${id}-error`, which
-      // the control points at before the field binds.
-      props: { id: "id", match: matchAttribute },
+    error: slot<FieldErrorProps & { value?: string }, FieldErrorState>({
+      props: {
+        id: "id",
+        match: matchAttribute,
+        // Internal: renderers key each error by a made value, so an invalid
+        // submit reads every error's own `match`. Field has no `field` slot,
+        // so no element attribute either.
+        value: { kind: "string", from: "field" },
+      },
       present: (state, { props, api }) => errorShown(state, api, props),
       state: (state, { api }) => errorState(state, api),
       attrs: (state, { id, key, props, api }) => ({
-        id: props.id ?? (key ? `${id}-error-${key}` : `${id}-error`),
+        id: props.id ?? api.internal.errorId(state, key),
         ...dataAttrs(state, api),
       }),
       bind: (el, { api }) => {

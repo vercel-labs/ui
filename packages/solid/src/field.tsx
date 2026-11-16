@@ -167,13 +167,11 @@ function FieldError(
       </Show>
     )
   }
-  // An error without `match`, or with `match` true, takes the field's id, which
-  // the control points at before the field binds. One that follows a validity
-  // flag needs an id of its own.
+  // Each error is its own part, keyed by a made value. Core gives the first one
+  // that shows the id the control points at before the field binds.
   const error = () => ({
-    id:
-      (props.id as string | undefined) ??
-      (props.match === undefined || props.match === true ? undefined : made),
+    id: props.id as string | undefined,
+    value: made,
     match: props.match,
   })
   return usePart(field, "error", error, rest, "div")

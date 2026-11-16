@@ -158,18 +158,28 @@ describe("server rendering form controls", () => {
     expect(html).not.toContain('data-slot="field-error"')
   })
 
-  test("an error shown with match is the one the control's description names", () => {
-    const html = renderToString(() => (
-      <Field invalid>
-        <FieldLabel>Handle</FieldLabel>
-        <FieldControl />
-        <FieldError match>That handle is taken.</FieldError>
-      </Field>
-    ))
-    const error = idOf(html, "field-error")
-    const described = html.match(/<input[^>]*aria-describedby="([^"]+)"/)![1]
-    expect(described.split(" ")).toContain(error)
-  })
+  test.each([
+    [[true]],
+    [["valueMissing", true]],
+    [[true, true]],
+    [[undefined, true]],
+  ] as const)(
+    "errors shown on a server keep their own ids, and the first is described (%j)",
+    (matches) => {
+      const html = renderToString(() => (
+        <Field invalid>
+          <FieldLabel>Handle</FieldLabel>
+          <FieldControl />
+          {matches.map((match, index) => (
+            <FieldError match={match}>Error {index}</FieldError>
+          ))}
+        </Field>
+      ))
+      const { errors: ids, described } = errorIds(html)
+      expect(new Set(ids).size).toBe(ids.length)
+      expect(described).toContain(ids[0])
+    }
+  )
 })
 
 // Opening tags, and an attribute of one.
@@ -365,8 +375,10 @@ describe("server rendering a select", () => {
   })
 })
 
-// The id of the element with this `data-slot`, wherever the attributes fall.
-const idOf = (html: string, slot: string) =>
-  html
-    .match(new RegExp(`<[^>]*data-slot="${slot}"[^>]*>`))![0]
-    .match(/\sid="([^"]+)"/)![1]
+// The ids of the field's errors and of what its control's description names.
+const errorIds = (html: string) => ({
+  errors: [...html.matchAll(/<[^>]*data-slot="field-error"[^>]*>/g)].map(
+    ([tag]) => tag.match(/\sid="([^"]+)"/)![1]
+  ),
+  described: html.match(/<input[^>]*aria-describedby="([^"]+)"/)![1].split(" "),
+})

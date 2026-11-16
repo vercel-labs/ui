@@ -1,8 +1,9 @@
 ---
+"@ui-sdk/core": patch
 "@ui-sdk/react": patch
 "@ui-sdk/vue": patch
 "@ui-sdk/svelte": patch
 "@ui-sdk/solid": patch
 ---
 
-A `FieldError` with `match` set to `true` takes the field's error id, so in server-rendered HTML the control's `aria-describedby` names it before hydration.
+In server-rendered HTML, a Field's control now names its first shown error in `aria-describedby`, including a `FieldError` with `match`. Every error shown at once keeps an id of its own.

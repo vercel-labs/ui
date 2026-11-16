@@ -19,16 +19,10 @@ browser's message for the current problem.
 
   const field = useField()
   const uid = $props.id()
-  // An error without `match`, or with `match` true, takes the field's id, which
-  // the control points at before the field binds. One that follows a validity
-  // flag needs an id of its own.
+  // Each error is its own part, keyed by a made value. Core gives the first one
+  // that shows the id the control points at before the field binds.
   const error = field
-    ? useHandlePart(field, "error", () => ({
-        id:
-          rest.id ??
-          (match === undefined || match === true ? undefined : `ui-sdk-${uid}`),
-        match,
-      }))
+    ? useHandlePart(field, "error", () => ({ id: rest.id, value: uid, match }))
     : undefined
   const shown = $derived(
     error ? error.present : fieldOutsideErrorShown({ match })
