@@ -82,6 +82,8 @@ An `allow` that returns `true` without reading `step.confirm` answers yes for th
 
 The mark covers its element and everything inside it, for any action. Put it on a form or section to cover every control in it, or on a dialog's content to cover the buttons inside, wherever the dialog renders.
 
+A mark on one option of a Select or Combobox counts even while the list is closed, since the agent opens it for a moment to look. A list that renders only some of its options, like a virtualized one, or one filtered by text in its field, shows the agent only those. Mark something that stays on the page instead, like its trigger or a wrapper around it, and every choice in it waits for the person.
+
 ## Keep Parts of the Page from the Agent
 
 Two more marks change what the agent sees:
