@@ -358,6 +358,28 @@ test.describe("focus", () => {
     await expect(page.getByRole("button", { name: "Real end" })).toBeFocused()
   })
 
+  test("Tab wraps from the last stop of a shadow root that orders a positive tabindex first", async ({
+    page,
+    tab,
+  }) => {
+    await defineElement(
+      page,
+      "x-ordered",
+      `<button type="button">Inner a</button><button type="button" tabindex="1">Inner b</button>`
+    )
+    await openWithKeyboard(page)
+    await dialog(page).evaluate((el) =>
+      el.insertAdjacentHTML("beforeend", `<x-ordered></x-ordered>`)
+    )
+    await page.getByRole("button", { name: "Inner b" }).focus()
+    await tab()
+    expect(await focusedText(page)).toBe("Inner a")
+    await tab()
+    await expect(field(page)).toBeFocused()
+    await tab({ shift: true })
+    expect(await focusedText(page)).toBe("Inner a")
+  })
+
   test("opening focuses the first field even when a later one has a positive tabindex", async ({
     page,
   }) => {

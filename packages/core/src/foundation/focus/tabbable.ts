@@ -62,37 +62,46 @@ function tabbables(root: ParentNode) {
   return Array.from(root.querySelectorAll(candidates)).filter(isTabbable)
 }
 
-// Tab order through open shadow roots and their slots too, which
-// `querySelectorAll` doesn't see into. Tab skips a whole shadow tree whose
-// host is inert or has a negative tabindex.
+// Tab order through open shadow roots and slots, which `querySelectorAll`
+// doesn't see into: each puts its own positive tabindex values first, and Tab
+// skips a whole tree whose host is inert or has a negative tabindex.
 function composedTabbables(root: ParentNode) {
-  const found: HTMLElement[] = []
-  const walk = (nodes: Iterable<Element>) => {
+  type Entry = { index: number; stops: HTMLElement[] }
+  const ordered = (scope: Entry[]) =>
+    [
+      ...scope
+        .filter((entry) => entry.index > 0)
+        .sort((a, b) => a.index - b.index),
+      ...scope.filter((entry) => entry.index <= 0),
+    ].flatMap((entry) => entry.stops)
+  const walk = (nodes: Iterable<Element>, scope: Entry[]) => {
     for (const el of nodes) {
-      if (
-        el.hasAttribute("inert") ||
-        (el.shadowRoot &&
-          el.hasAttribute("tabindex") &&
-          (el as HTMLElement).tabIndex < 0)
-      ) {
+      const index = el.hasAttribute("tabindex")
+        ? (el as HTMLElement).tabIndex
+        : 0
+      if (el.hasAttribute("inert") || (el.shadowRoot && index < 0)) {
         continue
       }
-      if (
+      const stops =
         el.matches(candidates) &&
         !el.shadowRoot?.delegatesFocus &&
         isTabbable(el)
-      ) {
-        found.push(el)
+          ? [el]
+          : []
+      const slotted = el instanceof HTMLSlotElement ? el.assignedElements() : []
+      if (el.shadowRoot || slotted.length) {
+        const inner: Entry[] = []
+        walk(el.shadowRoot?.children ?? slotted, inner)
+        scope.push({ index, stops: [...stops, ...ordered(inner)] })
+      } else {
+        scope.push({ index, stops })
+        walk(el.children, scope)
       }
-      const slotted = el instanceof HTMLSlotElement && el.assignedElements()
-      walk(
-        el.shadowRoot?.children ??
-          (slotted && slotted.length ? slotted : el.children)
-      )
     }
   }
-  walk(root.children)
-  return found
+  const top: Entry[] = []
+  walk(root.children, top)
+  return top.flatMap((entry) => entry.stops)
 }
 
 // The stops Tab visits before the rest: positive tabindex values, lowest
