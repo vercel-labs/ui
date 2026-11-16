@@ -157,11 +157,9 @@ function fieldApiBody(
     return false
   }
 
-  // The first error that shows without an id of its own takes `${id}-error`,
-  // which the control points at before the field binds. Parts are made in
-  // render order, so the server and hydration agree on which one it is.
-  // An error in the page keeps it once it has it, so it never moves to
-  // another error that starts to show.
+  // The first error that shows takes `${id}-error`, which the control points
+  // at before binding; parts are made in render order, so server and
+  // hydration agree. An error in the page keeps it, so it never moves.
   let holder: string | undefined
   const errorId = (state: FieldStore, key: string) => {
     const first =
@@ -240,10 +238,8 @@ function fieldApiBody(
         root = el
         return bindRoot(el)
       },
-      // Parts register a microtask after they bind: Vue binds them in the middle
-      // of hydrating, when a render would be lost.
-      // Each takes out only its own entry, so two parts that share an id for a
-      // moment, like errors trading the field's, don't drop each other.
+      // A microtask after binding, since Vue binds mid-hydration. Each takes out
+      // only its own entry, so two parts sharing an id don't drop each other.
       register(list: "labels" | "descriptions" | "errors", partId: string) {
         let active = true
         let added = false
