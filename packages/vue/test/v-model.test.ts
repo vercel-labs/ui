@@ -145,3 +145,25 @@ test.each(["value", "modelValue"])(
     unmount()
   }
 )
+
+test("v-model.trim on an Input or Textarea trims the text, and writes no attribute for its modifiers", async () => {
+  const { Textarea } = await import("../src/textarea")
+  for (const Control of [Input, Textarea]) {
+    const value = ref("")
+    const { el, unmount } = mount(() =>
+      h(Control, {
+        "aria-label": "Name",
+        modelValue: value.value,
+        modelModifiers: { trim: true },
+        "onUpdate:modelValue": (next: string) => (value.value = next),
+      })
+    )
+    const field = el.querySelector<HTMLInputElement>("input, textarea")!
+    expect(field.hasAttribute("modelmodifiers")).toBe(false)
+    field.value = "  Ada  "
+    field.dispatchEvent(new Event("input", { bubbles: true }))
+    await nextTick()
+    expect(value.value).toBe("Ada")
+    unmount()
+  }
+})

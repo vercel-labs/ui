@@ -90,9 +90,11 @@ function elementProps(
       : tag === "input"
         ? { "^value": props.defaultValue }
         : {}
+  // `v-model.trim` passes `modelModifiers`, which Vue applies itself and no element takes.
+  const { modelModifiers, valueModifiers, ...rest } = attrs
   return {
     name: field?.name(),
-    ...attrs,
+    ...rest,
     disabled: props.disabled || field?.disabled(),
     readonly: readOnlyOf(props, attrs) || undefined,
     required: props.required,
