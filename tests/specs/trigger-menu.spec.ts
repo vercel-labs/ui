@@ -47,6 +47,26 @@ test.describe("opening", () => {
     })
   })
 
+  test("text an input method commits filters the list", async ({
+    page,
+    browserName,
+  }) => {
+    test.skip(
+      browserName !== "chromium",
+      "Only Chromium can drive an input method."
+    )
+    await field(page).focus()
+    await page.keyboard.type("hi @")
+    const session = await page.context().newCDPSession(page)
+    await session.send("Input.imeSetComposition", {
+      text: "やまだ",
+      selectionStart: 3,
+      selectionEnd: 3,
+    })
+    await session.send("Input.insertText", { text: "山田" })
+    await expect(options(page)).toHaveText(["山田太郎"], { useInnerText: true })
+  })
+
   test("queries match Unicode letters and ignore accents", async ({ page }) => {
     await field(page).focus()
     await page.keyboard.type("@jose")

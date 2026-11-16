@@ -202,14 +202,15 @@ function textFieldAdapter(field: TextField) {
     listeners.forEach((listener) => listener(change))
   const focused = () => field.ownerDocument.activeElement === field
 
+  // During a composition the text from before it stays, so compositionend
+  // reports the whole commit: Chrome fires no input after it.
   function onBeforeInput() {
-    previous = field.value
+    if (!composing) {
+      previous = field.value
+    }
   }
 
   function onInput(event: Event) {
-    const value = field.value
-    const { range, inserted } = textDiff(previous, value)
-    previous = value
     // An input event outside a composition means any composition is over,
     // even when the browser dropped its compositionend.
     if (!(event as InputEvent).isComposing) {
@@ -218,6 +219,9 @@ function textFieldAdapter(field: TextField) {
     if (composing) {
       return
     }
+    const value = field.value
+    const { range, inserted } = textDiff(previous, value)
+    previous = value
     emit({
       type: "input",
       range,
