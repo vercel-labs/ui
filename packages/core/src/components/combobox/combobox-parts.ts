@@ -46,6 +46,7 @@ import {
   warnIfUnnamed,
 } from "../../foundation/lists/listbox-parts"
 import { flagWhileBound } from "../../foundation/kernel/bound-keys"
+import { typedBeforeBind } from "../../foundation/forms/form"
 import {
   inputState,
   listContentPart,
@@ -68,7 +69,6 @@ import { formatLabels, listOf } from "../../foundation/lists/listbox-value"
 import { selects } from "../../foundation/kernel/selects"
 import { direct, live } from "../../foundation/kernel/live"
 import { pressKeepsFocus } from "../../foundation/focus/press-keeps-focus"
-import { typedBeforeBind } from "../../foundation/forms/form"
 
 type ItemProps = ComboboxItemProps<unknown> & {
   /** @internal The group the item is in. */
