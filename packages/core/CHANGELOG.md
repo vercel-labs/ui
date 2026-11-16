@@ -1,5 +1,24 @@
 # @ui-sdk/core
 
+## 0.1.0-beta.7
+
+### Patch Changes
+
+- b6db62a: An agent's choice in a closed Select or Combobox now reads the option it chooses even when the option renders only while the list is open: the list opens for a moment, so a `data-agent-confirm` mark on that option asks a person first. With `items` or `emptyItems` data, the option was chosen without asking.
+- c52e8ad: The Calendar and Date Picker year select labels a year below 100 as that year, not as 19xx.
+- dec3e40: A click on a native label for a Combobox input, like a Field label, focuses the input and leaves the list closed, as a Select's label does. It opened the list.
+- 54b7c8d: A Control-click on macOS opens a context menu at the pointer, like a right-click. It used to open as if from the keyboard, anchored to the whole area with its first item focused.
+- 938e5e2: A Drawer on a touch screen puts a scroll area's own inline `overflow-y` back at its largest snap point and when it closes. It used to remove it, so a list scrolled by an inline style couldn't scroll.
+- e154ead: In server-rendered HTML, the control of a Field marked `invalid` now names its first shown error in `aria-describedby`, including a `FieldError` with `match`. Every error shown at once keeps an id of its own.
+- 3fbd191: With a `NavigationMenuViewport`, Tab from the last item past an open panel leaves the navigation, and the panel closes. It used to go back into the panel, so Tab could never leave.
+- 5a356dc: Number Input's default small step (a tenth of `step`) no longer carries floating point noise, so Alt+ArrowUp with `step: 0.7` from 1 gives 1.05, not 1.0499999999999998.
+- 76f3585: A touch drag that starts in a Resizable handle's touch hit area but beside the handle resizes and no longer scrolls the page. It used to scroll and stop after a few pixels.
+- a14961e: Server-rendered HTML now names and links the parts that render after the one pointing at them: an open Collapsible's trigger has `aria-controls`, a Progress or Meter with a label has `aria-labelledby`, and a Timeline item is named by its title. Once the component binds, a part that isn't in the page is dropped again.
+- 25ac95a: Tabs select the `defaultValue` tab when it binds after the others, like a tab inside Suspense or `React.lazy`. The first tab stands in until it does, unless someone picks another tab first.
+- 250c9bb: A Tree builds its collection once for each new `items` or `paths` array. While a new array rendered, it rebuilt the collection several times, which slowed a reorder in a large tree.
+- 217fc40: Text committed through an input method after a trigger character, like Japanese after `@`, filters a Trigger Menu. It used to leave the list unfiltered, so Enter inserted the highlighted item.
+- a36290a: In React, Combobox, Autocomplete, Command, Number Input, Date Picker and Color Picker inputs keep text typed before hydration, and take it as typing when they hydrate. A field that already lost focus settles the text as a blur would.
+
 ## 0.1.0-beta.6
 
 ### Patch Changes

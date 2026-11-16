@@ -1,5 +1,12 @@
 # @ui-sdk/vue
 
+## 0.1.0-beta.7
+
+### Patch Changes
+
+- e154ead: In server-rendered HTML, the control of a Field marked `invalid` now names its first shown error in `aria-describedby`, including a `FieldError` with `match`. Every error shown at once keeps an id of its own.
+- Updated @ui-sdk/core to 0.1.0-beta.7
+
 ## 0.1.0-beta.6
 
 ### Patch Changes

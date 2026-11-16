@@ -1,5 +1,14 @@
 # @ui-sdk/solid
 
+## 0.1.0-beta.7
+
+### Patch Changes
+
+- e154ead: In server-rendered HTML, the control of a Field marked `invalid` now names its first shown error in `aria-describedby`, including a `FieldError` with `match`. Every error shown at once keeps an id of its own.
+- 7f35e97: A part's event handler that runs while another component renders, like a focus change that component makes, no longer logs Solid's `STRICT_READ_UNTRACKED` warning for each reactive prop it reads.
+- f3fe140: Items that keep their component but change value in place, like `<For keyed={false}>` reversed, stay reachable with the arrow keys in Select, Tabs and other lists.
+- Updated @ui-sdk/core to 0.1.0-beta.7
+
 ## 0.1.0-beta.6
 
 ### Patch Changes

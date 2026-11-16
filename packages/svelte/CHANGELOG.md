@@ -1,5 +1,13 @@
 # @ui-sdk/svelte
 
+## 0.1.0-beta.7
+
+### Patch Changes
+
+- e154ead: In server-rendered HTML, the control of a Field marked `invalid` now names its first shown error in `aria-describedby`, including a `FieldError` with `match`. Every error shown at once keeps an id of its own.
+- 06fd2e2: `SelectItemText`, `ComboboxItemText`, `CommandItemText` and `AutocompleteItemText` follow their content when it changes, like an item reused by an unkeyed `{#each}` or a count in its label. They used to keep the first text they rendered. A label that changes while a search marks it updates once the search clears.
+- Updated @ui-sdk/core to 0.1.0-beta.7
+
 ## 0.1.0-beta.6
 
 ### Patch Changes
