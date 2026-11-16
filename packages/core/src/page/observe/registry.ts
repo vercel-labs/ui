@@ -287,8 +287,9 @@ function componentLabel(parts: Bound[]) {
   // Then any part's own name, keyless first, so an accordion isn't named by
   // its first item, but a slider is by its one thumb.
   const keys = new Set(parts.map((part) => part.key).filter(Boolean))
-  for (const part of parts) {
-    const name = (!part.key || keys.size === 1) && accessibleName(part.el)
+  const keyed = keys.size === 1 ? parts.filter((part) => part.key) : []
+  for (const part of [...parts.filter((part) => !part.key), ...keyed]) {
+    const name = accessibleName(part.el)
     if (name) {
       return name
     }

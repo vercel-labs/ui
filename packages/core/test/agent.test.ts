@@ -1515,6 +1515,30 @@ describe("agent", () => {
     ])
   })
 
+  test("a single tab doesn't name its tabs over the list's label", () => {
+    const agent = createAgent()
+    const files = tabs({ id: "open-files" })
+    const root = document.body.appendChild(document.createElement("div"))
+    const list = root.appendChild(document.createElement("div"))
+    list.setAttribute("aria-label", "Open files")
+    const tab = list.appendChild(document.createElement("button"))
+    tab.textContent = "index.ts"
+    // React binds a child before its parent.
+    cleanups.push(
+      bind(files.part("tab", { value: "index" }), tab),
+      bind(files.part("list"), list),
+      bind(files.part("root"), root),
+      () => files.destroy()
+    )
+    expect(
+      agent
+        .snapshot()
+        .find(
+          (component) => component.component === "tabs" && !component.offPage
+        )?.label
+    ).toBe("Open files")
+  })
+
   test("an item's label leaves out text a screen reader skips, like its check mark", async () => {
     const agent = createAgent()
     const people = listbox({ id: "people", multiple: true })
