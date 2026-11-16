@@ -18,15 +18,25 @@ const items = `<item value="a">Alpha</item><item value="b">Beta</item>`
 async function open(markup: string) {
   const view = mount(select, { defaultValue: "b" }, markup)
   mounts.push(view)
-  await view.click(view.part("trigger")!)
+  const press = () => view.click(view.part("trigger")!)
+  await press()
   return {
     naming: (slot: Slot) => [
       view.part(slot)!.getAttribute("aria-label"),
       view.part(slot)!.getAttribute("aria-labelledby"),
     ],
     idOf: (slot: Slot) => view.part(slot)!.id,
+    close: press,
   }
 }
+
+test("a closed list points at its trigger, so the name is the trigger's alone", async () => {
+  const view = await open(
+    `<root><trigger aria-label="Letter"><value /></trigger><content>${items}</content></root>`
+  )
+  await view.close()
+  expect(view.naming("content")).toEqual([null, view.idOf("trigger")])
+})
 
 test("a trigger named by aria-label names the list", async () => {
   const view = await open(

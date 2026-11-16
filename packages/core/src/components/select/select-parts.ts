@@ -117,14 +117,16 @@ function contentState(state: SelectState, { api }: { api: SelectApi }) {
 }
 
 // A list that points at its trigger is named after the value the trigger
-// shows, not the trigger's name (accname 1.2, step 2E), so it copies the name,
-// once `labeled` settles: a list that hydrates keeps the server's attributes.
+// shows (accname 1.2, step 2E), so an open one copies the trigger's name, once
+// `labeled` settles. Closed it has no name, so a query by label finds the trigger alone.
 function listName(state: SelectState, id: string, api: SelectApi) {
   if (state.labeled) {
     return { "aria-labelledby": `${id}-label` }
   }
   const trigger =
-    state.labeled === false ? api.internal.triggerElement() : undefined
+    state.open && state.labeled === false
+      ? api.internal.triggerElement()
+      : undefined
   const name = (trigger && accessibleName(trigger)) || undefined
   return {
     "aria-labelledby": name ? undefined : `${id}-trigger`,
