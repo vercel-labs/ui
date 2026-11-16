@@ -330,23 +330,24 @@ function tabsApiBody(
       checked = true
       const has = (key: string | null) => list.some((tab) => tab.key === key)
       let { value } = store.get()
-      if (controlled() || value !== (standIn ?? awaited)) {
+      if (controlled()) {
         awaited = null
       }
       if (awaited !== null && has(awaited)) {
-        if (value !== awaited) {
-          store.set({ value: awaited })
-        }
+        const from = value
         value = awaited
         awaited = standIn = null
+        if (from !== value) {
+          store.set({ value })
+        }
       }
       if (!controlled() && !has(value)) {
         const first = list.find(enabled)
         // The first pick is the default, so it calls nothing. A selected tab
         // that leaves the page later is a change.
         if (first && initial) {
-          store.set({ value: first.key })
           standIn = awaited === null ? null : first.key
+          store.set({ value: first.key })
         } else if (first) {
           change("value", first.key, { reason: "item-removed" })
         }
@@ -443,6 +444,9 @@ function tabsApiBody(
     }
     const from = previous
     previous = state.value
+    if (state.value !== standIn) {
+      awaited = null
+    }
     changed = true
     store.set(selecting({ ...state, value: from }, state.value))
     roving.check()

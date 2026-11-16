@@ -81,3 +81,23 @@ test("a tab picked before the default's tab binds stays selected", async () => {
   await React.act(async () => loaded())
   expect(selected(host)).toEqual(["team"])
 })
+
+test("a tab picked and left before the default's tab binds keeps the pick", async () => {
+  const { Late, loaded } = lateTab("billing")
+  const host = await mount(
+    <Tabs defaultValue="billing">
+      <TabsList aria-label="Settings">
+        <TabsTab value="general">general</TabsTab>
+        <TabsTab value="team">team</TabsTab>
+        <React.Suspense fallback={null}>
+          <Late />
+        </React.Suspense>
+      </TabsList>
+    </Tabs>
+  )
+  const tabs = host.querySelectorAll<HTMLElement>('[role="tab"]')
+  await React.act(async () => tabs[1]!.click())
+  await React.act(async () => tabs[0]!.click())
+  await React.act(async () => loaded())
+  expect(selected(host)).toEqual(["general"])
+})
