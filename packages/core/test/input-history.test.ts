@@ -176,6 +176,16 @@ describe("createInputHistory in a textarea", () => {
     el.setSelectionRange(0, 3)
     expect(press("ArrowUp").defaultPrevented).toBe(false)
   })
+
+  test("leaves the keys to a menu open on the textarea, which marks it with data-open", () => {
+    const { el, press } = mount("textarea", { history: ["one"] })
+    el.setAttribute("data-open", "")
+    expect(press("ArrowUp").defaultPrevented).toBe(false)
+    expect(el.value).toBe("")
+    el.removeAttribute("data-open")
+    expect(press("ArrowUp").defaultPrevented).toBe(true)
+    expect(el.value).toBe("one")
+  })
 })
 
 describe("createInputHistory with any value", () => {

@@ -130,6 +130,8 @@ function createInputHistory<T>(options: InputHistoryOptions<T>) {
         isComposing(event) ||
         (field as TextField | null)?.readOnly ||
         field?.getAttribute("aria-expanded") === "true" ||
+        // A textarea can't carry `aria-expanded`, so an open menu marks it with `data-open`.
+        field?.hasAttribute("data-open") ||
         !atEdge(direction, event)
       ) {
         return false
