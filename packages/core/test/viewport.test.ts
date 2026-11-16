@@ -1,6 +1,9 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, test, vi } from "vitest"
-import { trackKeyboard } from "../src/foundation/platform/keyboard"
+import {
+  measureViewportEarly,
+  trackKeyboard,
+} from "../src/foundation/platform/keyboard"
 import { bindAvoidKeyboard, bindViewport } from "../src/index"
 
 type FakeViewport = EventTarget & {
@@ -498,6 +501,25 @@ describe("trackKeyboard", () => {
     expect(dialog.style.getPropertyValue("--keyboard-inset")).toBe("")
     expect(region.style.getPropertyValue("--keyboard-inset")).toBe("0px")
     stops[1]()
+  })
+})
+
+describe("trackKeyboard after an early read", () => {
+  test("measures again when the early read saw a covered strip with no keyboard", () => {
+    phone(664)
+    // A controlled open read the page while a side sheet in its flow made it wider.
+    Object.defineProperty(window, "innerHeight", {
+      value: 773,
+      configurable: true,
+    })
+    measureViewportEarly(window)
+    Object.defineProperty(window, "innerHeight", {
+      value: 664,
+      configurable: true,
+    })
+    const sheet = document.createElement("div")
+    cleanups.push(trackKeyboard(sheet))
+    expect(sheet.style.getPropertyValue("--keyboard-inset")).toBe("0px")
   })
 })
 

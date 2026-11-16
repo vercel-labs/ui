@@ -117,7 +117,15 @@ function trackKeyboard(
       onChange?.after()
     }
   }
-  apply(early.get(view) ?? measureViewport(view, viewport))
+  // Read after a controlled open rendered, content still in the page's flow
+  // can widen a phone's layout viewport and look like a keyboard.
+  const measured = early.get(view)
+  apply(
+    measured &&
+      measured.layoutHeight - measured.offsetTop - measured.height <= 1
+      ? measured
+      : measureViewport(view, viewport)
+  )
   const stop = followViewport(view, viewport, apply)
   return () => {
     stop()
