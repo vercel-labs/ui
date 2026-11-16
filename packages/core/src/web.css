@@ -1843,17 +1843,28 @@
   :not([data-slot="field"]):has(
     > ui-date-picker-input + :is(ui-date-picker-trigger, ui-date-picker-clear)
   ) {
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
     align-items: center;
 
+    & > :is([data-slot="date-picker-input"], ui-date-picker-input) {
+      grid-area: 1 / 1;
+    }
+
     & [data-slot="date-picker-input"] {
-      flex: 1;
       padding-inline-end: calc(var(--ui-spacing) * 8);
     }
 
-    & [data-slot="date-picker-trigger"] {
-      position: relative;
-      margin-inline-start: calc(var(--ui-spacing) * -7);
+    &
+      > :is(
+        [data-slot="date-picker-trigger"],
+        [data-slot="date-picker-clear"],
+        ui-date-picker-trigger,
+        ui-date-picker-clear
+      ) {
+      grid-area: 1 / 1;
+      justify-self: end;
+      margin-inline-end: var(--ui-spacing);
     }
 
     &:has([data-slot="date-picker-clear"]) {
@@ -1861,13 +1872,8 @@
         padding-inline-end: calc(var(--ui-spacing) * 14);
       }
 
-      & [data-slot="date-picker-clear"] {
-        position: relative;
-        margin-inline-start: calc(var(--ui-spacing) * -13);
-      }
-
-      & [data-slot="date-picker-trigger"] {
-        margin-inline-start: 0;
+      & > :is([data-slot="date-picker-clear"], ui-date-picker-clear) {
+        margin-inline-end: calc(var(--ui-spacing) * 7);
       }
     }
   }
