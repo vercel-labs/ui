@@ -127,27 +127,32 @@ function treeApiBody(
   const itemElement = (key: string | null | undefined) =>
     key == null ? undefined : context.element("item", key)
 
-  // The shape `items` or `paths` give, kept until they change.
-  let source: unknown
-  let data:
-    | {
-        items: TreeItemData[]
-        tree: TreeCollection
-        byKey: Map<string, TreeItemData>
-      }
-    | undefined
+  // The shape `items` or `paths` give, kept per array: while new items render,
+  // reads alternate between the rendering array and the committed one.
+  const built = new WeakMap<
+    object,
+    {
+      items: TreeItemData[]
+      tree: TreeCollection
+      byKey: Map<string, TreeItemData>
+    }
+  >()
   function fromData() {
     const { items, paths } = store.get()
     const next = items ?? paths
-    if (next !== source) {
-      source = next
-      const list = items ?? (paths ? treeFromPaths(paths) : undefined)
-      const nodes = list ? treeDataNodes(list) : []
-      data = list && {
+    if (!next) {
+      return undefined
+    }
+    let data = built.get(next)
+    if (!data) {
+      const list = items ?? treeFromPaths(paths!)
+      const nodes = treeDataNodes(list)
+      data = {
         items: list,
         tree: createTreeCollection(nodes),
         byKey: new Map(nodes.map((node) => [node.key, node.item])),
       }
+      built.set(next, data)
     }
     return data
   }
