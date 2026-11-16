@@ -384,6 +384,24 @@ test.describe("forms", () => {
     )
   })
 
+  test("Enter in the form's one text field submits it, with no submit button", async ({
+    page,
+    open,
+  }) => {
+    await open("select", { value: "banana" })
+    await page.getByRole("button", { name: "Submit" }).evaluate((button) => {
+      button.form!.insertAdjacentHTML(
+        "beforeend",
+        `<input aria-label="Note" name="note">`
+      )
+      button.remove()
+    })
+    await page.getByRole("textbox", { name: "Note" }).press("Enter")
+    await expect(page.getByRole("status", { name: "Submitted" })).toContainText(
+      "fruit=banana"
+    )
+  })
+
   test("a required select blocks submission until a value is chosen", async ({
     page,
     open,

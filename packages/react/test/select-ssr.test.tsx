@@ -46,7 +46,7 @@ describe("server rendering a select", () => {
     expect(html).toContain('role="combobox"')
     expect(html).toContain('aria-expanded="false"')
     expect(html).toMatch(/data-slot="select-value"[^>]*>Pro</)
-    expect(html).toMatch(/<input[^>]*name="plan"[^>]*value="pro"/)
+    expect(html).toMatch(/<textarea[^>]*name="plan"[^>]*>pro<\/textarea>/)
     // The list isn't in the page while closed.
     expect(html).not.toContain('role="listbox"')
   })
@@ -59,7 +59,7 @@ describe("server rendering a select", () => {
     )
     expect(html).toContain("data-placeholder")
     expect(html).toContain("Choose a plan")
-    expect(html).toMatch(/<input[^>]*required/)
+    expect(html).toMatch(/<textarea[^>]*required/)
   })
 
   test("several values render one hidden input each", () => {
@@ -162,7 +162,7 @@ describe("server rendering a combobox", () => {
     )
     expect(html).toMatch(/<input[^>]*role="combobox"[^>]*value="Pro"/)
     expect(html).toContain('aria-autocomplete="list"')
-    expect(html).toMatch(/name="plan"[^>]*value="pro"/)
+    expect(html).toMatch(/<textarea[^>]*name="plan"[^>]*>pro<\/textarea>/)
   })
 
   test("the input holds the label of a composed item, before it mounts", () => {

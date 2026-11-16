@@ -39,9 +39,7 @@ describe("server rendering a combobox", () => {
     expect(typeof window).toBe("undefined")
     expect(field(html)).toContain('value="Pro"')
     expect(field(html)).toContain('aria-autocomplete="list"')
-    expect(
-      inputs(html).find((input) => input.includes('name="plan"'))
-    ).toContain('value="pro"')
+    expect(html).toMatch(/<textarea[^>]*name="plan"[^>]*>pro<\/textarea>/)
     // The list isn't in the page while closed.
     expect(html).not.toContain('role="listbox"')
   })

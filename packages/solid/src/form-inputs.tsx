@@ -16,7 +16,7 @@ function formInputs(
   )
   return (
     <>
-      <input {...input} />
+      <textarea {...input} />
       <Show when={multiple()}>
         <For each={serialized()}>
           {(key) => {

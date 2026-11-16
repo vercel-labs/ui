@@ -13,7 +13,7 @@ const FormInputs = defineComponent({
     return () => {
       const { handle } = props
       return [
-        h("input", handle.slot("form-input")),
+        h("textarea", handle.slot("form-input")),
         ...(handle.state.multiple
           ? (handle.api.internal.serialized() as string[]).map((key) =>
               h("input", {

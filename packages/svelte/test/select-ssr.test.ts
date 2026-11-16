@@ -11,7 +11,7 @@ describe("select server rendering", () => {
     expect(typeof window).toBe("undefined")
     expect(body).toContain('role="combobox"')
     expect(body).toMatch(/data-slot="select-value"[^>]*>(<!---->)?Pro</)
-    expect(body).toMatch(/<input[^>]*name="plan"[^>]*value="pro"/)
+    expect(body).toMatch(/<textarea[^>]*name="plan"[^>]*>pro<\/textarea>/)
   })
 
   test("a select with composed items shows the label `itemToLabel` gives before they mount", () => {

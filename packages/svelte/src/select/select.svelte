@@ -253,6 +253,8 @@ Picks one value, or several with `multiple`, from a list in a popup.
   // more per value with `multiple`. The input's attributes change with the
   // value, so reading them keeps the list of values current.
   const formInput = useHandlePart(select, "form-input")
+  // A textarea's value is its text, which the server renders too.
+  const { value: formValue, ...formAttrs } = $derived(formInput.slot())
   const values = $derived(
     (formInput.attrs,
     select.state.multiple ? select.api.internal.serialized() : [])
@@ -263,7 +265,7 @@ Picks one value, or several with `multiple`, from a list in a popup.
 {#if items && !own()}
   <SelectContent fromRoot />
 {/if}
-<input {...formInput.slot()} />
+<textarea {...formAttrs}>{formValue}</textarea>
 {#each values as key (key)}
   <ValueInput owner={select} value={key} />
 {/each}

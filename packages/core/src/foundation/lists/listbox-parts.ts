@@ -396,9 +396,9 @@ function bindFormRoot<State extends FormState, Api extends ListboxApi>(
   }
 }
 
-// React and Vue: a visually hidden text input, so the form submits, resets,
-// validates and autofills the value, even before hydration. With `multiple`,
-// it only validates, and each value has its own hidden input.
+// A visually hidden textarea that submits, resets, validates and autofills
+// the value before hydration; a text input would stop Enter from submitting the
+// form. With `multiple`, it only validates; each value has its own hidden input.
 function hiddenInputPart<State extends FormState, Api extends ListboxApi>(
   slot: string
 ) {
@@ -407,7 +407,6 @@ function hiddenInputPart<State extends FormState, Api extends ListboxApi>(
       const keys = api.internal.selection.keysOf(state.value)
       return {
         id: `${id}-${slot}`,
-        type: "text",
         name: state.multiple ? undefined : state.name,
         value: state.multiple ? keys.join(",") : (keys[0] ?? ""),
         form: state.form,

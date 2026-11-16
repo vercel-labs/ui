@@ -38,7 +38,7 @@ describe("server rendering", () => {
     expect(typeof window).toBe("undefined")
     expect(html).toContain('role="combobox"')
     expect(html).toMatch(/data-slot="select-value"[^>]*>Pro</)
-    expect(html).toMatch(/<input[^>]*name="plan"[^>]*value="pro"/)
+    expect(html).toMatch(/<textarea[^>]*name="plan"[^>]*>pro<\/textarea>/)
   })
 
   test("a combobox's input holds the value's label", async () => {

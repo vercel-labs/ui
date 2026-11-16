@@ -10,7 +10,7 @@ describe("combobox server rendering", () => {
     const body = html({ data: true })
     expect(typeof window).toBe("undefined")
     expect(body).toMatch(/<input[^>]*role="combobox"[^>]*value="France"/)
-    expect(body).toMatch(/<input[^>]*name="country"[^>]*value="fr"/)
+    expect(body).toMatch(/<textarea[^>]*name="country"[^>]*>fr<\/textarea>/)
   })
 
   test("a data combobox with several values renders a chip and a hidden input per value", () => {

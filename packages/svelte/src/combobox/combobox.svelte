@@ -269,6 +269,8 @@ list are its parts.
   // more per value with `multiple`. The input's attributes change with the
   // value, so reading them keeps the list of values current.
   const formInput = useHandlePart(combobox, "form-input")
+  // A textarea's value is its text, which the server renders too.
+  const { value: formValue, ...formAttrs } = $derived(formInput.slot())
   const values = $derived(
     (formInput.attrs,
     combobox.state.multiple ? combobox.api.internal.serialized() : [])
@@ -279,7 +281,7 @@ list are its parts.
 {#if items && !own()}
   <ComboboxContent fromRoot />
 {/if}
-<input {...formInput.slot()} />
+<textarea {...formAttrs}>{formValue}</textarea>
 {#each values as key (key)}
   <ValueInput owner={combobox} value={key} />
 {/each}

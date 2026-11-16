@@ -312,7 +312,7 @@ describe("server rendering a select", () => {
     expect(html).toContain('role="combobox"')
     expect(html).toContain('aria-expanded="false"')
     expect(html).toMatch(/data-slot="select-value"[^>]*>Pro</)
-    expect(html).toMatch(/<input[^>]*name="plan"[^>]*value="pro"/)
+    expect(html).toMatch(/<textarea[^>]*name="plan"[^>]*>pro<\/textarea>/)
     // The list isn't in the page while closed.
     expect(html).not.toContain('role="listbox"')
   })
@@ -325,7 +325,7 @@ describe("server rendering a select", () => {
     ))
     expect(html).toContain("data-placeholder")
     expect(html).toContain("Choose a plan")
-    expect(html).toMatch(/<input[^>]*required/)
+    expect(html).toMatch(/<textarea[^>]*required/)
   })
 
   test("several values render one hidden input each", () => {

@@ -6,7 +6,7 @@ import { readIn, slotIn, usePart, type PrimitiveHandle } from "./use-primitive"
 function FormInputs({ handle }: { handle: PrimitiveHandle<any> }) {
   const inputs = ({ value, ...input }: Record<string, any>) => (
     <>
-      <input {...input} defaultValue={value} />
+      <textarea {...input} defaultValue={value} />
       {handle.state.multiple &&
         readIn(handle, () => handle.api.internal.serialized() as string[]).map(
           (key) => {
@@ -19,7 +19,7 @@ function FormInputs({ handle }: { handle: PrimitiveHandle<any> }) {
         )}
     </>
   )
-  return usePart(handle, "form-input", {}, { render: inputs }, "input")
+  return usePart(handle, "form-input", {}, { render: inputs }, "textarea")
 }
 
 export { FormInputs }

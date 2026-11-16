@@ -137,6 +137,8 @@ An always-visible list to choose one option from, or several with `multiple`.
   // more per value with `multiple`. The input's attributes change with the
   // value, so reading them keeps the list of values current.
   const formInput = useHandlePart(listbox, "form-input")
+  // A textarea's value is its text, which the server renders too.
+  const { value: formValue, ...formAttrs } = $derived(formInput.slot())
   const values = $derived(
     (formInput.attrs,
     listbox.state.multiple ? listbox.api.internal.serialized() : [])
@@ -153,7 +155,7 @@ An always-visible list to choose one option from, or several with `multiple`.
   part={wrapPart(root, control)}
   props={{ ...rest, children: children ?? data }}
 />
-<input {...formInput.slot()} />
+<textarea {...formAttrs}>{formValue}</textarea>
 {#each values as key (key)}
   <ValueInput owner={listbox} value={key} />
 {/each}
