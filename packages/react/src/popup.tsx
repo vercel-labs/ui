@@ -98,10 +98,13 @@ function followTree() {
   // A microtask later, so StrictMode's cleanup and run again in one go don't count.
   const hideLater = () =>
     queueMicrotask(() => {
+      // An unmounted popup's elements left the page. React can keep the old
+      // fiber for a while, and its ref reaches this list, so they go now.
+      els = els.filter((el) => el.isConnected)
       if (isShown || show) {
         return
       }
-      const shows = els.filter((el) => el.isConnected).map(hide)
+      const shows = els.map(hide)
       if (shows.length) {
         show = () => shows.forEach((run) => run())
       }
