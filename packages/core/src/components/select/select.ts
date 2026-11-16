@@ -368,7 +368,7 @@ type SelectTriggerProps = {
 type SelectValueProps = {
   /** What shows while nothing is selected. Overrides the select's `placeholder`. */
   placeholder?: string
-  /** With `multiple`, how many labels show before the rest are counted, as in "Apple, Banana and 2 more", joined the way the page's language joins lists. */
+  /** With `multiple`, how many labels show before the rest are counted, as in "Apple, Banana and 2 more", joined the way the page's language joins lists, or in English with the default `getMoreLabel`. */
   maxLabels?: number
   /**
    * The words for the labels past `maxLabels`.

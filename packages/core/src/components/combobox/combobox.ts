@@ -488,7 +488,7 @@ type ComboboxClearProps = {
  * @stable
  */
 type ComboboxValueProps = {
-  /** With `multiple`, how many labels the `label` in its state shows before the rest are counted, as in "France, Chile and 2 more", joined the way the page's language joins lists. */
+  /** With `multiple`, how many labels the `label` in its state shows before the rest are counted, as in "France, Chile and 2 more", joined the way the page's language joins lists, or in English with the default `getMoreLabel`. */
   maxLabels?: number
   /**
    * The words for the labels past `maxLabels`.
