@@ -170,6 +170,8 @@ Arrow keys wrap by default; `loop` false stops at the ends. Typing finds an item
 </Menu>
 ```
 
+A menu holds items, groups and separators. For a text field beside a list of choices, like a search box or a rename field, use a [Popover](./popover). The field keeps its keys there, while in a menu the pointer moves focus from item to item.
+
 ## Focus After Closing
 
 When the menu closes with focus inside it, focus returns to the trigger. If an action removes the trigger or moves people on to something else, set `finalFocus` on the content to a selector, an element or a function returning one, or to `"none"` to leave focus where the action put it. See [popup focus](../popups#focus) for the shared focus rules.
