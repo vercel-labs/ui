@@ -708,6 +708,36 @@ describe("our popups on the kit", () => {
     instance.destroy()
   })
 
+  test("Dialog opened by its trigger's shortcut in a field returns focus to the field", async () => {
+    const view = mount(
+      dialog,
+      {},
+      `<div><trigger id="open" shortcut="ctrl+j">Open</trigger><input aria-label="Name"><content><button>Done</button></content></div>`
+    )
+    mounts.push(view)
+    const field = document.querySelector("input")!
+    field.focus()
+    await view.keys("Control+j")
+    expect(view.state.open).toBe(true)
+    await view.keys("Escape")
+    expect(view.state.open).toBe(false)
+    expect(document.activeElement).toBe(field)
+  })
+
+  test("Dialog opened from its trigger with the keyboard returns focus to the trigger", async () => {
+    const view = mount(
+      dialog,
+      {},
+      `<div><trigger id="open" shortcut="ctrl+j">Open</trigger><input aria-label="Name"><content><button>Done</button></content></div>`
+    )
+    mounts.push(view)
+    const trigger = view.part("trigger", "open")!
+    trigger.focus()
+    await view.keys("Control+j")
+    await view.keys("Escape")
+    expect(document.activeElement).toBe(trigger)
+  })
+
   test("Dialog opened from a popover whose trigger is then removed returns focus past that trigger", async () => {
     const menu = popover({ id: "p" })
     const confirm = dialog({ id: "d" })
