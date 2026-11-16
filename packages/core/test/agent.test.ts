@@ -31,9 +31,9 @@ import { slider } from "../src/components/slider/slider"
 import { tabs } from "../src/components/tabs/tabs"
 import { tokenInput } from "../src/components/token-input/token-input"
 import { toolbar } from "../src/components/toolbar/toolbar"
-import { tooltip } from "../src/components/tooltip/tooltip"
 import { tree } from "../src/components/tree/tree"
 import { triggerMenu } from "../src/components/trigger-menu/trigger-menu"
+import { tooltip } from "../src/components/tooltip/tooltip"
 
 let cleanups: (() => void)[] = []
 afterEach(() => {
