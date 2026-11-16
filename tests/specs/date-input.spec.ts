@@ -260,6 +260,26 @@ test("Enter submits the form with what was typed", async ({ page, open }) => {
   )
 })
 
+test("Enter submits a form with no submit button, in a segment or the form's one text field", async ({
+  page,
+  open,
+}) => {
+  await open("date-input", { date: "2026-11-02", time: "09:30" })
+  await page.getByRole("button", { name: "Save" }).evaluate((button) => {
+    button.form!.insertAdjacentHTML(
+      "beforeend",
+      `<input aria-label="Note" name="note">`
+    )
+    button.remove()
+  })
+  await segment(page, "month").click()
+  await page.keyboard.press("Enter")
+  await expect(submitted(page)).toContainText('["start","2026-11-02"]')
+  await page.getByRole("textbox", { name: "Note" }).fill("Soon")
+  await page.getByRole("textbox", { name: "Note" }).press("Enter")
+  await expect(submitted(page)).toContainText('["note","Soon"]')
+})
+
 test("resetting the form brings back the default date", async ({
   page,
   open,
