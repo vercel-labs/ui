@@ -562,6 +562,18 @@ describe("createStickToBottom", () => {
     el.append(row())
     await Promise.resolve()
     expect(el.scrollTop).toBe(50)
+    // Near the end, rows going above pull the scroll position back first.
+    el.scrollTop = 370
+    el.dispatchEvent(new Event("scroll"))
+    const last = el.children[8]
+    el.children[0].remove()
+    el.children[0].remove()
+    // The browser clamps to the shorter content.
+    el.scrollTop = el.scrollTop
+    expect(el.scrollTop).toBe(350)
+    await Promise.resolve()
+    expect(el.scrollTop).toBe(270)
+    expect(last.getBoundingClientRect().top).toBe(30)
   })
 
   test("prepend keeps the distance from the end", () => {

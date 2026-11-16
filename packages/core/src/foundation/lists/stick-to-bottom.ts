@@ -156,7 +156,9 @@ function createStickToBottom(options: StickToBottomOptions = {}) {
       const moved =
         pinned?.row.parentNode === el ? offset(el, pinned.row) - pinned.top : 0
       if (Math.abs(moved) >= 1) {
-        ours = Math.round(el.scrollTop + moved)
+        // Content that shrank below the scroll position pulled it back already.
+        const clamped = el.scrollTop < lastTop && distance(el) < 1
+        ours = Math.round((clamped ? lastTop : el.scrollTop) + moved)
         el.scrollTop = ours
       }
       unseen = el.scrollHeight - moved > lastHeight
