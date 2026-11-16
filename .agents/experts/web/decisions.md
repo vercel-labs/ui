@@ -43,7 +43,7 @@ Last reviewed: PRs 86 to 92 (2026-10-30, the audit fixes), 158 and 159 (2026-11-
 - **Text options read `undefined`**, not the default, without the attribute.
 - **No element interface** for drawer, slider, field, number input and progress.
 - **Typed JSX** for React, Vue and Svelte consumers.
-- **Focus inside shadow roots**: a popover in a closed root dismisses on inside presses and Escape drops focus to `body`; a modal popup's Tab loop skips slotted content, and shadow-root stops before its first or after its last light DOM stop (probed 2026-10-28 and 2026-11-01 in Chromium).
+- **Focus inside shadow roots**: a popover in a closed root dismisses on inside presses and Escape drops focus to `body`; a modal popup's Tab loop wraps around stops in open shadow roots and slots at its ends, in composed order, but not in closed roots (probed 2026-10-28 and 2026-11-01 in Chromium, changed 2026-11-16).
 - **Payload types**: a popup content's payload type is asserted by the user, not tied to the controller's type.
 - **Clicking a `<ui-field-label>`** checks its checkbox or radio but doesn't focus it.
 - **No-bundler pages can't reach the package's functions** (`toast()`, `confirm()`, the controllers, `createParts`): the browser files are side-effect entries with no exports. Needs a URL for an importable build.

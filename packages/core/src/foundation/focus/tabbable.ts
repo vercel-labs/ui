@@ -62,6 +62,30 @@ function tabbables(root: ParentNode) {
   return Array.from(root.querySelectorAll(candidates)).filter(isTabbable)
 }
 
+// Tab order through open shadow roots and their slots too, which
+// `querySelectorAll` doesn't see into.
+function composedTabbables(root: ParentNode) {
+  const found: HTMLElement[] = []
+  const walk = (nodes: Iterable<Element>) => {
+    for (const el of nodes) {
+      if (
+        el.matches(candidates) &&
+        !el.shadowRoot?.delegatesFocus &&
+        isTabbable(el)
+      ) {
+        found.push(el)
+      }
+      const slotted = el instanceof HTMLSlotElement && el.assignedElements()
+      walk(
+        el.shadowRoot?.children ??
+          (slotted && slotted.length ? slotted : el.children)
+      )
+    }
+  }
+  walk(root.children)
+  return found
+}
+
 // The stops Tab visits before the rest: positive tabindex values, lowest
 // first. One slotted into a custom element orders only within its slot, so it
 // keeps its host's place.
@@ -206,6 +230,7 @@ function bindTabStop(
 
 export {
   bindTabStop,
+  composedTabbables,
   focusables,
   isTabbable,
   nextTabbable,

@@ -27,6 +27,7 @@ export {
 export { nearestInDirection } from "./spatial"
 export {
   bindTabStop,
+  composedTabbables,
   focusables,
   isTabbable,
   nextTabbable,

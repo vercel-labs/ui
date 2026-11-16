@@ -315,6 +315,26 @@ test.describe("focus", () => {
     await expect(field(page)).toBeFocused()
   })
 
+  test("Tab from a last control inside a shadow root wraps to the first, and Shift+Tab comes back to it", async ({
+    page,
+    tab,
+  }) => {
+    await defineElement(
+      page,
+      "x-end",
+      `<button type="button">Inner end</button>`
+    )
+    await openWithKeyboard(page)
+    await dialog(page).evaluate((el) =>
+      el.insertAdjacentHTML("beforeend", `<x-end></x-end>`)
+    )
+    await page.getByRole("button", { name: "Inner end" }).focus()
+    await tab()
+    await expect(field(page)).toBeFocused()
+    await tab({ shift: true })
+    expect(await focusedText(page)).toBe("Inner end")
+  })
+
   test("opening focuses the first field even when a later one has a positive tabindex", async ({
     page,
   }) => {

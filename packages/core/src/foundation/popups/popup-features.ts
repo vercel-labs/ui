@@ -15,7 +15,7 @@ import {
   type PositionProps,
 } from "../platform/position"
 import { type Side } from "../platform/sides"
-import { tabbables } from "../focus/tabbable"
+import { composedTabbables } from "../focus/tabbable"
 import { accessibleName } from "../text/accessible-name"
 import type { PopupCore, PopupState } from "./create-popup"
 import { createHoverIntent } from "./hover"
@@ -154,7 +154,7 @@ function pressOpening(core: PopupCore) {
         return content
       }
       if (setting === "auto") {
-        return preferred?.() ?? tabbables(content)[0] ?? content
+        return preferred?.() ?? composedTabbables(content)[0] ?? content
       }
       if (typeof setting === "function") {
         return setting() ?? content
@@ -329,7 +329,9 @@ function focusOpening(core: PopupCore) {
     // to focus. Says whether it leaves Tab to the browser.
     keydown(event: KeyboardEvent) {
       const content = core.popup.element()
-      return event.key === "Tab" && !(content && tabbables(content).length)
+      return (
+        event.key === "Tab" && !(content && composedTabbables(content).length)
+      )
     },
     triggerAttrs(
       state: PopupState,
