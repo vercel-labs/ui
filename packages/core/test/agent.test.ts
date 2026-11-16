@@ -2834,28 +2834,6 @@ describe("a primitive's agent key", () => {
     expect(instance.get()).toMatchObject({ value: 42 })
   })
 
-  test("shown hides it from the agent while it returns false", () => {
-    const agent = createAgent()
-    mount(
-      sizes({ shown: (state) => (state as { visible: boolean }).visible }),
-      { visible: false }
-    )
-    expect(
-      agent.snapshot().filter((component) => !component.offPage)
-    ).toHaveLength(0)
-  })
-
-  test("a separator on the page is never listed, since it has nothing to read or change", () => {
-    const agent = createAgent()
-    const instance = separator({ id: "rule" })
-    const el = document.createElement("hr")
-    document.body.append(el)
-    cleanups.push(bind(instance.part("root"), el), () => instance.destroy())
-    expect(
-      agent.snapshot().map((component) => component.component)
-    ).not.toContain("separator")
-  })
-
   test("an input in a group with a clear button is one input, and clears by its label", async () => {
     const agent = createAgent()
     const field = input({ id: "website", defaultValue: "example.com" })
@@ -2888,6 +2866,28 @@ describe("a primitive's agent key", () => {
     })
     expect(outcome.error).toBeUndefined()
     expect(el.value).toBe("")
+  })
+
+  test("shown hides it from the agent while it returns false", () => {
+    const agent = createAgent()
+    mount(
+      sizes({ shown: (state) => (state as { visible: boolean }).visible }),
+      { visible: false }
+    )
+    expect(
+      agent.snapshot().filter((component) => !component.offPage)
+    ).toHaveLength(0)
+  })
+
+  test("a separator on the page is never listed, since it has nothing to read or change", () => {
+    const agent = createAgent()
+    const instance = separator({ id: "rule" })
+    const el = document.createElement("hr")
+    document.body.append(el)
+    cleanups.push(bind(instance.part("root"), el), () => instance.destroy())
+    expect(
+      agent.snapshot().map((component) => component.component)
+    ).not.toContain("separator")
   })
 })
 
