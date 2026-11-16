@@ -68,6 +68,7 @@ import { formatLabels, listOf } from "../../foundation/lists/listbox-value"
 import { selects } from "../../foundation/kernel/selects"
 import { direct, live } from "../../foundation/kernel/live"
 import { pressKeepsFocus } from "../../foundation/focus/press-keeps-focus"
+import { on } from "../../foundation/kernel/events"
 
 type ItemProps = ComboboxItemProps<unknown> & {
   /** @internal The group the item is in. */
@@ -174,6 +175,8 @@ function collapsed(state: ComboboxState, api: ComboboxApi, value: unknown) {
 
 // The chips that don't fit, the same object until that changes.
 const overflowMemo = new WeakMap<object, ComboboxChipsOverflowState>()
+// Inputs a native label just passed a click on to, for this task.
+const labelClicked = new WeakSet<Element>()
 function overflowState(state: ComboboxState, api: ComboboxApi) {
   const all = api.internal.selection.labels()
   const labels =
@@ -266,8 +269,8 @@ const comboboxSlots = (slot: SlotFactory<ComboboxState, ComboboxApi>) => ({
         api.internal.hide({ reason: "focus-out", event })
       },
     },
-    press({ api, store }, event) {
-      if (store.get().open) {
+    press({ api, el, store }, event) {
+      if (store.get().open || (el && labelClicked.has(el))) {
         return
       }
       api.internal.show({ event, by: openerOf(event), reason: "trigger-press" })
@@ -317,10 +320,24 @@ const comboboxSlots = (slot: SlotFactory<ComboboxState, ComboboxApi>) => ({
         open: (event) =>
           api.internal.show({ event, by: "touch", reason: "trigger-press" }),
       })
+      // A native label's click reaches the input as a click of its own, which only focuses, like a select.
+      const offLabel = on(
+        el.ownerDocument,
+        "click",
+        (event) => {
+          const target = event.composedPath()[0] as Element
+          if (target !== el && target.closest?.("label")?.control === el) {
+            labelClicked.add(el)
+            setTimeout(() => labelClicked.delete(el))
+          }
+        },
+        { capture: true }
+      )
       return () => {
         off()
         offInline()
         offSheet()
+        offLabel()
       }
     },
   }),

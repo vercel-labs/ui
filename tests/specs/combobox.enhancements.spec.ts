@@ -24,6 +24,18 @@ test.describe("enhancements", { tag: "@enhancement" }, () => {
     await expect(page.getByRole("listbox", { name: "Country" })).toBeVisible()
   })
 
+  test("a click on the label focuses the input and leaves the list closed", async ({
+    page,
+    open,
+  }) => {
+    await open("combobox")
+    await page.locator('[data-slot="combobox-label"]').first().click()
+    await expect(input(page)).toBeFocused()
+    await expect(listbox(page)).toBeHidden()
+    await input(page).click()
+    await expect(listbox(page)).toBeVisible()
+  })
+
   test("filtering matches an item's keywords as well as its label", async ({
     page,
     open,
