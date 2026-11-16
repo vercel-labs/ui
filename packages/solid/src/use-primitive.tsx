@@ -412,6 +412,22 @@ type PrimitiveHandle<P extends Primitive> = {
 
 const noProps = () => ({})
 
+type PartRef = (el: HTMLElement | null) => void
+
+// Two items can trade keys in one flush, like a list reversed in place, so a
+// part lets go only of the element this item handed it.
+const holders = new WeakMap<PartRef, HTMLElement>()
+const hand = (bound: PartRef, el: HTMLElement) => {
+  holders.set(bound, el)
+  bound(el)
+}
+const release = (bound: PartRef, el: HTMLElement | null) => {
+  if (holders.get(bound) === el) {
+    holders.delete(bound)
+    bound(null)
+  }
+}
+
 /**
  * Creates an instance of a primitive for this component, keeps its options
  * current, and destroys it when the component unmounts. Pass the options as a
@@ -533,7 +549,7 @@ function usePrimitive<P extends Primitive>(
       )
       const attach = (el: HTMLElement) => {
         attached = el
-        bound(el)
+        hand(bound, el)
       }
       // While hydrating, every element is connected already, but its
       // attributes and children render after the ref, so a part that reads
@@ -574,17 +590,17 @@ function usePrimitive<P extends Primitive>(
           if (next === bound) {
             return
           }
-          bound(null)
+          release(bound, attached)
           bound = next
           if (attached) {
-            bound(attached)
+            hand(bound, attached)
           }
         },
         { name: `${name} rebind` }
       )
       onCleanup(() => {
         if (attached) {
-          bound(null)
+          release(bound, attached)
         }
         element = attached = null
       })
