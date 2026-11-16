@@ -460,7 +460,8 @@ const inputGroupPrimitive = /* @__PURE__ */ definePrimitive({
       press: ({ api }, event) => api.clear(event),
     }),
   }),
-  agent: { actions: ["clear"] },
+  // The Input inside is the component an agent reads and clears.
+  agent: { shown: () => false },
 })
 
 /**

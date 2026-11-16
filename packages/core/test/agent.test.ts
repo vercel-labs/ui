@@ -16,7 +16,7 @@ import { checkbox } from "../src/components/checkbox/checkbox"
 import { combobox } from "../src/components/combobox/combobox"
 import { datePicker } from "../src/components/date-picker/date-picker"
 import { dialog } from "../src/components/dialog/dialog"
-import { input, textarea } from "../src/components/input/input"
+import { input, inputGroup, textarea } from "../src/components/input/input"
 import { listbox } from "../src/components/listbox/listbox-root"
 import { numberInput } from "../src/components/number-input/number-input"
 import { pagination } from "../src/components/pagination/pagination"
@@ -2854,6 +2854,40 @@ describe("a primitive's agent key", () => {
     expect(
       agent.snapshot().map((component) => component.component)
     ).not.toContain("separator")
+  })
+
+  test("an input in a group with a clear button is one input, and clears by its label", async () => {
+    const agent = createAgent()
+    const field = input({ id: "website", defaultValue: "example.com" })
+    const group = inputGroup({ id: "website-group" })
+    const label = document.createElement("label")
+    label.htmlFor = "website"
+    label.textContent = "Website"
+    const wrapper = document.createElement("div")
+    const el = document.createElement("input")
+    el.id = "website"
+    const clear = document.createElement("button")
+    clear.setAttribute("aria-label", "Clear website")
+    wrapper.append(el, clear)
+    document.body.append(label, wrapper)
+    cleanups.push(
+      bind(group.part("group"), wrapper),
+      bind(field.part("root"), el),
+      bind(group.part("clear"), clear),
+      () => group.destroy(),
+      () => field.destroy()
+    )
+    await Promise.resolve()
+    expect(
+      agent.snapshot().filter((component) => !component.offPage)
+    ).toMatchObject([
+      { component: "input", label: "Website", actions: ["setValue", "clear"] },
+    ])
+    const outcome = await agent.act({
+      steps: [{ ref: "Website", action: "clear" }],
+    })
+    expect(outcome.error).toBeUndefined()
+    expect(el.value).toBe("")
   })
 })
 
