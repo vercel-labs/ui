@@ -30,7 +30,7 @@ Tabs
 └── TabsPanel
 ```
 
-Give each tab and its panel the same unique `value`. Give the list an accessible name. Set `default-value` to choose the initial tab; otherwise, the first enabled tab is selected.
+Give each tab and its panel the same unique `value`. Give the list an accessible name. Set `default-value` to choose the initial tab; otherwise, the first enabled tab is selected. On the server, panels that render before the list don't know that tab yet, so a layout with the panels first, like a bottom tab bar, needs `default-value` to render its panel before hydration.
 
 ## Usage
 
