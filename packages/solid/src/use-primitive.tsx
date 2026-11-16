@@ -506,17 +506,20 @@ function usePrimitive<P extends Primitive>(
         partHandlers(untrack(() => instance.part(name, props())))
       )) {
         const prop = propOf(type)
-        handlers[prop] = (event) => {
-          callHandler(user[prop], event)
-          if (!event.defaultPrevented) {
-            ;(
-              partHandlers(instance.part(name, props())) as Record<
-                string,
-                (event: Event) => void
-              >
-            )[type]?.(event)
-          }
-        }
+        // Untracked, since an event can fire inside another component's body,
+        // like one that moves focus, and Solid would blame that body's reads.
+        handlers[prop] = (event) =>
+          untrack(() => {
+            callHandler(user[prop], event)
+            if (!event.defaultPrevented) {
+              ;(
+                partHandlers(instance.part(name, props())) as Record<
+                  string,
+                  (event: Event) => void
+                >
+              )[type]?.(event)
+            }
+          })
       }
       // Solid runs refs before the element is in the document, and parts
       // measure when they bind. So a disconnected element binds once the flush
