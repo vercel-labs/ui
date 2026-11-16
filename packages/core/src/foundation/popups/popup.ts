@@ -576,6 +576,8 @@ function createPopupLayer<
   let openedOnPress = false
   let returnMode: ReturnMode = true
   let before: HTMLElement | undefined
+  // The caret in a contenteditable it opened from, which focus alone puts back at the start.
+  let caret: Range | undefined
   let openedWithoutTrigger = store.get().open
   // Where focus goes when what had it is gone: the popup this one opened from
   // returns to its own target, else the focus that the last close left.
@@ -609,6 +611,13 @@ function createPopupLayer<
 
   function openedFrom(focused: HTMLElement | undefined) {
     before = focused
+    const selection = focused?.isContentEditable
+      ? focused.ownerDocument.getSelection()
+      : null
+    caret =
+      selection?.rangeCount && focused!.contains(selection.anchorNode)
+        ? selection.getRangeAt(0).cloneRange()
+        : undefined
     const openerLayer = before && findLayer(before)
     const openerTarget = openerLayer ? undefined : lastClosed()
     upstream = openerLayer?.returnTarget ?? (() => openerTarget)
@@ -854,6 +863,8 @@ function createPopupLayer<
 
   function returnFocus(el: HTMLElement, from: typeof upstream, strict = false) {
     const setting = options.finalFocus?.() ?? "trigger"
+    const range = caret
+    caret = undefined
     if (setting === "none") {
       return
     }
@@ -864,7 +875,15 @@ function createPopupLayer<
         return false
       }
       restoreFocus(target)
-      return activeElement() === target
+      if (activeElement() !== target) {
+        return false
+      }
+      if (range && target === before && target.contains(range.startContainer)) {
+        const selection = target.ownerDocument.getSelection()
+        selection?.removeAllRanges()
+        selection?.addRange(range)
+      }
+      return true
     }
     const chain = returnChain(el, take, from, strict)
     if (setting !== "trigger") {
