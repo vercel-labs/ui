@@ -352,6 +352,16 @@ function usable(el: HTMLElement) {
 
 // Whether focus rests on nothing a person can use: the body, or an element
 // that's gone, inert or no longer rendered, before the browser moves it away.
+// A Range has no direction, so a selection made backwards notes it to keep its caret end.
+function readCaret(selection: Selection) {
+  const range = selection.getRangeAt(0).cloneRange()
+  const backward =
+    !range.collapsed &&
+    selection.anchorNode === range.endContainer &&
+    selection.anchorOffset === range.endOffset
+  return { range, backward }
+}
+
 function focusIsLost() {
   const active = activeElement()
   return (
@@ -577,7 +587,7 @@ function createPopupLayer<
   let returnMode: ReturnMode = true
   let before: HTMLElement | undefined
   // The caret in a contenteditable it opened from, which focus alone puts back at the start.
-  let caret: Range | undefined
+  let caret: ReturnType<typeof readCaret> | undefined
   let openedWithoutTrigger = store.get().open
   // Where focus goes when what had it is gone: the popup this one opened from
   // returns to its own target, else the focus that the last close left.
@@ -616,7 +626,7 @@ function createPopupLayer<
       : null
     caret =
       selection?.rangeCount && focused!.contains(selection.anchorNode)
-        ? selection.getRangeAt(0).cloneRange()
+        ? readCaret(selection)
         : undefined
     const openerLayer = before && findLayer(before)
     const openerTarget = openerLayer ? undefined : lastClosed()
@@ -867,7 +877,7 @@ function createPopupLayer<
     el: HTMLElement,
     from: typeof upstream,
     strict = false,
-    range?: Range
+    range?: ReturnType<typeof readCaret>
   ) {
     const setting = options.finalFocus?.() ?? "trigger"
     if (setting === "none") {
@@ -884,16 +894,31 @@ function createPopupLayer<
       const kept =
         range && target === before
           ? selection?.rangeCount && target.contains(selection.anchorNode)
-            ? selection.getRangeAt(0).cloneRange()
+            ? readCaret(selection)
             : range
           : undefined
       restoreFocus(target)
       if (activeElement() !== target) {
         return false
       }
-      if (kept && target.contains(kept.startContainer)) {
-        selection?.removeAllRanges()
-        selection?.addRange(kept)
+      if (kept && target.contains(kept.range.startContainer)) {
+        const { startContainer, startOffset, endContainer, endOffset } =
+          kept.range
+        if (kept.backward) {
+          selection?.setBaseAndExtent(
+            endContainer,
+            endOffset,
+            startContainer,
+            startOffset
+          )
+        } else {
+          selection?.setBaseAndExtent(
+            startContainer,
+            startOffset,
+            endContainer,
+            endOffset
+          )
+        }
       }
       return true
     }

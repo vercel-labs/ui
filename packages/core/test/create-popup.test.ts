@@ -766,7 +766,7 @@ describe("our popups on the kit", () => {
     editor.tabIndex = 0
     editor.focus()
     const text = editor.firstChild!
-    document.getSelection()!.collapse(text, 11)
+    document.getSelection()!.setBaseAndExtent(text, 11, text, 6)
     view.api.open()
     await view.settle()
     document.getSelection()!.collapse(document.body, 0)
@@ -774,6 +774,7 @@ describe("our popups on the kit", () => {
     expect(document.activeElement).toBe(editor)
     expect(document.getSelection()!.anchorNode).toBe(text)
     expect(document.getSelection()!.anchorOffset).toBe(11)
+    expect(document.getSelection()!.focusOffset).toBe(6)
   })
 
   test("Popover opened from a contenteditable keeps a caret the app placed in it while open", async () => {
