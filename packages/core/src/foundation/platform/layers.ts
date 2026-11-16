@@ -328,12 +328,15 @@ function listen(doc: Document, win: Window) {
     win,
     "click",
     (event) => {
-      if (swallowClick) {
+      // A key's click, like Space on the trigger, isn't the press's: that one
+      // never came once its target left before the release.
+      if (swallowClick && event.detail) {
         swallowClick = false
         event.preventDefault()
         event.stopPropagation()
         return
       }
+      swallowClick = false
       if (!touch) {
         return
       }

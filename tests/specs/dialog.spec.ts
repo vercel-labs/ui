@@ -413,6 +413,17 @@ test.describe("dismissal", () => {
     await expect(trigger(page)).toBeFocused()
   })
 
+  test("after pressing the backdrop, Space on the trigger opens it again", async ({
+    page,
+  }) => {
+    await openWithKeyboard(page)
+    await page.mouse.click(5, 5)
+    await expect(dialog(page)).toBeHidden()
+    await expect(trigger(page)).toBeFocused()
+    await page.keyboard.press("Space")
+    await expect(dialog(page)).toBeVisible()
+  })
+
   test("clicking inside the dialog keeps it open", async ({ page }) => {
     await trigger(page).click()
     await page.getByRole("heading", { name: "Profile settings" }).click()

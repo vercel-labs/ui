@@ -358,6 +358,7 @@ describe("bindLayer", () => {
         bubbles: true,
         composed: true,
         cancelable: true,
+        detail: 1,
       })
     )
     expect(clicked).not.toHaveBeenCalled()
@@ -374,6 +375,7 @@ describe("bindLayer", () => {
         bubbles: true,
         composed: true,
         cancelable: true,
+        detail: 1,
       })
     )
     expect(clicked).toHaveBeenCalledOnce()

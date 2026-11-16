@@ -326,6 +326,24 @@ describe("a popup animating out", () => {
   })
 })
 
+describe("a modal dialog closed by a press on its backdrop", () => {
+  test("lets the next click through when the press's own click never comes", async () => {
+    const view = mount(dialog, { modal: true }, backdropMarkup)
+    mounts.push(view)
+    const trigger = view.part("trigger")!
+    await view.click(trigger)
+    const backdrop = view.part("backdrop")!
+    const press = { bubbles: true, cancelable: true, composed: true, button: 0 }
+    backdrop.dispatchEvent(new PointerEvent("pointerdown", press))
+    // The backdrop leaves as the release closes the dialog, so no click follows.
+    backdrop.dispatchEvent(new PointerEvent("pointerup", press))
+    expect(view.state.open).toBe(false)
+    trigger.focus()
+    await view.keys("Space")
+    expect(view.state.open).toBe(true)
+  })
+})
+
 describe("a popover on the popover preset", () => {
   test("a modal one passes the dialog pattern", async () => {
     const view = sharing({ modal: true })
