@@ -28,6 +28,18 @@ function useStable(preferences: readonly PreferenceLike[]) {
   return ref.current
 }
 
+// The current values, not the render's, which right after hydration are the
+// server's. Its own element too: a restore that `onValueChange` cancels leaves
+// the render's value, and React won't touch the attribute the script set.
+function show(list: readonly PreferenceLike[], element: HTMLElement | null) {
+  for (const preference of list) {
+    ;(preference.global ? document.documentElement : element)?.setAttribute(
+      preference.attribute,
+      preference.get().value
+    )
+  }
+}
+
 /**
  * Shows preferences on `data-*` attributes, so CSS styles by them from the
  * first paint: global ones on `<html>`, the rest on its own element, which
@@ -68,19 +80,10 @@ function Preferences({
     () =>
       JSON.stringify(list.map((preference) => preference.initialState.value))
   )
-  React.useEffect(() => {
-    // The current values, not the render's: right after hydration the render
-    // still has the server's, and the script already put the saved ones in
-    // place. Written to its own element too, since a restore that
-    // `onValueChange` canceled leaves the render's value as it was, and React
-    // wouldn't touch the attribute the script set.
-    for (const preference of list) {
-      ;(preference.global
-        ? document.documentElement
-        : element.current
-      )?.setAttribute(preference.attribute, preference.get().value)
-    }
-  }, [list, values])
+  // Before paint, where no script ran, like a root layout that mounts `<html>`
+  // again on a client navigation, and again once subscribing reads saved values.
+  React.useLayoutEffect(() => show(list, element.current), [list, values])
+  React.useEffect(() => show(list, element.current), [list, values])
   const shown = JSON.parse(values) as string[]
   const attributes: Record<string, string> = {}
   list.forEach((preference, index) => {

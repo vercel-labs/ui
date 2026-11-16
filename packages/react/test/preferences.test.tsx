@@ -122,6 +122,22 @@ test("a client-only render leaves the script out, and still shows the saved valu
   expect(document.documentElement.dataset.colorScheme).toBe("dark")
 })
 
+test("a global value is on <html> before the first paint of a client-only render", async () => {
+  localStorage.setItem("color-scheme", "dark")
+  const { app } = setup()
+  let painted: string | undefined
+  function Page() {
+    React.useLayoutEffect(() => {
+      painted = document.documentElement.dataset.colorScheme
+    }, [])
+    return app
+  }
+  const container = document.body.appendChild(document.createElement("div"))
+  root = createRoot(container)
+  await React.act(async () => root!.render(<Page />))
+  expect(painted).toBe("dark")
+})
+
 test("a restore that onValueChange cancels leaves the default on the attributes the script set", async () => {
   localStorage.setItem("color-scheme", "dark")
   localStorage.setItem("skin-tone", "medium")
