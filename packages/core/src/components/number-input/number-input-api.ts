@@ -22,6 +22,7 @@ import {
   clamp,
   decimalsOf,
   maxOnGrid,
+  roundTo,
   snapToStep,
   stepValue,
 } from "../../foundation/number/steps"
@@ -91,7 +92,7 @@ function settings(options: NumberInputOptions) {
     smallStep:
       options.smallStep && options.smallStep > 0
         ? options.smallStep
-        : step / 10,
+        : roundTo(step / 10, decimalsOf(step) + 1),
     format: options.format,
     locale: options.locale,
     wheel: !!options.wheel,

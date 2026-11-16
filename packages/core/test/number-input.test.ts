@@ -75,6 +75,16 @@ describe("number input", () => {
     expect(instance.get().value).toBe(9.3)
   })
 
+  test("the default small step has no floating point noise", () => {
+    const instance = numberInput({ id: "n", defaultValue: 1, step: 0.7 })
+    instance.api.internal.keydown({
+      key: "ArrowUp",
+      altKey: true,
+      preventDefault() {},
+    } as KeyboardEvent)
+    expect(instance.get().value).toBe(1.05)
+  })
+
   test("a disabled button is disabled on its own, even in a read-only field", () => {
     const instance = numberInput({ id: "n", defaultValue: 5 })
     expect(
