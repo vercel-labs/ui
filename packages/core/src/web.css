@@ -1852,7 +1852,7 @@
     }
 
     /* The Date Picker stacks its parts. Here they share a row, and the hint takes the next one. */
-    &[data-slot="date-picker"] {
+    &[data-slot="date-picker"]:not([data-mode="range"]) {
       flex-flow: row wrap;
       column-gap: 0;
 
