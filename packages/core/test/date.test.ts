@@ -390,6 +390,22 @@ describe("typing a date", () => {
     expect(parseDate("16 tháng 1, 2026", "vi")).toBe("2026-01-16")
   })
 
+  test("reads a month name date in the numeric order when the long one doesn't fit, and numbers as numbers", () => {
+    const date = (locale: string, options: Intl.DateTimeFormatOptions) =>
+      formatDate("2026-12-10", locale, options)
+    expect(parseDate(date("mg", { dateStyle: "medium" }), "mg")).toBe(
+      "2026-12-10"
+    )
+    expect(parseDate(date("ug", { dateStyle: "full" }), "ug")).toBe(
+      "2026-12-10"
+    )
+    for (const locale of ["cs", "fi", "bg", "ja"]) {
+      expect(parseDate(date(locale, { dateStyle: "medium" }), locale)).toBe(
+        "2026-12-10"
+      )
+    }
+  })
+
   test("reads a locale's own order before the ISO shape, and the short date's order when typed with its separator", () => {
     expect(parseDate("2026-05-01", "ky-KG")).toBe("2026-01-05")
     expect(parseDate("2026-05-01", "en-US")).toBe("2026-05-01")

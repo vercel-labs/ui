@@ -160,14 +160,26 @@ function parseDate(
 
   const values: Partial<Record<DateField, string>> = {}
   if (namedMonth !== undefined) {
-    const rest = namedOrder(locale).filter((field) => field !== "month")
     if (numbers.length > 2 || numbers.length === 0) {
       return undefined
     }
-    // With one number beside the name, it's the day: "October 16".
-    const order = numbers.length === 1 ? ["day" as const] : rest
-    order.forEach((field, index) => (values[field] = numbers[index]))
-    values.month = String(namedMonth)
+    // With one number beside the name, it's the day: "October 16". Two read
+    // in the long date's order, then the numeric one, like Malagasy "2026 Okt 16".
+    const orders =
+      numbers.length === 1 ? [["day" as const]] : [namedOrder(locale), fields]
+    for (const order of orders) {
+      const named: Partial<Record<DateField, string>> = {
+        month: String(namedMonth),
+      }
+      order
+        .filter((field) => field !== "month")
+        .forEach((field, index) => (named[field] = numbers[index]))
+      const date = dateOf(named, locale, referenceYear)
+      if (date) {
+        return date
+      }
+    }
+    return undefined
   } else if (numbers.length === 1) {
     const digits = numbers[0]!
     if (digits.length !== 8 && digits.length !== 6) {
@@ -195,6 +207,14 @@ function parseDate(
     return undefined
   }
 
+  return dateOf(values, locale, referenceYear)
+}
+
+function dateOf(
+  values: Partial<Record<DateField, string>>,
+  locale: string | undefined,
+  referenceYear: number
+) {
   const offset = yearOffset(locale)
   const year =
     values.year === undefined
@@ -312,7 +332,7 @@ function months(locale: string | undefined) {
   if (!found) {
     const lookup = monthLookup(locale)
     const spaced = [...lookup]
-      .filter(([name]) => /[^\p{L}\p{M}]/u.test(name))
+      .filter(([name]) => /\p{L}/u.test(name) && /[^\p{L}\p{M}]/u.test(name))
       .sort(([a], [b]) => b.length - a.length)
     monthLookups.set(key, (found = { lookup, spaced }))
   }
