@@ -81,7 +81,7 @@ type PopupContentProps = PositionProps &
      */
     finalFocus?: PopupFocusTarget
     /**
-     * Whether the popup stays in the page, hidden, while closed. For animation libraries that drive the exit from state.
+     * Whether the popup stays in the page, hidden, while closed. Its content keeps its state between opens.
      * @defaultValue false
      */
     keepMounted?: boolean

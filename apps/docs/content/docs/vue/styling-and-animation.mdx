@@ -98,6 +98,8 @@ import {
 
 Put exit styles on `data-ending-style`. `data-closed` describes the state but doesn't keep the element around for an exit.
 
+An exit animation you start from script is waited for too, when it starts in the same task that closes the popup, like in its open change callback. One started later, from an effect or an observer, isn't.
+
 Popups provide `--anchor-width` and `--available-height` for sizing. [Popups](./popups) covers mounting and placement.
 
 ## The ui-sdk Layer
