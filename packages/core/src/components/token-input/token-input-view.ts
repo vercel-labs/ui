@@ -15,6 +15,9 @@ const ANCHOR = "\u200b"
 const visuallyHidden =
   "position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap"
 const HOST = "data-token-id"
+// A server host's place among the value's tokens, so one deleted before the
+// page's script runs takes only its own token with it.
+const SERVER_INDEX = "data-token-index"
 const SENTINEL_ATTRIBUTE = "data-ui-sentinel"
 // A symbol, so no text can be mistaken for it.
 const SENTINEL = Symbol("sentinel")
@@ -216,7 +219,8 @@ function createTokenView(
           return
         }
         if ((node as Element).matches('[data-slot="token-input-host"]')) {
-          const token = rendered.shift()
+          const token =
+            rendered[Number((node as Element).getAttribute(SERVER_INDEX))]
           return void (token && value.push(token))
         }
         const name = (node as Element).localName
@@ -410,7 +414,7 @@ function createTokenView(
   }
 
   // What was typed into the server's markup before the page's script ran, its
-  // hosts standing for the value's tokens in order. A view bound before, as
+  // hosts standing for the value's tokens. A view bound before, as
   // under React's StrictMode, left its own hosts.
   function typedBeforeBind(value: TokenInputValue) {
     const server = doc.createElement("template")
@@ -462,6 +466,7 @@ function renderStaticHtml(
 ) {
   const escape = (text: string) =>
     text.replace(/[&<>"]/g, (char) => `&#${char.charCodeAt(0)};`)
+  let tokens = 0
   return layout(value)
     .map((item) => {
       if (item === SENTINEL) {
@@ -471,7 +476,7 @@ function renderStaticHtml(
         return escape(item)
       }
       // No token ids: the client gives its own, and replaces these hosts once it binds.
-      return `<span contenteditable="false" spellcheck="false" data-slot="token-input-host" data-token-type="${escape(item.type)}"><span>${escape(item.label)}</span><span data-slot="token-input-token-label" style="${visuallyHidden}"> ${escape(describe(item))}</span></span>`
+      return `<span contenteditable="false" spellcheck="false" data-slot="token-input-host" ${SERVER_INDEX}="${tokens++}" data-token-type="${escape(item.type)}"><span>${escape(item.label)}</span><span data-slot="token-input-token-label" style="${visuallyHidden}"> ${escape(describe(item))}</span></span>`
     })
     .join("")
 }

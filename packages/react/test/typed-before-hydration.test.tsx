@@ -253,3 +253,27 @@ test("a token input left as the server rendered it changes nothing as it hydrate
   })
   expect(onValueChange).not.toHaveBeenCalled()
 })
+
+test("a token input keeps the tokens after one deleted before hydration", async () => {
+  const onValueChange = vi.fn()
+  const a = { type: "file", value: "src/a.ts", label: "a.ts" }
+  const b = { type: "file", value: "src/b.ts", label: "b.ts" }
+  const app = (
+    <TokenInput
+      defaultValue={["Compare ", a, " and ", b]}
+      onValueChange={onValueChange}
+    >
+      <TokenInputEditor aria-label="Prompt" />
+    </TokenInput>
+  )
+  const container = document.body.appendChild(document.createElement("div"))
+  container.innerHTML = renderToString(app)
+  container.querySelector('[data-slot="token-input-host"]')!.remove()
+  await React.act(async () => {
+    root = hydrateRoot(container, app)
+  })
+  expect(onValueChange).toHaveBeenCalledWith(
+    ["Compare  and ", expect.objectContaining(b)],
+    expect.anything()
+  )
+})
