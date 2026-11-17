@@ -1548,6 +1548,32 @@ function createAgent(
             chosen.filter((item) => !held.includes(item))
           )
         }
+        // A suggestion for an empty query that the open list didn't show, like one a
+        // query hides, has no element to read its marks from, and a person can't choose it.
+        const empty = openParts.some((part) => part.key)
+          ? fromData(
+              internalOf(instance)?.options?.().emptyItems,
+              undefined,
+              key
+            )
+          : undefined
+        const unshown = chosen.find(
+          (item) =>
+            !held.includes(item) &&
+            empty?.some((suggestion) => suggestion.value === item) &&
+            !elementOf?.(item) &&
+            ![...bound(instance), ...openParts].some(
+              (part) => part.key === item
+            )
+        )
+        if (unshown !== undefined) {
+          const label =
+            empty?.find((suggestion) => suggestion.value === unshown)?.label ||
+            unshown
+          throw new Error(
+            `"${label}" isn't shown in ${entry.label ?? entry.component} (${entry.ref}) now. Set the query that shows it, then choose it.`
+          )
+        }
         // Read again once `allow` answers, since an item can turn disabled while the person decides.
         refuseBlocked = () => {
           const disabled = new Set([
@@ -1763,7 +1789,11 @@ function createAgent(
       asAgent(() => api.setOpen!(true))
       let shown = renderedItems(bound(instance))
       // Items that load can take a while. Ones the data already lists mount with the list.
-      for (let tries = 0; tries < (data ? 4 : 60) && !shown.length; tries++) {
+      for (
+        let tries = 0;
+        tries < (data ? 4 : 60) && (!shown.length || unseen());
+        tries++
+      ) {
         await frames()
         shown = renderedItems(bound(instance))
       }

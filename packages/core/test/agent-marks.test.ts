@@ -525,6 +525,74 @@ describe("data-agent-confirm on items", () => {
   })
 })
 
+describe("empty-query suggestions", () => {
+  // A combobox of "Basic", with "Free" and "Pro" suggested while its query is
+  // empty, "Pro" marked. Options are in the page only while the list is open,
+  // and with `late`, the ones after the first mount a moment later.
+  function plans(late = false) {
+    const content = document.body.appendChild(document.createElement("div"))
+    const unbinds: (() => void)[] = []
+    cleanups.push(() => unbinds.forEach((unbind) => unbind()))
+    const instance: ReturnType<typeof combobox> = combobox({
+      id: "plan",
+      items: ["Basic"],
+      emptyItems: ["Free", "Pro"],
+      onOpenChange: (open) => {
+        unbinds.splice(0).forEach((unbind) => unbind())
+        content.replaceChildren()
+        const query = instance.get().query
+        const shown = !open ? [] : query ? ["Basic"] : ["Free", "Pro"]
+        shown.forEach((value, index) => {
+          const add = () => {
+            const item = content.appendChild(document.createElement("div"))
+            item.textContent = value
+            if (value === "Pro") {
+              item.setAttribute("data-agent-confirm", "Charges $20 a month")
+            }
+            unbinds.push(bind(instance.part("item", { value }), item))
+          }
+          if (late && index) {
+            setTimeout(add, 30)
+          } else {
+            add()
+          }
+        })
+      },
+    })
+    const field = document.body.appendChild(document.createElement("input"))
+    field.setAttribute("aria-label", "Plan")
+    cleanups.push(bind(instance.part("input"), field), () => instance.destroy())
+    return instance
+  }
+
+  test("one a query hides isn't chosen, since its marks can't be read", async () => {
+    const instance = plans()
+    const agent = createAgent()
+    const outcome = await agent.act({
+      steps: [
+        { ref: "Plan", action: "setQuery", args: ["ba"] },
+        { ref: "Plan", action: "setValue", args: ["Pro"] },
+      ],
+    })
+    expect(outcome.error?.message).toMatch(
+      /^"Pro" isn't shown in Plan \(\w+\) now\./
+    )
+    expect(instance.get().value).toBeNull()
+  })
+
+  test("a marked one that mounts after the list opens still needs a person", async () => {
+    const instance = plans(true)
+    const agent = createAgent()
+    const outcome = await agent.act({
+      steps: [{ ref: "Plan", action: "setValue", args: ["Pro"] }],
+    })
+    expect(outcome.error?.message).toMatch(
+      /^Needs a person: "Charges \$20 a month"/
+    )
+    expect(instance.get().value).toBeNull()
+  })
+})
+
 describe("while allow decides", () => {
   test("a mark the page adds asks again, and a field disabled meanwhile refuses the step", async () => {
     const section = region("data-other")
