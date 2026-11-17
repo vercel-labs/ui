@@ -321,8 +321,11 @@ function listboxApiBody(
 
   // A press or the pointer moves the highlight while focus stays on the list.
   function highlightVirtually(key: string, event?: Event) {
-    focusInside = true
-    listbox.highlight(key, { event })
+    const entry = listbox.find(key)
+    if (entry && !listbox.disabled(entry)) {
+      focusInside = true
+      listbox.highlight(key, { event })
+    }
   }
 
   // With `virtualFocus`, the option highlighted last holds the tab stop, as

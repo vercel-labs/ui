@@ -27,6 +27,7 @@ import { idPart } from "../../foundation/kernel/attrs"
 import type { SlotFactory } from "../../foundation/kernel/primitive-types"
 import { selects } from "../../foundation/kernel/selects"
 import { live } from "../../foundation/kernel/live"
+import { holdFocus } from "../../foundation/focus/press-keeps-focus"
 
 type ItemProps = ListboxItemProps<unknown> & {
   /** @internal The group the item is in. */
@@ -181,8 +182,10 @@ const listboxSlots = (slot: SlotFactory<ListboxStore, ListboxApi>) => ({
       const { selected, disabled } = itemState(state, key, props, api)
       return {
         id: `${id}-option-${idPart(key)}`,
-        tabindex:
-          isDisabled(state) || state.virtualFocus
+        // With `virtualFocus`, -1 keeps an option that's a link out of the tab order.
+        tabindex: state.virtualFocus
+          ? "-1"
+          : isDisabled(state)
             ? undefined
             : isStop(state, key, props, api)
               ? "0"
@@ -210,15 +213,23 @@ const listboxSlots = (slot: SlotFactory<ListboxStore, ListboxApi>) => ({
           api.internal.highlightVirtually(key, event)
         }
       },
+      // With `virtualFocus`, a press keeps focus on the list.
+      pointerdown: (event, context) =>
+        context.store.get().virtualFocus && holdFocus(event, context),
       // Shift with a press selects a range, not the page's text.
-      mousedown(event, { store }) {
-        if (event.shiftKey && store.get().multiple) {
+      mousedown(event, context) {
+        const { shiftKey } = event
+        const { multiple, virtualFocus } = context.store.get()
+        if (virtualFocus) {
+          holdFocus(event, context)
+        } else if (shiftKey && multiple) {
           event.preventDefault()
         }
       },
     },
     press({ api, key, store }, event) {
       if (store.get().virtualFocus) {
+        api.internal.focusStop()
         api.internal.highlightVirtually(key, event)
       }
       api.internal.press(key, event)

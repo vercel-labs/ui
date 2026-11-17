@@ -31,7 +31,23 @@ function setup(options: Record<string, unknown> = {}) {
 test("the list is the tab stop, and its options aren't", () => {
   const { view, root } = setup()
   expect(root.getAttribute("tabindex")).toBe("0")
-  expect(view.part("item", "a")!.hasAttribute("tabindex")).toBe(false)
+  expect(view.part("item", "a")!.getAttribute("tabindex")).toBe("-1")
+})
+
+test("the pointer moves the highlight, but not onto a disabled option", async () => {
+  const { view, root, pointsAt } = setup({ defaultValue: "a" })
+  root.focus()
+  await view.settle()
+  const hover = (value: string) =>
+    view
+      .part("item", value)!
+      .dispatchEvent(
+        new PointerEvent("pointermove", { bubbles: true, pointerType: "mouse" })
+      )
+  hover("b")
+  expect(pointsAt()).toBe("Alpha")
+  hover("c")
+  expect(pointsAt()).toBe("Gamma")
 })
 
 test("keys move the highlight while focus stays on the list", async () => {
