@@ -33,7 +33,7 @@ function useShortcut(
   React.useLayoutEffect(() => {
     latest.current = { handler, options }
   })
-  const { scope, allowInInput, description } = options
+  const { scope, allowInInput, repeat, description } = options
   // Only a shortcut with a condition passes one, so the development warning
   // for the same keys registered twice still sees the rest.
   const conditional = !!options.when
@@ -45,6 +45,7 @@ function useShortcut(
     return shortcuts.register(keys, (event) => latest.current.handler(event), {
       scope,
       allowInInput,
+      repeat,
       description,
       when: conditional
         ? () => latest.current.options.when?.() ?? true
@@ -62,7 +63,7 @@ function useShortcut(
           }
         : undefined,
     })
-  }, [keys, scope, allowInInput, description, layered, conditional])
+  }, [keys, scope, allowInInput, repeat, description, layered, conditional])
 }
 
 /**
