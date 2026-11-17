@@ -754,6 +754,30 @@ test.describe("nested dialogs", () => {
   })
 })
 
+test("a nested dialog mounted open with its parent opens above it, nested", async ({
+  open,
+  page,
+}) => {
+  await open("dialog", { open: "", "nested-open": "" })
+  await expect(nestedDialog(page)).toBeVisible()
+  await expect(dialog(page)).toHaveAttribute("data-nested-open", "")
+  await expect(nestedDialog(page)).toHaveAttribute("data-nested", "")
+  await expect(page.getByRole("button", { name: "Done" })).toBeFocused()
+  const box = (await nestedDialog(page).boundingBox())!
+  const onTop = await page.evaluate(
+    ([x, y]: number[]) =>
+      !!document
+        .elementFromPoint(x, y)
+        ?.closest('[role="dialog"][aria-labelledby]')
+        ?.textContent?.includes("Advanced settings"),
+    [box.x + box.width / 2, box.y + box.height / 2]
+  )
+  expect(onTop).toBe(true)
+  await page.keyboard.press("Escape")
+  await expect(nestedDialog(page)).toBeHidden()
+  await expect(dialog(page)).toBeVisible()
+})
+
 test.describe("alert dialog", () => {
   test("opens with focus on the least destructive action", async ({ page }) => {
     await alertTrigger(page).click()

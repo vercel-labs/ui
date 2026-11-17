@@ -16,7 +16,7 @@ const backdrop = (owner: string) =>
     : ""
 
 const nested = `
-  <ui-dialog id="nested">
+  <ui-dialog id="nested"${parts.nestedOpen ? " default-open" : ""}>
     <ui-dialog-trigger><button>${dialogFixture.nested.trigger}</button></ui-dialog-trigger>
     ${backdrop("ui-dialog")}
     <ui-dialog-content class="dialog">

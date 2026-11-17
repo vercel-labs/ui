@@ -90,6 +90,7 @@ function onOpenChange(
         </form>
         <Dialog
           v-if="parts.nested"
+          :default-open="parts.nestedOpen"
           @open-change="
             (open: boolean, details: { reason: string }) =>
               recordOpenChange('nested', open, details)
