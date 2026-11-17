@@ -232,6 +232,8 @@ function otpInputApiBody(
   let inserting: { reason: OTPInputValueChangeReason; event: Event } | undefined
   // Set while the core writes the element's value, so its listeners skip it.
   let writing = false
+  // Set from a controlled change until its owner has had a chance to pass it back.
+  let awaitingOwner = false
   // Whether the last edit deleted, until the caret moves some other way.
   let afterDelete = false
   // What pressed last, since only a mouse press is taken over.
@@ -290,7 +292,7 @@ function otpInputApiBody(
   function syncElement() {
     const el = input()
     const { value, maxLength } = store.get()
-    if (!el || el.value === value) {
+    if (!el || el.value === value || awaitingOwner) {
       return
     }
     writing = true
@@ -364,9 +366,15 @@ function otpInputApiBody(
         if (!isControlled()) {
           store.set({ value: next })
         }
-        // A controlled input shows what its owner passes back, once the owner has rendered.
+        // A controlled input shows what its owner passes back, once the owner
+        // has rendered. Until then it keeps the typed code and its caret,
+        // rather than the value the owner held before.
         else {
-          queueMicrotask(syncElement)
+          awaitingOwner = true
+          queueMicrotask(() => {
+            awaitingOwner = false
+            syncElement()
+          })
         }
         complete(next, reason, cause)
       } else {
