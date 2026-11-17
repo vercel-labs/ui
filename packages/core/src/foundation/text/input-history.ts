@@ -18,6 +18,12 @@ type InputHistoryOptions<T> = {
    * textarea, and anywhere in a text input.
    */
   atEdge?: (direction: "up" | "down", event: KeyboardEvent) => boolean
+  /**
+   * A key for each value, like a message's id. With it, values are matched by key: values made
+   * again from the same messages keep their place, and so does the value shown when a new one
+   * arrives. Without it, values are compared as they are, and any change starts over.
+   */
+  getEntryKey?: (entry: T) => string
 }
 
 const recallableTypes = new Set(["text", "search", "url", "tel"])
@@ -90,10 +96,40 @@ function createInputHistory<T>(options: InputHistoryOptions<T>) {
     edits.clear()
   }
 
+  // Keeps the value shown, and edits to values brought back, on their keys.
+  function follow(entries: readonly T[], key: (entry: T) => string) {
+    const shown = at < seen.length ? key(seen[at]) : undefined
+    const edited = new Map<string, T>()
+    for (const [index, value] of edits) {
+      if (index < seen.length) {
+        edited.set(key(seen[index]), value)
+      }
+    }
+    const draft = edits.get(seen.length)
+    const typing = edits.has(seen.length)
+    seen = [...entries]
+    edits.clear()
+    seen.forEach((entry, index) => {
+      const value = edited.get(key(entry))
+      if (value !== undefined) {
+        edits.set(index, value)
+      }
+    })
+    if (typing) {
+      edits.set(seen.length, draft as T)
+    }
+    const index = seen.findIndex((entry) => key(entry) === shown)
+    at = index === -1 ? seen.length : index
+  }
+
   function step(by: -1 | 1, event: KeyboardEvent) {
     const entries = options.entries() ?? []
     if (!sameEntries(entries, seen)) {
-      reset()
+      if (options.getEntryKey) {
+        follow(entries, options.getEntryKey)
+      } else {
+        reset()
+      }
     }
     const next = at + by
     if (next < 0 || next > seen.length) {
