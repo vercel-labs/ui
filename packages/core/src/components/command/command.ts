@@ -430,7 +430,7 @@ const commandPrimitive = /* @__PURE__ */ definePrimitive({
   sync: syncCommandState,
   api: commandApi,
   slots: (slot) => commandSlots(slot),
-  agent: { actions: ["setValue", "setQuery", "setPages"] },
+  agent: { actions: ["run", "setValue", "setQuery", "setPages"] },
 })
 
 /**

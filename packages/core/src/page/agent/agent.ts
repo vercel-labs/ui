@@ -1515,7 +1515,9 @@ function createAgent(
       if (
         entry.component !== "autocomplete" &&
         args[0] !== undefined &&
-        ["setValue", "setChecked", "select", "open", "toggle"].includes(action)
+        ["setValue", "setChecked", "select", "open", "toggle", "run"].includes(
+          action
+        )
       ) {
         const value = (instance.get() as Record<string, unknown>)[
           action === "setChecked" ? "checked" : "value"
