@@ -50,6 +50,15 @@ test.describe("field", () => {
     await expect(listbox(page)).toBeVisible()
   })
 
+  test("the list is named by the field, not by what's typed", async ({
+    page,
+  }) => {
+    await input(page).fill("cal")
+    await expect(
+      page.getByRole("listbox", { name: "Search commands", exact: true })
+    ).toBeVisible()
+  })
+
   test("the first command is highlighted from the start", async ({ page }) => {
     await expect.poll(() => highlighted(page)).toBe("Calendar")
     await expect(option(page, "Calendar")).toHaveAttribute(

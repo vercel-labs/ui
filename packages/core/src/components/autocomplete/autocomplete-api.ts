@@ -79,6 +79,7 @@ function initialAutocompleteState(
     status: options.status ?? "idle",
     listed: false,
     labeled: false,
+    fieldName: null,
     inline: !!options.inlineComplete,
     disabled: !!options.disabled,
     formDisabled: false,

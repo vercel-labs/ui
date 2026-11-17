@@ -16,6 +16,7 @@ import {
   restoreFocus,
   trackModality,
 } from "../../foundation/kernel/modality"
+import { type FieldName } from "../../foundation/lists/listbox-popup"
 import { deriveOpen, type PopupOpener } from "../../foundation/popups/popup"
 import {
   createPopup,
@@ -78,6 +79,7 @@ type ComboboxState = PopupState & {
   status: AsyncOptionsStatus
   listed: boolean
   labeled: boolean
+  fieldName: FieldName
   // An input sits outside the content, so a trigger beside it can leave the tab order.
   inlineInput: boolean
   multiple: boolean
@@ -162,6 +164,7 @@ function initialComboboxState(
     status: options.status ?? "idle",
     listed: false,
     labeled: false,
+    fieldName: null,
     inlineInput: false,
     multiple: !!options.multiple,
     maxSelected: options.maxSelected,

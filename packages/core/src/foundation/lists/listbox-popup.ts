@@ -31,6 +31,7 @@ type ListPopupState = {
   // Whether the list part is in the page, which then is the listbox instead of the content.
   listed: boolean
   labeled: boolean
+  fieldName: FieldName
   settled: boolean
   // A combobox's: options can be chosen together.
   multiple?: boolean
@@ -78,9 +79,53 @@ const inputState = (state: FieldState) => ({
 const listId = (state: { listed: boolean }, id: string) =>
   `${id}-${state.listed ? "list" : "content"}`
 
-// The label names the list, or the field does while there's no label.
-const listLabelledBy = (state: { labeled: boolean }, id: string) =>
-  state.labeled ? `${id}-label` : `${id}-input`
+// How the field is named when no label part names it. A list labelled by the
+// input itself would be named by the text typed in it.
+type FieldName = { labelledBy: string } | { label: string } | null
+
+function fieldNameOf(el: HTMLElement, id: string) {
+  const labelledBy = el.getAttribute("aria-labelledby")
+  if (labelledBy && labelledBy !== `${id}-label`) {
+    return { labelledBy }
+  }
+  const labels = [...((el as HTMLInputElement).labels ?? [])]
+    .map((label) => label.id)
+    .filter(Boolean)
+  if (labels.length) {
+    return { labelledBy: labels.join(" ") }
+  }
+  const label = el.getAttribute("aria-label")
+  return label ? { label } : null
+}
+
+function bindFieldName(
+  el: HTMLElement,
+  store: Store<{ fieldName: FieldName }>,
+  id: string
+) {
+  const next = fieldNameOf(el, id)
+  if (JSON.stringify(next) !== JSON.stringify(store.get().fieldName)) {
+    store.set({ fieldName: next })
+  }
+}
+
+const unnamed = { "aria-labelledby": undefined, "aria-label": undefined }
+
+// The label names the list, or else what names the field.
+function listName(
+  state: { labeled?: boolean; fieldName: FieldName },
+  id: string
+) {
+  const named = state.labeled ? null : state.fieldName
+  return {
+    "aria-labelledby": state.labeled
+      ? `${id}-label`
+      : named && "label" in named
+        ? undefined
+        : (named?.labelledBy ?? `${id}-input`),
+    "aria-label": named && "label" in named ? named.label : undefined,
+  }
+}
 
 // The popup the list opens in. It's the listbox itself until a list part
 // renders inside it, next to a header or a status.
@@ -111,7 +156,7 @@ function listContentPart<
       ...popupContentAttrs(state, id),
       "aria-multiselectable":
         !state.listed && state.multiple ? "true" : undefined,
-      "aria-labelledby": state.listed ? undefined : listLabelledBy(state, id),
+      ...(state.listed ? unnamed : listName(state, id)),
       "aria-busy":
         !state.listed && state.status === "loading" ? "true" : undefined,
       "data-presentation": state.presentation,
@@ -191,7 +236,7 @@ function listPart<State extends ListPopupState, Api>() {
     attrs: (state, { id }) => ({
       id: `${id}-list`,
       "aria-multiselectable": state.multiple ? "true" : undefined,
-      "aria-labelledby": listLabelledBy(state, id),
+      ...listName(state, id),
       "aria-busy": state.status === "loading" ? "true" : undefined,
     }),
     bind: (el, { store }) => flagWhileBound(store, "listed"),
@@ -199,4 +244,13 @@ function listPart<State extends ListPopupState, Api>() {
     RoleFields<State, Api, BaseSlotProps>
 }
 
-export { bindListContent, inputState, listContentPart, listId, listPart }
+export {
+  bindFieldName,
+  bindListContent,
+  type FieldName,
+  inputState,
+  listContentPart,
+  listId,
+  listName,
+  listPart,
+}
