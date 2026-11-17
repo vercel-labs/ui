@@ -1,4 +1,7 @@
-import { orientationOf } from "../../foundation/focus/collection"
+import {
+  type Direction,
+  orientationOf,
+} from "../../foundation/focus/collection"
 import { isDisabled } from "../../foundation/forms/form"
 import { createController } from "../../foundation/kernel/controller"
 import type {
@@ -10,7 +13,10 @@ import type {
   PrimitiveOptions,
   WithGeneric,
 } from "../../foundation/kernel/primitive-types"
-import { bindIndicator } from "../../foundation/selection/indicator"
+import {
+  bindIndicator,
+  directionBetween,
+} from "../../foundation/selection/indicator"
 import {
   radioGroupApi,
   type RadioGroupApi,
@@ -159,7 +165,15 @@ type SegmentedControlIndicatorState = {
   value: string | null
   /** Which way the items run. */
   orientation: SegmentedControlOrientation
+  /** Which way the checked item last moved on screen, `"none"` before it first moves. */
+  direction: SegmentedControlDirection
 }
+
+/**
+ * Which way the checked item moved, on screen.
+ * @experimental
+ */
+type SegmentedControlDirection = Direction
 
 const slotNames = { group: "root", item: "item" }
 
@@ -198,7 +212,10 @@ const segmentedControlPrimitive = /* @__PURE__ */ definePrimitive({
     controller: "value",
   },
   state: (options: SegmentedControlOptions) =>
-    radioGroupState(options, { orientation: orientation(options) }),
+    radioGroupState(options, {
+      orientation: orientation(options),
+      direction: "none",
+    }),
   sync: (options) => ({
     ...syncRadioGroup(options),
     orientation: orientation(options),
@@ -221,10 +238,18 @@ const segmentedControlPrimitive = /* @__PURE__ */ definePrimitive({
         state: (state) => ({
           value: state.value,
           orientation: state.orientation ?? "horizontal",
+          direction: state.direction ?? "none",
         }),
-        attrs: (state) => ({ "data-orientation": state.orientation }),
+        attrs: (state) => ({
+          "data-orientation": state.orientation,
+          "data-activation-direction": state.direction ?? "none",
+        }),
         bind(el, { api, store }) {
           let value = store.get().value
+          const rect = (key: string | null) =>
+            key === null
+              ? undefined
+              : api.internal.radio(key)?.getBoundingClientRect()
           return bindIndicator({
             list: () => api.internal.group() ?? el.parentElement,
             active: () => {
@@ -237,7 +262,16 @@ const segmentedControlPrimitive = /* @__PURE__ */ definePrimitive({
                 if (store.get().value === value) {
                   return
                 }
+                const direction = directionBetween(
+                  rect(value),
+                  rect(store.get().value),
+                  store.get().orientation ?? "horizontal"
+                ) as SegmentedControlDirection
                 value = store.get().value
+                // Ahead of the render, so styles that skip transitions while
+                // the direction is "none" animate the first move too.
+                el.setAttribute("data-activation-direction", direction)
+                store.set({ direction })
                 remeasure()
               }),
             write(box) {
@@ -286,6 +320,7 @@ export {
   type SegmentedControlApi,
   type SegmentedControlChangeOptions,
   type SegmentedControlController,
+  type SegmentedControlDirection,
   type SegmentedControlIndicatorState,
   type SegmentedControlItemProps,
   type SegmentedControlItemState,

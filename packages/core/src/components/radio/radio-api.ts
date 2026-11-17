@@ -1,4 +1,8 @@
-import { moveIndex, radioStep } from "../../foundation/focus/collection"
+import {
+  type Direction,
+  moveIndex,
+  radioStep,
+} from "../../foundation/focus/collection"
 import { createRovingFocus } from "../../foundation/focus/roving-focus"
 import {
   dispatchChange,
@@ -35,15 +39,16 @@ type RadioGroupStore = {
   stop: string | null
   // Indicators animating out.
   exiting: string[]
-  // Only a segmented control has one.
+  // Only a segmented control has these.
   orientation?: "horizontal" | "vertical"
+  direction?: Direction
   // The radio a pointer previews, which only a rating shows.
   highlighted?: string | null
 }
 
 function radioGroupState(
   options: RadioGroupOptions,
-  extra: Pick<RadioGroupStore, "orientation" | "highlighted"> = {}
+  extra: Pick<RadioGroupStore, "orientation" | "direction" | "highlighted"> = {}
 ): RadioGroupStore {
   const value =
     options.value !== undefined ? options.value : (options.defaultValue ?? null)

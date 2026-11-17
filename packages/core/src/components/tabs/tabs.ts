@@ -3,7 +3,6 @@ import {
   orientationOf,
   scrollToShow,
 } from "../../foundation/focus/collection"
-import { directionBetween } from "./tabs-direction"
 import type { TabsGeneric } from "./tabs-generic"
 import {
   bindFindable,
@@ -15,7 +14,10 @@ import {
   type ButtonElement,
 } from "../../foundation/platform/button"
 import { layoutBox } from "../../foundation/platform/layout"
-import { bindIndicator } from "../../foundation/selection/indicator"
+import {
+  bindIndicator,
+  directionBetween,
+} from "../../foundation/selection/indicator"
 import {
   itemIconPart,
   type ItemIconProps,

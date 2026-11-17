@@ -7,6 +7,7 @@ export type {
   SegmentedControlApi,
   SegmentedControlChangeOptions,
   SegmentedControlController,
+  SegmentedControlDirection,
   SegmentedControlIndicatorState,
   SegmentedControlItemProps,
   SegmentedControlItemState,
