@@ -23,7 +23,7 @@ test("an agent runs a command by its label", async () => {
         ],
         onAction,
       },
-      `<root><input aria-label="Search commands"><list></list></root>`
+      `<root><input aria-label="Search commands"><list><item value="calendar">Calendar</item><item value="profile">Profile</item><item value="billing">Billing</item></list></root>`
     )
   )
   const agent = createAgent()

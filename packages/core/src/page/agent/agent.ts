@@ -1562,6 +1562,24 @@ function createAgent(
           )
         }
         refuseBlocked()
+        // A command the query or page hides has no element, so none of its marks.
+        const hidden =
+          action === "run"
+            ? chosen.find(
+                (item) =>
+                  !elementOf?.(item) &&
+                  !bound(instance).some((part) => part.key === item)
+              )
+            : undefined
+        if (hidden !== undefined) {
+          const label =
+            (dataOf(entry, instance) ?? []).find(
+              (item) => item.value === hidden
+            )?.label || hidden
+          throw new Error(
+            `"${label}" isn't shown in ${entry.label ?? entry.component} (${entry.ref}) now. Set the query or page that shows it, then run it.`
+          )
+        }
       }
       run = () => fn(...args)
     }
