@@ -257,7 +257,15 @@ function autocompleteApiBody(
   function setValue(
     value: string,
     reason: AutocompleteValueChangeReason,
-    { event, query = value }: { event?: Event; query?: string } = {}
+    {
+      event,
+      query = value,
+      item,
+    }: {
+      event?: Event
+      query?: string
+      item?: { value: string; label: string }
+    } = {}
   ) {
     const state = store.get()
     if ((isDisabled(state) || state.readOnly) && reason !== "reset") {
@@ -265,7 +273,10 @@ function autocompleteApiBody(
     }
     requested = value
     core.cause(reason, event)
-    if (value === state.value || change("value", value, { reason, event })) {
+    if (
+      value === state.value ||
+      change("value", value, { reason, event, ...(item && { item }) })
+    ) {
       // A value that `onValueChange` set in its place stored its own query.
       if (requested === value) {
         store.set({ query })
@@ -346,7 +357,10 @@ function autocompleteApiBody(
     if (!entry || core.listbox.disabled(entry) || !editable()) {
       return false
     }
-    setValue(entry.label, "item-press", { event })
+    setValue(entry.label, "item-press", {
+      event,
+      item: { value: entry.key, label: entry.label },
+    })
     const input = inputElement()
     if (input && input.value !== store.get().value) {
       input.value = store.get().value

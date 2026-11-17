@@ -161,6 +161,28 @@ describe("autocomplete headless", () => {
     expect(onSubmit).toHaveBeenCalledWith("Banana", expect.anything())
   })
 
+  test("a pick says which suggestion it was, though two share a label", () => {
+    const onValueChange = vi.fn()
+    const instance = autocomplete({
+      id: "a",
+      items: [
+        { value: "site-1", label: "Example" },
+        { value: "site-2", label: "Example" },
+      ],
+      onValueChange,
+    })
+    type(instance, "ex")
+    expect(onValueChange.mock.lastCall?.[1].item).toBeUndefined()
+    instance.api.internal.press("site-2")
+    expect(onValueChange).toHaveBeenLastCalledWith(
+      "Example",
+      expect.objectContaining({
+        reason: "item-press",
+        item: { value: "site-2", label: "Example" },
+      })
+    )
+  })
+
   test("a value from outside also becomes what filters", () => {
     const instance = autocomplete({ id: "a", items: fruits })
     instance.api.setValue("blue")

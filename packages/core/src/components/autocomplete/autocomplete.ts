@@ -91,6 +91,16 @@ type AutocompleteDismissReason = Extract<
 >
 
 /**
+ * What `onValueChange` receives after the text.
+ * @stable
+ */
+type AutocompleteValueChangeDetails =
+  ChangeDetails<AutocompleteValueChangeReason> & {
+    /** The suggestion chosen, for `"item-press"`, so two with the same label can be told apart. */
+    item?: { value: string; label: string }
+  }
+
+/**
  * What `onSubmit` receives besides the text.
  * @stable
  */
@@ -181,7 +191,7 @@ type AutocompleteOptions = PortalProps & {
   /** Runs when the text wants to change: typing, choosing a suggestion, a Clear part, a form reset or a controller. `details.cancel()` keeps it as it was. */
   onValueChange?: (
     value: string,
-    details: ChangeDetails<AutocompleteValueChangeReason>
+    details: AutocompleteValueChangeDetails
   ) => void
   /** Whether the suggestions are open. Pass it to control them. */
   open?: boolean
@@ -518,6 +528,7 @@ export {
   type AutocompletePrimitive,
   type AutocompleteStatusState,
   type AutocompleteSubmitDetails,
+  type AutocompleteValueChangeDetails,
   type AutocompleteTriggerState,
   type AutocompleteValueChangeReason,
   createAutocompleteController,
