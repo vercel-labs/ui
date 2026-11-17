@@ -336,6 +336,26 @@ describe("data-agent-confirm on items", () => {
     expect(instance.get().value).toEqual([])
   })
 
+  test("a listbox step that takes a marked option out, by setValue or clear, needs a person", async () => {
+    const agent = createAgent()
+    const instance = listbox({
+      id: "roles",
+      multiple: true,
+      defaultValue: ["viewer", "admin"],
+    })
+    mountList("Roles", instance as never, ["viewer", "admin"])
+    for (const step of [
+      { ref: "Roles", action: "setValue", args: [["viewer"]] },
+      { ref: "Roles", action: "clear" },
+    ]) {
+      const outcome = await agent.act({ steps: [step] })
+      expect(outcome.error?.message).toBe(
+        'Needs a person: "Grants admin". Ask them to make this change themselves.'
+      )
+    }
+    expect(instance.get().value).toEqual(["viewer", "admin"])
+  })
+
   test("a tree's setChecked with a marked row needs a person, and refuses a disabled one", async () => {
     const agent = createAgent()
     const instance = tree({
