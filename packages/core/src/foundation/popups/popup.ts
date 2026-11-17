@@ -506,8 +506,12 @@ function watchClose(close: (event: Event) => void) {
 // Each shown layer's own elements, which a parent that turns modal later keeps out of its inert.
 const layerParts = new WeakMap<Layer, HTMLElement[]>()
 const freezing = new WeakSet<Layer>()
-// Shows a layer's popup again from the start.
-const showsAgain = new WeakMap<Layer, () => void>()
+// Shows a layer's popup again from the start, when it sits inside an element:
+// its content does, or its trigger, when the content renders elsewhere.
+const showsAgain = new WeakMap<
+  Layer,
+  { inside: (el: HTMLElement) => boolean; again: () => void }
+>()
 
 // A modal spares what shows above it: a layer opened from it, a newer layer
 // that freezes the page like a confirm, and anything opened from that one.
@@ -1127,18 +1131,22 @@ function createPopupLayer<
     layer = own
     layerParts.set(own, [el, ...(backdrop ? [backdrop] : [])])
     cleanups.push(pushLayer(own))
-    showsAgain.set(own, () => {
-      const focused = activeElement()
-      hide()
-      for (const part of [host, backdrop]) {
-        try {
-          part?.hidePopover()
-        } catch {}
-      }
-      show()
-      if (focused && focused !== activeElement()) {
-        ;(focused as HTMLElement).focus({ preventScroll: true })
-      }
+    showsAgain.set(own, {
+      inside: (outer) =>
+        outer.contains(el) || (!!trigger && outer.contains(trigger)),
+      again: () => {
+        const focused = activeElement()
+        hide()
+        for (const part of [host, backdrop]) {
+          try {
+            part?.hidePopover()
+          } catch {}
+        }
+        show()
+        if (focused && focused !== activeElement()) {
+          ;(focused as HTMLElement).focus({ preventScroll: true })
+        }
+      },
     })
     if (modal.inertAndLock) {
       freezing.add(own)
@@ -1314,8 +1322,9 @@ function createPopupLayer<
     // A popup inside this one that showed first, like nested dialogs mounted
     // open in one commit, shows again, so it lands above this one and nests under it.
     for (const other of activeLayers()) {
-      if (other !== own && other.el && el.contains(other.el)) {
-        showsAgain.get(other)?.()
+      const shows = showsAgain.get(other)
+      if (other !== own && shows?.inside(el)) {
+        shows.again()
       }
     }
     // Children bind in the same commit. Focus once they have.
