@@ -150,6 +150,23 @@ test.describe("keyboard in the list", () => {
     await expect(trigger(page)).toContainText("Pick a fruit")
   })
 
+  test("an ancestor hears Escape already handled", async ({ page }) => {
+    await page.evaluate(() => {
+      document.body.addEventListener("keydown", (event) => {
+        ;(window as unknown as { __escapeSeen?: boolean }).__escapeSeen =
+          event.defaultPrevented
+      })
+    })
+    await openWithKeyboard(page)
+    await page.keyboard.press("Escape")
+    await expect(listbox(page)).toBeHidden()
+    expect(
+      await page.evaluate(
+        () => (window as unknown as { __escapeSeen?: boolean }).__escapeSeen
+      )
+    ).toBe(true)
+  })
+
   test("the chosen item is selected when the list opens again, and takes focus", async ({
     page,
   }) => {

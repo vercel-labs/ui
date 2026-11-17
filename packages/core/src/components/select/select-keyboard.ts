@@ -123,6 +123,7 @@ function createSelectKeyboard({
     }
     switch (event.key) {
       case "Tab":
+      case "Escape":
         return popupKeyDown(event)
       case "Enter":
       case " ":
@@ -150,6 +151,7 @@ function createSelectKeyboard({
     }
     switch (event.key) {
       case "Tab":
+      case "Escape":
         return popupKeyDown(event)
       case "Enter":
         event.preventDefault()

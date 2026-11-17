@@ -14,6 +14,7 @@ import { on } from "../kernel/events"
 import type { Store } from "../kernel/store"
 import {
   activeLayers,
+  escapeLayer,
   findLayer,
   lastClosed,
   lastEscape,
@@ -1352,9 +1353,13 @@ function createPopupLayer<
     cleanup()
   }
 
-  // Keeps Tab inside a trapping popup, hands focus back to the page after the
-  // trigger from a flowing one, wherever it renders, and closes a menu-like one.
+  // Escape closes the popup before its ancestors hear the key. Tab stays
+  // inside a trapping popup, goes back to the page after the trigger from a
+  // flowing one, wherever it renders, and closes a menu-like one.
   function keydown(event: KeyboardEvent) {
+    if (event.key === "Escape" && layer) {
+      return escapeLayer(layer, event)
+    }
     const popup = shown?.el
     if (event.key !== "Tab" || !popup) {
       return

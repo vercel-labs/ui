@@ -16,6 +16,7 @@ export { measureViewportEarly, trackKeyboard } from "./keyboard"
 export {
   activeLayers,
   bindPersistentLayer,
+  escapeLayer,
   findLayer,
   inPersistentLayer,
   lastClosed,
