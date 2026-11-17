@@ -560,11 +560,11 @@ test.describe("positioning", () => {
     })
     await trigger(page).click()
     await expect(dialog(page)).toBeVisible()
-    const { left, top } = await dialog(page).evaluate((el) => el.style)
-    expect([left, top]).toEqual([
-      expect.stringMatching(/^-?\d+px$/),
-      expect.stringMatching(/^-?\d+px$/),
-    ])
+    const { x, y } = await dialog(page).evaluate((el) => {
+      const box = el.getBoundingClientRect()
+      return { x: box.x * devicePixelRatio, y: box.y * devicePixelRatio }
+    })
+    expect([x, y]).toEqual([Math.round(x), Math.round(y)])
   })
 
   test("the popover flips above the trigger when there is no room below", async ({

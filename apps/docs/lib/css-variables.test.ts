@@ -43,8 +43,9 @@ function written(file: string) {
   return names
 }
 
-// Scroll locking sets this on <html> for any modal popup; the docs don't list it.
-const undocumented = ["--scrollbar-width"]
+// Scroll locking sets the first on <html> for any modal popup. The second is
+// the `anchor-name` a popup's anchor gets, not a variable. The docs list neither.
+const undocumented = ["--scrollbar-width", "--ui-anchor-*"]
 
 const covers = (declared: string[], name: string) =>
   undocumented.includes(name) ||
