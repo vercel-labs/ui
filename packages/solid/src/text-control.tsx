@@ -1,3 +1,5 @@
+import type { ChangeDetails } from "@ui-sdk/core"
+import type { InputValueChangeReason } from "@ui-sdk/core/input"
 import { isServer } from "@solidjs/web"
 import { merge, omit, untrack } from "solid-js"
 import type { useFieldControl } from "./field-context"
@@ -45,6 +47,32 @@ function valueProps(
     return value() === undefined
       ? { defaultValue: defaultValue() }
       : { value: value() }
+  }
+}
+
+// Solid writes `value` only when it changes, so a controlled value the parent
+// kept goes back once the change settles, as in React.
+function keepControlled(
+  value: () => string | undefined,
+  onValueChange?: (
+    value: string,
+    details: ChangeDetails<InputValueChangeReason>
+  ) => void
+) {
+  return (next: string, details: ChangeDetails<InputValueChangeReason>) => {
+    onValueChange?.(next, details)
+    const event = details.event as InputEvent | undefined
+    const el = event?.target as HTMLInputElement | null | undefined
+    // Mid-composition the IME owns the text, and its last change comes after.
+    if (details.canceled || !el || event?.isComposing) {
+      return
+    }
+    queueMicrotask(() => {
+      const kept = untrack(value)
+      if (kept !== undefined && el.value !== kept) {
+        el.value = kept
+      }
+    })
   }
 }
 
@@ -108,6 +136,7 @@ export {
   controlProps,
   defaultValueProps,
   elementProps,
+  keepControlled,
   type Native,
   startingText,
   valueProps,

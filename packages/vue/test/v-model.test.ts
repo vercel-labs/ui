@@ -15,6 +15,7 @@ import {
 } from "../src/navigation-menu"
 import { Slider, SliderControl, SliderThumb, SliderTrack } from "../src/slider"
 import { Tabs, TabsList, TabsTab } from "../src/tabs"
+import { Textarea } from "../src/textarea"
 
 Element.prototype.getAnimations ??= () => []
 
@@ -79,6 +80,59 @@ test("v-model checks a checkbox and fills an input", async () => {
   text.value = "Grace"
   await nextTick()
   expect(input.value).toBe("Grace")
+  unmount()
+})
+
+test.each([
+  ["Input", Input],
+  ["Textarea", Textarea],
+])(
+  "a controlled %s keeps a value the parent doesn't update, as in React",
+  async (_, component) => {
+    const short = ref("abc")
+    const typed: string[] = []
+    const { el, unmount } = mount(() =>
+      h(component, {
+        modelValue: short.value,
+        "onUpdate:modelValue": (next: string) => {
+          typed.push(next)
+          if (next.length <= 3) {
+            short.value = next
+          }
+        },
+      })
+    )
+    const field = el.querySelector<HTMLInputElement>("input, textarea")!
+    const type = async (text: string) => {
+      field.value = text
+      field.dispatchEvent(new Event("input", { bubbles: true }))
+      await new Promise((resolve) => setTimeout(resolve))
+    }
+    await type("abcd")
+    expect(typed).toEqual(["abcd"])
+    expect(field.value).toBe("abc")
+    await type("ab")
+    expect(short.value).toBe("ab")
+    expect(field.value).toBe("ab")
+    unmount()
+  }
+)
+
+test("v-model.trim keeps the spaces being typed", async () => {
+  const text = ref("hello")
+  const { el, unmount } = mount(() =>
+    h(Input, {
+      modelValue: text.value,
+      modelModifiers: { trim: true },
+      "onUpdate:modelValue": (next: string) => (text.value = next),
+    })
+  )
+  const field = el.querySelector("input")!
+  field.value = "hello "
+  field.dispatchEvent(new Event("input", { bubbles: true }))
+  await new Promise((resolve) => setTimeout(resolve))
+  expect(text.value).toBe("hello")
+  expect(field.value).toBe("hello ")
   unmount()
 })
 
