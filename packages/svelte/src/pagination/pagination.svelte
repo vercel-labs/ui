@@ -31,6 +31,7 @@ A navigation landmark around the page links. Name it with `aria-label`.
     siblings,
     boundaries,
     getHref,
+    disabled,
     controller,
     debug,
     onPageChange,
@@ -52,6 +53,8 @@ A navigation landmark around the page links. Name it with `aria-label`.
     boundaries?: number
     /** The URL of a page. With it, parts are links that work before JavaScript loads. Without it, they're buttons. */
     getHref?: (page: number) => string
+    /** Whether every page and step does nothing, like a step at its end. A controller still pages it. */
+    disabled?: boolean
     /** Pages it from anywhere. Create one with `createPaginationController()`. */
     controller?: PaginationController
     /** Logs every change with its reason. */
@@ -73,6 +76,7 @@ A navigation landmark around the page links. Name it with `aria-label`.
     siblings,
     boundaries,
     getHref,
+    disabled,
     controller,
     debug,
     onPageChange: (next: number, details: Details) => {

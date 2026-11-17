@@ -48,7 +48,7 @@ A list with a `<template>` renders the range from it: one copy for each page, wi
 
 The template keeps page entries keyed as the range moves. The current page's wrapped button gets `aria-current="page"` and `data-current`; an ellipsis shows “…” and is hidden from screen readers.
 
-Give each step text or an `aria-label` on its wrapped button. At an end, the button gets `aria-disabled="true"` and `data-disabled` and stops changing the page. As a button, it stays in the tab order.
+Give each step text or an `aria-label` on its wrapped button. At an end, the button gets `aria-disabled="true"` and `data-disabled` and stops changing the page. As a button, it stays in the tab order. Add `disabled` to `<ui-pagination>` to do the same for every page and step, like while results load. A controller still changes the page.
 
 ## Usage
 

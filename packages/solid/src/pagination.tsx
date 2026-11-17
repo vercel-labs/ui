@@ -73,6 +73,7 @@ function Pagination(
     siblings: props.siblings,
     boundaries: props.boundaries,
     getHref: props.getHref,
+    disabled: props.disabled,
     controller: props.controller,
     debug: props.debug,
   }))
@@ -87,6 +88,7 @@ function Pagination(
     "siblings",
     "boundaries",
     "getHref",
+    "disabled",
     "controller",
     "debug"
   )
