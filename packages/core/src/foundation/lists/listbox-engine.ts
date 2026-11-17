@@ -770,6 +770,7 @@ function createListboxEngine(
       return
     }
     store.set({ highlighted: null })
+    config.onHighlight?.(null, -1)
     if (focusMode() === "real" && config.active() && focusLost(el)) {
       config.container?.()?.focus({ preventScroll: true })
     }
