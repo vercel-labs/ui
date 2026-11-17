@@ -14,6 +14,7 @@ import { on } from "../kernel/events"
 import type { Store } from "../kernel/store"
 import {
   activeLayers,
+  escapeLayer,
   findLayer,
   lastClosed,
   lastEscape,
@@ -191,12 +192,14 @@ const selectableTypes = new Set([
 ])
 
 // Like Tab, landing on a filled text field selects its text, so typing replaces
-// it, as in a rename dialog.
+// it, as in a rename dialog. The field whose popup is open, like a combobox
+// input in its sheet, keeps what was typed.
 function selectFilled(el: HTMLElement) {
   if (
     el.localName === "input" &&
     selectableTypes.has((el as HTMLInputElement).type) &&
-    (el as HTMLInputElement).value
+    (el as HTMLInputElement).value &&
+    el.getAttribute("aria-expanded") !== "true"
   ) {
     ;(el as HTMLInputElement).select()
   }
@@ -1407,9 +1410,13 @@ function createPopupLayer<
     cleanup()
   }
 
-  // Keeps Tab inside a trapping popup, hands focus back to the page after the
-  // trigger from a flowing one, wherever it renders, and closes a menu-like one.
+  // Escape closes the popup before its ancestors hear the key. Tab stays
+  // inside a trapping popup, goes back to the page after the trigger from a
+  // flowing one, wherever it renders, and closes a menu-like one.
   function keydown(event: KeyboardEvent) {
+    if (event.key === "Escape" && layer) {
+      return escapeLayer(layer, event)
+    }
     const popup = shown?.el
     if (event.key !== "Tab" || !popup) {
       return

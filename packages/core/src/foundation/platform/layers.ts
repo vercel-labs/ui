@@ -353,24 +353,7 @@ function listen(doc: Document, win: Window) {
     { capture: true }
   )
 
-  const offKey = on(doc, "keydown", (event) => {
-    if (event.key !== "Escape" || event.defaultPrevented) {
-      return
-    }
-    // Escape ends an input method's composition first, like a Japanese candidate list.
-    if (isComposing(event)) {
-      return
-    }
-    // The topmost layer of this document: one open in another, like an
-    // iframe's, didn't hear the key.
-    const top = active()
-      .filter((layer) => documentOf(layer) === doc)
-      .at(-1)
-    if (top?.onEscape) {
-      realm.escapeAt = performance.now()
-    }
-    top?.onEscape?.(event)
-  })
+  const offKey = on(doc, "keydown", (event) => escapeTop(doc, event))
 
   // A click into an iframe or another window never reaches the page. Each
   // layer decides what that means for it.
@@ -471,6 +454,30 @@ function documentOf(layer: Layer) {
   return layer.el?.ownerDocument ?? document
 }
 
+// Escape goes to the topmost layer of the document it was pressed in: one
+// open in another, like an iframe's, didn't hear the key. With `from`, only
+// when that layer is the topmost, as its own content hears the key first.
+function escapeTop(doc: Document, event: KeyboardEvent, from?: Layer) {
+  // Escape ends an input method's composition first, like a Japanese candidate list.
+  if (event.key !== "Escape" || event.defaultPrevented || isComposing(event)) {
+    return
+  }
+  const top = active()
+    .filter((layer) => documentOf(layer) === doc)
+    .at(-1)
+  if (!top?.onEscape || (from && top !== from)) {
+    return
+  }
+  realm.escapeAt = performance.now()
+  top.onEscape(event)
+}
+
+// Escape on a layer's own content, before it bubbles to ancestors that may
+// act on it too. The document still hears what never reached a layer.
+function escapeLayer(layer: Layer, event: KeyboardEvent) {
+  escapeTop(documentOf(layer), event, layer)
+}
+
 function pushLayer(layer: Layer) {
   realm.pushed = (realm.pushed ?? 0) + 1
   layer.order = realm.pushed
@@ -495,6 +502,7 @@ function pushLayer(layer: Layer) {
 export {
   activeLayers,
   bindPersistentLayer,
+  escapeLayer,
   findLayer,
   inPersistentLayer,
   lastClosed,

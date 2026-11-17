@@ -206,6 +206,13 @@ function fromData(
   return out
 }
 
+// A file input's items are the files it holds, so a secret one names none of
+// them, the way its value reads "[redacted]".
+const unnamed = (entry: Entry, items: { value: string; label: string }[]) =>
+  entry.secret && entry.component === "file-input"
+    ? items.map((item) => ({ ...item, label: "[redacted]" }))
+    : items
+
 // A component's items as data, from its state's `items` unless its `agent` key says where they
 // are, then the ones a list shows while its query is empty, like recent choices.
 function dataOf(
@@ -225,7 +232,7 @@ function dataOf(
   const empty =
     items &&
     fromData(internalOf(instance)?.options?.().emptyItems, disabled, key, known)
-  return empty ? [...items, ...empty] : items
+  return items && unnamed(entry, empty ? [...items, ...empty] : items)
 }
 
 // The values of the items a person can't choose, like a disabled option, from the list's data and its elements.
@@ -576,7 +583,7 @@ function describe(entry: Entry, instance: PrimitiveInstance, parts: Bound[]) {
   // they're few, and through `query` when they may be many.
   const opens = typeof api.setOpen === "function"
   if (typeof api.setValue === "function" || entry.agent?.items) {
-    const rendered = opens ? [] : renderedItems(parts)
+    const rendered = opens ? [] : unnamed(entry, renderedItems(parts))
     const data = rendered.length ? undefined : dataOf(entry, instance)
     const items = data ? (data.length <= 10 ? data : []) : rendered
     if (items.length) {
@@ -1372,6 +1379,13 @@ function createAgent(
         }
         args = [highlighted, ...args.slice(1)]
       }
+      // The api reads a list as the command whose value is its text, so only that
+      // text names the command whose marks are read.
+      if (action === "run" && typeof args[0] !== "string") {
+        throw new Error(
+          `Name one command to run in ${entry.label ?? entry.component} (${entry.ref}), by its value or label.`
+        )
+      }
       // A combobox with `allowCustomValue` takes text that isn't an item.
       const closed =
         entry.agent?.closed && !internalOf(instance)?.allowCustomValue?.()
@@ -1434,7 +1448,7 @@ function createAgent(
             ? await listItems(entry, instance, askToOpen, seeOpen)
             : data?.length
               ? data
-              : renderedItems(bound(instance))
+              : unnamed(entry, renderedItems(bound(instance)))
         if (!items.some((item) => item.value === args[0])) {
           const name = `${entry.label ?? entry.component} (${entry.ref})`
           const found = items.filter((item) => fold(item.label) === label)
@@ -1465,6 +1479,22 @@ function createAgent(
             )
           }
         }
+      }
+      // A step can't pass a `File`, so a file input's file is named by its item's value or name.
+      if (action === "removeFile" && typeof args[0] === "string") {
+        const key = keyFor(instance)
+        const files = (instance.get() as { value?: unknown[] }).value ?? []
+        const file = files.find((value) => key(value) === args[0])
+        if (file === undefined) {
+          throw new Error(
+            `No file "${args[0]}" in ${entry.label ?? entry.component} (${entry.ref}). Its files: ${
+              (dataOf(entry, instance) ?? [])
+                .map((item) => item.label)
+                .join(", ") || "none"
+            }.`
+          )
+        }
+        args = [file, ...args.slice(1)]
       }
       // Each label in a list of values, like a multiple combobox's ["Theo Laurent"], the same way.
       if (
@@ -1546,6 +1576,32 @@ function createAgent(
             askToOpen,
             seeOpen,
             chosen.filter((item) => !held.includes(item))
+          )
+        }
+        // A suggestion for an empty query that the open list didn't show, like one a
+        // query hides, has no element to read its marks from, and a person can't choose it.
+        const empty = openParts.some((part) => part.key)
+          ? fromData(
+              internalOf(instance)?.options?.().emptyItems,
+              undefined,
+              key
+            )
+          : undefined
+        const unshown = chosen.find(
+          (item) =>
+            !held.includes(item) &&
+            empty?.some((suggestion) => suggestion.value === item) &&
+            !elementOf?.(item) &&
+            ![...bound(instance), ...openParts].some(
+              (part) => part.key === item
+            )
+        )
+        if (unshown !== undefined) {
+          const label =
+            empty?.find((suggestion) => suggestion.value === unshown)?.label ||
+            unshown
+          throw new Error(
+            `"${label}" isn't shown in ${entry.label ?? entry.component} (${entry.ref}) now. Set the query that shows it, then choose it.`
           )
         }
         // Read again once `allow` answers, since an item can turn disabled while the person decides.
@@ -1750,7 +1806,7 @@ function createAgent(
     const api = instance.api as { setOpen?: (open: boolean) => void }
     const known = new Set<string>()
     const data = dataOf(entry, instance, undefined, known)
-    let items = data ?? renderedItems(bound(instance))
+    let items = data ?? unnamed(entry, renderedItems(bound(instance)))
     // Data says what the items are, not what the page marked on them: a mark,
     // like `data-agent-confirm`, is on an item's element. So a chosen item
     // with no element in the page is looked for by opening the list too.
@@ -1774,7 +1830,11 @@ function createAgent(
       asAgent(() => api.setOpen!(true))
       let shown = renderedItems(bound(instance))
       // Items that load can take a while. Ones the data already lists mount with the list.
-      for (let tries = 0; tries < (data ? 4 : 60) && !shown.length; tries++) {
+      for (
+        let tries = 0;
+        tries < (data ? 4 : 60) && (!shown.length || unseen());
+        tries++
+      ) {
         await frames()
         shown = renderedItems(bound(instance))
       }
@@ -1935,7 +1995,7 @@ function createAgent(
       } else if (text) {
         // A list whose items match, from its data or the page, without opening it.
         const items = matching(
-          dataOf(entry, instance) ?? renderedItems(parts),
+          dataOf(entry, instance) ?? unnamed(entry, renderedItems(parts)),
           text
         )
         if (items.length) {

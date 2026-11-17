@@ -434,6 +434,23 @@ test.describe("focus", () => {
     await expect(trigger(page)).toBeFocused()
   })
 
+  test("an ancestor hears Escape already handled", async ({ page }) => {
+    await page.evaluate(() => {
+      document.body.addEventListener("keydown", (event) => {
+        ;(window as unknown as { __escapeSeen?: boolean }).__escapeSeen =
+          event.defaultPrevented
+      })
+    })
+    await openWithKeyboard(page)
+    await page.keyboard.press("Escape")
+    await expect(dialog(page)).toBeHidden()
+    expect(
+      await page.evaluate(
+        () => (window as unknown as { __escapeSeen?: boolean }).__escapeSeen
+      )
+    ).toBe(true)
+  })
+
   test("Escape after a click returns focus to the trigger", async ({
     page,
   }) => {

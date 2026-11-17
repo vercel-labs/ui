@@ -419,6 +419,8 @@ function fileInputApiBody(
     focus: () => element("trigger")?.focus(),
     isDragging: () => Object.keys(store.get().drags).length > 0,
     internal: {
+      keyOf: (value: unknown) =>
+        value && typeof value === "object" ? fileKey(value) : String(value),
       receive,
       removeItem,
       itemKeydown,
