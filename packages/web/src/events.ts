@@ -2079,7 +2079,7 @@ declare global {
     "ui-alert-dialog-content": UiPartElement<
       typeof alertDialog,
       "content",
-      "container" | "initialFocus" | "finalFocus" | "keepMounted"
+      "container" | "initialFocus" | "finalFocus" | "keepMounted" | "inline"
     >
     "ui-alert-dialog-title": UiPartElement<typeof alertDialog, "title">
     "ui-alert-dialog-description": UiPartElement<
@@ -2297,7 +2297,7 @@ declare global {
     "ui-dialog-content": UiPartElement<
       typeof dialog,
       "content",
-      "container" | "initialFocus" | "finalFocus" | "keepMounted"
+      "container" | "initialFocus" | "finalFocus" | "keepMounted" | "inline"
     >
     "ui-dialog-title": UiPartElement<typeof dialog, "title">
     "ui-dialog-description": UiPartElement<typeof dialog, "description">
@@ -2608,6 +2608,7 @@ declare global {
       | "initialFocus"
       | "finalFocus"
       | "keepMounted"
+      | "inline"
     >
     "ui-popover-title": UiPartElement<typeof popover, "title">
     "ui-popover-description": UiPartElement<typeof popover, "description">
