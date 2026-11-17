@@ -63,6 +63,7 @@ import { log } from "../../foundation/kernel/change"
 import { watchers } from "../../foundation/kernel/watchers"
 import { elements } from "../../foundation/kernel/elements"
 import { deriveFromOptions } from "../../foundation/kernel/derive"
+import { keepsValueOnReset } from "../../foundation/forms/value"
 
 // The create option's key in the highlight. Never a real item's.
 const CREATE = "\u0000create"
@@ -995,6 +996,9 @@ function comboboxApiBody(
       // change: it's still the default.
       adoptValue: (value: unknown) => store.set({ value }),
       reset() {
+        if (keepsValueOnReset(options().value, options().defaultValue)) {
+          return
+        }
         const initial = store.get().initial
         setValue(initial, { reason: "reset" })
         const first = listOf(initial)[0]

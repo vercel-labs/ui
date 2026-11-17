@@ -15,6 +15,7 @@ import type {
   RadioGroupOptions,
   RadioProps,
 } from "./radio"
+import { keepsValueOnReset } from "../../foundation/forms/value"
 
 type ItemProps = RadioProps
 
@@ -216,6 +217,9 @@ function radioGroupApiBody(
       // Checks the radio a press landed on. Rating unchecks a checked one.
       check: (key: string, details?: Details) => api.setValue(key, details),
       reset() {
+        if (keepsValueOnReset(options().value, options().defaultValue)) {
+          return
+        }
         change("value", store.get().initial, { reason: "reset" })
       },
       // The browser restores a disabled or read-only group too, as a native one.

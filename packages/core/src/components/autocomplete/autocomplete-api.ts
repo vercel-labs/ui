@@ -27,7 +27,7 @@ import {
 import { comboboxPreset } from "../../foundation/popups/popup-presets"
 import { normalize } from "../../foundation/text/typeahead"
 import { submitImplicitly } from "../../foundation/forms/form"
-import { afterReset } from "../../foundation/forms/value"
+import { afterReset, keepsValueOnReset } from "../../foundation/forms/value"
 import { type Listbox } from "../../foundation/lists/listbox"
 import { noListing } from "../../foundation/lists/listbox-listing"
 import { isDisabled } from "../../foundation/lists/listbox-parts"
@@ -449,7 +449,10 @@ function autocompleteApiBody(
       el.ownerDocument,
       "reset",
       (event) => {
-        if (event.target !== el.form) {
+        if (
+          event.target !== el.form ||
+          keepsValueOnReset(options().value, options().defaultValue)
+        ) {
           return
         }
         afterReset(event, () => {

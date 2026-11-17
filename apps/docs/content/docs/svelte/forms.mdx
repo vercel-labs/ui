@@ -50,7 +50,7 @@ A reset also goes through `onCheckedChange` and `bind:checked`. Keep the binding
 </form>
 ```
 
-Uncheck the box, then press Reset. `defaultChecked` supplies the reset value. The callback receives `true` with reason `"reset"`, and the binding updates `checked`. The callback runs when reset requests a different value; it does not run if the checkbox is already at its default.
+Uncheck the box, then press Reset. `defaultChecked` supplies the reset value. The callback receives `true` with reason `"reset"`, and the binding updates `checked`. The callback runs when reset requests a different value; it does not run if the checkbox is already at its default. Without `defaultChecked`, a reset leaves a controlled checkbox as it is, so your state stays the only source of its value.
 
 ## Label and Validate a Field
 

@@ -4,7 +4,7 @@
 // slots, which render from the value and the input's selection.
 import { isRTL } from "../../foundation/platform/env"
 import { isDisabled, watchFieldsets } from "../../foundation/forms/form"
-import { afterReset } from "../../foundation/forms/value"
+import { afterReset, keepsValueOnReset } from "../../foundation/forms/value"
 import {
   fitsPattern,
   focusSelection,
@@ -590,7 +590,10 @@ function otpInputApiBody(
         doc,
         "reset",
         (event) => {
-          if (event.target !== el.form) {
+          if (
+            event.target !== el.form ||
+            keepsValueOnReset(options().value, options().defaultValue)
+          ) {
             return
           }
           afterReset(event, () => write(store.get().initial, "reset"))
