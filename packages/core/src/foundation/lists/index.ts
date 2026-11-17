@@ -28,6 +28,7 @@ export {
   createFilteredListbox,
   filterAttribute,
   flattenData,
+  highlightFromCode,
   itemKey,
   type Listbox,
   type ListData,

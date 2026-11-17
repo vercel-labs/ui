@@ -6,6 +6,7 @@ import { dispatchChange, formInternals } from "../../foundation/forms/form"
 import { createItemIcons } from "../../foundation/lists/item-icon"
 import {
   createListboxEngine,
+  highlightFromCode,
   itemKey,
   revealInList,
   type ListData,
@@ -377,6 +378,25 @@ function listboxApiBody(
         missing.length > 0 &&
         setKeys([...selection.keys(), ...missing], { reason, event })
       )
+    },
+    getHighlighted() {
+      const { highlighted } = store.get()
+      return highlighted === null
+        ? null
+        : (listbox.valueOf(highlighted) ?? null)
+    },
+    highlight(value: unknown) {
+      const key = value === null ? null : toKey(value)
+      if (focusInside) {
+        return highlightFromCode(listbox, key, store.get().highlighted)
+      }
+      const entry = key === null ? undefined : listbox.find(key)
+      if (!entry || listbox.disabled(entry)) {
+        return false
+      }
+      remembered = entry.key
+      store.set({ stop: entry.key })
+      return true
     },
     focus: focusStop,
     // Internal. Used by slots and adapters.

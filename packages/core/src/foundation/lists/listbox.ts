@@ -202,6 +202,7 @@ export {
 }
 export {
   flattenData,
+  highlightFromCode,
   itemKey,
   revealInList,
   toListItem,

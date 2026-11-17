@@ -199,6 +199,13 @@ function createComboboxController<
       query: string,
       options?: ComboboxChangeOptions<ComboboxQueryChangeReason>
     ) => boolean
+    /** The value of the highlighted item, or null when none is. */
+    getHighlighted: () => T | null
+    /**
+     * Highlights the item with this value in the open list, scrolled into view, or none with null.
+     * Returns false when the list is closed, or no enabled item has the value.
+     */
+    highlight: (value: T | null) => boolean
     /** Moves focus to the input. */
     focus: () => void
   }>()

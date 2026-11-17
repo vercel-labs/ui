@@ -82,6 +82,14 @@ function createListboxController<
      * Returns false when the change was canceled or nothing changed.
      */
     selectAll: (options?: ListboxChangeOptions) => boolean
+    /** The value of the highlighted option, or null when none is, like while focus is outside the list. */
+    getHighlighted: () => T | null
+    /**
+     * Highlights the option with this value, scrolled into view, or none with null. While focus is
+     * outside the list, the option takes the tab stop instead, so focus lands on it next.
+     * Returns false when no enabled option has the value.
+     */
+    highlight: (value: T | null) => boolean
     /** Moves focus into the list, onto the option that holds its tab stop. */
     focus: () => void
   }>()

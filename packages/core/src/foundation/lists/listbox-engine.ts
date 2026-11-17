@@ -956,8 +956,27 @@ function createListboxEngine(
 
 type Listbox = ReturnType<typeof createListboxEngine>
 
+// A controller's highlight: onto the enabled item with this key, or off with
+// null. Returns whether it moved.
+function highlightFromCode(
+  listbox: Listbox,
+  key: string | null,
+  current: string | null
+) {
+  if (key === current) {
+    return false
+  }
+  const entry = key === null ? undefined : listbox.find(key)
+  if (key !== null && (!entry || listbox.disabled(entry))) {
+    return false
+  }
+  listbox.highlight(key)
+  return true
+}
+
 export {
   createListboxEngine,
+  highlightFromCode,
   flattenData,
   isGroup,
   isSeparator,

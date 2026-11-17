@@ -166,6 +166,13 @@ function createAutocompleteController() {
     clear: (
       options?: AutocompleteChangeOptions<AutocompleteValueChangeReason>
     ) => boolean
+    /** The value of the highlighted suggestion, or null when none is. */
+    getHighlighted: () => string | null
+    /**
+     * Highlights the suggestion with this value in the open list, scrolled into view, or none with null.
+     * Returns false when the suggestions are closed, or no enabled suggestion has the value.
+     */
+    highlight: (value: string | null) => boolean
     /** Moves focus to the field. */
     focus: () => void
   }>()
