@@ -95,6 +95,8 @@ type ComboboxState = PopupState & {
   labels: number
   // Counts icons learned from items, so the value's icon shows once its item's icon is known.
   icons: number
+  // The page's language, read once the input binds, for a value's labels.
+  pageLocale: string | null
   // Counts items mounting, so parts that depend on the list update.
   mounts: number
   // The content has bound and its items have registered, so an empty list is really empty.
@@ -176,6 +178,7 @@ function initialComboboxState(
     error: undefined,
     labels: 0,
     icons: 0,
+    pageLocale: null,
     mounts: 0,
     settled: false,
     presentation: "popover",

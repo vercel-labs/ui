@@ -72,6 +72,8 @@ type SelectState = PopupState & {
   labels: number
   // Counts icons learned from items, so the value's icon shows once its item's icon is known.
   icons: number
+  // The page's language, read once the trigger binds, for a value's labels.
+  pageLocale: string | null
   // The text in the search field, which filters the list while it's open.
   query: string
   // A search field is in the list, so typing filters and focus stays in the field.
@@ -133,6 +135,7 @@ function initialSelectState(options: SelectOptions<any, any>): SelectState {
     items: options.items,
     labels: 0,
     icons: 0,
+    pageLocale: null,
     query: options.query ?? options.defaultQuery ?? "",
     searchable: false,
     focusInList: false,

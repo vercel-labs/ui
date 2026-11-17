@@ -10,9 +10,13 @@ test("the default count, which is English, joins in English on a page in another
     formatLabels(["Apple", "Banana", "Orange", "Pear"], { maxLabels: 2 })
   ).toBe("Apple, Banana, and 2 more")
   expect(
-    formatLabels(["Apple", "Banana", "Pear"], {
-      maxLabels: 2,
-      getMoreLabel: (n) => `${n} más`,
-    })
+    formatLabels(
+      ["Apple", "Banana", "Pear"],
+      {
+        maxLabels: 2,
+        getMoreLabel: (n) => `${n} más`,
+      },
+      "es"
+    )
   ).toBe("Apple, Banana y 1 más")
 })
