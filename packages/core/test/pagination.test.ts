@@ -396,6 +396,33 @@ describe("pagination without a DOM", () => {
     expect(instance.api.getPage()).toBe(5)
   })
 
+  test("a disabled pagination ignores presses on every page and step, but not its controller", () => {
+    const instance = pagination({
+      id: "p",
+      pageCount: 5,
+      defaultPage: 2,
+      disabled: true,
+      getHref: (page) => `?page=${page}`,
+    })
+    for (const part of [
+      instance.part("next", {}),
+      instance.part("previous", {}),
+      instance.part("link", { page: 4 }),
+    ]) {
+      expect(attrs(part)).toMatchObject({
+        role: "link",
+        "aria-disabled": "true",
+        "data-disabled": "",
+      })
+      expect(attrs(part).href).toBeUndefined()
+      press(part)?.()
+    }
+    expect(attrs(instance.part("root", {}))["data-disabled"]).toBe("")
+    expect(instance.api.getPage()).toBe(2)
+    expect(instance.api.next()).toBe(true)
+    expect(instance.api.getPage()).toBe(3)
+  })
+
   test("a controller step in the same task as a step link's press goes from the new page", () => {
     const instance = pagination({
       id: "p",

@@ -71,6 +71,8 @@ Put long content in an inner `min-h-0 flex-1 overflow-y-auto` area. A downward d
   caption="Open the long sheet and scroll its text. At the top, drag downward to move the sheet; on a keyboard, Tab reaches the controls and Escape closes it."
 />
 
+Fields, sliders and color areas inside the sheet keep their own drags. For a drag surface of your own, like a canvas or a map, add `data-drawer-no-drag` to it, and a drag that starts there won't move the drawer.
+
 ## Sides
 
 `side` chooses bottom, top, left, or right. Logical `start` and `end` follow text direction. The content’s `data-side` tells you which physical edge to style.

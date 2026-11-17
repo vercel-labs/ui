@@ -17,4 +17,11 @@ function physicalSide(side: Side, rtl = false) {
   return side
 }
 
-export { physicalSide, type PhysicalSide, type Side }
+const opposite: Record<PhysicalSide, PhysicalSide> = {
+  top: "bottom",
+  bottom: "top",
+  left: "right",
+  right: "left",
+}
+
+export { opposite, physicalSide, type PhysicalSide, type Side }

@@ -23,6 +23,7 @@ import type {
   WithGeneric,
 } from "../../foundation/kernel/primitive-types"
 import { createChange } from "../../foundation/kernel/input-source"
+import { keepsValueOnReset } from "../../foundation/forms/value"
 
 /**
  * The state of a checkbox that controls a group: checked when every value is
@@ -295,6 +296,10 @@ function checkboxGroupApiBody(
     subscribe: store.subscribe,
     internal: {
       reset() {
+        const { value, defaultValue } = context.options()
+        if (keepsValueOnReset(value, defaultValue)) {
+          return
+        }
         change("value", store.get().initial, { reason: "reset" })
       },
       // The browser restores a disabled group too, as a native one.

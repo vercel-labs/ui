@@ -42,7 +42,7 @@ const RatingRoot = defineComponent(
 export { RatingRoot }
 ```
 
-Call both helpers in `setup`. The options getter keeps values current; `usePrimitive` also shares the instance with child parts. `usePart` returns a render function that forwards attrs and slots. `inheritAttrs: false` avoids applying attrs twice.
+Call both helpers in `setup`. The options getter keeps values current; `usePrimitive` also shares the instance with child parts. `usePart` returns a render function that forwards attrs and slots. `inheritAttrs: false` avoids applying attrs twice. Define a part with `defineComponent`, even in a [Vapor app](./installation#use-with-vapor-mode): a `<script setup vapor>` component can't call either helper.
 
 `HTMLAttributes` makes native attrs available to TypeScript callers; only `value` and `defaultValue` are declared component props, so the other attrs still reach `usePart`.
 

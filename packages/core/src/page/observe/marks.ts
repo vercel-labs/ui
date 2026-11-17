@@ -11,16 +11,19 @@ import { composedClosest } from "../../foundation/platform/platform"
 const marks = ["data-agent-confirm", "data-agent-hidden", "data-agent-secret"]
 
 // Confirm text is page text that reaches the model and the person, so it's
-// cut short, like a label would be.
+// cut short, like a label would be. Every distinct mark a step touches is
+// shown, so approving one warning never approves another unseen.
 function confirmOf(elements: Element[]) {
+  const texts = new Set<string>()
   for (const el of elements) {
     const text = composedClosest(el, "[data-agent-confirm]")?.getAttribute(
       "data-agent-confirm"
     )
     if (text != null) {
-      return text.trim().slice(0, 200) || "This needs a person."
+      texts.add(text.trim().slice(0, 200) || "This needs a person.")
     }
   }
+  return texts.size ? [...texts].join("; ") : undefined
 }
 
 const isOffLimits = (elements: Element[]) =>

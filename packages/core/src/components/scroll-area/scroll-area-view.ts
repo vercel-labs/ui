@@ -1,6 +1,6 @@
 import { isRTL } from "../../foundation/platform/env"
 import { prefersReducedMotion } from "../../foundation/platform/platform"
-import { registerUninherited } from "../../foundation/platform/style"
+import { ahead, registerUninherited } from "../../foundation/platform/style"
 import { bindTabStop } from "../../foundation/focus/tabbable"
 import { createScrollbarInput } from "./scroll-area-pointer"
 import { on } from "../../foundation/kernel/events"
@@ -236,6 +236,7 @@ function createScrollView(store: Store<ScrollAreaModel>) {
       set(name.atStart, edges.atStart)
       set(name.atEnd, edges.atEnd)
       if (root) {
+        registerUninherited(frameVariables)
         write(root, name.before, edges.before)
         write(root, name.after, edges.after)
         write(root, name.progress, edges.progress, "")
@@ -468,22 +469,21 @@ function createScrollView(store: Store<ScrollAreaModel>) {
   function bindViewport(el: HTMLElement) {
     viewport = el
     const view = el.ownerDocument.defaultView ?? window
-    // Measures a microtask later: Vue binds before the element is in the
-    // page, and while it hydrates, when a state change would mismatch.
-    queueMicrotask(() => {
-      if (viewport !== el) {
-        return
-      }
-      rtl = isRTL(el)
-      update({ resized: true })
-      store.set({ counted: true })
-    })
+    // The first measure waits for the observer's first call, once the frame has
+    // laid the viewport out: Vue binds before the element is in the page, and
+    // a state change while it hydrates would mismatch.
+    let counted = false
 
     // Keeps the end in view at once, before the frame paints, and leaves the
     // writes to the next frame: writing sizes here would resize the observed
     // scrollbars again, a loop WebKit reports as an error.
     const resize = new ResizeObserver(() => {
       rtl = isRTL(el)
+      if (!counted && viewport === el) {
+        counted = true
+        update({ resized: true })
+        store.set({ counted: true })
+      }
       measure()
       follow()
       schedule()
@@ -619,7 +619,7 @@ function createScrollView(store: Store<ScrollAreaModel>) {
   }
 
   function bindRoot(el: HTMLElement) {
-    registerUninherited(frameVariables)
+    ahead(() => registerUninherited(frameVariables))
     root = el
     // The pointer may already be over it when it mounts.
     queueMicrotask(() => {

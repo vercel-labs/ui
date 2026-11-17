@@ -41,6 +41,7 @@ import {
   createChange,
   createCommit,
 } from "../../foundation/kernel/input-source"
+import { keepsValueOnReset } from "../../foundation/forms/value"
 
 type State = {
   value: number | null
@@ -547,6 +548,9 @@ function numberInputApiBody(
         el.select()
       },
       reset() {
+        if (keepsValueOnReset(options().value, options().defaultValue)) {
+          return
+        }
         edited = false
         pending = undefined
         change("value", store.get().initial, { reason: "reset" })

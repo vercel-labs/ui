@@ -33,6 +33,7 @@ import { elements } from "../../foundation/kernel/elements"
 import { createChange } from "../../foundation/kernel/input-source"
 import type { ChangeOptions } from "../../foundation/kernel/details"
 import type { PrimitiveContext } from "../../foundation/kernel/primitive-types"
+import { keepsValueOnReset } from "../../foundation/forms/value"
 
 /**
  * Why a date or time input's value wants to change.
@@ -610,6 +611,10 @@ function dateInputApiBody(
   }
 
   function reset() {
+    const { value, defaultValue } = context.options()
+    if (keepsValueOnReset(value, defaultValue)) {
+      return
+    }
     setValue(store.get().initial, "reset")
   }
 

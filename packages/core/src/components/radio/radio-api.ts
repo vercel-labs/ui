@@ -1,4 +1,8 @@
-import { moveIndex, radioStep } from "../../foundation/focus/collection"
+import {
+  type Direction,
+  moveIndex,
+  radioStep,
+} from "../../foundation/focus/collection"
 import { createRovingFocus } from "../../foundation/focus/roving-focus"
 import {
   dispatchChange,
@@ -15,6 +19,7 @@ import type {
   RadioGroupOptions,
   RadioProps,
 } from "./radio"
+import { keepsValueOnReset } from "../../foundation/forms/value"
 
 type ItemProps = RadioProps
 
@@ -35,15 +40,16 @@ type RadioGroupStore = {
   stop: string | null
   // Indicators animating out.
   exiting: string[]
-  // Only a segmented control has one.
+  // Only a segmented control has these.
   orientation?: "horizontal" | "vertical"
+  direction?: Direction
   // The radio a pointer previews, which only a rating shows.
   highlighted?: string | null
 }
 
 function radioGroupState(
   options: RadioGroupOptions,
-  extra: Pick<RadioGroupStore, "orientation" | "highlighted"> = {}
+  extra: Pick<RadioGroupStore, "orientation" | "direction" | "highlighted"> = {}
 ): RadioGroupStore {
   const value =
     options.value !== undefined ? options.value : (options.defaultValue ?? null)
@@ -216,6 +222,9 @@ function radioGroupApiBody(
       // Checks the radio a press landed on. Rating unchecks a checked one.
       check: (key: string, details?: Details) => api.setValue(key, details),
       reset() {
+        if (keepsValueOnReset(options().value, options().defaultValue)) {
+          return
+        }
         change("value", store.get().initial, { reason: "reset" })
       },
       // The browser restores a disabled or read-only group too, as a native one.

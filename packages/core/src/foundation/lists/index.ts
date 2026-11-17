@@ -70,6 +70,7 @@ export {
   valueInputPart,
   warnIfUnnamed,
 } from "./listbox-parts"
+export { bindFieldName, type FieldName, listName } from "./field-name"
 export {
   bindListContent,
   inputState,
@@ -92,6 +93,7 @@ export { type ListSelectAllState, selectAllFeature } from "./listbox-select-all"
 export {
   createValueSelection,
   formatLabels,
+  type ItemsOf,
   listOf,
   type ValueSelection,
 } from "./listbox-value"

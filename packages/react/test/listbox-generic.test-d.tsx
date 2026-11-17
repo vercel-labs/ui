@@ -28,3 +28,12 @@ const { Root: Listbox, Item: ListboxItem } = createParts(listbox, {
 // @ts-expect-error With `multiple`, the value is a list.
 ;<Listbox multiple value={1} />
 ;<ListboxItem value={{ id: 1 }} />
+// An inline list of objects with `multiple` still makes `T` the object.
+;<Listbox
+  multiple
+  value={[{ id: 1 }]}
+  onValueChange={(value) => {
+    const known: { id: number }[] = value
+    void known
+  }}
+/>

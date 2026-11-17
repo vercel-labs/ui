@@ -212,3 +212,47 @@ describe("createInputHistory with any value", () => {
     ).toBe(false)
   })
 })
+
+describe("entries with keys", () => {
+  type Message = { id: string; text: string }
+  const up = { key: "ArrowUp", target: null } as unknown as KeyboardEvent
+  const recall = (
+    messages: () => Message[],
+    getEntryKey?: (m: Message) => string
+  ) => {
+    let value: Message = { id: "draft", text: "" }
+    const written: string[] = []
+    const history = createInputHistory<Message>({
+      entries: () => messages().map((m) => ({ ...m })),
+      read: () => value,
+      write: (next) => {
+        value = next
+        written.push(next.text)
+      },
+      atEdge: () => true,
+      getEntryKey,
+    })
+    return {
+      press: () =>
+        history.keydown({ ...up, preventDefault() {} } as KeyboardEvent),
+      written,
+    }
+  }
+
+  test("values made again from the same messages keep their place, and a new one doesn't move it", () => {
+    const messages = [
+      { id: "m1", text: "one" },
+      { id: "m2", text: "two" },
+      { id: "m3", text: "three" },
+    ]
+    const keyed = recall(
+      () => messages,
+      (m) => m.id
+    )
+    keyed.press()
+    keyed.press()
+    messages.push({ id: "m4", text: "four" })
+    keyed.press()
+    expect(keyed.written).toEqual(["three", "two", "one"])
+  })
+})

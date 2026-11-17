@@ -1361,6 +1361,17 @@ function createAgent(
           `${entry.component} ${entry.ref} takes no ${action} now. It takes: ${actions.join(", ") || "nothing"}.${actions.includes("press") ? pressable(instance) : ""}`
         )
       }
+      // A run with no command runs the highlighted one, so it's named here, where its marks are read
+      // and the approved one is the one that runs.
+      if (action === "run" && args[0] == null) {
+        const highlighted = (instance.get() as { value?: unknown }).value
+        if (highlighted == null) {
+          throw new Error(
+            `Name the command to run in ${entry.label ?? entry.component} (${entry.ref}).`
+          )
+        }
+        args = [highlighted, ...args.slice(1)]
+      }
       // A combobox with `allowCustomValue` takes text that isn't an item.
       const closed =
         entry.agent?.closed && !internalOf(instance)?.allowCustomValue?.()
@@ -1515,7 +1526,9 @@ function createAgent(
       if (
         entry.component !== "autocomplete" &&
         args[0] !== undefined &&
-        ["setValue", "setChecked", "select", "open", "toggle"].includes(action)
+        ["setValue", "setChecked", "select", "open", "toggle", "run"].includes(
+          action
+        )
       ) {
         const value = (instance.get() as Record<string, unknown>)[
           action === "setChecked" ? "checked" : "value"
@@ -1560,14 +1573,43 @@ function createAgent(
           )
         }
         refuseBlocked()
+        // A command the query or page hides has no element, so none of its marks.
+        const hidden =
+          action === "run"
+            ? chosen.find(
+                (item) =>
+                  !elementOf?.(item) &&
+                  !bound(instance).some((part) => part.key === item)
+              )
+            : undefined
+        if (hidden !== undefined) {
+          const label =
+            (dataOf(entry, instance) ?? []).find(
+              (item) => item.value === hidden
+            )?.label || hidden
+          throw new Error(
+            `"${label}" isn't shown in ${entry.label ?? entry.component} (${entry.ref}) now. Set the query or page that shows it, then run it.`
+          )
+        }
       }
       run = () => fn(...args)
+    }
+    // Replacing or clearing a value also asks the items it takes out, so
+    // dropping a marked selection needs a person just as adding it does.
+    const changed = () => {
+      if (action !== "setValue" && !/^clear/.test(action)) {
+        return args[0]
+      }
+      const current = (instance.get() as { value?: unknown }).value
+      return [args[0], current]
+        .flat()
+        .filter((value) => value !== undefined && value !== null)
     }
     // A press asks the button it clicks, and any other step the component's
     // own elements and the item it names, so a marked change has no unmarked
     // way around it, like choosing a marked menu item by its value.
     const targets = () =>
-      press ? [press.button, ...targetsOf()] : targetsOf(args[0])
+      press ? [press.button, ...targetsOf()] : targetsOf(changed())
     const askToRun = () =>
       press
         ? ask(args, [press.button], `press "${textOrName(press.button)}"`)
@@ -1909,6 +1951,31 @@ function createAgent(
     return capped(found)
   }
 
+  // A closed tooltip on a listed component says what that component's label
+  // or description already says, so the snapshot leaves it out.
+  const echoesTrigger = (
+    item: ReturnType<typeof scan>[number],
+    found: ReturnType<typeof scan>
+  ) => {
+    if (
+      item.entry.component !== "tooltip" ||
+      (item.instance.get() as { open?: boolean }).open
+    ) {
+      return false
+    }
+    const trigger = item.parts.find((part) => part.slot === "trigger")?.el
+    return (
+      !!trigger &&
+      found.some(
+        (other) =>
+          other !== item &&
+          other.parts.some(
+            (part) => part.el === trigger || trigger.contains(part.el)
+          )
+      )
+    )
+  }
+
   // One `act` or `query` at a time, in the order they were called. While a
   // step waits on `allow`, like a confirm the person must answer, another
   // call can't run, so an agent can't press that confirm itself.
@@ -1928,9 +1995,10 @@ function createAgent(
      * component: "more", more, use: "query" }`, how many were left out.
      */
     snapshot: () => {
-      const shown = scan().map(({ entry, instance, parts }) =>
-        describe(entry, instance, parts)
-      )
+      const found = scan()
+      const shown = found
+        .filter((item) => !echoesTrigger(item, found))
+        .map(({ entry, instance, parts }) => describe(entry, instance, parts))
       const all = [...shown, ...offPage.values()]
       if (all.length <= limit) {
         return all

@@ -137,6 +137,41 @@ test("a popup stays where it was when its anchor leaves the page or stops render
   })
 })
 
+test("a popup stays beside a new anchor that takes the old one's place", async ({
+  page,
+}) => {
+  const box = await page.evaluate(async () => {
+    const stage = document.createElement("div")
+    stage.id = "probe-stage"
+    stage.innerHTML =
+      `<div id="probe-anchor" style="position: fixed; left: 300px; top: 300px; width: 80px; height: 30px"></div>` +
+      `<div id="probe-other" style="position: fixed; left: 300px; top: 300px; width: 80px; height: 30px"></div>` +
+      `<div id="probe-popup" popover="manual" style="width: 200px; height: 120px; padding: 0; border: 0; margin: 0"></div>`
+    document.body.append(stage)
+    const popup = document.getElementById("probe-popup")!
+    popup.showPopover()
+    const { loadCoreModule } = window as unknown as {
+      loadCoreModule: (name: string) => Promise<{
+        position: (anchor: () => Element, el: HTMLElement) => () => void
+      }>
+    }
+    const { position } = await loadCoreModule("position")
+    let current = document.getElementById("probe-anchor")!
+    position(() => current, popup)
+    const frames = (count: number) =>
+      new Promise<void>((resolve) => {
+        const next = () => (--count ? requestAnimationFrame(next) : resolve())
+        requestAnimationFrame(next)
+      })
+    await frames(2)
+    current = document.getElementById("probe-other")!
+    await frames(10)
+    const { x, y } = popup.getBoundingClientRect()
+    return { x, y }
+  })
+  expect(box).toEqual({ x: 300, y: 334 })
+})
+
 test("a popup leaves with an anchor scrolled off screen sideways, touching its far edge", async ({
   page,
 }) => {
@@ -219,12 +254,16 @@ test("a turned popup lines up with its anchor as it would unturned", async ({
       anchor("position: fixed; left: 300px; top: 300px") +
         `<div id="probe-popup" popover="manual" style="width: 200px; height: 120px; padding: 0; border: 0; margin: 0; ${turn}"></div>`
     )
-    const { left, top } = await page
-      .locator("#probe-popup")
-      .evaluate((el) => ({ left: el.style.left, top: el.style.top }))
+    const { left, top } = await page.locator("#probe-popup").evaluate((el) => {
+      const style = getComputedStyle(el)
+      return {
+        left: parseFloat(style.left) + parseFloat(style.marginLeft),
+        top: parseFloat(style.top) + parseFloat(style.marginTop),
+      }
+    })
     // Firefox places it a few thousandths of a pixel off.
-    expect(parseFloat(left)).toBeCloseTo(300, 1)
-    expect(parseFloat(top)).toBeCloseTo(334, 1)
+    expect(left).toBeCloseTo(300, 1)
+    expect(top).toBeCloseTo(334, 1)
     await page.evaluate(() => {
       ;(window as unknown as { stopProbe: () => void }).stopProbe()
       document.getElementById("probe-stage")!.remove()

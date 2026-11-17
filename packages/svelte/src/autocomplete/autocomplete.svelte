@@ -12,7 +12,7 @@ A text field that suggests as you type. The text is the value. Renders no elemen
     type AutocompleteDismissReason,
     type AutocompleteOpenChangeReason,
     type AutocompleteSubmitDetails,
-    type AutocompleteValueChangeReason,
+    type AutocompleteValueChangeDetails,
     type ListAnnouncement,
     type ListData,
     type ListHighlightDetails,
@@ -28,7 +28,7 @@ A text field that suggests as you type. The text is the value. Renders no elemen
   import { ContainerKey, OwnContentKey } from "./context"
   import AutocompleteContent from "./autocomplete-content.svelte"
 
-  type ValueDetails = ChangeDetails<AutocompleteValueChangeReason>
+  type ValueDetails = AutocompleteValueChangeDetails
   type OpenDetails = ChangeDetails<AutocompleteOpenChangeReason>
 
   let {

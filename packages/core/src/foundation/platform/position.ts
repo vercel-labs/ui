@@ -1,5 +1,12 @@
+import {
+  anchorable,
+  anchorStyles,
+  fillsLayoutViewport,
+  nameAnchor,
+  unnameAnchor,
+} from "./anchoring"
 import { shadowRootsAround, watchMoves, watchShadowRoots } from "./moves"
-import { physicalSide, type PhysicalSide, type Side } from "./sides"
+import { opposite, physicalSide, type PhysicalSide, type Side } from "./sides"
 import { ahead, registerUninherited } from "./style"
 
 /**
@@ -147,13 +154,6 @@ type Viewport = { x?: number; y?: number; width: number; height: number }
 
 const isVertical = (side: Side) => side === "top" || side === "bottom"
 
-const opposite: Record<PhysicalSide, PhysicalSide> = {
-  top: "bottom",
-  bottom: "top",
-  left: "right",
-  right: "left",
-}
-
 function place(
   anchor: Rect,
   size: { width: number; height: number },
@@ -250,6 +250,14 @@ function available(
   return { width: Math.max(0, width), height: Math.max(0, height) }
 }
 
+// Start and end along the top or bottom follow the reading direction.
+const physicalAlign = (side: PhysicalSide, align: Align, rtl = false) =>
+  rtl && isVertical(side) && align !== "center"
+    ? align === "start"
+      ? "end"
+      : "start"
+    : align
+
 const clamp = (value: number, min: number, max: number) =>
   Math.min(Math.max(value, min), Math.max(min, max))
 
@@ -264,13 +272,7 @@ function computePlacement(
     ...placement,
     side: physicalSide(placement.side, placement.rtl),
   }
-  const vertical = options.side === "top" || options.side === "bottom"
-  const align: Align =
-    options.rtl && vertical && options.align !== "center"
-      ? options.align === "start"
-        ? "end"
-        : "start"
-      : options.align
+  const align = physicalAlign(options.side, options.align, options.rtl)
 
   let side = options.side
   let point = place(anchor, size, side, align, options)
@@ -287,10 +289,42 @@ function computePlacement(
     }
   }
 
+  const padding = options.collisionPadding
+  const room = available(side, anchor, viewport, options)
+  // Beside an anchor at least its size, like a context area opened from the
+  // keyboard, with room on neither side, it goes on screen inside the anchor.
+  if (overflow(side, point, size, viewport, padding) > 0) {
+    if ((side === "top" || side === "bottom") && anchor.height >= size.height) {
+      point.y = clamp(
+        clamp(
+          point.y,
+          viewport.y + padding,
+          viewport.y + viewport.height - size.height - padding
+        ),
+        anchor.y,
+        anchor.y + anchor.height - size.height
+      )
+      room.height = Math.max(0, viewport.height - padding * 2)
+    } else if (
+      (side === "left" || side === "right") &&
+      anchor.width >= size.width
+    ) {
+      point.x = clamp(
+        clamp(
+          point.x,
+          viewport.x + padding,
+          viewport.x + viewport.width - size.width - padding
+        ),
+        anchor.x,
+        anchor.x + anchor.width - size.width
+      )
+      room.width = Math.max(0, viewport.width - padding * 2)
+    }
+  }
+
   // Shifts along the anchor to stay on screen, but never past the anchor's
   // far edge, so a popup whose anchor scrolls away leaves with it. An
   // `alignOffset` that alone takes it past the anchor is kept.
-  const padding = options.collisionPadding
   if (side === "top" || side === "bottom") {
     const x = clamp(
       point.x,
@@ -317,7 +351,7 @@ function computePlacement(
     ...point,
     side,
     align: options.align,
-    available: available(side, anchor, viewport, options),
+    available: room,
   }
 }
 
@@ -422,6 +456,7 @@ function position(
     top: "0",
   })
   const popup = createWriter(el)
+  const style = getComputedStyle(el)
   let arrowWriter:
     { el: HTMLElement; write: ReturnType<typeof createWriter> } | undefined
 
@@ -436,6 +471,28 @@ function position(
   let stopped = false
   let watchedRoots: Node[] = []
   let unwatchRoots = () => {}
+  // Decided on the first placement. JS takes over for good once the browser can't follow.
+  let decided = false
+  let anchoring: { anchor: HTMLElement; name: string } | undefined
+  let anchoredAt = { left: "0", top: "0" }
+  let lastAnchorBox: Rect | undefined
+  const anchoredStyles = new Set<string>()
+
+  function unanchor(at = { left: "0", top: "0" }) {
+    if (anchoring) {
+      unnameAnchor(anchoring.anchor)
+    }
+    anchoring = undefined
+    for (const name of anchoredStyles) {
+      popup.style(name, "")
+    }
+    anchoredStyles.clear()
+    last = ""
+    popup.style("inset", "auto")
+    popup.style("margin", "0")
+    popup.style("left", at.left)
+    popup.style("top", at.top)
+  }
 
   function update() {
     if (stopped) {
@@ -448,11 +505,14 @@ function position(
     if (!anchor) {
       return false
     }
-    const node = "nodeType" in anchor ? (anchor as Element) : undefined
+    const node = "nodeType" in anchor ? (anchor as HTMLElement) : undefined
     const shown = node && renderedRect(node)
     // An anchor that left the page or stopped rendering has no place to
     // follow, so a placed popup stays where it was rather than jumping to a corner.
     if (node && placed && (!node.isConnected || !shown)) {
+      if (anchoring) {
+        unanchor(anchoredAt)
+      }
       return false
     }
     // Read each time, since the same anchor can move to another shadow root.
@@ -466,6 +526,28 @@ function position(
       unwatchRoots = watchShadowRoots(around)
     }
     unwatched = !node && "getBoundingClientRect" in anchor
+    const viewport = visibleViewport()
+    if (
+      anchoring &&
+      (node !== anchoring.anchor || !fillsLayoutViewport(viewport))
+    ) {
+      unanchor()
+    }
+    if (!decided) {
+      decided = true
+      if (node && shown && anchorable(node, shown, el, style, viewport)) {
+        anchoring = { anchor: node, name: nameAnchor(node) }
+      } else {
+        // A popup the browser placed last time keeps its anchor once closed.
+        for (const name of leftoverStyles) {
+          if (el.style.getPropertyValue(name)) {
+            el.style.removeProperty(name)
+          }
+        }
+      }
+    } else if (anchoring) {
+      nameAnchor(anchoring.anchor)
+    }
     // The first placement never animates: a popup coming into view has no
     // place to move from, and a `left` or `top` transition would fly it in
     // from the corner. Later moves, between anchors, animate.
@@ -475,7 +557,6 @@ function position(
       el.style.transition = "none"
     }
     const a = anchorRect(shown ?? anchor)
-    const viewport = visibleViewport()
     const offsets = { width: el.offsetWidth, height: el.offsetHeight }
     const arrow = arrowOf(options)
     const arrowSize = arrow
@@ -511,15 +592,22 @@ function position(
       height: el.clientHeight,
     }
 
-    // A transformed or filtered ancestor becomes the containing block for
-    // fixed elements. Where the popup is now, less its offsets, finds that
-    // block's origin, so portaled popups land right. Computed offsets are the
-    // ones on screen, mid-transition too, so a popup moving between anchors,
-    // like a navigation menu's viewport, can transition `left` and `top`.
-    // Reading before writing forces no extra layout.
-    const style = getComputedStyle(el)
     const rtl = style.direction === "rtl"
     const exact = exactSize(style, offsets)
+    if (anchoring) {
+      const side = physicalSide(resolved.side, rtl)
+      const styles = anchorStyles(
+        anchoring.name,
+        side,
+        physicalAlign(side, resolved.align, rtl),
+        resolved,
+        exact
+      )
+      for (const [name, value] of Object.entries(styles)) {
+        anchoredStyles.add(name)
+        popup.style(name, value)
+      }
+    }
     const box = untransformed(el.getBoundingClientRect(), exact, style)
     // Placement works in screen pixels, and the popup's own styles in its
     // CSS pixels, which `zoom` or a scaled containing block make differ.
@@ -528,31 +616,61 @@ function position(
       width: exact.width * scale.x,
       height: exact.height * scale.y,
     }
-    const result = computePlacement(
-      { x: a.x, y: a.y, width: a.width, height: a.height },
-      size,
-      viewport,
-      {
-        ...resolved,
-        sideOffset:
-          resolved.sideOffset * (isVertical(resolved.side) ? scale.y : scale.x),
-        alignOffset:
-          resolved.alignOffset *
-          (isVertical(resolved.side) ? scale.x : scale.y),
-        rtl,
-      }
-    )
-    const across = isVertical(result.side) ? scale.x : scale.y
-    const origin = {
-      x: box.x - (parseFloat(style.left) || 0) * scale.x,
-      y: box.y - (parseFloat(style.top) || 0) * scale.y,
+    const placement = {
+      ...resolved,
+      sideOffset:
+        resolved.sideOffset * (isVertical(resolved.side) ? scale.y : scale.x),
+      alignOffset:
+        resolved.alignOffset * (isVertical(resolved.side) ? scale.x : scale.y),
+      rtl,
     }
-    popup.style("left", `${(result.x - origin.x) / scale.x}px`)
-    popup.style("top", `${(result.y - origin.y) / scale.y}px`)
+    const anchorBox = { x: a.x, y: a.y, width: a.width, height: a.height }
+    const result = computePlacement(anchorBox, size, viewport, placement)
+    const previous = lastAnchorBox
+    lastAnchorBox = anchorBox
+    const near = (point: { x: number; y: number }) =>
+      Math.abs(box.x - point.x) <= 1 && Math.abs(box.y - point.y) <= 1
+    if (anchoring) {
+      // Anything the browser places differently is left to JS, like a
+      // containing block the anchor isn't in, or a shift onto the screen,
+      // which Chromium and Firefox work out once and then leave as it scrolls.
+      const caughtUp = near(result)
+      // While a page scrolls, they report the popup a frame late.
+      const behind =
+        !caughtUp &&
+        !!previous &&
+        near(computePlacement(previous, size, viewport, placement))
+      if (!caughtUp && !behind) {
+        unanchor()
+        el.style.transition = transition
+        return update()
+      }
+      if (behind) {
+        last = ""
+      }
+      anchoredAt = {
+        left: `${parseFloat(style.left) + parseFloat(style.marginLeft)}px`,
+        top: `${parseFloat(style.top) + parseFloat(style.marginTop)}px`,
+      }
+    } else {
+      // A transformed ancestor becomes the containing block for fixed elements:
+      // where the popup is, less its computed offsets (mid-transition too),
+      // finds that block's origin, so portaled popups land right.
+      const origin = {
+        x: box.x - (parseFloat(style.left) || 0) * scale.x,
+        y: box.y - (parseFloat(style.top) || 0) * scale.y,
+      }
+      // On the device's pixel grid, so text inside renders the same each time.
+      const ratio = el.ownerDocument.defaultView?.devicePixelRatio || 1
+      const snap = (value: number) => Math.round(value * ratio) / ratio
+      popup.style("left", `${snap((result.x - origin.x) / scale.x)}px`)
+      popup.style("top", `${snap((result.y - origin.y) / scale.y)}px`)
+    }
+    const across = isVertical(result.side) ? scale.x : scale.y
     if (first) {
       placed = true
       // Reading a style applies the placement before transitions come back.
-      void getComputedStyle(el).left
+      void style.left
       el.style.transition = transition
     }
 
@@ -671,6 +789,12 @@ function position(
     },
   })
 }
+
+const leftoverStyles = [
+  "position-anchor",
+  "position-try-fallbacks",
+  "position-visibility",
+]
 
 const arrowOf = (options: PositionOptions) =>
   typeof options.arrow === "function" ? options.arrow() : options.arrow

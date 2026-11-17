@@ -69,14 +69,16 @@ function autoId(el: Element) {
 }
 
 /**
- * The button or link a wrapper part holds, like the <button> in <ui-tabs-tab>,
- * so the part binds to it and native button behavior stays.
+ * The button or link a wrapper part holds, like the <button> in <ui-tabs-tab>
+ * or in a <ui-button> there, so the part binds to it and native button
+ * behavior stays.
  * @stable
  */
 function wrappedButton(el: HTMLElement) {
   return (
-    el.querySelector<HTMLElement>(":scope > button, :scope > a") ??
-    (el.firstElementChild as HTMLElement | null)
+    el.querySelector<HTMLElement>(
+      ":scope > button, :scope > a, :scope > ui-button > button, :scope > ui-button > a"
+    ) ?? (el.firstElementChild as HTMLElement | null)
   )
 }
 

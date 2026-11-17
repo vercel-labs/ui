@@ -158,7 +158,7 @@ const Combobox = /* @__PURE__ */ renderless(
         (itemValue: any, value: any) => boolean
       >,
       autoHighlight: {
-        type: [Boolean, String] as PropType<boolean | "always">,
+        type: [Boolean, String] as PropType<boolean | "always" | "selected">,
         default: undefined,
       },
       keepQuery: optionalBoolean,

@@ -34,6 +34,7 @@ import {
 } from "./token-input-model"
 import type { TokenView } from "./token-input-view"
 import { createChange } from "../../foundation/kernel/input-source"
+import { keepsValueOnReset } from "../../foundation/forms/value"
 
 type TokenInputState = {
   value: TokenInputValue
@@ -556,8 +557,14 @@ function tokenInputApiBody(
       hosts: () => view?.hosts() ?? [],
       setCustom: (custom: boolean) => store.set({ custom }),
       text: () => toText(store.get().value, codec()),
-      reset: () =>
-        commit(store.get().initial, { reason: "reset", selection: caretAt(0) }),
+      reset() {
+        if (!keepsValueOnReset(options().value, options().defaultValue)) {
+          commit(store.get().initial, {
+            reason: "reset",
+            selection: caretAt(0),
+          })
+        }
+      },
       setFormDisabled: (formDisabled: boolean) => store.set({ formDisabled }),
       restore: (saved: string) =>
         commit(codec().parse(saved), { reason: "restore" }),

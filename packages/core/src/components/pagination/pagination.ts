@@ -111,6 +111,11 @@ type PaginationOptions = {
    * tab with a modifier key, and work before JavaScript loads. Without it, they're buttons.
    */
   getHref?: (page: number) => string
+  /**
+   * Whether every page and step does nothing, like a step at its end. A controller still pages it.
+   * @defaultValue false
+   */
+  disabled?: boolean
   /** Pages it from anywhere. Create one with `createPaginationController()`. */
   controller?: PaginationController
 } & PrimitiveOptions
@@ -146,7 +151,7 @@ type PaginationLinkState = {
 type PaginationStepState = {
   /** The page it goes to. */
   page: number
-  /** Whether it's at the end it goes to, so it does nothing. */
+  /** Whether it's at the end it goes to, or the pagination is disabled, so it does nothing. */
   disabled: boolean
 }
 
@@ -165,6 +170,7 @@ type State = {
   siblings: number
   boundaries: number
   getHref: ((page: number) => string) | undefined
+  disabled: boolean
   // A step link the browser is about to follow, which keeps its href until it has.
   held: { step: Step; page: number } | null
 }
@@ -191,6 +197,12 @@ function stepTarget(state: State, step: Step, holds = true) {
       ? page === 1
       : page === state.pageCount
   return { page: clampPage(target, state.pageCount), disabled: atEnd }
+}
+
+// What a step part does: nothing at its end or while the pagination is disabled.
+function stepPart(state: State, step: Step) {
+  const target = stepTarget(state, step)
+  return state.disabled ? { ...target, disabled: true } : target
 }
 
 // A link with `getHref`, else a button. A link at an end has no `href`, so it
@@ -220,6 +232,7 @@ const settings = (options: PaginationOptions) => ({
   siblings: options.siblings ?? 1,
   boundaries: options.boundaries ?? 1,
   getHref: options.getHref,
+  disabled: !!options.disabled,
 })
 
 const paginationPrimitive = /* @__PURE__ */ definePrimitive({
@@ -234,6 +247,7 @@ const paginationPrimitive = /* @__PURE__ */ definePrimitive({
     siblings: "number",
     boundaries: "number",
     getHref: "value",
+    disabled: "boolean",
     controller: "value",
   },
   state: (options: PaginationOptions): State => ({
@@ -381,24 +395,25 @@ const paginationPrimitive = /* @__PURE__ */ definePrimitive({
     const stepSlot = (kind: Step) =>
       slot<{}, PaginationStepState>({
         role: (state) =>
-          state.getHref && stepTarget(state, kind).disabled
-            ? "link"
-            : undefined,
+          state.getHref && stepPart(state, kind).disabled ? "link" : undefined,
         roles: ["link"],
         focus: "native",
-        state: (state) => stepTarget(state, kind),
+        state: (state) => stepPart(state, kind),
         attrs: (state) => {
-          const target = stepTarget(state, kind)
+          const target = stepPart(state, kind)
           return partAttrs(state, target.page, target.disabled)
         },
         press: ({ api, store, el }, event) =>
-          api.internal.press(kind, stepTarget(store.get(), kind), event, el),
+          api.internal.press(kind, stepPart(store.get(), kind), event, el),
       })
     return {
       root: slot<{}, PaginationState>({
         // A <nav>, or a web component, which needs the role.
         role: "navigation",
         state: rangeState,
+        attrs: (state) => ({
+          "data-disabled": state.disabled ? "" : undefined,
+        }),
       }),
       list: slot<{}, PaginationState>({
         // Safari drops list semantics from lists styled with `list-style: none`, like Tailwind's reset does.
@@ -408,6 +423,8 @@ const paginationPrimitive = /* @__PURE__ */ definePrimitive({
       item: slot({ role: "listitem" }),
       link: slot<PaginationLinkProps, PaginationLinkState>({
         props: { page: "number" },
+        role: (state) => (state.getHref && state.disabled ? "link" : undefined),
+        roles: ["link"],
         state: (state, { props }) => ({
           page: props.page,
           current: props.page === currentPage(state),
@@ -415,13 +432,18 @@ const paginationPrimitive = /* @__PURE__ */ definePrimitive({
         attrs: (state, { props }) => {
           const current = props.page === currentPage(state)
           return {
-            ...partAttrs(state, props.page, false),
+            ...partAttrs(state, props.page, state.disabled),
             "aria-current": current ? "page" : undefined,
             "data-current": current ? "" : undefined,
           }
         },
-        press: ({ api, props, el }, event) =>
-          api.internal.press("link", props, event, el),
+        press: ({ api, props, store, el }, event) =>
+          api.internal.press(
+            "link",
+            { page: props.page, disabled: store.get().disabled },
+            event,
+            el
+          ),
       }),
       previous: stepSlot("previous"),
       next: stepSlot("next"),

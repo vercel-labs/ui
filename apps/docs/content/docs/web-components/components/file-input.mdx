@@ -134,12 +134,14 @@ input.addEventListener("valuechange", (event) => {
 
 ## Validation
 
-Set the `validate` property for checks of your own. Return a reason string to reject a file, or `null` to accept it. It runs after the built-in type and size checks, and its reason reaches the `reject` event like theirs. Validate uploads on your server too.
+Set the `validate` property for checks of your own. Return a reason string to reject a file, or `null` to accept it. Its second argument's `accepted` holds the files of the same drop accepted before this one, so a duplicate check catches two files with one name in a single drop. It runs after the built-in type and size checks, and its reason reaches the `reject` event like theirs. Validate uploads on your server too.
 
 ```ts
 const input = document.querySelector("ui-file-input")!
-input.validate = (file) =>
-  input.value.some((other) => other.name === file.name) ? "duplicate" : null
+input.validate = (file, { accepted }) =>
+  [...input.value, ...accepted].some((other) => other.name === file.name)
+    ? "duplicate"
+    : null
 input.addEventListener("reject", (event) => setRejected(event.detail.value))
 ```
 

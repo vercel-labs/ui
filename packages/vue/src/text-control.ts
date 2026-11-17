@@ -3,7 +3,7 @@ import type {
   InputController,
   InputValueChangeReason,
 } from "@ui-sdk/core/input"
-import type { PropType } from "vue"
+import { getCurrentInstance, nextTick, type PropType } from "vue"
 import type { useFieldControl } from "./field-context"
 import { optionalBoolean, orModel } from "./use-primitive"
 
@@ -46,25 +46,55 @@ type Emit = ((event: "update:value", value: string) => void) &
     details: ChangeDetails<InputValueChangeReason>
   ) => void)
 
+// What the parent receives for a typed value, after v-model's `trim` and
+// `number`, which Vue's emit applies.
+function received(value: string, modifiers?: Record<string, boolean>) {
+  if (modifiers?.number) {
+    const number = parseFloat(value)
+    return Number.isNaN(number) ? value : number
+  }
+  return modifiers?.trim ? value.trim() : value
+}
+
 // Options for a text field's primitive. The change event runs first, so
 // canceling it also keeps v-model as it was.
-const textOptions = (props: TextProps, emit: Emit) => () => ({
-  value: orModel(props.value, props.modelValue),
-  defaultValue: props.defaultValue,
-  controller: props.controller,
-  debug: props.debug,
-  onValueChange: (
-    value: string,
-    details: ChangeDetails<InputValueChangeReason>
-  ) => {
-    emit("valueChange", value, details)
-    if (details.canceled) {
-      return
-    }
-    emit("update:value", value)
-    emit("update:modelValue", value)
-  },
-})
+function textOptions(props: TextProps, emit: Emit) {
+  const component = getCurrentInstance()
+  // Vue writes the element's value only when it renders, so a controlled
+  // value the parent kept goes back in a render of its own, as in React.
+  const keep = (value: string) => {
+    nextTick(() => {
+      const kept = orModel(props.value, props.modelValue)
+      const key =
+        props.value === undefined ? "modelModifiers" : "valueModifiers"
+      const modifiers = component?.vnode.props?.[key]
+      if (kept !== undefined && kept !== received(value, modifiers)) {
+        component?.proxy?.$forceUpdate()
+      }
+    })
+  }
+  return () => ({
+    value: orModel(props.value, props.modelValue),
+    defaultValue: props.defaultValue,
+    controller: props.controller,
+    debug: props.debug,
+    onValueChange: (
+      value: string,
+      details: ChangeDetails<InputValueChangeReason>
+    ) => {
+      emit("valueChange", value, details)
+      if (details.canceled) {
+        return
+      }
+      emit("update:value", value)
+      emit("update:modelValue", value)
+      // Mid-composition the IME owns the text, and its last change comes after.
+      if (!(details.event as InputEvent | undefined)?.isComposing) {
+        keep(value)
+      }
+    },
+  })
+}
 
 // Whether a control is read-only: the `read-only` prop, or else a native
 // `readonly` attribute, which Vue keeps in `attrs`.

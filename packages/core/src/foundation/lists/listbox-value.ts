@@ -227,6 +227,19 @@ function createValueSelection(config: {
     return typeof value === "string" ? value : toKey(value)
   }
 
+  // A label learned from an item that's selected shows in the value. Batched,
+  // since a long list registers all at once.
+  function queueLabels() {
+    if (labelsQueued) {
+      return
+    }
+    labelsQueued = true
+    queueMicrotask(() => {
+      labelsQueued = false
+      store.set({ labels: listbox.labelsVersion() })
+    })
+  }
+
   // The keys of the value whose items never mounted, so no label is known.
   const unlabeled = () =>
     keys().filter((key) => listbox.labelOf(key) === undefined)
@@ -249,40 +262,32 @@ function createValueSelection(config: {
       }
       return lastLabels
     },
-    // A label learned from an item that's selected shows in the value. Batched,
-    // since a long list registers all at once.
-    queueLabels() {
-      if (labelsQueued) {
-        return
-      }
-      labelsQueued = true
-      queueMicrotask(() => {
-        labelsQueued = false
-        store.set({ labels: listbox.labelsVersion() })
-      })
-    },
-    // Learns the labels of values whose items haven't mounted, like on the
-    // server. `find` answers for the keys with none, from the items among an
-    // adapter's children. Only the first call looks, since it's for the
-    // render before the items mount. Returns whether it found any.
+    queueLabels,
+    // Learns the labels of values whose items aren't mounted, like on the
+    // server or in a closed list, from the items among an adapter's children,
+    // so a label that changes while closed still shows.
     learn(
       find: (
         keys: ReadonlySet<string>
       ) => readonly { value: unknown; label: string }[]
     ) {
-      if (learned || options().itemToLabel) {
+      if (options().itemToLabel) {
         return false
       }
-      learned = true
-      const unknown = new Set(unlabeled())
-      if (!unknown.size) {
+      const unmounted = new Set(keys().filter((key) => !listbox.element(key)))
+      if (!unmounted.size) {
         return false
       }
-      const found = find(unknown)
-      for (const { value, label } of found) {
+      const version = listbox.labelsVersion()
+      for (const { value, label } of find(unmounted)) {
         listbox.remember(toKey(value), label, value)
       }
-      return found.length > 0
+      const changed = listbox.labelsVersion() !== version
+      if (changed && learned) {
+        queueLabels()
+      }
+      learned = true
+      return changed
     },
     // Whether a closed list must mount its items hidden for the value: for a
     // label only its item knows, or for a value icon in the page, which copies
@@ -353,4 +358,15 @@ type Restoring = { value: unknown; keys: ReadonlyMap<number, string> }
 
 type ValueSelection = ReturnType<typeof createValueSelection>
 
-export { createValueSelection, formatLabels, listOf, type ValueSelection }
+// Resolves to nothing. It gives TypeScript a list to infer `T` from in a
+// single value's options, so an inline list of objects passed to a multiple
+// one infers `T` as the object, not as the object or a list of them.
+type ItemsOf<T> = T extends unknown ? never : T[]
+
+export {
+  createValueSelection,
+  formatLabels,
+  type ItemsOf,
+  listOf,
+  type ValueSelection,
+}

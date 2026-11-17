@@ -17,8 +17,18 @@ function markTrusted<E extends Event>(event: E) {
 const focusable =
   "a[href], button, input, select, textarea, summary, [tabindex], [contenteditable]:not([contenteditable=false])"
 
-// Waits for what a primitive schedules after an event: microtasks, a timer
-// and two frames, like a focus move that waits for the next frame.
+/**
+ * Waits for what a component schedules after rendering or an event: microtasks,
+ * a timer and two frames. A tooltip's name and focus moving into a menu that
+ * opened on a press both arrive this way. `mount`'s `view.settle()` is the same.
+ *
+ * @example
+ * await user.click(screen.getByRole("button", { name: "Options" }))
+ * await act(settle)
+ * await checkPattern(screen.getByRole("menu"), "menu")
+ *
+ * @experimental
+ */
 async function settle() {
   for (let i = 0; i < 3; i++) {
     await Promise.resolve()

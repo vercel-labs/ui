@@ -330,6 +330,28 @@ describe("createListbox", () => {
     expect(onEnd).toHaveBeenCalledTimes(1)
   })
 
+  test("the highlighted option leaving the list reports no highlight", async () => {
+    const onHighlight = vi.fn()
+    const { input, press, type, highlighted } = render(
+      { focus: "virtual", onHighlight },
+      fruits
+    )
+    await tick()
+    input.focus()
+    press("ArrowDown")
+    expect(onHighlight).toHaveBeenLastCalledWith(
+      "apple",
+      expect.objectContaining({ index: 0 })
+    )
+    type("ban")
+    await tick()
+    expect(highlighted()).toBe(null)
+    expect(onHighlight).toHaveBeenLastCalledWith(
+      null,
+      expect.objectContaining({ index: -1 })
+    )
+  })
+
   test("with real focus, focus that lands on an option another way highlights it", async () => {
     const { options, highlighted } = render({}, fruits)
     await tick()

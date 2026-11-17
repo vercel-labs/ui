@@ -144,6 +144,34 @@ test.describe("focus", () => {
     await expect(page.getByRole("button", { name: "Close" })).toBeFocused()
   })
 
+  for (const [shift, edge] of [
+    [false, "last"],
+    [true, "first"],
+  ] as const) {
+    test(`${shift ? "Shift+Tab" : "Tab"} from inside an iframe that is the ${edge} element wraps around the dialog`, async ({
+      page,
+      tab,
+    }) => {
+      await openWithKeyboard(page)
+      await dialog(page).evaluate(
+        (el, shift) =>
+          el.insertAdjacentHTML(
+            shift ? "afterbegin" : "beforeend",
+            `<iframe title="Embed" srcdoc="<button>Inside</button>"></iframe>`
+          ),
+        shift
+      )
+      await page
+        .frameLocator('iframe[title="Embed"]')
+        .getByRole("button", { name: "Inside" })
+        .focus()
+      await tab({ shift })
+      await expect(
+        shift ? page.getByRole("button", { name: "Close" }) : field(page)
+      ).toBeFocused()
+    })
+  }
+
   test("Shift+Tab from the first element wraps to the checked radio of a group outside a form", async ({
     page,
     tab,
@@ -769,6 +797,30 @@ test.describe("nested dialogs", () => {
     await expect(dialog(page)).toBeHidden()
     await expect(trigger(page)).toBeFocused()
   })
+})
+
+test("a nested dialog mounted open with its parent opens above it, nested", async ({
+  open,
+  page,
+}) => {
+  await open("dialog", { open: "", "nested-open": "" })
+  await expect(nestedDialog(page)).toBeVisible()
+  await expect(dialog(page)).toHaveAttribute("data-nested-open", "")
+  await expect(nestedDialog(page)).toHaveAttribute("data-nested", "")
+  await expect(page.getByRole("button", { name: "Done" })).toBeFocused()
+  const box = (await nestedDialog(page).boundingBox())!
+  const onTop = await page.evaluate(
+    ([x, y]: number[]) =>
+      !!document
+        .elementFromPoint(x, y)
+        ?.closest('[role="dialog"][aria-labelledby]')
+        ?.textContent?.includes("Advanced settings"),
+    [box.x + box.width / 2, box.y + box.height / 2]
+  )
+  expect(onTop).toBe(true)
+  await page.keyboard.press("Escape")
+  await expect(nestedDialog(page)).toBeHidden()
+  await expect(dialog(page)).toBeVisible()
 })
 
 test.describe("alert dialog", () => {

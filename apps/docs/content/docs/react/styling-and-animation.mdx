@@ -116,7 +116,9 @@ export { Example }
 
 Put exit styles on `data-ending-style`. `data-closed` describes the state, but doesn't keep the element around for an exit.
 
-Popups also provide `--anchor-width` and `--available-height` for sizing. If an animation library needs closed content to stay mounted, use `keepMounted`. See [Popups](./popups) for placement and mounting options.
+An exit animation you start from script is waited for too, when it starts in the same task that closes the popup, like in its open change callback. One started later, from an effect or an observer, isn't.
+
+Popups also provide `--anchor-width` and `--available-height` for sizing. See [Popups](./popups) for placement and mounting options.
 
 ## The ui-sdk Layer
 
@@ -139,6 +141,8 @@ ui-sdk adds this CSS once a component mounts, so HTML rendered on the server doe
 ```
 
 It leaves `hidden="until-found"` alone, so find in page can still open a closed panel.
+
+The same layer takes the browser's own popover border, padding and background off Popover, Dialog, Drawer, Tooltip and Hover Card content. Menu, Select, Combobox and Date Picker content keep them, so give those parts a `border`, `padding` and `background` of your own. `web.css` already does.
 
 ## Content Security Policy
 
