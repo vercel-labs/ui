@@ -551,6 +551,22 @@ test.describe("positioning", () => {
     await expect(dialog(page)).toHaveAttribute("data-side", "bottom")
   })
 
+  test("the popover sits on whole pixels beside a trigger that doesn't", async ({
+    page,
+  }) => {
+    await trigger(page).evaluate((el) => {
+      el.style.marginLeft = "10.3px"
+      el.style.marginTop = "0.4px"
+    })
+    await trigger(page).click()
+    await expect(dialog(page)).toBeVisible()
+    const { left, top } = await dialog(page).evaluate((el) => el.style)
+    expect([left, top]).toEqual([
+      expect.stringMatching(/^-?\d+px$/),
+      expect.stringMatching(/^-?\d+px$/),
+    ])
+  })
+
   test("the popover flips above the trigger when there is no room below", async ({
     page,
     open,
