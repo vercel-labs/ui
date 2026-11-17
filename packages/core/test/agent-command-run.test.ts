@@ -39,3 +39,29 @@ test("an agent runs a command by its label", async () => {
   ).resolves.toMatchObject({ ok: false })
   expect(onAction).toHaveBeenCalledTimes(1)
 })
+
+test("a run names one command, so a list can't reach a marked one", async () => {
+  const onAction = vi.fn()
+  mounts.push(
+    mount(
+      command,
+      { onAction },
+      `<root><input aria-label="Search commands"><list><item value="calendar">Calendar</item><item value="delete" data-agent-confirm="Deletes the workspace.">Delete</item></list></root>`
+    )
+  )
+  const allow = vi.fn(() => true)
+  const agent = createAgent({ allow })
+  const [entry] = agent.snapshot()
+  for (const arg of [
+    ["delete"],
+    [["delete"]],
+    ["calendar"],
+    { value: "delete" },
+  ]) {
+    await expect(
+      agent.act({ steps: [{ ref: entry.ref, action: "run", args: [arg] }] })
+    ).resolves.toMatchObject({ ok: false })
+  }
+  expect(onAction).not.toHaveBeenCalled()
+  expect(allow).not.toHaveBeenCalled()
+})

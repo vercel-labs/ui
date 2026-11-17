@@ -1372,6 +1372,13 @@ function createAgent(
         }
         args = [highlighted, ...args.slice(1)]
       }
+      // The api reads a list as the command whose value is its text, so only that
+      // text names the command whose marks are read.
+      if (action === "run" && typeof args[0] !== "string") {
+        throw new Error(
+          `Name one command to run in ${entry.label ?? entry.component} (${entry.ref}), by its value or label.`
+        )
+      }
       // A combobox with `allowCustomValue` takes text that isn't an item.
       const closed =
         entry.agent?.closed && !internalOf(instance)?.allowCustomValue?.()
