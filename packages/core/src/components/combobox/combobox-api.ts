@@ -577,8 +577,8 @@ function comboboxApiBody(
   }
 
   // What `autoHighlight` highlights: the first match while there's text, an
-  // item over a create option, and with "always" the selected item or the
-  // first without text. Undefined when it highlights nothing of its own.
+  // item over a create option, and without text the selected item, or with
+  // "always" the first. Undefined when it highlights nothing of its own.
   function autoTarget() {
     const mode = options().autoHighlight
     const list = listbox
@@ -588,15 +588,16 @@ function comboboxApiBody(
     if (filterQuery()) {
       return mode ? ((items[0] ?? list[0])?.key ?? null) : undefined
     }
-    if (mode !== "always") {
+    if (mode !== "always" && mode !== "selected") {
       return undefined
     }
-    return (
-      (
-        items.find((entry) => selection.isSelected(entry.key, entry.value)) ??
-        items[0]
-      )?.key ?? null
+    const selected = items.find((entry) =>
+      selection.isSelected(entry.key, entry.value)
     )
+    if (mode === "selected") {
+      return selected?.key
+    }
+    return (selected ?? items[0])?.key ?? null
   }
 
   // After the text or the list changed. A highlight the user moved stays while
@@ -941,7 +942,11 @@ function comboboxApiBody(
         const target = pendingHighlight
         pendingHighlight = null
         if (!store.get().focusInList) {
-          if (options().autoHighlight === "always") {
+          const mode = options().autoHighlight
+          if (
+            mode === "always" ||
+            (mode === "selected" && autoTarget() !== undefined)
+          ) {
             settleHighlight(false)
           } else if (
             target === "first" &&
