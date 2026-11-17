@@ -45,6 +45,7 @@ import {
   type PopupBehaviorName,
 } from "./popup-behavior"
 import { registerPopupElement } from "./popup-elements"
+import { guardFrames } from "./frame-guards"
 import type { Anchor, position, PositionOptions } from "../platform/position"
 import { animateIn, animateOut, writeOpen } from "../motion/presence"
 import {
@@ -1252,6 +1253,7 @@ function createPopupLayer<
         })
       )
     }
+    cleanups.push(guardFrames(el, () => tabMode() === "trap"))
     if (behavior.closeWatcher) {
       const stop = watchClose((event) =>
         options.close("back", { event, focus: true })

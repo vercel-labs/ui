@@ -144,6 +144,34 @@ test.describe("focus", () => {
     await expect(page.getByRole("button", { name: "Close" })).toBeFocused()
   })
 
+  for (const [shift, edge] of [
+    [false, "last"],
+    [true, "first"],
+  ] as const) {
+    test(`${shift ? "Shift+Tab" : "Tab"} from inside an iframe that is the ${edge} element wraps around the dialog`, async ({
+      page,
+      tab,
+    }) => {
+      await openWithKeyboard(page)
+      await dialog(page).evaluate(
+        (el, shift) =>
+          el.insertAdjacentHTML(
+            shift ? "afterbegin" : "beforeend",
+            `<iframe title="Embed" srcdoc="<button>Inside</button>"></iframe>`
+          ),
+        shift
+      )
+      await page
+        .frameLocator('iframe[title="Embed"]')
+        .getByRole("button", { name: "Inside" })
+        .focus()
+      await tab({ shift })
+      await expect(
+        shift ? page.getByRole("button", { name: "Close" }) : field(page)
+      ).toBeFocused()
+    })
+  }
+
   test("Shift+Tab from the first element wraps to the checked radio of a group outside a form", async ({
     page,
     tab,
