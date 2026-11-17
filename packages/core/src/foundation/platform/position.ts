@@ -287,10 +287,42 @@ function computePlacement(
     }
   }
 
+  const padding = options.collisionPadding
+  const room = available(side, anchor, viewport, options)
+  // Beside an anchor at least its size, like a context area opened from the
+  // keyboard, with room on neither side, it goes on screen inside the anchor.
+  if (overflow(side, point, size, viewport, padding) > 0) {
+    if ((side === "top" || side === "bottom") && anchor.height >= size.height) {
+      point.y = clamp(
+        clamp(
+          point.y,
+          viewport.y + padding,
+          viewport.y + viewport.height - size.height - padding
+        ),
+        anchor.y,
+        anchor.y + anchor.height - size.height
+      )
+      room.height = Math.max(0, viewport.height - padding * 2)
+    } else if (
+      (side === "left" || side === "right") &&
+      anchor.width >= size.width
+    ) {
+      point.x = clamp(
+        clamp(
+          point.x,
+          viewport.x + padding,
+          viewport.x + viewport.width - size.width - padding
+        ),
+        anchor.x,
+        anchor.x + anchor.width - size.width
+      )
+      room.width = Math.max(0, viewport.width - padding * 2)
+    }
+  }
+
   // Shifts along the anchor to stay on screen, but never past the anchor's
   // far edge, so a popup whose anchor scrolls away leaves with it. An
   // `alignOffset` that alone takes it past the anchor is kept.
-  const padding = options.collisionPadding
   if (side === "top" || side === "bottom") {
     const x = clamp(
       point.x,
@@ -317,7 +349,7 @@ function computePlacement(
     ...point,
     side,
     align: options.align,
-    available: available(side, anchor, viewport, options),
+    available: room,
   }
 }
 
