@@ -39,6 +39,8 @@ type ListboxStore = {
   deselectable: boolean
   orientation: "horizontal" | "vertical"
   keepInView: boolean
+  // Focus stays on the list, which points at the highlighted option.
+  virtualFocus: boolean
   disabled: boolean
   formDisabled: boolean
   readOnly: boolean
@@ -83,6 +85,7 @@ function syncListboxStore(options: ListboxOptions<any, any>) {
     deselectable: !!options.deselectable,
     orientation: orientationOf(options.orientation, "vertical"),
     keepInView: options.keepInView ?? true,
+    virtualFocus: !!options.virtualFocus,
     disabled: !!options.disabled,
     readOnly: !!options.readOnly,
     required: !!options.required,
@@ -124,7 +127,7 @@ function listboxApiBody(
   const listbox = createListboxEngine(
     {
       store,
-      focus: "real",
+      focus: () => (store.get().virtualFocus ? "virtual" : "real"),
       items: () => store.get().items,
       toKey,
       filter: () => undefined,
@@ -294,16 +297,46 @@ function listboxApiBody(
   }
 
   // The list itself got focus, like from a press on its padding, a Field
-  // label, or an option that left the page. It hands focus to the tab stop.
+  // label, or an option that left the page. It hands focus to the tab stop,
+  // or with `virtualFocus` keeps it and highlights the tab stop.
   function focusStop() {
     focusInside = true
-    const { stop } = store.get()
+    const { stop, virtualFocus, highlighted } = store.get()
     const key = stop ?? stopKey()
+    if (virtualFocus) {
+      const root = rootElement()
+      if (root && root.ownerDocument.activeElement !== root) {
+        root.focus({ preventScroll: true })
+      }
+      if (key !== null && highlighted === null) {
+        focused(key)
+      }
+      return
+    }
     const el = key === null ? undefined : listbox.element(key)
     if (el?.isConnected) {
       el.focus({ preventScroll: true })
     }
   }
+
+  // A press or the pointer moves the highlight while focus stays on the list.
+  function highlightVirtually(key: string, event?: Event) {
+    focusInside = true
+    listbox.highlight(key, { event })
+  }
+
+  // With `virtualFocus`, the option highlighted last holds the tab stop, as
+  // the one focused last does without it.
+  store.subscribe(() => {
+    const { virtualFocus, highlighted, stop } = store.get()
+    if (!virtualFocus || highlighted === null || highlighted === remembered) {
+      return
+    }
+    remembered = highlighted
+    if (stop !== highlighted) {
+      store.set({ stop: highlighted })
+    }
+  })
 
   // Focus left the list. An option that left the page, or moved within it,
   // takes focus with it, which isn't leaving: the engine gives focus back once
@@ -389,6 +422,7 @@ function listboxApiBody(
       claim: createClaim(),
       focused,
       focusStop,
+      highlightVirtually,
       blurred,
       onKeyDown: keyboard.onKeyDown,
       press: keyboard.press,

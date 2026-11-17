@@ -182,7 +182,7 @@ function createListboxKeyboard({
     }
     const el = listbox.element(key)
     // A press with Shift kept the browser from selecting text, and focus with it.
-    if (el && el.ownerDocument.activeElement !== el) {
+    if (el && !state.virtualFocus && el.ownerDocument.activeElement !== el) {
       el.focus({ preventScroll: true })
     }
     const why = { reason: "item-press", event } as const

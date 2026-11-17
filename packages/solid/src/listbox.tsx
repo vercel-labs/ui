@@ -49,6 +49,7 @@ const optionKeys = [
   "deselectable",
   "orientation",
   "loop",
+  "virtualFocus",
   "keepInView",
   "items",
   "itemToValue",

@@ -85,6 +85,7 @@ const Listbox = defineComponent({
     deselectable: optionalBoolean,
     orientation: String as PropType<"horizontal" | "vertical">,
     loop: optionalBoolean,
+    virtualFocus: optionalBoolean,
     keepInView: optionalBoolean,
     items: Array as PropType<ListData<any>>,
     itemToValue: Function as PropType<(value: any) => string>,

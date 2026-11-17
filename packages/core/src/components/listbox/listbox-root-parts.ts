@@ -93,7 +93,8 @@ function isStop(
 }
 
 const listboxSlots = (slot: SlotFactory<ListboxStore, ListboxApi>) => ({
-  // The listbox itself. It takes focus only to hand it to the option that holds the tab stop.
+  // The listbox itself. It takes focus only to hand it to the option that
+  // holds the tab stop, unless `virtualFocus` keeps focus here.
   root: slot<{}, ListboxState>({
     role: "listbox",
     keys: (state) => [
@@ -113,7 +114,7 @@ const listboxSlots = (slot: SlotFactory<ListboxStore, ListboxApi>) => ({
       return {
         id: `${id}-listbox`,
         // Never a tab stop of its own, even disabled, when browsers make scrolling containers one.
-        tabindex: "-1",
+        tabindex: state.virtualFocus && !disabled ? "0" : "-1",
         "aria-multiselectable": state.multiple ? "true" : undefined,
         "aria-orientation": state.orientation,
         "aria-disabled": disabled ? "true" : undefined,
@@ -123,6 +124,12 @@ const listboxSlots = (slot: SlotFactory<ListboxStore, ListboxApi>) => ({
         ...formAttrs(state),
       }
     },
+    live: live((state, { id }) => ({
+      "aria-activedescendant":
+        state.virtualFocus && state.highlighted !== null
+          ? `${id}-option-${idPart(state.highlighted)}`
+          : undefined,
+    })),
     on: {
       keydown: (event, { api, el }) => el && api.internal.onKeyDown(event, el),
       focusin(event, { api, el }) {
@@ -155,7 +162,7 @@ const listboxSlots = (slot: SlotFactory<ListboxStore, ListboxApi>) => ({
 
   item: slot<ItemProps, ListboxItemState>({
     role: "option",
-    focus: "roving",
+    focus: (state) => (state.virtualFocus ? "active-descendant" : "roving"),
     props: {
       value: "key",
       label: "string",
@@ -174,11 +181,12 @@ const listboxSlots = (slot: SlotFactory<ListboxStore, ListboxApi>) => ({
       const { selected, disabled } = itemState(state, key, props, api)
       return {
         id: `${id}-option-${idPart(key)}`,
-        tabindex: isDisabled(state)
-          ? undefined
-          : isStop(state, key, props, api)
-            ? "0"
-            : "-1",
+        tabindex:
+          isDisabled(state) || state.virtualFocus
+            ? undefined
+            : isStop(state, key, props, api)
+              ? "0"
+              : "-1",
         "aria-selected": String(selected),
         "aria-disabled": disabled ? "true" : undefined,
         ...positionAttrs(props.index, api.internal.listbox),
@@ -191,6 +199,17 @@ const listboxSlots = (slot: SlotFactory<ListboxStore, ListboxApi>) => ({
     })),
     on: {
       focusin: (event, { api, key }) => api.internal.focused(key),
+      pointermove(event, { api, key, store }) {
+        const { virtualFocus, highlighted } = store.get()
+        if (
+          virtualFocus &&
+          event.pointerType !== "touch" &&
+          highlighted !== null &&
+          highlighted !== key
+        ) {
+          api.internal.highlightVirtually(key, event)
+        }
+      },
       // Shift with a press selects a range, not the page's text.
       mousedown(event, { store }) {
         if (event.shiftKey && store.get().multiple) {
@@ -198,7 +217,12 @@ const listboxSlots = (slot: SlotFactory<ListboxStore, ListboxApi>) => ({
         }
       },
     },
-    press: ({ api, key }, event) => api.internal.press(key, event),
+    press({ api, key, store }, event) {
+      if (store.get().virtualFocus) {
+        api.internal.highlightVirtually(key, event)
+      }
+      api.internal.press(key, event)
+    },
     bind: (el, context) => registerItem(el, context),
   }),
 

@@ -63,6 +63,11 @@ const checks: Record<string, Check> = {
     await selects("Nuxt")(preview, "")
     await expect(lastLog(preview)).toHaveText("nuxt (item-press)")
   },
+  "virtual-focus": async (preview) => {
+    await selects("Nuxt")(preview, "")
+    await expect(lastLog(preview)).toHaveText("nuxt (item-press)")
+    await expect(preview.getByRole("listbox")).toBeFocused()
+  },
   deselectable: async (preview) => {
     await option(preview, "Astro").click()
     await expect(lastLog(preview)).toHaveText("Nothing (item-press)")

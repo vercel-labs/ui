@@ -209,3 +209,54 @@ test.describe("touch", () => {
     await expectSelected(page, ["Onion"])
   })
 })
+
+test.describe("focus on the list", { tag: "@enhancement" }, () => {
+  // The option the list points at, by its text.
+  const pointsAt = (page: Page) =>
+    list(page).evaluate((el) => {
+      const id = el.getAttribute("aria-activedescendant")
+      const item = id && el.ownerDocument.getElementById(id)
+      return item ? item.textContent?.replace("✓", "").trim() : null
+    })
+
+  test("with virtualFocus, keys move the highlight while focus stays on the list, which points at it", async ({
+    page,
+    open,
+    tab,
+  }) => {
+    await open("listbox", {
+      "virtual-focus": "",
+      value: "mushroom",
+      activation: "manual",
+      loop: "false",
+    })
+    await tabIn(page, tab)
+    await expect(list(page)).toBeFocused()
+    await expect.poll(() => pointsAt(page)).toBe("Mushroom")
+    // Olive is disabled, so the highlight skips it.
+    await page.keyboard.press("ArrowDown")
+    await expect.poll(() => pointsAt(page)).toBe("Onion")
+    await page.keyboard.press("End")
+    await expect.poll(() => pointsAt(page)).toBe("Tomato")
+    await page.keyboard.press("Home")
+    await expect.poll(() => pointsAt(page)).toBe("Basil")
+    await page.keyboard.press("g")
+    await expect.poll(() => pointsAt(page)).toBe("Garlic")
+    await expect(list(page)).toBeFocused()
+    await page.keyboard.press("Enter")
+    await expectSelected(page, ["Garlic"])
+    await page.getByRole("button", { name: "After" }).focus()
+    await expect(list(page)).not.toHaveAttribute("aria-activedescendant")
+  })
+
+  test("with virtualFocus, a press chooses an option and keeps focus on the list", async ({
+    page,
+    open,
+  }) => {
+    await open("listbox", { "virtual-focus": "" })
+    await option(page, "Garlic").click()
+    await expectSelected(page, ["Garlic"])
+    await expect(list(page)).toBeFocused()
+    await expect.poll(() => pointsAt(page)).toBe("Garlic")
+  })
+})

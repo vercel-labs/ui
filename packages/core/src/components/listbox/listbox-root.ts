@@ -198,6 +198,11 @@ type ListboxSharedOptions<T> = {
    */
   loop?: boolean
   /**
+   * Keeps focus on the list itself, which points at the highlighted option with `aria-activedescendant`, instead of moving focus onto the options.
+   * @defaultValue false
+   */
+  virtualFocus?: boolean
+  /**
    * Whether the list scrolls the option keys move to into view, and the selected option when it first shows. Turn it off when something else scrolls the list, like `bindScrollPicker`.
    * @defaultValue true
    */
@@ -318,6 +323,7 @@ const listboxPrimitive = /* @__PURE__ */ definePrimitive({
     deselectable: "boolean",
     orientation: "string",
     loop: "boolean",
+    virtualFocus: "boolean",
     keepInView: "boolean",
     items: "value",
     itemToValue: "value",

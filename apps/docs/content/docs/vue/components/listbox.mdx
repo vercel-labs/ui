@@ -97,6 +97,15 @@ Set `activation="manual"` on a single list to browse without selecting. Space, E
   caption="Move through the options with the arrow keys. Nothing is selected until you press Space or Enter, and the console logs the choice."
 />
 
+## Focus on the List
+
+Set `virtual-focus` to keep focus on the list itself while arrow keys, Home, End, and typing move a highlight through the options. The list points at the highlighted option with `aria-activedescendant`, so screen readers still announce it. Style the highlight with `[data-highlighted]`, since the options don't take focus.
+
+<ComponentExample
+  name="listbox/virtual-focus"
+  caption="Tab into the list and move through it with the arrow keys. Focus stays on the list, and Space or Enter chooses the highlighted option."
+/>
+
 ## Deselectable
 
 Add `deselectable` to let pressing the selected option clear a single selection. Without it, the selection stays as it is.
@@ -339,7 +348,7 @@ Follows the [WAI-ARIA listbox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/
 
 ### Focus
 
-The list is one tab stop. Tab returns to the last focused option, then falls back to the first selected or enabled option. Options receive real DOM focus, so `focus-visible` works directly.
+The list is one tab stop. Tab returns to the last focused option, then falls back to the first selected or enabled option. Options receive real DOM focus, so `focus-visible` works directly. With `virtual-focus`, the list is the tab stop and keeps focus instead.
 
 The root forwards focus into the options, including when you press a Field label or the list’s padding. Escape stays available to an enclosing dialog.
 

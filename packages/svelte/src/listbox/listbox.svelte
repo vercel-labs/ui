@@ -36,6 +36,7 @@ An always-visible list to choose one option from, or several with `multiple`.
     deselectable,
     orientation,
     loop,
+    virtualFocus,
     keepInView,
     items,
     itemToValue,
@@ -66,6 +67,8 @@ An always-visible list to choose one option from, or several with `multiple`.
     orientation?: "horizontal" | "vertical"
     /** Whether arrow keys wrap from the last item to the first. */
     loop?: boolean
+    /** Keeps focus on the list, which points at the highlighted option with `aria-activedescendant`. */
+    virtualFocus?: boolean
     /** Whether the list scrolls the option keys move to into view, and the selected option when it first shows. */
     keepInView?: boolean
     /** The items as data. Renders them for you. */
@@ -107,6 +110,7 @@ An always-visible list to choose one option from, or several with `multiple`.
     deselectable,
     orientation,
     loop,
+    virtualFocus,
     keepInView,
     items,
     itemToValue,

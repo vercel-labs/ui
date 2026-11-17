@@ -87,6 +87,9 @@ async function render(root: HTMLElement, data = false) {
   if (!options.loop) {
     listbox.setAttribute("loop", "false")
   }
+  if (options.virtualFocus) {
+    listbox.setAttribute("virtual-focus", "")
+  }
   if (defaultValue !== undefined) {
     listbox.setAttribute(
       "default-value",

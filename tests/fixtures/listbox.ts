@@ -68,13 +68,9 @@ function listboxData(grouped: boolean) {
   ]
 }
 
-// Options a spec can set through the URL:
-// ?value=cheese selects Cheese at first (comma-separated with ?multiple),
-// ?multiple, ?activation=manual|automatic, ?orientation=horizontal,
-// ?loop=false, ?deselectable, ?grouped, ?required, ?readonly, ?disabled,
-// ?cancel cancels value changes, ?fieldset puts the listbox in a disabled
-// fieldset, ?long renders 300 items in a list that scrolls, and ?controlled
-// keeps the value in the fixture's own state.
+// Options a spec sets through the URL, like ?value=cheese (comma-separated with
+// ?multiple), ?loop=false or ?virtual-focus. ?fieldset puts it in a disabled
+// fieldset, ?long renders 300 items, and ?controlled keeps the value in state.
 function listboxOptions() {
   const params = new URLSearchParams(location.search)
   const multiple = params.has("multiple")
@@ -92,6 +88,7 @@ function listboxOptions() {
         ? ("horizontal" as const)
         : ("vertical" as const),
     loop: params.get("loop") !== "false",
+    virtualFocus: params.has("virtual-focus"),
     deselectable: params.has("deselectable"),
     grouped: params.has("grouped"),
     required: params.has("required"),
