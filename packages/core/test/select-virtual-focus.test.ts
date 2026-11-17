@@ -97,3 +97,16 @@ test("without it, focus moves onto the highlighted item", async () => {
   expect(document.activeElement).toBe(view.part("item", "a"))
   expect(trigger.hasAttribute("aria-activedescendant")).toBe(false)
 })
+
+test("keys on the trigger mark the list as used by keyboard after a pointer opened it", async () => {
+  const { view, trigger } = open()
+  trigger.dispatchEvent(
+    new PointerEvent("pointerdown", { bubbles: true, pointerType: "mouse" })
+  )
+  view.api.setOpen(true)
+  await view.settle()
+  const content = view.part("content")!
+  content.setAttribute("data-modality", "pointer")
+  await view.keys("ArrowDown")
+  expect(content.getAttribute("data-modality")).toBe("keyboard")
+})

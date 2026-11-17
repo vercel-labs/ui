@@ -317,7 +317,10 @@ function selectApiBody(
         }
         const el = element("content")
         if (el) {
-          return trackModality(el, modalityOf(openedBy))
+          // With `virtualFocus`, the list's keys reach the trigger.
+          return trackModality(el, modalityOf(openedBy), () =>
+            store.get().virtualFocus ? [triggerElement()] : []
+          )
         }
       },
       open(request, open) {
