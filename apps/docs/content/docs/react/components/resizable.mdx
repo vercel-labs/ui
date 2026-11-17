@@ -142,7 +142,7 @@ Pass `layout` and `onLayoutChange` to control the group. The layout is one perce
 
 ## Saving on Complete
 
-`onLayoutChange` runs on every frame of a drag. `onLayoutCommit` runs once, when the interaction that changed the layout ends: the pointer lifts, the key comes up, or a panel collapses. Save there.
+`onLayoutChange` runs on every frame of a drag. `onLayoutCommit` runs once, when the interaction that changed the layout ends: the pointer lifts, the key comes up, or a panel collapses. Save there. Escape during a drag puts the panels back where they started, and nothing commits.
 
 <ComponentExample
   name="resizable/complete"

@@ -244,7 +244,7 @@ function createCellRange<State extends object>(
 ) {
   const { store } = context
   const { grid } = options
-  const cellOf = new WeakMap<Element, GridCell>()
+  const joined = new WeakSet<Element>()
   const drags = createDragSession(context.onDestroy)
 
   const current = () => store.get()[options.key] as CellRange | null
@@ -381,10 +381,10 @@ function createCellRange<State extends object>(
     },
     /** Joins a rendered cell, for focus and for finding it under a dragging pointer. Return its cleanup from `bind`. */
     bind(el: HTMLElement, cell: GridCell) {
-      cellOf.set(el, { row: cell.row, col: cell.col })
+      joined.add(el)
       const leave = grid.bind(el, cell)
       return () => {
-        cellOf.delete(el)
+        joined.delete(el)
         leave()
       }
     },
@@ -499,12 +499,12 @@ function createCellRange<State extends object>(
       // root, like React's, which is the document in a Next app.
       const pressed = event.currentTarget
       let el =
-        pressed instanceof Element && cellOf.has(pressed)
+        pressed instanceof Element && joined.has(pressed)
           ? pressed
           : event.target instanceof Element
             ? event.target
             : null
-      while (el && !cellOf.has(el)) {
+      while (el && !joined.has(el)) {
         el = el.parentElement
       }
       if (!(el instanceof HTMLElement)) {
@@ -514,7 +514,7 @@ function createCellRange<State extends object>(
       const paint = () => {
         const hit = el.ownerDocument
           .elementsFromPoint(last.x, last.y)
-          .map((node) => cellOf.get(node))
+          .map((node) => (joined.has(node) ? grid.placeOf(node) : undefined))
           .find(Boolean)
         if (!hit) {
           return

@@ -194,8 +194,8 @@ function visibleText(nodes: VNodeArrayChildren, skip: ReadonlySet<unknown>) {
 /**
  * Tells a listbox the labels of its value from the items among the root's
  * `children`, so the server's markup and the render that hydrates it show the
- * label, not the value, before the items mount. The listbox looks only on its
- * first render. Call it in the render, since a slot called in setup warns.
+ * label, not the value, before the items mount. The listbox looks while the
+ * items aren't mounted, so a closed list follows a label that changes. Call it in the render, since a slot called in setup warns.
  */
 function learnLabels(
   internal: {
