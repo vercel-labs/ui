@@ -47,14 +47,14 @@ function anchorable(
   ) {
     return false
   }
-  const durations = style.transitionDuration.split(",")
-  return !style.transitionProperty
-    .split(",")
-    .some(
-      (property, index) =>
-        ["all", "left", "top", "inset"].includes(property.trim()) &&
-        parseFloat(durations[index % durations.length]) > 0
-    )
+  // Safari runs a popup's enter transition again each time it ends while the
+  // browser places it, so a popup that animates is placed by script.
+  const moves = (durations: string) =>
+    durations.split(",").some((duration) => parseFloat(duration) > 0)
+  return (
+    !moves(style.transitionDuration) &&
+    (style.animationName === "none" || !moves(style.animationDuration))
+  )
 }
 
 // Places a popup of `size`, in CSS pixels, as `computePlacement` would:
