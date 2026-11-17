@@ -369,6 +369,10 @@ const comboboxSlots = (slot: SlotFactory<ComboboxState, ComboboxApi>) => ({
       ...pressKeepsFocus,
       keydown: (event, { api }) => api.internal.onTriggerKeyDown(event),
     },
+    // An input inside the popup binds only when it opens, so the trigger reads the page's language too.
+    bind(el, { store }) {
+      bindPageLocale(el, (pageLocale) => store.set({ pageLocale }))
+    },
     press({ api, store }, event) {
       api.internal.inputElement()?.focus({ preventScroll: true })
       if (store.get().open) {

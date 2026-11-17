@@ -51,4 +51,15 @@ describe("on a Spanish page", () => {
     expect(label()).toBe("Apple y 2 más")
     unbind()
   })
+
+  test("a Combobox whose input is in its popup joins them in Spanish once its trigger binds", async () => {
+    document.documentElement.lang = "es"
+    const instance = combobox({ id: "fruit", ...options })
+    const label = () => partState(instance.part("value", valueProps)).label
+    const trigger = document.body.appendChild(document.createElement("button"))
+    const unbind = bind(instance.part("trigger"), trigger)
+    await settle()
+    expect(label()).toBe("Apple y 2 más")
+    unbind()
+  })
 })
