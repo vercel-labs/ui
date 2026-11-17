@@ -1,5 +1,14 @@
 # @ui-sdk/web
 
+## 0.1.0-beta.8
+
+### Patch Changes
+
+- 005c6eb: The agent snapshot leaves out a closed Tooltip whose trigger is a listed component, since its text is already that component's label. In web components, a dialog or menu trigger around a `<ui-button>` binds the button inside it, so a press by its label reaches it.
+- 43ee542: An Autocomplete's `onValueChange` details carry `item`, the chosen suggestion's `value` and `label`, when a suggestion is chosen, so two suggestions with the same label can be told apart. The new `AutocompleteValueChangeDetails` type describes them.
+- 13a1ae4: Segmented Control's indicator gets `data-activation-direction`, like Tabs' indicator: `"none"` on its first placement, so a transition can skip it, then which way the checked item moved.
+- Updated @ui-sdk/core to 0.1.0-beta.8
+
 ## 0.1.0-beta.7
 
 ### Patch Changes

@@ -1,5 +1,19 @@
 # @ui-sdk/vue
 
+## 0.1.0-beta.8
+
+### Patch Changes
+
+- 43ee542: An Autocomplete's `onValueChange` details carry `item`, the chosen suggestion's `value` and `label`, when a suggestion is chosen, so two suggestions with the same label can be told apart. The new `AutocompleteValueChangeDetails` type describes them.
+- a93c6e6: Combobox's `autoHighlight` takes `"selected"`: opening the list highlights the selected item, so the arrow keys move on from it, and highlights nothing when none is selected. While typing, it highlights the first match, like `true`.
+- 7e2ebe9: Pagination takes `disabled`: every page and step then does what a step at its end does (`aria-disabled`, `data-disabled`, no `href`, presses ignored), and the root gets `data-disabled`. A controller still changes the page.
+- 13a1ae4: Segmented Control's indicator gets `data-activation-direction`, like Tabs' indicator: `"none"` on its first placement, so a transition can skip it, then which way the checked item moved.
+- 7e5834f: The hidden field a Select, Combobox or Listbox renders for its form is now a `<textarea>`, so Enter in the form's one text field submits a form without a submit button, like it does next to a native `<select>`.
+- 649df7f: A Vue `Input` or `Textarea` whose `value` or `v-model` the parent doesn't update now keeps showing that value as you type, like in React. Before, the typed text stayed and the form submitted it. `v-model.trim` and `v-model.number` still keep the text being typed.
+- 174a18a: `v-model.trim` on an Input or Textarea no longer writes `modelmodifiers="[object Object]"` on the element.
+- 8a40e72: A Vue part that a Vapor app sets up without `vaporInteropPlugin` now throws an error that says to install it, instead of "The root part must call usePart in its setup." or rendering nothing.
+- Updated @ui-sdk/core to 0.1.0-beta.8
+
 ## 0.1.0-beta.7
 
 ### Patch Changes

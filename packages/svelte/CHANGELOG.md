@@ -1,5 +1,18 @@
 # @ui-sdk/svelte
 
+## 0.1.0-beta.8
+
+### Patch Changes
+
+- 43ee542: An Autocomplete's `onValueChange` details carry `item`, the chosen suggestion's `value` and `label`, when a suggestion is chosen, so two suggestions with the same label can be told apart. The new `AutocompleteValueChangeDetails` type describes them.
+- a93c6e6: Combobox's `autoHighlight` takes `"selected"`: opening the list highlights the selected item, so the arrow keys move on from it, and highlights nothing when none is selected. While typing, it highlights the first match, like `true`.
+- 7e2ebe9: Pagination takes `disabled`: every page and step then does what a step at its end does (`aria-disabled`, `data-disabled`, no `href`, presses ignored), and the root gets `data-disabled`. A controller still changes the page.
+- 13a1ae4: Segmented Control's indicator gets `data-activation-direction`, like Tabs' indicator: `"none"` on its first placement, so a transition can skip it, then which way the checked item moved.
+- 7e5834f: The hidden field a Select, Combobox or Listbox renders for its form is now a `<textarea>`, so Enter in the form's one text field submits a form without a submit button, like it does next to a native `<select>`.
+- 795d1fe: A popup with a one-way `open` whose content renders only while it's open, like `{#if open}`, opens again after it closes. Before, an entrance animation that fills forwards left it stuck closed.
+- fa92d22: A part's inline style that goes away now leaves the element too when the owner keeps `style` out of its spread, like an avatar image that loads.
+- Updated @ui-sdk/core to 0.1.0-beta.8
+
 ## 0.1.0-beta.7
 
 ### Patch Changes
