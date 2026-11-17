@@ -88,6 +88,8 @@ const placed = {
   "content.collisionPadding": [0, 8],
   "content.arrowPadding": [0, 8],
 }
+const inlineSkip =
+  "Read when the content binds, and adapters render it again when it changes."
 const popupSkips = {
   presentation:
     "Decided each time it opens, so an open one keeps how it presents.",
@@ -614,7 +616,7 @@ const cases: Case[] = [
     </div>`,
     parts: { trigger: { "": {} }, content: { "": {} }, close: { "": {} } },
     values: { ...popups, ...dialogs },
-    skip: popupSkips,
+    skip: { ...popupSkips, "content.inline": inlineSkip },
   },
   {
     name: "alert dialog",
@@ -628,7 +630,7 @@ const cases: Case[] = [
     </div>`,
     parts: { trigger: { "": {} }, content: { "": {} }, close: { "": {} } },
     values: { ...popups, ...dialogs },
-    skip: popupSkips,
+    skip: { ...popupSkips, "content.inline": inlineSkip },
   },
   {
     name: "drawer",
@@ -681,7 +683,7 @@ const cases: Case[] = [
       closeDelay: [0, 300],
       dismissible: [true, false],
     },
-    skip: popupSkips,
+    skip: { ...popupSkips, "content.inline": inlineSkip },
   },
   {
     name: "hover card",

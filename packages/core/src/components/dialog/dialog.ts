@@ -316,7 +316,7 @@ type ContentProps = PortalProps & {
    */
   keepMounted?: boolean
   /**
-   * Renders the dialog and its backdrop where they are in the page instead of above it, so it can stay inside a frame, like an app preview. Pair it with `modal="trap-focus"` to keep the rest of the page usable.
+   * Renders the dialog and its backdrop where they are in the page instead of above it, so it can stay inside a frame, like an app preview. Pair it with `modal="trap-focus"` to keep the rest of the page usable. A `container` on the dialog still moves its backdrop, so leave it off.
    * @defaultValue false
    */
   inline?: boolean

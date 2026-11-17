@@ -109,7 +109,7 @@ async function mount(root: HTMLElement) {
   for (const [name, value] of Object.entries(dialogContentOptions())) {
     content.setAttribute(
       name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`),
-      value === true ? "" : value
+      value === true ? "" : String(value)
     )
   }
   const confirm = createConfirm()

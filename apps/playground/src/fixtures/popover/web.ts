@@ -108,7 +108,7 @@ async function mount(root: HTMLElement) {
   for (const [name, value] of Object.entries(popoverContentOptions())) {
     content.setAttribute(
       name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`),
-      value === true ? "" : value
+      value === true ? "" : String(value)
     )
   }
   await import("@ui-sdk/web/popover")

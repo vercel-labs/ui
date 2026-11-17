@@ -1626,13 +1626,16 @@ function createPopupLayer<
       }
       const { el } = shown
       const host = bound?.config.host?.() ?? el
+      const inline = !!bound?.config.inline
       shown.backdrop = backdrop
-      const stop = showBackdrop(backdrop)
+      const stop = showBackdrop(backdrop, inline)
       const active = activeElement()
-      try {
-        host.hidePopover()
-        host.showPopover()
-      } catch {}
+      if (!inline) {
+        try {
+          host.hidePopover()
+          host.showPopover()
+        } catch {}
+      }
       // Hiding sends focus back to where it was before. Put it back.
       if (active && active !== activeElement()) {
         active.focus({ preventScroll: true })

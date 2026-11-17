@@ -72,7 +72,10 @@ function dialogOptions() {
         modal === "trap-focus" ? ("trap-focus" as const) : modal === "true",
     }),
     ...(params.get("outside") === "false" && { closeOnOutsidePress: false }),
-    ...(container && { container: document.getElementById(container) }),
+    ...(container &&
+      !params.has("inline") && {
+        container: document.getElementById(container),
+      }),
     ...presentationOption(),
   }
 }
