@@ -614,7 +614,8 @@ function resizableApiBody(
           event
         )
       },
-      endDrag(event?: PointerEvent) {
+      // `restore` puts back the layout from before the drag, like on Escape.
+      endDrag(event?: PointerEvent, restore = false) {
         const ended = drag
         if (!ended) {
           return
@@ -623,7 +624,11 @@ function resizableApiBody(
         store.set({ dragging: null })
         // Bounds or space that changed since the last move fit as part of the
         // drag, once it's over, so this write can't end it a second time.
-        request(fitLayout(current(), store.get().constraints), "drag", event)
+        request(
+          fitLayout(restore ? ended.base : current(), store.get().constraints),
+          "drag",
+          event
+        )
         complete(ended.base, "drag", event)
       },
       keydown(event: KeyboardEvent, key: string, el: HTMLElement) {
