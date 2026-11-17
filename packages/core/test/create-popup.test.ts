@@ -446,6 +446,23 @@ describe("a popover on the popover preset", () => {
     expect(view.state.open).toBe(true)
   })
 
+  test("one the pointer opened closes when another opens by hover, unless that one is inside it", async () => {
+    const first = sharing({ openOnHover: true })
+    const second = sharing({ openOnHover: true })
+    const nested = sharing({ openOnHover: true })
+    await first.hover(first.part("trigger")!)
+    await vi.waitFor(() => expect(first.state.open).toBe(true))
+    first.part("content")!.append(nested.root)
+    await nested.hover(nested.part("trigger")!)
+    await vi.waitFor(() => expect(nested.state.open).toBe(true))
+    expect(first.state.open).toBe(true)
+    await second.hover(second.part("trigger")!)
+    await vi.waitFor(() => expect(second.state.open).toBe(true))
+    expect(first.state.open).toBe(false)
+    expect(nested.state.open).toBe(false)
+    expect(first.reasons).toEqual(["trigger-hover", "trigger-hover"])
+  })
+
   test("renders on the server from state alone", () => {
     const html = checkServer(
       share,

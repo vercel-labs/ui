@@ -206,12 +206,37 @@ function pressOpening(core: PopupCore) {
   }
 }
 
+// Popovers and hover cards the pointer opened. Another one opening by hover
+// closes them, unless its trigger is inside them, so they don't pile up when
+// a trigger sits in the area between one's trigger and popup.
+const hoverOpened = new Set<PopupCore>()
+
+function closeOtherHovered(
+  core: PopupCore,
+  trigger: Node | undefined,
+  event: PointerEvent
+) {
+  for (const other of hoverOpened) {
+    const popup = other.popup.element()
+    if (!other.store.get().open || other.popup.opener() !== "hover") {
+      hoverOpened.delete(other)
+    } else if (
+      other !== core &&
+      !popup?.contains(trigger ?? null) &&
+      !popup?.contains(document.activeElement)
+    ) {
+      other.control.hide({ reason: "trigger-hover", event, focus: false })
+    }
+  }
+}
+
 // Resting the pointer on a trigger opens it after `delay`, always for a hover
 // preset and with `openOnHover` for the others. The pointer may cross the gap
 // between the trigger and the popup; leaving the area that spans both closes
 // it after `closeDelay`. Another trigger takes the open popup over at once.
 function hoverOpening(core: PopupCore, group?: ReturnType<typeof warmGroup>) {
   const { store, options, preset } = core
+  core.onDestroy(() => hoverOpened.delete(core))
   const intent = createHoverIntent({
     trigger: core.triggerElement,
     popup: () => core.popup.element(),
@@ -242,9 +267,14 @@ function hoverOpening(core: PopupCore, group?: ReturnType<typeof warmGroup>) {
         return intent.enter(event)
       }
       // Disabled while the delay ran, it stays closed.
-      const open = () =>
-        opens() &&
-        !core.triggerDisabled(key) &&
+      const open = () => {
+        if (!opens() || core.triggerDisabled(key)) {
+          return
+        }
+        if (!group) {
+          closeOtherHovered(core, core.element(core.triggerSlot, key), event)
+          hoverOpened.add(core)
+        }
         core.control.show({
           by: "hover",
           event,
@@ -252,6 +282,7 @@ function hoverOpening(core: PopupCore, group?: ReturnType<typeof warmGroup>) {
           trigger: key,
           payload,
         })
+      }
       if (store.get().open) {
         intent.enter(event)
         if (store.get().trigger !== key) {
