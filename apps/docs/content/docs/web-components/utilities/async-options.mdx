@@ -77,11 +77,12 @@ Use the component's status and empty parts to show loading, error, and empty mes
 
 The helper's second argument sets its starting behavior:
 
-| Option      | What It Does                                            | Default |
-| ----------- | ------------------------------------------------------- | ------- |
-| `debounce`  | Milliseconds typing must pause before a request starts. | `200`   |
-| `query`     | The starting search text.                               | `""`    |
-| `immediate` | Loads that text before anyone types.                    | `false` |
+| Option      | What It Does                                                                    | Default |
+| ----------- | ------------------------------------------------------------------------------- | ------- |
+| `debounce`  | Milliseconds typing must pause before a request starts.                         | `200`   |
+| `query`     | The starting search text.                                                       | `""`    |
+| `immediate` | Loads that text before anyone types.                                            | `false` |
+| `minLength` | Characters the text needs before anything loads. Shorter text clears the items. | `0`     |
 
 Add `{ immediate: true, debounce: 300 }` after the loader to load initial choices. If you set `query`, use the same text for the component's `default-query`.
 

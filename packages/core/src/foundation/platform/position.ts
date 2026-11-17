@@ -293,8 +293,13 @@ function computePlacement(
   const room = available(side, anchor, viewport, options)
   // Beside an anchor at least its size, like a context area opened from the
   // keyboard, with room on neither side, it goes on screen inside the anchor.
+  // A popup not measured yet has no size to fit.
   if (overflow(side, point, size, viewport, padding) > 0) {
-    if ((side === "top" || side === "bottom") && anchor.height >= size.height) {
+    if (
+      (side === "top" || side === "bottom") &&
+      size.height &&
+      anchor.height >= size.height
+    ) {
       point.y = clamp(
         clamp(
           point.y,
@@ -307,6 +312,7 @@ function computePlacement(
       room.height = Math.max(0, viewport.height - padding * 2)
     } else if (
       (side === "left" || side === "right") &&
+      size.width &&
       anchor.width >= size.width
     ) {
       point.x = clamp(
