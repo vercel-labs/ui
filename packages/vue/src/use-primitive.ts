@@ -60,12 +60,12 @@ import { useBindings } from "./lifecycle"
 // Booleans default to undefined so "not passed" stays different from false.
 const optionalBoolean = { type: Boolean, default: undefined }
 
-// Vue sets up a Vapor component with an instance that only `inject` sees.
-// Without vaporInteropPlugin, a Vapor app sets up ui-sdk's parts that way.
+// In a Vapor component's setup, `getCurrentInstance()` is null though `inject`
+// works. Without vaporInteropPlugin, a Vapor app sets up ui-sdk's parts that way.
 function refuseVapor(subject: string) {
   if (!getCurrentInstance() && hasInjectionContext()) {
     throw new Error(
-      `${subject} is set up as a Vapor component, but ui-sdk parts are VDOM components. In a Vapor app, install vaporInteropPlugin. Define your own parts with defineComponent.`
+      `${subject} isn't set up in a VDOM component's setup. In a Vapor app, install vaporInteropPlugin, and define your own parts with defineComponent.`
     )
   }
 }
