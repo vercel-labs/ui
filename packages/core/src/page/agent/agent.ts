@@ -1466,6 +1466,22 @@ function createAgent(
           }
         }
       }
+      // A step can't pass a `File`, so a file input's file is named by its item's value or name.
+      if (action === "removeFile" && typeof args[0] === "string") {
+        const key = keyFor(instance)
+        const files = (instance.get() as { value?: unknown[] }).value ?? []
+        const file = files.find((value) => key(value) === args[0])
+        if (file === undefined) {
+          throw new Error(
+            `No file "${args[0]}" in ${entry.label ?? entry.component} (${entry.ref}). Its files: ${
+              (dataOf(entry, instance) ?? [])
+                .map((item) => item.label)
+                .join(", ") || "none"
+            }.`
+          )
+        }
+        args = [file, ...args.slice(1)]
+      }
       // Each label in a list of values, like a multiple combobox's ["Theo Laurent"], the same way.
       if (
         action === "setValue" &&

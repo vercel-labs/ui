@@ -474,7 +474,13 @@ const fileInputPrimitive = /* @__PURE__ */ definePrimitive({
         api.internal.removeItem(props.file!, event as MouseEvent | undefined),
     }),
   }),
-  agent: { actions: ["setValue", "addFiles", "removeFile", "clear", "open"] },
+  agent: {
+    actions: ["setValue", "addFiles", "removeFile", "clear", "open"],
+    items: (api) =>
+      api
+        .getValue()
+        .map((file) => ({ value: fileKey(file), label: file.name })),
+  },
 })
 
 /**
