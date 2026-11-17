@@ -341,7 +341,15 @@ function tabsApiBody(
           store.set({ value })
         }
       }
-      if (!controlled() && !has(value)) {
+      // With streaming, the default's tab can be in the server's markup while
+      // its boundary waits to hydrate. It keeps the selection the server showed.
+      const streamed =
+        awaited !== null &&
+        value === awaited &&
+        !!list[0].el.ownerDocument.getElementById(
+          `${id}-tab-${idPart(awaited)}`
+        )
+      if (!controlled() && !has(value) && !streamed) {
         const first = list.find(enabled)
         // The first pick is the default, so it calls nothing. A selected tab
         // that leaves the page later is a change.
