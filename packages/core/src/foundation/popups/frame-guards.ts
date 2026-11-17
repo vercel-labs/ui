@@ -39,11 +39,14 @@ function guardFrames(popup: HTMLElement, trapping: () => boolean) {
     active.after(guards[1])
   }
   // Focus moving into an iframe blurs the window and moves no focus in it.
-  // Some browsers point activeElement at the iframe only after the blur.
-  const offBlur = on(doc.defaultView ?? window, "blur", () => {
+  // Some browsers point activeElement at the iframe only after the blur, and
+  // some fire no blur on a window without system focus.
+  const later = () => {
     watch()
     setTimeout(watch)
-  })
+  }
+  const offBlur = on(doc.defaultView ?? window, "blur", later)
+  const offFocusOut = on(doc, "focusout", later)
   const offFocus = on(doc, "focusin", (event) => {
     const side = guards.indexOf(event.target as HTMLElement)
     const from = frame
@@ -58,6 +61,7 @@ function guardFrames(popup: HTMLElement, trapping: () => boolean) {
   })
   return () => {
     offBlur()
+    offFocusOut()
     offFocus()
     remove()
   }

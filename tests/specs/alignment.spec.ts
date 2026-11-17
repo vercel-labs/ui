@@ -169,8 +169,11 @@ test.describe("context menus", () => {
       el.style.cssText =
         "position: fixed; inset: 0; width: 100vw; height: 100vh; margin: 0"
       el.focus()
+      // What Shift+F10 fires, which WebKit and Firefox don't fire from the key here.
+      el.dispatchEvent(
+        new MouseEvent("contextmenu", { bubbles: true, cancelable: true })
+      )
     })
-    await page.keyboard.press("Shift+F10")
     const menu = page.getByRole("menu")
     await expect(menu).toBeVisible()
     const box = (await menu.boundingBox())!
