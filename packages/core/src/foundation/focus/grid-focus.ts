@@ -110,12 +110,15 @@ const byCell = {
  * @experimental
  */
 function createGridFocus<State extends object>(
-  context: Pick<PrimitiveContext<any, State, any>, "store" | "options">,
+  context: Pick<
+    PrimitiveContext<any, State, any>,
+    "store" | "options" | "parts"
+  >,
   options: GridFocusOptions<State>
 ) {
   const { store } = context
-  const cells = new Map<string, HTMLElement>()
-  const id = (cell: GridCell) => `${cell.row}:${cell.col}`
+  // Each element that joined, with the cell it joined as.
+  const cells = new Map<HTMLElement, GridCell>()
   const active = () => store.get()[options.key] as GridCell | null
   // The cell to focus once it binds, when it wasn't rendered as focus moved to it.
   let pending: GridCell | null = null
@@ -178,8 +181,38 @@ function createGridFocus<State extends object>(
     return cell
   }
 
+  // A cell whose part's props hold its row and column is where it last
+  // rendered, since a keyed cell can move and keep its element without binding
+  // again. Any other element stays where it joined.
+  function places() {
+    const rendered = new Map(cells)
+    for (const part of context.parts()) {
+      const props = part.props as Partial<GridCell>
+      if (
+        part.el &&
+        cells.has(part.el) &&
+        typeof props.row === "number" &&
+        typeof props.col === "number"
+      ) {
+        rendered.set(part.el, { row: props.row, col: props.col })
+      }
+    }
+    return rendered
+  }
+
+  // The newest join wins.
+  function elementAt(cell: GridCell) {
+    let found: HTMLElement | undefined
+    for (const [el, place] of places()) {
+      if (sameCell(place, cell)) {
+        found = el
+      }
+    }
+    return found
+  }
+
   function focusElement(cell: GridCell) {
-    const el = cells.get(id(cell))
+    const el = elementAt(cell)
     if (el?.isConnected) {
       pending = null
       if (el.ownerDocument.activeElement !== el) {
@@ -209,17 +242,18 @@ function createGridFocus<State extends object>(
     isActive(state: State, cell: GridCell) {
       return sameCell(state[options.key] as GridCell | null, cell)
     },
+    /** Where a joined cell's element is now, like the one under a dragging pointer. */
+    placeOf: (el: Element) => places().get(el as HTMLElement),
     /** Joins a rendered cell, so focus can reach it. Return its cleanup from the slot's `bind`. */
     bind(el: HTMLElement, cell: GridCell) {
-      const key = id(cell)
-      cells.set(key, el)
+      // Joins again at the end, so the newest join wins in elementAt.
+      cells.delete(el)
+      cells.set(el, { row: cell.row, col: cell.col })
       if (sameCell(pending, cell)) {
         queueMicrotask(() => sameCell(pending, cell) && focusElement(cell))
       }
       return () => {
-        if (cells.get(key) === el) {
-          cells.delete(key)
-        }
+        cells.delete(el)
       }
     },
     /** Makes a cell active and focuses it, scrolling it in through `reveal` first. */
