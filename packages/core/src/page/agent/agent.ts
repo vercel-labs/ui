@@ -1909,6 +1909,31 @@ function createAgent(
     return capped(found)
   }
 
+  // A closed tooltip on a listed component says what that component's label
+  // or description already says, so the snapshot leaves it out.
+  const echoesTrigger = (
+    item: ReturnType<typeof scan>[number],
+    found: ReturnType<typeof scan>
+  ) => {
+    if (
+      item.entry.component !== "tooltip" ||
+      (item.instance.get() as { open?: boolean }).open
+    ) {
+      return false
+    }
+    const trigger = item.parts.find((part) => part.slot === "trigger")?.el
+    return (
+      !!trigger &&
+      found.some(
+        (other) =>
+          other !== item &&
+          other.parts.some(
+            (part) => part.el === trigger || trigger.contains(part.el)
+          )
+      )
+    )
+  }
+
   // One `act` or `query` at a time, in the order they were called. While a
   // step waits on `allow`, like a confirm the person must answer, another
   // call can't run, so an agent can't press that confirm itself.
@@ -1928,9 +1953,10 @@ function createAgent(
      * component: "more", more, use: "query" }`, how many were left out.
      */
     snapshot: () => {
-      const shown = scan().map(({ entry, instance, parts }) =>
-        describe(entry, instance, parts)
-      )
+      const found = scan()
+      const shown = found
+        .filter((item) => !echoesTrigger(item, found))
+        .map(({ entry, instance, parts }) => describe(entry, instance, parts))
       const all = [...shown, ...offPage.values()]
       if (all.length <= limit) {
         return all

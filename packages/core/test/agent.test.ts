@@ -2264,6 +2264,32 @@ describe("agent act", () => {
     expect(clicked).toHaveBeenCalledTimes(1)
   })
 
+  test("the snapshot leaves out a closed tooltip whose trigger is a listed Button", () => {
+    const agent = createAgent()
+    const el = document.body.appendChild(document.createElement("button"))
+    el.setAttribute("aria-label", "Account")
+    const plain = document.body.appendChild(document.createElement("button"))
+    plain.setAttribute("aria-label", "Help")
+    const own = button({ id: "account" })
+    const hint = tooltip({ id: "account-hint" })
+    const help = tooltip({ id: "help-hint" })
+    cleanups.push(
+      bind(own.part("root"), el),
+      bind(hint.part("trigger"), el),
+      bind(help.part("trigger"), plain),
+      () => [own, hint, help].forEach((instance) => instance.destroy())
+    )
+    expect(
+      agent
+        .snapshot()
+        .filter((component) => !component.offPage)
+        .map(({ component, label }) => [component, label])
+    ).toEqual([
+      ["button", "Account"],
+      ["tooltip", "Help"],
+    ])
+  })
+
   test("a press with the text of a button in the dialog a Button opens is on the dialog", async () => {
     const agent = createAgent()
     const el = document.body.appendChild(document.createElement("button"))
