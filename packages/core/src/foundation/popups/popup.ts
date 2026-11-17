@@ -192,12 +192,14 @@ const selectableTypes = new Set([
 ])
 
 // Like Tab, landing on a filled text field selects its text, so typing replaces
-// it, as in a rename dialog.
+// it, as in a rename dialog. The field whose popup is open, like a combobox
+// input in its sheet, keeps what was typed.
 function selectFilled(el: HTMLElement) {
   if (
     el.localName === "input" &&
     selectableTypes.has((el as HTMLInputElement).type) &&
-    (el as HTMLInputElement).value
+    (el as HTMLInputElement).value &&
+    el.getAttribute("aria-expanded") !== "true"
   ) {
     ;(el as HTMLInputElement).select()
   }
