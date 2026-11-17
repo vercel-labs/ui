@@ -336,6 +336,54 @@ describe("data-agent-confirm on items", () => {
     expect(instance.get().value).toEqual([])
   })
 
+  test("a listbox step that takes a marked option out, by setValue or clear, needs a person", async () => {
+    const agent = createAgent()
+    const instance = listbox({
+      id: "roles",
+      multiple: true,
+      defaultValue: ["viewer", "admin"],
+    })
+    mountList("Roles", instance as never, ["viewer", "admin"])
+    for (const step of [
+      { ref: "Roles", action: "setValue", args: [["viewer"]] },
+      { ref: "Roles", action: "clear" },
+    ]) {
+      const outcome = await agent.act({ steps: [step] })
+      expect(outcome.error?.message).toBe(
+        'Needs a person: "Grants admin". Ask them to make this change themselves.'
+      )
+    }
+    expect(instance.get().value).toEqual(["viewer", "admin"])
+  })
+
+  test("replacing one marked option with another shows both warnings to allow", async () => {
+    const seen: (string | undefined)[] = []
+    const agent = createAgent({
+      allow: (step) => {
+        seen.push(step.confirm)
+        return step.confirm === "Grants viewer"
+      },
+    })
+    const instance = listbox({ id: "roles", defaultValue: "viewer" })
+    const root = document.body.appendChild(document.createElement("div"))
+    root.setAttribute("aria-label", "Roles")
+    cleanups.push(bind(instance.part("root"), root), () => instance.destroy())
+    for (const value of ["viewer", "admin"]) {
+      const el = root.appendChild(document.createElement("div"))
+      el.textContent = value
+      el.setAttribute("data-agent-confirm", `Grants ${value}`)
+      cleanups.push(bind(instance.part("item", { value }), el))
+    }
+    const outcome = await agent.act({
+      steps: [{ ref: "Roles", action: "setValue", args: ["admin"] }],
+    })
+    expect(seen).toEqual(["Grants viewer; Grants admin"])
+    expect(outcome.error?.message).toBe(
+      'The person said no to "Grants viewer; Grants admin".'
+    )
+    expect(instance.get().value).toBe("viewer")
+  })
+
   test("a tree's setChecked with a marked row needs a person, and refuses a disabled one", async () => {
     const agent = createAgent()
     const instance = tree({

@@ -59,11 +59,12 @@ The same pattern works with [Select](../components/select#async-search), [Autoco
 
 The hook's second argument sets its starting behavior:
 
-| Option      | What It Does                                     | Default |
-| ----------- | ------------------------------------------------ | ------- |
-| `debounce`  | How long typing must pause, in milliseconds.     | `200`   |
-| `query`     | The starting search text.                        | `""`    |
-| `immediate` | Loads that text as soon as the component mounts. | `false` |
+| Option      | What It Does                                                                    | Default |
+| ----------- | ------------------------------------------------------------------------------- | ------- |
+| `debounce`  | How long typing must pause, in milliseconds.                                    | `200`   |
+| `query`     | The starting search text.                                                       | `""`    |
+| `immediate` | Loads that text as soon as the component mounts.                                | `false` |
+| `minLength` | Characters the text needs before anything loads. Shorter text clears the items. | `0`     |
 
 For example, add `{ immediate: true, debounce: 300 }` after the loader to fetch initial choices and wait a little longer between searches. Until that first load starts, `status` is already `"loading"`, so the list never flashes an empty state. If you set `query`, use the same starting text for the component's `defaultQuery`.
 

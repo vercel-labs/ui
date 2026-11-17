@@ -1620,11 +1620,22 @@ function createAgent(
       }
       run = () => fn(...args)
     }
+    // Replacing or clearing a value also asks the items it takes out, so
+    // dropping a marked selection needs a person just as adding it does.
+    const changed = () => {
+      if (action !== "setValue" && !/^clear/.test(action)) {
+        return args[0]
+      }
+      const current = (instance.get() as { value?: unknown }).value
+      return [args[0], current]
+        .flat()
+        .filter((value) => value !== undefined && value !== null)
+    }
     // A press asks the button it clicks, and any other step the component's
     // own elements and the item it names, so a marked change has no unmarked
     // way around it, like choosing a marked menu item by its value.
     const targets = () =>
-      press ? [press.button, ...targetsOf()] : targetsOf(args[0])
+      press ? [press.button, ...targetsOf()] : targetsOf(changed())
     const askToRun = () =>
       press
         ? ask(args, [press.button], `press "${textOrName(press.button)}"`)

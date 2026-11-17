@@ -67,7 +67,7 @@ The snapshot lists the button with `confirm: "Charges $20 to your card for 1,000
 Needs a person: "Charges $20 to your card for 1,000 credits". Ask them to press "Buy credits" themselves.
 ```
 
-With `allow`, the step waits for your callback, and `step.confirm` carries the sentence. Show it to the person and return their answer:
+With `allow`, the step waits for your callback, and `step.confirm` carries the sentence. A step that touches several marks, like replacing one marked option with another, carries every sentence, joined by semicolons. Show it to the person and return their answer:
 
 ```ts
 const agent = createAgent({

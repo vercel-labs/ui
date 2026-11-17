@@ -58,6 +58,12 @@ type AsyncOptionsOptions = {
    * @defaultValue false
    */
   immediate?: boolean
+  /**
+   * How many characters the trimmed text needs before anything loads. Shorter
+   * text clears the items and loads nothing.
+   * @defaultValue 0
+   */
+  minLength?: number
 }
 
 /**
@@ -70,7 +76,12 @@ function createAsyncOptions<Item>(
     query: string,
     context: AsyncOptionsContext
   ) => Promise<Item[] | { items: Item[]; hasMore?: boolean }>,
-  { debounce = 200, query = "", immediate = false }: AsyncOptionsOptions = {}
+  {
+    debounce = 200,
+    query = "",
+    immediate = false,
+    minLength = 0,
+  }: AsyncOptionsOptions = {}
 ) {
   let state: AsyncOptionsState<Item> = {
     query,
@@ -96,7 +107,24 @@ function createAsyncOptions<Item>(
     controller = undefined
   }
 
+  const tooShort = (text: string) => text.trim().length < minLength
+
+  function clear(text: string) {
+    cancel()
+    set({
+      query: text,
+      items: [],
+      status: "idle",
+      error: undefined,
+      hasMore: false,
+    })
+  }
+
   function run(next: number) {
+    if (tooShort(state.query)) {
+      clear(state.query)
+      return
+    }
     controller?.abort()
     const current = new AbortController()
     controller = current
@@ -146,6 +174,10 @@ function createAsyncOptions<Item>(
         next === state.query &&
         (state.status === "loading" || timer !== undefined)
       ) {
+        return
+      }
+      if (tooShort(next)) {
+        clear(next)
         return
       }
       cancel()
