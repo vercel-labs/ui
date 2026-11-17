@@ -57,7 +57,7 @@ Dialogs, alert dialogs, drawers, and popovers move focus into their content when
 | Hover                                        | Nowhere. Focus stays where it is.                            |
 | Rendered open                                | Nowhere, except in a dialog, which takes focus as it mounts. |
 
-`initial-focus` defaults to `auto`: the first focusable element, or the content when it has none. A dialog tries an element with `autofocus` first, and an alert dialog tries its first Close part. Set it to `content` to focus the content itself, `none` to leave focus alone, or a CSS selector.
+`initial-focus` defaults to `auto`: the first focusable element, or the content when it has none. A dialog tries an element with `autofocus` first, and an alert dialog tries its first Close part. Set it to `content` to focus the content itself, `none` to leave focus alone, or a CSS selector. When focus lands on a text field that already holds a value, its text is selected, so typing replaces it.
 
 `modal` decides whether Tab can leave. With `modal="true"` or `modal="trap-focus"`, Tab and Shift+Tab wrap inside the content. With `modal="false"`, Tab moves from the trigger into a popover and on to the page after it, and focus leaving closes the popover. A non-modal dialog stays open.
 

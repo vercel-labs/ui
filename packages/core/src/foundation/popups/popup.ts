@@ -180,6 +180,27 @@ function outsidePressFocus(press: {
   return press.type === "pointerdown" ? ("later" as const) : true
 }
 
+const selectableTypes = new Set([
+  "text",
+  "search",
+  "url",
+  "tel",
+  "email",
+  "password",
+])
+
+// Like Tab, landing on a filled text field selects its text, so typing replaces
+// it, as in a rename dialog.
+function selectFilled(el: HTMLElement) {
+  if (
+    el.localName === "input" &&
+    selectableTypes.has((el as HTMLInputElement).type) &&
+    (el as HTMLInputElement).value
+  ) {
+    ;(el as HTMLInputElement).select()
+  }
+}
+
 function firstUsable<T>(
   candidates: (() => T | null | undefined)[],
   usable: (value: T) => boolean
@@ -961,6 +982,7 @@ function createPopupLayer<
       const target = plan === "popup" ? shown.el : resolve?.()
       if (target) {
         moveFocus(target)
+        selectFilled(target)
       }
     }
     if (openedOnPress) {
