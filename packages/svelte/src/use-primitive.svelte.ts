@@ -62,6 +62,10 @@ const deliveries = new WeakMap<object, (part: CorePart) => string>()
 // Svelte starts a `transition:` or `out:` outro only once the core has
 // finished closing, so a close completes when those outros end.
 const exits = new WeakMap<object, Promise<void>[]>()
+// Svelte runs an element's cleanup in the teardown of the effect removing it,
+// where reading `current` runs it again and it stops following the props.
+// Reads from such a cleanup get the options delivered last.
+let tearingDown = 0
 
 const memo = <Value>(compute: () => Value) => {
   const value = $derived.by(compute)
@@ -117,7 +121,10 @@ function usePrimitive<P extends Primitive>(
   // `value`, from here: a read sees it in the same update as the parent's own
   // state, before the effect below hands it over. Untracked, or every part
   // would hear every prop.
-  const delivered = instance.follow(() => untrack(() => current))
+  let seen: typeof current | undefined
+  const delivered = instance.follow(() =>
+    tearingDown && seen ? seen : (seen = untrack(() => current))
+  )
   // What the props changed in it, counted by the names parts read it by
   // (`followed`). Each part compares its own counts, so a value moving
   // between two of 500 items updates two. Both sides read the state held
@@ -398,7 +405,12 @@ function useHandlePart<P extends Primitive, S extends SlotName<P>>(
     return () => {
       cleanups.forEach((cleanup) => cleanup())
       bound = undefined
-      ref(null)
+      tearingDown++
+      try {
+        ref(null)
+      } finally {
+        tearingDown--
+      }
       restore()
       removed?.()
       removed = undefined
