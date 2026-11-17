@@ -206,6 +206,13 @@ function fromData(
   return out
 }
 
+// A file input's items are the files it holds, so a secret one names none of
+// them, the way its value reads "[redacted]".
+const unnamed = (entry: Entry, items: { value: string; label: string }[]) =>
+  entry.secret && entry.component === "file-input"
+    ? items.map((item) => ({ ...item, label: "[redacted]" }))
+    : items
+
 // A component's items as data, from its state's `items` unless its `agent` key says where they
 // are, then the ones a list shows while its query is empty, like recent choices.
 function dataOf(
@@ -225,7 +232,7 @@ function dataOf(
   const empty =
     items &&
     fromData(internalOf(instance)?.options?.().emptyItems, disabled, key, known)
-  return empty ? [...items, ...empty] : items
+  return items && unnamed(entry, empty ? [...items, ...empty] : items)
 }
 
 // The values of the items a person can't choose, like a disabled option, from the list's data and its elements.
@@ -576,7 +583,7 @@ function describe(entry: Entry, instance: PrimitiveInstance, parts: Bound[]) {
   // they're few, and through `query` when they may be many.
   const opens = typeof api.setOpen === "function"
   if (typeof api.setValue === "function" || entry.agent?.items) {
-    const rendered = opens ? [] : renderedItems(parts)
+    const rendered = opens ? [] : unnamed(entry, renderedItems(parts))
     const data = rendered.length ? undefined : dataOf(entry, instance)
     const items = data ? (data.length <= 10 ? data : []) : rendered
     if (items.length) {
@@ -1434,7 +1441,7 @@ function createAgent(
             ? await listItems(entry, instance, askToOpen, seeOpen)
             : data?.length
               ? data
-              : renderedItems(bound(instance))
+              : unnamed(entry, renderedItems(bound(instance)))
         if (!items.some((item) => item.value === args[0])) {
           const name = `${entry.label ?? entry.component} (${entry.ref})`
           const found = items.filter((item) => fold(item.label) === label)
@@ -1739,7 +1746,7 @@ function createAgent(
     const api = instance.api as { setOpen?: (open: boolean) => void }
     const known = new Set<string>()
     const data = dataOf(entry, instance, undefined, known)
-    let items = data ?? renderedItems(bound(instance))
+    let items = data ?? unnamed(entry, renderedItems(bound(instance)))
     // Data says what the items are, not what the page marked on them: a mark,
     // like `data-agent-confirm`, is on an item's element. So a chosen item
     // with no element in the page is looked for by opening the list too.
@@ -1924,7 +1931,7 @@ function createAgent(
       } else if (text) {
         // A list whose items match, from its data or the page, without opening it.
         const items = matching(
-          dataOf(entry, instance) ?? renderedItems(parts),
+          dataOf(entry, instance) ?? unnamed(entry, renderedItems(parts)),
           text
         )
         if (items.length) {
