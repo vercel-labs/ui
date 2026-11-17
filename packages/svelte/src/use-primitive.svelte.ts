@@ -415,7 +415,13 @@ function useHandlePart<P extends Primitive, S extends SlotName<P>>(
   // element shows is what Svelte gets, so its write changes nothing.
   const styleFor = (merged: unknown) => {
     styleShown = merged
-    if (!bound || typeof merged !== "string") {
+    if (!bound) {
+      return merged
+    }
+    // A style that goes away takes what it wrote with it, even when the owner
+    // left `style` out of its spread and Svelte writes nothing.
+    if (typeof merged !== "string") {
+      applyAttrs(bound, { style: undefined }, "svelte-style")
       return merged
     }
     applyAttrs(bound, { style: merged }, "svelte-style")
