@@ -2093,7 +2093,8 @@
     }
 
     & > :has(> [data-slot="file-input-trigger"]),
-    & > [data-slot="file-input-trigger"] {
+    & > [data-slot="file-input-trigger"],
+    & > ui-file-input-trigger > [data-slot="file-input-trigger"] {
       margin-top: calc(var(--ui-spacing) * 3);
     }
 
