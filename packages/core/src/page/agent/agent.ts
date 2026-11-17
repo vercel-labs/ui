@@ -1361,6 +1361,17 @@ function createAgent(
           `${entry.component} ${entry.ref} takes no ${action} now. It takes: ${actions.join(", ") || "nothing"}.${actions.includes("press") ? pressable(instance) : ""}`
         )
       }
+      // A run with no command runs the highlighted one, so it's named here, where its marks are read
+      // and the approved one is the one that runs.
+      if (action === "run" && args[0] == null) {
+        const highlighted = (instance.get() as { value?: unknown }).value
+        if (highlighted == null) {
+          throw new Error(
+            `Name the command to run in ${entry.label ?? entry.component} (${entry.ref}).`
+          )
+        }
+        args = [highlighted, ...args.slice(1)]
+      }
       // A combobox with `allowCustomValue` takes text that isn't an item.
       const closed =
         entry.agent?.closed && !internalOf(instance)?.allowCustomValue?.()
