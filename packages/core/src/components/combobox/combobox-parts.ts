@@ -47,6 +47,7 @@ import {
 } from "../../foundation/lists/listbox-parts"
 import { flagWhileBound } from "../../foundation/kernel/bound-keys"
 import { typedBeforeBind } from "../../foundation/forms/form"
+import { bindFieldName } from "../../foundation/lists/field-name"
 import {
   inputState,
   listContentPart,
@@ -145,6 +146,7 @@ const unreadByItems = {
   presentation: [],
   prepared: [],
   groupLabels: [],
+  fieldName: [],
   visibleChips: [],
   payload: [],
   titled: [],
@@ -280,6 +282,7 @@ const comboboxSlots = (slot: SlotFactory<ComboboxState, ComboboxApi>) => ({
     },
     bind(el, { api, id, store }) {
       bindPageLocale(el, (pageLocale) => store.set({ pageLocale }))
+      bindFieldName(el, store, id)
       // A value whose label or icon only its item knows: render the list
       // hidden so the item says it, once the parts that render now have.
       const { items, itemToLabel } = api.internal.options()

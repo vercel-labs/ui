@@ -4,6 +4,7 @@
 // primitive. State and the API live in listbox-root-api.ts, keys and
 // presses in listbox-root-keyboard.ts, parts in listbox-root-parts.ts, and
 // the range math in listbox-range.ts.
+import type { ItemsOf } from "../../foundation/lists/listbox-value"
 import {
   type ItemIconProps,
   type ItemIconState,
@@ -122,9 +123,9 @@ type ListboxSingleOptions<T, Multiple> = {
    */
   multiple?: false
   /** The selected value. Pass it to control the listbox. `null` selects nothing. */
-  value?: T | null
+  value?: T | ItemsOf<T> | null
   /** The value selected at first, when uncontrolled. A form reset returns to it. */
-  defaultValue?: T | null
+  defaultValue?: T | ItemsOf<T> | null
   // TypeScript infers `T` from both sides of the union, so a multiple one's
   // state setter would make `T` a list here. `NoInfer` leaves `T` to the
   // value, the items and the multiple side's callback.

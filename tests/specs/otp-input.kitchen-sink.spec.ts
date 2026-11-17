@@ -103,3 +103,34 @@ test("every OTP input kitchen sink variant takes a code", async ({
 
   expect(errors).toEqual([])
 })
+
+// A controlled input waits for its owner to pass the change back. Until then
+// the code it held before must not be written back, or the caret would be put
+// after the code when the owner's answer arrives.
+test("a controlled OTP input keeps the caret where a character was deleted or typed", async ({
+  page,
+  framework,
+}) => {
+  test.skip(
+    !["react", "vue", "web"].includes(framework),
+    "Composition frameworks only."
+  )
+  await page.goto(`/?fixture=otp-input-kitchen-sink&framework=${framework}`)
+  await page.locator("body[data-mounted]").waitFor({ state: "attached" })
+  const input = page.locator('[data-variant="controlled"] input')
+  await input.focus()
+  await page.keyboard.type("4829")
+  await page.keyboard.press("ArrowLeft")
+  await page.keyboard.press("ArrowLeft")
+  await page.keyboard.press("Backspace")
+  await expect(input).toHaveValue("489")
+  const caret = () =>
+    input.evaluate((el: HTMLInputElement) => [
+      el.selectionStart,
+      el.selectionEnd,
+    ])
+  await expect.poll(caret).toEqual([2, 2])
+  await page.keyboard.type("7")
+  await expect(input).toHaveValue("4879")
+  await expect.poll(caret).toEqual([3, 4])
+})

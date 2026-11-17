@@ -31,7 +31,7 @@ type Group = {
   vertical: () => boolean
   startDrag: (handle: number, key: string) => boolean
   dragBy: (delta: number, event?: PointerEvent) => void
-  endDrag: (event?: PointerEvent) => void
+  endDrag: (event?: PointerEvent, restore?: boolean) => void
   handleValue: (key: string) => { now: number; min: number; max: number } | null
 }
 
@@ -143,6 +143,7 @@ function resizableDom(
     const vertical = group().vertical()
     const origin = vertical ? event.clientY : event.clientX
     const stop = bindDrag(el, event, {
+      cancelOnEscape: true,
       onMove: (sample) => {
         const moved = (vertical ? sample.y : sample.x) - origin
         group().dragBy(
@@ -151,9 +152,10 @@ function resizableDom(
         )
         refreshCursor(el.ownerDocument)
       },
-      onEnd: (end) => {
+      onEnd: (end, canceled) => {
         drags.delete(key)
-        group().endDrag(end)
+        // Escape cancels with the last move. The browser taking the pointer keeps the layout.
+        group().endDrag(end, canceled && end.type !== "pointercancel")
         release()
       },
     })

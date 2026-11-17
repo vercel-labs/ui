@@ -64,7 +64,7 @@ Outside rendering, use `formatShortcut` for display text or `ariaKeyshortcuts` f
 
 Shortcuts with Command, Control, or Option can run in a text field. Plain letters and other keys stay available for typing.
 
-Set `allowInInput: true` when the shortcut should work there too, such as Escape to clear a search. `when` checks a condition each time the keys are pressed; it can keep a Save shortcut inactive until there's text.
+Set `allowInInput: true` when the shortcut should work there too, such as Escape to clear a search. `when` checks a condition each time the keys are pressed; it can keep a Save shortcut inactive until there's text. A shortcut runs once per press. Set `repeat: true` to keep it running while the keys are held, like `j` moving down a list.
 
 <ComponentExample
   name="shortcuts/scope"

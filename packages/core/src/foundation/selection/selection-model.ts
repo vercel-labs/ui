@@ -68,6 +68,9 @@ function createKeySelection<Reason extends string>(config: {
       }
     },
     anchor: () => anchor?.key ?? null,
+    setAnchor(key: string | null) {
+      anchor = key === null ? null : { key, base: [...keys()] }
+    },
     resetAnchor() {
       anchor = null
     },
@@ -222,6 +225,11 @@ function createSelection<
     },
     /** The key ranges start from, or `null`. */
     anchor: model.anchor,
+    /**
+     * Starts the next range at `key` without changing the selection, like when
+     * arrow keys move focus but don't select. The range keeps what's selected now. `null` clears it.
+     */
+    setAnchor: model.setAnchor,
   }
 }
 

@@ -211,3 +211,13 @@ document.head.append(
 ```
 
 These stubs don't exercise native popup or animation behavior. Use a browser for those checks, and for checking the finished component with a keyboard and screen reader.
+
+Some things land a moment after a render or an event. An icon-only button gets its name from its tooltip a tick after it renders, and focus moves into a menu that opened on a press in the next frame. Wait for them with `settle`, inside `act` in React, or query with `findByRole`:
+
+```ts
+import { checkPattern, settle } from "@ui-sdk/core/testing"
+
+await user.click(screen.getByRole("button", { name: "Options" }))
+await act(settle)
+await checkPattern(screen.getByRole("menu"), "menu")
+```

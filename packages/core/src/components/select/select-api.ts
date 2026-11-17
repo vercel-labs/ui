@@ -46,6 +46,7 @@ import { type ItemIcons } from "../../foundation/lists/item-icon"
 import { createValueSelection } from "../../foundation/lists/listbox-value"
 import { createChange } from "../../foundation/kernel/input-source"
 import { elements } from "../../foundation/kernel/elements"
+import { keepsValueOnReset } from "../../foundation/forms/value"
 
 type SelectState = PopupState & {
   value: unknown
@@ -636,6 +637,9 @@ function selectApiBody(
       // change: it's still the default.
       adoptValue: (value: unknown) => store.set({ value }),
       reset() {
+        if (keepsValueOnReset(options().value, options().defaultValue)) {
+          return
+        }
         setValue(store.get().initial, { reason: "reset" })
       },
       setFormDisabled(formDisabled: boolean) {

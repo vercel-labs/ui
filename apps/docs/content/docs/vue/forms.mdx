@@ -56,7 +56,7 @@ const reason = ref("No change yet")
 </template>
 ```
 
-Uncheck the box, then press Reset. `default-checked` supplies the reset value. The event receives `true` with reason `"reset"`, and `v-model` updates `checked`. The event runs when reset requests a different value; it does not run if the checkbox is already at its default.
+Uncheck the box, then press Reset. `default-checked` supplies the reset value. The event receives `true` with reason `"reset"`, and `v-model` updates `checked`. The event runs when reset requests a different value; it does not run if the checkbox is already at its default. Without `default-checked`, a reset leaves a controlled checkbox as it is, so your state stays the only source of its value.
 
 ## Label and Validate a Field
 

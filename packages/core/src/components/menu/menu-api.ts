@@ -231,7 +231,7 @@ type ContentProps = PositionProps &
      */
     finalFocus?: MenuFinalFocus
     /**
-     * Whether the menu stays in the page, hidden, while closed. For animation libraries that drive the exit from state.
+     * Whether the menu stays in the page, hidden, while closed. Its content keeps its state between opens.
      * @defaultValue false
      */
     keepMounted?: boolean

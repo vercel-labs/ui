@@ -144,7 +144,7 @@ list are its parts.
     /** Whether an item's value is the selected value, for object values that aren't the same object. */
     isItemEqualToValue?: (itemValue: T, value: T) => boolean
     /** Whether the first matching item is highlighted while typing, so Enter chooses it. `"always"` also highlights the selected item, or the first, when the list opens. */
-    autoHighlight?: boolean | "always"
+    autoHighlight?: boolean | "always" | "selected"
     /** With `multiple`, whether the input keeps its text after an item is chosen. */
     keepQuery?: boolean
     /** What screen readers hear once the Create part's action has been pending for a second. An empty string says nothing. */

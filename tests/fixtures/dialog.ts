@@ -49,7 +49,8 @@ function dialogParts() {
   const params = new URLSearchParams(location.search)
   return {
     title: !params.has("untitled"),
-    nested: params.has("nested"),
+    nested: params.has("nested") || params.has("nested-open"),
+    nestedOpen: params.has("nested-open"),
     removable: params.has("removable"),
     form: params.has("form"),
     long: params.has("long"),

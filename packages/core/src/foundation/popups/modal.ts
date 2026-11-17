@@ -88,14 +88,13 @@ function freezeScroller(doc: Document) {
   const restores = Object.entries(styles).map(([name, value]) =>
     setStyle(scroller, name, value)
   )
-  // A public styling hook: fixed elements, like a header, can pad themselves by it.
-  restores.push(
-    setStyle(
-      doc.documentElement,
-      "--scrollbar-width",
-      `${Math.max(0, gutter)}px`
+  // A styling hook: a fixed header can pad itself by `var(--scrollbar-width, 0px)`.
+  // Without a gutter it stays unset, since changing it restyles the whole page.
+  if (gutter > 0) {
+    restores.push(
+      setStyle(doc.documentElement, "--scrollbar-width", `${gutter}px`)
     )
-  )
+  }
   return () => restores.forEach((restore) => restore())
 }
 

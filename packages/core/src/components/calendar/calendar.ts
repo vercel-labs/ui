@@ -384,7 +384,7 @@ type CalendarDayProps = {
   /** Its ISO date. */
   value: ISODate
   /**
-   * The offset of the grid it's in.
+   * The offset of the grid it's in, read from that grid, so you don't pass it.
    * @defaultValue 0
    */
   offset?: number

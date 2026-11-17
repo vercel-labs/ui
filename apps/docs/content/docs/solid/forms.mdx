@@ -62,7 +62,7 @@ function Example() {
 export { Example }
 ```
 
-Uncheck the box, then press Reset. `defaultChecked` supplies the reset value, and the callback receives `true` with reason `"reset"`. The callback runs when reset requests a different value; it does not run if the checkbox is already at its default.
+Uncheck the box, then press Reset. `defaultChecked` supplies the reset value, and the callback receives `true` with reason `"reset"`. The callback runs when reset requests a different value; it does not run if the checkbox is already at its default. Without `defaultChecked`, a reset leaves a controlled checkbox as it is, so your state stays the only source of its value.
 
 ## Label and Validate a Field
 

@@ -62,8 +62,15 @@ type FileRules<F extends FileLike = File> = {
   maxSize?: number
   /** The smallest size accepted, in bytes. */
   minSize?: number
-  /** A check of your own. Return a reason, like `"duplicate"`, to reject the file, or nothing to accept it. */
-  validate?: (file: F) => string | null | undefined | void
+  /**
+   * A check of your own. Return a reason, like `"duplicate"`, to reject the
+   * file, or nothing to accept it. `accepted` holds the files of the same
+   * choice, drop or paste accepted before this one.
+   */
+  validate?: (
+    file: F,
+    batch: { accepted: readonly F[] }
+  ) => string | null | undefined | void
 }
 
 /** The tokens of an `accept` list: lowercase, trimmed, without empty ones. */
@@ -188,7 +195,9 @@ function validateFiles<F extends FileLike>(
       reasons.push("file-too-small")
     }
     // Your check runs only on files that passed ours, so it can be costly.
-    const custom = reasons.length ? undefined : rules.validate?.(file)
+    const custom = reasons.length
+      ? undefined
+      : rules.validate?.(file, { accepted })
     if (custom) {
       reasons.push(custom)
     }

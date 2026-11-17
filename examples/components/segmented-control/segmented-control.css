@@ -78,5 +78,9 @@
       var(--shadow-drop);
     transition-property: top, left, width, height;
     transition-duration: calc(var(--duration) * 2);
+
+    &[data-activation-direction="none"] {
+      transition: none;
+    }
   }
 }

@@ -42,6 +42,19 @@ test.describe("enhancements", { tag: "@enhancement" }, () => {
     })
   })
 
+  test("an inert its owner writes during the exit stays once the exit ends", async ({
+    page,
+    open,
+  }) => {
+    await open("collapsible", { open: "", "keep-mounted": "", animate: "" })
+    await trigger(page).click()
+    await expect(panel(page)).toHaveAttribute("data-ending-style", "")
+    await panel(page).evaluate((el) => el.setAttribute("inert", ""))
+    await expect(panel(page)).not.toHaveAttribute("data-ending-style", "")
+    await expect(output(page, "Last completed")).toHaveText("closed")
+    await expect(panel(page)).toHaveAttribute("inert", "")
+  })
+
   test("find in page reports its own reason and opens without an animation", async ({
     page,
     open,

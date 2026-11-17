@@ -193,7 +193,7 @@ import type {
   AutocompleteDismissReason,
   AutocompleteOpenChangeReason,
   AutocompleteOptions,
-  AutocompleteValueChangeReason,
+  AutocompleteValueChangeDetails,
 } from "@ui-sdk/core/autocomplete"
 import type {
   CommandController,
@@ -1690,7 +1690,7 @@ interface UiComboboxElement
  * @stable
  */
 type AutocompleteEvents = OpenEvents<AutocompleteOpenChangeReason> & {
-  valuechange: UiChangeEvent<string, AutocompleteValueChangeReason>
+  valuechange: UiDetailedChangeEvent<string, AutocompleteValueChangeDetails>
   highlight: UiHighlightEvent
   loadmore: UiLoadMoreEvent
   /** Enter with nothing highlighted, or a choice with `submit-on-select`. It doesn't bubble. Cancel it to keep the form from submitting. */

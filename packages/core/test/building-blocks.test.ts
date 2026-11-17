@@ -624,7 +624,9 @@ describe("animateOut", () => {
     const exitingAtUnmount: boolean[] = []
     animateOut(el, () => {
       queueMicrotask(() => {
-        exitingAtUnmount.push(el.hasAttribute("data-ending-style") && el.inert)
+        exitingAtUnmount.push(
+          el.hasAttribute("data-ending-style") && el.hasAttribute("inert")
+        )
         el.remove()
       })
     })
@@ -641,7 +643,21 @@ describe("animateOut", () => {
     await nextFrames(3)
     expect(exitingAtDone).toEqual([true])
     expect(el.hasAttribute("data-ending-style")).toBe(false)
-    expect(el.inert).toBe(false)
+    expect(el.hasAttribute("inert")).toBe(false)
+  })
+
+  test("an inert its owner writes during the exit stays, and one it had before comes back", async () => {
+    const el = animating()
+    animateOut(el, () => {})
+    el.setAttribute("inert", "")
+    await nextFrames(3)
+    expect(el.hasAttribute("inert")).toBe(true)
+
+    const kept = animating()
+    kept.setAttribute("inert", "")
+    animateOut(kept, () => {})
+    await nextFrames(3)
+    expect(kept.hasAttribute("inert")).toBe(true)
   })
 })
 

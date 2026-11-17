@@ -24,6 +24,7 @@ import type { PrimitiveContext } from "../../foundation/kernel/primitive-types"
 import { createValueSelection } from "../../foundation/lists/listbox-value"
 import { orientationOf } from "../../foundation/focus/collection"
 import { createChange } from "../../foundation/kernel/input-source"
+import { keepsValueOnReset } from "../../foundation/forms/value"
 
 type ListboxStore = {
   value: unknown
@@ -401,6 +402,9 @@ function listboxApiBody(
       // change: it's still the default.
       adoptValue: (value: unknown) => store.set({ value }),
       reset() {
+        if (keepsValueOnReset(options().value, options().defaultValue)) {
+          return
+        }
         setValue(store.get().initial, { reason: "reset" })
       },
       // The browser restores a disabled or read-only control too, as a native one.

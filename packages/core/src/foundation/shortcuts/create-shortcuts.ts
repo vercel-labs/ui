@@ -49,6 +49,11 @@ type ShortcutOptions = {
    * @defaultValue false
    */
   allowInInput?: boolean
+  /**
+   * Whether it runs again while the keys are held down, like `j` moving through a list.
+   * @defaultValue false, so it runs once per press
+   */
+  repeat?: boolean
   /** Checked each time the keys are pressed, and by `list()`. The shortcut runs only while it returns true. */
   when?: () => boolean
   /** What the shortcut does, for a help screen that lists them. */
@@ -128,7 +133,7 @@ function createShortcuts() {
   }
 
   function onKeydown(event: KeyboardEvent) {
-    if (event.defaultPrevented || event.repeat || isComposing(event)) {
+    if (event.defaultPrevented || isComposing(event)) {
       return
     }
     // Read only once some keys match, so typing that matches nothing allocates nothing.
@@ -137,7 +142,11 @@ function createShortcuts() {
     const apple = isApple()
     for (const entry of entries) {
       const keys = keysOf(entry)
-      if (!keys || !matchesShortcut(event, keys, apple)) {
+      if (
+        !keys ||
+        (event.repeat && !entry.options.repeat) ||
+        !matchesShortcut(event, keys, apple)
+      ) {
         continue
       }
       context ??= {

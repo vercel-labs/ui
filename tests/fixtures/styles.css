@@ -115,6 +115,17 @@
     animation: spin 300ms linear infinite;
   }
 
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  /* An entrance that keeps its end state, so the animation outlives it. */
+  .fill-in {
+    animation: fade-in 100ms both;
+  }
+
   /* Popover. Each rule targets the class and the data-slot. */
   [data-slot="popover-content"] {
     min-width: 180px;

@@ -32,6 +32,7 @@ import {
   warnIfUnnamed,
 } from "../../foundation/lists/listbox-parts"
 import { itemIconPart, optionIcon } from "../../foundation/lists/item-icon"
+import { listName } from "../../foundation/lists/field-name"
 import {
   itemTextPart,
   type ListItemTextProps,
@@ -66,6 +67,7 @@ const unreadByItems = {
   mounts: [],
   settled: [],
   groupLabels: [],
+  fieldName: [],
 } satisfies Record<
   Exclude<
     keyof CommandStore,
@@ -138,7 +140,7 @@ const commandSlots = (slot: SlotFactory<CommandStore, CommandApi>) => ({
     }),
     attrs: (state, { id }) => ({
       id: `${id}-list`,
-      "aria-labelledby": `${id}-input`,
+      ...listName(state, id),
       "aria-busy": state.status === "loading" ? "true" : undefined,
     }),
     on: pressKeepsFocus,

@@ -41,3 +41,12 @@ declare const ada: User
 ;<ComboboxChip value={ada} />
 // @ts-expect-error An item needs a value.
 ;<ComboboxItem />
+// An inline list of objects with `multiple` still makes `T` the object.
+;<Combobox
+  multiple
+  value={[{ id: 1 }]}
+  onValueChange={(value) => {
+    const known: { id: number }[] = value
+    void known
+  }}
+/>

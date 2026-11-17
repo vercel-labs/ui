@@ -9,7 +9,7 @@
     --ui-muted: light-dark(oklch(0.967 0 0), oklch(0.226 0 0));
     --ui-muted-foreground: light-dark(oklch(0.528 0 0), oklch(0.706 0 0));
     --ui-border: light-dark(oklch(0.919 0 0), oklch(0.285 0 0));
-    --ui-input: light-dark(oklch(0.82 0 0), oklch(0.409 0 0));
+    --ui-input: light-dark(oklch(0.64 0 0), oklch(0.52 0 0));
     --ui-primary: var(--ui-foreground);
     --ui-primary-foreground: var(--ui-background);
     --ui-destructive: light-dark(
@@ -17,7 +17,7 @@
       oklch(0.712 0.181 22.8)
     );
     --ui-ring: light-dark(oklch(0.913 0 0), oklch(0.333 0 0));
-    --ui-ring-border: light-dark(oklch(0.699 0 0), oklch(0.538 0 0));
+    --ui-ring-border: light-dark(oklch(0.55 0 0), oklch(0.62 0 0));
     --ui-overlay: light-dark(oklch(1 0 0 / 0.7), oklch(0 0 0 / 0.7));
     --ui-shadow:
       0 1px 2px light-dark(oklch(0 0 0 / 0.06), oklch(0 0 0 / 0.4)),
@@ -2093,7 +2093,8 @@
     }
 
     & > :has(> [data-slot="file-input-trigger"]),
-    & > [data-slot="file-input-trigger"] {
+    & > [data-slot="file-input-trigger"],
+    & > ui-file-input-trigger > [data-slot="file-input-trigger"] {
       margin-top: calc(var(--ui-spacing) * 3);
     }
 

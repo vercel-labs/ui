@@ -138,7 +138,7 @@ Bind `v-model:layout` to control the group, and listen to `@layout-change` for t
 
 ## Saving on Complete
 
-`@layout-change` runs on every frame of a drag. `@layout-commit` runs once, when the interaction that changed the layout ends: the pointer lifts, the key comes up, or a panel collapses. Save there.
+`@layout-change` runs on every frame of a drag. `@layout-commit` runs once, when the interaction that changed the layout ends: the pointer lifts, the key comes up, or a panel collapses. Save there. Escape during a drag puts the panels back where they started, and nothing commits.
 
 <ComponentExample
   name="resizable/complete"

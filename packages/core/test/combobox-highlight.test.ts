@@ -51,6 +51,34 @@ test('"always" highlights the first item when nothing is selected', async () => 
   expect(combo.state.highlighted).toBe("Backlog")
 })
 
+test('"selected" highlights the selected item when the list opens, and arrows move from it', async () => {
+  const combo = view({
+    items: ["Backlog", "Todo", "Done"],
+    defaultValue: "Todo",
+    autoHighlight: "selected",
+  })
+  combo.api.setOpen(true)
+  await settle()
+  expect(combo.state.highlighted).toBe("Todo")
+  await combo.keys("ArrowDown")
+  expect(combo.state.highlighted).toBe("Done")
+})
+
+test('"selected" highlights nothing of its own when nothing is selected', async () => {
+  const combo = view({
+    items: ["Backlog", "Todo", "Done"],
+    autoHighlight: "selected",
+  })
+  combo.api.setOpen(true)
+  await settle()
+  expect(combo.state.highlighted).toBeNull()
+  combo.api.setOpen(false)
+  await settle()
+  await combo.keys("ArrowDown")
+  await settle()
+  expect(combo.state.highlighted).toBe("Backlog")
+})
+
 test("results that arrive while open take the highlight autoHighlight placed", async () => {
   const combo = view({ items: ["Apple"], autoHighlight: true })
   await combo.type("b")

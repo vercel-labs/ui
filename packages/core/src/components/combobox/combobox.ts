@@ -3,6 +3,7 @@
 // assembles the primitive. State and the API live in combobox-api.ts, keys
 // in combobox-keyboard.ts, and parts and attributes in combobox-parts.ts, on
 // the listbox engine and the selection model Select shares.
+import type { ItemsOf } from "../../foundation/lists/listbox-value"
 import { type AsyncOptionsStatus } from "../../foundation/lists/async-options"
 import { type Modal, type PopupResult } from "../../foundation/popups/popup"
 import { pointerModalAttribute } from "../../foundation/popups/modal-attribute"
@@ -239,9 +240,9 @@ type ComboboxSingleOptions<T, Multiple> = {
    */
   multiple?: false
   /** The selected value. Pass it to control the combobox. `null` selects nothing. */
-  value?: T | null
+  value?: T | ItemsOf<T> | null
   /** The value selected at first, when uncontrolled. A form reset returns to it. */
-  defaultValue?: T | null
+  defaultValue?: T | ItemsOf<T> | null
   // TypeScript infers `T` from both sides of the union, so a multiple one's
   // state setter would make `T` a list here. `NoInfer` leaves `T` to the
   // value, the items and the multiple side's callback.
@@ -334,10 +335,10 @@ type ComboboxSharedOptions<T> = PortalProps & {
   /** Whether an item's value is the selected value, for object values that aren't the same object. */
   isItemEqualToValue?: (itemValue: T, value: T) => boolean
   /**
-   * Whether the first matching item is highlighted while typing, so Enter chooses it. `"always"` also highlights the selected item, or the first, when the list opens, so arrows move from there.
+   * Whether the first matching item is highlighted while typing, so Enter chooses it. `"always"` also highlights the selected item, or the first, when the list opens, so arrows move from there. `"selected"` highlights only the selected item when the list opens, and nothing when none is.
    * @defaultValue false
    */
-  autoHighlight?: boolean | "always"
+  autoHighlight?: boolean | "always" | "selected"
   /**
    * With `multiple`, whether the input keeps its text after an item is chosen.
    * @defaultValue false
@@ -706,8 +707,8 @@ const comboboxPrimitive = /* @__PURE__ */ definePrimitive({
     autoHighlight: (attribute: string | null) =>
       attribute === null
         ? undefined
-        : attribute === "always"
-          ? "always"
+        : attribute === "always" || attribute === "selected"
+          ? attribute
           : attribute !== "false",
     keepQuery: "boolean",
     allowCustomValue: "boolean",

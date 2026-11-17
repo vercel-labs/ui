@@ -122,6 +122,20 @@ describe("validateFiles", () => {
     expect(rejected[0].reasons).toEqual(["too-many-files"])
   })
 
+  test("validate sees the files of the same batch accepted before, so it catches a duplicate", () => {
+    const { accepted, rejected } = validateFiles(
+      [file("a.txt"), file("a.txt"), file("b.txt")],
+      {
+        validate: (candidate, { accepted }) =>
+          accepted.some((other) => other.name === candidate.name)
+            ? "duplicate"
+            : null,
+      }
+    )
+    expect(accepted.map((f) => f.name)).toEqual(["a.txt", "b.txt"])
+    expect(rejected.map(({ reasons }) => reasons)).toEqual([["duplicate"]])
+  })
+
   test("runs validate only on files that passed, and its reason rejects them", () => {
     const validate = vi.fn((f: { name: string }) =>
       f.name === "dup.png" ? "duplicate" : null

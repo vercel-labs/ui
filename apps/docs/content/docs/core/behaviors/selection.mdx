@@ -95,6 +95,15 @@ if (moved?.shift) {
 
 `from` supplies the starting point when there isn't an anchor yet. `selection.anchor()` returns the current anchor's key.
 
+When arrow keys move focus without selecting, like in a table with a checkbox column, move the anchor along with focus so the next Shift range starts there. `setAnchor` leaves the selection as it is, and `null` clears the anchor:
+
+```ts
+const moved = roving.keydown(event, el)
+if (moved && !moved.shift) {
+  selection.setAnchor(moved.key)
+}
+```
+
 A range keeps what was selected when the anchor was set, then adds the items between the anchor and the target. Pass `additive: false` to select only the range. Supplying a different selection from outside starts the next range over.
 
 <ComponentExample

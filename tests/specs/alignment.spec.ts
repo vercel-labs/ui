@@ -159,6 +159,26 @@ test.describe("context menus", () => {
     expect(Math.abs(opened.x - (box.x + 10))).toBeLessThan(2)
   })
 
+  test("Shift+F10 on an area that fills the viewport opens the menu on screen", async ({
+    page,
+    open,
+  }) => {
+    await open("alignment")
+    const canvas = page.locator(".canvas")
+    await canvas.evaluate((el: HTMLElement) => {
+      el.style.cssText =
+        "position: fixed; inset: 0; width: 100vw; height: 100vh; margin: 0"
+      el.focus()
+    })
+    await page.keyboard.press("Shift+F10")
+    const menu = page.getByRole("menu")
+    await expect(menu).toBeVisible()
+    const box = (await menu.boundingBox())!
+    const viewport = page.viewportSize()!
+    expect(box.y).toBeGreaterThanOrEqual(0)
+    expect(box.y + box.height).toBeLessThanOrEqual(viewport.height)
+  })
+
   test("the context menu points aria-labelledby at no missing element", async ({
     page,
     open,

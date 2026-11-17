@@ -17,6 +17,7 @@ import {
 } from "./listbox"
 import { listStep } from "./listbox-keyboard"
 import { keepListing, type Listing } from "./listbox-listing"
+import { bindFieldName, type FieldName } from "./field-name"
 import { listStepKeys, positionAttrs, registerItem } from "./listbox-parts"
 import {
   announceResults,
@@ -48,6 +49,7 @@ type AutocompleteCoreState = {
   focusInList: boolean
   // The groups whose label is in the page, so only those are named by it.
   groupLabels: readonly string[]
+  fieldName: FieldName
   // What each item shows from the list as a whole: whether it matches.
   listing: Listing
 }
@@ -368,7 +370,8 @@ function fieldPart<State extends AutocompleteCoreState, Api extends CoreApi>() {
         api.internal.typed(el as HTMLInputElement, event),
       keydown: (event, { api }) => api.internal.onInputKeyDown(event),
     },
-    bind(el, { api, store }) {
+    bind(el, { api, id, store }) {
+      bindFieldName(el, store, id)
       // The DOM property, since an input's value attribute stops applying once someone types.
       // Only new text is written: typing stores the query before the text, and
       // a write in between would put the old text back with the caret at the end.

@@ -68,6 +68,7 @@ export {
 } from "./toggle-control"
 export {
   afterReset,
+  keepsValueOnReset,
   type TextControl,
   watchValue,
   writeValue,

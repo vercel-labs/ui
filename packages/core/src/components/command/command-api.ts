@@ -79,6 +79,7 @@ function initialCommandState(options: CommandOptions): CommandStore {
     // Inline, so focus never has to move into the list.
     focusInList: false,
     groupLabels: [],
+    fieldName: null,
     listing: noListing,
   }
 }

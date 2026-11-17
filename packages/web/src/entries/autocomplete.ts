@@ -26,6 +26,7 @@ export type {
   AutocompleteStatusState,
   AutocompleteSubmitDetails,
   AutocompleteTriggerState,
+  AutocompleteValueChangeDetails,
   AutocompleteValueChangeReason,
   ListAnnouncement,
   ListData,
