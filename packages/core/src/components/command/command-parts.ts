@@ -32,7 +32,7 @@ import {
   warnIfUnnamed,
 } from "../../foundation/lists/listbox-parts"
 import { itemIconPart, optionIcon } from "../../foundation/lists/item-icon"
-import { listName } from "../../foundation/lists/listbox-popup"
+import { listName } from "../../foundation/lists/field-name"
 import {
   itemTextPart,
   type ListItemTextProps,

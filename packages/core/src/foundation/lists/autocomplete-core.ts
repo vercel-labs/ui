@@ -17,7 +17,7 @@ import {
 } from "./listbox"
 import { listStep } from "./listbox-keyboard"
 import { keepListing, type Listing } from "./listbox-listing"
-import { bindFieldName, type FieldName } from "./listbox-popup"
+import { bindFieldName, type FieldName } from "./field-name"
 import { listStepKeys, positionAttrs, registerItem } from "./listbox-parts"
 import {
   announceResults,

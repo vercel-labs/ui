@@ -47,8 +47,8 @@ import {
 } from "../../foundation/lists/listbox-parts"
 import { flagWhileBound } from "../../foundation/kernel/bound-keys"
 import { typedBeforeBind } from "../../foundation/forms/form"
+import { bindFieldName } from "../../foundation/lists/field-name"
 import {
-  bindFieldName,
   inputState,
   listContentPart,
   listId,

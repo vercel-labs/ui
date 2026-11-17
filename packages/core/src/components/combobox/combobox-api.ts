@@ -16,7 +16,7 @@ import {
   restoreFocus,
   trackModality,
 } from "../../foundation/kernel/modality"
-import { type FieldName } from "../../foundation/lists/listbox-popup"
+import { type FieldName } from "../../foundation/lists/field-name"
 import { deriveOpen, type PopupOpener } from "../../foundation/popups/popup"
 import {
   createPopup,

@@ -106,4 +106,4 @@ function settleFlag<Key extends string>(
   })
 }
 
-export { flagWhileBound, keyWhileBound, settleFlag }
+export { flagWhileBound, keyWhileBound, later, settleFlag }

@@ -37,7 +37,7 @@ for (const [name, view] of Object.entries(views)) {
     const mounted = view(`<input aria-label="Framework">`)
     mounts.push(mounted)
     await Promise.resolve()
-    const list = mounted.part("list")
+    const list = mounted.part("list")!
     expect(list.getAttribute("aria-label")).toBe("Framework")
     expect(list.hasAttribute("aria-labelledby")).toBe(false)
   })
@@ -48,7 +48,7 @@ for (const [name, view] of Object.entries(views)) {
     const mounted = view(`<input aria-labelledby="framework-heading">`)
     mounts.push(mounted)
     await Promise.resolve()
-    expect(mounted.part("list").getAttribute("aria-labelledby")).toBe(
+    expect(mounted.part("list")!.getAttribute("aria-labelledby")).toBe(
       "framework-heading"
     )
   })

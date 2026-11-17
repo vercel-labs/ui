@@ -2,6 +2,7 @@
 // content the list opens in, the list part inside it, and the state their
 // field and its buttons reflect.
 import { type AsyncOptionsStatus } from "./async-options"
+import { type FieldName, listName } from "./field-name"
 import { isDisabled, listStepKeys } from "./listbox-parts"
 import { flagWhileBound } from "../kernel/bound-keys"
 import { pressKeepsFocus } from "../focus/press-keeps-focus"
@@ -79,53 +80,7 @@ const inputState = (state: FieldState) => ({
 const listId = (state: { listed: boolean }, id: string) =>
   `${id}-${state.listed ? "list" : "content"}`
 
-// How the field is named when no label part names it. A list labelled by the
-// input itself would be named by the text typed in it.
-type FieldName = { labelledBy: string } | { label: string } | null
-
-function fieldNameOf(el: HTMLElement, id: string) {
-  const labelledBy = el.getAttribute("aria-labelledby")
-  if (labelledBy && labelledBy !== `${id}-label`) {
-    return { labelledBy }
-  }
-  const labels = [...((el as HTMLInputElement).labels ?? [])]
-    .map((label) => label.id)
-    .filter(Boolean)
-  if (labels.length) {
-    return { labelledBy: labels.join(" ") }
-  }
-  const label = el.getAttribute("aria-label")
-  return label ? { label } : null
-}
-
-function bindFieldName(
-  el: HTMLElement,
-  store: Store<{ fieldName: FieldName }>,
-  id: string
-) {
-  const next = fieldNameOf(el, id)
-  if (JSON.stringify(next) !== JSON.stringify(store.get().fieldName)) {
-    store.set({ fieldName: next })
-  }
-}
-
 const unnamed = { "aria-labelledby": undefined, "aria-label": undefined }
-
-// The label names the list, or else what names the field.
-function listName(
-  state: { labeled?: boolean; fieldName: FieldName },
-  id: string
-) {
-  const named = state.labeled ? null : state.fieldName
-  return {
-    "aria-labelledby": state.labeled
-      ? `${id}-label`
-      : named && "label" in named
-        ? undefined
-        : (named?.labelledBy ?? `${id}-input`),
-    "aria-label": named && "label" in named ? named.label : undefined,
-  }
-}
 
 // The popup the list opens in. It's the listbox itself until a list part
 // renders inside it, next to a header or a status.
@@ -244,13 +199,4 @@ function listPart<State extends ListPopupState, Api>() {
     RoleFields<State, Api, BaseSlotProps>
 }
 
-export {
-  bindFieldName,
-  bindListContent,
-  type FieldName,
-  inputState,
-  listContentPart,
-  listId,
-  listName,
-  listPart,
-}
+export { bindListContent, inputState, listContentPart, listId, listPart }

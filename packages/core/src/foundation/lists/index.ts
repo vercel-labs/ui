@@ -70,14 +70,12 @@ export {
   valueInputPart,
   warnIfUnnamed,
 } from "./listbox-parts"
+export { bindFieldName, type FieldName, listName } from "./field-name"
 export {
-  bindFieldName,
   bindListContent,
-  type FieldName,
   inputState,
   listContentPart,
   listId,
-  listName,
   listPart,
 } from "./listbox-popup"
 export {
