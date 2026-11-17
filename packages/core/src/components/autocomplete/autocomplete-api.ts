@@ -27,7 +27,7 @@ import {
 import { comboboxPreset } from "../../foundation/popups/popup-presets"
 import { normalize } from "../../foundation/text/typeahead"
 import { submitImplicitly } from "../../foundation/forms/form"
-import { afterReset } from "../../foundation/forms/value"
+import { afterReset, keepsValueOnReset } from "../../foundation/forms/value"
 import { type Listbox } from "../../foundation/lists/listbox"
 import { noListing } from "../../foundation/lists/listbox-listing"
 import { isDisabled } from "../../foundation/lists/listbox-parts"
@@ -79,6 +79,7 @@ function initialAutocompleteState(
     status: options.status ?? "idle",
     listed: false,
     labeled: false,
+    fieldName: null,
     inline: !!options.inlineComplete,
     disabled: !!options.disabled,
     formDisabled: false,
@@ -257,7 +258,15 @@ function autocompleteApiBody(
   function setValue(
     value: string,
     reason: AutocompleteValueChangeReason,
-    { event, query = value }: { event?: Event; query?: string } = {}
+    {
+      event,
+      query = value,
+      item,
+    }: {
+      event?: Event
+      query?: string
+      item?: { value: string; label: string }
+    } = {}
   ) {
     const state = store.get()
     if ((isDisabled(state) || state.readOnly) && reason !== "reset") {
@@ -265,7 +274,10 @@ function autocompleteApiBody(
     }
     requested = value
     core.cause(reason, event)
-    if (value === state.value || change("value", value, { reason, event })) {
+    if (
+      value === state.value ||
+      change("value", value, { reason, event, ...(item && { item }) })
+    ) {
       // A value that `onValueChange` set in its place stored its own query.
       if (requested === value) {
         store.set({ query })
@@ -346,7 +358,10 @@ function autocompleteApiBody(
     if (!entry || core.listbox.disabled(entry) || !editable()) {
       return false
     }
-    setValue(entry.label, "item-press", { event })
+    setValue(entry.label, "item-press", {
+      event,
+      item: { value: entry.key, label: entry.label },
+    })
     const input = inputElement()
     if (input && input.value !== store.get().value) {
       input.value = store.get().value
@@ -449,7 +464,10 @@ function autocompleteApiBody(
       el.ownerDocument,
       "reset",
       (event) => {
-        if (event.target !== el.form) {
+        if (
+          event.target !== el.form ||
+          keepsValueOnReset(options().value, options().defaultValue)
+        ) {
           return
         }
         afterReset(event, () => {

@@ -45,6 +45,7 @@ import {
   type PopupBehaviorName,
 } from "./popup-behavior"
 import { registerPopupElement } from "./popup-elements"
+import { guardFrames } from "./frame-guards"
 import type { Anchor, position, PositionOptions } from "../platform/position"
 import { animateIn, animateOut, writeOpen } from "../motion/presence"
 import {
@@ -178,6 +179,27 @@ function outsidePressFocus(press: {
     return false
   }
   return press.type === "pointerdown" ? ("later" as const) : true
+}
+
+const selectableTypes = new Set([
+  "text",
+  "search",
+  "url",
+  "tel",
+  "email",
+  "password",
+])
+
+// Like Tab, landing on a filled text field selects its text, so typing replaces
+// it, as in a rename dialog.
+function selectFilled(el: HTMLElement) {
+  if (
+    el.localName === "input" &&
+    selectableTypes.has((el as HTMLInputElement).type) &&
+    (el as HTMLInputElement).value
+  ) {
+    ;(el as HTMLInputElement).select()
+  }
 }
 
 function firstUsable<T>(
@@ -506,6 +528,12 @@ function watchClose(close: (event: Event) => void) {
 // Each shown layer's own elements, which a parent that turns modal later keeps out of its inert.
 const layerParts = new WeakMap<Layer, HTMLElement[]>()
 const freezing = new WeakSet<Layer>()
+// Shows a layer's popup again from the start, when it sits inside an element:
+// its content does, or its trigger, when the content renders elsewhere.
+const showsAgain = new WeakMap<
+  Layer,
+  { inside: (el: HTMLElement) => boolean; again: () => void }
+>()
 
 // A modal spares what shows above it: a layer opened from it, a newer layer
 // that freezes the page like a confirm, and anything opened from that one.
@@ -961,6 +989,7 @@ function createPopupLayer<
       const target = plan === "popup" ? shown.el : resolve?.()
       if (target) {
         moveFocus(target)
+        selectFilled(target)
       }
     }
     if (openedOnPress) {
@@ -1125,6 +1154,23 @@ function createPopupLayer<
     layer = own
     layerParts.set(own, [el, ...(backdrop ? [backdrop] : [])])
     cleanups.push(pushLayer(own))
+    showsAgain.set(own, {
+      inside: (outer) =>
+        outer.contains(el) || (!!trigger && outer.contains(trigger)),
+      again: () => {
+        const focused = activeElement()
+        hide()
+        for (const part of [host, backdrop]) {
+          try {
+            part?.hidePopover()
+          } catch {}
+        }
+        show()
+        if (focused && focused !== activeElement()) {
+          ;(focused as HTMLElement).focus({ preventScroll: true })
+        }
+      },
+    })
     if (modal.inertAndLock) {
       freezing.add(own)
     }
@@ -1252,6 +1298,7 @@ function createPopupLayer<
         })
       )
     }
+    cleanups.push(guardFrames(el, () => tabMode() === "trap"))
     if (behavior.closeWatcher) {
       const stop = watchClose((event) =>
         options.close("back", { event, focus: true })
@@ -1295,6 +1342,14 @@ function createPopupLayer<
       focusIsLost()
     ) {
       focusPending = true
+    }
+    // A popup inside this one that showed first, like nested dialogs mounted
+    // open in one commit, shows again, so it lands above this one and nests under it.
+    for (const other of activeLayers()) {
+      const shows = showsAgain.get(other)
+      if (other !== own && shows?.inside(el)) {
+        shows.again()
+      }
     }
     // Children bind in the same commit. Focus once they have.
     queueMicrotask(() => initialFocus(config.initialFocus))

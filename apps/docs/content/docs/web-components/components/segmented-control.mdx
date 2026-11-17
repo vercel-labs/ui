@@ -76,6 +76,10 @@ Name the control with `aria-label`, or put it in a [Field](./field) whose label 
   height: var(--segmented-control-indicator-height);
   transition-property: top, left, width, height;
   transition-duration: 200ms;
+
+  &[data-activation-direction="none"] {
+    transition: none;
+  }
 }
 ```
 
@@ -86,7 +90,7 @@ Name the control with `aria-label`, or put it in a [Field](./field) whose label 
   class="relative isolate inline-flex"
 >
   <ui-segmented-control-indicator
-    class="absolute -z-1 top-(--segmented-control-indicator-top) left-(--segmented-control-indicator-left) w-(--segmented-control-indicator-width) h-(--segmented-control-indicator-height) transition-[top,left,width,height] duration-200"
+    class="absolute -z-1 top-(--segmented-control-indicator-top) left-(--segmented-control-indicator-left) w-(--segmented-control-indicator-width) h-(--segmented-control-indicator-height) transition-[top,left,width,height] duration-200 data-[activation-direction=none]:transition-none"
   ></ui-segmented-control-indicator>
   <ui-segmented-control-item value="list">List</ui-segmented-control-item>
   <ui-segmented-control-item value="grid">Grid</ui-segmented-control-item>
@@ -94,6 +98,8 @@ Name the control with `aria-label`, or put it in a [Field](./field) whose label 
 ```
 
 </StyleTabs>
+
+Skip the transitions while `data-activation-direction` is `"none"`, so the indicator doesn't slide in on its first placement. After that it says which way the checked item moved: `left`, `right`, `up` or `down`.
 
 ## Vertical
 

@@ -199,7 +199,7 @@ function CopyPromptForm({ close }: { close: React.ReactNode }) {
   const id = React.useId()
 
   return (
-    <div className="flex min-h-0 flex-col gap-5">
+    <div className="flex flex-col gap-5">
       <div className="flex flex-col gap-2">
         <SectionLabel id={`${id}-framework`}>Framework</SectionLabel>
         <RadioGroup
@@ -246,7 +246,7 @@ function CopyPromptForm({ close }: { close: React.ReactNode }) {
           </RadioGroup>
         )}
       </div>
-      <Frame className="flex min-h-0 flex-col">
+      <Frame className="flex flex-col">
         <pre
           tabIndex={0}
           aria-label="Prompt"

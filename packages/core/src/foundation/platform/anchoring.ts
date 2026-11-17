@@ -83,11 +83,12 @@ function anchorStyles(
         : `anchor(center) - ${length / 2 - alignOffset}px`
   const facing = opposite[side]
   return {
-    [facing]: `anchor(${side})`,
+    // Whole pixels, so text inside renders the same each time.
+    [facing]: `round(anchor(${side}), 1px)`,
     [side]: "auto",
     [`margin-${facing}`]: `${sideOffset}px`,
     [`margin-${side}`]: `${padding}px`,
-    [start]: `min(max(${ideal}, min(${padding}px, anchor(${end}))), max(100% - ${length + padding}px, anchor(${start}) - ${length}px))`,
+    [start]: `round(min(max(${ideal}, min(${padding}px, anchor(${end}))), max(100% - ${length + padding}px, anchor(${start}) - ${length}px)), 1px)`,
     "position-anchor": name,
     "position-try-fallbacks": vertical ? "flip-y" : "flip-x",
     // Its initial value hides a popup whose anchor is scrolled out of view.

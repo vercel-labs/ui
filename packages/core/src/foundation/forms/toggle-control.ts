@@ -11,6 +11,7 @@ import {
 import { checkedAttrs } from "../kernel/attrs"
 import type { ChangeDetails, ChangeOptions } from "../kernel/details"
 import type { PrimitiveContext, SlotFactory } from "../kernel/primitive-types"
+import { keepsValueOnReset } from "./value"
 
 /**
  * Checked, unchecked, or `"indeterminate"`, for a checkbox that stands for a partly checked group.
@@ -156,9 +157,10 @@ function toggleControl<
   {
     store,
     element,
+    options,
   }: Pick<
     PrimitiveContext<AnyOptions, ToggleState, string>,
-    "store" | "element"
+    "store" | "element" | "options"
   >,
   change: (
     key: "checked",
@@ -229,7 +231,10 @@ function toggleControl<
       },
       reset() {
         // A group resets its checkboxes itself.
-        if (group?.owner()) {
+        if (
+          group?.owner() ||
+          keepsValueOnReset(options().checked, options().defaultChecked)
+        ) {
           return
         }
         change("checked", store.get().initial, { reason: "reset" })

@@ -336,6 +336,54 @@ describe("data-agent-confirm on items", () => {
     expect(instance.get().value).toEqual([])
   })
 
+  test("a listbox step that takes a marked option out, by setValue or clear, needs a person", async () => {
+    const agent = createAgent()
+    const instance = listbox({
+      id: "roles",
+      multiple: true,
+      defaultValue: ["viewer", "admin"],
+    })
+    mountList("Roles", instance as never, ["viewer", "admin"])
+    for (const step of [
+      { ref: "Roles", action: "setValue", args: [["viewer"]] },
+      { ref: "Roles", action: "clear" },
+    ]) {
+      const outcome = await agent.act({ steps: [step] })
+      expect(outcome.error?.message).toBe(
+        'Needs a person: "Grants admin". Ask them to make this change themselves.'
+      )
+    }
+    expect(instance.get().value).toEqual(["viewer", "admin"])
+  })
+
+  test("replacing one marked option with another shows both warnings to allow", async () => {
+    const seen: (string | undefined)[] = []
+    const agent = createAgent({
+      allow: (step) => {
+        seen.push(step.confirm)
+        return step.confirm === "Grants viewer"
+      },
+    })
+    const instance = listbox({ id: "roles", defaultValue: "viewer" })
+    const root = document.body.appendChild(document.createElement("div"))
+    root.setAttribute("aria-label", "Roles")
+    cleanups.push(bind(instance.part("root"), root), () => instance.destroy())
+    for (const value of ["viewer", "admin"]) {
+      const el = root.appendChild(document.createElement("div"))
+      el.textContent = value
+      el.setAttribute("data-agent-confirm", `Grants ${value}`)
+      cleanups.push(bind(instance.part("item", { value }), el))
+    }
+    const outcome = await agent.act({
+      steps: [{ ref: "Roles", action: "setValue", args: ["admin"] }],
+    })
+    expect(seen).toEqual(["Grants viewer; Grants admin"])
+    expect(outcome.error?.message).toBe(
+      'The person said no to "Grants viewer; Grants admin".'
+    )
+    expect(instance.get().value).toBe("viewer")
+  })
+
   test("a tree's setChecked with a marked row needs a person, and refuses a disabled one", async () => {
     const agent = createAgent()
     const instance = tree({
@@ -522,6 +570,74 @@ describe("data-agent-confirm on items", () => {
     const free = await choose(agent, "Free")
     expect(free.ok, free.error?.message).toBe(true)
     expect(instance.get()).toMatchObject({ value: "Free", open: false })
+  })
+})
+
+describe("empty-query suggestions", () => {
+  // A combobox of "Basic", with "Free" and "Pro" suggested while its query is
+  // empty, "Pro" marked. Options are in the page only while the list is open,
+  // and with `late`, the ones after the first mount a moment later.
+  function plans(late = false) {
+    const content = document.body.appendChild(document.createElement("div"))
+    const unbinds: (() => void)[] = []
+    cleanups.push(() => unbinds.forEach((unbind) => unbind()))
+    const instance: ReturnType<typeof combobox> = combobox({
+      id: "plan",
+      items: ["Basic"],
+      emptyItems: ["Free", "Pro"],
+      onOpenChange: (open) => {
+        unbinds.splice(0).forEach((unbind) => unbind())
+        content.replaceChildren()
+        const query = instance.get().query
+        const shown = !open ? [] : query ? ["Basic"] : ["Free", "Pro"]
+        shown.forEach((value, index) => {
+          const add = () => {
+            const item = content.appendChild(document.createElement("div"))
+            item.textContent = value
+            if (value === "Pro") {
+              item.setAttribute("data-agent-confirm", "Charges $20 a month")
+            }
+            unbinds.push(bind(instance.part("item", { value }), item))
+          }
+          if (late && index) {
+            setTimeout(add, 30)
+          } else {
+            add()
+          }
+        })
+      },
+    })
+    const field = document.body.appendChild(document.createElement("input"))
+    field.setAttribute("aria-label", "Plan")
+    cleanups.push(bind(instance.part("input"), field), () => instance.destroy())
+    return instance
+  }
+
+  test("one a query hides isn't chosen, since its marks can't be read", async () => {
+    const instance = plans()
+    const agent = createAgent()
+    const outcome = await agent.act({
+      steps: [
+        { ref: "Plan", action: "setQuery", args: ["ba"] },
+        { ref: "Plan", action: "setValue", args: ["Pro"] },
+      ],
+    })
+    expect(outcome.error?.message).toMatch(
+      /^"Pro" isn't shown in Plan \(\w+\) now\./
+    )
+    expect(instance.get().value).toBeNull()
+  })
+
+  test("a marked one that mounts after the list opens still needs a person", async () => {
+    const instance = plans(true)
+    const agent = createAgent()
+    const outcome = await agent.act({
+      steps: [{ ref: "Plan", action: "setValue", args: ["Pro"] }],
+    })
+    expect(outcome.error?.message).toMatch(
+      /^Needs a person: "Charges \$20 a month"/
+    )
+    expect(instance.get().value).toBeNull()
   })
 })
 

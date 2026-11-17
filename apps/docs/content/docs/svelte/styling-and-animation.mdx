@@ -92,6 +92,8 @@ Popup content gets `data-starting-style` before it enters and `data-ending-style
 
 Put exit styles on `data-ending-style`. `data-closed` describes the state but doesn't keep the element around for an exit.
 
+An exit animation you start from script is waited for too, when it starts in the same task that closes the popup, like in its open change callback. One started later, from an effect or an observer, isn't.
+
 ### Svelte Transitions
 
 Svelte's own transitions work too. Put one on the element you render, with `|global`, since the block that adds and removes the element is inside the component. A popup stays visible above the page until its outro ends:

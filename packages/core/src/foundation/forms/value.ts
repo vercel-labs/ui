@@ -143,8 +143,16 @@ function release(el: TextControl) {
   restores.delete(el)
 }
 
+// A form reset returns a control to its default. A controlled one with no
+// default keeps its value, like a controlled input in React, so a form action
+// that resets the form leaves the app's state alone.
+function keepsValueOnReset(value: unknown, defaultValue: unknown) {
+  return value !== undefined && defaultValue === undefined
+}
+
 export {
   afterReset,
+  keepsValueOnReset,
   type TextControl,
   type ValueSource,
   watchValue,

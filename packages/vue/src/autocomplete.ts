@@ -11,7 +11,7 @@ import {
   type AutocompleteDismissReason,
   type AutocompleteOpenChangeReason,
   type AutocompleteSubmitDetails,
-  type AutocompleteValueChangeReason,
+  type AutocompleteValueChangeDetails,
   type ListAnnouncement,
   type ListData,
   type SearchFilter,
@@ -64,7 +64,7 @@ const ContainerKey: InjectionKey<() => PopupContainer> = Symbol(
   "autocomplete-container"
 )
 
-type ValueDetails = ChangeDetails<AutocompleteValueChangeReason>
+type ValueDetails = AutocompleteValueChangeDetails
 type OpenDetails = ChangeDetails<AutocompleteOpenChangeReason>
 
 const useAutocomplete = () => useHandle(autocompletePrimitive)
@@ -480,6 +480,7 @@ export type {
   AutocompleteStatusState,
   AutocompleteSubmitDetails,
   AutocompleteTriggerState,
+  AutocompleteValueChangeDetails,
   AutocompleteValueChangeReason,
   ListAnnouncement,
   ListData,

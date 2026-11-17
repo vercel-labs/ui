@@ -5,7 +5,12 @@ import {
 } from "@ui-sdk/core/input"
 import { omit } from "solid-js"
 import { joinField, useFieldControl } from "./field-context"
-import { controlProps, elementProps, type Native } from "./text-control"
+import {
+  controlProps,
+  elementProps,
+  keepControlled,
+  type Native,
+} from "./text-control"
 import { usePart, usePrimitive } from "./use-primitive"
 
 /**
@@ -19,7 +24,7 @@ function Textarea(
   const textarea = usePrimitive(textareaPrimitive, () => ({
     value: props.value,
     defaultValue: props.defaultValue,
-    onValueChange: props.onValueChange,
+    onValueChange: keepControlled(() => props.value, props.onValueChange),
     controller: props.controller,
     debug: props.debug,
     autoResize: props.autoResize,

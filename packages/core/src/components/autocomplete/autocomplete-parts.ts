@@ -92,6 +92,7 @@ const unreadByItems = {
   mounts: [],
   settled: [],
   groupLabels: [],
+  fieldName: [],
   presentation: [],
   trigger: [],
   payload: [],

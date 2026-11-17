@@ -2,6 +2,7 @@
 // content the list opens in, the list part inside it, and the state their
 // field and its buttons reflect.
 import { type AsyncOptionsStatus } from "./async-options"
+import { type FieldName, listName } from "./field-name"
 import { isDisabled, listStepKeys } from "./listbox-parts"
 import { flagWhileBound } from "../kernel/bound-keys"
 import { pressKeepsFocus } from "../focus/press-keeps-focus"
@@ -31,6 +32,7 @@ type ListPopupState = {
   // Whether the list part is in the page, which then is the listbox instead of the content.
   listed: boolean
   labeled: boolean
+  fieldName: FieldName
   settled: boolean
   // A combobox's: options can be chosen together.
   multiple?: boolean
@@ -78,9 +80,7 @@ const inputState = (state: FieldState) => ({
 const listId = (state: { listed: boolean }, id: string) =>
   `${id}-${state.listed ? "list" : "content"}`
 
-// The label names the list, or the field does while there's no label.
-const listLabelledBy = (state: { labeled: boolean }, id: string) =>
-  state.labeled ? `${id}-label` : `${id}-input`
+const unnamed = { "aria-labelledby": undefined, "aria-label": undefined }
 
 // The popup the list opens in. It's the listbox itself until a list part
 // renders inside it, next to a header or a status.
@@ -111,7 +111,7 @@ function listContentPart<
       ...popupContentAttrs(state, id),
       "aria-multiselectable":
         !state.listed && state.multiple ? "true" : undefined,
-      "aria-labelledby": state.listed ? undefined : listLabelledBy(state, id),
+      ...(state.listed ? unnamed : listName(state, id)),
       "aria-busy":
         !state.listed && state.status === "loading" ? "true" : undefined,
       "data-presentation": state.presentation,
@@ -191,7 +191,7 @@ function listPart<State extends ListPopupState, Api>() {
     attrs: (state, { id }) => ({
       id: `${id}-list`,
       "aria-multiselectable": state.multiple ? "true" : undefined,
-      "aria-labelledby": listLabelledBy(state, id),
+      ...listName(state, id),
       "aria-busy": state.status === "loading" ? "true" : undefined,
     }),
     bind: (el, { store }) => flagWhileBound(store, "listed"),

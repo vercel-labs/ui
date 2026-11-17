@@ -127,9 +127,19 @@ function bindPanel(el: HTMLElement, panel: PanelBinding) {
     halt()
     const how = panel.opening()
     if (how !== "animate") {
-      // Nothing animates on the first paint or for a find in page match, keyframes included.
-      for (const animation of el.getAnimations()) {
-        animation.finish()
+      // Nothing animates on the first paint or for a find in page match, keyframes
+      // included. On mount, the frame before that paint reads the animations, so
+      // the commit never computes style for them.
+      const finish = () => {
+        for (const animation of el.getAnimations()) {
+          animation.finish()
+        }
+      }
+      if (how === "mount") {
+        const frame = requestAnimationFrame(finish)
+        stop = () => cancelAnimationFrame(frame)
+      } else {
+        finish()
       }
       size("auto")
       if (how === "instant") {

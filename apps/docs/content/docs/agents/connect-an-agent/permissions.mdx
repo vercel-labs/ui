@@ -67,7 +67,7 @@ The snapshot lists the button with `confirm: "Charges $20 to your card for 1,000
 Needs a person: "Charges $20 to your card for 1,000 credits". Ask them to press "Buy credits" themselves.
 ```
 
-With `allow`, the step waits for your callback, and `step.confirm` carries the sentence. Show it to the person and return their answer:
+With `allow`, the step waits for your callback, and `step.confirm` carries the sentence. A step that touches several marks, like replacing one marked option with another, carries every sentence, joined by semicolons. Show it to the person and return their answer:
 
 ```ts
 const agent = createAgent({
@@ -104,7 +104,7 @@ Two more marks change what the agent sees:
 </Field>
 ```
 
-Changes inside `data-agent-hidden` still reach [Observe](./observe-changes), so your own logs see them, while `agent.subscribe` stays quiet. A secret value stays out of `snapshot`, `act` results and change events, and the field's error text reads `"[redacted]"` too. Password, card and one-time-code fields are treated as secret without a mark. A hidden input is left out without one.
+Changes inside `data-agent-hidden` still reach [Observe](./observe-changes), so your own logs see them, while `agent.subscribe` stays quiet. A secret value stays out of `snapshot`, `act` results and change events, and the field's error text reads `"[redacted]"` too. A secret File Input lists its files without their names. Password, card and one-time-code fields are treated as secret without a mark. A hidden input is left out without one.
 
 In development, a misspelled mark such as `data-agent-confim` logs a warning with the name it meant.
 

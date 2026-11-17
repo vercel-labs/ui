@@ -54,3 +54,18 @@ test("a remove button that needs a person needs one for removeFile too", async (
   expect(result).toMatchObject({ ok: false })
   expect(input.value.map((file) => file.name)).toEqual(["a.pdf", "b.pdf"])
 })
+
+test("a secret file input's files can't be found or listed by name", async () => {
+  const input = await attachments()
+  input.parentElement!.setAttribute("data-agent-secret", "")
+  const agent = createAgent()
+  const result = await agent.act({
+    steps: [{ ref: "Attachments", action: "removeFile", args: ["a.pdf"] }],
+  })
+  expect(result).toMatchObject({ ok: false })
+  expect(result.error?.message).toMatch(
+    /Its files: \[redacted\], \[redacted\]\.$/
+  )
+  expect(JSON.stringify(result)).not.toContain("b.pdf")
+  expect(input.value.map((file) => file.name)).toEqual(["a.pdf", "b.pdf"])
+})

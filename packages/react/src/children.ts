@@ -61,8 +61,8 @@ function notLabel<Part extends object>(part: Part) {
 /**
  * Tells a listbox the labels of its value from the items among `children`,
  * so the server's markup and the render that hydrates it show the label, not
- * the value, before the items mount. The listbox looks only on its first
- * render. An item is any component element with a selected `value`, so a
+ * the value, before the items mount. The listbox looks while the items aren't
+ * mounted, so a closed list follows a label that changes. An item is any component element with a selected `value`, so a
  * component of your own that takes the value and the label as props counts
  * too: its `label`, or else its text, without hidden parts, parts of the
  * types in `skip`, like its indicator, or parts marked with `notLabel`. Items a component renders from

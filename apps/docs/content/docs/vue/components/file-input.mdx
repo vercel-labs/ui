@@ -109,7 +109,7 @@ Without `multiple`, a new file replaces the current one. A rejected file leaves 
 
 ## Validation
 
-Add `validate` for checks of your own. Return a reason string to reject a file, or `null` to accept it. It runs after the built-in type and size checks, and its reason reaches `@reject` like theirs. Validate uploads on your server too.
+Add `validate` for checks of your own. Return a reason string to reject a file, or `null` to accept it. Its second argument's `accepted` holds the files of the same drop accepted before this one, so a duplicate check catches two files with one name in a single drop. It runs after the built-in type and size checks, and its reason reaches `@reject` like theirs. Validate uploads on your server too.
 
 ```vue
 <script setup lang="ts">
@@ -119,7 +119,7 @@ const files = createFileInputController()
 <FileInput
   multiple
   :controller="files"
-  :validate="(file: File) => (files.getValue().some((other) => other.name === file.name) ? 'duplicate' : null)"
+  :validate="(file: File, { accepted }: { accepted: readonly File[] }) => ([...files.getValue(), ...accepted].some((other) => other.name === file.name) ? 'duplicate' : null)"
   @reject="(next) => (rejected = next)"
 >
 ```

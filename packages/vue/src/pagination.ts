@@ -48,6 +48,7 @@ const Pagination = withElement(
       siblings: { type: Number, default: undefined },
       boundaries: { type: Number, default: undefined },
       getHref: Function as PropType<(page: number) => string>,
+      disabled: { type: Boolean, default: undefined },
       controller: Object as PropType<PaginationController>,
       debug: { type: Boolean, default: undefined },
     },
@@ -70,6 +71,7 @@ const Pagination = withElement(
         siblings: props.siblings,
         boundaries: props.boundaries,
         getHref: props.getHref,
+        disabled: props.disabled,
         controller: props.controller,
         debug: props.debug,
         // The change event runs first, so canceling it also keeps v-model as it was.

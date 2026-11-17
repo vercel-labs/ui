@@ -3,6 +3,7 @@
 // primitive. State and the API live in select-api.ts, keys and pointer
 // presses in select-keyboard.ts, and parts and attributes in select-parts.ts,
 // on the listbox engine and the selection model Combobox shares.
+import type { ItemsOf } from "../../foundation/lists/listbox-value"
 import { type AsyncOptionsStatus } from "../../foundation/lists/async-options"
 import { type Modal, type PopupResult } from "../../foundation/popups/popup"
 import { pointerModalAttribute } from "../../foundation/popups/modal-attribute"
@@ -207,9 +208,9 @@ type SelectSingleOptions<T, Multiple> = {
    */
   multiple?: false
   /** The selected value. Pass it to control the select. `null` selects nothing. */
-  value?: T | null
+  value?: T | ItemsOf<T> | null
   /** The value selected at first, when uncontrolled. A form reset returns to it. */
-  defaultValue?: T | null
+  defaultValue?: T | ItemsOf<T> | null
   // TypeScript infers `T` from both sides of the union, so a multiple one's
   // state setter would make `T` a list here. `NoInfer` leaves `T` to the
   // value, the items and the multiple side's callback.
@@ -409,7 +410,7 @@ type SelectContentProps = PositionProps &
      */
     alignItemWithTrigger?: boolean
     /**
-     * Whether the list stays in the page, hidden, while closed. For animation libraries that drive the exit from state.
+     * Whether the list stays in the page, hidden, while closed. Its content keeps its state between opens.
      * @defaultValue false
      */
     keepMounted?: boolean

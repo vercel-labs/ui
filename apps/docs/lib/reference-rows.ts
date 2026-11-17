@@ -187,12 +187,14 @@ async function typeRows({
   }))
 }
 
-// The declared type, without the `undefined` that optional props add. A
-// type too long to read, like a map of every DOM event, shows its outline.
+// The declared type, without the `undefined` that optional props add or
+// `ItemsOf`, which only steers inference. A type too long to read, like a map
+// of every DOM event, shows its outline.
 function shortType(entry: { type: string; simplifiedType: string }) {
   const type = entry.type
     .replace(/ \| undefined$/, "")
     .replace(/^undefined \| /, "")
+    .replace(/ \| ItemsOf<\w+>/g, "")
   return type.length > 200 ? entry.simplifiedType : type
 }
 

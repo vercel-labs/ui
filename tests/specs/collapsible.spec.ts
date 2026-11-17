@@ -287,6 +287,29 @@ test.describe("animation", () => {
     expect(Math.round(height)).toBe(full)
   })
 
+  test("a panel open from the start doesn't play its keyframes", async ({
+    page,
+    open,
+  }) => {
+    await page.addInitScript(() =>
+      document.addEventListener("DOMContentLoaded", () => {
+        const style = document.createElement("style")
+        style.textContent =
+          "@keyframes grow { from { opacity: 0 } } [data-slot=collapsible-panel][data-open] { animation: grow 10s }"
+        document.head.append(style)
+      })
+    )
+    await open("collapsible", { open: "" })
+    await expect(content(page)).toBeVisible()
+    await expect
+      .poll(() =>
+        panel(page).evaluate((el) =>
+          el.getAnimations().map((animation) => animation.playState)
+        )
+      )
+      .toEqual([])
+  })
+
   test("content that grows while open is shown in full", async ({
     page,
     open,

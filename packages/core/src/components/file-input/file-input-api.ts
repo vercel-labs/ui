@@ -11,7 +11,10 @@ import {
   type FileLike,
   type FileRejection,
 } from "../../foundation/forms/files"
-import { writingFromScript } from "../../foundation/forms/value"
+import {
+  keepsValueOnReset,
+  writingFromScript,
+} from "../../foundation/forms/value"
 import {
   associate,
   bindInternals,
@@ -439,7 +442,11 @@ function fileInputApiBody(
           context.props("dropzone", key) ?? {}
         return props
       },
-      reset: () => replace(store.get().initial, "reset"),
+      reset() {
+        if (!keepsValueOnReset(options().value, options().defaultValue)) {
+          replace(store.get().initial, "reset")
+        }
+      },
       setFormDisabled(formDisabled: boolean) {
         store.set({ formDisabled })
       },

@@ -42,6 +42,7 @@ import type {
   DatePickerValue,
   DatePickerValueChangeReason,
 } from "./date-picker"
+import { keepsValueOnReset } from "../../foundation/forms/value"
 
 type State = PopupState &
   CalendarModelState & {
@@ -343,6 +344,10 @@ function datePickerApiBody(
   }
 
   function reset() {
+    const { value, defaultValue } = context.options()
+    if (keepsValueOnReset(value, defaultValue)) {
+      return
+    }
     store.set({ anchor: null, hover: null })
     clearDrafts()
     setValue(store.get().initial, "reset")

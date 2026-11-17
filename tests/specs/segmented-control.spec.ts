@@ -177,6 +177,27 @@ test.describe("indicator", () => {
     await expect.poll(() => coversItem(page, "Calendar")).toBe(true)
   })
 
+  test("the indicator says which way the checked item moved, and none at first", async ({
+    page,
+    open,
+  }) => {
+    await open("segmented-control")
+    await expect(indicator(page)).toHaveAttribute(
+      "data-activation-direction",
+      "none"
+    )
+    await item(page, "Calendar").click()
+    await expect(indicator(page)).toHaveAttribute(
+      "data-activation-direction",
+      "right"
+    )
+    await item(page, "List").click()
+    await expect(indicator(page)).toHaveAttribute(
+      "data-activation-direction",
+      "left"
+    )
+  })
+
   test("the indicator covers the checked item in a vertical control", async ({
     page,
     open,

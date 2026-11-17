@@ -1,6 +1,6 @@
 import { describe, expect, test, vi } from "vitest"
 import { moveIndex, stepFor } from "../src/foundation/focus/collection"
-import { directionBetween } from "../src/components/tabs/tabs-direction"
+import { directionBetween } from "../src/foundation/selection/indicator"
 import { idPart } from "../src/foundation/kernel/attrs"
 import { renderVersion } from "../src/foundation/kernel/primitive"
 import { tabs } from "../src/components/tabs/tabs"

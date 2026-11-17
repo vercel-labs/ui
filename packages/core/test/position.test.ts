@@ -104,6 +104,27 @@ describe("placement", () => {
     expect(result.x).toBe(-600 + 80)
   })
 
+  test("goes inside an anchor bigger than it when neither side has room, like a context area", () => {
+    const result = computePlacement(
+      { x: 0, y: 0, width: 1000, height: 800 },
+      size,
+      viewport,
+      options
+    )
+    expect(result).toMatchObject({ x: 8, y: 800 - 300 - 8, side: "bottom" })
+    expect(result.available.height).toBe(800 - 16)
+  })
+
+  test("leaves with a big anchor scrolled off screen", () => {
+    const result = computePlacement(
+      { x: 0, y: -2000, width: 1000, height: 800 },
+      size,
+      viewport,
+      options
+    )
+    expect(result.y).toBe(-2000 + 800 + 4)
+  })
+
   test("keeps an alignOffset that takes it past the anchor when it fits", () => {
     const result = computePlacement(
       { x: 100, y: 100, width: 80, height: 30 },

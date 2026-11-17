@@ -512,7 +512,7 @@ type WithFeatures<
     slot: S,
     props?: SlotProps<AllSlots<P, Features>[S]>
   ) => ReturnType<ReturnType<P>["part"]>
-}) & { options?: Record<string, PropSpec>; slots?: object }
+}) & { options?: Record<string, PropSpec> | undefined; slots?: object }
 
 type AllSlots<
   P extends (options: any) => { types: { slots: object } },
@@ -600,7 +600,7 @@ type AgentSurface = {
  * @stable
  */
 type Primitive = ((options: any) => PrimitiveInstance) & {
-  options?: Record<string, PropSpec>
+  options?: Record<string, PropSpec> | undefined
   slots?: object
 }
 

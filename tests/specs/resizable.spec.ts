@@ -311,6 +311,21 @@ test.describe("pointer", () => {
     await expect(sidebarHandle(page)).toHaveAttribute("aria-valuenow", "40")
   })
 
+  test("Escape during a drag puts the panels back where they started", async ({
+    page,
+  }) => {
+    const start = await center(sidebarHandle(page))
+    await page.mouse.move(start.x, start.y)
+    await page.mouse.down()
+    await page.mouse.move(start.x + 60, start.y, { steps: 4 })
+    await expect(sidebarHandle(page)).not.toHaveAttribute("aria-valuenow", "25")
+    await page.keyboard.press("Escape")
+    await expect(sidebarHandle(page)).toHaveAttribute("aria-valuenow", "25")
+    await page.mouse.move(start.x + 120, start.y, { steps: 4 })
+    await page.mouse.up()
+    await expect(sidebarHandle(page)).toHaveAttribute("aria-valuenow", "25")
+  })
+
   test("a double-click on a handle collapses its panel, and another restores it", async ({
     page,
   }) => {

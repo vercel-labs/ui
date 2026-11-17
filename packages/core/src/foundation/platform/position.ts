@@ -289,10 +289,48 @@ function computePlacement(
     }
   }
 
+  const padding = options.collisionPadding
+  const room = available(side, anchor, viewport, options)
+  // Beside an anchor at least its size, like a context area opened from the
+  // keyboard, with room on neither side, it goes on screen inside the anchor.
+  // A popup not measured yet has no size to fit.
+  if (overflow(side, point, size, viewport, padding) > 0) {
+    if (
+      (side === "top" || side === "bottom") &&
+      size.height &&
+      anchor.height >= size.height
+    ) {
+      point.y = clamp(
+        clamp(
+          point.y,
+          viewport.y + padding,
+          viewport.y + viewport.height - size.height - padding
+        ),
+        anchor.y,
+        anchor.y + anchor.height - size.height
+      )
+      room.height = Math.max(0, viewport.height - padding * 2)
+    } else if (
+      (side === "left" || side === "right") &&
+      size.width &&
+      anchor.width >= size.width
+    ) {
+      point.x = clamp(
+        clamp(
+          point.x,
+          viewport.x + padding,
+          viewport.x + viewport.width - size.width - padding
+        ),
+        anchor.x,
+        anchor.x + anchor.width - size.width
+      )
+      room.width = Math.max(0, viewport.width - padding * 2)
+    }
+  }
+
   // Shifts along the anchor to stay on screen, but never past the anchor's
   // far edge, so a popup whose anchor scrolls away leaves with it. An
   // `alignOffset` that alone takes it past the anchor is kept.
-  const padding = options.collisionPadding
   if (side === "top" || side === "bottom") {
     const x = clamp(
       point.x,
@@ -319,7 +357,7 @@ function computePlacement(
     ...point,
     side,
     align: options.align,
-    available: available(side, anchor, viewport, options),
+    available: room,
   }
 }
 
@@ -628,8 +666,11 @@ function position(
         x: box.x - (parseFloat(style.left) || 0) * scale.x,
         y: box.y - (parseFloat(style.top) || 0) * scale.y,
       }
-      popup.style("left", `${(result.x - origin.x) / scale.x}px`)
-      popup.style("top", `${(result.y - origin.y) / scale.y}px`)
+      // On the device's pixel grid, so text inside renders the same each time.
+      const ratio = el.ownerDocument.defaultView?.devicePixelRatio || 1
+      const snap = (value: number) => Math.round(value * ratio) / ratio
+      popup.style("left", `${snap((result.x - origin.x) / scale.x)}px`)
+      popup.style("top", `${snap((result.y - origin.y) / scale.y)}px`)
     }
     const across = isVertical(result.side) ? scale.x : scale.y
     if (first) {

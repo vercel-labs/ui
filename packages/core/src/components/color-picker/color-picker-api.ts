@@ -48,6 +48,7 @@ import {
   type ColorChannel,
   type ColorPickerSpace,
 } from "./color-picker-channels"
+import { keepsValueOnReset } from "../../foundation/forms/value"
 
 type State = {
   value: string
@@ -503,6 +504,10 @@ function colorPickerApiBody(
           .catch(() => {})
       },
       reset() {
+        const { value, defaultValue } = context.options()
+        if (keepsValueOnReset(value, defaultValue)) {
+          return
+        }
         const color = colorIn(store.get().initial, store.get().space)
         if (color) {
           setColor(color, { reason: "reset" }, false)

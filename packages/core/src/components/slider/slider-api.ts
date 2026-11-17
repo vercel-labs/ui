@@ -39,6 +39,7 @@ import {
   createChange,
   createCommit,
 } from "../../foundation/kernel/input-source"
+import { keepsValueOnReset } from "../../foundation/forms/value"
 
 type State = {
   value: number | number[]
@@ -427,6 +428,9 @@ function sliderApiBody(
         commit(start, "step-key", event ?? last, thumb)
       },
       reset() {
+        if (keepsValueOnReset(options().value, options().defaultValue)) {
+          return
+        }
         change("value", store.get().initial, { reason: "reset", thumb: null })
       },
       // The browser restores a disabled or read-only control too, as a native one.

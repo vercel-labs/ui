@@ -205,7 +205,7 @@ Suggestions can change while the list is open. The highlight stays with its sugg
 
 ## Controlled
 
-The value is always a string. Set its initial text with `default-value`, then read or write the element’s `value` property. The popup has a separate `open` property. Listen for `valuechange` and `openchange`; the requested value is in `event.detail.value`. Call `event.preventDefault()` to reject a change. [State and Events](../state-and-events) covers controlled state and cancellation.
+The value is always a string. Set its initial text with `default-value`, then read or write the element’s `value` property. The popup has a separate `open` property. Listen for `valuechange` and `openchange`; the requested value is in `event.detail.value`. Call `event.preventDefault()` to reject a change. When a suggestion is chosen, `event.detail.item` holds its `value` and `label`, so suggestions that share a label can still be told apart. [State and Events](../state-and-events) covers controlled state and cancellation.
 
 <ComponentExample
   name="autocomplete/controlled"
