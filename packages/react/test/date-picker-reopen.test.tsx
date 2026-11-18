@@ -38,12 +38,16 @@ const settle = () =>
 const focusedDate = () =>
   (document.activeElement as HTMLElement).getAttribute("data-value")
 
-async function render(value?: string) {
+async function render(value?: string, defaultMonth?: string) {
   const container = document.body.appendChild(document.createElement("div"))
   root = createRoot(container)
   await act(async () =>
     root!.render(
-      <DatePicker today="2026-01-10" defaultValue={value}>
+      <DatePicker
+        today="2026-01-10"
+        defaultValue={value}
+        defaultMonth={defaultMonth}
+      >
         <DatePickerInput aria-label="Date" />
         <DatePickerTrigger />
         <DatePickerContent>
@@ -127,3 +131,16 @@ test.each([
     )
   }
 )
+
+test("with nothing selected, each open shows defaultMonth", async () => {
+  const trigger = await render(undefined, "2025-10")
+  await open(trigger)
+  const label = () =>
+    document.querySelector("[role=grid]")!.getAttribute("aria-label")
+  expect(label()).toBe("October 2025")
+  await press("PageDown")
+  expect(label()).toBe("November 2025")
+  await press("Escape")
+  await open(trigger)
+  expect(label()).toBe("October 2025")
+})

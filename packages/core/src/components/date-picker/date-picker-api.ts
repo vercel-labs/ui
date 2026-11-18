@@ -173,14 +173,18 @@ function datePickerApiBody(
   let awaited = false
   let last = store.get().value
   let opened = store.get().open
+  // With nothing selected, an open goes back to the month the picker started on, like `defaultMonth`.
+  const firstMonth = store.get().month
   store.subscribe(() => {
     const state = store.get()
-    // Each open shows the selected date, else today, wherever browsing left the months.
+    // Each open shows the selected date, wherever browsing left the months.
     if (state.open !== opened) {
       opened = state.open
-      const date = selectedDates(state.value)[0] ?? state.today
+      const [date] = selectedDates(state.value)
       if (opened && date) {
         reveal(clampDate(date, state.min, state.max), "imperative")
+      } else if (opened && state.month !== firstMonth) {
+        setMonth(firstMonth, "imperative")
       }
     }
     if (state.value === last) {
