@@ -1,5 +1,18 @@
 # @ui-sdk/core
 
+## 0.1.0-beta.9
+
+### Patch Changes
+
+- fcb4382: Dialog and Popover content take `inline`, which renders the content (and a dialog's backdrop) where it is in the page instead of the top layer, so it can stay inside a frame. An inline popover is placed by your CSS.
+- da25ba4: Combobox, Autocomplete and Listbox controllers take `highlight(value)` and `getHighlighted()`, so code can put the highlight on a particular item, like the row a cascading picker came back from. `onHighlight` fires for it, and the item scrolls into view. While focus is outside a Listbox, `highlight` gives the option the tab stop instead.
+- 7a18902: An image cropper's handles go beside its selection, not inside it, so assistive technology reaches them: a slider's children are hidden from it. Each handle gets its place on the selection's edge or corner as an inline style. Move `ImageCropperHandle` out of `ImageCropperSelection` into the viewport, and drop any CSS that placed handles by `data-position`.
+- c1a9a86: Page Up and Page Down move a Listbox's focus ten options and stop at its ends. A Listbox with `bindScrollPicker` still pages by what fits in view.
+- bf17e93: Listbox takes `virtualFocus` to keep focus on the list itself. Arrow keys, Home, End and typing move a highlight, the list points at it with `aria-activedescendant`, and a press chooses an option without moving focus.
+- 91bea17: An exit animation reads an empty duration as none, and async options read a loader that resolves to nothing as no items, instead of staying `loading`.
+- 1a04e0d: Select takes `virtualFocus` to keep focus on the trigger while the list is open, as on a native select. Arrow keys, Home, End and typing move the highlight, the trigger points at it with `aria-activedescendant`, and Tab closes the list and moves on.
+- 610e965: Token Input keeps text typed into a server-rendered editor before the page's script runs, and React no longer reports a hydration mismatch for it.
+
 ## 0.1.0-beta.8
 
 ### Patch Changes
