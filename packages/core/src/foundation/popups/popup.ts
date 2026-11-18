@@ -785,7 +785,21 @@ function createPopupLayer<
       return
     }
     if (mode === true) {
-      return returnFocus(el, from, false, range)
+      returnFocus(el, from, false, range)
+      // What focus went back to can leave as the framework renders the close,
+      // like the row a confirm dialog's action removes. The chain goes on then.
+      const target = activeElement()
+      setTimeout(() => {
+        if (
+          target &&
+          !target.isConnected &&
+          focusIsLost() &&
+          !openedSince(order)
+        ) {
+          returnFocus(el, from)
+        }
+      })
+      return
     }
     if (mode === "unless-moved") {
       queueMicrotask(() => {
@@ -921,9 +935,9 @@ function createPopupLayer<
     el: HTMLElement,
     from: typeof upstream,
     strict = false,
-    range?: ReturnType<typeof readCaret>
+    range?: ReturnType<typeof readCaret>,
+    setting = options.finalFocus?.() ?? "trigger"
   ) {
-    const setting = options.finalFocus?.() ?? "trigger"
     if (setting === "none") {
       return
     }
@@ -1076,10 +1090,11 @@ function createPopupLayer<
         { x: (event as MouseEvent).clientX, y: (event as MouseEvent).clientY },
         el.getBoundingClientRect()
       )
-    // Element neighbours, since a framework's anchor comments beside the
-    // trigger, like Svelte's, leave with it. Content that binds again after
-    // that trigger is gone keeps the way to where it was.
-    const returnsTo = returnTrigger()
+    // Element neighbours, since a framework's anchor comments beside the trigger,
+    // like Svelte's, leave with it. Without a trigger, what had focus stands in.
+    // Content that binds again after either is gone keeps the way to where it was.
+    const returnsTo =
+      returnTrigger() ?? (!trigger && before?.isConnected ? before : undefined)
     if (returnsTo || !trigger) {
       path = []
     }
@@ -1532,6 +1547,8 @@ function createPopupLayer<
       }
       return () => {
         cancelled = true
+        // Read while the content's props are still there, for a return after it's gone.
+        const setting = options.finalFocus?.() ?? "trigger"
         unregister()
         if (bound?.el !== el) {
           return
@@ -1556,7 +1573,7 @@ function createPopupLayer<
             caret = undefined
             queueMicrotask(() => {
               if (!bound && !el.isConnected && focusIsLost()) {
-                returnFocus(el, from, true, range)
+                returnFocus(el, from, true, range, setting)
               }
             })
           }
