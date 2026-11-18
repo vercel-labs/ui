@@ -125,6 +125,35 @@
     height: 1rem;
   }
 
+  [data-slot="visually-hidden"] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  :is(
+    [data-slot="select-item-icon"],
+    [data-slot="select-value-icon"],
+    [data-slot="combobox-item-icon"],
+    [data-slot="combobox-value-icon"],
+    [data-slot="autocomplete-item-icon"],
+    [data-slot="listbox-item-icon"],
+    [data-slot="command-item-icon"],
+    [data-slot="menu-item-icon"],
+    [data-slot="trigger-menu-item-icon"],
+    [data-slot="tabs-tab-icon"],
+    [data-slot="navigation-menu-link-icon"],
+    [data-slot="toggle-icon"]
+  ) {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+  }
+
   /* Drawn only when a part has no icon of its own. */
   [data-slot="select-trigger"]:not(:has(> svg))::after,
   [data-slot="combobox-trigger"]:not(:has(> svg))::after,
@@ -402,7 +431,7 @@
     margin-top: calc(var(--ui-spacing) * 3.5);
   }
 
-  [data-slot="field-label"] {
+  :is([data-slot="field-label"], [data-slot="select-label"]) {
     display: block;
     color: var(--ui-foreground);
     font-size: calc(var(--ui-font-size) - 0.0625rem);
@@ -478,6 +507,32 @@
 
   [data-slot="number-input-group"] {
     display: inline-flex;
+  }
+
+  [data-slot="number-input-scrub-area"] {
+    display: inline-flex;
+    align-self: flex-start;
+    align-items: center;
+    gap: calc(var(--ui-spacing) * 2);
+    cursor: ew-resize;
+
+    &[data-orientation="vertical"] {
+      cursor: ns-resize;
+    }
+
+    & [data-slot="field-label"] {
+      cursor: inherit;
+    }
+  }
+
+  [data-slot="number-input-scrub-area-cursor"] {
+    margin: -0.625rem 0 0 -0.625rem;
+    color: var(--ui-foreground);
+
+    & > svg {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
   }
 
   :is(
@@ -1076,6 +1131,28 @@
     font-size: var(--ui-font-size);
   }
 
+  /* A wrapper that adds an icon beside the search field takes over its bottom edge. */
+  [data-slot="command"] :has(> svg):has([data-slot="command-input"]) {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--ui-spacing) * 2);
+    padding-inline: calc(var(--ui-spacing) * 3);
+    border-bottom: 1px solid var(--ui-border);
+    color: var(--ui-muted-foreground);
+
+    & > svg {
+      flex-shrink: 0;
+      width: 1rem;
+      height: 1rem;
+    }
+
+    & [data-slot="command-input"] {
+      padding-inline: 0;
+      border-bottom: 0;
+      color: var(--ui-foreground);
+    }
+  }
+
   [data-slot="command-input"] {
     width: 100%;
     height: calc(var(--ui-spacing) * 10);
@@ -1648,6 +1725,7 @@
     [data-slot="date-picker-trigger"],
     [data-slot="date-picker-clear"],
     [data-slot="password-input-toggle"],
+    [data-slot="input-clear"],
     [data-slot="file-input-item-remove"],
     [data-slot="toast-close"]
   ) {
@@ -1679,13 +1757,15 @@
   :is(
     [data-slot="date-picker-trigger"],
     [data-slot="date-picker-clear"],
-    [data-slot="password-input-toggle"]
+    [data-slot="password-input-toggle"],
+    [data-slot="input-clear"]
   ) {
     width: calc(var(--ui-spacing) * 6);
     height: calc(var(--ui-spacing) * 6);
   }
 
-  [data-slot="date-picker-clear"][data-empty] {
+  [data-slot="date-picker-clear"][data-empty],
+  [data-slot="input-clear"]:not([data-filled]) {
     visibility: hidden;
   }
 
@@ -1693,7 +1773,8 @@
   :is(
     [data-slot="date-input"],
     [data-slot="time-input"],
-    [data-slot="password-input"]
+    [data-slot="password-input"],
+    [data-slot="input-group"]
   ) {
     display: inline-flex;
     align-items: center;
@@ -1778,6 +1859,25 @@
   [data-slot="password-input"] {
     display: flex;
     padding-inline-end: calc(var(--ui-spacing) * 1);
+  }
+
+  [data-slot="input-group"] {
+    display: flex;
+    color: var(--ui-muted-foreground);
+
+    &:has([data-slot="input-clear"]) {
+      padding-inline-end: calc(var(--ui-spacing) * 1);
+    }
+
+    & [data-slot="input"] {
+      flex: 1;
+      height: 100%;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--ui-foreground);
+      outline: none;
+    }
   }
 
   [data-slot="password-input-control"] {
