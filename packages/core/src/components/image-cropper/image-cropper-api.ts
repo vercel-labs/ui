@@ -402,10 +402,12 @@ function imageCropperApiBody(
         startFrom(state.crop)
         store.set({ dragging: "pan" })
         let reason: "drag" | "pinch" = "drag"
+        let last = event
         const move = (moved: PointerEvent) => {
           if (!pointers.has(moved.pointerId) || !gesture) {
             return
           }
+          last = moved
           pointers.set(moved.pointerId, { x: moved.clientX, y: moved.clientY })
           const now = store.get()
           if (!now.natural) {
@@ -471,17 +473,19 @@ function imageCropperApiBody(
           }
           release(lifted)
         }
-        // Escape, or the browser taking the pointer, puts the crop back.
+        // Escape, or the browser taking the pointer, puts the crop back. Like
+        // any drag, Escape reports the last pointer event, not the key.
         const cancel = (canceled: Event) => {
           if (canceled instanceof KeyboardEvent && canceled.key !== "Escape") {
             return
           }
           stop?.()
           store.set({ dragging: null })
+          const event = canceled instanceof KeyboardEvent ? last : canceled
           if (state.crop) {
-            setCrop(state.crop, { reason, event: canceled })
+            setCrop(state.crop, { reason, event })
           }
-          commit({ reason, event: canceled })
+          commit({ reason, event })
         }
         const doc = el.ownerDocument
         el.addEventListener("pointermove", move)

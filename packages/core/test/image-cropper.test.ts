@@ -319,6 +319,62 @@ describe("image cropper", () => {
     }
   })
 
+  test("Escape during a drag or a pan puts the crop back, and reports the last pointer event", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
+    const pointer = (type: string, clientX: number) =>
+      new PointerEvent(type, {
+        pointerId: 1,
+        pointerType: "mouse",
+        button: 0,
+        buttons: 1,
+        clientX,
+        clientY: 150,
+        bubbles: true,
+        cancelable: true,
+      })
+    const frame = () => new Promise((resolve) => requestAnimationFrame(resolve))
+    for (const mode of ["box", "frame"] as const) {
+      const onCropChange = vi.fn()
+      const defaultCrop = { x: 100, y: 100, width: 100, height: 100 }
+      const cropper = make({ mode, defaultCrop, onCropChange })
+      const viewport = document.body.appendChild(document.createElement("div"))
+      Object.defineProperties(viewport, {
+        clientWidth: { value: 400 },
+        clientHeight: { value: 300 },
+      })
+      viewport.getBoundingClientRect = () => new DOMRect(0, 0, 400, 300)
+      const unbind = bind(cropper.part("viewport", {}), viewport)
+      load(cropper)
+      const before = cropper.api.getCrop()
+      if (mode === "box") {
+        cropper.api.internal.selectionPointerdown(
+          pointer("pointerdown", 150),
+          viewport,
+          "move"
+        )
+      } else {
+        cropper.api.internal.viewportPointerdown(
+          pointer("pointerdown", 150),
+          viewport
+        )
+      }
+      viewport.dispatchEvent(pointer("pointermove", 170))
+      await frame()
+      expect(cropper.api.getCrop()).not.toEqual(before)
+      document.dispatchEvent(
+        new KeyboardEvent("keydown", { key: "Escape", bubbles: true })
+      )
+      expect(cropper.api.getCrop()).toEqual(before)
+      const [, details] = onCropChange.mock.lastCall!
+      expect(details.reason).toBe("drag")
+      expect(details.event).toBeInstanceOf(PointerEvent)
+      unbind?.()
+      cropper.destroy()
+    }
+    expect(warn).not.toHaveBeenCalled()
+    warn.mockRestore()
+  })
+
   test("a box shows the whole image, and a frame shows the crop as large as it fits", () => {
     const crop = { x: 100, y: 50, width: 200, height: 200, ...plain }
     const box = { left: 10, top: 10, width: 400, height: 400 }
