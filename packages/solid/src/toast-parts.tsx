@@ -27,6 +27,7 @@ import {
 import { renderPopup, type PopupContainer } from "./popup"
 import {
   renderAs,
+  rootScope,
   usePart,
   usePrimitive,
   type PartProps,
@@ -106,7 +107,9 @@ function ToastRegion(props: ToastRegionProps) {
 }
 
 // The region, placed by the app or rendered by the overlay host.
-function Region(props: ToastRegionProps & { placed?: boolean }) {
+const Region = /* @__PURE__ */ rootScope(function Region(
+  props: ToastRegionProps & { placed?: boolean }
+) {
   const region = usePrimitive(
     toastRegion,
     () =>
@@ -169,7 +172,7 @@ function Region(props: ToastRegionProps & { placed?: boolean }) {
   })
   const element = () => usePart(region, "region", undefined, user, "section")
   return renderPopup(element, () => props.container)
-}
+})
 
 // A toast rendered from its data, with the parts.
 function DataToast(props: { toast: ToastData<Content> }) {

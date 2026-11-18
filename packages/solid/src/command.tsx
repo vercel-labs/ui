@@ -28,6 +28,7 @@ import { markSegments, textToMark } from "./list-text"
 import {
   createChildFlag,
   createParts,
+  rootScope,
   useAround,
   usePart,
   usePrimitive,
@@ -103,7 +104,9 @@ const optionKeys = [
  * A search field over an always-open list of commands. Renders a `div` around them.
  * @stable
  */
-function Command(props: CommandProps) {
+const Command = /* @__PURE__ */ rootScope(function Command(
+  props: CommandProps
+) {
   const command = usePrimitive(commandPrimitive, () => ({
     value: props.value,
     defaultValue: props.defaultValue,
@@ -165,7 +168,7 @@ function Command(props: CommandProps) {
       {usePart(command, "root", undefined, rest, "div")}
     </CommandContext>
   )
-}
+})
 
 /**
  * The search field. It keeps focus while arrow keys move the highlight. Name it with `aria-label`.

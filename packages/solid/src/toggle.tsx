@@ -12,6 +12,7 @@ import { useToolbarScope } from "./toolbar-context"
 import {
   createParts,
   provided,
+  rootScope,
   usePart,
   usePrimitive,
   type PartProps,
@@ -29,7 +30,7 @@ const ToggleGroupContext = createContext<PrimitiveHandle<
  * A button that stays pressed. Inside a ToggleGroup, the group decides whether it's pressed.
  * @stable
  */
-function Toggle(
+const Toggle = /* @__PURE__ */ rootScope(function Toggle(
   props: ToggleOptions &
     Omit<
       PartProps<"button", ToggleState>,
@@ -62,7 +63,7 @@ function Toggle(
     "debug"
   )
   return usePart(handle, "root", undefined, rest, "button")
-}
+})
 
 /**
  * An icon inside a toggle. A toggle with only an icon needs an `aria-label`. Screen readers skip
@@ -76,7 +77,9 @@ const ToggleIcon = parts.Icon
  * `T` is inferred from `value`, `defaultValue` or `onValueChange`.
  * @stable
  */
-function ToggleGroup<T extends string = string>(
+const ToggleGroup = /* @__PURE__ */ rootScope(function ToggleGroup<
+  T extends string = string,
+>(
   props: ToggleGroupOptions<T> &
     Omit<
       PartProps<"div", ToggleGroupState<T>>,
@@ -115,7 +118,7 @@ function ToggleGroup<T extends string = string>(
       {usePart(group, "group", undefined, rest, "div")}
     </ToggleGroupContext>
   )
-}
+})
 
 export {
   createToggleController,

@@ -35,6 +35,7 @@ import {
   createParts,
   providePrimitive,
   renderStatic,
+  rootScope,
   usePart,
   usePrimitive,
   type PartProps,
@@ -93,7 +94,7 @@ type DrawerProps = DrawerOptions & { children?: JSX.Element }
  * A dialog presented as a sheet that slides in from an edge. Put its trigger, backdrop and content inside.
  * @stable
  */
-function Drawer(props: DrawerProps) {
+const Drawer = /* @__PURE__ */ rootScope(function Drawer(props: DrawerProps) {
   const options = omit(props, "children", "container")
   const drawer = usePrimitive(drawerPrimitive, () => ({ ...options }))
   useControllerEntry(() => props.controller, drawer)
@@ -104,7 +105,7 @@ function Drawer(props: DrawerProps) {
       </ContainerContext>
     </Context>
   ))
-}
+})
 
 /**
  * The button that opens the drawer. A trigger outside the drawer, like one per table row, connects through

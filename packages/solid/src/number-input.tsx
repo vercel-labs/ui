@@ -12,6 +12,7 @@ import { startingText } from "./text-control"
 import {
   createParts,
   renderStatic,
+  rootScope,
   usePart,
   usePrimitive,
   type PartProps,
@@ -47,7 +48,9 @@ type DivProps = Omit<
  * The root, and the hidden input that submits the number as is.
  * @stable
  */
-function NumberInput(props: NumberInputOptions & DivProps) {
+const NumberInput = /* @__PURE__ */ rootScope(function NumberInput(
+  props: NumberInputOptions & DivProps
+) {
   const field = useFieldControl()
   const controlId = useFieldControlId()
   const numberInput = usePrimitive(numberInputPrimitive, () => ({
@@ -125,7 +128,7 @@ function NumberInput(props: NumberInputOptions & DivProps) {
       )}
     </NumberInputContext>
   )
-}
+})
 
 /**
  * Holds the input and its buttons.

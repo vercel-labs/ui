@@ -631,6 +631,18 @@ function usePrimitive<P extends Primitive>(
   return handle
 }
 
+// A pending controlled input, like an async `open`, suspends the root here.
+// Without a scope of its own, Solid makes the component above it again. The
+// label keeps Solid's strict read check on in the body, as in any component.
+function rootScope<Root extends (props: never) => JSX.Element>(root: Root) {
+  const render = root as unknown as (props: unknown) => JSX.Element
+  const label = `<${root.name || "Root"}>`
+  const scoped = (props: unknown) =>
+    createMemo(() => untrack(() => render(props), label), { name: root.name })
+  Object.defineProperty(scoped, "name", { value: root.name })
+  return scoped as unknown as Root
+}
+
 /**
  * A part's state for `render` functions and state-based class names. Each
  * key is a memo, so a part re-renders for a key only when its value changes:
@@ -1197,7 +1209,7 @@ function createParts<
 
   const rootTag = (tags as Record<string, Tag>).root
   const rootProps = schema.slots.root ?? {}
-  parts.Root = (props) => {
+  parts.Root = rootScope((props) => {
     const handle = usePrimitive(
       primitive,
       () => pick(props, schema.options) as OptionsOf<P>
@@ -1213,7 +1225,7 @@ function createParts<
       )
     }
     return providePrimitive(handle, () => props.children)
-  }
+  })
 
   for (const [slot, tag] of Object.entries(tags as Record<string, Tag>)) {
     if (slot === "root") {
@@ -1326,6 +1338,7 @@ export {
   type RenderProp,
   renderAs,
   renderStatic,
+  rootScope,
   toSolidProps,
   useAround,
   useHandle,

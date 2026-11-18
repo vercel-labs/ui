@@ -11,6 +11,7 @@ import { ToolbarContext, ToolbarGroupContext } from "./toolbar-context"
 import {
   createParts,
   provided,
+  rootScope,
   usePart,
   usePrimitive,
   type PartProps,
@@ -29,7 +30,9 @@ const parts = createParts(toolbar, {
  * `ToolbarButton`, and fields through `ToolbarInput`.
  * @stable
  */
-function Toolbar(props: ToolbarOptions & PartProps<"div", ToolbarState>) {
+const Toolbar = /* @__PURE__ */ rootScope(function Toolbar(
+  props: ToolbarOptions & PartProps<"div", ToolbarState>
+) {
   const handle = usePrimitive(toolbar, () => ({
     orientation: props.orientation,
     loop: props.loop,
@@ -50,7 +53,7 @@ function Toolbar(props: ToolbarOptions & PartProps<"div", ToolbarState>) {
       {usePart(handle, "root", undefined, rest, "div")}
     </ToolbarContext>
   )
-}
+})
 
 /**
  * A button in the toolbar. Arrow keys move between it and the toolbar's other items.

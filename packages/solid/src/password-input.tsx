@@ -8,6 +8,7 @@ import { joinField, useFieldControl, useFieldControlId } from "./field-context"
 import { valueProps } from "./text-control"
 import {
   createParts,
+  rootScope,
   usePart,
   usePrimitive,
   type PartProps,
@@ -38,7 +39,7 @@ function usePasswordInput(part: string) {
  * Holds the field and its toggle. Presses on its own text and icons focus the field.
  * @stable
  */
-function PasswordInput(
+const PasswordInput = /* @__PURE__ */ rootScope(function PasswordInput(
   props: PasswordInputOptions &
     Omit<
       PartProps<"div", PasswordInputState>,
@@ -91,7 +92,7 @@ function PasswordInput(
       {usePart(passwordInput, "root", undefined, rest, "div")}
     </PasswordInputContext>
   )
-}
+})
 
 /**
  * The native <input>. Its type follows whether the password is shown, and

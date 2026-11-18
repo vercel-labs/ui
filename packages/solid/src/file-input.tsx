@@ -15,6 +15,7 @@ import { joinField, useFieldControl } from "./field-context"
 import {
   createParts,
   renderStatic,
+  rootScope,
   usePart,
   usePrimitive,
   type PartProps,
@@ -69,7 +70,9 @@ const resolve = (value: unknown, state: unknown) =>
  * the picker and that a form submits.
  * @stable
  */
-function FileInput(props: FileInputOptions & DivProps<FileInputState>) {
+const FileInput = /* @__PURE__ */ rootScope(function FileInput(
+  props: FileInputOptions & DivProps<FileInputState>
+) {
   const field = useFieldControl()
   const fileInput = usePrimitive(fileInputPrimitive, () => ({
     value: props.value,
@@ -130,7 +133,7 @@ function FileInput(props: FileInputOptions & DivProps<FileInputState>) {
       {usePart(fileInput, "root", undefined, root, "div")}
     </FileInputContext>
   )
-}
+})
 
 const unconnected: FileInputState = {
   value: [],

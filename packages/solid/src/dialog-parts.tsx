@@ -32,6 +32,7 @@ import {
   createParts,
   providePrimitive,
   renderStatic,
+  rootScope,
   usePart,
   usePrimitive,
   type PartProps,
@@ -85,7 +86,9 @@ function createDialogParts(
     return context
   }
 
-  function Root(props: DialogOptions & { children?: JSX.Element }) {
+  const Root = rootScope(function Root(
+    props: DialogOptions & { children?: JSX.Element }
+  ) {
     const options = omit(props, "children", "container")
     const dialog = usePrimitive(primitive, () => ({ ...options }))
     useControllerEntry(() => props.controller, dialog)
@@ -96,7 +99,7 @@ function createDialogParts(
         </ContainerContext>
       </Context>
     ))
-  }
+  })
 
   function Trigger(
     props: TriggerPartProps & {

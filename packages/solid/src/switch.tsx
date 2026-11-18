@@ -9,7 +9,7 @@ import {
   useFieldControl,
   type ButtonControlProps,
 } from "./field-context"
-import { createParts, usePart, usePrimitive } from "./use-primitive"
+import { createParts, rootScope, usePart, usePrimitive } from "./use-primitive"
 
 const parts = createParts(switchPrimitive, { thumb: "span" })
 
@@ -17,7 +17,9 @@ const parts = createParts(switchPrimitive, { thumb: "span" })
  * A control that turns a setting on or off, with the hidden native input that takes part in the form.
  * @stable
  */
-function Switch(props: SwitchOptions & ButtonControlProps<SwitchState>) {
+const Switch = /* @__PURE__ */ rootScope(function Switch(
+  props: SwitchOptions & ButtonControlProps<SwitchState>
+) {
   const field = useFieldControl()
   const control = usePrimitive(switchPrimitive, () => ({
     checked: props.checked,
@@ -59,7 +61,7 @@ function Switch(props: SwitchOptions & ButtonControlProps<SwitchState>) {
       <input {...input} />
     </>
   )
-}
+})
 
 /**
  * The thumb that slides along the switch as it turns on or off.

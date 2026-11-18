@@ -5,14 +5,21 @@ import {
 } from "@ui-sdk/core/menubar"
 import { omit } from "solid-js"
 import { MenubarContext } from "./menubar-context"
-import { usePart, usePrimitive, type PartProps } from "./use-primitive"
+import {
+  rootScope,
+  usePart,
+  usePrimitive,
+  type PartProps,
+} from "./use-primitive"
 
 /**
  * A row of menus, like a desktop app's: one tab stop, arrow keys between the
  * triggers and between open menus. Each `Menu` inside joins it.
  * @stable
  */
-function Menubar(props: MenubarOptions & PartProps<"div", MenubarState>) {
+const Menubar = /* @__PURE__ */ rootScope(function Menubar(
+  props: MenubarOptions & PartProps<"div", MenubarState>
+) {
   const menubar = usePrimitive(menubarPrimitive, () => ({
     orientation: props.orientation,
     loop: props.loop,
@@ -35,7 +42,7 @@ function Menubar(props: MenubarOptions & PartProps<"div", MenubarState>) {
       {usePart(menubar, "root", undefined, rest, "div")}
     </MenubarContext>
   )
-}
+})
 
 export { createMenubarController } from "@ui-sdk/core/menubar"
 export type {

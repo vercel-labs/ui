@@ -16,6 +16,7 @@ import {
 } from "./text-control"
 import {
   createParts,
+  rootScope,
   usePart,
   usePrimitive,
   type PartProps,
@@ -27,7 +28,9 @@ const groupParts = createParts(inputGroup, { clear: "button" })
  * A native <input>, wired to the Field it's in.
  * @stable
  */
-function Input(props: InputOptions & Native<"input", InputState>) {
+const Input = /* @__PURE__ */ rootScope(function Input(
+  props: InputOptions & Native<"input", InputState>
+) {
   const field = useFieldControl()
   const input = usePrimitive(inputPrimitive, () => ({
     value: props.value,
@@ -57,19 +60,19 @@ function Input(props: InputOptions & Native<"input", InputState>) {
     joinField(field, element, "input"),
     "input"
   )
-}
+})
 
 /**
  * Holds an Input or Textarea with icons, text and buttons around it. Presses
  * on its text and icons focus the field.
  * @stable
  */
-function InputGroup(
+const InputGroup = /* @__PURE__ */ rootScope(function InputGroup(
   props: InputGroupOptions & PartProps<"div", InputGroupState>
 ) {
   const group = usePrimitive(inputGroup, () => ({ debug: props.debug }))
   return usePart(group, "group", undefined, omit(props, "debug"), "div")
-}
+})
 
 /**
  * Empties the field in its group and focuses it. Shown while there's text to clear.

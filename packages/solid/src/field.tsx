@@ -30,6 +30,7 @@ import {
 import { FieldContext, type FieldContextValue } from "./field-context"
 import {
   renderStatic,
+  rootScope,
   usePart,
   usePrimitive,
   type PartProps,
@@ -81,7 +82,9 @@ function outside(
  * Ties a form control to its label, description and error messages.
  * @stable
  */
-function Field(props: FieldOptions & PartProps<"div", FieldState>) {
+const Field = /* @__PURE__ */ rootScope(function Field(
+  props: FieldOptions & PartProps<"div", FieldState>
+) {
   const field = usePrimitive(fieldPrimitive, () => ({
     name: props.name,
     disabled: props.disabled,
@@ -102,7 +105,7 @@ function Field(props: FieldOptions & PartProps<"div", FieldState>) {
       </DescribedContext>
     </FieldContext>
   )
-}
+})
 
 /**
  * The field's label, which names its control. Outside a Field it's a plain
@@ -203,7 +206,7 @@ function FieldControl(props: PartProps<"input", FieldState>) {
  * A native <fieldset>, so `disabled` disables every control inside it.
  * @stable
  */
-function FieldSet(
+const FieldSet = /* @__PURE__ */ rootScope(function FieldSet(
   props: FieldSetOptions &
     Omit<PartProps<"fieldset", FieldSetState>, "disabled">
 ) {
@@ -219,7 +222,7 @@ function FieldSet(
       </DescribedContext>
     </FieldSetContext>
   )
-}
+})
 
 /**
  * Names the field set. Keep it the set's first child, where a <legend> names it natively.
@@ -243,7 +246,9 @@ function FieldLegend(props: PartProps<"legend", FieldSetState>) {
  * Lays fields out. It has no role: a FieldSet is what names and disables a group.
  * @stable
  */
-function FieldGroup(props: PartProps<"div">) {
+const FieldGroup = /* @__PURE__ */ rootScope(function FieldGroup(
+  props: PartProps<"div">
+) {
   return usePart(
     usePrimitive(fieldGroupPrimitive, () => ({})),
     "group",
@@ -251,7 +256,7 @@ function FieldGroup(props: PartProps<"div">) {
     props,
     "div"
   )
-}
+})
 
 export {
   Field,

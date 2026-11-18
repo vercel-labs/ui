@@ -31,6 +31,7 @@ import {
   createParts,
   ownChildren,
   providePrimitive,
+  rootScope,
   usePart,
   usePrimitive,
   type PartProps,
@@ -80,7 +81,9 @@ type TriggerMenuProps<T = string> = TriggerMenuOptions<T> & {
  * it uses that editor; otherwise render a TriggerMenuInput, or pass `editor`.
  * @stable
  */
-function TriggerMenu<T = string>(props: TriggerMenuProps<T>) {
+const TriggerMenu = /* @__PURE__ */ rootScope(function TriggerMenu<T = string>(
+  props: TriggerMenuProps<T>
+) {
   const inherited = useContext(EditorContext)
   const options = omit(props, "children", "container", "editor")
   const menu = usePrimitive(triggerMenuPrimitive, () => ({
@@ -109,7 +112,7 @@ function TriggerMenu<T = string>(props: TriggerMenuProps<T>) {
       </ContainerContext>
     </TriggerMenuContext>
   )
-}
+})
 
 /**
  * The text field the menu suggests into: a `<textarea>`, or an `<input>` from `render`.

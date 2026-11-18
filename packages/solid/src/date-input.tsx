@@ -7,7 +7,7 @@ import {
   type RootProps,
   type SegmentProps,
 } from "./segmented-input"
-import { usePrimitive } from "./use-primitive"
+import { rootScope, usePrimitive } from "./use-primitive"
 
 /**
  * The root: a group of segments the locale orders, like month, day and year,
@@ -16,7 +16,9 @@ import { usePrimitive } from "./use-primitive"
  * `state.segments` in a keyed `<For>`.
  * @stable
  */
-function DateInput(props: DateInputOptions & RootProps) {
+const DateInput = /* @__PURE__ */ rootScope(function DateInput(
+  props: DateInputOptions & RootProps
+) {
   const field = useFieldControl()
   const handle = usePrimitive(dateInput, () => ({
     value: props.value,
@@ -56,7 +58,7 @@ function DateInput(props: DateInputOptions & RootProps) {
     "debug"
   )
   return renderRoot(handle, field, rest, DateInputSegment)
-}
+})
 
 /**
  * A segment, like the month: an input arrow keys step and digits fill, named

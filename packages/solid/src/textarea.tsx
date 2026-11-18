@@ -11,13 +11,13 @@ import {
   keepControlled,
   type Native,
 } from "./text-control"
-import { usePart, usePrimitive } from "./use-primitive"
+import { rootScope, usePart, usePrimitive } from "./use-primitive"
 
 /**
  * A native <textarea>, wired to the Field it's in, that can grow with its text.
  * @stable
  */
-function Textarea(
+const Textarea = /* @__PURE__ */ rootScope(function Textarea(
   props: TextareaOptions & Omit<Native<"textarea", TextareaState>, "onSubmit">
 ) {
   const field = useFieldControl()
@@ -55,7 +55,7 @@ function Textarea(
     joinField(field, element, "textarea"),
     "textarea"
   )
-}
+})
 
 export { createInputController } from "@ui-sdk/core/input"
 export type {

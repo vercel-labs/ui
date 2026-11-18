@@ -8,7 +8,7 @@ import {
   type Segmented,
   type SegmentProps,
 } from "./segmented-input"
-import { usePrimitive, type PrimitiveHandle } from "./use-primitive"
+import { rootScope, usePrimitive, type PrimitiveHandle } from "./use-primitive"
 
 const primitive = timeInput as unknown as Segmented
 
@@ -19,7 +19,9 @@ const primitive = timeInput as unknown as Segmented
  * renders `state.segments` in a keyed `<For>`.
  * @stable
  */
-function TimeInput(props: TimeInputOptions & RootProps) {
+const TimeInput = /* @__PURE__ */ rootScope(function TimeInput(
+  props: TimeInputOptions & RootProps
+) {
   const field = useFieldControl()
   const handle = usePrimitive(timeInput, () => ({
     value: props.value,
@@ -62,7 +64,7 @@ function TimeInput(props: TimeInputOptions & RootProps) {
     rest,
     TimeInputSegment
   )
-}
+})
 
 /**
  * A segment, like the hour: an input arrow keys step and digits fill, named

@@ -8,6 +8,7 @@ import type { JSX } from "@solidjs/web"
 import { omit } from "solid-js"
 import {
   callHandler,
+  rootScope,
   usePart,
   usePrimitive,
   type PartProps,
@@ -48,7 +49,7 @@ type ButtonProps = Omit<PartProps<"button", ButtonState>, "type" | "onClick"> &
  * A button, or a link or any element that acts as one through `render`.
  * @stable
  */
-function Button(props: ButtonProps) {
+const Button = /* @__PURE__ */ rootScope(function Button(props: ButtonProps) {
   const button = usePrimitive(buttonPrimitive, () => ({
     disabled: props.disabled,
     focusableWhenDisabled: props.focusableWhenDisabled,
@@ -69,7 +70,7 @@ function Button(props: ButtonProps) {
     "onClick"
   )
   return usePart(button, "root", undefined, rest, "button")
-}
+})
 
 export { Button }
 export type {

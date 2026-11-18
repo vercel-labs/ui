@@ -16,6 +16,7 @@ import {
 import {
   createParts,
   provided,
+  rootScope,
   usePart,
   usePrimitive,
   type PartProps,
@@ -33,7 +34,7 @@ const CheckboxGroupContext = createContext<PrimitiveHandle<
  * The control and the hidden native input that takes part in the form.
  * @stable
  */
-function Checkbox(
+const Checkbox = /* @__PURE__ */ rootScope(function Checkbox(
   props: Omit<CheckboxOptions, "group"> & ButtonControlProps<CheckboxState>
 ) {
   const group = useContext(CheckboxGroupContext)
@@ -86,7 +87,7 @@ function Checkbox(
       <input {...input} />
     </>
   )
-}
+})
 
 /**
  * The check inside the checkbox. Rendered while it's checked or indeterminate, or always with `keepMounted`.
@@ -100,7 +101,9 @@ const CheckboxIndicator = parts.Indicator
  * `T` is inferred from `value`, `defaultValue` or `onValueChange`.
  * @stable
  */
-function CheckboxGroup<T extends string = string>(
+const CheckboxGroup = /* @__PURE__ */ rootScope(function CheckboxGroup<
+  T extends string = string,
+>(
   props: CheckboxGroupOptions<T> &
     Omit<PartProps<"div", CheckboxGroupState>, "onChange" | "onSelect">
 ) {
@@ -138,7 +141,7 @@ function CheckboxGroup<T extends string = string>(
       {usePart(group, "group-input", undefined, {}, "input")}
     </CheckboxGroupContext>
   )
-}
+})
 
 export {
   createCheckboxController,

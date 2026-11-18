@@ -21,7 +21,12 @@ import {
   useContext,
 } from "solid-js"
 import { CalendarContext, monthCount } from "./calendar-context"
-import { usePart, usePrimitive, type PartProps } from "./use-primitive"
+import {
+  rootScope,
+  usePart,
+  usePrimitive,
+  type PartProps,
+} from "./use-primitive"
 
 // A grid's offset and state, for the rows and days inside it.
 type GridContextValue = { readonly offset: number; state: CalendarGridState }
@@ -70,7 +75,9 @@ const ofState = (children: unknown, state: unknown) =>
  * Previous and Next, and a grid for each month.
  * @stable
  */
-function Calendar(props: CalendarOptions & PartProps<"div", CalendarState>) {
+const Calendar = /* @__PURE__ */ rootScope(function Calendar(
+  props: CalendarOptions & PartProps<"div", CalendarState>
+) {
   const calendar = usePrimitive(calendarPrimitive, () => ({
     mode: props.mode,
     value: props.value,
@@ -159,7 +166,7 @@ function Calendar(props: CalendarOptions & PartProps<"div", CalendarState>) {
       )}
     </CalendarContext>
   )
-}
+})
 
 /**
  * The months shown, like "October 2026". Screen readers hear it change.

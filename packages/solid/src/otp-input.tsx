@@ -11,6 +11,7 @@ import { useFieldControl } from "./field-context"
 import { defaultValueProps } from "./text-control"
 import {
   createParts,
+  rootScope,
   usePart,
   usePrimitive,
   type PartProps,
@@ -48,7 +49,7 @@ const named = [
  * and the `aria-*` naming props go to that input.
  * @stable
  */
-function OTPInput(
+const OTPInput = /* @__PURE__ */ rootScope(function OTPInput(
   props: OTPInputOptions & InputProps & DivProps<OTPInputState>
 ) {
   const field = useFieldControl()
@@ -116,7 +117,7 @@ function OTPInput(
     merge(rest, { children: content }),
     "div"
   )
-}
+})
 
 // A live view of some of the props, by key.
 function pick(props: Record<string, any>, keys: readonly string[]) {

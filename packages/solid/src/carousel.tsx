@@ -22,6 +22,7 @@ import { useControllerEntry, useControllerTarget } from "./controller-target"
 import {
   createParts,
   renderStatic,
+  rootScope,
   usePart,
   usePrimitive,
   type PartProps,
@@ -52,7 +53,9 @@ function useConnectedCarousel(
  * A region of slides that scroll a page at a time. Name it with `aria-label`.
  * @stable
  */
-function Carousel(props: CarouselOptions & PartProps<"div", CarouselState>) {
+const Carousel = /* @__PURE__ */ rootScope(function Carousel(
+  props: CarouselOptions & PartProps<"div", CarouselState>
+) {
   const carousel = usePrimitive(carouselPrimitive, () => ({
     page: props.page,
     defaultPage: props.defaultPage,
@@ -98,7 +101,7 @@ function Carousel(props: CarouselOptions & PartProps<"div", CarouselState>) {
       {usePart(carousel, "root", undefined, rest, "div")}
     </CarouselContext>
   )
-}
+})
 
 /**
  * The scrolling window onto the slides. Touch, wheels and keys scroll it natively.

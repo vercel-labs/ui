@@ -21,6 +21,7 @@ import {
 import {
   createParts,
   renderAs,
+  rootScope,
   usePart,
   usePrimitive,
   type PartProps,
@@ -60,7 +61,7 @@ function tagged(
  * A navigation landmark around the page links. Name it with `aria-label`.
  * @stable
  */
-function Pagination(
+const Pagination = /* @__PURE__ */ rootScope(function Pagination(
   props: PaginationOptions & PartProps<"nav", PaginationState>
 ) {
   const pagination = usePrimitive(paginationPrimitive, () => ({
@@ -101,7 +102,7 @@ function Pagination(
       {usePart(pagination, "root", undefined, rest, "nav")}
     </PaginationContext>
   )
-}
+})
 
 /**
  * The list of pages and steps. Its children can be a function of the state,

@@ -19,6 +19,7 @@ import {
   createParts,
   providePrimitive,
   renderStatic,
+  rootScope,
   usePart,
   usePrimitive,
   type PartProps,
@@ -52,7 +53,9 @@ type HoverCardProps = HoverCardOptions & { children?: JSX.Element }
  * A preview of what a link points to, shown when the pointer rests on the link or keyboard focus stays on it.
  * @stable
  */
-function HoverCard(props: HoverCardProps) {
+const HoverCard = /* @__PURE__ */ rootScope(function HoverCard(
+  props: HoverCardProps
+) {
   const options = omit(props, "children", "container")
   const hoverCard = usePrimitive(hoverCardPrimitive, () => ({ ...options }))
   useControllerEntry(() => props.controller, hoverCard)
@@ -63,7 +66,7 @@ function HoverCard(props: HoverCardProps) {
       </ContainerContext>
     </HoverCardContext>
   ))
-}
+})
 
 type TriggerPartProps = PartProps<"a", HoverCardTriggerState> &
   HoverCardTriggerProps

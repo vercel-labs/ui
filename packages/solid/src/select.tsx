@@ -50,6 +50,7 @@ import {
   ownChildren,
   providePrimitive,
   renderStatic,
+  rootScope,
   useAround,
   usePart,
   usePrimitive,
@@ -114,9 +115,10 @@ type SelectProps<
  * `multiple` makes the value a list.
  * @stable
  */
-function Select<T = string, Multiple extends boolean | undefined = false>(
-  props: SelectProps<T, Multiple>
-) {
+const Select = /* @__PURE__ */ rootScope(function Select<
+  T = string,
+  Multiple extends boolean | undefined = false,
+>(props: SelectProps<T, Multiple>) {
   const field = useFieldControl()
   const options = omit(props, "children", "container")
   const select = usePrimitive(selectPrimitive, () => ({
@@ -160,7 +162,7 @@ function Select<T = string, Multiple extends boolean | undefined = false>(
       </ContainerContext>
     </SelectContext>
   )
-}
+})
 
 /**
  * A visible label for the select. Pressing it focuses the trigger, like a native select's label.

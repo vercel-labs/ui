@@ -41,6 +41,7 @@ import {
 import { startingText } from "./text-control"
 import {
   createParts,
+  rootScope,
   usePart,
   usePrimitive,
   type PartProps,
@@ -81,7 +82,7 @@ type ButtonProps<State> = Omit<
  * renders an input, or two in range mode, the trigger and the popup.
  * @stable
  */
-function DatePicker(
+const DatePicker = /* @__PURE__ */ rootScope(function DatePicker(
   props: DatePickerOptions &
     Omit<
       PartProps<"div", DatePickerState>,
@@ -237,7 +238,7 @@ function DatePicker(
       </CalendarContext>
     </DatePickerContext>
   )
-}
+})
 
 /**
  * A text input that reads a date typed in the page's language on Enter or

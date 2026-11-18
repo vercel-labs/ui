@@ -24,6 +24,7 @@ import { EditorContext } from "./editor-context"
 import { joinField, useFieldControl } from "./field-context"
 import {
   providePrimitive,
+  rootScope,
   usePart,
   usePrimitive,
   type PartProps,
@@ -65,7 +66,9 @@ type TokenInputProps = TokenInputOptions & {
  * A text field with atomic tokens. A TriggerMenu inside it suggests into it.
  * @stable
  */
-function TokenInput(props: TokenInputProps) {
+const TokenInput = /* @__PURE__ */ rootScope(function TokenInput(
+  props: TokenInputProps
+) {
   const field = useFieldControl()
   const options = omit(props, "children", "renderToken")
   const input = usePrimitive(tokenInputPrimitive, () => ({
@@ -97,7 +100,7 @@ function TokenInput(props: TokenInputProps) {
       </EditorContext>
     </TokenInputContext>
   )
-}
+})
 
 // Each token's content, rendered into its host in the editor. The hosts are
 // read after mount, from an effect: the server has none, and reading them
