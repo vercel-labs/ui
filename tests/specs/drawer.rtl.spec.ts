@@ -50,3 +50,14 @@ test(
     await expect(drawerTrigger(page)).toBeFocused()
   }
 )
+
+test(
+  'side="top" stays at the top in a right-to-left layout',
+  { tag: "@enhancement" },
+  async ({ page, open }) => {
+    await open("drawer", { dir: "rtl", side: "top" })
+    await openDrawer(page)
+    expect((await sheetRect(page)).top).toBe(0)
+    await expect(drawerDialog(page)).toHaveAttribute("data-side", "top")
+  }
+)

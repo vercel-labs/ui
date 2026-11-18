@@ -122,8 +122,8 @@ async function waitFrames(page: Page, frames: number) {
 
 /**
  * Style recalculations while `run` runs, and the elements they restyled, from
- * a Chromium trace. An inherited property changing on an element restyles
- * everything inside it.
+ * a Chromium trace, with the objects each layout laid out. An inherited
+ * property changing on an element restyles everything inside it.
  */
 async function countRestyles(page: Page, run: () => Promise<unknown>) {
   // Only persistent contexts have no browser, and the specs never use one.
@@ -134,11 +134,14 @@ async function countRestyles(page: Page, run: () => Promise<unknown>) {
     traceEvents: {
       name: string
       ph: string
-      args?: { elementCount?: number }
+      args?: { elementCount?: number; beginData?: { dirtyObjects?: number } }
     }[]
   }
   const recalcs = trace.traceEvents.filter(
     ({ name, ph }) => name === "UpdateLayoutTree" && ph === "X"
+  )
+  const layouts = trace.traceEvents.filter(
+    ({ name, ph }) => name === "Layout" && (ph === "X" || ph === "B")
   )
   return {
     recalcs: recalcs.length,
@@ -147,6 +150,7 @@ async function countRestyles(page: Page, run: () => Promise<unknown>) {
       0
     ),
     each: recalcs.map(({ args }) => args?.elementCount ?? 0),
+    layouts: layouts.map(({ args }) => args?.beginData?.dirtyObjects ?? 0),
   }
 }
 

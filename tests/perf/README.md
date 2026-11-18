@@ -787,6 +787,32 @@ cd tests && PLAYGROUND_PORT=5310 ../scripts/test-slot.sh npx playwright test spe
 cd tests && PLAYGROUND_PORT=5310 ../scripts/test-slot.sh npx playwright test specs/popup-open.counts --project react
 ```
 
+<a id="drawer-open"></a>
+
+### drawer.open
+
+**Measures:** Style recalculations and layouts that cover a drawer's whole content while it opens, for a drawer with many lines.
+
+**Why:** Each one grows with the content. The drawer read its direction before styling its host and measured the host before the top layer took it, so it styled the content twice and laid it out twice, three times each on a phone.
+
+**Budget:**
+
+- `contentRestyles`: 1.
+- `contentLayouts`: 1.
+
+**Notes:** The content is styled once as it appears, and laid out once in the top layer.
+
+**Tests:**
+
+- `drawer.counts.spec.ts` › styles and lays out its content once
+- `drawer.counts.spec.ts` › styles and lays out its content once on a phone
+
+**Run:**
+
+```bash
+cd tests && PLAYGROUND_PORT=5310 ../scripts/test-slot.sh npx playwright test specs/drawer.counts --project react
+```
+
 <a id="popup-reopen"></a>
 
 ### popup.reopen

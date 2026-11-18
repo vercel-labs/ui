@@ -269,7 +269,9 @@ function attachSheet(el: HTMLElement, input: SheetOptions) {
     return config
   }
 
+  let measured = false
   function measure() {
+    measured = true
     const nextSide = resolveSide(options.side(), el)
     if (nextSide !== side) {
       side = nextSide
@@ -280,6 +282,7 @@ function attachSheet(el: HTMLElement, input: SheetOptions) {
     const container =
       (isVertical(side) ? host.clientHeight : host.clientWidth) -
       (scrollSnap ? toolbarBleed : 0)
+    viewportHeight ??= view.visualViewport?.height
     size = sizeAlong(el, side)
     const rootFontSize =
       parseFloat(view.getComputedStyle(doc.documentElement).fontSize) || 16
@@ -371,7 +374,9 @@ function attachSheet(el: HTMLElement, input: SheetOptions) {
     )
   }
 
-  measure()
+  // Measured as it opens, once the host is in the top layer, since laying it
+  // out here too lays out the whole sheet twice. One that doesn't open yet is
+  // measured when its size is first observed.
   readConfig()
   const driver: SheetDriver = scrollSnap
     ? createScrollSnapDriver(driverOptions)
@@ -385,7 +390,7 @@ function attachSheet(el: HTMLElement, input: SheetOptions) {
   observer.observe(el)
   observer.observe(host)
   let keyboardFrom = 0
-  let viewportHeight = view.visualViewport?.height
+  let viewportHeight: number | undefined
   let keyboardSlide: Animation | null = null
   const offKeyboard = trackKeyboard(host, {
     before: () => (keyboardFrom = el.getBoundingClientRect().top),
@@ -535,7 +540,8 @@ function attachSheet(el: HTMLElement, input: SheetOptions) {
   // A snap point the owner moved to as the resting one left, like a drawer
   // whose new snap points drop it, wins over the nearest.
   function relayout(immediate: boolean) {
-    if (measure()) {
+    const first = !measured
+    if (measure() && !first) {
       driver.relayout(
         immediate,
         resolved[findSnapIndex(resolved, options.snapPoint())]?.id
@@ -609,9 +615,12 @@ function attachSheet(el: HTMLElement, input: SheetOptions) {
 
 function styleHost(host: HTMLElement, side: PhysicalSide, sheet: HTMLElement) {
   const vertical = isVertical(side)
-  const rtl =
-    sheet.ownerDocument.defaultView?.getComputedStyle(host).direction === "rtl"
-  const atEnd = side === "bottom" || (side === "right") !== rtl
+  // Read only when it matters: the read styles the sheet before its own writes restyle it.
+  const atEnd = vertical
+    ? side === "bottom"
+    : (side === "right") !==
+      (sheet.ownerDocument.defaultView?.getComputedStyle(host).direction ===
+        "rtl")
   return setStyles(host, {
     position: "fixed",
     inset: "0 0 var(--keyboard-inset, 0px) 0",

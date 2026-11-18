@@ -298,6 +298,14 @@ const budgets = {
     // The one the inert page and the scroll lock need.
     pageRestyles: 1,
   },
+  "drawer.open": {
+    measures:
+      "Style recalculations and layouts that cover a drawer's whole content while it opens, for a drawer with many lines.",
+    why: "Each one grows with the content. The drawer read its direction before styling its host and measured the host before the top layer took it, so it styled the content twice and laid it out twice, three times each on a phone.",
+    // The content is styled once as it appears, and laid out once in the top layer.
+    contentRestyles: 1,
+    contentLayouts: 1,
+  },
   "popup.reopen": {
     measures:
       "Frames from Enter on the trigger of a menu, select, popover or dialog that opened and closed before, until the popup settles.",
