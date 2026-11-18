@@ -85,6 +85,12 @@ const config = {
     const pages =
       "components|utilities|rendering|server-rendering|custom-parts|styling-and-animation"
     return [
+      // A framework's name alone, like /react, is short for its docs.
+      {
+        source: `/:framework(${frameworks.join("|")})`,
+        destination: "/docs/:framework",
+        permanent: false,
+      },
       // Get Started is Core's page by its file, and lives at /docs.
       {
         source: "/docs/core/kernel/style-a-primitive",
