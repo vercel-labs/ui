@@ -6,6 +6,7 @@ import { dispatchChange, formInternals } from "../../foundation/forms/form"
 import { createItemIcons } from "../../foundation/lists/item-icon"
 import {
   createListboxEngine,
+  highlightable,
   highlightFromCode,
   itemKey,
   revealInList,
@@ -387,11 +388,12 @@ function listboxApiBody(
     },
     highlight(value: unknown) {
       const key = value === null ? null : toKey(value)
-      if (focusInside) {
+      const root = rootElement()
+      if (root?.contains(root.ownerDocument.activeElement)) {
         return highlightFromCode(listbox, key, store.get().highlighted)
       }
-      const entry = key === null ? undefined : listbox.find(key)
-      if (!entry || listbox.disabled(entry)) {
+      const entry = key === null ? undefined : highlightable(listbox, key)
+      if (!entry) {
         return false
       }
       remembered = entry.key

@@ -28,7 +28,11 @@ import { comboboxPreset } from "../../foundation/popups/popup-presets"
 import { normalize } from "../../foundation/text/typeahead"
 import { submitImplicitly } from "../../foundation/forms/form"
 import { afterReset, keepsValueOnReset } from "../../foundation/forms/value"
-import { highlightFromCode, type Listbox } from "../../foundation/lists/listbox"
+import {
+  highlightedValue,
+  highlightFromCode,
+  type Listbox,
+} from "../../foundation/lists/listbox"
 import { noListing } from "../../foundation/lists/listbox-listing"
 import { isDisabled } from "../../foundation/lists/listbox-parts"
 import { listKeyDown } from "../../foundation/lists/listbox-keyboard"
@@ -502,12 +506,8 @@ function autocompleteApiBody(
       event,
     }: AutocompleteChangeOptions<AutocompleteValueChangeReason> = {}) =>
       store.get().value !== "" && setValue("", reason, { event }),
-    getHighlighted() {
-      const { highlighted } = store.get()
-      return highlighted === null
-        ? null
-        : ((core.listbox.valueOf(highlighted) as string | undefined) ?? null)
-    },
+    getHighlighted: () =>
+      highlightedValue(core.listbox, store.get().highlighted) as string | null,
     highlight: (value: string | null) =>
       store.get().open &&
       highlightFromCode(
