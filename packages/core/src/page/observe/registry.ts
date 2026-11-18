@@ -285,10 +285,25 @@ function componentLabel(parts: Bound[]) {
     return shown
   }
   // Then any part's own name, keyless first, so an accordion isn't named by
-  // its first item, but a slider is by its one thumb.
+  // its first item, but a slider is by its one thumb. Next, a shown part alone
+  // in its slot with a key of its own, which the web adapter gives every part.
   const keys = new Set(parts.map((part) => part.key).filter(Boolean))
   const keyed = keys.size === 1 ? parts.filter((part) => part.key) : []
-  for (const part of [...parts.filter((part) => !part.key), ...keyed]) {
+  const sole = parts.filter(
+    (part) =>
+      part.key &&
+      !part.slot.startsWith("group") &&
+      !part.el.closest("[hidden]") &&
+      parts.every(
+        (other) =>
+          other === part || (other.slot !== part.slot && other.key !== part.key)
+      )
+  )
+  for (const part of [
+    ...parts.filter((part) => !part.key),
+    ...sole,
+    ...keyed,
+  ]) {
     const name = accessibleName(part.el)
     if (name) {
       return name
