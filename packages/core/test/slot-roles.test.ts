@@ -1,6 +1,8 @@
 // @vitest-environment jsdom
 // What development builds check of a slot's declared role, for definitions
 // the types can't see, like JavaScript or a spread slot, and for elements.
+import { readdirSync } from "node:fs"
+import path from "node:path"
 import { afterEach, expect, test, vi } from "vitest"
 import { definePrimitive, live } from "../src/index"
 import { listbox } from "../src/components/listbox/listbox-root"
@@ -251,5 +253,16 @@ test("listbox declares its roles and what they need", () => {
   expect(partAttrs(instance.part("root")).role).toBe("listbox")
   expect(partAttrs(instance.part("item", { value: "a" })).role).toBe("option")
   expect(partAttrs(instance.part("separator")).role).toBe("none")
+  expect(read()).toEqual([])
+})
+
+test("every component's slots meet what their roles need", async () => {
+  const read = warnings()
+  const components = path.join(import.meta.dirname, "../src/components")
+  for (const file of readdirSync(components, { recursive: true })) {
+    if (typeof file === "string" && file.endsWith(".ts")) {
+      await import(path.join(components, file))
+    }
+  }
   expect(read()).toEqual([])
 })

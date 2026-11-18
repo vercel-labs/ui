@@ -425,6 +425,7 @@ const paginationPrimitive = /* @__PURE__ */ definePrimitive({
         props: { page: "number" },
         role: (state) => (state.getHref && state.disabled ? "link" : undefined),
         roles: ["link"],
+        focus: "native",
         state: (state, { props }) => ({
           page: props.page,
           current: props.page === currentPage(state),
