@@ -2171,7 +2171,7 @@ describe("agent act", () => {
       steps: [{ ref: "resume", action: "setChecked", args: [true] }],
     })
     expect(outcome.error?.message).toBe(
-      `"resume" names 2 components: ${refs.join(", ")}. Use a ref.`
+      `"resume" names 2 components: ${refs.join(", ")}. Use a ref. A page tells them apart with a word in one label the other lacks, like a verb or the row's name.`
     )
   })
 
@@ -2198,7 +2198,7 @@ describe("agent act", () => {
       steps: [{ ref: "Jane Doe", action: "setChecked", args: [true] }],
     })
     expect(outcome.error?.message).toMatch(
-      /"Jane Doe" names 2 components: c\d+ Admin \(Jane Doe jane@acme\.com\), c\d+ Jane Doe\. Use a ref\./
+      /"Jane Doe" names 2 components: c\d+ Admin \(Jane Doe jane@acme\.com\), c\d+ Jane Doe\. Use a ref\. A page tells them apart with a word in one label the other lacks, like a verb or the row's name\./
     )
     expect([jane.get().checked, other.get().checked]).toEqual([false, false])
   })

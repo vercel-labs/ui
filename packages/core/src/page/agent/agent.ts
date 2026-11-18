@@ -790,7 +790,7 @@ function createAgent(
       }
       if (near.length > 1) {
         throw new Error(
-          `"${ref}" names ${near.length} components: ${near.map(({ entry }) => described(entry)).join(", ")}. Use a ref.`
+          `"${ref}" names ${near.length} components: ${near.map(({ entry }) => described(entry)).join(", ")}. Use a ref. A page tells them apart with a word in one label the other lacks, like a verb or the row's name.`
         )
       }
     }
