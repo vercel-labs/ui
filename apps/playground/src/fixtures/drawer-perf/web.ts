@@ -9,7 +9,7 @@ async function mount(root: HTMLElement) {
   root.innerHTML = `
     <div class="fixture">
       <button>Before</button>
-      <ui-drawer${driver ? ` driver="${driver}"` : ""}>
+      <ui-drawer>
         <ui-drawer-trigger><button>Open</button></ui-drawer-trigger>
         <ui-drawer-backdrop class="drawer-backdrop"></ui-drawer-backdrop>
         <ui-drawer-content class="drawer">
@@ -20,6 +20,7 @@ async function mount(root: HTMLElement) {
       </ui-drawer>
       <button>After</button>
     </div>`
+  if (driver) root.querySelector("ui-drawer")?.setAttribute("driver", driver)
   await import("@ui-sdk/web/drawer")
 }
 
