@@ -861,6 +861,48 @@ describe("calendar", () => {
     expect(focused()).toBe("2026-10-20")
   })
 
+  // Chromium and Firefox focus a cell with a tabindex on mousedown, unless it's prevented.
+  const chromiumPress = (el: HTMLElement) => {
+    el.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }))
+    const mousedown = new MouseEvent("mousedown", {
+      bubbles: true,
+      cancelable: true,
+    })
+    if (el.dispatchEvent(mousedown) && el.hasAttribute("tabindex")) {
+      el.focus()
+    }
+    el.dispatchEvent(new PointerEvent("pointerup", { bubbles: true }))
+    el.dispatchEvent(new MouseEvent("click", { bubbles: true, detail: 1 }))
+  }
+
+  test.each([
+    ["Chromium", chromiumPress],
+    ["Safari", safariPress],
+  ])(
+    "a %s press on a day before min or after max leaves focus where it was",
+    async (_, press) => {
+      const { day, focused } = mount({ min: "2026-10-10", max: "2026-10-25" })
+      await tick()
+      expect(day("2026-10-05").hasAttribute("tabindex")).toBe(false)
+      expect(day("2026-10-28").hasAttribute("tabindex")).toBe(false)
+      day("2026-10-16").focus()
+      press(day("2026-10-05"))
+      press(day("2026-10-28"))
+      await tick()
+      expect(focused()).toBe("2026-10-16")
+      expect(day("2026-10-16").getAttribute("tabindex")).toBe("0")
+    }
+  )
+
+  test("an unavailable day still takes focus from a press", async () => {
+    const { day, focused } = mount({ unavailable: ["2026-10-05"] })
+    await tick()
+    expect(day("2026-10-05").getAttribute("tabindex")).toBe("-1")
+    day("2026-10-16").focus()
+    chromiumPress(day("2026-10-05"))
+    expect(focused()).toBe("2026-10-05")
+  })
+
   test("canceling an anchor change keeps a range's start as it was", async () => {
     let cancel = false
     const { day, instance } = mount({

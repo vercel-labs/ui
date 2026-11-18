@@ -426,9 +426,12 @@ function calendarApi<
     key: "focused",
     // Unavailable dates stay focusable, as the date picker pattern asks; they just can't be picked.
     disabled: (day) => blockedDate(store.get(), day.key),
-    // Days of the months around a grid show it, but focus moves through each grid's own.
+    // Days of the months around a grid show it, but focus moves through each
+    // grid's own. Days past min and max can't take focus at all.
     focusable: (day) =>
-      !isDisabled(store.get()) && !isOutside(store.get(), day.props),
+      !isDisabled(store.get()) &&
+      !isOutside(store.get(), day.props) &&
+      !outOfBounds(store.get(), day.key),
     preferred: (day) => day.key === preferredDate(store.get()),
     claims: (state, day) =>
       !isOutside(state, day.props) && day.key === preferredDate(state),
@@ -653,6 +656,7 @@ function calendarApi<
         if (
           el &&
           !isOutside(state, props) &&
+          !outOfBounds(state, props.value) &&
           el.ownerDocument.activeElement !== el &&
           // Only the refused press's own click counts clicks; a script's click() on that day still focuses it.
           (refused !== props.value ||
@@ -720,11 +724,10 @@ function calendarApi<
         pointer = event
         refused = null
       },
-      // A press on another month's day past min or max changes nothing, so the
-      // focused day keeps focus. That cell has no tabindex, and the page would blur it.
+      // A press on a day past min or max changes nothing, so the focused day
+      // keeps focus. That cell has no tabindex, and the page would blur it.
       mousedown(event: MouseEvent, props: CalendarDayProps) {
-        const state = store.get()
-        if (isOutside(state, props) && outOfBounds(state, props.value)) {
+        if (outOfBounds(store.get(), props.value)) {
           event.preventDefault()
         }
       },
@@ -927,7 +930,7 @@ function calendarSlots<
         const range = shownRange(state)
         return {
           tabindex:
-            isDisabled(state) || day.outside
+            isDisabled(state) || day.outside || outOfBounds(state, props.value)
               ? undefined
               : api.internal.roving.tabIndex(state, part),
           "aria-label": formatDate(props.value, localeOf(state)),
