@@ -112,7 +112,8 @@ const wrapped = new WeakMap<
 // library or other layer wrapped it since: then binding again reuses ours.
 function intercept(el: TextControl) {
   let layer = wrapped.get(el)
-  if (!layer) {
+  // With no own `value` left, a layer took ours off with its own.
+  if (!layer || !Object.getOwnPropertyDescriptor(el, "value")) {
     const own = Object.getOwnPropertyDescriptor(el, "value")
     const base = own ?? prototypeValue(el)
     const wrapper: PropertyDescriptor = {

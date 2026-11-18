@@ -36,6 +36,18 @@ test("a value wrapper added after binding stays through unbinding and binding ag
   expect(el.value).toBe("x")
 })
 
+test("binding again wraps anew once a later layer took its wrapper off with ours", () => {
+  const el = document.createElement("input")
+  const heard: string[] = []
+  const stop = watchValue(el, () => {})
+  wrapOnce(el, [])
+  stop()
+  delete (el as { value?: string }).value
+  watchValue(el, (source) => heard.push(source))
+  el.value = "x"
+  expect(heard).toEqual(["write"])
+})
+
 test("unbinding with nothing wrapped after puts the element's own value back", () => {
   const el = document.createElement("input")
   watchValue(el, () => {})()
