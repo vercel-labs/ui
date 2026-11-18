@@ -1,5 +1,12 @@
 # @ui-sdk/svelte
 
+## 0.1.0-beta.10
+
+### Patch Changes
+
+- 81943ed: Give each `FieldDescription` an id of its own, so a control with two descriptions is described by both.
+- Updated @ui-sdk/core to 0.1.0-beta.10
+
 ## 0.1.0-beta.9
 
 ### Patch Changes

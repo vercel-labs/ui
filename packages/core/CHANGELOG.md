@@ -1,5 +1,17 @@
 # @ui-sdk/core
 
+## 0.1.0-beta.10
+
+### Patch Changes
+
+- 0410825: Keep focus where it was when a Calendar or Date Picker day before `min` or after `max` is pressed. Those days no longer get a `tabindex`, so no browser can focus them, as the docs say.
+- 8760bba: Report the last pointer event, not the Escape key, when Escape puts an Image Cropper's crop back after a pan, as every other drag does.
+- ef33d41: Open a Date Picker on the selected date, else today, each time, as the docs say, instead of the day browsing stopped on last time. Each open turns the calendar back to that date's month, which `onMonthChange` hears with reason `"imperative"`. A roving focus group whose key is set back to `null` now forgets the item focused last.
+- 211b82a: Return focus to the next control when a dialog's action removes the element that opened it, like a confirm dialog that deletes its row. A dialog opened without a trigger now remembers where the element focused before it sat, a return target removed as the close renders hands focus on, and `finalFocus` applies to a dialog unmounted while open.
+- 81943ed: Give each `FieldDescription` an id of its own, so a control with two descriptions is described by both.
+- 65406ef: A form reset returns a controlled Input with a `defaultValue` to that default, through `onValueChange` with reason `"reset"`, as Textarea and the other form controls already did. The reset used to read the element's own default, which React moves with a controlled input's value.
+- fc97b27: Leave a `value` wrapper another layer added after a text control bound, like a testing library's, in place when the control unbinds, so it keeps hearing writes under React StrictMode.
+
 ## 0.1.0-beta.9
 
 ### Patch Changes
