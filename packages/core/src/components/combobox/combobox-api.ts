@@ -1089,15 +1089,23 @@ function comboboxApiBody(
     })
   })
 
-  let listed = { items: store.get().items, mounts: store.get().mounts }
+  let listed = {
+    items: store.get().items,
+    mounts: store.get().mounts,
+    query: store.get().query,
+  }
   store.subscribe(() => {
-    const { items, mounts } = store.get()
-    if (items === listed.items && mounts === listed.mounts) {
+    const { items, mounts, query } = store.get()
+    if (
+      items === listed.items &&
+      mounts === listed.mounts &&
+      query === listed.query
+    ) {
       return
     }
-    listed = { items, mounts }
-    // After the options that brought the items are handed over, so the
-    // highlight isn't written beside them.
+    listed = { items, mounts, query }
+    // After the options that brought the items or a controlled query are
+    // handed over, so the highlight isn't written beside them.
     queueMicrotask(() => {
       if (store.get().open) {
         settleHighlight(false)

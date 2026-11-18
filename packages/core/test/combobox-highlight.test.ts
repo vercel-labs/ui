@@ -149,3 +149,20 @@ test("arrows still reach unchosen items once a multiple combobox is at maxSelect
   await combo.keys("ArrowDown", "ArrowDown")
   expect(combo.state.highlighted).toBe("Done")
 })
+
+test("autoHighlight highlights the match for a controlled query once it arrives", async () => {
+  let combo: ReturnType<typeof view>
+  combo = view({
+    items: ["Apple", "Banana", "Blueberry"],
+    autoHighlight: true,
+    query: "",
+    onQueryChange: (query) =>
+      queueMicrotask(() => rerenderOf(combo).setOptions({ query })),
+  })
+  await combo.type("b")
+  await settle()
+  expect(combo.state.highlighted).toBe("Banana")
+  await combo.type("l")
+  await settle()
+  expect(combo.state.highlighted).toBe("Blueberry")
+})
