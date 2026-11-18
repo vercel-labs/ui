@@ -130,6 +130,7 @@ function FieldLabel(props: PartProps<"label", FieldState>) {
  */
 function FieldDescription(props: PartProps<"p", FieldDescriptionState>) {
   const described = useContext(DescribedContext)
+  const made = createUniqueId()
   if (!described) {
     return outside("description", "p", props)
   }
@@ -139,7 +140,7 @@ function FieldDescription(props: PartProps<"p", FieldDescriptionState>) {
   return usePart(
     owner,
     "description",
-    () => ({ id: props.id as string | undefined }),
+    () => ({ id: props.id as string | undefined, value: made }),
     props,
     "p"
   )

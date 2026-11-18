@@ -150,12 +150,14 @@ const FieldDescription = withElement(
       if (!described) {
         return useOutside("description", { tag: "p" })
       }
+      const attrs = useAttrs()
+      const made = useId()
       // A field set's description slot takes the same props, and its state is the
       // `disabled` that FieldDescriptionState always has.
       return usePart(
         described as FieldContext,
         "description",
-        useIdProp(),
+        () => ({ id: attrs.id as string | undefined, value: made }),
         undefined,
         "p"
       )

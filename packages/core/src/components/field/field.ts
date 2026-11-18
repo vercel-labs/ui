@@ -22,6 +22,7 @@ import {
   bindFoundControl,
   controlAttrs,
   dataAttrs,
+  descriptionId,
   errorShown,
   errorState,
   fieldState,
@@ -234,6 +235,7 @@ function fieldApiBody(
     },
     internal: {
       errorId,
+      descriptionId: (key: string) => descriptionId(parts(), id, key),
       bindRoot(el: HTMLElement) {
         root = el
         return bindRoot(el)
@@ -556,11 +558,12 @@ const fieldPrimitive = /* @__PURE__ */ definePrimitive({
         registerById(el, (id) => api.internal.register("labels", id)),
     }),
 
-    description: slot<{}, FieldState>({
-      props: { id: "string" },
+    description: slot<{ value?: string }, FieldState>({
+      // Renderers key each description by a made value, like errors.
+      props: { id: "string", value: { kind: "string", from: "field" } },
       state: (state, { api }) => fieldState(state, api),
-      attrs: (state, { id, props, api }) => ({
-        id: props.id ?? `${id}-description`,
+      attrs: (state, { key, props, api }) => ({
+        id: props.id ?? api.internal.descriptionId(key),
         ...dataAttrs(state, api),
       }),
       bind: (el, { api }) =>

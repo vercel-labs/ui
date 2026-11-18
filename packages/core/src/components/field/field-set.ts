@@ -1,5 +1,6 @@
 import { watchFieldsets } from "../../foundation/forms/form"
 import { definePrimitive } from "../../foundation/kernel/primitive"
+import { descriptionId } from "./field-attrs"
 import type {
   Named,
   PrimitiveOptions,
@@ -81,7 +82,8 @@ const fieldSetPrimitive = /* @__PURE__ */ definePrimitive({
     descriptions: [],
   }),
   sync: (options) => ({ disabled: !!options.disabled }),
-  api: ({ store }) => ({
+  api: ({ id, store, parts }) => ({
+    descriptionId: (key: string) => descriptionId(parts(), id, key),
     // Parts register a microtask after they bind, since Vue binds them while hydrating.
     register(list: "legends" | "descriptions", partId: string) {
       let active = true
@@ -134,11 +136,11 @@ const fieldSetPrimitive = /* @__PURE__ */ definePrimitive({
         registerById(el, (id) => api.register("legends", id)),
     }),
     // A FieldDescription right inside a FieldSet, outside any Field, describes the group.
-    description: slot<{}, FieldSetState>({
-      props: { id: "string" },
+    description: slot<{ value?: string }, FieldSetState>({
+      props: { id: "string", value: { kind: "string", from: "field" } },
       state: fieldSetState,
-      attrs: (state, { id, props }) => ({
-        id: props.id ?? `${id}-description`,
+      attrs: (state, { key, props, api }) => ({
+        id: props.id ?? api.descriptionId(key),
         ...disabledAttrs(state),
       }),
       bind: (el, { api }) =>

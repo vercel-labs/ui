@@ -268,8 +268,23 @@ function submitterOf(control: HTMLElement, root: HTMLElement) {
   return control.matches("input, select, textarea") ? control : undefined
 }
 
+// The first description takes `${id}-description`, which the control points
+// at before binding, or stands for the author's id there. Each one after it
+// takes its own.
+function descriptionId(
+  parts: Iterable<{ slot: string; key: string }>,
+  id: string,
+  key: string
+) {
+  const first = [...parts].find((part) => part.slot === "description")?.key
+  return !key || first === key
+    ? `${id}-description`
+    : `${id}-description-${key}`
+}
+
 export {
   bindFoundControl,
+  descriptionId,
   controlAttrs,
   dataAttrs,
   errorShown,

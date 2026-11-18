@@ -142,6 +142,7 @@ function FieldLabel(props: PartProps<"label", FieldState>) {
  */
 function FieldDescription(props: PartProps<"p", FieldDescriptionState>) {
   const described = React.useContext(DescribedContext)
+  const made = React.useId()
   if (!described) {
     return outside("description", "p", props)
   }
@@ -152,7 +153,7 @@ function FieldDescription(props: PartProps<"p", FieldDescriptionState>) {
     <InField
       field={owner}
       slot="description"
-      part={{ id: props.id }}
+      part={{ id: props.id, value: made }}
       props={props}
       tag="p"
     />

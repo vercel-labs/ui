@@ -21,11 +21,13 @@ describes the group, so screen readers say it as focus enters the group.
   const described = getContext<FieldContext | FieldSetContext | undefined>(
     DescribedKey
   )
+  const uid = $props.id()
   // A field set's description slot takes the same props, and its state is the
   // `disabled` that FieldDescriptionState always has.
   const description = described
     ? useHandlePart(described as FieldContext, "description", () => ({
         id: rest.id,
+        value: uid,
       }))
     : outsidePart("description")
 </script>
