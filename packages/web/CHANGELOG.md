@@ -1,5 +1,11 @@
 # @ui-sdk/web
 
+## 0.1.0-beta.11
+
+### Patch Changes
+
+- Updated @ui-sdk/core to 0.1.0-beta.11
+
 ## 0.1.0-beta.10
 
 ### Patch Changes

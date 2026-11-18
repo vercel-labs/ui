@@ -1,5 +1,12 @@
 # @ui-sdk/core
 
+## 0.1.0-beta.11
+
+### Patch Changes
+
+- 56a7c93: When a name fits more than one component, the agent's error now also says how a page tells them apart: a word in one label the other lacks, like a verb or the row's name.
+- b30d156: Let an agent call a component's own `run` action with the arguments it takes. Only Command's `run` names one of its commands, so only Command checks that the command is shown and reads its marks.
+
 ## 0.1.0-beta.10
 
 ### Patch Changes
