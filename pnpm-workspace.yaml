@@ -10,8 +10,8 @@ allowBuilds:
 
 catalog:
   "@playwright/test": ^1.63.0
-  "@solidjs/vite-plugin": 3.0.0-next.35
-  "@solidjs/web": 2.0.0-rc.14
+  "@solidjs/vite-plugin": 3.0.1
+  "@solidjs/web": 2.0.0
   "@sveltejs/vite-plugin-svelte": ^7.3.1
   "@types/react": ~19.2.2
   "@types/react-dom": ~19.2.2
@@ -19,7 +19,7 @@ catalog:
   "@vitejs/plugin-vue": ^6.0.9
   react: 19.2.3
   react-dom: 19.2.3
-  solid-js: 2.0.0-rc.14
+  solid-js: 2.0.0
   svelte: ^5.57.2
   svelte-check: ^4.7.6
   typescript: ~5.9.3
@@ -29,5 +29,3 @@ catalog:
   vite: ^8.3.3
   vue: ^3.5.43
   vue-tsc: ^3.3.12
-patchedDependencies:
-  "@solidjs/web@2.0.0-rc.14": patches/@solidjs__web@2.0.0-rc.14.patch

@@ -1,11 +1,9 @@
+import { resolve } from "node:path"
 import type { Plugin } from "vite"
 
-// Answers `/__ssr?fixture=<name>&framework=solid&…` with the fixture's server
-// HTML, for the `solid-ssr` fixtures: Solid's server output is a separate
-// compile, so a fixture can't render itself to a string in the browser. The
-// dev server renders through its own SSR module
-// graph. `vite preview` has no module runner, so it starts a dev server in
-// middleware mode just to answer this path.
+// Answers `/__ssr?fixture=<name>&framework=solid&…` with the fixture's server HTML. The
+// dev server renders through Vite. The preview server, which CI uses, loads the build in
+// dist-ssr, since Solid compiles a build differently and both sides have to match.
 function solidSsr(): Plugin {
   const path = "/__ssr"
   type Renderer = {
@@ -52,19 +50,9 @@ function solidSsr(): Plugin {
         )
       )
     },
-    async configurePreviewServer(preview) {
-      const { createServer } = await import("vite")
-      const server = await createServer({
-        configFile: preview.config.configFile,
-        server: { middlewareMode: true, hmr: false, watch: null },
-        appType: "custom",
-        logLevel: "warn",
-      })
-      preview.middlewares.use(
-        handle(
-          () => server.ssrLoadModule("/src/ssr/solid.ts") as Promise<Renderer>
-        )
-      )
+    configurePreviewServer(preview) {
+      const built = resolve(preview.config.root, "dist-ssr", "solid.js")
+      preview.middlewares.use(handle(() => import(built) as Promise<Renderer>))
     },
   }
 }

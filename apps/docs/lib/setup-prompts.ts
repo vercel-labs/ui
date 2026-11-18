@@ -88,7 +88,7 @@ const stacks = [
     id: "solid",
     name: "Solid",
     pkg: "solid",
-    needs: "It needs Solid 2: solid-js and @solidjs/web 2.0.0-rc.14 or newer.",
+    needs: "It needs Solid 2: solid-js and @solidjs/web 2.0.0 or newer.",
     projects: [
       {
         id: "vite",
@@ -106,7 +106,7 @@ const stacks = [
         // The stable TanStack Start for Solid is on Solid 1.9; only its release
         // candidate supports Solid 2.
         needs:
-          "It needs Solid 2: move solid-js, @solidjs/web and @tanstack/solid-start to their 2.0 release candidates, with solid-js and @solidjs/web 2.0.0-rc.14 or newer.",
+          "It needs Solid 2: move solid-js and @solidjs/web to 2.0.0 or newer, and @tanstack/solid-start to its 2.0 release candidate.",
       },
     ],
   },
