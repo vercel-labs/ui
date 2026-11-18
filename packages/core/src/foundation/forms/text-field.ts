@@ -163,7 +163,9 @@ function textFieldApi<Slot extends string>(
           on(el, "input", (event) => typed(el, event)),
           // Browsers differ on whether an `input` follows the end of a composition.
           on(el, "compositionend", (event) => typed(el, event)),
-          // A reset puts the default back, unless the change is canceled.
+          // A reset puts the default back, unless the change is canceled. The
+          // browser restores the element's own default, which React moves with
+          // a controlled input's value, so `defaultValue` wins when it's set.
           on(
             el.ownerDocument,
             "reset",
@@ -172,13 +174,21 @@ function textFieldApi<Slot extends string>(
                 return
               }
               afterReset(event, () => {
-                if (el.value === store.get().value) {
+                const target = options().defaultValue ?? el.value
+                const show = (value: string) => {
+                  if (el.value !== value) {
+                    el.value = value
+                  }
+                }
+                if (target === store.get().value) {
+                  show(target)
                   return
                 }
-                if (!change("value", el.value, { reason: "reset" })) {
-                  el.value = store.get().value
+                if (!change("value", target, { reason: "reset" })) {
+                  show(store.get().value)
                 } else if (!isControlled()) {
-                  read(el.value)
+                  show(target)
+                  read(target)
                 }
               })
             },
