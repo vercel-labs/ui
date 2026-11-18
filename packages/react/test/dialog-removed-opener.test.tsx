@@ -23,7 +23,9 @@ document.head.append(
 )
 Element.prototype.checkVisibility ??= function (this: Element) {
   for (let node: Element | null = this; node; node = node.parentElement) {
-    if (getComputedStyle(node).display === "none") return false
+    if (getComputedStyle(node).display === "none") {
+      return false
+    }
   }
   return this.isConnected
 }
@@ -65,12 +67,16 @@ function Rows({
   const pick = (row: string) => {
     const i = rows.indexOf(row)
     next.current = rows[i + 1] ?? rows[i - 1]
-    if (opening !== "controller") setRemoving(row)
+    if (opening !== "controller") {
+      setRemoving(row)
+    }
   }
   const remove = (row: string | null) =>
     setRows((all) => all.filter((r) => r !== row))
   const onOpenChange = (open: boolean) => {
-    if (!open) setRemoving(null)
+    if (!open) {
+      setRemoving(null)
+    }
   }
   const content = (
     <DialogContent
