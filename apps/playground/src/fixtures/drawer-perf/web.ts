@@ -20,7 +20,9 @@ async function mount(root: HTMLElement) {
       </ui-drawer>
       <button>After</button>
     </div>`
-  if (driver) root.querySelector("ui-drawer")?.setAttribute("driver", driver)
+  if (driver) {
+    root.querySelector("ui-drawer")?.setAttribute("driver", driver)
+  }
   await import("@ui-sdk/web/drawer")
 }
 
