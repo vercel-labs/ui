@@ -132,6 +132,11 @@ function createAutocompleteCore<
   let mountsQueued = false
   // What changes the text next, so the highlight that follows reports it.
   let cause: HighlightCause<Reason> | null = null
+  // Text that was asked for and hasn't arrived, while `settleFor` reads the list.
+  let asked: string | undefined
+  const query = () => asked ?? config.query()
+  // The text held when `settleFor` ran, until the options that answer it arrive.
+  let heldQuery: string | undefined
 
   const loadMore = createLoadMore({
     count: () => listbox.count(),
@@ -149,7 +154,7 @@ function createAutocompleteCore<
     // Scores rank data items. Composed ones keep their order, since frameworks own theirs.
     rank: () =>
       config.filter() === "fuzzy" || typeof config.filter() === "function",
-    query: config.query,
+    query,
     loop: () => options().loop ?? true,
     skipDisabled: true,
     active: () => store.get().open,
@@ -185,8 +190,7 @@ function createAutocompleteCore<
       return highlighted
     }
     const mode = config.autoHighlight()
-    const auto =
-      mode === "always" || (mode === "typing" && config.query() !== "")
+    const auto = mode === "always" || (mode === "typing" && query() !== "")
     const kept =
       highlighted !== null &&
       listbox.entries().some((entry) => entry.key === highlighted)
@@ -259,6 +263,22 @@ function createAutocompleteCore<
     }
   })
 
+  // An app that kept its text, like one that strips digits from it, was asked
+  // for a highlight that fits text it never took, so it's asked again.
+  context.onOptions(() => {
+    if (heldQuery === undefined) {
+      return
+    }
+    const held = heldQuery
+    const why = cause
+    heldQuery = undefined
+    queueMicrotask(() => {
+      if (config.query() === held) {
+        settle(true, why)
+      }
+    })
+  })
+
   // Turned on, the highlight goes to the best match if nothing has it, once
   // the options are handed over. Turned off, it stays where it is.
   let autoMode = config.autoHighlight()
@@ -293,6 +313,17 @@ function createAutocompleteCore<
     // Says what changes the text next, before it changes.
     cause(reason: HighlightCause<Reason>["reason"], event?: Event) {
       cause = { reason, event }
+    },
+    // Settles the highlight for text a controlled query was asked to become,
+    // so a controlled highlight is asked for with the text, not a render later.
+    settleFor(next: string) {
+      heldQuery = config.query()
+      asked = next
+      try {
+        settle(true, cause)
+      } finally {
+        asked = undefined
+      }
     },
     // The pointer highlights what it moves onto. Touch never does, since a
     // finger scrolling past isn't choosing.

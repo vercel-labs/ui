@@ -164,6 +164,26 @@ function commandApiBody(
     return change("query", query, { reason, event })
   }
 
+  // The text changing on its own, not with a page. An app that holds the text
+  // and the value hears both in one event, so it renders them together. With
+  // `filter: false` the app's next items decide the highlight, so it waits.
+  function search(
+    query: string,
+    reason: CommandQueryChangeReason,
+    event?: Event
+  ) {
+    const changed = setQuery(query, reason, event)
+    if (
+      changed &&
+      options().query !== undefined &&
+      options().value !== undefined &&
+      options().filter !== false
+    ) {
+      core.settleFor(query)
+    }
+    return changed
+  }
+
   // The cause of the next page change, for the highlight that follows it.
   let pageCause: HighlightCause<CommandValueChangeReason> | null = null
 
@@ -276,7 +296,7 @@ function commandApiBody(
         }
         event.preventDefault()
         if (query) {
-          setQuery("", "escape-key", event)
+          search("", "escape-key", event)
         } else {
           pop("escape-key", event)
         }
@@ -390,7 +410,7 @@ function commandApiBody(
         reason = "imperative",
         event,
       }: CommandChangeOptions<CommandQueryChangeReason> = {}
-    ) => setQuery(query, reason, event),
+    ) => search(query, reason, event),
     getPages: () => store.get().pages,
     setPages(
       pages: string[],
@@ -430,7 +450,7 @@ function commandApiBody(
       press: (key: string, event?: Event) => run(key, { event }),
       text: (state: CommandStore) => state.query,
       typed: (el: HTMLInputElement, event?: Event) =>
-        setQuery(el.value, "input-change", event),
+        search(el.value, "input-change", event),
       onInputKeyDown,
       // Whether a command is on the page shown: outside any page, or on the current one.
       onCurrentPage: (state: CommandStore, page: string | null | undefined) =>

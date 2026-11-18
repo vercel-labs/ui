@@ -457,4 +457,68 @@ describe("command headless", () => {
     })
     expect(instance.get()).toMatchObject({ highlighted: "theme" })
   })
+
+  test("with the text and the value both controlled, typing asks for the best match with the text, once", () => {
+    const onQueryChange = vi.fn()
+    const onValueChange = vi.fn()
+    const options = {
+      id: "c",
+      items: commands,
+      query: "",
+      value: "calendar",
+      onQueryChange,
+      onValueChange,
+    }
+    const instance = command(options)
+    type(instance, "se")
+    expect(onQueryChange).toHaveBeenLastCalledWith("se", expect.anything())
+    expect(onValueChange).toHaveBeenLastCalledWith(
+      "settings",
+      expect.objectContaining({ reason: "input-change", index: 0 })
+    )
+    expect(instance.get()).toMatchObject({ query: "", highlighted: "calendar" })
+    instance.setOptions({ ...options, query: "se", value: "settings" })
+    expect(onValueChange).toHaveBeenCalledTimes(1)
+    expect(keys(instance)).toEqual(["settings", "emoji"])
+    expect(instance.get()).toMatchObject({ highlighted: "settings" })
+  })
+
+  test("an app that takes the value but keeps its text is asked for the highlight its text has", async () => {
+    const onValueChange = vi.fn()
+    const options = {
+      id: "c",
+      items: commands,
+      query: "",
+      value: "calendar",
+      onQueryChange() {},
+      onValueChange,
+    }
+    const instance = command(options)
+    type(instance, "se")
+    expect(onValueChange).toHaveBeenLastCalledWith(
+      "settings",
+      expect.anything()
+    )
+    instance.setOptions({ ...options, value: "settings" })
+    await Promise.resolve()
+    expect(onValueChange).toHaveBeenLastCalledWith(
+      "calendar",
+      expect.anything()
+    )
+  })
+
+  test("with filter off, the highlight waits for the items the app sends for the text", () => {
+    const onValueChange = vi.fn()
+    const instance = command({
+      id: "c",
+      items: commands,
+      filter: false,
+      query: "",
+      value: "profile",
+      onQueryChange() {},
+      onValueChange,
+    })
+    type(instance, "se")
+    expect(onValueChange).not.toHaveBeenCalled()
+  })
 })

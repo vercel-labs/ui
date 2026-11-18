@@ -7,6 +7,7 @@ import {
   CollapsiblePanel,
   CollapsibleTrigger,
 } from "../src/collapsible"
+import { Command, CommandInput, CommandItem, CommandList } from "../src/command"
 import { Switch } from "../src/switch"
 import { Tabs, TabsList, TabsPanel, TabsTab } from "../src/tabs"
 
@@ -22,7 +23,7 @@ afterEach(() => {
   document.body.replaceChildren()
 })
 
-test("controlled components raise none of Solid's diagnostics", () => {
+function watchDiagnostics() {
   vi.spyOn(console, "warn").mockImplementation(() => {})
   const codes = new Set<string>()
   const off = OBSERVE!.diagnostics.subscribe((event) => codes.add(event.code))
@@ -31,6 +32,11 @@ test("controlled components raise none of Solid's diagnostics", () => {
     hotTime: false,
     wastedRecompute: false,
   })
+  return { codes, off }
+}
+
+test("controlled components raise none of Solid's diagnostics", () => {
+  const { codes, off } = watchDiagnostics()
   const [open, setOpen] = createSignal(false)
   const [tab, setTab] = createSignal("account")
   const [on, setOn] = createSignal(false)
@@ -72,5 +78,41 @@ test("controlled components raise none of Solid's diagnostics", () => {
   }
   off()
   dispose()
+  expect([...codes]).toEqual([])
+})
+
+test("a Command with its text and value controlled raises none while typing", async () => {
+  const { codes, off } = watchDiagnostics()
+  const [query, setQuery] = createSignal("")
+  const [value, setValue] = createSignal<string | null>(null)
+  const root = document.body.appendChild(document.createElement("div"))
+  const dispose = render(
+    () => (
+      <Command
+        query={query()}
+        onQueryChange={setQuery}
+        value={value()}
+        onValueChange={setValue}
+      >
+        <CommandInput aria-label="Search" />
+        <CommandList>
+          <CommandItem value="calendar" label="Calendar" />
+          <CommandItem value="billing" label="Billing" />
+        </CommandList>
+      </Command>
+    ),
+    root
+  )
+  flush()
+  await new Promise((resolve) => setTimeout(resolve))
+  const input = root.querySelector("input")!
+  for (const text of ["c", "b", ""]) {
+    input.value = text
+    input.dispatchEvent(new InputEvent("input", { bubbles: true }))
+    flush()
+  }
+  off()
+  dispose()
+  expect(value()).toBe("calendar")
   expect([...codes]).toEqual([])
 })

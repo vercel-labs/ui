@@ -49,6 +49,7 @@ Last reviewed: PRs 86 to 92 (2026-10-30, the audit fixes), 158 and 159 (2026-11-
 - **`submitShortcut="enter"` leaves phones no way to add a line**: a soft keyboard has no Shift+Enter, and the textarea sets no `enterkeyhint`.
 - **Timeline items have no description or feed position before hydration.** `aria-describedby`, `aria-posinset` and `aria-setsize` are live attributes written once the parts bind. `aria-labelledby` renders on the server, pointing at the title id until the root binds.
 - Waterfall's Solid default rows flatten `items` with their own `everySpan`, where React reads core's `api.internal.all()`. A pure flatten helper in core would keep the two from drifting.
+- **Opening or leaving a Command page with `query` and `value` controlled** still asks for the new page's highlight from the options effect, so Solid reports `EFFECT_WRITES_OWN_SOURCE` and `EFFECT_RELAY_TEAR` there. Text that changes on its own is asked for in the event (#582).
 
 ## Revisit
 
