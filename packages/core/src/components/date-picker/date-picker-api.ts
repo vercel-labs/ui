@@ -21,7 +21,11 @@ import {
 import type { CalendarOptions } from "../calendar/calendar"
 import { formatDate } from "../../foundation/date/format"
 import { parseDate } from "../../foundation/date/parse"
-import { isISODate, type ISODate } from "../../foundation/date/plain-date"
+import {
+  clampDate,
+  isISODate,
+  type ISODate,
+} from "../../foundation/date/plain-date"
 import { formInternals } from "../../foundation/forms/form"
 import { initialApple } from "../../foundation/platform/platform"
 import { deriveOpen } from "../../foundation/popups/popup"
@@ -168,12 +172,21 @@ function datePickerApiBody(
 
   let awaited = false
   let last = store.get().value
+  let opened = store.get().open
   store.subscribe(() => {
-    const { value } = store.get()
-    if (value === last) {
+    const state = store.get()
+    // Each open shows the selected date, else today, wherever browsing left the months.
+    if (state.open !== opened) {
+      opened = state.open
+      const date = selectedDates(state.value)[0] ?? state.today
+      if (opened && date) {
+        reveal(clampDate(date, state.min, state.max), "imperative")
+      }
+    }
+    if (state.value === last) {
       return
     }
-    last = value
+    last = state.value
     if (awaited) {
       awaited = false
       showValue()

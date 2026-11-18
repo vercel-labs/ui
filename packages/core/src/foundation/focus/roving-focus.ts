@@ -45,7 +45,7 @@ type RovingFocusMoveContext<Props = any> = {
 type RovingFocusOptions<State extends object, Props = any> = {
   /** The slot whose parts are the group's items. Each joins in the slot's `bind` with `roving.bind(el, part)`. */
   slot: string
-  /** The state key that holds the key of the item with the tab stop. Start it at `null`. */
+  /** The state key that holds the key of the item with the tab stop. Start it at `null`, and set it back to `null` to forget the item focused last. */
   key: keyof State & string
   /** Which arrows move focus when there's no `move`: Up and Down, Left and Right, or `"both"` for all four, like a rating. Defaults to `"vertical"`. */
   orientation?: () => RovingOrientation | "both"
@@ -135,6 +135,14 @@ function createRovingFocus<State extends object, Props = any>(
   const claim = createClaim()
   // The item focus was on last, which a group that remembers keeps the stop on.
   let remembered: string | null = null
+  // Set while the group moves its own stop. The key set to null by anyone
+  // else starts the group over, like a date picker opening on its value.
+  let moving = false
+  const setStop = (itemKey: string | null) => {
+    moving = true
+    store.set({ [key]: itemKey } as Partial<State>)
+    moving = false
+  }
   // An item focus is moving to that hasn't bound yet, and the element focus
   // left, so focus only follows if nothing else took it in between.
   let pending: { key: string; from: Element | null; left?: boolean } | null =
@@ -177,7 +185,7 @@ function createRovingFocus<State extends object, Props = any>(
   function check() {
     const stop = stopFor()
     if (stop !== undefined) {
-      store.set({ [key]: stop } as Partial<State>)
+      setStop(stop)
     }
   }
 
@@ -211,7 +219,7 @@ function createRovingFocus<State extends object, Props = any>(
     if (remember) {
       remembered = itemKey
     }
-    store.set({ [key]: itemKey } as Partial<State>)
+    setStop(itemKey)
     setTimeout(() => {
       // An item the framework kept, which only now renders its tabindex, takes focus here.
       focusPending()
@@ -258,6 +266,9 @@ function createRovingFocus<State extends object, Props = any>(
     store.subscribe(() => {
       const was = stop
       stop = store.get()[key]
+      if (stop === null && was !== null && !moving) {
+        remembered = null
+      }
       if (stop === was && order.size()) {
         queue(false)
       }
@@ -285,7 +296,7 @@ function createRovingFocus<State extends object, Props = any>(
           remembered = part.key
         }
         if (store.get()[key] === was) {
-          store.set({ [key]: part.key } as Partial<State>)
+          setStop(part.key)
         }
         if (el.ownerDocument.activeElement === el) {
           holder = el
@@ -438,7 +449,7 @@ function createRovingFocus<State extends object, Props = any>(
         return
       }
       remembered = itemKey
-      store.set({ [key]: itemKey } as Partial<State>)
+      setStop(itemKey)
     },
     /** Moves the stop to where the group's rules put it now. It also runs on its own after items join or leave and after state changes. */
     check,
