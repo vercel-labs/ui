@@ -101,24 +101,45 @@ function watchValue(el: TextControl, listener: (source: ValueSource) => void) {
 }
 
 const restores = new WeakMap<TextControl, () => void>()
+// Each element's wrapper, and how to take it off.
+const wrapped = new WeakMap<
+  TextControl,
+  { wrapper: PropertyDescriptor; unwrap: () => void }
+>()
 
-// Wraps `value` with an own property that reports writes. It wraps whatever
-// was there, so a framework's own tracker (React defines one) keeps working,
-// and the cleanup puts it back.
+// Wraps `value` with an own property that reports writes, around whatever was
+// there, like React's tracker. The cleanup puts that back, unless a testing
+// library or other layer wrapped it since: then binding again reuses ours.
 function intercept(el: TextControl) {
-  const own = Object.getOwnPropertyDescriptor(el, "value")
-  const base = own ?? prototypeValue(el)
-  Object.defineProperty(el, "value", {
-    configurable: true,
-    enumerable: base.enumerable,
-    get() {
-      return base.get!.call(el)
-    },
-    set(value: string) {
-      base.set!.call(el, value)
-      notify(el, "write")
-    },
-  })
+  let layer = wrapped.get(el)
+  if (!layer) {
+    const own = Object.getOwnPropertyDescriptor(el, "value")
+    const base = own ?? prototypeValue(el)
+    const wrapper: PropertyDescriptor = {
+      configurable: true,
+      enumerable: base.enumerable,
+      get() {
+        return base.get!.call(el)
+      },
+      set(value: string) {
+        base.set!.call(el, value)
+        notify(el, "write")
+      },
+    }
+    Object.defineProperty(el, "value", wrapper)
+    layer = {
+      wrapper,
+      unwrap: () => {
+        if (own) {
+          Object.defineProperty(el, "value", own)
+        } else {
+          delete (el as { value?: string }).value
+        }
+      },
+    }
+    wrapped.set(el, layer)
+  }
+  const { wrapper, unwrap } = layer
   const onInput = () => notify(el, "input")
   const onReset = (event: Event) => {
     if (event.target === el.form) {
@@ -130,10 +151,9 @@ function intercept(el: TextControl) {
   restores.set(el, () => {
     el.removeEventListener("input", onInput)
     el.ownerDocument.removeEventListener("reset", onReset, true)
-    if (own) {
-      Object.defineProperty(el, "value", own)
-    } else {
-      delete (el as { value?: string }).value
+    if (Object.getOwnPropertyDescriptor(el, "value")?.set === wrapper.set) {
+      unwrap()
+      wrapped.delete(el)
     }
   })
 }
