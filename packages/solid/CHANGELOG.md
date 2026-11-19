@@ -1,5 +1,12 @@
 # @ui-sdk/solid
 
+## 0.1.0-beta.12
+
+### Patch Changes
+
+- ab55044: A Solid root whose controlled option is still loading, like `<Switch checked={checked()}>` over an async memo, now waits under your `<Loading>` and renders once the value arrives. Before, the component that rendered the root was made again each time, so its source never finished loading.
+- Updated @ui-sdk/core to 0.1.0-beta.12
+
 ## 0.1.0-beta.11
 
 ### Patch Changes

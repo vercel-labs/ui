@@ -1,5 +1,16 @@
 # @ui-sdk/core
 
+## 0.1.0-beta.12
+
+### Patch Changes
+
+- 1cae2d1: With `autoHighlight` and a controlled `query`, Combobox now highlights the first match of the query you typed, not the one before it.
+- bc93b25: A Command whose `query` and `value` are both controlled now calls `onValueChange` in the same event as `onQueryChange` when the text changes from typing, Escape or `setQuery`, so an app renders the new text and the new highlight together. Before, the highlight was asked for a render later, which Solid's diagnostics reported as `EFFECT_WRITES_OWN_SOURCE` and `EFFECT_RELAY_TEAR`.
+- 4217a40: A drawer now styles and lays out its content once as it opens, instead of twice, or three times on a phone. Opening a drawer with long content is faster. A top drawer in a right-to-left layout now opens at the top instead of the bottom.
+- d2f3fa0: Importing Pagination no longer logs a development warning about its `link` part, or throws when strict mode is on.
+- 337bfaf: `web.css` now styles Input Group and its clear button, Select's label, Number Input's scrub area, the item icons in lists, menus, tabs and toggles, `data-slot="visually-hidden"` text, and a wrapper that adds an icon beside Command's search field.
+- 1e6aef9: In web components, an agent now names Tabs by their list's `aria-label`, as it does in React.
+
 ## 0.1.0-beta.11
 
 ### Patch Changes
