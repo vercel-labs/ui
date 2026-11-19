@@ -55,7 +55,7 @@ type PreferenceLike = {
   /** The value when nothing allowed is saved. */
   defaultValue: string
   /** Where the value is kept. */
-  storage?: ValueStorage
+  storage?: ValueStorage | undefined
   /** What the server and the first client render show. */
   initialState: { value: string }
   /** The current state. */
