@@ -1,0 +1,100 @@
+---
+title: Run the Model on Your Server
+description: Keep the model and its keys on your server while the agent works with the page.
+---
+
+The bridge you created in [Get Started](./index) reads and changes the components on the page, so it runs in the browser. The model can still run on your server, next to your API keys, usage limits, and other tools. Each time the model calls `snapshot`, `act`, or `query`, the call goes to the page, the bridge runs it, and the result goes back to the model.
+
+This page uses the [AI SDK](https://ai-sdk.dev), where a tool without `execute` on the server is run by the browser. The examples use React.
+
+## Declare the Tools on the Server
+
+Pass `agentTools` to `streamText` as tools without `execute`:
+
+```ts title="app/api/chat/route.ts"
+import { convertToModelMessages, jsonSchema, streamText, tool } from "ai"
+import { agentTools } from "@ui-sdk/react/agent"
+
+const tools = Object.fromEntries(
+  agentTools.map(({ name, description, inputSchema }) => [
+    name,
+    tool({ description, inputSchema: jsonSchema(inputSchema) }),
+  ])
+)
+
+async function POST(request: Request) {
+  const { messages } = await request.json()
+  const result = streamText({
+    model: "anthropic/claude-sonnet-5-5",
+    messages: await convertToModelMessages(messages),
+    tools,
+  })
+  return result.toUIMessageStreamResponse()
+}
+
+export { POST }
+```
+
+The model sees the same names, descriptions, and input schemas as any other agent. When it calls one, the response streams the call to the browser instead of running it on the server.
+
+## Run the Calls in the Browser
+
+In the chat component, run each call on `agent` and add its result. The form sends what the person types, and each message shows its text:
+
+```tsx title="chat.tsx"
+import { useState } from "react"
+import { useChat } from "@ai-sdk/react"
+import { lastAssistantMessageIsCompleteWithToolCalls } from "ai"
+import { agent } from "./agent"
+
+function Chat() {
+  const [input, setInput] = useState("")
+  const { messages, sendMessage, addToolOutput } = useChat({
+    sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
+    async onToolCall({ toolCall }) {
+      const tool = toolCall.toolName as "snapshot" | "act" | "query"
+      const output = await agent[tool](toolCall.input as never)
+      addToolOutput({ tool, toolCallId: toolCall.toolCallId, output })
+    },
+  })
+
+  return (
+    <form
+      onSubmit={(event) => {
+        event.preventDefault()
+        sendMessage({ text: input })
+        setInput("")
+      }}
+    >
+      {messages.map((message) => (
+        <p key={message.id}>
+          {message.parts
+            .map((part) => (part.type === "text" ? part.text : ""))
+            .join("")}
+        </p>
+      ))}
+      <input value={input} onChange={(event) => setInput(event.target.value)} />
+    </form>
+  )
+}
+
+export { Chat }
+```
+
+`sendAutomaticallyWhen` sends the results back once every call in the message has one, and the model continues from there. Ask it to set a field and it calls `act`, the field changes on the page, and the model gets the steps it ran and every field's value.
+
+The results are plain objects, so they travel as JSON without changes. A step that fails comes back in the result with `ok: false` and the reason, so the model can try again.
+
+## Refs Between Calls
+
+A ref from `snapshot` stays with its component while it's on the page, including across re-renders. If the component is gone, the step fails and lists what's on the page now. Take a new snapshot after you reorder or rename components, since two components with the same kind, label, and row text can trade refs when they come back.
+
+## Stopping a Turn
+
+A step that needs a person waits for your [`allow`](./permissions#ask-first) callback. If the person stops the chat while it waits, answer `false` from your confirmation so the step ends and later calls don't wait behind it. Otherwise the step fails once `timeout` passes, 5 minutes by default.
+
+## Next Steps
+
+- [Permissions](./permissions): approve, refuse, or ask the person before a change.
+- [Observe Changes](./observe-changes): tell the model what the person changed between turns.
+- [Reference](./reference): look up what each tool returns.

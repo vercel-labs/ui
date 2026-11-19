@@ -124,7 +124,7 @@ Use these definitions when setting up your agent's tools. Route each tool call t
 
 What the tools return comes from the page, so it can include text your users wrote, like a name in a table row. Their descriptions tell the model to treat it as data. Before an agent changes something that matters, have a person confirm it with [Permissions](./permissions).
 
-For a browser that supports WebMCP, [register the tools with the browser](./webmcp).
+When your model runs on your server, [send the calls to the page](./run-on-your-server) and return the results. For a browser that supports WebMCP, [register the tools with the browser](./webmcp).
 
 ## Your Own Components
 
@@ -137,5 +137,6 @@ The snapshot reads the primitive's `controlled` state keys. If none are declared
 - [Permissions](./permissions): approve, refuse, or cancel an agent's changes.
 - [Observe Changes](./observe-changes): keep the agent up to date with what the person changed.
 - [History and Undo](./history-and-undo): record changes, undo them, and preview suggestions.
+- [Run the Model on Your Server](./run-on-your-server): keep the model on your server and run the tools in the browser.
 - [WebMCP](./webmcp): make the tools available to a browser agent.
 - [Reference](./reference): look up options, methods, and return values.
