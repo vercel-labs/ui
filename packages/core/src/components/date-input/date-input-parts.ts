@@ -135,6 +135,17 @@ function rangeMessage(
   return message
 }
 
+// The validity flag for the value's problem. A read-only control is barred
+// from validation, like a native one.
+function problemFlag(state: State) {
+  const problem = state.readOnly
+    ? undefined
+    : isPartial(state)
+      ? "badInput"
+      : problemOf(state)
+  return problem === "unavailable" ? "customError" : problem
+}
+
 function problemMessage(state: State) {
   if (isPartial(state)) {
     return badInputMessage(state)
@@ -190,7 +201,8 @@ const dateInputSlots = (slot: SlotFactory<State, DateInputApi>) => ({
         }
         carrier = first
         if (first) {
-          setComponentValidity(first, problemMessage(store.get()))
+          const state = store.get()
+          setComponentValidity(first, problemMessage(state), problemFlag(state))
         }
       }
       queueMicrotask(validate)
@@ -215,19 +227,12 @@ const dateInputSlots = (slot: SlotFactory<State, DateInputApi>) => ({
           message: () => valueMissingMessage("text"),
           invalid: () => {
             const state = store.get()
-            // A read-only control is barred from validation, like a native one.
-            const problem = state.readOnly
-              ? undefined
-              : isPartial(state)
-                ? "badInput"
-                : problemOf(state)
-            if (!problem) {
+            const flag = problemFlag(state)
+            if (!flag) {
               return undefined
             }
             return {
-              flags: {
-                [problem === "unavailable" ? "customError" : problem]: true,
-              },
+              flags: { [flag]: true },
               message: problemMessage(state),
               anchor: api.internal.firstSegment(),
             }

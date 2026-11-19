@@ -126,6 +126,14 @@ describe("parsing", () => {
     expect(parseNumber("1.2.3", "en-US")).toBe(null)
   })
 
+  test("rejects a group separator after the decimal one", () => {
+    expect(parseNumber("1,234.98,7654", "en-US")).toBe(null)
+    expect(parseNumber("1,5.3", "de-DE")).toBe(null)
+    expect(isPartialNumber("1.5,", "en-US")).toBe(false)
+    expect(isPartialNumber("1,234.5", "en-US")).toBe(true)
+    expect(parseNumber("1 234,5", "fr-FR")).toBe(1234.5)
+  })
+
   test("reads the locale's separators", () => {
     expect(parseNumber("1.234,5", "de-DE")).toBe(1234.5)
     expect(parseNumber("1 234,5", "fr-FR")).toBe(1234.5)

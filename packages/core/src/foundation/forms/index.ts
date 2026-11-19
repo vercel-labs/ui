@@ -21,6 +21,7 @@ export {
   bindInternals,
   bindValueInput,
   claimInvalidFocus,
+  componentFlagOf,
   dispatchChange,
   fieldControlId,
   formInternals,

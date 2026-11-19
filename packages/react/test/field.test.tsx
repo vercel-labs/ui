@@ -2,6 +2,7 @@
 import * as React from "react"
 import { createRoot, type Root } from "react-dom/client"
 import { afterEach, expect, test } from "vitest"
+import { DateInput } from "../src/date-input"
 import { Field, FieldControl, FieldError, FieldLabel } from "../src/field"
 
 // Errors without ids are parts of their own, so a submit reads each one's
@@ -79,4 +80,35 @@ test("an error that changes its `match` or unmounts gives the message back", asy
 
   await React.act(async () => root!.render(<Email match shown={false} />))
   expect(submit(input).defaultPrevented).toBe(false)
+})
+
+test("a date before `min` matches rangeUnderflow, though its segments carry a custom message", async () => {
+  const container = document.body.appendChild(document.createElement("div"))
+  root = createRoot(container)
+  await React.act(async () =>
+    root!.render(
+      <form>
+        <Field>
+          <FieldLabel>Pickup</FieldLabel>
+          <DateInput
+            defaultValue="2026-01-02"
+            min="2026-06-01"
+            locale="en-US"
+          />
+          <FieldError match="rangeUnderflow">Pick a later date.</FieldError>
+        </Field>
+      </form>
+    )
+  )
+  await React.act(async () => new Promise((resolve) => setTimeout(resolve)))
+  const segment = container.querySelector<HTMLInputElement>(
+    '[role="spinbutton"]'
+  )!
+  let event!: Event
+  await React.act(async () => {
+    event = submit(segment)
+  })
+  expect(event.defaultPrevented).toBe(true)
+  const error = container.querySelector('[data-slot="field-error"]')
+  expect(error?.textContent).toBe("Pick a later date.")
 })

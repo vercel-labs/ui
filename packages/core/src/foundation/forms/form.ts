@@ -128,26 +128,34 @@ function onValidityChange(listener: (el: HTMLElement) => void) {
 // <Activity>, picks up what the element already carries.
 const heldMessages = new WeakMap<
   HTMLInputElement,
-  { message: string; app: string }
+  { message: string; app: string; flag?: ValidityFlag }
 >()
+
+type ValidityFlag = Exclude<keyof ValidityState, "valid">
 
 // Sets a native control's custom validity from a component's own check, like a
 // date picker's text that isn't a date, and tells fields around it. An empty
 // message gives the control back the message the app had set, unless the app
 // set another one since. A control barred from validation, like a disabled
 // one, reports no message, so there it's taken to still hold the component's.
-function setComponentValidity(el: HTMLInputElement, message: string) {
+function setComponentValidity(
+  el: HTMLInputElement,
+  message: string,
+  flag?: ValidityFlag
+) {
   const held = heldMessages.get(el)
-  if ((held?.message ?? "") === message) {
+  if ((held?.message ?? "") === message && held?.flag === flag) {
     return
   }
   if (message) {
     if (held) {
       held.message = message
+      held.flag = flag
     } else {
       heldMessages.set(el, {
         message,
         app: el.validity.customError ? el.validationMessage : "",
+        flag,
       })
     }
     el.setCustomValidity(message)
@@ -158,6 +166,15 @@ function setComponentValidity(el: HTMLInputElement, message: string) {
     }
   }
   validityChanged(el)
+}
+
+// The flag a component's message stands for, like rangeUnderflow, which a
+// custom validity can't set on a native control.
+function componentFlagOf(el: HTMLElement) {
+  const held = heldMessages.get(el as HTMLInputElement)
+  return held && (el as HTMLInputElement).validationMessage === held.message
+    ? held.flag
+    : undefined
 }
 
 const blocksImplicitSubmission = new Set([
@@ -618,6 +635,7 @@ export {
   bindInternals,
   bindValueInput,
   claimInvalidFocus,
+  componentFlagOf,
   dispatchChange,
   elementMoved,
   fieldControlId,

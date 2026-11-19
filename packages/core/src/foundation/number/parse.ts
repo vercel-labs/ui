@@ -128,6 +128,14 @@ function normalize(text: string, symbols: Symbols) {
     result = result.split(symbol).join("")
   }
   const groupIsSpace = symbols.group.trim() === ""
+  const decimalAt = result.indexOf(symbols.decimal)
+  if (
+    !groupIsSpace &&
+    decimalAt !== -1 &&
+    result.includes(symbols.group, decimalAt + 1)
+  ) {
+    return "?"
+  }
   result = groupIsSpace
     ? result.replace(spaces, "")
     : result.split(symbols.group).join("").replace(spaces, "")

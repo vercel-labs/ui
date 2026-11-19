@@ -979,6 +979,18 @@ describe("stageChanges", () => {
     expect([pin.get().value, name.get().value]).toEqual(["9999", ""])
   })
 
+  test("finds a control by ref past the snapshot's limit", async () => {
+    const agent = createAgent()
+    const fields = Array.from({ length: 120 }, (_, i) =>
+      mountInput(`Field ${i}`)
+    )
+    const found = await agent.query({ text: "Field 119" })
+    const ref = Array.isArray(found) ? found[0].ref : ""
+    const staged = await stageChanges(agent, [{ ref, value: "Ada" }])
+    expect(staged.applied).toHaveLength(1)
+    expect(fields[119].get().value).toBe("Ada")
+  })
+
   test("puts values on through the bridge and reverts them", async () => {
     const agent = createAgent()
     const wifi = mountCheckbox("wifi", "Wi-Fi")

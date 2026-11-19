@@ -35,11 +35,15 @@ async function stageChanges(
       ? list.filter((c) => !c.offPage && c.component !== "more")
       : []
   const components = onPage(agent.snapshot())
-  // A long page's snapshot stops at its limit, so a control past it is looked up by name.
+  // A long page's snapshot stops at its limit, so a control past it is looked up by ref, then name.
   const find = async (ref: string) => {
     const match = (list: AgentComponent[]) =>
       list.find((c) => c.ref === ref) ?? list.find((c) => c.label === ref)
-    return match(components) ?? match(onPage(await agent.query({ text: ref })))
+    return (
+      match(components) ??
+      match(onPage(await agent.query({ within: ref }))) ??
+      match(onPage(await agent.query({ text: ref })))
+    )
   }
   const applied: {
     ref: string

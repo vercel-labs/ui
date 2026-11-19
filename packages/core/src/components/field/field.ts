@@ -1,5 +1,6 @@
 import {
   claimInvalidFocus,
+  componentFlagOf,
   fieldControlId,
   formInternals,
   invalidFocusClaimed,
@@ -200,6 +201,11 @@ function fieldApiBody(
         if (validity[key]) {
           flags[key] = true
         }
+      }
+      const flag = componentFlagOf(el)
+      if (flag && flags.customError) {
+        delete flags.customError
+        flags[flag as ValidityKey] = true
       }
       next = { valid: false, flags, message }
       break
