@@ -14,7 +14,7 @@ import {
   bindInternals,
   bindValueInput,
   setComponentValidity,
-  typedBeforeBind,
+  takeTypedText,
 } from "../../foundation/forms/form"
 import { pageLocale } from "../../foundation/text/locale"
 import {
@@ -191,23 +191,26 @@ const datePickerSlots = (slot: SlotFactory<State, DatePickerApi>) => ({
           invalidAt(state, indexOf(props)) ? invalidDateMessage : ""
         )
       }
-      const state = store.get()
-      if (
-        typedBeforeBind(
-          input,
-          textOf(state, indexOf(props)),
-          textOf({ ...state, pageLocale: null }, indexOf(props))
-        )
-      ) {
-        // The root reads the page's language after its parts bind, and the text parses in it.
-        if (store.get().pageLocale === null) {
-          store.set({ pageLocale: pageLocale(input) ?? null })
+      takeTypedText(
+        input,
+        () => {
+          const state = store.get()
+          return [
+            textOf(state, indexOf(props)),
+            textOf({ ...state, pageLocale: null }, indexOf(props)),
+          ]
+        },
+        () => {
+          // The root reads the page's language after its parts bind, and the text parses in it.
+          if (store.get().pageLocale === null) {
+            store.set({ pageLocale: pageLocale(input) ?? null })
+          }
+          api.internal.setText(indexOf(props), input.value)
+          if (!input.matches(":focus")) {
+            api.internal.commit(indexOf(props))
+          }
         }
-        api.internal.setText(indexOf(props), input.value)
-        if (!input.matches(":focus")) {
-          api.internal.commit(indexOf(props))
-        }
-      }
+      )
       write()
       const unsubscribe = store.subscribe(write)
       return () => {

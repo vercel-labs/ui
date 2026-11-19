@@ -28,6 +28,7 @@ export {
   withSource,
 } from "./details"
 export { settleDraft } from "./draft"
+export { takeEarlyText } from "./early-text"
 export { elements } from "./elements"
 export { isComposing, on, selectEvent } from "./events"
 export { createUndoStack, type UndoStackOptions } from "./undo-stack"

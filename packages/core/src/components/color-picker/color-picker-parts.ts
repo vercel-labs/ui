@@ -7,7 +7,7 @@ import {
   bindInternals,
   bindValueInput,
   isDisabled,
-  typedBeforeBind,
+  takeTypedText,
 } from "../../foundation/forms/form"
 import { css } from "../../foundation/kernel/inline-style"
 import type { SlotFactory } from "../../foundation/kernel/primitive-types"
@@ -452,13 +452,16 @@ function colorPickerSlots(slot: SlotFactory<State, ColorPickerApi>) {
             input.value = next
           }
         }
-        const { text, value } = store.get()
-        if (typedBeforeBind(input, text ?? value)) {
-          api.internal.setText(input.value)
-          if (!input.matches(":focus")) {
-            api.internal.commitText()
+        takeTypedText(
+          input,
+          () => [store.get().text ?? store.get().value],
+          () => {
+            api.internal.setText(input.value)
+            if (!input.matches(":focus")) {
+              api.internal.commitText()
+            }
           }
-        }
+        )
         write()
         return store.subscribe(write)
       },

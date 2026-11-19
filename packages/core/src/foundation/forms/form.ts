@@ -8,6 +8,7 @@
 //   ElementInternals with the binder from form-internals.ts, and forwards
 //   their form callbacks there. `bindInternals` reports the value and
 //   validity through it.
+import { takeEarlyText } from "../kernel/early-text"
 import { documentOrder } from "../kernel/order"
 import { trusted } from "../kernel/trusted"
 import { afterReset, writeValue, writingFromScript } from "./value"
@@ -602,11 +603,32 @@ function labelledBy(
   return () => watch.removeEventListener("focusin", update)
 }
 
-// Text typed before the page's script ran, which neither the server's markup
-// nor what the field shows has, goes in as typing. A field can show more than one
-// text, like a date before and after its root reads the page's language.
-function typedBeforeBind(input: HTMLInputElement, ...shown: string[]) {
-  return input.value !== input.defaultValue && !shown.includes(input.value)
+// Text typed before the page's script ran goes in as typing. A field can show more
+// than one text, like a date before and after its root reads the page's language.
+// Text a framework wrote over as it hydrated goes in once hydration is done.
+function takeTypedText(
+  input: HTMLInputElement,
+  shown: () => string[],
+  take: () => void
+) {
+  const typed = () =>
+    input.value !== input.defaultValue && !shown().includes(input.value)
+  if (typed()) {
+    take()
+    return
+  }
+  const text = takeEarlyText(input)
+  if (text === undefined) {
+    return
+  }
+  queueMicrotask(() => {
+    if (input.isConnected && !typed()) {
+      input.value = text
+      if (typed()) {
+        take()
+      }
+    }
+  })
 }
 
 export {
@@ -636,7 +658,7 @@ export {
   onValidityChange,
   setComponentValidity,
   submitImplicitly,
-  typedBeforeBind,
+  takeTypedText,
   validityChanged,
   valueMissingMessage,
   watchFieldsets,

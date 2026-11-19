@@ -1,7 +1,7 @@
 import {
   bindValueInput,
   bindInternals,
-  typedBeforeBind,
+  takeTypedText,
 } from "../../foundation/forms/form"
 import {
   atBound,
@@ -409,16 +409,20 @@ const numberInputPrimitive = /* @__PURE__ */ definePrimitive({
             input.value = store.get().text
           }
         }
-        if (typedBeforeBind(input, store.get().text)) {
-          // The root reads the page's language after its parts bind, and the text parses in it.
-          if (store.get().pageLocale === null) {
-            store.set({ pageLocale: pageLocale(input) ?? null })
+        takeTypedText(
+          input,
+          () => [store.get().text],
+          () => {
+            // The root reads the page's language after its parts bind, and the text parses in it.
+            if (store.get().pageLocale === null) {
+              store.set({ pageLocale: pageLocale(input) ?? null })
+            }
+            api.internal.type(input.value)
+            if (!input.matches(":focus")) {
+              api.internal.commitText()
+            }
           }
-          api.internal.type(input.value)
-          if (!input.matches(":focus")) {
-            api.internal.commitText()
-          }
-        }
+        )
         write()
         // React's wheel listeners are passive, and its beforeinput isn't the
         // native event, so the field listens itself.
