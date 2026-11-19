@@ -85,6 +85,15 @@ function createStickToBottom(options: StickToBottomOptions = {}) {
     }
   }
 
+  // Rows can sit in a wrapper of their own, like Scroll Area's content.
+  const rowsOf = (el: Element) => {
+    let parent = el
+    while (parent.children.length === 1) {
+      parent = parent.children[0]
+    }
+    return parent
+  }
+
   // In content coordinates, so a scroll the page makes itself isn't a row moving.
   const offset = (el: HTMLElement, row: Element) =>
     row.getBoundingClientRect().top -
@@ -96,7 +105,7 @@ function createStickToBottom(options: StickToBottomOptions = {}) {
     if (state.following) {
       return
     }
-    const rows = el.children
+    const rows = rowsOf(el).children
     const box = el.getBoundingClientRect()
     let found: { row: Element; rect: DOMRect } | undefined
     let low = 0
@@ -154,7 +163,9 @@ function createStickToBottom(options: StickToBottomOptions = {}) {
     } else {
       // The browser's own anchoring is off, and Safari has none.
       const moved =
-        pinned?.row.parentNode === el ? offset(el, pinned.row) - pinned.top : 0
+        pinned && el.contains(pinned.row)
+          ? offset(el, pinned.row) - pinned.top
+          : 0
       if (Math.abs(moved) >= 1) {
         // Content that shrank below the scroll position pulled it back already.
         const clamped = el.scrollTop < lastTop && distance(el) < 1
@@ -225,10 +236,20 @@ function createStickToBottom(options: StickToBottomOptions = {}) {
       const children = view?.MutationObserver
         ? new view.MutationObserver(() => {
             watch()
+            observeRows()
             resized()
           })
         : undefined
-      children?.observe(el, { childList: true })
+      const observeRows = () => {
+        children?.disconnect()
+        for (let parent: Element = el; ; parent = parent.children[0]) {
+          children?.observe(parent, { childList: true })
+          if (parent.children.length !== 1) {
+            break
+          }
+        }
+      }
+      observeRows()
       // A wheel or touch going up stops following at once, before any frame lands.
       const intent = (event: WheelEvent | TouchEvent | KeyboardEvent) => {
         const up =

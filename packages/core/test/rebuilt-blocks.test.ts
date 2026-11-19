@@ -576,6 +576,39 @@ describe("createStickToBottom", () => {
     expect(last.getBoundingClientRect().top).toBe(30)
   })
 
+  test("rows in a wrapper, like Scroll Area's content, stay still when rows above them go", async () => {
+    const content = document.createElement("div")
+    const el = scroller(100, () => content.children.length * 50)
+    el.append(content)
+    el.getBoundingClientRect = () => new DOMRect(0, 0, 300, 100)
+    const row = () => {
+      const p = document.createElement("p")
+      p.getBoundingClientRect = () => {
+        const top = [...content.children].indexOf(p) * 50 - el.scrollTop
+        return new DOMRect(0, top, 300, 50)
+      }
+      p.getClientRects = () =>
+        [p.getBoundingClientRect()] as unknown as DOMRectList
+      return p
+    }
+    for (let i = 0; i < 10; i++) {
+      content.append(row())
+    }
+    const log = createStickToBottom()
+    cleanups.push(log.connect(el))
+    el.dispatchEvent(new WheelEvent("wheel", { deltaY: -50 }))
+    el.scrollTop = 220
+    el.dispatchEvent(new Event("scroll"))
+    const first = content.children[4]
+    content.children[0].remove()
+    content.children[0].remove()
+    content.append(row())
+    await Promise.resolve()
+    expect(el.scrollTop).toBe(120)
+    expect(first.getBoundingClientRect().top).toBe(-20)
+    expect(log.get()).toMatchObject({ following: false, unseen: true })
+  })
+
   test("prepend keeps the distance from the end", () => {
     let content = 500
     const el = scroller(100, () => content)
