@@ -106,6 +106,8 @@ Two more marks change what the agent sees:
 
 Changes inside `data-agent-hidden` still reach [Observe](./observe-changes), so your own logs see them, while `agent.subscribe` stays quiet. A secret value stays out of `snapshot`, `act` results and change events, and the field's error text reads `"[redacted]"` too. A secret File Input lists its files without their names. Password, card and one-time-code fields are treated as secret without a mark. A hidden input is left out without one.
 
+The agent reaches what a person can reach. A component hidden with CSS, the `hidden` attribute, a closed `<details>` or `aria-hidden="true"` is left out without a mark. A component in an `inert` region, like the page behind a modal dialog, is listed as disabled until the region is usable again.
+
 In development, a misspelled mark such as `data-agent-confim` logs a warning with the name it meant.
 
 ## Cancel a Value Change
