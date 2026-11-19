@@ -657,9 +657,39 @@
 .ov-cmd-result {
   min-width: 0;
   overflow: hidden;
+}
+
+.ov-cmd-done {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  font-weight: 500;
+  color: var(--tile-ink);
+  animation: ov-cmd-done 280ms var(--ease-out);
+}
+
+.ov-cmd-done svg {
+  flex: none;
+  color: oklch(0.6 0.15 150);
+}
+
+.ov-cmd-done[data-busy] {
   color: var(--tile-ink-2);
+}
+
+.ov-cmd-done[data-busy] svg {
+  display: none;
+}
+
+@keyframes ov-cmd-done {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
 }
 
 .ov-cmd-keys {

@@ -428,7 +428,18 @@ function Palette() {
         )}
       </CommandList>
       <footer className="ov-cmd-foot">
-        <output className="ov-cmd-result">{result}</output>
+        <output className="ov-cmd-result">
+          {result && (
+            <span
+              key={result}
+              className="ov-cmd-done"
+              data-busy={result.endsWith("…") ? "" : undefined}
+            >
+              <CheckIcon size={13} weight="bold" aria-hidden />
+              {result}
+            </span>
+          )}
+        </output>
         <span className="ov-cmd-keys">
           <span>
             <kbd className="ov-kbd">↵</kbd> Run

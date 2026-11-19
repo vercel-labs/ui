@@ -2388,8 +2388,9 @@ function ThrowCard() {
   const fling = (direction: number, velocity: MovePoint) => {
     const el = top.current
     const width = el?.parentElement?.clientWidth ?? 260
+    const stage = el?.closest(".tile-stage")?.clientWidth ?? 0
     const from = Math.abs(pos.current.x)
-    const to = width * 1.2
+    const to = Math.max(width * 1.2, stage / 2 + width * 0.7)
     cancel.current()
     cancel.current = runSpring(
       pos.current,
@@ -2413,7 +2414,7 @@ function ThrowCard() {
         pos.current = { x: 0, y: 0 }
         setDeck((current) => [...current.slice(1), current[0]])
       },
-      { response: 0.3, damping: 1, tolerance: 24 }
+      { response: 0.42, damping: 1, tolerance: 12 }
     )
   }
 

@@ -15,6 +15,7 @@ import {
   directNames,
   handlers as partHandlers,
   keep,
+  noteEarlyText,
   partState,
   present as isPresent,
   ref,
@@ -271,6 +272,7 @@ function usePrimitive<P extends Primitive>(
   // What reaches outside the instance, like its controller, starts once it
   // mounts, since a server never mounts or unmounts it: a module-level
   // controller would stay attached to one request's instance.
+  noteEarlyText()
   const instance = unwatched(() =>
     primitive(snapshot({ ...options(), id }))
   ) as ReturnType<P>

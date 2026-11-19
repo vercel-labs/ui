@@ -46,7 +46,7 @@ import {
   warnIfUnnamed,
 } from "../../foundation/lists/listbox-parts"
 import { flagWhileBound } from "../../foundation/kernel/bound-keys"
-import { typedBeforeBind } from "../../foundation/forms/form"
+import { takeTypedText } from "../../foundation/forms/form"
 import { bindFieldName } from "../../foundation/lists/field-name"
 import {
   inputState,
@@ -308,9 +308,12 @@ const comboboxSlots = (slot: SlotFactory<ComboboxState, ComboboxApi>) => ({
           input.value = query
         }
       }
-      if (typedBeforeBind(input, store.get().query)) {
-        api.internal.typed(input.value, undefined, input.matches(":focus"))
-      }
+      takeTypedText(
+        input,
+        () => [store.get().query],
+        () =>
+          api.internal.typed(input.value, undefined, input.matches(":focus"))
+      )
       write()
       if (dev) {
         warnIfUnnamed(

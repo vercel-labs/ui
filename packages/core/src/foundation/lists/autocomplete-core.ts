@@ -7,7 +7,7 @@
 import { afterBind } from "../kernel/after-bind"
 import { type AsyncOptionsStatus } from "./async-options"
 import { pressKeepsFocus } from "../focus/press-keeps-focus"
-import { typedBeforeBind } from "../forms/form"
+import { takeTypedText } from "../forms/form"
 import { isApple } from "../platform/platform"
 import { fuzzyFilter } from "../text/fuzzy"
 import {
@@ -419,9 +419,11 @@ function fieldPart<State extends AutocompleteCoreState, Api extends CoreApi>() {
           input.value = value
         }
       }
-      if (typedBeforeBind(input, text(api, store.get()))) {
-        api.internal.typed(input)
-      }
+      takeTypedText(
+        input,
+        () => [text(api, store.get())],
+        () => api.internal.typed(input)
+      )
       write()
       return store.subscribe(write)
     },

@@ -11,6 +11,9 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
 const tilesDir = path.join(root, "app/sink/tiles")
 const out = path.join(root, "app/sink/bento/uses.generated.ts")
 
+// How a demo is put together rather than what it does, so never a tag.
+const plumbing = new Set(["definePrimitive", "createParts"])
+
 // A part counts as its component: `MenuItem` is `Menu`, `CalendarDay` from
 // ".../date-picker" is `DatePicker`, and `AlertDialogContent` from ".../dialog"
 // is `AlertDialog` when the tile imports that too.
@@ -116,7 +119,12 @@ function usesIn(file) {
       ) {
         return
       }
-      if (ts.isIdentifier(child)) {
+      const parent = child.parent
+      const key =
+        (ts.isPropertyAssignment(parent) ||
+          ts.isPropertyAccessExpression(parent)) &&
+        parent.name === child
+      if (ts.isIdentifier(child) && !key) {
         names.add(child.text)
       }
       ts.forEachChild(child, visit)
@@ -145,7 +153,9 @@ function usesIn(file) {
         }
       }
     }
-    return [...new Set([...uses].map((use) => componentOf(use, uses)))].sort()
+    return [...new Set([...uses].map((use) => componentOf(use, uses)))]
+      .filter((name) => !plumbing.has(name))
+      .sort()
   }
   const result = {}
   if (!list || !ts.isArrayLiteralExpression(list)) {

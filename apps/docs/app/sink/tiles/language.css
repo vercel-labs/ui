@@ -2065,3 +2065,7 @@
     transition: none;
   }
 }
+
+.lg-sheet-cell:focus-visible {
+  outline-offset: -2px;
+}
