@@ -118,6 +118,10 @@ describe.each(componentCases)("$name", (component) => {
         expect(result.ok).toBe(false)
       }
     }
+    // A step that names nothing looks inside closed sections, like an accordion's.
+    await agent.act({
+      steps: [{ ref: "Nothing by this name", action: "press" }],
+    })
     await mounted.settle()
     expect(allow).not.toHaveBeenCalled()
     expect(mounted.changes.map((change) => change.key)).toEqual([])

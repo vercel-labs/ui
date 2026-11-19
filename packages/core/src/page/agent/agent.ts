@@ -1158,7 +1158,8 @@ function createAgent(
         if (
           typeof api.open !== "function" ||
           typeof api.setValue !== "function" ||
-          !Array.isArray(value)
+          !Array.isArray(value) ||
+          isComponentDisabled(instance.get() as Record<string, unknown>, parts)
         ) {
           continue
         }
