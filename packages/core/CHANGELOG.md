@@ -1,5 +1,18 @@
 # @ui-sdk/core
 
+## 0.1.0-beta.13
+
+### Patch Changes
+
+- fc65a63: An agent takes no action on a component in an inert region, like the page behind a modal dialog, and leaves out one hidden with `visibility: hidden`. A File Input refuses text as a file, and a step named after an inherited method, like `constructor`, is refused cleanly.
+- 553401b: Keep focus on the item the pointer reaches right after the press that opens a menu. The menu's own focus, a frame after the press, used to take it back.
+- d17bb74: A carousel behind a modal dialog or drawer is now inert, like the rest of the page. Its slides and viewport stayed usable, because the slides are a live region and live regions stay live over a modal.
+- 702c30f: `Preferences` accepts a preference from `createPreference` or `createColorScheme` under `exactOptionalPropertyTypes`, whose `storage` can be `undefined`.
+- e741e64: Mounting a Field, Select, Combobox or Autocomplete inside a synchronous `act()`, like Testing Library's `render`, no longer logs "An update was not wrapped in act(...)". The store writes their parts make as they bind now land in the same commit.
+- e7f240f: `stageChanges` finds a control by its ref on a page longer than an agent snapshot, where it used to skip the change. `parseNumber` and `isPartialNumber` refuse a group separator after the decimal one, like "1,234.98,7654". A Date Input or Time Input outside `min` or `max` matches a Field Error's `rangeUnderflow` or `rangeOverflow` in every framework, as it already did in web components.
+- e0252d3: `createStickToBottom` keeps the rows in view still when rows above them go, also when the rows sit in a wrapper, like a Scroll Area's content. Before, only rows that were the scroller's own children stayed put.
+- d757d5c: Text typed into a Combobox, Autocomplete, Command, Number Input, Date Picker or Color Picker before a Vue or Svelte page hydrates now stays, as it already did in React. Vue and Svelte write a field's value while they hydrate, so the text is read as the first component is made and goes in once hydration is done.
+
 ## 0.1.0-beta.12
 
 ### Patch Changes

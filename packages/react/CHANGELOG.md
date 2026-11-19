@@ -1,5 +1,12 @@
 # @ui-sdk/react
 
+## 0.1.0-beta.13
+
+### Patch Changes
+
+- e741e64: Mounting a Field, Select, Combobox or Autocomplete inside a synchronous `act()`, like Testing Library's `render`, no longer logs "An update was not wrapped in act(...)". The store writes their parts make as they bind now land in the same commit.
+- Updated @ui-sdk/core to 0.1.0-beta.13
+
 ## 0.1.0-beta.12
 
 ### Patch Changes
