@@ -231,9 +231,9 @@ const svelteScript =
   /<script\b[^>]*\blang=["']ts["'][^>]*>([\s\S]*?)<\/script>/g
 const popupStep = /\bpopup\??\.(opening|returnFocus)\(/
 const htmlSink =
-  /\b(innerHTML|outerHTML|insertAdjacentHTML|dangerouslySetInnerHTML|srcdoc|setHTMLUnsafe|createContextualFragment|parseFromString)\b|\{@html\b|\bv-html\b|\bdocument\.write(ln)?\(|\beval\(|\bnew Function\(/
+  /\b(innerHTML|outerHTML|insertAdjacentHTML|dangerouslySetInnerHTML|srcdoc|setHTMLUnsafe|createContextualFragment|parseFromString)\b|\{@html\b|\bv-html\b|\bdocument\.write(ln)?\(|\beval\(|\bnew Function\(/g
 const urlSink =
-  /\.(href|src|action|formAction)\s*=(?![=>])|\bsetAttribute\(\s*["'`](href|src|action|formaction|xlink:href)["'`]|\blocation\.(assign|replace)\(|\bwindow\.open\(/
+  /\.(href|src|action|formAction)\s*=(?![=>])|\bsetAttribute\(\s*["'`](href|src|action|formaction|xlink:href)["'`]|\blocation\.(assign|replace)\(|\bwindow\.open\(/g
 const commentLine = /^\s*(\/\/|\/?\*|<!--)/
 const svelteComponentDoc = /^<!--\s*@component\b/m
 const svelteComponentComment = /^<!--\s*@component\b[\s\S]*?-->/m
@@ -491,19 +491,20 @@ function checkSinks() {
       if (relative in allowlist) {
         continue
       }
-      readFileSync(path.join(root, relative), "utf8")
+      // Read whole, with comment lines blank, since a formatter breaks a
+      // long call like `setAttribute("href", url)` over lines.
+      const code = readFileSync(path.join(root, relative), "utf8")
         .split("\n")
-        .forEach((text, index) => {
-          const found = commentLine.test(text) ? null : text.match(sink)
-          if (found) {
-            violations.push({
-              file: relative,
-              line: index + 1,
-              rule,
-              message: message(found[0].trim()),
-            })
-          }
+        .map((text) => (commentLine.test(text) ? "" : text))
+        .join("\n")
+      for (const found of code.matchAll(sink)) {
+        violations.push({
+          file: relative,
+          line: code.slice(0, found.index).split("\n").length,
+          rule,
+          message: message(found[0].replace(/\s+/g, " ").trim()),
         })
+      }
     }
   }
 }
