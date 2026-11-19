@@ -1,6 +1,5 @@
 // `definePrimitive`: a component's behavior without its markup, and the
 // instances adapters make of it. Its types are in `primitive-types.ts`.
-import { noteEarlyText } from "./early-text"
 import {
   checkControlled,
   checkRoles,
@@ -472,10 +471,8 @@ function definePrimitive<
     }
     return instance
   }
-  const create = (initialOptions: Options & { id: string }) => {
-    noteEarlyText()
-    return withLifecycle(() => make(initialOptions))
-  }
+  const create = (initialOptions: Options & { id: string }) =>
+    withLifecycle(() => make(initialOptions))
   // Named like its instances, so renderers can name its parts, like `TabsList`.
   // Its options schema and slots are for renderers, which read the schema
   // with `schemaOf`, so primitives no renderer reads that way pay nothing for it.

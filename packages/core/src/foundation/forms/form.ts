@@ -613,11 +613,11 @@ function takeTypedText(
 ) {
   const typed = () =>
     input.value !== input.defaultValue && !shown().includes(input.value)
+  const text = takeEarlyText(input)
   if (typed()) {
     take()
     return
   }
-  const text = takeEarlyText(input)
   if (text === undefined) {
     return
   }

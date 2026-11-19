@@ -15,6 +15,7 @@ import {
   directNames,
   followed,
   handlers as partHandlers,
+  noteEarlyText,
   on,
   partState,
   present as isPresent,
@@ -89,6 +90,7 @@ function usePrimitive<P extends Primitive>(
   // The first options go into the constructor, since effects never run on the server.
   const first = untrack(() => snapshot(options()))
   const prefixed = `ui-sdk-${first.id}`
+  noteEarlyText()
   const instance = primitive({ ...first, id: prefixed }) as ReturnType<P>
   const bindable = trackBindable(primitive, instance.get(), first, options)
   const removals: Promise<void>[] = []

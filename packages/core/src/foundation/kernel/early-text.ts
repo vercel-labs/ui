@@ -1,6 +1,6 @@
 // Text typed into the page's fields before its script ran. Vue and Svelte
-// write a field's value as they hydrate it, before any part binds, so it's
-// read once, as the first instance is made, ahead of hydration.
+// write a field's value as they hydrate it, before any part binds, so they
+// note it once, as they make their first instance, ahead of hydration.
 let early: WeakMap<HTMLInputElement, string> | undefined
 
 function noteEarlyText() {
