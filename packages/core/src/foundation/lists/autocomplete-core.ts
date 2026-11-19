@@ -4,6 +4,7 @@
 // Autocomplete adds a popup, forms and inline completion on top, and Command
 // adds running commands and pages. Combobox stays apart, since it owns a
 // selected value.
+import { afterBind } from "../kernel/after-bind"
 import { type AsyncOptionsStatus } from "./async-options"
 import { pressKeepsFocus } from "../focus/press-keeps-focus"
 import { typedBeforeBind } from "../forms/form"
@@ -167,7 +168,7 @@ function createAutocompleteCore<
         return
       }
       mountsQueued = true
-      queueMicrotask(() => {
+      afterBind(() => {
         mountsQueued = false
         store.set({ mounts: store.get().mounts + 1 } as Partial<State>)
       })

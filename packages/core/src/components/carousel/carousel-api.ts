@@ -3,6 +3,7 @@
 // `carousel-keyboard.ts`, the seamless loop in `carousel-loop.ts`, DOM reads and
 // writes in `carousel-dom.ts`, and the parts and their attributes in
 // `carousel.ts`.
+import { afterBind } from "../../foundation/kernel/after-bind"
 import { dev } from "#dev"
 import { checkName } from "#name-check"
 import { clamp } from "../../foundation/number/steps"
@@ -359,7 +360,7 @@ function carouselApiBody(
       return
     }
     measureQueued = true
-    queueMicrotask(measure)
+    afterBind(measure)
   }
 
   function updateInView() {

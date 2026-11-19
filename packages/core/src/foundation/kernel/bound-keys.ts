@@ -5,6 +5,7 @@
 // part that hydrates after the write keeps the server's attributes, so a
 // synchronous write leaves a hydrated trigger without its label. A flag only
 // the part's ancestors read can be written at once (`flagWhileBound`).
+import { afterBind } from "./after-bind"
 import type { Store } from "./store"
 
 type Draft = Record<string, unknown>
@@ -25,7 +26,7 @@ function later<State extends object>(
   }
   const edits = [edit]
   queued.set(store, edits)
-  queueMicrotask(() => {
+  afterBind(() => {
     queued.delete(store)
     const draft: Draft = {}
     for (const run of edits) {

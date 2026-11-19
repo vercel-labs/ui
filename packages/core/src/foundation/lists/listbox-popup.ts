@@ -1,6 +1,7 @@
 // What Combobox and Autocomplete share as fields that pop up a list: the
 // content the list opens in, the list part inside it, and the state their
 // field and its buttons reflect.
+import { afterBind } from "../kernel/after-bind"
 import { type AsyncOptionsStatus } from "./async-options"
 import { type FieldName, listName } from "./field-name"
 import { isDisabled, listStepKeys } from "./listbox-parts"
@@ -150,7 +151,7 @@ function bindListContent(
   const { aligned } = config
   // Items bind in the same commit as the content. A microtask later, an empty list is really empty.
   let active = true
-  queueMicrotask(() => active && flags.set({ settled: true }))
+  afterBind(() => active && flags.set({ settled: true }))
   const unloading = internal.loadMore.bind(el)
   const unbind = internal.presentation.bind(el, {
     snapPoints: config.snapPoints,

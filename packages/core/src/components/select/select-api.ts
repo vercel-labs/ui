@@ -1,5 +1,6 @@
 // Select's state and API: opening and closing, choosing items, the value and
 // its labels, and what the form asks of it.
+import { afterBind } from "../../foundation/kernel/after-bind"
 import { type AsyncOptionsStatus } from "../../foundation/lists/async-options"
 import { modalityOf, trackModality } from "../../foundation/kernel/modality"
 import {
@@ -255,7 +256,7 @@ function selectApiBody(
         return
       }
       mountsQueued = true
-      queueMicrotask(() => {
+      afterBind(() => {
         mountsQueued = false
         store.set({ mounts: store.get().mounts + 1 })
       })

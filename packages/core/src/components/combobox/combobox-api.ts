@@ -1,5 +1,6 @@
 // Combobox's state and API: opening and closing, the text and how it filters,
 // choosing and removing items, the create option, and what the form asks of it.
+import { afterBind } from "../../foundation/kernel/after-bind"
 import { type AsyncOptionsStatus } from "../../foundation/lists/async-options"
 import type {
   ComboboxChangeOptions,
@@ -360,7 +361,7 @@ function comboboxApiBody(
         return
       }
       mountsQueued = true
-      queueMicrotask(() => {
+      afterBind(() => {
         mountsQueued = false
         store.set({ mounts: store.get().mounts + 1 })
       })

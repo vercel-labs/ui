@@ -2,6 +2,7 @@
 // makes parts (`instance.part(slot, props)`), and these read, subscribe and
 // bind them. They're free functions, so each adapter bundles only the ones it
 // calls.
+import { afterBind } from "./after-bind"
 import { checkFocus, checkRole, dev, warn } from "#dev"
 import { enforceHidden } from "../platform/style"
 import { isComposing, on } from "./events"
@@ -660,7 +661,7 @@ function readIdLater(part: PartRecord) {
   const { owner } = part
   if (!owner.unread) {
     owner.unread = new Set()
-    queueMicrotask(() => readIds(owner, part.store))
+    afterBind(() => readIds(owner, part.store))
   }
   owner.unread.add(part)
 }

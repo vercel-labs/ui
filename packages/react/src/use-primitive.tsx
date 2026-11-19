@@ -21,6 +21,7 @@ import {
   ref,
   release,
   renderVersion,
+  runBindWrites,
   sameSlotState,
   sameValue,
   schemaOf,
@@ -260,6 +261,10 @@ function usePrimitive<P extends Primitive>(
       })
     }
   }, [instance])
+
+  // Its parts bound in this commit, before this root's effects: their store
+  // writes land in it too, so a mount inside `act()` leaves none for after.
+  React.useLayoutEffect(() => runBindWrites())
 
   // One object for the instance's life, so context consumers never re-render
   // because of it. Parts subscribe to what they render through usePart.

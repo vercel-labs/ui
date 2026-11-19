@@ -2,6 +2,7 @@
 // primitive's own state so parts render it, with arrow keys between them.
 // Tabs, Radio Group, Toggle Group, Toolbar, Menubar and Carousel run on it,
 // the same block a component of your own uses.
+import { afterBind } from "../kernel/after-bind"
 import { moveIndex, rovingStop, stepFor } from "./collection"
 import type { Part, PrimitiveContext } from "../kernel/primitive-types"
 import { isRTL } from "../platform/env"
@@ -198,7 +199,7 @@ function createRovingFocus<State extends object, Props = any>(
       return
     }
     queued = true
-    queueMicrotask(() => {
+    afterBind(() => {
       queued = false
       check()
       focusPending()
