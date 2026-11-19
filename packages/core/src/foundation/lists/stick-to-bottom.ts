@@ -88,7 +88,7 @@ function createStickToBottom(options: StickToBottomOptions = {}) {
   // Rows can sit in a wrapper of their own, like Scroll Area's content.
   const rowsOf = (el: Element) => {
     let parent = el
-    while (parent.children.length === 1) {
+    while (parent.children.length === 1 && parent.children[0].children.length) {
       parent = parent.children[0]
     }
     return parent

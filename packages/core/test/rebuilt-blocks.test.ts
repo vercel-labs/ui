@@ -609,6 +609,32 @@ describe("createStickToBottom", () => {
     expect(log.get()).toMatchObject({ following: false, unseen: true })
   })
 
+  test("one row alone stays still when a row goes in above it", async () => {
+    const el = scroller(100, () => el.children.length * 300)
+    el.getBoundingClientRect = () => new DOMRect(0, 0, 300, 100)
+    const row = () => {
+      const p = document.createElement("p")
+      p.textContent = "A long message"
+      p.getBoundingClientRect = () => {
+        const top = [...el.children].indexOf(p) * 300 - el.scrollTop
+        return new DOMRect(0, top, 300, 300)
+      }
+      p.getClientRects = () =>
+        [p.getBoundingClientRect()] as unknown as DOMRectList
+      return p
+    }
+    const first = row()
+    el.append(first)
+    const log = createStickToBottom()
+    cleanups.push(log.connect(el))
+    el.dispatchEvent(new WheelEvent("wheel", { deltaY: -50 }))
+    el.scrollTop = 100
+    el.dispatchEvent(new Event("scroll"))
+    el.prepend(row())
+    await Promise.resolve()
+    expect(first.getBoundingClientRect().top).toBe(-100)
+  })
+
   test("prepend keeps the distance from the end", () => {
     let content = 500
     const el = scroller(100, () => content)
