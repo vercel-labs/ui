@@ -1,0 +1,378 @@
+---
+title: Customize a Behavior
+description: Change a rule, add or remove a key, refuse a change, and build your own behavior on top of one.
+---
+
+[Compose Behaviors](./compose-behaviors) built a rating from `createChange` and `createRovingFocus`. Each behavior came with rules of its own: roving focus decides which keys move focus, where each one goes, and which star Tab lands on. When your component needs something different, keep the behavior and change it in one of these places:
+
+| You Want To                               | Where                                                |
+| ----------------------------------------- | ---------------------------------------------------- |
+| Change one of its rules                   | [An option](#change-a-rule)                          |
+| Add a key, or take one away               | [Your `api`, around the call](#add-a-key)            |
+| Choose what happens after it runs         | [What the call returns](#choose-what-a-move-does)    |
+| Reuse your version in other components    | [A function around the behavior](#extend-a-behavior) |
+| Change a behavior other than roving focus | [The same places, by behavior](#other-behaviors)     |
+| Stop a change from outside                | [The change callback](#refuse-a-change)              |
+| Take a key from outside the component     | [Your own event handler](#handle-an-event-first)     |
+
+We'll keep working on [that rating](./compose-behaviors#complete-primitive). Each step changes a few lines of `rating.ts` or the code that renders it.
+
+## Change a Rule
+
+Each rule a behavior follows is an option. The rating wraps from the last star to the first because it passes `loop`. To stop at either end, change that option in `createRovingFocus`:
+
+```ts
+loop: () => false,
+```
+
+Most options are functions, so a rule can depend on state or on the component's own options. They run each time the behavior needs an answer.
+
+Start here for any behavior: its options are listed with its guide, and [All Behaviors](./behaviors) links to each one. For roving focus, [Focus and Keys](./behaviors/focus#roving-focus) covers `orientation`, `loop`, `disabled`, `focusable`, `preferred` and `remember`.
+
+One option goes further. `move` replaces every built-in key, which fits a layout the built-in keys don't describe, such as a [keypad](./behaviors/focus#any-layout). To add one key and keep the rest, wrap the call.
+
+## Add a Key
+
+Roving focus doesn't listen for keys by itself. The star's `keydown` handler calls `api.keydown`, and that calls `roving.keydown`. The call is yours, so you can handle a key before the behavior sees it.
+
+Let's make the number keys jump to a star. Update `keydown` in the object returned from `api`:
+
+```ts {2-14}
+keydown(event: KeyboardEvent, el: HTMLElement) {
+  const modified = event.ctrlKey || event.metaKey || event.altKey
+  const star = modified
+    ? undefined
+    : roving.items().find((item) => item.key === event.key)
+  if (star) {
+    event.preventDefault()
+    roving.focus(star.key)
+    change("value", Number(star.key), {
+      reason: "list-navigation",
+      event,
+    })
+    return
+  }
+
+  const moved = roving.keydown(event, el)
+  if (moved) {
+    change("value", Number(moved.key), {
+      reason: "list-navigation",
+      event,
+    })
+  }
+},
+```
+
+- `roving.items()` returns the stars that can take focus. Each star's key is its value, so pressing 4 finds the fourth star.
+- `roving.focus(key)` moves focus to that star. The tab stop follows the new rating, as it did before.
+- Every other key still reaches `roving.keydown`, so the arrows, Home and End work as before.
+
+<ComponentExample
+  name="core/rating-keys"
+  caption="Focus a star and press 4. The arrows, Home and End still work."
+/>
+
+## Take a Key Away
+
+To drop a key, return before the call. Add this at the top of `keydown`, and Home and End no longer change the rating:
+
+```ts
+if (event.key === "Home" || event.key === "End") {
+  return
+}
+```
+
+The behavior never sees the key, so the browser handles it as usual.
+
+## Choose What a Move Does
+
+`roving.keydown` moves focus and tells you where it went. It returns `key`, the item it moved to, `from`, the item it left, and `shift`, whether Shift was held. For a key that isn't its own, it returns `undefined`.
+
+What a move means is up to the component. The rating selects the star it lands on:
+
+```ts
+const moved = roving.keydown(event, el)
+if (moved) {
+  change("value", Number(moved.key), { reason: "list-navigation", event })
+}
+```
+
+A row of buttons can ignore the result, so focus moves and nothing else changes. A file list uses `shift` to extend a selection, as [Ranges and Select All](./behaviors/selection#ranges-and-select-all) shows.
+
+## Extend a Behavior
+
+The number keys now live inside the rating. To use them in other components, move them into a function that wraps the behavior and returns it with your `keydown` in place of the original:
+
+```ts title="number-keys.ts"
+import {
+  createRovingFocus,
+  type PrimitiveContext,
+  type RovingFocusOptions,
+} from "@ui-sdk/core"
+
+function createNumberKeys<State extends object>(
+  context: PrimitiveContext<any, State, any>,
+  options: RovingFocusOptions<State>
+) {
+  const roving = createRovingFocus(context, options)
+
+  return {
+    ...roving,
+    keydown(event: KeyboardEvent, el: HTMLElement) {
+      const modified = event.ctrlKey || event.metaKey || event.altKey
+      const items = roving.items()
+      const from = items.find((item) => item.el === el)
+      const to = modified
+        ? undefined
+        : items.find((item) => item.key === event.key)
+      if (from && to) {
+        event.preventDefault()
+        roving.focus(to.key)
+        return { key: to.key, from: from.key, shift: event.shiftKey }
+      }
+
+      return roving.keydown(event, el)
+    },
+  }
+}
+
+export { createNumberKeys }
+```
+
+- It takes the same `context` and options as `createRovingFocus`, so each component still passes its own rules.
+- `...roving` keeps `bind`, `tabIndex`, `items` and the rest.
+- Its `keydown` returns the same result as the original, so a component treats a number key like any other move.
+
+In `rating.ts`, call `createNumberKeys` in place of `createRovingFocus` and leave its options as they are. `keydown` goes back to what it was in Compose Behaviors:
+
+```ts
+keydown(event: KeyboardEvent, el: HTMLElement) {
+  const moved = roving.keydown(event, el)
+  if (moved) {
+    change("value", Number(moved.key), { reason: "list-navigation", event })
+  }
+},
+```
+
+Any group whose keys are numbers can use it now. A row of page buttons passes its own slot and `orientation`, and gets the number keys with them.
+
+Your `keydown` runs wherever your component calls it. You can replace `focus` or `tabIndex` the same way. Inside, the behavior keeps using its own methods: when focus lands on an item, it calls the original `remember`. To change what it does by itself, use its options.
+
+## Other Behaviors
+
+The other behaviors change in the same places. Their rules are options too. Where roving focus returns each move from `keydown`, a behavior that changes a value hands you the value to write, through `set`.
+
+A selection writes each new value through `set`, so a limit goes there. This one allows three toppings:
+
+```ts
+const selection = createSelection(context, {
+  key: "value",
+  set: (value, details) => value.length <= 3 && change("value", value, details),
+  order: () => roving.items().map((item) => item.key),
+  multiple: () => true,
+})
+```
+
+`set` returns whether the value went through. Returning `false` leaves the selection as it was.
+
+Here's where to look in the behaviors you'll use most. Each name links to its guide:
+
+| Behavior                                                                 | Rules You Can Change                                   | What It Hands You                                                      |
+| ------------------------------------------------------------------------ | ------------------------------------------------------ | ---------------------------------------------------------------------- |
+| [`createRovingFocus`](./behaviors/focus#roving-focus)                    | `orientation`, `loop`, `disabled`, `focusable`, `move` | Each move, returned from `keydown`                                     |
+| [`createGridFocus`](./behaviors/focus#grids)                             | `disabled`, `pageSize`                                 | Each move, in `onMove`                                                 |
+| [`createSelection`](./behaviors/selection#selecting-items)               | `multiple`, `selectable`                               | Each selection, in `set`                                               |
+| [`createListbox`](./behaviors/lists#options-you-search)                  | `filter`, `loop`                                       | Each highlight, in `onHighlight`                                       |
+| [`createReorder`](./behaviors/drag-and-drop#reordering)                  | `orientation`, `group`, `disabled`                     | Each order, in `set`, and each announcement, in `message`              |
+| [`createTransfer`](./behaviors/drag-and-drop#moving-between-lists)       | `accepts`, `order`, `disabled`                         | Each move between lists, in `set`, and each announcement, in `message` |
+| [`createMove`](./behaviors/direct-manipulation#moving-in-two-dimensions) | `bounds`, `step`, `disabled`                           | Each position, in `set`, and each announcement, in `message`           |
+| [`createResize`](./behaviors/direct-manipulation#resizing-boxes)         | `min`, `max`, `aspect`, `bounds`                       | Each size, in `set`, and each announcement, in `message`               |
+| [`createPopup`](./behaviors/popups#pick-its-behavior)                    | A preset, and `role`                                   | Each open and close, in `onOpenChange`                                 |
+
+A `message` can reword one announcement and keep the others, since each default is exported: `reorderMessage`, `transferMessage`, `moveMessage` and `resizeMessage`. [What's Read Out](./behaviors/drag-and-drop#whats-read-out) shows one.
+
+## Refuse a Change
+
+The next two steps need no changes to `rating.ts`. They're for whoever renders the rating.
+
+Every change the rating makes goes through `change`, which calls `onValueChange` before it writes the value. The callback can refuse. Here a review form keeps the rating as it is while it saves:
+
+<FrameworkContent value="react">
+
+```tsx
+<Rating
+  aria-label="Rating"
+  onValueChange={(value, details) => {
+    if (saving) {
+      details.cancel()
+    }
+  }}
+>
+  {children}
+</Rating>
+```
+
+</FrameworkContent>
+<FrameworkContent value="vue">
+
+```vue
+<Rating
+  aria-label="Rating"
+  @value-change="(value, details) => saving && details.cancel()"
+>
+  <slot />
+</Rating>
+```
+
+</FrameworkContent>
+<FrameworkContent value="svelte">
+
+```svelte
+<Rating
+  aria-label="Rating"
+  onValueChange={(value, details) => {
+    if (saving) {
+      details.cancel()
+    }
+  }}
+>
+  {@render children()}
+</Rating>
+```
+
+</FrameworkContent>
+<FrameworkContent value="solid">
+
+```tsx
+<Rating
+  aria-label="Rating"
+  onValueChange={(value, details) => {
+    if (saving()) {
+      details.cancel()
+    }
+  }}
+>
+  {props.children}
+</Rating>
+```
+
+</FrameworkContent>
+<FrameworkContent value="web-components">
+
+```ts
+const rating = document.querySelector("my-rating")!
+
+rating.addEventListener("valuechange", (event) => {
+  if (saving) {
+    event.preventDefault()
+  }
+})
+```
+
+</FrameworkContent>
+
+It refuses a press, an arrow key and a number key alike, since they all ask through `change`. To refuse only some of them, check `details.reason`: the rating reports `item-press` and `list-navigation`. [What a Change Reports](./kernel/handle-changes#what-a-change-reports) lists everything a callback gets.
+
+## Handle an Event First
+
+An event handler you pass to a part runs before the part's own. Call `event.preventDefault()` and the part skips its handler for that event.
+
+Say the rating sits in a table row, where Up and Down move between rows. Take those two keys and leave the others to the rating:
+
+<FrameworkContent value="react">
+
+```tsx
+<RatingStar
+  value="3"
+  onKeyDown={(event) => {
+    if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+      event.preventDefault()
+      moveRow(event.key)
+    }
+  }}
+/>
+```
+
+</FrameworkContent>
+<FrameworkContent value="vue">
+
+```vue
+<script setup lang="ts">
+function onKeydown(event: KeyboardEvent) {
+  if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+    event.preventDefault()
+    moveRow(event.key)
+  }
+}
+</script>
+
+<template>
+  <RatingStar value="3" @keydown="onKeydown" />
+</template>
+```
+
+</FrameworkContent>
+<FrameworkContent value="svelte">
+
+```svelte
+<RatingStar
+  value="3"
+  onkeydown={(event) => {
+    if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+      event.preventDefault()
+      moveRow(event.key)
+    }
+  }}
+/>
+```
+
+</FrameworkContent>
+<FrameworkContent value="solid">
+
+```tsx
+<RatingStar
+  value="3"
+  onKeyDown={(event) => {
+    if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+      event.preventDefault()
+      moveRow(event.key)
+    }
+  }}
+/>
+```
+
+</FrameworkContent>
+<FrameworkContent value="web-components">
+
+```ts
+const rating = document.querySelector("my-rating")!
+
+rating.addEventListener(
+  "keydown",
+  (event) => {
+    if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+      event.preventDefault()
+      moveRow(event.key)
+    }
+  },
+  { capture: true }
+)
+```
+
+Listen in the capture phase, on the rating or anything around it. The star's own listener is on its button, so a plain listener added to that button later runs after it.
+
+</FrameworkContent>
+
+Left, Right, Home, End and the number keys still belong to the rating. `preventDefault()` also stops what the browser would do with the key, such as scrolling the page.
+
+Both work the same way on the ready-made components, since they're built from the same pieces. [Tabs](/docs/components/tabs) takes `onValueChange` with `details.cancel()`, and a key handler on its list runs before the arrow keys do.
+
+## Replace One Behavior
+
+Behaviors don't know about each other. The rating's `createChange` and `createRovingFocus` meet only in your `api`. So when a component needs focus rules of its own, you can write that one piece yourself and keep the rest: changes, callbacks and controlled state stay as they are.
+
+## Keep Building
+
+- [Focus and Keys](./behaviors/focus) has every roving focus option, with a demo for each.
+- [Handle Changes](./kernel/handle-changes) goes further into callbacks, reasons and controlled state.
+- [Testing](./testing) checks that the keyboard still matches the pattern after you change it.

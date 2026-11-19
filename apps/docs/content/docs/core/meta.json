@@ -7,6 +7,7 @@
     "kernel/style-a-component",
     "compose-behaviors",
     "kernel/handle-changes",
+    "customize-a-behavior",
     "reference",
     "[Changelog](/docs/core/changelog)",
     "---Utilities---",
