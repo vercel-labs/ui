@@ -15,6 +15,7 @@ import { createPopup, popupState } from "../src/foundation/popups/create-popup"
 import { tooltipPreset } from "../src/foundation/popups/popup-hover-presets"
 import { popoverPreset } from "../src/foundation/popups/popup-presets"
 import { popupSlots } from "../src/foundation/popups/popup-slots"
+import { carousel } from "../src/components/carousel/carousel"
 import { dialog } from "../src/components/dialog/dialog"
 import { hoverCard } from "../src/components/hover-card/hover-card"
 import { popover } from "../src/components/popover/popover"
@@ -1068,4 +1069,24 @@ describe("a shown popup's modal effects", () => {
       expect(inert(content)).toBe(false)
     }
   )
+
+  test("a modal makes a carousel's slides inert, and leaves a status region live", async () => {
+    const photos = mount(
+      carousel,
+      {},
+      `<div><viewport><content><item>One</item><item>Two</item></content></viewport></div>`
+    )
+    const status = document.body.appendChild(document.createElement("div"))
+    status.setAttribute("role", "status")
+    const view = mount(dialog, { defaultOpen: true }, shareMarkup)
+    mounts.push(photos, view)
+    await frame()
+    const inert = (node: HTMLElement | null): boolean =>
+      !!node && (node.inert || inert(node.parentElement))
+    const slides = photos.part("content")!
+    expect(slides.getAttribute("aria-live")).toBe("polite")
+    expect(inert(slides)).toBe(true)
+    expect(inert(photos.part("viewport")!)).toBe(true)
+    expect(inert(status)).toBe(false)
+  })
 })

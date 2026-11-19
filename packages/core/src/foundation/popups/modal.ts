@@ -252,8 +252,9 @@ function guardTouch(modal: HTMLElement) {
   }
 }
 
+// A carousel's slides are live, but they are page content, so they go inert with the page.
 const liveRegions =
-  '[aria-live]:not([aria-live="off"]),[role="status"],[role="alert"],[role="log"],output'
+  '[aria-live]:not([aria-live="off"]):not([data-slot="carousel-content"]),[role="status"],[role="alert"],[role="log"],output'
 
 function parentOf(node: Node) {
   const parent = node.parentNode
