@@ -29,7 +29,9 @@ test("a sink tag filters the tiles and lands in the URL", async ({ page }) => {
     .getByRole("button", { name: "Checkbox", exact: true })
     .click()
   await expect(page).toHaveURL(/[?&]uses=Checkbox\b/)
-  for (const tile of await tiles.all()) {
+  const shown = page.locator("article.tile:not([hidden])")
+  expect(await shown.count()).toBeLessThan(await tiles.count())
+  for (const tile of await shown.all()) {
     await expect(
       tile.getByRole("button", { name: "Checkbox", exact: true })
     ).toHaveAttribute("aria-pressed", "true")
