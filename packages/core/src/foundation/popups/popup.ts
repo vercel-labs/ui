@@ -1010,7 +1010,13 @@ function createPopupLayer<
       }
     }
     if (openedOnPress) {
-      requestAnimationFrame(run)
+      // The pointer can reach an item before the frame, which focuses it.
+      requestAnimationFrame(() => {
+        const active = activeElement()
+        if (!shown || !active || !composedContains(shown.el, active)) {
+          run()
+        }
+      })
     } else {
       run()
     }

@@ -509,6 +509,21 @@ test.describe("submenu with a pointer", () => {
     await expect(menuNamed(page, "Share")).toBeHidden()
   })
 
+  test("an item the pointer reaches before the frame after the press keeps focus", async ({
+    page,
+    open,
+  }) => {
+    // Paused, so the frame after the press runs once the pointer is on the item.
+    await page.clock.install({ time: 0 })
+    await page.clock.pauseAt(1000)
+    await open("menu")
+    await page.getByRole("button", { name: "File" }).click()
+    const remove = page.getByRole("menuitem", { name: "Delete" })
+    await remove.hover()
+    await page.clock.runFor(100)
+    await expect(remove).toBeFocused()
+  })
+
   test("a pointermove without movement on an open submenu trigger keeps focus in the submenu", async ({
     page,
   }) => {
