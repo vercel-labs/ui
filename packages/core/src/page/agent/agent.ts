@@ -291,7 +291,8 @@ function takes(entry: Entry, action: string) {
   }
   return (
     declared.includes(action) ||
-    !!synonyms[action]?.some((of) => declared.includes(of))
+    (Object.hasOwn(synonyms, action) &&
+      synonyms[action].some((of) => declared.includes(of)))
   )
 }
 
@@ -357,12 +358,22 @@ function renderedItems(parts: Bound[]) {
   })
 }
 
+// `visibility: hidden` hides an element too. Chrome before 121 names the option `checkVisibilityCSS`.
+const visible = { visibilityProperty: true, checkVisibilityCSS: true }
+
 // Whether an element shows, as far as the browser can tell, and isn't hidden
 // from screen readers, like a decorative avatar. Without `checkVisibility`, a
 // `hidden` ancestor hides it.
 const isShown = (el: HTMLElement) =>
-  (el.checkVisibility?.() ?? !el.closest("[hidden]")) &&
+  (el.checkVisibility?.(visible) ?? !el.closest("[hidden]")) &&
   !el.closest('[aria-hidden="true"]')
+
+// Inert content takes nothing from a person, like the page behind a modal
+// dialog or a carousel's slide out of view, so it takes nothing from an agent.
+function isInert(parts: Bound[]) {
+  const shown = parts.filter((part) => isShown(part.el))
+  return shown.length > 0 && shown.every((part) => part.el.closest("[inert]"))
+}
 
 // A toast's action and close, which are on the page whenever the toast is,
 // and are its buttons whatever they render as, like an action that's a link.
@@ -385,7 +396,7 @@ function buttonsOf(parts: Bound[]) {
   ])
   return [...new Set([...toastButtons(parts), ...inside])].filter(
     (el) =>
-      el.checkVisibility?.() !== false &&
+      el.checkVisibility?.(visible) !== false &&
       !el.closest("[inert], [data-agent-hidden]")
   )
 }
@@ -435,7 +446,7 @@ function isComponentDisabled(state: Record<string, unknown>, parts: Bound[]) {
     return true
   }
   const root = rootState(parts)
-  if (root.disabled === true || root.readOnly === true) {
+  if (root.disabled === true || root.readOnly === true || isInert(parts)) {
     return true
   }
   const button = ownButton(parts)
@@ -1497,6 +1508,15 @@ function createAgent(
           )
         }
         args = [file, ...args.slice(1)]
+      }
+      if (
+        entry.component === "file-input" &&
+        (action === "setValue" || action === "addFiles") &&
+        [args[0]].flat().some((value) => !(value instanceof File))
+      ) {
+        throw new Error(
+          `${entry.label ?? entry.component} (${entry.ref}) takes files, and a step's text isn't one. Leave choosing a file to the person. removeFile and clear take the files it holds.`
+        )
       }
       // Each label in a list of values, like a multiple combobox's ["Theo Laurent"], the same way.
       if (

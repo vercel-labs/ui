@@ -46,3 +46,19 @@ test("naming no file fails the step and lists the files", async () => {
   expect(view.api.getValue()).toEqual([a, b])
   view.unmount()
 })
+
+test("a step's text isn't a file, so setValue and addFiles refuse it", async () => {
+  const view = attachments()
+  const agent = createAgent()
+  const [entry] = agent.snapshot()
+  for (const action of ["setValue", "addFiles"]) {
+    const result = await agent.act({
+      steps: [{ ref: entry.ref, action, args: ["report.pdf"] }],
+    })
+    expect(result).toMatchObject({ ok: false })
+    expect(result.error?.message).toContain("takes files")
+  }
+  expect(view.api.getValue()).toEqual([a, b])
+  expect(agent.snapshot()[0].items).toHaveLength(2)
+  view.unmount()
+})
