@@ -195,7 +195,7 @@ A `message` can reword one announcement and keep the others, since each default 
 
 The next two steps need no changes to `rating.ts`. They're for whoever renders the rating.
 
-Every change the rating makes goes through `change`, which calls `onValueChange` before it writes the value. The callback can refuse. Here a review form keeps the rating as it is while it saves:
+Every change the rating makes goes through `change`, which calls `onValueChange` before it writes the value. The callback can refuse. Here a review form keeps the value as it is while it saves:
 
 <FrameworkContent value="react">
 
@@ -260,7 +260,7 @@ Every change the rating makes goes through `change`, which calls `onValueChange`
 <FrameworkContent value="web-components">
 
 ```ts
-const rating = document.querySelector("my-rating")!
+const rating = document.querySelector<HTMLElement>("my-rating")!
 
 rating.addEventListener("valuechange", (event) => {
   if (saving) {
@@ -272,6 +272,10 @@ rating.addEventListener("valuechange", (event) => {
 </FrameworkContent>
 
 It refuses a press, an arrow key and a number key alike, since they all ask through `change`. To refuse only some of them, check `details.reason`: the rating reports `item-press` and `list-navigation`. [What a Change Reports](./kernel/handle-changes#what-a-change-reports) lists everything a callback gets.
+
+Focus still follows the keys while a change is refused. Only the value stays.
+
+`cancel()` refuses a change the rating would write itself. If you pass `value`, you decide instead: keep the old value and the rating stays where it is.
 
 ## Handle an Event First
 
@@ -345,7 +349,7 @@ function onKeydown(event: KeyboardEvent) {
 <FrameworkContent value="web-components">
 
 ```ts
-const rating = document.querySelector("my-rating")!
+const rating = document.querySelector<HTMLElement>("my-rating")!
 
 rating.addEventListener(
   "keydown",
@@ -365,7 +369,7 @@ Listen in the capture phase, on the rating or anything around it. The star's own
 
 Left, Right, Home, End and the number keys still belong to the rating. `preventDefault()` also stops what the browser would do with the key, such as scrolling the page.
 
-Both work the same way on the ready-made components, since they're built from the same pieces. [Tabs](/docs/components/tabs) takes `onValueChange` with `details.cancel()`, and a key handler on its list runs before the arrow keys do.
+Both work the same way on the ready-made components, since they're built from the same pieces. [Tabs](/docs/components/tabs) takes `onValueChange` with `details.cancel()`, and a key handler on its list runs before the arrow keys do. With web components, listen in the capture phase there too.
 
 ## Replace One Behavior
 
