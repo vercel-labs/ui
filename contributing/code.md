@@ -10,6 +10,7 @@ Write code a highly skilled team would be glad to read, review and extend. Reada
 - Never annotate function return types; let them infer. One exception: a component's api gets a named type, `interface ComboboxApi extends ReturnType<typeof comboboxApiBody> {}`, and the function the primitive takes is typed with it, `const comboboxApi: (...args: Parameters<typeof comboboxApiBody>) => ComboboxApi = comboboxApiBody`. Without the name, declaration files repeat the whole api at every slot, which made core's types ten times their size. `pnpm lint` checks it (`named-api`).
 - Prefer inline types. A Svelte component's props are the exception: an `interface Props` above `let { ... }: Props = $props()`.
 - Named exports, listed once at the end of the file.
+- Never write markup or a URL from a string in `packages/*/src`: no `innerHTML`, `dangerouslySetInnerHTML`, `{@html}` or `v-html`, and no write to `href` or `src`. Build elements, set text with `textContent`, and leave URLs to the app. The few files that must are on an allowlist in `scripts/check-code.mjs`, each with why its string is safe. `pnpm lint` checks it (`html-sinks`, `url-sinks`).
 - `pnpm lint` (`scripts/check-code.mjs`, `scripts/check-comments.mjs` and `scripts/check-braces.mjs`) checks the rules a script can. Every new convention lands with its lint rule.
 
 ## Structure

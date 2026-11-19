@@ -15,6 +15,16 @@
 // - drag-session: no `bindDrag(` in packages/*/src outside the files in
 //   `dragSessionAllowlist`. A component drags through `createDragSession`,
 //   which takes one press at a time and ends a drag cut short as canceled.
+// - html-sinks: no `innerHTML`, `outerHTML`, `insertAdjacentHTML`,
+//   `dangerouslySetInnerHTML`, `{@html}`, `v-html`, `srcdoc`, `document.write`,
+//   `eval` or `new Function` in packages/*/src outside the files in
+//   `htmlSinkAllowlist`. Markup written from a string runs what the string
+//   holds, so each place that does it says why its string is safe.
+// - url-sinks: no write to `href`, `src`, `action` or `formAction`, by
+//   property or `setAttribute`, and no `location.assign`, `location.replace`
+//   or `window.open`, in packages/*/src outside the files in
+//   `urlSinkAllowlist`. A URL from data can be `javascript:`. An `href` an
+//   app passes to a part is the app's own and isn't a write here.
 // - slot-roles: no `role:` in a slot's `attrs` in packages/core/src. A slot
 //   declares its role, `role: "option"`, so its types and development builds
 //   check what the role needs.
@@ -118,6 +128,38 @@ const dragSessionAllowlist = {
     "One press can drag two handles where they meet, one along each axis.",
 }
 
+// Files under packages/ that may write or read markup as a string, each with why its string is safe.
+const htmlSinkAllowlist = {
+  "packages/core/src/components/token-input/token-input-view.ts":
+    "Parses its own markup, built from escaped text, in a template that never joins the page, to compare it with the server's.",
+  "packages/react/src/token-input.tsx":
+    "Writes the editor's markup, which core builds from escaped text.",
+  "packages/solid/src/token-input.tsx":
+    "Writes the editor's markup, which core builds from escaped text.",
+  "packages/svelte/src/token-input/token-input-editor.svelte":
+    "Writes the editor's markup, which core builds from escaped text.",
+  "packages/vue/src/token-input.ts":
+    "Writes the editor's markup, which core builds from escaped text.",
+  "packages/react/src/preferences.tsx":
+    "Writes the script that shows saved preferences before paint. Core builds it from JSON with `<` escaped.",
+  "packages/solid/src/preferences.tsx":
+    "Writes the script that shows saved preferences before paint. Core builds it from JSON with `<` escaped.",
+  "packages/svelte/src/preferences/preferences.svelte":
+    "Writes the script that shows saved preferences before paint. Core builds it from JSON with `<` escaped.",
+  "packages/vue/src/preferences.ts":
+    "Writes the script that shows saved preferences before paint. Core builds it from JSON with `<` escaped.",
+  "packages/web/src/list.ts":
+    "Reads an item's markup to tell whether it was made again. Writes none.",
+  "packages/web/src/date-picker.ts":
+    "Writes its own calendar icon, a constant.",
+}
+
+// Files under packages/ that may write a URL, each with why.
+const urlSinkAllowlist = {
+  "packages/core/src/foundation/image/crop.ts":
+    "Loads the image an app passes to crop into an `Image` that never joins the page.",
+}
+
 // Imports across core's layers that import-layers lets through, by folder, each with why.
 const importLayersAllowlist = {
   "foundation/kernel -> foundation/platform":
@@ -188,6 +230,11 @@ const allowReturnType = /\/\/\s*check-code: allow return-type\b(.*)/
 const svelteScript =
   /<script\b[^>]*\blang=["']ts["'][^>]*>([\s\S]*?)<\/script>/g
 const popupStep = /\bpopup\??\.(opening|returnFocus)\(/
+const htmlSink =
+  /\b(innerHTML|outerHTML|insertAdjacentHTML|dangerouslySetInnerHTML|srcdoc|setHTMLUnsafe|createContextualFragment|parseFromString)\b|\{@html\b|\bv-html\b|\bdocument\.write(ln)?\(|\beval\(|\bnew Function\(/
+const urlSink =
+  /\.(href|src|action|formAction)\s*=(?![=>])|\bsetAttribute\(\s*["'`](href|src|action|formaction|xlink:href)["'`]|\blocation\.(assign|replace)\(|\bwindow\.open\(/
+const commentLine = /^\s*(\/\/|\/?\*|<!--)/
 const svelteComponentDoc = /^<!--\s*@component\b/m
 const svelteComponentComment = /^<!--\s*@component\b[\s\S]*?-->/m
 const svelteStabilityLabel = /^\s*@(stable|experimental)\s*$/gm
@@ -201,6 +248,7 @@ const allowances = []
 checkReturnTypes()
 checkPopupSteps()
 checkDragSession()
+checkSinks()
 checkSlotRoles()
 checkImportLayers()
 const surface = publicExports(root)
@@ -406,6 +454,57 @@ function checkPopupSteps() {
           message: `open and close through \`createOpenSteps\` instead of calling \`popup.${step}\` yourself.`,
         })
       })
+  }
+}
+
+function checkSinks() {
+  const rules = [
+    {
+      rule: "html-sinks",
+      sink: htmlSink,
+      allowlist: htmlSinkAllowlist,
+      message: (found) =>
+        `\`${found}\` runs what its string holds. Build elements instead, or add the file to \`htmlSinkAllowlist\` with why its string is safe.`,
+    },
+    {
+      rule: "url-sinks",
+      sink: urlSink,
+      allowlist: urlSinkAllowlist,
+      message: (found) =>
+        `\`${found}\` writes a URL, which can be \`javascript:\`. Leave URLs to the app, or add the file to \`urlSinkAllowlist\` with why.`,
+    },
+  ]
+  const sources = packageSources().map((file) => path.relative(root, file))
+  for (const { rule, sink, allowlist, message } of rules) {
+    for (const file of Object.keys(allowlist)) {
+      if (!sources.includes(file)) {
+        violations.push({
+          file,
+          line: 1,
+          rule,
+          message:
+            "is on the allowlist but isn't in packages/*/src. Remove it.",
+        })
+      }
+    }
+    for (const relative of sources) {
+      if (relative in allowlist) {
+        continue
+      }
+      readFileSync(path.join(root, relative), "utf8")
+        .split("\n")
+        .forEach((text, index) => {
+          const found = commentLine.test(text) ? null : text.match(sink)
+          if (found) {
+            violations.push({
+              file: relative,
+              line: index + 1,
+              rule,
+              message: message(found[0].trim()),
+            })
+          }
+        })
+    }
   }
 }
 

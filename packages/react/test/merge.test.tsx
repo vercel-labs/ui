@@ -55,6 +55,12 @@ describe("render elements", () => {
     expect(own).toHaveBeenCalledTimes(1)
   })
 
+  test("mergeProps keeps a __proto__ key from parsed JSON off Object.prototype", () => {
+    const parsed = JSON.parse('{"__proto__":{"polluted":true},"id":"a"}')
+    expect(mergeProps({ className: "a" }, parsed)).toMatchObject({ id: "a" })
+    expect(({} as { polluted?: boolean }).polluted).toBeUndefined()
+  })
+
   test("mergeProps combines class names and styles, and later props win otherwise", () => {
     expect(
       mergeProps(
