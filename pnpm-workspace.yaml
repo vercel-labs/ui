@@ -7,12 +7,8 @@ packages:
   - scripts/typescript7
 allowBuilds:
   esbuild: true
-# A version has to be a day old before it installs, so one pulled for malware
-# never lands here.
 minimumReleaseAge: 1440
-# A package that published with provenance can't install a later version without it.
 trustPolicy: no-downgrade
-# Dependencies of dependencies come from the registry, never a git URL or a tarball.
 blockExoticSubdeps: true
 
 catalog:
