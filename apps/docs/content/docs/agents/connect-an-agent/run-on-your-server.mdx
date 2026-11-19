@@ -25,7 +25,7 @@ const tools = Object.fromEntries(
 async function POST(request: Request) {
   const { messages } = await request.json()
   const result = streamText({
-    model: "anthropic/claude-sonnet-5-5",
+    model: "anthropic/claude-sonnet-5.5",
     messages: await convertToModelMessages(messages),
     tools,
   })
