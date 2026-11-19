@@ -12,6 +12,7 @@ import {
   ComboboxLabel,
   ComboboxList,
 } from "../src/combobox"
+import { Button } from "../src/button"
 import { Field, FieldError, FieldLabel } from "../src/field"
 import { Input } from "../src/input"
 import {
@@ -24,6 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../src/select"
+import { Tabs, TabsList, TabsPanel, TabsTab } from "../src/tabs"
 
 Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true })
 
@@ -101,3 +103,25 @@ test.each([
     expect(await updatesAfterMounting(ui)).toEqual([])
   }
 )
+
+test("a strict mode remount keeps a tab with a button inside it selected", async () => {
+  const change = vi.fn()
+  root = createRoot(document.body.appendChild(document.createElement("div")))
+  await act(async () =>
+    root!.render(
+      <React.StrictMode>
+        <Tabs defaultValue="b" onValueChange={change}>
+          <TabsList aria-label="Views">
+            <TabsTab value="a">A</TabsTab>
+            <TabsTab value="b" render={<div />}>
+              B <Button>Pin</Button>
+            </TabsTab>
+          </TabsList>
+          <TabsPanel value="a">A</TabsPanel>
+          <TabsPanel value="b">B</TabsPanel>
+        </Tabs>
+      </React.StrictMode>
+    )
+  )
+  expect(change).not.toHaveBeenCalled()
+})

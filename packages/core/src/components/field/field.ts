@@ -254,7 +254,7 @@ function fieldApiBody(
         })
         return () => {
           active = false
-          queueMicrotask(() => {
+          afterBind(() => {
             const items = store.get()[list]
             const index = items.indexOf(partId)
             if (added && index !== -1) {
