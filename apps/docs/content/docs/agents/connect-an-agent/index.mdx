@@ -130,7 +130,7 @@ For a browser that supports WebMCP, [register the tools with the browser](./webm
 
 A component built with [`definePrimitive`](/docs/core/kernel/define-a-primitive) joins the bridge too. Its `agent` key lists the API methods an agent can call, like `agent: { actions: ["setValue"] }`. Without one, methods named like changes, such as `setValue` or `toggle`, become its actions, and event handlers such as `keydown` stay internal.
 
-The snapshot reads the primitive's `controlled` state keys. If none are declared, it reads `open`, `value`, and `checked` when present. [Your Own Components](./your-components) shows how to add the key and what each part of it does.
+The snapshot reads the primitive's `controlled` state keys. If none are declared, it reads `open`, `value`, and `checked` when present. [The Agent Key](./your-components) shows how to add the key and what each part of it does.
 
 ## Next Steps
 

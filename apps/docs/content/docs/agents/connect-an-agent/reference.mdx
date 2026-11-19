@@ -225,9 +225,9 @@ const sizePicker = definePrimitive({
 | `items`   | A function from the api to its items, when they aren't in the state's `items`.                                        |
 | `reveals` | Its closed items hide other components, like tabs. When a step names a component it can't find, the error lists them. |
 | `shown`   | A function from the state that says whether the agent sees it now, like a field only while it has errors.             |
-| `secret`  | Its value is always redacted, like a password's.                                                                      |
+| `secret`  | Its value reads `"[redacted]"` once it's filled, like a password's.                                                   |
 
-[Your Own Components](./your-components) walks through each key with examples.
+[The Agent Key](./your-components) walks through each key with examples.
 
 Without `actions`, the bridge picks methods by name: `set` followed by a capital letter, such as `setValue`, and these verbs alone or followed by a capital letter:
 

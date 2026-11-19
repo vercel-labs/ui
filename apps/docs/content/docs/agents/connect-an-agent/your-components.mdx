@@ -1,11 +1,13 @@
 ---
-title: Your Own Components
+title: The Agent Key
 description: Let an agent use the components you build with definePrimitive, wherever they're rendered.
 ---
 
 A component you build with [`definePrimitive`](/docs/core/kernel/define-a-primitive) shows up in the agent's snapshot next to every Select and Dialog on the page. Add an `agent` key to say which of its methods an agent can call.
 
 You write the key once, in the component. Anyone who renders the component gets it: an app that installs your rating from npm [creates the bridge](./index#create-the-bridge), renders `<Rating>`, and its agent can rate, with no tool or schema to write.
+
+ui-sdk's components use the same key. A Checkbox has `agent: { actions: ["setChecked"] }`. You'll find a few more [at the end of this page](#in-ui-sdks-components).
 
 ## Try It
 
@@ -38,9 +40,17 @@ const rating = definePrimitive({
 })
 ```
 
-`actions` lists the API methods an agent can call. Put `agent` last, after `slots`, so TypeScript has read your API by then.
+`actions` lists the API methods an agent can call. Put `agent` after `api`.
 
-With the key, the snapshot lists `rate`:
+Then give the rating a name where you render it:
+
+```tsx
+<Rating aria-label="Your rating">
+```
+
+The name is the rating's `label` in the snapshot, and a step can use it as its `ref`. A rating is a `group`, and a group doesn't take its name from the text inside it, so it needs `aria-label`, or `aria-labelledby` pointing at a visible label. A screen reader announces the same name.
+
+With the key and the name, the snapshot lists `rate`:
 
 ```json
 [
@@ -58,24 +68,112 @@ And an agent can call it with the arguments the method takes:
 
 ```ts
 await agent.act({ steps: [{ ref: "Your rating", action: "rate", args: [4] }] })
-// { ok: true, steps: [{ ref: "c1", changes: [{ key: "value", value: 4, ... }] }], ... }
 ```
+
+The step returns `ok: true` and what it changed: the rating's `value` is now `4`.
 
 The change goes through `createChange`, so the app's `onValueChange` sees `details.source === "agent"` and can cancel it, like any other change. [Permissions](./permissions) covers that.
 
 ## Choose What an Agent Calls
 
-Only the methods in `actions` are offered. The rest of your API, like a `keydown` handler or a roving focus helper, stays private to your component, and a step that names one is refused.
+Only the methods in `actions` are offered. The rest of your API, like a `keydown` handler or a roving focus helper, stays private to your component, and a step that names one is refused:
+
+```txt
+rating c1 takes no keydown now. It takes: rate.
+```
 
 If `actions` names a method your API doesn't have, development builds warn, so a typo shows up right away.
 
-Without an `agent` key, the bridge guesses from method names: `set` followed by a capital letter, like `setValue`, and verbs like `open`, `toggle` or `clear`. It can't guess `rate`, so the rating would show `"actions": []`, and a step that asks for `rate` would get:
+## Without the Key
+
+Without an `agent` key, the bridge guesses from method names: `set` followed by a capital letter, like `setValue`, and verbs like `open`, `toggle` or `clear`.
+
+A popover built on `createPopup` gets `setOpen` from it:
+
+```ts
+api: (context) => createPopup(context, { preset: popoverPreset }),
+```
+
+It has no `agent` key, and an agent can open it:
+
+```json
+{
+  "ref": "c1",
+  "component": "share",
+  "actions": ["setOpen", "press"],
+  "label": "Share",
+  "open": false
+}
+```
+
+The bridge can't guess `rate`. Without the key, the rating would show `"actions": []`, and a step that asks for `rate` would get:
 
 ```txt
 rating c1 takes no rate now. It takes: nothing.
 ```
 
 Listing your actions makes the component say exactly what it does, whatever its methods are called.
+
+## Arguments
+
+A step's `args` become the method's arguments. This board has two actions. `moveCard` takes a card and a column, and `addCard` takes a title:
+
+```ts title="board.ts"
+const columns = ["todo", "doing", "done"]
+
+const board = definePrimitive({
+  name: "board",
+  state: () => ({
+    value: { "Fix login": "todo", "Write docs": "doing" } as Record<
+      string,
+      string
+    >,
+  }),
+  api: (context) => {
+    const change = createChange(context)
+    const cards = () => context.store.get().value
+    return {
+      moveCard: (card: string, column: string) => {
+        if (!columns.includes(column)) {
+          throw new Error(
+            `No column "${column}". Columns: ${columns.join(", ")}.`
+          )
+        }
+        return change(
+          "value",
+          { ...cards(), [card]: column },
+          { reason: "drag" }
+        )
+      },
+      addCard: (card: string) =>
+        change("value", { ...cards(), [card]: "todo" }, { reason: "input" }),
+    }
+  },
+  slots: (slot) => ({
+    root: slot({ attrs: () => ({ role: "group" }) }),
+  }),
+  agent: { actions: ["moveCard", "addCard"] },
+})
+```
+
+An agent can move one card and add another in the same call:
+
+```ts
+await agent.act({
+  steps: [
+    { ref: "Sprint board", action: "moveCard", args: ["Fix login", "done"] },
+    { ref: "Sprint board", action: "addCard", args: ["Write tests"] },
+  ],
+})
+```
+
+The bridge doesn't check the arguments of your own methods, so check them yourself, the way `moveCard` checks the column. When a method throws, the step fails with your message, and the steps after it don't run:
+
+```txt
+No column "shipped". Columns: todo, doing, done.
+```
+
+An action can also return a promise. The bridge doesn't wait for it to resolve, so the step's result is `"pending"`. If the promise rejects before the step ends, the step fails with its message.
 
 ## Lists
 
@@ -97,7 +195,9 @@ The bridge reads the items from your state's `items`. If they live somewhere els
 agent: { actions: ["setValue"], items: (api) => api.allItems() },
 ```
 
-The snapshot shows the items with the component when there are 10 or fewer and none are on the page. That works for any action, not only `setValue`, so a stepper's `goTo` shows its steps. Longer lists come back from `query({ within })`.
+`items` reads your API, which is why `agent` goes after `api`. Placed before it, TypeScript reports that `allItems` doesn't exist.
+
+The snapshot lists the items with the component: the ones on the page, or the ones in your data when there are 10 or fewer. Longer lists come back from `query({ within })`. With an `items` function that works for any action, not only `setValue`, so a stepper's `goTo` shows its steps.
 
 ## Content Behind Items
 
@@ -105,6 +205,12 @@ Tabs and accordions hide other components behind their closed items. Add `reveal
 
 ```ts
 agent: { actions: ["setValue"], closed: true, reveals: true },
+```
+
+For a setup flow on its Account step, a step that asks for a field on another step gets:
+
+```txt
+No component "Card number" on the page. Its labels: Setup. It may be behind one of these, which a step can open first: Setup (c1): Billing, Team.
 ```
 
 ## Show It When It Matters
@@ -125,6 +231,20 @@ agent: { actions: ["setValue", "clear"], secret: true },
 
 To hide one particular field instead, the app can mark it with `data-agent-secret`. See [Permissions](./permissions).
 
+## In ui-sdk's Components
+
+These are the `agent` keys of a few ui-sdk components, as they're written in `@ui-sdk/core`:
+
+| Component    | `agent`                                                                                                    |
+| ------------ | ---------------------------------------------------------------------------------------------------------- |
+| Checkbox     | `{ actions: ["setChecked"] }`                                                                              |
+| Number Input | `{ actions: ["setValue", "increment", "decrement"] }`                                                      |
+| Select       | `{ actions: ["setOpen", "setValue", "clear", "setQuery"], closed: true }`                                  |
+| Tabs         | `{ actions: ["setValue"], closed: true, reveals: true }`                                                   |
+| Accordion    | `{ actions: ["setValue", "open", "close", "toggle", "openAll", "closeAll"], closed: true, reveals: true }` |
+| OTP Input    | `{ actions: ["setValue", "clear"], secret: true }`                                                         |
+| Field        | `{ shown: (state) => !!state.errors.length }`                                                              |
+
 ## API Reference
 
 | Key       | Type                 | Description                                                                                            |
@@ -134,6 +254,6 @@ To hide one particular field instead, the app can mark it with `data-agent-secre
 | `items`   | `(api) => unknown`   | The items as data, when they aren't the state's `items`.                                               |
 | `reveals` | `boolean`            | Closed items hide other components. A component the agent can't find is reported as maybe behind them. |
 | `shown`   | `(state) => boolean` | Whether an agent sees the component right now.                                                         |
-| `secret`  | `boolean`            | The value is always redacted, in the snapshot, in step results and in `observe`.                       |
+| `secret`  | `boolean`            | A filled value reads `"[redacted]"` in the snapshot, in step results and in `observe`.                 |
 
 The `agent` key is experimental.

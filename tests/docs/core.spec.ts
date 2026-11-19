@@ -37,7 +37,7 @@ const pages = [
   ["/agents/build-with-an-agent", "Build with an Agent"],
   ["/agents/connect-an-agent", "Get Started"],
   ["/agents/connect-an-agent/guide", "Guide"],
-  ["/agents/connect-an-agent/your-components", "Your Own Components"],
+  ["/agents/connect-an-agent/your-components", "The Agent Key"],
   ["/agents/connect-an-agent/permissions", "Permissions"],
   ["/agents/connect-an-agent/observe-changes", "Observe Changes"],
   ["/agents/connect-an-agent/history-and-undo", "History and Undo"],
