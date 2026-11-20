@@ -68,7 +68,10 @@ test.describe("searchable select", { tag: "@enhancement" }, () => {
     open,
     framework,
   }) => {
-    test.skip(!framework.startsWith("react"), "flushSync is React's.")
+    test.skip(
+      framework !== "react" && framework !== "react-ssr",
+      "flushSync is React's, and the data fixture's list isn't the app's."
+    )
     await open("select", { search: "", flushed: "" })
     await openSearch(page)
     const orange = option(page, "Orange")
