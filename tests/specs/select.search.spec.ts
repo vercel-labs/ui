@@ -63,6 +63,30 @@ test.describe("searchable select", { tag: "@enhancement" }, () => {
     await expect(search(page)).toHaveAttribute("aria-activedescendant", id!)
   })
 
+  test("a field whose onChange renders the filtered list at once still highlights the first match", async ({
+    page,
+    open,
+    framework,
+  }) => {
+    test.skip(!framework.startsWith("react"), "flushSync is React's.")
+    await open("select", { search: "", flushed: "" })
+    await openSearch(page)
+    const orange = option(page, "Orange")
+    for (let press = 0; press < 10; press++) {
+      if ((await orange.getAttribute("data-highlighted")) !== null) {
+        break
+      }
+      await page.keyboard.press("ArrowDown")
+    }
+    await expect(orange).toHaveAttribute("data-highlighted", "")
+    await page.keyboard.type("an")
+    await expect(search(page)).toHaveValue("an")
+    await expect
+      .poll(() => optionTexts(page))
+      .toEqual(["Banana", "Mango", "Orange"])
+    await expect(option(page, "Banana")).toHaveAttribute("data-highlighted", "")
+  })
+
   test("typing never jumps by first letter: the characters go into the field", async ({
     page,
   }) => {
