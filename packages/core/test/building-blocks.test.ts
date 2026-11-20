@@ -646,6 +646,24 @@ describe("animateOut", () => {
     expect(el.hasAttribute("inert")).toBe(false)
   })
 
+  test("a scroll-driven animation inside doesn't hold the exit", async () => {
+    vi.useFakeTimers()
+    const el = document.createElement("div")
+    const scrolling = {
+      finished: new Promise(() => {}),
+      timeline: { source: document.body },
+      effect: { getComputedTiming: () => ({ endTime: 100_000, localTime: 0 }) },
+    } as unknown as Animation
+    el.getAnimations = () => [scrolling]
+    document.body.append(el)
+    const done = vi.fn()
+    animateOut(el, done)
+    await vi.advanceTimersByTimeAsync(1000)
+    expect(done).toHaveBeenCalledTimes(1)
+    vi.useRealTimers()
+    el.remove()
+  })
+
   test("an inert its owner writes during the exit stays, and one it had before comes back", async () => {
     const el = animating()
     animateOut(el, () => {})

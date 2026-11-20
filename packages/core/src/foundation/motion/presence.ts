@@ -117,10 +117,14 @@ function remaining(animations: Animation[]) {
   return longestLeft
 }
 
+// A scroll-driven animation runs on its scroller's timeline, so it has no end in time.
+const onClock = (animation: Animation) =>
+  !animation.timeline || !("source" in animation.timeline)
+
 function whenFinished(el: HTMLElement, done: () => void) {
   let finished = false
   // Reading animations flushes styles, so transitions just triggered are included.
-  const animations = el.getAnimations({ subtree: true })
+  const animations = el.getAnimations({ subtree: true }).filter(onClock)
   const finish = () => {
     if (finished) {
       return
