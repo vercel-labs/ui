@@ -527,7 +527,10 @@ function bindInternals(
   return attached ? attached.bind(el, attached.internals, options) : () => {}
 }
 
-let labelCount = 0
+// Shared on `globalThis` like anchor names, so two copies of core never give two labels one id.
+const labelCount = ((globalThis as Record<symbol, unknown>)[
+  Symbol.for("ui-sdk.label-ids@1")
+] ??= { count: 0 }) as { count: number }
 
 const fieldControlId = (fieldId: string) => `${fieldId}-control`
 
@@ -598,7 +601,7 @@ function labelledBy(
     const labels = findLabels()
     for (const label of labels) {
       if (!label.id) {
-        label.id = `ui-sdk-label-${++labelCount}`
+        label.id = `ui-sdk-label-${++labelCount.count}`
       }
     }
     const ids = labels.map((label) => label.id).join(" ")

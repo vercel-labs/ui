@@ -97,14 +97,18 @@ function anchorStyles(
 }
 
 const names = new WeakMap<HTMLElement, string>()
-let named = 0
+// Shared on `globalThis`, since anchor names are global to the page and a second copy of
+// core counting from 1 would hand an open popup's name to its own anchor.
+const named = ((globalThis as Record<symbol, unknown>)[
+  Symbol.for("ui-sdk.anchor-names@1")
+] ??= { count: 0 }) as { count: number }
 
 // Adds a name to the anchor's own, kept for its later popups, and adds it
 // back when something rewrites the anchor's styles.
 function nameAnchor(anchor: HTMLElement) {
   let name = names.get(anchor)
   if (!name) {
-    name = `--ui-anchor-${++named}`
+    name = `--ui-anchor-${++named.count}`
     names.set(anchor, name)
   }
   const own = anchor.style.getPropertyValue("anchor-name")
