@@ -431,19 +431,21 @@ const selectSlots = (slot: SlotFactory<SelectState, SelectApi>) => ({
       store.set({ searchable: true })
       // The DOM property, since an input's value attribute stops applying once someone types.
       const input = el as HTMLInputElement
-      // Only a query that changed. Text the field's own handlers haven't handed to Select yet
-      // is ahead of the store, and writing the old query back would lose it.
-      let shown: string | undefined
+      // Not while the field's input event runs: an owner's handler can flush a render before
+      // Select reads the typed text, and writing the old query back would lose it.
+      let typing = false
       const write = () => {
-        const { query } = store.get()
-        if (query === shown) {
-          return
-        }
-        shown = query
-        if (input.value !== query) {
-          input.value = query
+        if (!typing && input.value !== store.get().query) {
+          input.value = store.get().query
         }
       }
+      const onInput = () => {
+        typing = true
+        queueMicrotask(() => {
+          typing = false
+        })
+      }
+      input.addEventListener("input", onInput, { capture: true })
       write()
       if (dev) {
         warnIfUnnamed(
@@ -458,6 +460,7 @@ const selectSlots = (slot: SlotFactory<SelectState, SelectApi>) => ({
       const unsubscribe = store.subscribe(write)
       return () => {
         unsubscribe()
+        input.removeEventListener("input", onInput, { capture: true })
         queueMicrotask(
           () =>
             !api.internal.searchElement() && store.set({ searchable: false })
