@@ -76,7 +76,12 @@ function createFocus(config: {
       if (isModified(event) || !ownsEvent(list, event)) {
         return
       }
-      const items = topLevel()
+      const items = topLevel().filter(
+        (item) =>
+          !item.closest("[inert]") &&
+          (item.checkVisibility?.({ visibilityProperty: true }) ??
+            !item.closest("[hidden]"))
+      )
       const index = items.findIndex(
         (item) => item === target || item.contains(target)
       )
