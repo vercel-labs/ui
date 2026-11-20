@@ -431,9 +431,17 @@ const selectSlots = (slot: SlotFactory<SelectState, SelectApi>) => ({
       store.set({ searchable: true })
       // The DOM property, since an input's value attribute stops applying once someone types.
       const input = el as HTMLInputElement
+      // Only a query that changed. Text the field's own handlers haven't handed to Select yet
+      // is ahead of the store, and writing the old query back would lose it.
+      let shown: string | undefined
       const write = () => {
-        if (input.value !== store.get().query) {
-          input.value = store.get().query
+        const { query } = store.get()
+        if (query === shown) {
+          return
+        }
+        shown = query
+        if (input.value !== query) {
+          input.value = query
         }
       }
       write()
