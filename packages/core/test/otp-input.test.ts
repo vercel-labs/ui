@@ -39,6 +39,15 @@ describe("input otp patterns", () => {
     expect(pastedCode("Your code is 123456", "digits")).toBeNull()
     expect(pastedCode("   ", "digits")).toBeNull()
   })
+
+  test("reads another script's digits as plain ones", () => {
+    expect(pastedCode("٤٨٢٩١٣", "digits")).toBe("482913")
+    expect(pastedCode("۹۱۳ ۴۸۲", "digits")).toBe("913482")
+    expect(pastedCode("४८२", "digits")).toBe("482")
+    expect(pastedCode("A٤", "alphanumeric")).toBe("A4")
+    expect(pastedCode("٤٨٢", /[٠-٩]/)).toBe("٤٨٢")
+    expect(pastedCode("Your code is ٤٨٢٩١٣", "digits")).toBeNull()
+  })
 })
 
 describe("input otp editing", () => {

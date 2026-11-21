@@ -99,14 +99,37 @@ function patternAttribute(
 
 /**
  * What inserted text becomes. Full-width characters from an input method,
- * like "１２３", become their plain forms. Codes are often written "123 456"
+ * like "１２３", become their plain forms, and so do another script's digits,
+ * like "٤٨٢", unless the pattern takes them as they are. Codes are often written "123 456"
  * or "123-456", so spaces and dashes go. Null when anything else doesn't fit
  * the pattern, like "Your code is 123456", which is ignored rather than half
  * pasted.
  */
 function pastedCode(text: string, pattern: OTPInputPattern) {
   const code = text.normalize("NFKC").replace(/[\s\u00A0\-\u2010-\u2015]/g, "")
-  return code && fitsPattern(code, pattern) ? code : null
+  if (!code) {
+    return null
+  }
+  if (fitsPattern(code, pattern)) {
+    return code
+  }
+  const plain = plainDigits(code)
+  return fitsPattern(plain, pattern) ? plain : null
+}
+
+const decimalDigit = /\p{Nd}/u
+
+// Every script's digits, like Arabic-Indic "٤" or Persian "۴", run in order
+// from zero, some runs side by side, so a digit's value is its place in its run.
+function plainDigits(text: string) {
+  return text.replace(/\p{Nd}/gu, (digit) => {
+    const code = digit.codePointAt(0)!
+    let start = code
+    while (decimalDigit.test(String.fromCodePoint(start - 1))) {
+      start--
+    }
+    return String((code - start) % 10)
+  })
 }
 
 /**
