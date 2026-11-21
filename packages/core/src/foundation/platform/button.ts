@@ -65,10 +65,17 @@ function buttonElementAttrs(
 // click does, since a script's click reports itself as programmatic. A key an
 // agent sends isn't a person's, so its click keeps the agent's source.
 function keyClick(event: KeyboardEvent, el: HTMLElement) {
+  // An SVG element has no `click()`, so it gets the click a script would dispatch.
+  const click = () =>
+    typeof el.click === "function"
+      ? el.click()
+      : el.dispatchEvent(
+          new MouseEvent("click", { bubbles: true, cancelable: true })
+        )
   if (trusted(event)) {
-    withSource("keyboard", () => el.click())
+    withSource("keyboard", click)
   } else {
-    el.click()
+    click()
   }
 }
 
