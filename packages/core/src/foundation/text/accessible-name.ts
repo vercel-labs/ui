@@ -123,10 +123,18 @@ function contentOf(el: Element, labelling = false, hidden = isHidden(el)) {
       node.nodeType === Node.ELEMENT_NODE &&
       (hidden || !isHidden(node as Element))
     ) {
-      text += nameWithin(node as Element, labelling, hidden)
+      const name = nameWithin(node as Element, labelling, hidden)
+      text += apart(node as Element) ? ` ${name} ` : name
     }
   }
   return text
+}
+
+// Anything but plain inline content, like a flex item or an inline-block,
+// stands apart from its neighbors, as Chromium names it.
+function apart(el: Element) {
+  const display = el.ownerDocument.defaultView?.getComputedStyle(el).display
+  return !!display && display !== "inline"
 }
 
 const collapse = (text: string) => text.replace(/\s+/g, " ").trim()
