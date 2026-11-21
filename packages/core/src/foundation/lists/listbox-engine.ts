@@ -913,7 +913,7 @@ function createListboxEngine(
     },
     // Whether any item of a composed group matches.
     groupMatches(group: string) {
-      if (data()) {
+      if (data() || !config.query().trim()) {
         return true
       }
       return registry
