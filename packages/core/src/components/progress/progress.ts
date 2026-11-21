@@ -176,14 +176,14 @@ const progressPrimitive = /* @__PURE__ */ definePrimitive({
       attrs: (state, { id }) => ({ id: labelId(id), ...statusAttrs(state) }),
       bind: (_, { api }) => api.internal.label(),
     }),
-    // The formatted value. Its text isn't announced on its own: a progressbar's
-    // content is presentational, and the bar reads the value through `aria-valuetext`.
+    // The bar reads the value through `aria-valuetext`. Chromium still exposes a
+    // progressbar's text, so the visible value is hidden to keep it from being read twice.
     value: slot<{}, ProgressValueState>({
       state: (state) => ({
         ...progressState(state),
         text: formatGaugeValue(state.value, state),
       }),
-      attrs: statusAttrs,
+      attrs: (state) => ({ ...statusAttrs(state), "aria-hidden": "true" }),
     }),
   }),
 })

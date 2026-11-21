@@ -135,13 +135,14 @@ const meterPrimitive = /* @__PURE__ */ definePrimitive({
       attrs: (_, { id }) => ({ id: labelId(id) }),
       bind: (_, { api }) => api.internal.label(),
     }),
-    // The formatted value. Its text isn't announced on its own: a meter's
-    // content is presentational, and the meter reads the value through `aria-valuetext`.
+    // The meter reads the value through `aria-valuetext`. Chromium still exposes a
+    // meter's text, so the visible value is hidden to keep it from being read twice.
     value: slot<{}, MeterValueState>({
       state: (state) => ({
         ...meterState(state),
         text: formatGaugeValue(state.value, state),
       }),
+      attrs: () => ({ "aria-hidden": "true" }),
     }),
   }),
 })
