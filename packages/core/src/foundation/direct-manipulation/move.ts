@@ -154,7 +154,8 @@ function createMove<State extends object>(
     ) {
       const current = positions()
       const next = { ...current }
-      const round = details.reason === "drag" ? (options.step?.() ?? 1) : 1
+      const round =
+        details.reason === "imperative" ? 1 : (options.step?.() ?? 1)
       for (const key of keys) {
         const at = current[key] ?? { x: 0, y: 0 }
         next[key] = place(key, at.x + dx, at.y + dy, round)
