@@ -339,6 +339,13 @@ function focusOpening(core: PopupCore) {
       }
       const wait = preset.focusDelay ?? options().delay ?? preset.delay ?? 0
       clear()
+      // Another trigger takes the open popup over at once, as the pointer does.
+      if (store.get().open) {
+        if (store.get().trigger !== key) {
+          open()
+        }
+        return
+      }
       if (wait > 0) {
         timer = setTimeout(open, wait)
       } else {
@@ -351,7 +358,16 @@ function focusOpening(core: PopupCore) {
         return
       }
       const next = event.relatedTarget as Node | null
-      if (next && core.popup.element()?.contains(next)) {
+      if (
+        next &&
+        (core.popup.element()?.contains(next) ||
+          [...core.parts()].some(
+            (part) =>
+              part.slot === core.triggerSlot &&
+              part.el?.contains(next) &&
+              !core.triggerDisabled(part.key)
+          ))
+      ) {
         return
       }
       core.control.hide({ reason: "focus-out", event, focus: false })

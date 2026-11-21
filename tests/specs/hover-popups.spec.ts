@@ -42,6 +42,23 @@ test("a hover card opens with the event at its link, and reports the payload of 
   await expect(page.getByText("Card for grace")).toBeVisible()
 })
 
+test("Tab from one link of an open hover card to the next moves the card without closing it", async ({
+  page,
+  tab,
+}) => {
+  await page.getByRole("link", { name: "Ada" }).focus()
+  await tab({ shift: true })
+  await tab()
+  await expect(page.getByText("Card for ada")).toBeVisible()
+  await tab()
+  await expect(page.getByRole("link", { name: "Grace" })).toBeFocused()
+  await expect(lastChange(page)).toHaveText("hover card payload grace: Grace")
+  await expect(page.getByText("Card for grace")).toBeVisible()
+  await tab({ shift: true })
+  await expect(lastChange(page)).toHaveText("hover card payload ada: Ada")
+  await expect(page.getByText("Card for ada")).toBeVisible()
+})
+
 test("a popover that opens on hover opens with the event at its trigger", async ({
   page,
 }) => {
