@@ -339,11 +339,10 @@ function focusOpening(core: PopupCore) {
       }
       const wait = preset.focusDelay ?? options().delay ?? preset.delay ?? 0
       clear()
-      // Another trigger takes the open popup over at once, as the pointer does.
+      // An open popup moves to this trigger at once, as it does for the pointer,
+      // and one the pointer opened becomes the keyboard's, so it stays open.
       if (store.get().open) {
-        if (store.get().trigger !== key) {
-          open()
-        }
+        open()
         return
       }
       if (wait > 0) {

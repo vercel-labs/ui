@@ -94,6 +94,20 @@ test.describe("keyboard", () => {
     await expect(link(page)).toBeFocused()
   })
 
+  test("keyboard focus on a link the pointer opened keeps the card open when the pointer leaves", async ({
+    page,
+    tab,
+  }) => {
+    await before(page).focus()
+    await link(page).hover()
+    await expect(card(page)).toBeVisible()
+    await tab()
+    await expect(link(page)).toBeFocused()
+    await moveAway(page)
+    await page.clock.runFor(1000)
+    await expect(card(page)).toBeVisible()
+  })
+
   test("Escape closes the card and leaves focus on the link", async ({
     page,
     tab,
