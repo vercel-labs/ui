@@ -185,6 +185,21 @@ test.describe("announcements", { tag: "@enhancement" }, () => {
     await expect(polite(page)).toHaveText("Synced. Saved")
   })
 
+  test("text that already ends a sentence gets no second stop", async ({
+    page,
+    open,
+  }) => {
+    await open("toast")
+    await show(page, {
+      title: "Your credits are used.",
+      description: "Choose a plan to continue.",
+    })
+    await show(page, { title: "Saved!" })
+    await expect(polite(page)).toHaveText(
+      "Saved! Your credits are used. Choose a plan to continue."
+    )
+  })
+
   test("the visible region isn't a live region, so nothing is read twice", async ({
     page,
     open,

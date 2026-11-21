@@ -61,6 +61,15 @@ const isExpanded = (state: {
 const hasToasts = (items: readonly ToastItem[]) =>
   items.some((item) => !item.leaving)
 
+// Texts read one after another. One that already ends a sentence gets no
+// second stop, which a screen reader would read out.
+const sentences = (texts: string[]) =>
+  texts.reduce(
+    (all, text) =>
+      all ? `${all}${/[.!?…。！？]$/u.test(all) ? " " : ". "}${text}` : text,
+    ""
+  )
+
 // Options only adapters pass.
 type ToastRegionInternalOptions = ToastRegionOptions & {
   // Whether the app placed the region, rather than the overlay host rendering it.
@@ -201,18 +210,17 @@ function toastRegionApiBody(
       element("description", toast.id),
     ].filter((el): el is HTMLElement => !!el && !el.hidden)
     if (parts.length) {
-      return parts
-        .map((el) => textOf(el).trim())
-        .filter(Boolean)
-        .join(". ")
+      return sentences(parts.map((el) => textOf(el).trim()).filter(Boolean))
     }
     const root = element("root", toast.id)
     if (root) {
       return textOf(root).trim()
     }
-    return [toast.title, toast.description]
-      .filter((text) => typeof text === "string")
-      .join(". ")
+    return sentences(
+      [toast.title, toast.description].filter(
+        (text): text is string => typeof text === "string"
+      )
+    )
   }
 
   // Toasts that arrive close together are read together: each one waits a
@@ -245,7 +253,7 @@ function toastRegionApiBody(
     toAnnounce.clear()
     for (const priority of ["assertive", "polite"] as const) {
       if (texts[priority].length) {
-        announce(texts[priority].join(". "), { priority })
+        announce(sentences(texts[priority]), { priority })
       }
     }
   }
