@@ -1,5 +1,36 @@
 # @ui-sdk/core
 
+## 0.1.0-beta.14
+
+### Patch Changes
+
+- 8573f8f: `agent.act` takes an optional `{ signal }`. When it aborts, a step waiting on `allow` fails as cancelled and later steps don't run, so a chat's stop button can end a confirm nobody will answer.
+- 1869178: Agent: a table's header row adds no row text to the controls in it. A sort button in a header used to carry the other column titles as its row, so a step naming one header was refused as ambiguous.
+- 4be6e4a: Names read from content put a space around a child that isn't plain inline, like a flex item or an inline-block, as Chromium does. An agent's label for `<button style="display: flex"><span>Read</span><span>Swedish orders</span></button>` is "Read Swedish orders", not "ReadSwedish orders".
+- b8abeb6: An `act` step that names a component by its label no longer lands on an open component whose label only holds the same words, like an open Collapsible "Read live-system.png" for a step naming the Button "System". The step is refused with both refs, as it is while nothing is open.
+- 855bc7f: The agent bridge leaves out a component inside a popup that's animating out (`data-ending-style`), so a step right after a person's choice in a menu isn't ambiguous with the field the menu belongs to.
+- b4dbe88: Inside a `Field`, `ComboboxChips` takes the name the field's label gives the input, so screen readers no longer announce an unnamed toolbar.
+- 1086598: A composed Command group renders shown on the server while there's no query, instead of `hidden` until its items bind, so the list doesn't jump on hydration. This also covers Trigger Menu groups.
+- 2930633: Dialog and Alert Dialog: while one Close part's action runs, the other Close parts get `aria-disabled` and `data-disabled`, since presses on them are refused until it settles.
+- fb6945a: `formatShortcut("")` and `ariaKeyshortcuts("")` return an empty string instead of throwing, so `useShortcutHint` renders nothing for a shortcut with no keys.
+- f5d0ab3: A popup's exit no longer waits on scroll-driven animations inside it, which kept it mounted for 100 seconds after closing in Firefox.
+- 99d761e: The visible value of Progress and Meter is hidden from screen readers, as the docs say, so the value is read once through `aria-valuetext`. Chromium used to expose its text under the bar too.
+- ddee2a4: Keyboard focus moving to another trigger of an open shared Hover Card or Tooltip moves the popup to it at once, as the pointer does, instead of closing it and opening again after the delay.
+- 08b86f2: A popup whose `initialFocus` points at something that can't take focus, like a disabled button, focuses its content instead of leaving focus on the trigger behind it.
+- 7053edd: `createMove`'s Alt and arrow nudges land on `step`'s grid, as drops do, so a `step` below 1 nudges by that step instead of rounding to whole units.
+- bb8ae12: Arrow keys in a Navigation Menu's list skip a top-level item that's hidden, like one a responsive bar hides when it doesn't fit, instead of stopping on it.
+- 349836b: Enter in a Command search with nothing highlighted no longer submits a form around the Command, like a popover's in-place content inside a page form. A Popover whose content holds a form and renders inside another form warns in development, as Dialog and Drawer do.
+- 0f8f075: Two copies of core on one page, like an app and an embedded widget, no longer give two anchors the same name, so an open popup stays at its own trigger. Labels without an id get ids apart too.
+- f1f87a3: Select's search field no longer writes the old query over text its own `onChange` flushed, so the highlight moves to the first match.
+- 4c9967d: A `keydown` with no `key`, like the one Chrome's autofill sends, no longer throws in the shortcut listener on pages with a `ToastRegion` or any registered shortcut.
+- 41ade18: A side popup that shrinks to fit beside an anchor at least its width settles in one place. Once it moves inside the anchor, it stays there while the anchor and the viewport don't change, instead of swapping sides every frame as its width changed.
+- 911474e: The `ui-sdk` skill's agent checklist no longer says to put `data-agent-hidden` on a toast region, which hid every toast from agents. The region is already left out while it's empty.
+- 1d3cd49: Enter and Space press a Button or Toggle rendered as an SVG element, which has no `click()`, instead of throwing.
+- 69078df: A tab selected by a click or an arrow key scrolls fully into view inside a scrolling list. Browsers don't scroll a half-hidden element they focus, so a tab cut off at the list's edge used to stay cut off.
+- ef6d8ce: A `ToastRegion` without `toaster` no longer throws "Expected a toaster from createToaster()" when a second copy of `@ui-sdk/core` runs in the page, such as after upgrading during `next dev`.
+- e9cf7aa: Trigger Menu: a field whose value React controls through `onChange` keeps the typed trigger and opens the list. The menu now reads an edit once the input event has reached the window, after the owner's own listeners.
+- 279e7e1: A Trigger Menu closes when its Empty part or its last row unmounts, so an Empty shown for one trigger no longer keeps an empty menu open, and swallows Enter, for the next one.
+
 ## 0.1.0-beta.13
 
 ### Patch Changes

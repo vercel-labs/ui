@@ -1,5 +1,11 @@
 # @ui-sdk/react
 
+## 0.1.0-beta.14
+
+### Patch Changes
+
+- Updated @ui-sdk/core to 0.1.0-beta.14
+
 ## 0.1.0-beta.13
 
 ### Patch Changes
