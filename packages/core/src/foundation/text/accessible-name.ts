@@ -124,17 +124,22 @@ function contentOf(el: Element, labelling = false, hidden = isHidden(el)) {
       (hidden || !isHidden(node as Element))
     ) {
       const name = nameWithin(node as Element, labelling, hidden)
-      text += apart(node as Element) ? ` ${name} ` : name
+      text += apart(node as Element, name) ? ` ${name} ` : name
     }
   }
   return text
 }
 
 // Anything but plain inline content, like a flex item or an inline-block,
-// stands apart from its neighbors, as Chromium names it.
-function apart(el: Element) {
+// stands apart from its neighbors, as Chromium names it. An empty inline-block
+// doesn't, so an icon between two words leaves them joined.
+function apart(el: Element, name: string) {
   const display = el.ownerDocument.defaultView?.getComputedStyle(el).display
-  return !!display && display !== "inline"
+  return (
+    !!display &&
+    display !== "inline" &&
+    (!display.startsWith("inline") || !!name.trim())
+  )
 }
 
 const collapse = (text: string) => text.replace(/\s+/g, " ").trim()

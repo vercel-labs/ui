@@ -155,4 +155,14 @@ test("children that aren't plain inline read as separate words, inline ones run 
     )
   ).toBe("Read Swedish")
   expect(nameIn(`<button id="target"><b>Hel</b>lo</button>`)).toBe("Hello")
+  expect(
+    nameIn(
+      `<button id="target">Hel<span style="display: inline-block"></span>lo</button>`
+    )
+  ).toBe("Hello")
+  expect(
+    nameIn(
+      `<button id="target">Hel<span style="display: block"></span>lo</button>`
+    )
+  ).toBe("Hel lo")
 })
