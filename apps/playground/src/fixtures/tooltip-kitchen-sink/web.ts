@@ -153,9 +153,9 @@ function mount(root: HTMLElement) {
       const text = tooltip.querySelector<HTMLElement>("[data-text]")!
       const initial = text.textContent
       // Shows the payload of the trigger that opened it last.
-      const showPayload = () => {
+      const showPayload = (payload = tooltip.api?.getPayload()) => {
         if (variant.controller) {
-          text.textContent = `Open ${tooltip.api?.getPayload() ?? "nothing"}`
+          text.textContent = `Open ${payload ?? "nothing"}`
         }
       }
       tooltip.addEventListener("openchange", (event) => {
@@ -185,7 +185,9 @@ function mount(root: HTMLElement) {
       // Moving to another trigger while open hands the tooltip over with a payload change, and no open change.
       tooltip.addEventListener(
         "payloadchange",
-        (event) => event.target === tooltip && showPayload()
+        (event) =>
+          event.target === tooltip &&
+          showPayload((event as CustomEvent<{ value: unknown }>).detail.value)
       )
       if (env.controller) {
         tooltip.controller = env.controller
