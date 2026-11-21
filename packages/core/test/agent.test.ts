@@ -13,6 +13,7 @@ import {
 } from "../src/page/agent/agent"
 import { button } from "../src/components/button/button"
 import { checkbox } from "../src/components/checkbox/checkbox"
+import { collapsible } from "../src/components/collapsible/collapsible"
 import { combobox } from "../src/components/combobox/combobox"
 import { datePicker } from "../src/components/date-picker/date-picker"
 import { dialog } from "../src/components/dialog/dialog"
@@ -2219,6 +2220,39 @@ describe("agent act", () => {
       /"Jane Doe" names 2 components: c\d+ Admin \(Jane Doe jane@acme\.com\), c\d+ Jane Doe\. Use a ref\. A page tells them apart with a word in one label the other lacks, like a verb or the row's name\./
     )
     expect([jane.get().checked, other.get().checked]).toEqual([false, false])
+  })
+
+  test("an open component whose label only holds the words doesn't beat the exact label", async () => {
+    const agent = createAgent()
+    const el = document.body.appendChild(document.createElement("button"))
+    el.textContent = "System"
+    const pressed = vi.fn()
+    el.addEventListener("click", pressed)
+    const own = button({ id: "system" })
+    const row = collapsible({ id: "tool-call", defaultOpen: true })
+    const root = document.body.appendChild(document.createElement("div"))
+    root.setAttribute("aria-label", "Read live-system.png")
+    const trigger = root.appendChild(document.createElement("button"))
+    trigger.textContent = "read live-system.png"
+    const panel = root.appendChild(
+      Object.assign(document.createElement("div"), {
+        textContent: "image",
+        getAnimations: () => [],
+      })
+    )
+    cleanups.push(
+      bind(own.part("root"), el),
+      bind(row.part("root"), root),
+      bind(row.part("trigger"), trigger),
+      bind(row.part("panel"), panel),
+      () => [own, row].forEach((instance) => instance.destroy())
+    )
+    const outcome = await agent.act({
+      steps: [{ ref: "System", action: "press" }],
+    })
+    expect(outcome.error?.message).toMatch(/"System" names 2 components/)
+    expect(pressed).not.toHaveBeenCalled()
+    expect(row.get().open).toBe(true)
   })
 
   test("a label that matches exactly still wins when nothing else holds its words", async () => {

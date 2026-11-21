@@ -777,11 +777,18 @@ function createAgent(
       if (meant.length === 1) {
         return meant[0]
       }
-      // An open popup is what the agent means while it's open, like the dialog a row's menu just opened.
+      // An open popup is what the agent means while it's open, like the dialog a row's menu just opened,
+      // but only among labels that match alike: one holding the words doesn't beat the exact one.
+      const exact = meant.filter(
+        ({ entry }) => entry.label && fold(entry.label) === needle
+      )
       const open = meant.filter(
         ({ instance }) => (instance.get() as { open?: boolean }).open === true
       )
-      if (open.length === 1) {
+      if (
+        open.length === 1 &&
+        (!exact.length || exact.length === meant.length)
+      ) {
         return open[0]
       }
       // A Button and the popups it opens are one button on the page. A press is on the
