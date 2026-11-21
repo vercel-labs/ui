@@ -311,6 +311,15 @@ function componentLabel(parts: Bound[]) {
   }
 }
 
+// A table's header row holds column titles, not a record.
+const headerRow = (row: Element) =>
+  !!row.closest("thead") ||
+  (row.children.length > 0 &&
+    [...row.children].every(
+      (cell) =>
+        cell.localName === "th" || cell.getAttribute("role") === "columnheader"
+    ))
+
 // Text in the component's row that isn't the component's own, its parts' or
 // its label's, like the name beside a member's menu, so an agent knows which
 // row it is.
@@ -320,7 +329,7 @@ function rowOf(parts: Bound[]) {
     parts[0]
   )?.el
   const row = el?.closest("li, tr, [role=row], [role=listitem]")
-  if (!row || parts.some((part) => part.el.contains(row))) {
+  if (!row || headerRow(row) || parts.some((part) => part.el.contains(row))) {
     return
   }
   const own = parts.flatMap(({ el }) => [

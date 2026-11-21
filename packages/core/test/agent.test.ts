@@ -1951,6 +1951,32 @@ describe("agent rows", () => {
     ])
   })
 
+  test("a table's header row adds no row text, so a header button is found by its label", async () => {
+    const agent = createAgent()
+    const table = document.createElement("table")
+    table.innerHTML =
+      "<thead><tr><th><button>Email</button></th><th><button>Status</button></th></tr></thead>" +
+      "<tbody><tr><th>Row</th><td><button>Edit</button></td></tr></tbody>"
+    document.body.append(table)
+    const pressed: string[] = []
+    for (const el of table.querySelectorAll("button")) {
+      const instance = button({ id: el.textContent! })
+      el.addEventListener("click", () => pressed.push(el.textContent!))
+      cleanups.push(bind(instance.part("root"), el), () => instance.destroy())
+    }
+    const rows = Object.fromEntries(
+      agent
+        .snapshot()
+        .filter((component) => !component.offPage)
+        .map((component) => [component.label, component.row])
+    )
+    expect(rows).toEqual({ Email: undefined, Status: undefined, Edit: "Row" })
+    expect(
+      await agent.act({ steps: [{ ref: "Email", action: "press" }] })
+    ).toMatchObject({ ok: true })
+    expect(pressed).toEqual(["Email"])
+  })
+
   test("a component that leaves and comes back, like a tab's, keeps its ref", () => {
     const agent = createAgent()
     const unmount = mountRow("Priya Shah")
