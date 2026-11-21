@@ -14,6 +14,7 @@ import {
   type ButtonElement,
 } from "../../foundation/platform/button"
 import { layoutBox } from "../../foundation/platform/layout"
+import { isRTL } from "../../foundation/platform/env"
 import {
   bindIndicator,
   directionBetween,
@@ -395,12 +396,16 @@ function tabsApiBody(
       return
     }
     const rect = layoutBox(tab, list)
-    list.scrollLeft = scrollToShow(
-      list.scrollLeft,
+    // Right to left, scrollLeft runs from 0 at the right edge to negative, so
+    // the distances are measured from the right.
+    const rtl = isRTL(list)
+    const scrolled = scrollToShow(
+      rtl ? -list.scrollLeft : list.scrollLeft,
       list.clientWidth,
-      rect.left,
+      rtl ? list.clientWidth - rect.left - rect.width : rect.left,
       rect.width
     )
+    list.scrollLeft = rtl ? -scrolled : scrolled
     list.scrollTop = scrollToShow(
       list.scrollTop,
       list.clientHeight,
