@@ -983,11 +983,7 @@ function menuApiBody(
       hide({ reason: "trigger-press", event })
     }
     openedByHover = false
-    const start = {
-      x: event.clientX,
-      y: event.clientY,
-      time: performance.now(),
-    }
+    const start = { x: event.clientX, y: event.clientY }
     const off = on(window, "pointerup", (up) => {
       off()
       // The window sees only the shadow host around a trigger in a shadow root.
@@ -999,7 +995,9 @@ function menuApiBody(
       if (!opening) {
         return
       }
-      const held = performance.now() - start.time >= 200
+      // Timed by when the input happened, so a busy page rendering the menu
+      // doesn't turn a click into a hold.
+      const held = up.timeStamp - event.timeStamp >= 200
       const moved = Math.hypot(up.clientX - start.x, up.clientY - start.y) > 4
       if (!held || (!moved && composedContains(trigger, target))) {
         return

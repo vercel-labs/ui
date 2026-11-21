@@ -247,11 +247,7 @@ function createSelectKeyboard({
     } else {
       hide({ reason: "trigger-press", event })
     }
-    const start = {
-      x: event.clientX,
-      y: event.clientY,
-      time: performance.now(),
-    }
+    const start = { x: event.clientX, y: event.clientY }
     const off = on(window, "pointerup", (up) => {
       off()
       // The window sees only the shadow host around a trigger in a shadow root.
@@ -263,7 +259,9 @@ function createSelectKeyboard({
       if (!opening) {
         return
       }
-      const held = performance.now() - start.time >= HOLD_MS
+      // Timed by when the input happened, so a busy page rendering the list
+      // doesn't turn a click into a hold.
+      const held = up.timeStamp - event.timeStamp >= HOLD_MS
       const moved =
         Math.hypot(up.clientX - start.x, up.clientY - start.y) > DRAG_PX
       if ((!held && !moved) || composedContains(trigger, target)) {
