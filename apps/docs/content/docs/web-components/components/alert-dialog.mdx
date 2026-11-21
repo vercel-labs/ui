@@ -185,7 +185,7 @@ Add `action` to a Close part and listen for its `action` event. Pass a Promise t
   caption="Choose Delete Project, then Delete. The first attempt fails so you can try again. While Deleting… is shown, Cancel and Escape leave the dialog open. A successful retry closes it."
 />
 
-While the action runs, its button stays focusable and gets `data-pending`, `aria-busy`, and `aria-disabled`. Other Close parts and dismissals cannot close the dialog until it settles. `dismissattempt` reports refused dismissals; a controller can still close it.
+While the action runs, its button stays focusable and gets `data-pending`, `aria-busy`, and `aria-disabled`. Other Close parts get `aria-disabled` and `data-disabled`, and neither they nor dismissals can close the dialog until it settles. `dismissattempt` reports refused dismissals; a controller can still close it.
 
 The root's `pending-announcement` attribute sets what screen readers hear after a second of waiting. The error clears on the next attempt or when the dialog opens again. The action event's `detail.source` describes the input that started it; [Changes After an Await](./button#changes-after-an-await) explains when to use it.
 

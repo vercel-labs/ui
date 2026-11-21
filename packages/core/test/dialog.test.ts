@@ -281,7 +281,14 @@ describe("actions", () => {
     expect(attrs(instance.part("close", props))["aria-busy"]).toBe("true")
     expect(attrs(instance.part("close", props))["aria-disabled"]).toBe("true")
     expect(partState(instance.part("content")).pending).toBe(true)
+    expect(
+      attrs(instance.part("close", props))["data-disabled"]
+    ).toBeUndefined()
     // Escape and the other Close part do nothing meanwhile.
+    const cancel = attrs(instance.part("close", { id: "cancel" }))
+    expect(cancel["aria-disabled"]).toBe("true")
+    expect(cancel["data-disabled"]).toBe("")
+    expect(cancel["aria-busy"]).toBeUndefined()
     press(instance.part("close", { id: "cancel" }))?.()
     expect(instance.get()).toMatchObject({ open: true })
     finish()
@@ -289,6 +296,9 @@ describe("actions", () => {
     await Promise.resolve()
     expect(changes).toEqual([[false, "action", "confirm"]])
     expect(instance.get()).toMatchObject({ open: false, pending: null })
+    expect(
+      attrs(instance.part("close", { id: "cancel" }))["aria-disabled"]
+    ).toBeUndefined()
   })
 
   test("a rejected action keeps the dialog open and shows the error until the next press", async () => {

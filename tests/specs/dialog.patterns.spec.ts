@@ -263,8 +263,12 @@ test.describe("async actions", { tag: "@enhancement" }, () => {
     await removeAction(page).click()
     await expect(removeAction(page)).toHaveAttribute("data-pending", "")
     await expect(removeAction(page)).toHaveAttribute("aria-busy", "true")
+    const cancel = remove(page).getByRole("button", { name: f.remove.cancel })
+    await expect(cancel).toHaveAttribute("aria-disabled", "true")
+    await expect(cancel).toHaveAttribute("data-disabled", "")
     await page.keyboard.press("Escape")
-    await remove(page).getByRole("button", { name: f.remove.cancel }).click()
+    // Playwright waits for an `aria-disabled` button to enable before a click.
+    await cancel.click({ force: true })
     await expect(
       remove(page),
       "nothing but the action closes it meanwhile"

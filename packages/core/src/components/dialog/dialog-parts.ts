@@ -180,13 +180,18 @@ function dialogSlots(
         pending: state.pending === key,
         error: state.errors[key],
       }),
-      attrs: (state, { key }) => ({
-        type: "button",
-        "data-pending": state.pending === key ? "" : undefined,
-        "aria-busy": state.pending === key ? "true" : undefined,
-        // Presses do nothing while it's pending. Not the native attribute, which would drop focus.
-        "aria-disabled": state.pending === key ? "true" : undefined,
-      }),
+      attrs: (state, { key }) => {
+        const blocked = state.pending !== null && state.pending !== key
+        return {
+          type: "button",
+          "data-pending": state.pending === key ? "" : undefined,
+          "aria-busy": state.pending === key ? "true" : undefined,
+          // Presses on every Close part do nothing while one is pending. Not the
+          // native attribute, which would drop focus.
+          "aria-disabled": state.pending !== null ? "true" : undefined,
+          "data-disabled": blocked ? "" : undefined,
+        }
+      },
       press: ({ api, key, props }, event) =>
         api.internal.closePress(key, props, event),
     }),
