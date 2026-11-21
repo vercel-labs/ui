@@ -210,7 +210,34 @@ function textFieldAdapter(field: TextField) {
     }
   }
 
+  // React reads a controlled field in its own listener at the root, after this one, and
+  // microtasks run between a real event's listeners: a render the menu set off first would put
+  // the old value back. So the change waits until the event reaches the window.
   function onInput(event: Event) {
+    const view = field.ownerDocument.defaultView
+    if (
+      !view ||
+      !event.bubbles ||
+      !field.isConnected ||
+      (!event.composed && field.getRootNode() !== field.ownerDocument)
+    ) {
+      return readInput(event)
+    }
+    let done = false
+    const run = (seen?: Event) => {
+      if (done || (seen && seen !== event)) {
+        return
+      }
+      done = true
+      view.removeEventListener("input", run)
+      readInput(event)
+    }
+    view.addEventListener("input", run)
+    // A listener that stopped the event keeps it from the window.
+    setTimeout(run)
+  }
+
+  function readInput(event: Event) {
     // An input event outside a composition means any composition is over,
     // even when the browser dropped its compositionend.
     if (!(event as InputEvent).isComposing) {

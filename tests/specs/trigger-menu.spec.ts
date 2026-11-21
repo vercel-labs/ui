@@ -39,6 +39,26 @@ test.describe("opening", () => {
     await expect(openStatus(page)).toHaveText("true:input-change")
   })
 
+  test("a field controlled through onChange keeps the typed trigger and opens the list", async ({
+    page,
+    open,
+    framework,
+  }) => {
+    test.skip(
+      framework !== "react",
+      "Only React sets a controlled field's value back in a render."
+    )
+    await open("trigger-menu", { controlled: "" })
+    await field(page).focus()
+    await page.keyboard.type("@")
+    await expect(field(page)).toHaveValue("@")
+    await expect(listbox(page)).toBeVisible()
+    await page.keyboard.type("car")
+    await expect(options(page)).toHaveText(["Carol White"], {
+      useInnerText: true,
+    })
+  })
+
   test("typing after the trigger filters the list", async ({ page }) => {
     await field(page).focus()
     await page.keyboard.type("@car")

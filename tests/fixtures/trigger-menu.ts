@@ -130,6 +130,7 @@ function triggerMenuOptions() {
     empty: params.has("empty"),
     autoHighlight: params.get("auto") !== "false",
     twice: params.has("twice"),
+    controlled: params.has("controlled"),
   }
 }
 

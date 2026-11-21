@@ -28,8 +28,10 @@ function Composer({
   onAction: (action: string) => void
   onOpen: (open: string) => void
 }) {
-  const { input, textarea, empty, autoHighlight } = triggerMenuOptions()
+  const { input, textarea, empty, autoHighlight, controlled } =
+    triggerMenuOptions()
   const [triggers] = React.useState(fixtureTriggers)
+  const [text, setText] = React.useState("")
   const id = React.useId()
   return (
     <TriggerMenu
@@ -50,6 +52,11 @@ function Composer({
         render={
           input ? <input /> : textarea ? <Textarea autoResize /> : undefined
         }
+        {...(controlled && {
+          value: text,
+          onChange: (event: React.ChangeEvent<HTMLTextAreaElement>) =>
+            setText(event.currentTarget.value),
+        })}
       />
       <TriggerMenuHint className="hint" />
       <TriggerMenuStatus className="status" />
