@@ -379,12 +379,13 @@ function tabsApiBody(
     return !!tab && roving.tabIndex(state, { key, props: tab }) === "0"
   }
 
-  // Brings a tab selected without focus, like by a controller or the URL,
-  // into view inside a scrolling list. The page itself never scrolls.
+  // Brings the selected tab into view inside a scrolling list, focused too,
+  // since browsers don't scroll a half-hidden element they focus. The page
+  // itself never scrolls.
   function reveal(value: string | null) {
     const list = element("list")
     const tab = value === null ? undefined : element("tab", value)
-    if (!list || !tab || tab.contains(document.activeElement)) {
+    if (!list || !tab) {
       return
     }
     if (

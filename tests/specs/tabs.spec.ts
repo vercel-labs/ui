@@ -550,3 +550,48 @@ test.describe("animation", () => {
     await expect(page.locator('[role="tabpanel"]:not([hidden])')).toHaveCount(1)
   })
 })
+
+test.describe("a list that scrolls", () => {
+  test.beforeEach(async ({ open, page }) => {
+    await open("tabs")
+    await page.getByRole("tablist").evaluate((list) => {
+      list.style.cssText += ";display:flex;width:180px;overflow-x:auto"
+      for (const tab of list.querySelectorAll<HTMLElement>("[role=tab]")) {
+        tab.style.cssText += ";flex:none;width:120px;box-sizing:border-box"
+      }
+    })
+  })
+
+  const shown = (page: Parameters<typeof tabNamed>[0], name: string) =>
+    tabNamed(page, name).evaluate((tab) => {
+      const list = tab
+        .closest<HTMLElement>("[role=tablist]")!
+        .getBoundingClientRect()
+      const box = tab.getBoundingClientRect()
+      return box.left >= list.left - 1 && box.right <= list.right + 1
+    })
+
+  test("a click on a half-hidden tab scrolls all of it into view", async ({
+    page,
+  }) => {
+    expect(await shown(page, "Password")).toBe(false)
+    await tabNamed(page, "Password").click({ position: { x: 10, y: 10 } })
+    await expect(tabNamed(page, "Password")).toHaveAttribute(
+      "aria-selected",
+      "true"
+    )
+    await expect.poll(() => shown(page, "Password")).toBe(true)
+  })
+
+  test("an arrow key to a half-hidden tab scrolls all of it into view", async ({
+    page,
+  }) => {
+    await tabNamed(page, "Account").focus()
+    await page.keyboard.press("ArrowRight")
+    await expect(tabNamed(page, "Password")).toHaveAttribute(
+      "aria-selected",
+      "true"
+    )
+    await expect.poll(() => shown(page, "Password")).toBe(true)
+  })
+})
