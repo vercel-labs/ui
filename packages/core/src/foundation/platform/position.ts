@@ -265,7 +265,11 @@ function computePlacement(
   anchor: Rect,
   size: { width: number; height: number },
   visible: Viewport,
-  placement: Omit<Placement, "side"> & { side: Side; rtl?: boolean }
+  placement: Omit<Placement, "side"> & {
+    side: Side
+    rtl?: boolean
+    inside?: boolean
+  }
 ) {
   const viewport = { x: 0, y: 0, ...visible }
   const options = {
@@ -293,13 +297,15 @@ function computePlacement(
   const room = available(side, anchor, viewport, options)
   // Beside an anchor at least its size, like a context area opened from the
   // keyboard, with room on neither side, it goes on screen inside the anchor.
-  // A popup not measured yet has no size to fit.
+  // A popup not measured yet has no size to fit. `inside` keeps it there.
+  let inside = false
   if (overflow(side, point, size, viewport, padding) > 0) {
     if (
       (side === "top" || side === "bottom") &&
       size.height &&
-      anchor.height >= size.height
+      (anchor.height >= size.height || options.inside)
     ) {
+      inside = true
       point.y = clamp(
         clamp(
           point.y,
@@ -313,8 +319,9 @@ function computePlacement(
     } else if (
       (side === "left" || side === "right") &&
       size.width &&
-      anchor.width >= size.width
+      (anchor.width >= size.width || options.inside)
     ) {
+      inside = true
       point.x = clamp(
         clamp(
           point.x,
@@ -358,6 +365,7 @@ function computePlacement(
     side,
     align: options.align,
     available: room,
+    inside,
   }
 }
 
@@ -467,6 +475,7 @@ function position(
     { el: HTMLElement; write: ReturnType<typeof createWriter> } | undefined
 
   let last = ""
+  let insideAt = ""
   let placed = false
   // Sizes are left to `platform/moves.ts` and the slow check, not a
   // `ResizeObserver`: components whose own observers resize a popup, like a
@@ -622,8 +631,22 @@ function position(
       width: exact.width * scale.x,
       height: exact.height * scale.y,
     }
+    // Once inside the anchor, it stays while nothing but its own size changes: a
+    // popup that shrinks to fit is wider inside than beside, and would swap every frame.
+    const surroundings = [
+      a.x,
+      a.y,
+      a.width,
+      a.height,
+      viewport.x,
+      viewport.y,
+      viewport.width,
+      viewport.height,
+      ...Object.values(resolved),
+    ].join()
     const placement = {
       ...resolved,
+      inside: insideAt === surroundings,
       sideOffset:
         resolved.sideOffset * (isVertical(resolved.side) ? scale.y : scale.x),
       alignOffset:
@@ -632,6 +655,7 @@ function position(
     }
     const anchorBox = { x: a.x, y: a.y, width: a.width, height: a.height }
     const result = computePlacement(anchorBox, size, viewport, placement)
+    insideAt = result.inside ? surroundings : ""
     const previous = lastAnchorBox
     lastAnchorBox = anchorBox
     const near = (point: { x: number; y: number }) =>

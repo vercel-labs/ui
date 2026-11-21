@@ -137,6 +137,51 @@ test("a popup stays where it was when its anchor leaves the page or stops render
   })
 })
 
+test("a popup that shrinks to fit beside a wide anchor settles in one place", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 400, height: 600 })
+  const changes = await page.evaluate(async () => {
+    const stage = document.createElement("div")
+    stage.id = "probe-stage"
+    stage.innerHTML = `<div id="probe-anchor" style="position: fixed; left: 8px; top: 100px; width: 300px; height: 30px"></div><div id="probe-popup" popover="manual" style="padding: 0; border: 0; margin: 0">Open the project settings for this workspace and its team</div>`
+    document.body.append(stage)
+    const popup = document.getElementById("probe-popup")!
+    popup.showPopover()
+    const { loadCoreModule } = window as unknown as {
+      loadCoreModule: (name: string) => Promise<{
+        position: (
+          anchor: Element,
+          el: HTMLElement,
+          options: object
+        ) => () => void
+      }>
+    }
+    const { position } = await loadCoreModule("position")
+    const stop = position(document.getElementById("probe-anchor")!, popup, {
+      side: "right",
+      align: "start",
+    })
+    Object.assign(window, { stopProbe: stop })
+    const frames = async (count: number) => {
+      for (let frame = 0; frame < count; frame++) {
+        await new Promise(requestAnimationFrame)
+      }
+    }
+    await frames(10)
+    let changes = 0
+    const observer = new MutationObserver(() => changes++)
+    observer.observe(popup, { attributes: true })
+    await frames(30)
+    observer.disconnect()
+    return changes
+  })
+  expect(changes).toBe(0)
+  const { anchor, popup } = await boxes(page)
+  expect(popup.x + popup.width).toBeLessThanOrEqual(400)
+  expect(popup.x).toBeGreaterThanOrEqual(anchor.x)
+})
+
 test("a popup stays beside a new anchor that takes the old one's place", async ({
   page,
 }) => {
