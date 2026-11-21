@@ -20,6 +20,22 @@ test.describe("pattern details", () => {
     await expect(page.getByRole("menuitem", { name: "Share" })).toBeFocused()
   })
 
+  test("Escape closes a submenu the pointer opened before its menu", async ({
+    page,
+  }) => {
+    await page.getByRole("button", { name: "File" }).click()
+    const share = page.getByRole("menuitem", { name: "Share" })
+    await share.hover()
+    await expect(menuNamed(page, "Share")).toBeVisible()
+    await expect(share).toBeFocused()
+    await page.keyboard.press("Escape")
+    await expect(menuNamed(page, "Share")).toBeHidden()
+    await expect(menuNamed(page, "File")).toBeVisible()
+    await expect(share).toBeFocused()
+    await page.keyboard.press("Escape")
+    await expect(menuNamed(page, "File")).toBeHidden()
+  })
+
   test("Tab moves focus to the element after the trigger", async ({
     page,
     tab,

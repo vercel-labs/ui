@@ -1150,8 +1150,15 @@ function menuApiBody(
           event.preventDefault()
         }
         return
-      case "Escape":
+      case "Escape": {
         event.preventDefault()
+        // A submenu the pointer opened leaves focus on its trigger here, and it
+        // closes first, as it does with focus inside it.
+        const child = openChild()
+        if (child) {
+          child.hide({ reason: "escape-key", event, focus: false })
+          return
+        }
         if (parent) {
           hide({ reason: "escape-key", event, focus: false })
           focusTriggerItem()
@@ -1159,6 +1166,7 @@ function menuApiBody(
           hide({ reason: "escape-key", event })
         }
         return
+      }
       case "Tab":
         // Lets the browser move focus on from the trigger, then closes everything.
         return popup.keydown(event)
