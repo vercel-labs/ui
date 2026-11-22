@@ -18,6 +18,7 @@ const openLayer = (onEscape: () => void) => {
     el,
     contains: (target) => el.contains(target),
     active: () => true,
+    modal: false,
     onEscape,
   })
   return () => {
