@@ -60,6 +60,30 @@ test.describe("dialog", { tag: "@enhancement" }, () => {
     await page.getByRole("button", { name: "Cancel" }).click()
     expect((await result).reason).toBe("close-press")
   })
+
+  // Where the browser has a top layer, a popup opened from inside the drawer renders in it.
+  test("focus inside a popup open in its content leaves that popup's scrolling alone", async ({
+    page,
+    open,
+  }) => {
+    await open("drawer")
+    await openDrawer(page)
+    await waitForRest(page)
+    const scrolled = await page.evaluate(async () => {
+      const layer = document.createElement("div")
+      layer.popover = "manual"
+      layer.tabIndex = -1
+      layer.style.cssText =
+        "inset: 0 auto auto 0; height: 200px; overflow: auto"
+      layer.innerHTML = "<p style='height: 1000px'>Rows</p>"
+      document.querySelector('[data-slot="drawer-content"]')!.append(layer)
+      layer.showPopover()
+      layer.focus({ preventScroll: true })
+      await new Promise((resolve) => setTimeout(resolve, 500))
+      return layer.scrollTop
+    })
+    expect(scrolled).toBe(0)
+  })
 })
 
 test.describe("shortcuts", { tag: "@enhancement" }, () => {

@@ -187,6 +187,13 @@ function sheetAt(target: EventTarget | null) {
   return null
 }
 
+// Where the browser has a top layer, a popup opened from inside a sheet is
+// rendered in it, and focus inside it is that popup's to show.
+function inNestedLayer(field: Element, sheet: Element) {
+  const layer = field.closest("[popover]")
+  return !!layer && layer !== sheet && sheet.contains(layer)
+}
+
 // A press this close to the screen's left or right edge starts iOS Safari's
 // back and forward swipe.
 const edgeZone = 24
@@ -505,7 +512,8 @@ function attachSheet(el: HTMLElement, input: SheetOptions) {
     if (
       !(field instanceof HTMLElement) ||
       !el.contains(field) ||
-      field === el
+      field === el ||
+      inNestedLayer(field, el)
     ) {
       return
     }
