@@ -135,6 +135,15 @@ test.describe("focus", () => {
     await expect(field(page)).toBeFocused()
   })
 
+  // Safari's default Tab moves only between text fields, and the page behind is inert.
+  test("Tab keeps focus inside where the browser's Tab skips the buttons", async ({
+    page,
+  }) => {
+    await openWithKeyboard(page)
+    await page.keyboard.press("Tab")
+    await expect(dialog(page).locator(":focus")).toHaveCount(1)
+  })
+
   test("Shift+Tab from the first element wraps to the last", async ({
     page,
     tab,

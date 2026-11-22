@@ -1520,7 +1520,25 @@ function createPopupLayer<
       ) {
         event.preventDefault()
         next?.focus({ preventScroll: true })
+        return
       }
+      // Safari's default Tab moves only between text fields, so from the last
+      // one it skips the buttons after it and lands on the body.
+      setTimeout(() => {
+        const now = activeElement()
+        if (
+          shown?.el === popup &&
+          !(
+            now &&
+            (composedContains(popup, now) ||
+              (!!layer && layerContains(layer, now)))
+          )
+        ) {
+          ;((event.shiftKey ? last : first) ?? popup).focus({
+            preventScroll: true,
+          })
+        }
+      })
       return
     }
     const trigger = options.trigger()
