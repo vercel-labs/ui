@@ -1433,13 +1433,18 @@ function createAgent(
         const rest = args[0]
           .trim()
           .replace(/^[-+]?(\d+\.?\d*|\.\d+)(e[-+]?\d+)?/i, "")
-        if (Number.isNaN(number) || /^[\s,.']*\d/.test(rest)) {
+        // A list whose values are numbers, like a select of project ids, leaves
+        // other text to the label lookup below.
+        const byLabel = opens && (Number.isNaN(number) || rest.trim())
+        if (!byLabel && (Number.isNaN(number) || /^[\s,.']*\d/.test(rest))) {
           throw new Error(`${entry.component} ${entry.ref} takes a number.`)
         }
-        args = [
-          Array.isArray(state.value) ? [number] : number,
-          ...args.slice(1),
-        ]
+        if (!byLabel) {
+          args = [
+            Array.isArray(state.value) ? [number] : number,
+            ...args.slice(1),
+          ]
+        }
       }
       // One value for a component that holds a list, like a multiple select's, is a list of one.
       // A token input reads its own text.
@@ -1482,7 +1487,8 @@ function createAgent(
           // search text isn't an item. Data with no items, or a popup that opened
           // and showed none, is a list with none. The first 20 keep the error short.
           if (found.length === 1) {
-            args = [found[0].value, ...args.slice(1)]
+            const { value } = found[0]
+            args = [numeric ? Number(value) : value, ...args.slice(1)]
             named = true
           } else if (
             (items.length || data || opens) &&

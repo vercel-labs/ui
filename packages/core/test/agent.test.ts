@@ -639,6 +639,30 @@ describe("agent", () => {
     expect(onValueChange).not.toHaveBeenCalled()
   })
 
+  test("setValue names an item of a select whose values are numbers by its label", async () => {
+    const agent = createAgent()
+    const instance = select({
+      id: "project",
+      items: [
+        { value: 1, label: "Mobile app" },
+        { value: 2, label: "Website" },
+      ],
+      defaultValue: 1,
+    })
+    const el = document.body.appendChild(document.createElement("button"))
+    el.setAttribute("aria-label", "Project")
+    cleanups.push(bind(instance.part("trigger"), el), () => instance.destroy())
+    const byLabel = await agent.act({
+      steps: [{ ref: "Project", action: "setValue", args: ["Website"] }],
+    })
+    expect(byLabel.ok).toBe(true)
+    expect(instance.get().value).toBe(2)
+    await agent.act({
+      steps: [{ ref: "Project", action: "setValue", args: ["1"] }],
+    })
+    expect(instance.get().value).toBe(1)
+  })
+
   function mountCombobox(
     options: Parameters<typeof combobox>[0],
     label: string
