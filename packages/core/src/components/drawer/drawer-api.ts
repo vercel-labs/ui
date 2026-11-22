@@ -62,6 +62,13 @@ function interactiveByOrder(options: DrawerOptions, point: SnapPoint | null) {
   return above >= 0 && index >= 0 && index <= above
 }
 
+// A scroll-snap sheet moves by the browser's own scrolling, so a touch on the
+// handle has to pan it. The pointer driver tracks the touch itself.
+const handleTouchAction = (handle: Element) =>
+  handle.closest("[data-driver]")?.getAttribute("data-driver") === "scroll-snap"
+    ? "pan-y"
+    : "none"
+
 // What a sheet reads only as it attaches: `"auto"` picks its driver from the rest.
 const shapeOf = (options: DrawerOptions) =>
   [
@@ -349,6 +356,11 @@ function drawerApiBody(
       onDragChange: events.drag,
       onLayout: ({ side, snapPoints }) => events.layout(side, snapPoints),
     })
+    for (const handle of el.querySelectorAll<HTMLElement>(
+      '[data-slot="drawer-handle"]'
+    )) {
+      handle.style.touchAction = handleTouchAction(handle)
+    }
     if (dev && options().snapPoints?.length === 0) {
       warn("`snapPoints` is empty, so it rests at its own size.", {
         component: "drawer",
@@ -456,5 +468,6 @@ export {
   type DrawerApi,
   drawerApi,
   type DrawerState,
+  handleTouchAction,
   interactiveByOrder,
 }

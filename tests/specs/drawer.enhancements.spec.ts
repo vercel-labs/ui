@@ -506,6 +506,21 @@ test.describe("scroll-snap driver", { tag: "@enhancement" }, () => {
     expect((await sheetRect(page)).top).toBe(Math.round(height * 0.5))
   })
 
+  test("a swipe up from the handle snaps to the next snap point", async ({
+    page,
+    context,
+  }) => {
+    const box = (await handle(page).boundingBox())!
+    await touchDrag(page, context, {
+      x: box.x + box.width / 2,
+      y: box.y + box.height / 2,
+      dy: -page.viewportSize()!.height * 0.2,
+      steps: 12,
+      hold: 200,
+    })
+    await expect.poll(() => drawerLog(page)).toContain("0.5:swipe")
+  })
+
   test("it comes to rest when the scroll ends before the page hears the finger lift", async ({
     page,
   }) => {

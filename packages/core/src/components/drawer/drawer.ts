@@ -46,6 +46,7 @@ import {
 import {
   defaultSnap,
   drawerApi,
+  handleTouchAction,
   interactiveByOrder,
   type DrawerApi,
   type DrawerState,
@@ -601,7 +602,7 @@ const drawerPrimitive = /* @__PURE__ */ definePrimitive({
         },
         bind(el, { id }) {
           // Touch drags on the handle always move the drawer, never the page.
-          el.style.touchAction = "none"
+          el.style.touchAction = handleTouchAction(el)
           checkName(el, "The handle", { component: "drawer", id })
           return () => el.style.removeProperty("touch-action")
         },
