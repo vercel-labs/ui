@@ -93,6 +93,15 @@ type Entry = {
 const keysOf = (entry: Entry) =>
   (typeof entry.keys === "function" ? entry.keys() : entry.keys) || undefined
 
+// Escape closes the topmost layer first, like an open tooltip, even when the
+// layers started listening after the shortcuts did.
+function escapesLayerAbove(order: number) {
+  const top = activeLayers()
+    .filter((layer) => (layer.el?.ownerDocument ?? document) === document)
+    .at(-1)
+  return !!top?.onEscape && (top.order ?? 0) > order
+}
+
 // The same keys on every platform, to tell conflicting registrations apart.
 function normalize(keys: string) {
   return ariaKeyshortcuts(keys, true).split("+").sort().join("+")
@@ -173,7 +182,7 @@ function createShortcuts() {
         best = { entry, order }
       }
     }
-    if (!best) {
+    if (!best || (event.key === "Escape" && escapesLayerAbove(best.order))) {
       return
     }
     event.preventDefault()
