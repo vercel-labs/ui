@@ -154,6 +154,11 @@
       "count": 1
     }
   },
+  "packages/react/src/children.ts": {
+    "react-hooks/refs": {
+      "count": 1
+    }
+  },
   "packages/react/src/preferences.tsx": {
     "react-hooks/refs": {
       "count": 5

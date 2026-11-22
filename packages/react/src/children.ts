@@ -25,17 +25,36 @@ const PlacedContext = React.createContext<(() => () => void) | null>(null)
  * For a root that renders its own content part when the app places none:
  * whether one is placed, and the value of the provider its children go in.
  * Its own part goes in `<Placed value={null}>`, so it doesn't count. `wanted`
- * is whether the root would render its own part now. Only then do placed
- * parts register, so a root whose content is a direct child, or that has no
- * items to show, renders once instead of again when its content mounts.
+ * is whether the root would render its own part now. Placed parts always
+ * count, so a root that gets its items later already knows about them, but
+ * only one it renders a part for renders again when they mount or leave.
  */
 function usePlacedContent(wanted: boolean) {
-  const [count, setCount] = React.useState(0)
+  const placed = React.useRef(0)
+  const rendersOwn = React.useRef(wanted)
+  const [, rerender] = React.useReducer((count: number) => count + 1, 0)
+  const seen = placed.current > 0
+  // Children's effects run first, so this sees parts placed or removed in the
+  // same commit, whose own calls still read the last commit's `rendersOwn`.
+  React.useLayoutEffect(() => {
+    rendersOwn.current = wanted
+    if (wanted && placed.current > 0 !== seen) {
+      rerender()
+    }
+  })
   const register = React.useCallback(() => {
-    setCount((count) => count + 1)
-    return () => setCount((count) => count - 1)
+    placed.current += 1
+    if (rendersOwn.current) {
+      rerender()
+    }
+    return () => {
+      placed.current -= 1
+      if (rendersOwn.current && !placed.current) {
+        rerender()
+      }
+    }
   }, [])
-  return [count > 0, wanted ? register : null] as const
+  return [seen, register] as const
 }
 
 const Placed = PlacedContext.Provider
