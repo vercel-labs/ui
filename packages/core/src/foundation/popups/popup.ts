@@ -1525,7 +1525,7 @@ function createPopupLayer<
       // Safari's default Tab moves only between text fields, so from the last
       // one it skips the buttons after it and lands on the body.
       setTimeout(() => {
-        const now = activeElement()
+        const now = activeElement(popup.ownerDocument)
         if (
           shown?.el === popup &&
           !(
