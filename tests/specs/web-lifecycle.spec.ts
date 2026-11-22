@@ -100,6 +100,28 @@ test("a part whose button is replaced binds the new one", async ({ page }) => {
   await expect(page.getByRole("tabpanel")).toHaveText("B panel")
 })
 
+test("a field labels a select built one element at a time, outer elements first", async ({
+  page,
+}) => {
+  await page.evaluate(() => {
+    const add = (parent: Element, tag: string) =>
+      parent.appendChild(document.createElement(tag))
+    const field = add(document.querySelector("#stage")!, "ui-field")
+    add(field, "ui-field-label").textContent = "Office"
+    const select = add(field, "ui-select")
+    const trigger = add(add(select, "ui-select-trigger"), "button")
+    trigger.setAttribute("type", "button")
+    add(trigger, "ui-select-value")
+    const item = add(add(select, "ui-select-content"), "ui-select-item")
+    item.setAttribute("value", "east")
+    item.textContent = "East"
+  })
+  const trigger = page.getByRole("combobox", { name: "Office" })
+  await expect(trigger).toBeVisible()
+  await page.getByText("Office").click()
+  await expect(trigger).toBeFocused()
+})
+
 test("a button moved out of its tab is a plain button again", async ({
   page,
 }) => {

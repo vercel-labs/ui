@@ -245,7 +245,13 @@ function bindFoundControl(
     typeof MutationObserver === "undefined"
       ? undefined
       : new MutationObserver(find)
-  observer?.observe(root, { childList: true, subtree: true })
+  // A control can take its role after it arrives, like a select trigger's
+  // button that its custom element binds a moment later.
+  observer?.observe(root, {
+    childList: true,
+    subtree: true,
+    attributeFilter: ["role", "data-slot"],
+  })
   return () => {
     unsubscribe()
     observer?.disconnect()
