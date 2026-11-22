@@ -1,5 +1,18 @@
 # @ui-sdk/core
 
+## 0.1.0-beta.15
+
+### Patch Changes
+
+- 8060d16: A trapping popup like a modal Dialog brings focus back when a Tab leaves it, as Safari's default Tab does from a last text field followed by buttons.
+- a34bd86: A swipe that starts on a drawer's handle moves a drawer using the scroll-snap driver.
+- 79d05d1: A field finds a control that takes its role after it arrives, like the button inside a `<ui-select-trigger>` added one element at a time, so its label names and focuses it.
+- 358d845: Escape closes a submenu the pointer opened while focus is still on its trigger, and leaves the menu around it open, as it does with focus inside the submenu. A second Escape closes the menu.
+- a2dfb9e: OTP Input reads another script's digits, like Arabic-Indic "٤٨٢" or Persian "۴۸۲", as plain ones when its pattern doesn't take them as they are, so a code typed or pasted in them goes in.
+- 145936f: A quick click on a Menu or Select trigger no longer counts as a press held to drag when the page is busy rendering what it opened. The hold is timed by when the press and release happened, not by when their handlers ran, so the menu no longer closes and the select no longer chooses the option under the pointer.
+- c321356: A sheet no longer scrolls a popup opened from inside it when focus moves into that popup, so a nested sheet's long list opens at its top.
+- 13e84a2: A toast whose title already ends a sentence, like "Saved.", is announced without a second period before its description.
+
 ## 0.1.0-beta.14
 
 ### Patch Changes
