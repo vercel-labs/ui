@@ -7,10 +7,10 @@
 //   node ../../scripts/build/build-svelte-package.mjs
 import { execFileSync } from "node:child_process"
 import {
-  existsSync,
   readdirSync,
   readFileSync,
   rmSync,
+  statSync,
   writeFileSync,
 } from "node:fs"
 import path from "node:path"
@@ -37,7 +37,10 @@ for (const entry of readdirSync(outDir, {
   }
   const file = path.join(entry.parentPath, entry.name)
   const source = readFileSync(file, "utf8")
-  const names = (target) => existsSync(path.resolve(path.dirname(file), target))
+  const names = (target) =>
+    statSync(path.resolve(path.dirname(file), target), {
+      throwIfNoEntry: false,
+    })?.isFile()
   const rewritten = source.replace(specifier, (match, lead, quote, target) =>
     isRelative(target) && !names(target)
       ? `${lead}${quote}${withJsExtension(target, path.dirname(file), [".js", ".d.ts"])}${quote}`
