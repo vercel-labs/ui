@@ -648,6 +648,7 @@ const menuContextTrigger = /* @__PURE__ */ (() => ({
       // iOS fires no context menu event, so a long press opens it.
       bind(el, part) {
         const { api, store, key } = part
+        adoptPlatform(store)
         if (store.get().trigger === null) {
           store.set({ trigger: key })
         }
