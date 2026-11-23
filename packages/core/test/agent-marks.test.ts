@@ -595,6 +595,39 @@ describe("data-agent-confirm on items", () => {
     expect(instance.get()).toMatchObject({ value: "Free", open: false })
   })
 
+  test("a select whose values are numbers keeps an option's mark and disabled state when it's named by its label", async () => {
+    const agent = createAgent()
+    const instance: ReturnType<typeof select> = select({
+      id: "plan",
+      items: [
+        { value: 1, label: "Free" },
+        { value: 2, label: "Pro" },
+        { value: 3, label: "Team", disabled: true },
+      ],
+      defaultValue: 1,
+      onOpenChange: optionsWhileOpen(
+        (value) =>
+          instance.part("item", {
+            value: value === "Free" ? 1 : 2,
+          }) as never
+      ),
+    })
+    const trigger = document.body.appendChild(document.createElement("button"))
+    trigger.setAttribute("aria-label", "Plan")
+    cleanups.push(bind(instance.part("trigger"), trigger), () =>
+      instance.destroy()
+    )
+    const marked = await choose(agent, "Pro")
+    expect(marked.error?.message).toMatch(
+      /^Needs a person: "Charges \$20 a month"/
+    )
+    const disabled = await choose(agent, "Team")
+    expect(disabled.error?.message).toMatch(
+      /^"Team" in Plan \(c\d+\) is disabled now\.$/
+    )
+    expect(instance.get()).toMatchObject({ value: 1, open: false })
+  })
+
   test("a combobox's empty-query suggestion still reads the mark on its option, with no items of its own", async () => {
     const agent = createAgent()
     const instance: ReturnType<typeof combobox> = combobox({
