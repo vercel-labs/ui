@@ -62,7 +62,13 @@ const shardMinutes = 6
 const maxShards = 12
 
 const frameworks = ["react", "vue", "web", "solid", "svelte"]
-const engineProjects = ["web-webkit", "web-firefox"]
+// `BROWSERS` drops an engine's projects from the Playwright config, so it does here too.
+const engineProjects = ["webkit", "firefox"]
+  .filter(
+    (engine) =>
+      !process.env.BROWSERS || process.env.BROWSERS.split(",").includes(engine)
+  )
+  .map((engine) => `web-${engine}`)
 
 /** A framework's Chromium projects, as tests/playwright.config.ts names them. */
 function chromiumProjects(framework) {
@@ -513,7 +519,7 @@ function commands({ touched, shared, specs }) {
   // A changed spec file runs on WebKit and Firefox too, so one written against
   // Chromium fails on its pull request, not in the nightly run. With the flag,
   // its component runs on both above.
-  if (!flags.engines && specs.length > 0) {
+  if (!flags.engines && specs.length > 0 && engineProjects.length > 0) {
     runs.push([
       ...specs.map((spec) => `specs/${spec.replaceAll(".", "\\.")}`),
       ...projectArgs(engineProjects),
