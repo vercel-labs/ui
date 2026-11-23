@@ -337,11 +337,10 @@ function labelContent(el: HTMLElement) {
 }
 
 // A slot whose `bind` runs while the tooltip is asleep.
-const asleepToo = <Slot extends { bind?: unknown }>(slot: Slot) => ({
-  ...slot,
-  asleep: slot.bind,
-  bind: undefined,
-})
+const asleepToo = <Slot extends { bind?: unknown }>({
+  bind,
+  ...slot
+}: Slot) => ({ ...slot, ...(bind ? { asleep: bind } : {}) })
 
 /**
  * `tooltip`'s api, which its slots and controller call.

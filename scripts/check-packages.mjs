@@ -21,10 +21,14 @@
 // build that stopped or a wrong `publishConfig.exports` path, which look the
 // same from here.
 // Node then imports every core, React and Vue entry, as an app's server would.
+// Every relative import in a packed module must name a file, since Node's
+// loader takes neither a folder nor a path without its extension. That covers
+// the packages Node can't import here, like Svelte's.
 //
-// TypeScript runs with `strict` and `skipLibCheck: false`, so an error in a
-// shipped declaration fails here as it does in an app that checks its
-// libraries. An error prints once, under the first package that reaches it.
+// TypeScript runs with `strict`, `exactOptionalPropertyTypes` and
+// `skipLibCheck: false`, so an error in a shipped declaration fails here as it
+// does in the strictest app that checks its libraries. An error prints once,
+// under the first package that reaches it.
 // Every package is unpacked side by side, as an app installs an adapter with
 // `@ui-sdk/core` beside it. A package that needs another `@ui-sdk` package
 // takes it as a peer, never a dependency, so an app ends up with one copy.
@@ -42,6 +46,7 @@ import {
   readFileSync,
   realpathSync,
   rmSync,
+  statSync,
   symlinkSync,
   writeFileSync,
 } from "node:fs"
@@ -75,6 +80,7 @@ const peers = [
 
 const compilerOptions = {
   strict: true,
+  exactOptionalPropertyTypes: true,
   skipLibCheck: false,
   module: "esnext",
   moduleResolution: "bundler",
@@ -163,7 +169,7 @@ if (errorCount || missingCount) {
   process.exit(1)
 }
 console.log(
-  "\nEvery packed entry typechecks, and every core, React and Vue entry imports in Node."
+  "\nEvery packed entry typechecks, every relative import names a file, and every core, React and Vue entry imports in Node."
 )
 
 // Packs a package as it's published and unpacks it into the app's node_modules.
@@ -204,6 +210,7 @@ function checkPackage(name, manifest, manifests, reported) {
     ...findMissingDocs(name, manifest),
     ...findBundledSiblings(name, manifest),
     ...findUnpublishedImports(name, manifest, manifests),
+    ...findUnresolvedImports(name, manifest),
     ...findImportFailures(name, manifest, subpaths),
   ]
   const checks = [
@@ -324,6 +331,30 @@ function findUnpublishedImports(name, manifest, manifests) {
       if (!entries.get(target)?.includes(`.${subpath}`)) {
         problems.add(
           `packages/${name}/${file} imports ${target}${subpath}, which ${target} doesn't publish.`
+        )
+      }
+    }
+  }
+  return [...problems]
+}
+
+// Each relative import in a packed module that doesn't name a file. A bundler
+// resolves `./parts` to `./parts.js` or `./parts/index.js`; Node throws.
+function findUnresolvedImports(name, manifest) {
+  const relativeImport =
+    /(?:\bfrom\s*|\bimport\s*\(?\s*)["'](\.{1,2}\/[^"']+)["']/g
+  const packageDir = path.join(app, "node_modules", manifest.name)
+  const problems = new Set()
+  for (const file of readdirSync(packageDir, { recursive: true })) {
+    if (!/\.(m?js|jsx|svelte)$/.test(file)) {
+      continue
+    }
+    const source = readFileSync(path.join(packageDir, file), "utf8")
+    for (const [, specifier] of source.matchAll(relativeImport)) {
+      const target = path.resolve(packageDir, path.dirname(file), specifier)
+      if (!statSync(target, { throwIfNoEntry: false })?.isFile()) {
+        problems.add(
+          `packages/${name}/${file} imports ${specifier}, which isn't a file in the package.`
         )
       }
     }

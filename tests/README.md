@@ -56,7 +56,7 @@ A file filter is a regular expression matched against the path, so `specs/menu` 
 - **`specsThatSkip`** (`tests/fixture-files.ts`) leaves out of a project every spec file whose fixtures don't exist for its framework. It reads the fixtures a spec opens from its `open("<fixture>")` calls and looks for `apps/playground/src/fixtures/<fixture>/<framework>.ts(x)`. Kitchen sinks are left out of every project but the composition ones. CI shards split by test count, so a file that would only skip would still take a shard's share.
 - **`portalSpecs`**: alignment, autocomplete, combobox, command, dialog, drawer, hover-card, list, menu, menubar, navigation-menu, popover, popup, presentation, select, toast, token-input, tooltip and trigger-menu. The pattern is `**/<name>.*spec.ts`, so it matches every kind of spec for those names. Add a component when it gains a popup.
 - **`sheetSpecs`**: autocomplete, combobox, dialog, menu, popover and select, as `**/<name>.spec.ts`. Specs that measure placement against a trigger skip there, through `isSheet(fixtureOptions)` in `tests/fixtures.ts`.
-- **Engines.** WebKit and Firefox run web only: behavior lives in core and differs by engine, not framework. Edge is Chromium's engine, so it has no project. `BROWSERS=webkit,firefox` keeps only those engines' projects. `BROWSERS=chromium` drops both.
+- **Engines.** WebKit and Firefox run web only: behavior lives in core and differs by engine, not framework. Edge is Chromium's engine, so it has no project. `BROWSERS=webkit,firefox` keeps only those engines' projects. `BROWSERS=chromium` drops both. A pull request runs the spec files it changes on both, so a spec written against Chromium fails there; the rest of its specs run on them nightly, or with the `engines` label.
 - **Missing fixtures.** A test whose fixture doesn't exist for its framework skips with "No `<fixture>` fixture for `<framework>`." `open()` knows from the files before it loads the page.
 
 ## CI tiers
@@ -233,6 +233,7 @@ cd tests && PLAYGROUND_PORT=5310 ../scripts/test-slot.sh npx playwright test spe
 `packages/*/test/*.test.ts` and `.test.tsx`, run by vitest in Node, with no browser:
 
 - `packages/core/test`: the core's logic with no framework, like stores, ordering, positioning math, typeahead and each component's state machine. Some read budgets from `tests/perf/budgets.ts`, like `store-fanout.test.ts`.
+- `packages/core/test/*-everywhere.test.ts`: one rule checked on every component in `after-mount.cases.ts` or `component-cases.ts`, like `server-references-everywhere.test.ts`. When a bug could sit in more than one component, its test goes here, so the others are checked too.
 - `packages/react/test`, `packages/solid/test` and `packages/svelte/test`: server rendering for each component (`*-ssr.test.tsx`), merged props, and the package's exports.
 - `packages/vue/test`: server rendering for each component (`*-ssr.test.ts`), and which state changes render a part again (`slot-state.test.ts`).
 - `packages/web/test`: attributes, properties and lifecycle of the elements, in jsdom. Their behavior in a browser is covered by the `web` projects.

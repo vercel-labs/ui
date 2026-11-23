@@ -377,10 +377,18 @@ function importingSpecs(file) {
   return [...seen].filter(isSpec).map((spec) => path.basename(spec))
 }
 
-/** Each touched component with the frameworks it runs on, and each framework shared code reaches. */
+/** Each touched component with the frameworks it runs on, each framework shared code reaches, and the changed spec files. */
 function plan(files) {
   const touched = new Map()
   const shared = new Map()
+  const specs = files
+    .filter(
+      (file) =>
+        file.startsWith("tests/specs/") &&
+        isSpec(file) &&
+        existsSync(path.join(root, file))
+    )
+    .map((file) => path.basename(file))
   const touch = (component, reach) => {
     if (!touched.has(component)) {
       touched.set(component, new Set())
@@ -458,7 +466,7 @@ function plan(files) {
       }
     }
   }
-  return { touched, shared }
+  return { touched, shared, specs }
 }
 
 /** The frameworks shared code runs whole: `react` for code every framework runs, else the adapters it's in. */
@@ -470,7 +478,7 @@ function sharedFrameworks(shared) {
   return frameworks.filter((framework) => reach.has(framework))
 }
 
-function commands({ touched, shared }) {
+function commands({ touched, shared, specs }) {
   const projectArgs = (projects) =>
     projects.flatMap((project) => ["--project", project])
   const runs = []
@@ -501,6 +509,16 @@ function commands({ touched, shared }) {
         "--pass-with-no-tests",
       ])
     }
+  }
+  // A changed spec file runs on WebKit and Firefox too, so one written against
+  // Chromium fails on its pull request, not in the nightly run. With the flag,
+  // its component runs on both above.
+  if (!flags.engines && specs.length > 0) {
+    runs.push([
+      ...specs.map((spec) => `specs/${spec.replaceAll(".", "\\.")}`),
+      ...projectArgs(engineProjects),
+      "--pass-with-no-tests",
+    ])
   }
   const reached = new Set(
     [...touched.values(), ...shared.values()].flatMap((reach) => [...reach])
@@ -626,6 +644,11 @@ for (const args of runs) {
 }
 if (flags.shards) {
   console.log(`shards=${runs.length > 0 ? shardCount(runs) : 0}`)
+  // Whether the runners need WebKit and Firefox installed.
+  const engines = runs.some((args) =>
+    engineProjects.some((project) => args.includes(project))
+  )
+  console.log(`engines=${engines}`)
 }
 if (flags.dry || flags.shards || runs.length === 0) {
   process.exit(0)

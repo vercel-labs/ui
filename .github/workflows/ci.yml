@@ -202,6 +202,7 @@ jobs:
       base: ${{ steps.size.outputs.base }}
       shards: ${{ steps.size.outputs.shards }}
       count: ${{ steps.size.outputs.count }}
+      engines: ${{ steps.size.outputs.engines }}
     steps:
       # Full history, so the script finds where the changes left their base.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -226,6 +227,7 @@ jobs:
           count=$(sed -n 's/^shards=//p' "$RUNNER_TEMP/plan.txt")
           echo "base=$(git rev-parse "$BASE")" >> "$GITHUB_OUTPUT"
           echo "count=$count" >> "$GITHUB_OUTPUT"
+          echo "engines=$(sed -n 's/^engines=//p' "$RUNNER_TEMP/plan.txt")" >> "$GITHUB_OUTPUT"
           echo "shards=[$(seq -s, 1 "$count")]" >> "$GITHUB_OUTPUT"
 
   affected:
@@ -246,7 +248,7 @@ jobs:
           fetch-depth: 0
       - uses: ./.github/actions/setup
         with:
-          browsers: ${{ needs.plan.outputs.suite == 'affected-engines' && 'chromium webkit firefox' || 'chromium' }}
+          browsers: ${{ needs.affected-plan.outputs.engines == 'true' && 'chromium webkit firefox' || 'chromium' }}
 
       # Each runner takes its share of every Playwright command in the plan.
       - name: Run Playwright

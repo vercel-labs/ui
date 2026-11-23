@@ -85,7 +85,7 @@ function changeFrom<Options, State extends object>(
     value: State[Key],
     details: {
       reason: ReasonFor<Options, Key>
-      event?: Event
+      event?: Event | undefined
       source?: ChangeSource
       [extra: string]: unknown
     }
