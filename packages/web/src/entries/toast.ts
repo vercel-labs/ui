@@ -3,6 +3,8 @@ import { defineToastElements } from "../toast"
 
 defineToastElements()
 
+export { createToaster, toast, type ToastContent } from "../toast"
+
 export type {
   Toast,
   ToastAction,

@@ -46,8 +46,7 @@ Import the parts and put them together, then call `toast()` when an action finis
 
 ```html
 <script type="module">
-  import "@ui-sdk/web/toast"
-  import { toast } from "@ui-sdk/web"
+  import { toast } from "@ui-sdk/web/toast"
 
   document
     .querySelector("#create-event")
@@ -67,7 +66,7 @@ Import the parts and put them together, then call `toast()` when an action finis
 </ui-toast-region>
 ```
 
-`toast()` works from anywhere, not only from event listeners, and returns the toast's id. Place the region once, near your app's root. Without a template, it renders each toast's title, description, action and cancel button with unstyled parts.
+`toast()` works from anywhere, not only from event listeners, and returns the toast's id. On a page without a build step, import it from `https://ui-sdk.dev/web@0/toast.js`. Place the region once, near your app's root. Without a template, it renders each toast's title, description, action and cancel button with unstyled parts.
 
 The examples below each call `createToaster()` for a queue of their own and set it on their region's `toaster` property, so their toasts don't mix.
 
