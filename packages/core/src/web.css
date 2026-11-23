@@ -326,11 +326,13 @@
       min-width: 0;
     }
 
-    & [data-slot="combobox-input"] {
+    & > [data-slot="combobox-input"],
+    & > * > [data-slot="combobox-input"] {
       padding-inline-end: calc(var(--ui-spacing) * 8);
     }
 
-    & [data-slot="combobox-trigger"] {
+    & > [data-slot="combobox-trigger"],
+    & > * > [data-slot="combobox-trigger"] {
       position: relative;
       width: calc(var(--ui-spacing) * 8);
       margin-inline-start: calc(var(--ui-spacing) * -8);
@@ -1946,7 +1948,8 @@
     display: flex;
     align-items: center;
 
-    & [data-slot="date-picker-input"] {
+    & > [data-slot="date-picker-input"],
+    & > * > [data-slot="date-picker-input"] {
       flex: 1;
       padding-inline-end: calc(var(--ui-spacing) * 8);
     }
@@ -1957,7 +1960,8 @@
       column-gap: 0;
 
       /* With no width of its own to start from, the row would have room for the hint. */
-      & [data-slot="date-picker-input"] {
+      & > [data-slot="date-picker-input"],
+      & > * > [data-slot="date-picker-input"] {
         flex-basis: calc(var(--ui-spacing) * 8);
       }
 
@@ -1966,22 +1970,26 @@
       }
     }
 
-    & [data-slot="date-picker-trigger"] {
+    & > [data-slot="date-picker-trigger"],
+    & > * > [data-slot="date-picker-trigger"] {
       position: relative;
       margin-inline-start: calc(var(--ui-spacing) * -7);
     }
 
     &:has([data-slot="date-picker-clear"]) {
-      & [data-slot="date-picker-input"] {
+      & > [data-slot="date-picker-input"],
+      & > * > [data-slot="date-picker-input"] {
         padding-inline-end: calc(var(--ui-spacing) * 14);
       }
 
-      & [data-slot="date-picker-clear"] {
+      & > [data-slot="date-picker-clear"],
+      & > * > [data-slot="date-picker-clear"] {
         position: relative;
         margin-inline-start: calc(var(--ui-spacing) * -13);
       }
 
-      & [data-slot="date-picker-trigger"] {
+      & > [data-slot="date-picker-trigger"],
+      & > * > [data-slot="date-picker-trigger"] {
         margin-inline-start: 0;
       }
 
@@ -1990,11 +1998,13 @@
         > :is([data-slot="date-picker-trigger"], ui-date-picker-trigger)
           ~ :is([data-slot="date-picker-clear"], ui-date-picker-clear)
       ) {
-        & [data-slot="date-picker-trigger"] {
+        & > [data-slot="date-picker-trigger"],
+        & > * > [data-slot="date-picker-trigger"] {
           margin-inline-start: calc(var(--ui-spacing) * -13);
         }
 
-        & [data-slot="date-picker-clear"] {
+        & > [data-slot="date-picker-clear"],
+        & > * > [data-slot="date-picker-clear"] {
           margin-inline-start: 0;
         }
       }
