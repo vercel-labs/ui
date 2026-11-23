@@ -91,6 +91,7 @@ const ItemContext = createContext<{
   item: "checkbox-item" | "radio-item"
   itemKey: () => string
   group?: () => string
+  checked?: () => boolean | undefined
 } | null>(null)
 
 function useMenu() {
@@ -426,9 +427,12 @@ function MenuCheckboxItem(
     "onCheckedChange",
     "closeOnSelect"
   )
+  // A controlled item changes `checked` without writing the store its
+  // indicator selects, so the indicator follows the prop here.
   const indicator = {
     item: "checkbox-item" as const,
     itemKey: () => props.value,
+    checked: () => props.checked,
   }
   return (
     <ItemContext value={indicator}>
@@ -535,13 +539,16 @@ function MenuItemIndicator(
       "<MenuItemIndicator> must be used inside a checkbox or radio item."
     )
   }
-  const indicator = () => ({
-    id,
-    item: item.item,
-    itemKey: item.itemKey(),
-    group: item.group?.(),
-    keepMounted: props.keepMounted,
-  })
+  const indicator = () => (
+    item.checked?.(),
+    {
+      id,
+      item: item.item,
+      itemKey: item.itemKey(),
+      group: item.group?.(),
+      keepMounted: props.keepMounted,
+    }
+  )
   return usePart(
     menu,
     "item-indicator",
