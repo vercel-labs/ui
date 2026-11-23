@@ -1,5 +1,11 @@
 # @ui-sdk/core
 
+## 0.1.0-beta.16
+
+### Patch Changes
+
+- 0e2349b: Escape closes an open layer like a tooltip before it runs a page shortcut for Escape, whichever started listening first.
+
 ## 0.1.0-beta.15
 
 ### Patch Changes

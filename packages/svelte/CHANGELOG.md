@@ -1,5 +1,11 @@
 # @ui-sdk/svelte
 
+## 0.1.0-beta.16
+
+### Patch Changes
+
+- Updated @ui-sdk/core to 0.1.0-beta.16
+
 ## 0.1.0-beta.15
 
 ### Patch Changes
