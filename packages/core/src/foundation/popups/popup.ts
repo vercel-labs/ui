@@ -1541,7 +1541,9 @@ function createPopupLayer<
       })
       return
     }
-    const trigger = options.trigger()
+    // Without a trigger, Tab goes on from what had focus, where focus returns.
+    const trigger =
+      options.trigger() ?? (before?.isConnected ? before : undefined)
     if (!trigger) {
       return
     }

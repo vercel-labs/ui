@@ -73,6 +73,23 @@ test.describe("enhancements", { tag: "@enhancement" }, () => {
     await expect(field(page)).toBeFocused()
   })
 
+  test("with no trigger, Shift+Tab from the first field goes back to where it opened from", async ({
+    page,
+    open,
+  }) => {
+    await open("popover", { removable: "" })
+    await trigger(page).click()
+    await page.getByRole("button", { name: "Remove trigger" }).click()
+    await expect(trigger(page)).toHaveCount(0)
+    await page.keyboard.press("Escape")
+    await expect(dialog(page)).toBeHidden()
+    const opener = page.getByRole("button", { name: "Open with controller" })
+    await opener.click()
+    await expect(field(page)).toBeFocused()
+    await page.keyboard.press("Shift+Tab")
+    await expect(opener).toBeFocused()
+  })
+
   test("a popover open from the start leaves focus alone", async ({
     page,
     open,
