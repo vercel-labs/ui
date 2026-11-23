@@ -5,6 +5,8 @@ import { beforeAll, expect, test } from "vitest"
 import { createAgent } from "../src/agent"
 import { defineComboboxElements } from "../src/combobox"
 import { defineDialogElements } from "../src/dialog"
+import { defineFieldElements } from "../src/field"
+import { defineSliderElements } from "../src/slider"
 import { defineTabsElements } from "../src/tabs"
 
 const wait = () => new Promise((resolve) => setTimeout(resolve, 10))
@@ -18,6 +20,8 @@ beforeAll(() => {
   defineComboboxElements()
   defineTabsElements()
   defineDialogElements()
+  defineFieldElements()
+  defineSliderElements()
 })
 
 test("a combobox is named by its label, not by its trigger", async () => {
@@ -73,4 +77,24 @@ test("a closed dialog isn't named by a button inside its hidden content", async 
     .find((component) => component.component === "dialog" && !component.offPage)
   expect(dialog).toBeDefined()
   expect(dialog?.label).toBeUndefined()
+})
+
+test("a slider is named by its field's label, through its one thumb", async () => {
+  const agent = createAgent()
+  document.body.innerHTML = `
+    <ui-field>
+      <ui-field-label>Volume</ui-field-label>
+      <ui-slider default-value="50">
+        <ui-slider-control>
+          <ui-slider-track>
+            <ui-slider-indicator></ui-slider-indicator>
+            <ui-slider-thumb></ui-slider-thumb>
+          </ui-slider-track>
+        </ui-slider-control>
+      </ui-slider>
+    </ui-field>`
+  await wait()
+  expect(agent.snapshot()).toContainEqual(
+    expect.objectContaining({ component: "slider", label: "Volume" })
+  )
 })

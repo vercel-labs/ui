@@ -316,7 +316,6 @@ const rangeInputStyle = css({
   overflow: "hidden",
   "clip-path": "inset(50%)",
   "white-space": "nowrap",
-  "pointer-events": "none",
 })
 
 // The first thumb's input takes the field's id even in a range, whose root

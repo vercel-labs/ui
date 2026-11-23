@@ -218,6 +218,18 @@ test.describe("pointer", () => {
     expect(await formEventCounts(page)).toEqual({ input: 1, change: 1 })
   })
 
+  test("a browser agent's snapshot gives the thumb a ref, and filling it sets the value", async ({
+    page,
+  }) => {
+    // Playwright gives a ref only to an element that takes pointer events.
+    const snapshot = await page.ariaSnapshot({ mode: "ai" })
+    const ref = /slider "Volume" \[ref=(\w+)\]/.exec(snapshot)?.[1]
+    expect(ref).toBeDefined()
+    await page.locator(`aria-ref=${ref}`).fill("70")
+    await expect(volume(page)).toHaveValue("70")
+    await expect.poll(() => status(page, "Committed")).toBe("volume:70")
+  })
+
   test("a drag sends input as it moves, and change once when the pointer lifts", async ({
     page,
   }) => {
