@@ -37,7 +37,7 @@ import {
 import { whenKept } from "../../foundation/kernel/keep"
 import { aliasReferences } from "../../foundation/kernel/part"
 import { idPart } from "../../foundation/kernel/attrs"
-import { applyAttrs } from "../../foundation/kernel/live"
+import { applyAttrs, releaseAttrs } from "../../foundation/kernel/live"
 import type { PrimitiveContext } from "../../foundation/kernel/primitive-types"
 import type {
   TextEditorAdapter,
@@ -548,15 +548,23 @@ function triggerMenuApiBody(
       document.addEventListener("keydown", onKey, true)
       cleanups.push(() => document.removeEventListener("keydown", onKey, true))
       // On a channel of its own, so the editor's own attributes stay.
-      const writeAttrs = () =>
-        next.element &&
-        applyAttrs(
-          next.element,
-          aliasReferences(context, fieldAttrs(store.get(), "multiline")),
-          "trigger-menu"
-        )
+      let field: HTMLElement | undefined
+      const writeAttrs = () => {
+        field = next.element ?? field
+        if (next.element) {
+          applyAttrs(
+            next.element,
+            aliasReferences(context, fieldAttrs(store.get(), "multiline")),
+            "trigger-menu"
+          )
+        }
+      }
       writeAttrs()
-      cleanups.push(store.subscribe(writeAttrs), next.subscribe(writeAttrs))
+      cleanups.push(
+        store.subscribe(writeAttrs),
+        next.subscribe(writeAttrs),
+        () => field && releaseAttrs(field, "trigger-menu")
+      )
     }
     connected = {
       editor: next,

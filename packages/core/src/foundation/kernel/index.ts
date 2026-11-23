@@ -42,7 +42,7 @@ export {
   dispatch,
   inputSource,
 } from "./input-source"
-export { applyAttrs, direct, live } from "./live"
+export { applyAttrs, direct, live, releaseAttrs } from "./live"
 export {
   isFocusFromKeyboard,
   modalityOf,
