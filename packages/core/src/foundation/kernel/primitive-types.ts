@@ -25,7 +25,10 @@ import type { Store } from "./store"
  */
 type Attrs = Record<string, string | undefined>
 
-// Props every slot accepts. `id` identifies one element among many in the same slot.
+/**
+ * Props every slot accepts. `id` identifies one element among many in the same slot.
+ * @stable
+ */
 type BaseSlotProps = { id?: string }
 
 /**
@@ -408,8 +411,11 @@ type SlotFactory<State extends object, Api> = <
     RoleDeclaration<State, Api, Props & BaseSlotProps>
 ) => SlotDefinition<State, Api, NoInfer<Props> & BaseSlotProps, NoInfer<Public>>
 
-// Exported because emitted declarations name it in every instance's `part`
-// signature: unexported, tsc inlines it and prints the slots type twice.
+/**
+ * The props a slot's parts take, which an instance's `part` reads. Emitted
+ * declarations name it in every instance's `part` signature.
+ * @stable
+ */
 type SlotProps<Slot> =
   Slot extends SlotDefinition<any, any, infer Props, any> ? Props : never
 type SlotState<Slot> =
@@ -481,7 +487,9 @@ type PrimitiveContext<Options, State extends object, Slot extends string> = {
  * per instance, the first time a part registers it with `use`, and fills in
  * the hooks the component's `api` calls. Define one as a top-level constant
  * marked `/* @__PURE__ *\/`, so a page that never imports it drops it.
- * Internal: our components use it, through `@ui-sdk/core/renderer`.
+ * Our components use it, through `@ui-sdk/core/renderer`; a primitive's type
+ * names it, so declarations that print one need it.
+ * @experimental
  */
 type Feature<
   Api = any,
@@ -562,6 +570,7 @@ type WithGeneric<P extends Primitive, G extends PrimitiveGeneric> = P & {
  * a name: `interface TabsPrimitive extends Named<typeof tabsPrimitive> {}`.
  * Emitted declarations name an interface where they would print a primitive's
  * whole type, its slots and api, at every use.
+ * @stable
  */
 type Named<T> = T
 

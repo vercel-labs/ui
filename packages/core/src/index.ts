@@ -14,6 +14,9 @@ export type {
 } from "./foundation/kernel/details"
 export type {
   Attrs,
+  BaseSlotProps,
+  Feature,
+  Named,
   OptionsOf,
   Part,
   Primitive,
@@ -26,10 +29,11 @@ export type {
   SlotDefinition,
   SlotFactory,
   SlotName,
+  SlotProps,
   StateOf,
   TypesOf,
 } from "./foundation/kernel/primitive-types"
-export type { Store } from "./foundation/kernel/store"
+export type { Listener, Store } from "./foundation/kernel/store"
 export type { ActionDetails } from "./foundation/kernel/action"
 export { isComposing } from "./foundation/kernel/events"
 export { isRTL } from "./foundation/platform/env"

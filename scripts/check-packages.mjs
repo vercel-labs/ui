@@ -89,6 +89,8 @@ const compilerOptions = {
 // which those apps set, so only errors in ui-sdk's files count.
 const toolOptions = { ...compilerOptions, lib: ["es2022"], types: ["node"] }
 const frameworkOptions = {
+  // Core's consumers ship primitives, so their declarations have to emit too.
+  core: { declaration: true, emitDeclarationOnly: true },
   react: { jsx: "react-jsx" },
   // Solid 2 ships its JSX runtime in @solidjs/web, not solid-js.
   solid: { jsx: "preserve", jsxImportSource: "@solidjs/web" },

@@ -119,10 +119,13 @@ function sameWithin(a: unknown, b: unknown, open: unknown[] | undefined) {
   }
 }
 
-// What a listener hears: whether the change touched only live keys, which
-// adapters that write attributes can skip, since the core writes live ones,
-// whether it only handed over keys a framework already delivers, through
-// `follow`, which a framework's parts can skip, and the keys it changed.
+/**
+ * What a store's listener hears: whether the change touched only live keys,
+ * which adapters that write attributes can skip, since the core writes live
+ * ones, whether it only handed over keys a framework already delivers, through
+ * `follow`, which a framework's parts can skip, and the keys it changed.
+ * @experimental
+ */
 type Listener = (
   liveOnly: boolean,
   delivered: boolean,
