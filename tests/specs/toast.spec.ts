@@ -634,6 +634,47 @@ test.describe("over a modal dialog", () => {
       await expect(modal).toBeVisible()
     }
   )
+
+  test(
+    "a toast stays above a dialog opened after it, and leaves a page's own popover alone",
+    { tag: "@enhancement" },
+    async ({ page, open }) => {
+      await open("toast")
+      await show(page, { title: basic.title, duration: forever })
+      const toast = toastNamed(page, basic.title)
+      await expect(toast).toBeVisible()
+      await region(page).evaluate((el) => {
+        const counted = el as HTMLElement & { raised?: number }
+        counted.raised = 0
+        el.addEventListener("toggle", (event) => {
+          if ((event as ToggleEvent).newState === "open") {
+            counted.raised!++
+          }
+        })
+      })
+      const raised = () =>
+        region(page).evaluate(
+          (el) => (el as HTMLElement & { raised?: number }).raised
+        )
+      await page.evaluate(() => {
+        const own = document.body.appendChild(document.createElement("div"))
+        own.popover = "manual"
+        own.textContent = "Page popover"
+        own.showPopover()
+      })
+      await expect(page.getByText("Page popover")).toBeVisible()
+      await page.evaluate(
+        () =>
+          new Promise((done) => requestAnimationFrame(() => setTimeout(done)))
+      )
+      expect(await raised()).toBe(0)
+      await page.getByRole("button", { name: dialog.trigger }).click()
+      await expect(
+        page.getByRole("dialog", { name: dialog.title })
+      ).toBeVisible()
+      await expect.poll(raised).toBeGreaterThan(0)
+    }
+  )
 })
 
 test.describe("updates after closing", () => {

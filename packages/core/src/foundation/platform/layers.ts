@@ -104,9 +104,19 @@ function inPersistentLayer(target: Node) {
 
 const raising = new WeakMap<Document, { count: number; off: () => void }>()
 
+// A popover no layer owns, like an extension's that shows itself again to stay
+// on top, is left alone, or the two would raise each other forever.
+function ownedByLayer(opened: Element) {
+  return active().some(
+    (layer) =>
+      !!layer.el &&
+      (composedContains(layer.el, opened) || composedContains(opened, layer.el))
+  )
+}
+
 // The top layer stacks in the order things were shown, so a dialog opened
-// after a toast region covers it. Whenever another popover opens, persistent
-// ones are shown again, which moves them back to the top.
+// after a toast region covers it. Whenever another layer's popover opens,
+// persistent ones are shown again, which moves them back to the top.
 function raiseAbovePopups(doc: Document) {
   let entry = raising.get(doc)
   if (!entry) {
@@ -118,7 +128,7 @@ function raiseAbovePopups(doc: Document) {
       ) {
         return
       }
-      if (inPersistentLayer(opened)) {
+      if (inPersistentLayer(opened) || !ownedByLayer(opened)) {
         return
       }
       for (const el of persistentLayers()) {
