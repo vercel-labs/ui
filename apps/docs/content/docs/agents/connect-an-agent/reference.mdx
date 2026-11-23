@@ -40,23 +40,25 @@ const components = agent.snapshot()
 
 Each entry describes one registered component with bound elements, or a remembered component that left the page. Components inside `data-agent-hidden` are left out. Past 100 entries, the snapshot keeps open popups, fills up to 100, and ends with `{ ref: "more", component: "more", more, use: "query", actions: [] }`, where `more` is how many it left out.
 
-| Field                                                                          | What It Contains                                                                                                |
-| ------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------- |
-| `ref`                                                                          | The component's identifier, such as `"c1"`. Use it in `act` and `query`.                                        |
-| `component`                                                                    | Its kind, such as `"input"`, `"select"`, or a custom primitive's name.                                          |
-| `label`                                                                        | Its accessible name, when available.                                                                            |
-| `row`                                                                          | Nearby row text that helps identify it, such as the person beside a menu.                                       |
-| State keys                                                                     | Its exposed state, commonly `value`, `checked`, or `open`. See [Custom Primitives](#custom-primitives).         |
-| `min`, `max`, `step`, `placeholder`, `query`, `multiple`, `required`, `errors` | Additional state when present and meaningful.                                                                   |
-| `items`                                                                        | Included choices as `{ value, label }[]`. Use `query()` when the snapshot doesn't include the choices you need. |
-| `text`                                                                         | Text from its title, description, and error parts.                                                              |
-| `buttons`                                                                      | Button text inside an open component.                                                                           |
-| `pending`, `error`                                                             | Whether a component action is still running, or its error as text.                                              |
-| `disabled`                                                                     | `true` when the bridge considers the component unavailable. Its `actions` are then empty.                       |
-| `offPage`                                                                      | `true` for a remembered component that left the page. Its `actions` are empty.                                  |
-| `confirm`                                                                      | The text of a `data-agent-confirm` mark. A step on it needs the person.                                         |
-| `source`                                                                       | Where the app writes it, such as `"components/header.tsx:24"`. Development builds only; see below.              |
-| `actions`                                                                      | Action names available to request, such as `setValue`, `setChecked`, or `press`.                                |
+| Field                                                                          | What It Contains                                                                                                              |
+| ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
+| `ref`                                                                          | The component's identifier, such as `"c1"`. Use it in `act` and `query`.                                                      |
+| `component`                                                                    | Its kind, such as `"input"`, `"select"`, or a custom primitive's name.                                                        |
+| `label`                                                                        | Its accessible name, when available.                                                                                          |
+| `row`                                                                          | Nearby row text that helps identify it, such as the person beside a menu.                                                     |
+| `section`                                                                      | The labelled regions it sits in, such as `"Notifications > Email"`, when another shares its name or it is off the page.       |
+| State keys                                                                     | Its exposed state, commonly `value`, `checked`, or `open`. See [Custom Primitives](#custom-primitives).                       |
+| `min`, `max`, `step`, `placeholder`, `query`, `multiple`, `required`, `errors` | Additional state when present and meaningful.                                                                                 |
+| `items`                                                                        | Included choices as `{ value, label }[]`. Use `query()` when the snapshot doesn't include the choices you need.               |
+| `more`                                                                         | How many choices it has, when there are more than 10 in its data and `items` is left out. `query()` with `within` lists them. |
+| `text`                                                                         | Text from its title, description, and error parts.                                                                            |
+| `buttons`                                                                      | Button text inside an open component.                                                                                         |
+| `pending`, `error`                                                             | Whether a component action is still running, or its error as text.                                                            |
+| `disabled`                                                                     | `true` when the bridge considers the component unavailable. Its `actions` are then empty.                                     |
+| `offPage`                                                                      | `true` for a remembered component that left the page. Its `actions` are empty.                                                |
+| `confirm`                                                                      | The text of a `data-agent-confirm` mark. A step on it needs the person.                                                       |
+| `source`                                                                       | Where the app writes it, such as `"components/header.tsx:24"`. Development builds only; see below.                            |
+| `actions`                                                                      | Action names available to request, such as `setValue`, `setChecked`, or `press`.                                              |
 
 A password, card, or one-time-code field's value, or one inside `data-agent-secret`, shows as `"[redacted]"` once it's filled, here, in `act`'s values and changes, and in `subscribe`. Password Input and OTP Input stay redacted while their text is shown.
 
@@ -89,13 +91,39 @@ Each step is an `AgentStep`:
 | `action` | `string`    | Names an action, usually taken from a snapshot entry’s `actions`.   |
 | `args`   | `unknown[]` | Supplies the action's arguments. Defaults to an empty array.        |
 
-Use a specific ref when a name is ambiguous. A step can reach a component revealed by an earlier step. The bridge can also look for a target inside closed accordion sections.
+A step can reach a component revealed by an earlier step, and one that sits on another tab or in a closed section. See [Behind a Closed Tab or Section](#behind-a-closed-tab-or-section).
 
-For choices, an argument can be the item's value or its label. Labels match regardless of case and accents, like component names; values match exactly. Ambiguous item labels are refused. When a list's items show only while it's open, `setValue` with a label asks `allow` with the label before it opens the list to read them, then again with the item's value. Numeric `setValue` actions also accept text that starts with a number, such as `"90 days"`. Text with grouped digits, such as `"1,499.5"`, is refused. A component that holds a list, such as a multiple Select, takes one value or label as a list of one.
+The bridge checks the shape of the whole call before the first step runs. A call that isn't `{ steps }`, a step with a key other than `ref`, `action`, and `args`, `args` that isn't a list, or a `set` or `expect` step without its value fails with what to send, and no step runs:
+
+```ts
+const result = await agent.act({
+  steps: [{ ref: "Project name", action: "setValue", value: "Atlas" }],
+})
+// result.error.message:
+// steps[0] has "value", which a step doesn't take: a step is
+// { "ref": "…", "action": "…", "args": […] }. A value goes in "args",
+// like "args": ["Atlas"]. No step ran.
+```
+
+For choices, an argument can be the item's value or its label. Labels match regardless of case and accents, like component names; values match exactly. Ambiguous item labels are refused. When a list's items show only while it's open, `setValue` with a label asks `allow` with the label before it opens the list to read them, then again with the item's value. Numeric `setValue` actions also accept text that starts with a number, such as `"90 days"`. Text with grouped digits, such as `"1,499.5"`, is refused. A number outside the component's `min` and `max` is refused too, and nothing changes: `setValue on Seats (c7) takes a number from 1 to 20, not 25.` A number the component moves, like a slider's to its nearest step, fails the step with the value it holds now. A number sent to a text field, or to a list whose values are text, is stored as text. A component that holds a list, such as a multiple Select, takes one value or label as a list of one.
 
 A `set` action's first argument is checked against the kind of the option it sets in the primitive's schema, like `setChecked` against `checked`. A `"boolean"` option takes only `true` or `false`, a `"number"` option takes a number or text that is one, like `"3"`, and an option read by an attribute parser takes what that parser reads, so a resizable group takes `"30,70"` as its layout but a checkbox refuses `"yes"`. A value the kind doesn't take fails the step, with the type it expects, and changes nothing.
 
-`press` without arguments clicks the component's own button. `press` with a button's text finds and clicks that button inside the component, opening a closed menu or dialog if needed. `allow` decides the press before anything opens; if the button it finds carries a `data-agent-confirm` mark, `allow` is asked again with `confirm`, and a refusal closes what the press opened. The text matches a button's whole text, or whole words in it; when two buttons match, the step fails. It waits up to 15 seconds for a ui-sdk Button's action, and any other action waits the same way for its component's work. An action error fails the step; an action still running after that limit is reported as pending in the step's result.
+`press` without arguments clicks the component's own button. A `click` is a `press`, and so is `setValue` with a button's text on a component that only has buttons, such as a row's menu. `press` with a button's text finds and clicks that button inside the component, opening a closed menu or dialog if needed. `allow` decides the press before anything opens; if the button it finds carries a `data-agent-confirm` mark, `allow` is asked again with `confirm`, and a refusal closes what the press opened. The text matches a button's whole text, or whole words in it. Failing those, it matches a button of two or more words when the text holds them in order and starts with the same word, so `"Mark as paid"` presses **Mark paid**. When two buttons match the same way, the step fails. It waits up to 15 seconds for a ui-sdk Button's action, and any other action waits the same way for its component's work. An action error fails the step; an action still running after that limit is reported as pending in the step's result.
+
+`expect` checks a component and changes nothing. Its argument is the value, the checked state, or the row text the component must have now. A value also matches by its item's label:
+
+```ts
+const result = await agent.act({
+  steps: [
+    { ref: "Jane Doe", action: "press", args: ["Make admin"] },
+    { ref: "Jane Doe", action: "expect", args: ["Admin"] },
+    { ref: "Save", action: "press" },
+  ],
+})
+```
+
+When the check doesn't hold, the step fails with what the component has, such as `Actions for Jane Doe (c8) is "Jane Doe Member", not "Admin".`, and the steps after it don't run. A private field can't be checked.
 
 Other actions call the component's API directly. They don't simulate pointer or keyboard input. Text inputs can still emit an `input` event, and the bridge triggers blur validation on a containing Field. A method returning a promise is reported as `"pending"`; the bridge doesn't wait for arbitrary API promises to resolve. A promise that rejects before the step ends fails the step with its message.
 
@@ -118,9 +146,46 @@ Names match regardless of case and accents, so `"Region"` finds "Région" and `"
 
 When a name fits more than one component, the step fails and lists each one's ref, label and row text, such as `"Jane Doe" names 2 components: c1 Admin (Jane Doe), c4 Jane Doe. Use a ref.`, then a hint for whoever builds the page. Retry the step with one of those refs. That holds even when one label matches exactly, since labels and rows are page text anyone can write, like a person's display name. On your own page, two labels that share their words, like a "Technician" filter and a "Technician" field, each name their component once one has a word the other lacks. If exactly one of them takes the step's action, like a Textarea and the Trigger Menu on the same field for `setValue`, the step uses that one. Otherwise, if exactly one of them is an open popup, the step uses that one.
 
-A returning component can reuse a remembered ref when its kind, label, and row text match. The bridge remembers refs for the last 500 that left. Identical components receive remembered refs in the order they return. Read a fresh snapshot after reordering or renaming components instead of assuming each ref still names the same control.
+A returning component can reuse a remembered ref when its kind, label, row text, and section match. The bridge remembers refs for the last 500 that left. Identical components receive remembered refs in the order they return. Read a fresh snapshot after reordering or renaming components instead of assuming each ref still names the same control.
 
 Each entry in the result's `steps` names the ref it acted on, so you can see which component changed.
+
+### Behind a Closed Tab or Section
+
+A step doesn't need its component on the page. When nothing on the page fits the name, the bridge looks behind closed accordion sections and closed collapsibles, then behind the other tabs and the other pages of a pagination, and in the sections each of those brings with it. Each one opens in turn and goes back, the way find in page looks through a document. When exactly one place has the component, that place opens again and the step runs there:
+
+```ts
+const result = await agent.act({
+  steps: [
+    { ref: "Project name", action: "setValue", args: ["Atlas"] },
+    { ref: "Weekly digest", action: "setChecked", args: [false] },
+  ],
+})
+```
+
+Here **Weekly digest** is in the Email section of the Notifications tab. The step selects the tab, opens the section, and turns the switch off. Its `changes` include the tab and the section it opened.
+
+When two places hold the name, the step fails and lists them, such as `"Deploy failures" is in 2 closed sections: Notifications > Email, Notifications > Slack. Put the one you mean first, like "Email > Deploy failures".` Write the place before the name, with `>` between them:
+
+```ts
+const step = {
+  ref: "Email > Deploy failures",
+  action: "setChecked",
+  args: [true],
+}
+```
+
+The place can be a tab, a section, or any labelled region around the component, such as a `fieldset` with a legend. It can also be a component around it, by label or kind, so `"dialog > Status"` means the **Status** field in the open dialog. Every word of the place has to be in those regions' names, so `"Email notifications > Deploy failures"` finds the one under Email on the Notifications tab, and `"Slack notifications > Weekly digest"` fails and says where **Weekly digest** is. Look-alikes that are on the page together carry a `section` in the snapshot, and the same name picks between them.
+
+A step that names a tab or a section and gives no arguments means that item: `{ ref: "Email", action: "open" }` opens the Email section, and `{ ref: "Members", action: "press" }` selects the Members tab.
+
+When a step names a component, an item or a button that isn't there, its error also lists what the closed tabs and sections hold, such as `Behind what is closed: Members: Invite only. Notifications > Email: Deploy failures, Weekly digest.` One wrong name is enough to correct every later one in the same call. A page of a pagination is listed as `page 2`.
+
+When an open modal covers the rest of the page, nothing under it is looked through. The error names the modal and its buttons instead, such as `Edit order (c9) is open over the rest of the page, with the buttons Cancel, Apply`, so the next call can finish it first.
+
+A panel that loads what it holds after it opens, like a code-split tab, is still empty when the bridge looks. The error then lists the closed tabs and sections the component may be behind, so the agent can select that tab in one call and work there in the next.
+
+Each tab or section the bridge opens to look is an action of its own: `allow` is asked first, the component's change callback runs, and a no leaves it closed. A step opens 24 places at most. Disabled tabs and sections stay closed. Selecting another tab can unmount what a person typed in the one they were on, so keep that state above the panels when agents work on the page.
 
 ### Result
 
@@ -135,11 +200,11 @@ Each entry in the result's `steps` names the ref it acted on, so you can see whi
 
 Each change is `{ component, label?, key, value }`. `gone` lists components that left the page, using their refs with labels when available.
 
-A failed step stops the call. Earlier steps stay applied; there is no rollback. A callback can also cancel a change without making the step fail, so `ok: true` doesn't mean every requested value was accepted. Inspect each step's `changes` and the returned `values` to see what took effect.
+A failed step stops the call. Earlier steps stay applied; there is no rollback. The error's message says so, and how many steps are left to send again. A call or a step with the wrong shape fails before any step runs, as [Steps](#steps) describes. A `set` action fails when its value stays as it was and isn't what the step asked for, such as a change a callback canceled: `setValue on Region (c3) didn't take: it is still "europe".` A parent that takes the value after work of its own, like a request, has about a second to do it. So a step that saves can go last in the same call, and it runs only when every change before it took. A step on something an open modal covers fails too, and names what is open.
 
 `act` and `query` calls on the same bridge are queued in the order they're called.
 
-## query(\{ text?, within?, kind? \})
+## query(\{ text?, within?, kind?, closed?, from? \})
 
 Finds components and their choices without listing the page, and returns a promise:
 
@@ -156,10 +221,20 @@ const [region] = found
 | `text`   | Matches a component's label or row text by whole words, regardless of case and accents. A list whose choices match comes back with only those choices. |
 | `within` | Names one list by its ref or label, and returns it with its choices, matching `text` when given.                                                       |
 | `kind`   | Keeps one kind of component, such as `"select"`.                                                                                                       |
+| `from`   | With `within`, skips that many choices, to read a list past its first 50.                                                                              |
+| `closed` | With `true`, also reads the other tabs and the closed sections. Alone, it lists the whole page.                                                        |
 
-Pass at least one. Returns an `AgentComponent[]` of up to 100 entries, ending with a `more` entry like the snapshot's when there were more. A list's `items` hold up to 50 matching choices as `{ value, label }`, with `more` set to how many matched beyond that. A choice matches `text` by a case- and accent-insensitive substring of its label or value. An unknown or ambiguous `within`, or a call with no input, returns `{ error: string }`. Components that left the page are included with `offPage: true`.
+Pass at least one. Returns an `AgentComponent[]` of up to 100 entries, ending with a `more` entry like the snapshot's when there were more. A list's `items` hold up to 50 matching choices as `{ value, label }`, with `more` set to how many matched beyond that. To read those, call it again with `from`: `query({ within: "Region", from: 50 })` returns the next 50. A choice matches `text` by a case- and accent-insensitive substring of its label or value. An unknown or ambiguous `within`, a `from` without `within`, or a call with no input, returns `{ error: string }`. Components that left the page are included with `offPage: true`.
 
-With `within`, the bridge reads item data or rendered parts, and never opens the component. If neither supplies choices, `items` is empty and `note` says that `act`'s `setValue` takes an item's label and opens the list to find it. Tree data includes closed branches. This method doesn't search inside closed accordion sections for the component itself.
+With `within`, the bridge reads item data or rendered parts, and never opens the component. If neither supplies choices, `items` is empty and `note` says that `act`'s `setValue` takes an item's label and opens the list to find it. Tree data includes closed branches. Without `closed`, a query opens nothing, and doesn't search inside closed tabs or accordion sections.
+
+With `closed: true`, the bridge opens each closed section and each other tab in turn, reads what it holds, and goes back, the same way a step looks [behind a closed tab or section](#behind-a-closed-tab-or-section). `allow` is asked before each one opens. Tabs and pages are selected and then put back, so state a panel holds on its own goes the way it does when a person switches tabs. What it reads comes back with `offPage: true` and its `section`:
+
+```ts
+const page = await agent.query({ closed: true })
+```
+
+One call reads a whole settings page this way, so an agent whose task depends on what is there now, like "turn off whatever is on", can read once and then send every step in one `act`.
 
 ## subscribe(listener)
 
@@ -186,11 +261,13 @@ Call `unsubscribe()` when you're done. See [Observe Changes](./observe-changes) 
 
 ## agentTools
 
-The definitions of the three tools: `snapshot`, `act`, and `query`.
+The definitions of the three tools: `act`, `query`, and `snapshot`. `act` comes first, since a model can plan a whole task from its words and send it in one call.
 
 ```ts
 import { agentTools } from "@ui-sdk/react/agent"
 ```
+
+The bridge carries the same list as `agent.tools`, so an agent that finds the bridge on the page, such as `window.agent`, can read how to call it.
 
 Each definition is `{ name, description, inputSchema }`. Adapt it to your model SDK's tool format, route calls to the matching bridge method in the page, and return the result to the model. These definitions don't create a model connection or run a tool loop for you.
 
@@ -220,14 +297,14 @@ const sizePicker = definePrimitive({
 })
 ```
 
-| Key       | Description                                                                                                           |
-| --------- | --------------------------------------------------------------------------------------------------------------------- |
-| `actions` | The api methods an agent can call. Development builds warn about a name the api doesn't have.                         |
-| `closed`  | Its value is always one of its items, so the bridge refuses text that names none of them.                             |
-| `items`   | A function from the api to its items, when they aren't in the state's `items`.                                        |
-| `reveals` | Its closed items hide other components, like tabs. When a step names a component it can't find, the error lists them. |
-| `shown`   | A function from the state that says whether the agent sees it now, like a field only while it has errors.             |
-| `secret`  | Its value reads `"[redacted]"` once it's filled, like a password's.                                                   |
+| Key       | Description                                                                                                            |
+| --------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `actions` | The api methods an agent can call. Development builds warn about a name the api doesn't have.                          |
+| `closed`  | Its value is always one of its items, so the bridge refuses text that names none of them.                              |
+| `items`   | A function from the api to its items, when they aren't in the state's `items`.                                         |
+| `reveals` | Its closed items, pages or closed panel hide other components. A step that can't find its component looks behind them. |
+| `shown`   | A function from the state that says whether the agent sees it now, like a field only while it has errors.              |
+| `secret`  | Its value reads `"[redacted]"` once it's filled, like a password's.                                                    |
 
 [The Agent Key](./your-components) walks through each key with examples.
 

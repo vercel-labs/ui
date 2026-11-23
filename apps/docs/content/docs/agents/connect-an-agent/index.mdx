@@ -108,7 +108,7 @@ if ("error" in found) {
 const [region] = found
 ```
 
-`query` returns `{ error }` when nothing on the page is named **Region**. Otherwise `region.items` holds up to 50 matching choices, each with a `value` and `label`, and `region.more` says how many matched beyond that. Leave out `text` to list the first 50. `query()` never opens anything. When a list's items only show while it's open, `items` is empty and `note` says so.
+`query` returns `{ error }` when nothing on the page is named **Region**. Otherwise `region.items` holds up to 50 matching choices, each with a `value` and `label`, and `region.more` says how many matched beyond that. Leave out `text` to list the first 50, and pass `from: 50` for the next 50. `query()` opens nothing unless you pass `closed: true`. When a list's items only show while it's open, `items` is empty and `note` says so.
 
 `query` also finds components without listing the page. `agent.query({ text: "Europe" })` returns the components whose label or row text has that word, and lists whose choices match, with those choices under them. `kind` keeps one kind, such as `"select"`.
 

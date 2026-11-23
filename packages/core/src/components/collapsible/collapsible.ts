@@ -329,7 +329,7 @@ const collapsiblePrimitive = /* @__PURE__ */ definePrimitive({
       },
     }),
   }),
-  agent: { actions: ["setOpen"] },
+  agent: { actions: ["setOpen"], reveals: true },
 })
 
 /**

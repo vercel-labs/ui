@@ -197,20 +197,20 @@ agent: { actions: ["setValue"], items: (api) => api.allItems() },
 
 `items` reads your API, which is why `agent` goes after `api`. Placed before it, TypeScript reports that `allItems` doesn't exist.
 
-The snapshot lists the items with the component: the ones on the page, or the ones in your data when there are 10 or fewer. Longer lists come back from `query({ within })`. With an `items` function that works for any action, not only `setValue`, so a stepper's `goTo` shows its steps.
+The snapshot lists the items with the component: the ones on the page, or the ones in your data when there are 10 or fewer. For a longer list the snapshot gives `more`, the number of items, and `query({ within })` returns them. With an `items` function that works for any action, not only `setValue`, so a stepper's `goTo` shows its steps.
 
 ## Content Behind Items
 
-Tabs and accordions hide other components behind their closed items. Add `reveals: true` and, when an agent looks for something it can't find, the error lists the closed items it might be behind, so the agent can open one first:
+Tabs and accordions hide other components behind their closed items. Add `reveals: true` and a step that can't find its component on the page looks [behind those items](./reference#behind-a-closed-tab-or-section), opening each with `setValue`, or `open` when the component holds a list of open items. A component with `setPage` and a `pageCount` in its state is looked through page by page, and one with only `setOpen` is opened while it's closed:
 
 ```ts
 agent: { actions: ["setValue"], closed: true, reveals: true },
 ```
 
-For a setup flow on its Account step, a step that asks for a field on another step gets:
+For a setup flow on its Account step, a step on `"Card number"` selects the Billing step and fills the field there. A step that names a field no step has gets what the other steps hold:
 
 ```txt
-No component "Card number" on the page. Its labels: Setup. It may be behind one of these, which a step can open first: Setup (c1): Billing, Team.
+No component "Coupon" on the page. Its labels: Setup, Email. Behind what is closed: Billing: Card number, Postal code. Team: Invite.
 ```
 
 ## Show It When It Matters
@@ -247,13 +247,13 @@ These are the `agent` keys of a few ui-sdk components, as they're written in `@u
 
 ## API Reference
 
-| Key       | Type                 | Description                                                                                            |
-| --------- | -------------------- | ------------------------------------------------------------------------------------------------------ |
-| `actions` | `string[]`           | The API methods an agent can call. Without it, methods named like changes, such as `setValue`.         |
-| `closed`  | `boolean`            | The value is always one of the items, so a step that names another item is refused.                    |
-| `items`   | `(api) => unknown`   | The items as data, when they aren't the state's `items`.                                               |
-| `reveals` | `boolean`            | Closed items hide other components. A component the agent can't find is reported as maybe behind them. |
-| `shown`   | `(state) => boolean` | Whether an agent sees the component right now.                                                         |
-| `secret`  | `boolean`            | A filled value reads `"[redacted]"` in the snapshot, in step results and in `observe`.                 |
+| Key       | Type                 | Description                                                                                                          |
+| --------- | -------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `actions` | `string[]`           | The API methods an agent can call. Without it, methods named like changes, such as `setValue`.                       |
+| `closed`  | `boolean`            | The value is always one of the items, so a step that names another item is refused.                                  |
+| `items`   | `(api) => unknown`   | The items as data, when they aren't the state's `items`.                                                             |
+| `reveals` | `boolean`            | Closed items, pages or a closed panel hide other components. A step that can't find its component looks behind them. |
+| `shown`   | `(state) => boolean` | Whether an agent sees the component right now.                                                                       |
+| `secret`  | `boolean`            | A filled value reads `"[redacted]"` in the snapshot, in step results and in `observe`.                               |
 
 The `agent` key is experimental.

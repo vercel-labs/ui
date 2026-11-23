@@ -30,6 +30,7 @@ Last checked: 2026-10-28, against `node_modules/react` 19.2.3.
 - A render React throws away runs no effects and no cleanup. Anything created during it must be safe to drop.
 - **Suspense** hides an already-shown tree with `display: none` and keeps its state; its layout effects clean up while hidden and run again when shown. Passive effects keep running. A tree that suspends before it ever commits never mounts.
 - **`<Activity mode="hidden">`** (19.2): keeps the tree's state and DOM, hides it, cleans up all its effects (layout and passive) and renders it at low priority. When shown again, effects set up again. A component can't tell hidden from removed from inside: both run the same cleanup. Code that destroys state in cleanup loses it under Activity.
+- The agent bridge waits two frames after a call for the adapter to render. That covers sync updates and plain transitions, not an async Action or a lazy panel's first load.
 
 ### Effects
 

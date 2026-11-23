@@ -53,6 +53,8 @@ type Entry = {
   key?: string
   label?: string
   row?: string
+  // The labelled regions around it, outermost first, like a tab's panel and an accordion's section in it.
+  sections?: string[]
   // A password, card or one-time code, or a field inside `data-agent-secret`,
   // whose value is redacted and isn't kept once it leaves the page.
   secret?: boolean
@@ -88,6 +90,8 @@ const retired = new Map<string, { at: number; refs: string[] }>()
 const retiredLimit = 500
 // What those components showed when they left, so an agent can check a closed tab without opening it.
 const offPage = new Map<string, AgentComponent>()
+// The regions each of those was in, for telling look-alikes apart.
+const placeOf = new WeakMap<AgentComponent, string[]>()
 const partsOf = new WeakMap<PrimitiveInstance, ReadonlyMap<string, Part>>()
 let count = 0
 type Listener = (change: ObservedChange, parts: Bound[]) => void
@@ -168,6 +172,9 @@ function retire(entry: Entry) {
       last[key] = state[key] ?? null
     }
   }
+  if (entry.sections) {
+    placeOf.set(last, entry.sections)
+  }
   offPage.delete(entry.ref)
   offPage.set(entry.ref, last)
   // The most recent 50, for a page that swaps many components in and out.
@@ -206,7 +213,8 @@ function remember(entry: Entry, parts: Bound[]) {
   entry.offLimits =
     isOffLimits(elements) ||
     elements.every((el) => (el as HTMLInputElement).type === "hidden")
-  entry.key = `${entry.component}|${entry.label}|${entry.row}`
+  entry.sections = sectionsOf(parts)
+  entry.key = `${entry.component}|${entry.label}|${entry.row}|${entry.sections.join(">")}`
   if (!first) {
     return
   }
@@ -319,6 +327,27 @@ const headerRow = (row: Element) =>
       (cell) =>
         cell.localName === "th" || cell.getAttribute("role") === "columnheader"
     ))
+
+const regions = "[role=tabpanel], [role=region], [role=group], fieldset"
+
+// The names of the labelled regions a component is in, so two with one
+// label, like a switch under Email and under Slack, are told apart.
+function sectionsOf(parts: Bound[]) {
+  const own = new Set<Element>(parts.map((part) => part.el))
+  const names: string[] = []
+  let region = (
+    parts.find((part) => part.slot === "trigger" || part.slot === "root") ??
+    parts[0]
+  )?.el.parentElement?.closest(regions)
+  while (region) {
+    const name = !own.has(region) && accessibleName(region).slice(0, 80)
+    if (name) {
+      names.unshift(name)
+    }
+    region = region.parentElement?.closest(regions)
+  }
+  return names
+}
 
 // Text in the component's row that isn't the component's own, its parts' or
 // its label's, like the name beside a member's menu, so an agent knows which
@@ -478,6 +507,7 @@ export {
   listen,
   type ObservedChange,
   offPage,
+  placeOf,
   remember,
   retire,
   rowOf,

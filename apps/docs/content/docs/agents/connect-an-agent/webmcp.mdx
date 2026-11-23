@@ -38,7 +38,7 @@ This removes the browser tools. You can still call methods on `agent` directly.
 
 ## Tool Annotations
 
-`snapshot` and `query` have `readOnlyHint: true`. All three tools have `untrustedContentHint: true` because their results include page content, such as labels and text people entered.
+`snapshot` has `readOnlyHint: true`. `query` doesn't, since a query with `closed: true` opens tabs and sections to read them, and your `allow` decides each one. All three tools have `untrustedContentHint: true` because their results include page content, such as labels and text people entered.
 
 `act` has `consequentialHint: true` because a step can press any button, including one whose action can't be undone. A browser can use it to ask the person before it runs `act`.
 

@@ -126,7 +126,7 @@ onValueChange={(value, details) => {
 
 You can still choose Asia Pacific yourself. To apply the rule to every change, remove the `details.source === "agent"` check.
 
-Canceling a value change can leave `act` with `ok: true` and no change for that step. Check each step's `changes` and the returned `values` to confirm what happened.
+Canceling a value change fails that step, and `act` stops there. The error says the value is still what it was.
 
 Put value checks in these change callbacks. Actions such as `setValue` call the component's API directly, so checks in keyboard or pointer handlers won't run.
 
@@ -134,6 +134,6 @@ Put value checks in these change callbacks. Actions such as `setValue` call the 
 
 `allow` checks actions. Components and their actions remain visible in `snapshot()`, and the agent can still read choices with `query()`. Use `data-agent-hidden` to keep a region out of view.
 
-Finding a component or its choices can open a section or popup before the requested action is checked. Use the component's `onOpenChange` or equivalent callback if you need to reject those changes too.
+Finding a component can open a tab or a section first. Each one is checked as an action of its own, such as `setValue` on the tabs or `open` on the accordion, before the requested action is.
 
 The [Reference](./reference) lists the fields passed to `allow` and the results returned by `act`.
