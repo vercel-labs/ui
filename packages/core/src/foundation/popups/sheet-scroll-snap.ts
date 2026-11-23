@@ -27,6 +27,7 @@ import {
 import { nearestIndex } from "../motion/projection"
 import { settleTime, solveSpring, springLinearEasing } from "../motion/spring"
 import { on } from "../kernel/events"
+import { isIOS } from "../platform/env"
 import {
   afterFirstFrame,
   openHold,
@@ -117,11 +118,12 @@ function createScrollSnapDriver(options: SheetDriverOptions) {
     on(host, "touchend", onTouchEnd, { passive: true }),
     on(host, "touchcancel", onTouchEnd, { passive: true }),
   ]
-  // Closed, the sheet's top touches the scroller's bottom edge, which still
-  // counts as intersecting, so the edge is pulled in by a pixel.
+  // Only iOS draws the page under its toolbar, so elsewhere the sheet closes
+  // at the screen's edge. A sheet touching the edge still counts as intersecting.
+  const hiddenBelow = isIOS() ? 1 : toolbarBleed + 1
   const visibility = new IntersectionObserver(onVisibility, {
     root: host,
-    rootMargin: "0px 0px -1px 0px",
+    rootMargin: `0px 0px -${hiddenBelow}px 0px`,
     threshold: 0,
   })
   visibility.observe(sheet)

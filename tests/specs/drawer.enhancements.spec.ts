@@ -564,6 +564,42 @@ test.describe("scroll-snap driver", { tag: "@enhancement" }, () => {
     await expect.poll(() => drawerLog(page)).toContain("0.5:swipe")
   })
 
+  test("a swipe down closes it once it leaves the screen", async ({
+    page,
+    context,
+  }) => {
+    const height = page.viewportSize()!.height
+    await drawerDialog(page).evaluate((sheet) => {
+      const record = sheet as HTMLElement & { lowestOpenTop?: number }
+      record.lowestOpenTop = 0
+      const follow = () => {
+        if (!sheet.hasAttribute("data-open")) {
+          return
+        }
+        record.lowestOpenTop = Math.max(
+          record.lowestOpenTop!,
+          sheet.getBoundingClientRect().top
+        )
+        requestAnimationFrame(follow)
+      }
+      requestAnimationFrame(follow)
+    })
+    const sheet = await drawerDialog(page).elementHandle()
+    await touchDrag(page, context, {
+      x: 200,
+      y: height * 0.75 + 10,
+      dy: height * 0.25 - 20,
+      steps: 12,
+    })
+    await expect
+      .poll(() => sheet!.evaluate((el) => el.hasAttribute("data-open")))
+      .toBe(false)
+    const lowestOpenTop = await sheet!.evaluate(
+      (el) => (el as HTMLElement & { lowestOpenTop?: number }).lowestOpenTop!
+    )
+    expect(lowestOpenTop).toBeLessThan(height + 40)
+  })
+
   test("the handle moves it with a spring, like the pointer driver", async ({
     page,
   }) => {
