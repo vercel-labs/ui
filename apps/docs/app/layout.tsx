@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 })
 
 const DESCRIPTION =
-  "A library of behaviors for agents to build the next generation of user interfaces."
+  "A library of behaviors for agents to build and drive the next generation of user interfaces."
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://ui-sdk.dev"),

@@ -106,8 +106,8 @@ export default function HomePage() {
       <Search pages={pages} />
       <main data-width="wide" className="container flex-1 pt-6 pb-24 sm:pt-10">
         <h1 className="text-5xl leading-none font-[450] tracking-[-0.045em] text-balance sm:text-6xl sm:leading-[1.08] lg:max-w-[13em] lg:text-7xl xl:text-8xl xl:leading-[1.02]">
-          A library of behaviors for agents to build the next generation of user
-          interfaces.
+          A library of behaviors for agents to build and drive the next
+          generation of user interfaces.
         </h1>
         <div className="mt-8 grid grid-cols-1 gap-3 sm:mt-10 lg:grid-cols-[4fr_5fr] lg:gap-4">
           <Poster tone="gray" pattern="none" body="gap-6 sm:gap-10">

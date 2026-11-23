@@ -1,6 +1,6 @@
 # UI SDK
 
-A library of behaviors for agents to build the next generation of user interfaces.
+A library of behaviors for agents to build and drive the next generation of user interfaces.
 
 Keyboard navigation, focus, selection, dismissal, popups, drag and drop and the ARIA they need live in `@ui-sdk/core`, with adapters for React, Vue, Svelte, Solid and Web Components.
 
