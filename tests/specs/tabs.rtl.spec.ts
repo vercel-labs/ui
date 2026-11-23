@@ -25,6 +25,19 @@ test("the indicator covers the selected tab", async ({ page }) => {
   await expect.poll(() => coversTab(page, "Notifications")).toBe(true)
 })
 
+test("the indicator follows the selected tab when the direction changes", async ({
+  page,
+}) => {
+  await tabNamed(page, "Notifications").click()
+  await expect.poll(() => coversTab(page, "Notifications")).toBe(true)
+  await page.evaluate(() => {
+    for (const el of document.querySelectorAll("[dir=rtl]")) {
+      el.setAttribute("dir", "ltr")
+    }
+  })
+  await expect.poll(() => coversTab(page, "Notifications")).toBe(true)
+})
+
 test("the activation direction follows the screen", async ({ page }) => {
   await tabNamed(page, "Notifications").click()
   await expect(page.getByRole("tablist")).toHaveAttribute(

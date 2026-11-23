@@ -45,11 +45,24 @@ function bindIndicator(options: {
     update()
   }
   const unsubscribe = options.subscribe(remeasure)
+  // A new `dir` moves every item to the other side without resizing one.
+  const flips =
+    typeof MutationObserver === "undefined"
+      ? undefined
+      : new MutationObserver(update)
+  const list = options.list()
+  if (list) {
+    flips?.observe(list.ownerDocument.documentElement, {
+      attributeFilter: ["dir"],
+      subtree: true,
+    })
+  }
   // Items bind in the same commit. Measure once they have.
   queueMicrotask(remeasure)
   return () => {
     unsubscribe()
     observer?.disconnect()
+    flips?.disconnect()
   }
 }
 
