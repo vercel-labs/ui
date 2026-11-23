@@ -336,7 +336,7 @@ function handlers(part: Part) {
       context: unknown
     ) => void
     result[type as keyof EventMap] = (event) => {
-      if (event.defaultPrevented || composing(event)) {
+      if (event.defaultPrevented || ignoredKey(event)) {
         return
       }
       ownerOf(part).sleeping?.wake()
@@ -725,12 +725,14 @@ function rename(part: PartRecord, id: string | null | undefined) {
   return made !== undefined
 }
 
-// Keys an input method owns while it composes text, like Enter confirming a
-// Japanese candidate. Components never act on them.
-function composing(event: Event) {
+// Key events components never act on: one an input method owns while it
+// composes text, like Enter confirming a Japanese candidate, and one with no
+// key, like the keydown Chrome's autofill sends, which isn't a KeyboardEvent.
+function ignoredKey(event: Event) {
   return (
     (event.type === "keydown" || event.type === "keyup") &&
-    isComposing(event as KeyboardEvent)
+    (typeof (event as KeyboardEvent).key !== "string" ||
+      isComposing(event as KeyboardEvent))
   )
 }
 
