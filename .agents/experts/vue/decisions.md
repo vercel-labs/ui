@@ -29,7 +29,7 @@ Last reviewed: PRs 86 to 92 (2026-10-30, the audit fixes), 158 and 159 (2026-11-
 ## Known and open (don't report again, check whether fixed)
 
 - **An agent's step doesn't find what a panel is still loading.** After it opens a tab or section the bridge waits two frames, and a `defineAsyncComponent` panel, or a Nuxt `Lazy*` one, is still loading on first use. The error keeps its "may be behind" hint for a place that came up empty, so the agent opens it in a step first (the agent steps branch).
-- **`query({ closed: true })` selects each tab and page in turn and comes back**, which remounts their content, so a value a component there holds on its own is lost. The reference says so and points at `v-model` above the panels (the agent steps branch).
+- **`query({ closed: true })` selects each tab and page in turn and comes back**, which remounts their content, so a value a component there holds on its own is lost. The agent docs say so and point at `v-model` above the panels (the agent steps branch).
 - Roots that render hidden inputs beside their element (Listbox, Checkbox, Radio, Rating, Segmented Control items) are fragments, so a component ref's `$el` is a text anchor. Binding `bindScrollPicker` takes a wrapper and `querySelector` until the root exposes its element; exposing `$el` needs a maintainer's sign-off.
 - **A trigger connected through `controller` renders without `data-slot` on the server** (`controller-target.ts`), so `web.css` leaves it unstyled until hydration. Seen in `select/controller`, `dialog/payload`, `menu/payload`, `popover/payload`, `tooltip/shared` (PR 321).
 - **Command groups render `hidden` in server HTML** (`command/demo`), so the list is empty until hydration (older than PR 321).
