@@ -759,6 +759,77 @@ describe("agent", () => {
     expect(instance.get().value).toBe(1)
   })
 
+  test("setValue by a label sets that item's own value, not a disabled item's number that reads like it", async () => {
+    const agent = createAgent()
+    const instance = select({
+      id: "seats",
+      items: [
+        { value: 1, label: "One seat" },
+        { value: "02", label: "Two seats" },
+        { value: 2, label: "Two seats, sold out", disabled: true },
+      ],
+      defaultValue: 1,
+    })
+    const el = document.body.appendChild(document.createElement("button"))
+    el.setAttribute("aria-label", "Seats")
+    cleanups.push(bind(instance.part("trigger"), el), () => instance.destroy())
+    const outcome = await agent.act({
+      steps: [{ ref: "Seats", action: "setValue", args: ["Two seats"] }],
+    })
+    expect(outcome.ok, outcome.error?.message).toBe(true)
+    expect(instance.get().value).toBe("02")
+  })
+
+  test("setValue by a label sets that item's own value when the values are objects", async () => {
+    const agent = createAgent()
+    const ada = { id: 1, name: "Ada" }
+    const grace = { id: 2, name: "Grace" }
+    const instance = select({
+      id: "owner",
+      items: [
+        { value: ada, label: "Ada" },
+        { value: grace, label: "Grace" },
+      ],
+    })
+    const el = document.body.appendChild(document.createElement("button"))
+    el.setAttribute("aria-label", "Owner")
+    cleanups.push(bind(instance.part("trigger"), el), () => instance.destroy())
+    const outcome = await agent.act({
+      steps: [{ ref: "Owner", action: "setValue", args: ["Ada"] }],
+    })
+    expect(outcome.ok, outcome.error?.message).toBe(true)
+    expect(instance.get().value).toBe(ada)
+  })
+
+  test("setValue by a label refuses a disabled item of a select with its own keys", async () => {
+    const agent = createAgent()
+    const instance = select({
+      id: "plan",
+      items: [
+        { value: 1, label: "Free" },
+        { value: 2, label: "Pro" },
+        { value: 3, label: "Team", disabled: true },
+      ],
+      itemToValue: (value: number) => `plan-${value}`,
+      defaultValue: 1,
+    })
+    const el = document.body.appendChild(document.createElement("button"))
+    el.setAttribute("aria-label", "Plan")
+    cleanups.push(bind(instance.part("trigger"), el), () => instance.destroy())
+    const disabled = await agent.act({
+      steps: [{ ref: "Plan", action: "setValue", args: ["Team"] }],
+    })
+    expect(disabled.error?.message).toMatch(
+      / in Plan \(c\d+\) is disabled now\.$/
+    )
+    expect(instance.get().value).toBe(1)
+    const enabled = await agent.act({
+      steps: [{ ref: "Plan", action: "setValue", args: ["Pro"] }],
+    })
+    expect(enabled.ok, enabled.error?.message).toBe(true)
+    expect(instance.get().value).toBe(2)
+  })
+
   function mountCombobox(
     options: Parameters<typeof combobox>[0],
     label: string

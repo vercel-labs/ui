@@ -168,11 +168,13 @@ const keyFor = (instance: PrimitiveInstance) =>
   internalOf(instance)?.keyOf ?? keyOf
 
 // A list's items as data, like a select's `items`, flattened out of groups and a tree's branches.
+// `values` takes each listed item's own value, which its text loses: 2 and "2" read the same.
 function fromData(
   items: unknown,
   disabled?: Set<string>,
   key = keyOf,
-  known?: Set<string>
+  known?: Set<string>,
+  values?: Map<object, unknown>
 ) {
   if (!Array.isArray(items)) {
     return
@@ -182,8 +184,10 @@ function fromData(
   const listed = new Set(known)
   const push = (value: unknown, label: string) => {
     if (!listed.has(key(value))) {
-      out.push({ value: String(value), label })
+      const item = { value: String(value), label }
+      out.push(item)
       known?.add(key(value))
+      values?.set(item, value)
     }
   }
   const add = (item: unknown) => {
@@ -227,7 +231,8 @@ function dataOf(
   entry: Entry,
   instance: PrimitiveInstance,
   disabled?: Set<string>,
-  known = new Set<string>()
+  known = new Set<string>(),
+  values?: Map<object, unknown>
 ) {
   const key = keyFor(instance)
   const items = fromData(
@@ -235,11 +240,18 @@ function dataOf(
       (instance.get() as { items?: unknown }).items,
     disabled,
     key,
-    known
+    known,
+    values
   )
   const empty =
     items &&
-    fromData(internalOf(instance)?.options?.().emptyItems, disabled, key, known)
+    fromData(
+      internalOf(instance)?.options?.().emptyItems,
+      disabled,
+      key,
+      known,
+      values
+    )
   return items && unnamed(entry, empty ? [...items, ...empty] : items)
 }
 
@@ -1922,7 +1934,7 @@ function createAgent(
       return true
     }
     // The items a list renders only while it's open, as this step saw them when it opened it.
-    let openParts: { key: string; el: HTMLElement }[] = []
+    let openParts: Pick<Bound, "key" | "el" | "props">[] = []
     // The component's own elements and the items an argument names, which a step's confirm comes
     // from: each value of a list, or every item for a step like `selectAll`.
     const targetsOf = (item?: unknown) => {
@@ -2089,15 +2101,14 @@ function createAgent(
       let whileOpen: Set<string> | undefined
       const seeOpen = (found: Set<string>, open: Bound[]) => {
         whileOpen = found
-        openParts = open.map(({ key, el }) => ({ key, el }))
+        openParts = open.map(({ key, el, props }) => ({ key, el, props }))
       }
       const askToOpen = () => ask(args, targetsOf(args[0]), "make this change")
-      // The key of the item a label named, which a number-valued list's value isn't.
-      let named: string | undefined
       // A value by its item's label, like "Germany (Frankfurt)" or an accordion's "Email", so the agent needn't look up the value first.
       const label = typeof args[0] === "string" && fold(args[0])
       if (label) {
-        const data = dataOf(entry, instance)
+        const values = new Map<object, unknown>()
+        const data = dataOf(entry, instance, undefined, undefined, values)
         const items =
           action === "setValue"
             ? await listItems(entry, instance, askToOpen, seeOpen)
@@ -2116,8 +2127,17 @@ function createAgent(
           // search text isn't an item. Data with no items, or a popup that opened
           // and showed none, is a list with none. The first 20 keep the error short.
           if (found.length === 1) {
-            named = found[0].value
-            args = [numeric ? Number(named) : named, ...args.slice(1)]
+            const listed = data?.find((item) => fold(item.label) === label)
+            const part = [...bound(instance), ...openParts].find(
+              (part) => part.key === found[0].value
+            )
+            args = [
+              listed && values.has(listed)
+                ? values.get(listed)
+                : ((part?.props as { value?: unknown } | undefined)?.value ??
+                  found[0].value),
+              ...args.slice(1),
+            ]
           } else if (
             (items.length || data || opens) &&
             closed &&
@@ -2229,10 +2249,7 @@ function createAgent(
           action === "setChecked" ? "checked" : "value"
         ]
         const held = (Array.isArray(value) ? value : [value]).map(key)
-        const chosen =
-          named !== undefined
-            ? [named]
-            : (Array.isArray(args[0]) ? args[0] : [args[0]]).map(key)
+        const chosen = (Array.isArray(args[0]) ? args[0] : [args[0]]).map(key)
         // Options that render only while the list is open are read by opening it, now. Only
         // a choice opens it: a popup's open() takes a payload, not an item.
         if (!whileOpen && (action === "setValue" || action === "select")) {
