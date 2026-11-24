@@ -81,13 +81,17 @@ function textFieldApi<Slot extends string>(
   // A change the user or a controller asked for. The element follows unless
   // it was canceled. A controlled field waits for its new `value`.
   function write(value: string, reason: InputValueChangeReason, event?: Event) {
+    const el = control()
+    // Code can only empty a file input: the browser throws on any other text.
+    if (el?.type === "file" && value !== "") {
+      return false
+    }
     if (!change("value", value, { reason, event })) {
       return false
     }
     if (!isControlled()) {
       read(value)
     }
-    const el = control()
     if (!el || el.value === value) {
       return true
     }

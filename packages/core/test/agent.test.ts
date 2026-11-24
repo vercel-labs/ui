@@ -1808,6 +1808,31 @@ describe("agent", () => {
     expect(instance.get().value).toBe("94107")
   })
 
+  test("a file input takes no text, so a set fails and its value stays as it was", async () => {
+    const agent = createAgent()
+    const onValueChange = vi.fn()
+    const instance = input({ id: "photo", onValueChange })
+    const el = document.body.appendChild(document.createElement("input"))
+    el.type = "file"
+    el.setAttribute("aria-label", "Photo")
+    cleanups.push(bind(instance.part("root"), el), () => instance.destroy())
+    const outcome = await agent.act({
+      steps: [{ ref: "Photo", action: "setValue", args: ["photo.png"] }],
+    })
+    expect(outcome).toMatchObject({
+      ok: false,
+      error: {
+        step: 0,
+        message: expect.stringContaining('didn\'t take: it is still ""'),
+      },
+    })
+    const photo = agent.snapshot().find((each) => each.label === "Photo")!
+    expect(outcome.values[`${photo.ref} Photo`]).toBe("")
+    expect(photo.value).toBe("")
+    expect(instance.get()).toMatchObject({ value: "", filled: false })
+    expect(onValueChange).not.toHaveBeenCalled()
+  })
+
   test("a number is text to a list of text with nothing chosen, and a number to a list of numbers", async () => {
     const agent = createAgent()
     const choose = async (
