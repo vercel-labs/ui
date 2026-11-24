@@ -98,3 +98,39 @@ test("a slider is named by its field's label, through its one thumb", async () =
     expect.objectContaining({ component: "slider", label: "Volume" })
   )
 })
+
+test("a slider's name leaves out what its field's label keeps from agents", async () => {
+  const agent = createAgent()
+  const slider = `
+    <ui-slider default-value="50">
+      <ui-slider-control>
+        <ui-slider-track><ui-slider-thumb></ui-slider-thumb></ui-slider-track>
+      </ui-slider-control>
+    </ui-slider>`
+  document.body.innerHTML = `
+    <ui-field>
+      <ui-field-label>Budget <span data-agent-hidden>for Canary</span></ui-field-label>
+      ${slider}
+    </ui-field>
+    <ui-field>
+      <ui-field-label data-agent-hidden>Canary bonus</ui-field-label>
+      ${slider}
+    </ui-field>`
+  await wait()
+  const sliders = agent
+    .snapshot()
+    .filter(({ component, offPage }) => component === "slider" && !offPage)
+  expect(sliders.map((component) => component.label)).toEqual([
+    "Budget",
+    undefined,
+  ])
+  const read = [
+    agent.snapshot(),
+    await agent.query({ kind: "slider" }),
+    await agent.query({ text: "canary" }),
+    await agent.act({
+      steps: [{ ref: "bonus", action: "setValue", args: [10] }],
+    }),
+  ]
+  expect(JSON.stringify(read)).not.toMatch(/canary/i)
+})
