@@ -684,6 +684,35 @@ describe("agent", () => {
     expect(instance.get().value).toBe("02")
   })
 
+  test("setValue by a label refuses a disabled item of a select with its own keys", async () => {
+    const agent = createAgent()
+    const instance = select({
+      id: "plan",
+      items: [
+        { value: 1, label: "Free" },
+        { value: 2, label: "Pro" },
+        { value: 3, label: "Team", disabled: true },
+      ],
+      itemToValue: (value: number) => `plan-${value}`,
+      defaultValue: 1,
+    })
+    const el = document.body.appendChild(document.createElement("button"))
+    el.setAttribute("aria-label", "Plan")
+    cleanups.push(bind(instance.part("trigger"), el), () => instance.destroy())
+    const disabled = await agent.act({
+      steps: [{ ref: "Plan", action: "setValue", args: ["Team"] }],
+    })
+    expect(disabled.error?.message).toMatch(
+      / in Plan \(c\d+\) is disabled now\.$/
+    )
+    expect(instance.get().value).toBe(1)
+    const enabled = await agent.act({
+      steps: [{ ref: "Plan", action: "setValue", args: ["Pro"] }],
+    })
+    expect(enabled.ok, enabled.error?.message).toBe(true)
+    expect(instance.get().value).toBe(2)
+  })
+
   function mountCombobox(
     options: Parameters<typeof combobox>[0],
     label: string
