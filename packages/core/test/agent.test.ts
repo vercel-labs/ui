@@ -3118,6 +3118,51 @@ describe("agent act", () => {
     expect(seats.get().value).toBe(2)
   })
 
+  test("only the component a step names commits, so a private one its callback mounts and changes commits nothing", async () => {
+    const agent = createAgent()
+    const region = document.body.appendChild(document.createElement("div"))
+    region.setAttribute("data-agent-secret", "")
+    cleanups.push(() => region.remove())
+    const onLimitCommit = vi.fn(() => {
+      throw new Error("Limit 4242 was refused")
+    })
+    let limit: ReturnType<typeof numberInput> | undefined
+    const mountLimit = () => {
+      const instance = numberInput({
+        id: "limit",
+        defaultValue: 1,
+        onValueCommit: onLimitCommit,
+      })
+      const field = region.appendChild(document.createElement("input"))
+      field.setAttribute("aria-label", "Limit")
+      cleanups.push(bind(instance.part("control"), field), () =>
+        instance.destroy()
+      )
+      return instance
+    }
+    const onValueCommit = vi.fn()
+    const seats = slider({
+      id: "seats",
+      defaultValue: 1,
+      onValueCommit,
+      onValueChange: (value) => {
+        limit ??= mountLimit()
+        limit.api.setValue((value as number) * 10)
+      },
+    })
+    const root = document.body.appendChild(document.createElement("div"))
+    root.setAttribute("aria-label", "Seats")
+    cleanups.push(bind(seats.part("root"), root), () => seats.destroy())
+    const outcome = await agent.act({
+      steps: [{ ref: "Seats", action: "setValue", args: [2] }],
+    })
+    expect(JSON.stringify(outcome)).not.toContain("4242")
+    expect(outcome.ok).toBe(true)
+    expect(limit!.get().value).toBe(20)
+    expect(onLimitCommit).not.toHaveBeenCalled()
+    expect(onValueCommit).toHaveBeenCalledTimes(1)
+  })
+
   test("a step that fails after it moved the value still commits where it landed", async () => {
     const agent = createAgent()
     const onValueCommit = vi.fn()

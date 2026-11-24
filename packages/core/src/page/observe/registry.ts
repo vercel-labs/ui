@@ -468,44 +468,43 @@ function settle(id: string, key: string, value: unknown, details: Details) {
   entry.started.delete(key)
 }
 
-// An agent's step is a whole interaction, like a drag that ended, so what it
-// changed on a key its component commits is committed once it ends, unless
-// the component did. A value that is what it was, like one turned down, isn't.
-function commitStep(secret: boolean) {
-  const steps = [...uncommitted]
+// An agent's step is a whole interaction with its component, like a drag that
+// ended, so a key it changed there commits as the step ends, unless the value
+// is what it was. What a callback changes on another component is code's change.
+function commitStep(step?: { entry: Entry; secret: boolean }) {
+  const changed = step && uncommitted.get(step.entry)
   uncommitted.clear()
+  const instance = step?.entry.instance.deref()
+  const options = instance && optionsOf.get(instance)
+  if (!changed || !options) {
+    return
+  }
+  const { entry, secret } = step
+  const state = instance.get() as Record<string, unknown>
+  const commit = commitFrom(
+    { id: entry.id, label: entry.component, options },
+    () => "agent"
+  )
   let failed: { error: unknown } | undefined
-  for (const [entry, changed] of steps) {
-    const instance = entry.instance.deref()
-    const options = instance && optionsOf.get(instance)
-    if (!options) {
+  for (const [key, { details, from }] of changed) {
+    const { cancel, canceled, source, ...given } = details as Details & {
+      cancel?: unknown
+      canceled?: unknown
+    }
+    if (sameValue(state[key], from)) {
       continue
     }
-    const state = instance.get() as Record<string, unknown>
-    const commit = commitFrom(
-      { id: entry.id, label: entry.component, options },
-      () => "agent"
-    )
-    for (const [key, { details, from }] of changed) {
-      const { cancel, canceled, source, ...given } = details as Details & {
-        cancel?: unknown
-        canceled?: unknown
-      }
-      if (sameValue(state[key], from)) {
-        continue
-      }
-      try {
-        commit(key, state[key], given)
-      } catch (error) {
-        // What a private field's handler throws can repeat its value.
-        failed ??= {
-          error:
-            secret || entry.secret
-              ? new Error(
-                  `The commit of ${entry.label ?? entry.component} (${entry.ref}) failed: [redacted]`
-                )
-              : error,
-        }
+    try {
+      commit(key, state[key], given)
+    } catch (error) {
+      // What a private field's handler throws can repeat its value.
+      failed ??= {
+        error:
+          secret || entry.secret
+            ? new Error(
+                `The commit of ${entry.label ?? entry.component} (${entry.ref}) failed: [redacted]`
+              )
+            : error,
       }
     }
   }
