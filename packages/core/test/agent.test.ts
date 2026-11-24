@@ -4350,7 +4350,8 @@ describe("agent act behind a closed tab or section", () => {
       <label>Deploys <span data-agent-hidden>at Canary</span><button></button></label>
       <button aria-label="Digest"><span data-agent-hidden>Canary</span></button>
       <button><span data-agent-hidden>Canary</span> Invoices</button>
-      <button><span aria-labelledby="owner"></span> Receipts</button>`
+      <button><span aria-labelledby="owner"></span> Receipts</button>
+      <button><span aria-labelledby="alerts"></span> Refunds</button>`
     cleanups.push(() => root.remove())
     for (const [at, el] of [...root.querySelectorAll("button")].entries()) {
       const instance = checkbox({ id: `named-${at}` })
@@ -4368,11 +4369,54 @@ describe("agent act behind a closed tab or section", () => {
       "Digest",
       "Invoices",
       "Receipts",
+      "Refunds",
     ])
     const outcome = await agent.act({ steps: [check("Nowhere")] })
     expect(outcome.ok).toBe(false)
     expect(JSON.stringify([screen, agent.query({}), outcome])).not.toContain(
       "Canary"
+    )
+  })
+
+  test("what a field holds, or what hidden takes off the page, is never read as a name or as a row's text", async () => {
+    const agent = createAgent()
+    const root = document.body.appendChild(document.createElement("div"))
+    root.innerHTML = `
+      <label>Notes <span data-agent-hidden>for Canary</span><span hidden>zq7canary</span>
+        <textarea data-agent-secret>zq7canary</textarea></label>
+      <label>Plan <span data-agent-hidden>for Canary</span>
+        <button></button><select><option>zq7canary</option></select></label>
+      <ul><li>Jane <span hidden>zq7canary</span>
+        <textarea data-agent-secret>zq7canary</textarea><button></button></li></ul>`
+    cleanups.push(() => root.remove())
+    for (const [at, el] of [...root.querySelectorAll("textarea")].entries()) {
+      const instance = textarea({ id: `notes-${at}` })
+      const unbind = bind(instance.part("root"), el)
+      cleanups.push(() => {
+        unbind()
+        instance.destroy()
+      })
+    }
+    for (const [at, el] of [...root.querySelectorAll("button")].entries()) {
+      const instance = checkbox({ id: `held-${at}` })
+      const unbind = bind(instance.part("root"), el)
+      cleanups.push(() => {
+        unbind()
+        instance.destroy()
+      })
+    }
+    const screen = agent.snapshot().filter((component) => !component.offPage)
+    expect(screen.map((component) => [component.label, component.row])).toEqual(
+      [
+        ["Notes", undefined],
+        [undefined, "Jane"],
+        ["Plan", undefined],
+        [undefined, "Jane"],
+      ]
+    )
+    const outcome = await agent.act({ steps: [check("Nowhere")] })
+    expect(JSON.stringify([screen, agent.query({}), outcome])).not.toMatch(
+      /canary/i
     )
   })
 

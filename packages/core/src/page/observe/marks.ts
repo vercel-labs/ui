@@ -37,6 +37,10 @@ const isOffLimits = (elements: Element[]) =>
 const isSecret = (elements: Element[]) =>
   elements.some((el) => composedClosest(el, "[data-agent-secret]"))
 
+// Not the page's text: what a field holds, like a textarea's value, and
+// what `hidden` takes off the page.
+const unread = "input, select, textarea, [hidden]"
+
 // An element's text as it reads, with its spaces collapsed, and without the text of the
 // elements in `skip`, like a tree branch's child items, of `data-agent-hidden` or of what a
 // screen reader skips, like an item's check mark: "Ada Lovelace", not "✓ Ada Lovelace".
@@ -49,6 +53,7 @@ function textOf(el: Element, skip: Element[] = []) {
       } else if (
         child instanceof Element &&
         !skip.includes(child) &&
+        !child.matches(unread) &&
         !child.hasAttribute("data-agent-hidden") &&
         child.getAttribute("aria-hidden") !== "true"
       ) {
@@ -80,27 +85,28 @@ function nameOf(el: Element) {
   const within = sources.flatMap((source) =>
     [...source.querySelectorAll("[aria-labelledby]")].flatMap(namersOf)
   )
+  const read = [...sources, ...within]
   if (
-    !isOffLimits([...sources, ...within]) &&
-    !sources.some((source) => source.querySelector("[data-agent-hidden]"))
+    !isOffLimits(read) &&
+    !read.some((source) => source.querySelector("[data-agent-hidden]"))
   ) {
     return accessibleName(el)
   }
-  const read = (elements: Element[]) =>
+  const shown = (elements: Element[]) =>
     elements
       .filter((each) => !isOffLimits([each]))
       .map((each) => textOf(each))
       .join(" ")
       .trim()
   return (
-    read(by) ||
+    shown(by) ||
     el.getAttribute("aria-label")?.trim() ||
-    read(labels) ||
-    read(content)
+    shown(labels) ||
+    shown(content)
   )
 }
 
 // A misspelled mark does nothing, so development warns about one.
 const checkMarks = (elements: Element[]) => warnMarks(elements, marks)
 
-export { checkMarks, confirmOf, isOffLimits, isSecret, nameOf, textOf }
+export { checkMarks, confirmOf, isOffLimits, isSecret, nameOf, textOf, unread }

@@ -11,7 +11,14 @@ import type {
   PropSpec,
 } from "../../foundation/kernel/primitive-types"
 import { watchEarlier, watchers } from "../../foundation/kernel/watchers"
-import { checkMarks, isOffLimits, isSecret, nameOf, textOf } from "./marks"
+import {
+  checkMarks,
+  isOffLimits,
+  isSecret,
+  nameOf,
+  textOf,
+  unread,
+} from "./marks"
 
 /**
  * A change a person or an agent made to a component, as `observe` and `agent.subscribe` report it.
@@ -390,6 +397,7 @@ function rowOf(parts: Bound[]) {
     if (
       !own.some((el) => el.contains(node)) &&
       !isOffLimits([node.parentElement!]) &&
+      !node.parentElement!.closest(unread) &&
       node.textContent?.trim()
     ) {
       words.push(node.textContent.trim())

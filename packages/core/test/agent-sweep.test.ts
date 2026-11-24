@@ -4,7 +4,7 @@
 import { afterEach, expect, test } from "vitest"
 import { checkbox } from "../src/components/checkbox/checkbox"
 import { collapsible } from "../src/components/collapsible/collapsible"
-import { input } from "../src/components/input/input"
+import { input, textarea } from "../src/components/input/input"
 import { bind } from "../src/foundation/kernel/part"
 import { createAgent } from "../src/page/agent/agent"
 
@@ -107,7 +107,10 @@ test("no tool reads what is private, and no step or look changes what needs a pe
     <div role="group" aria-labelledby="private-heading"></div>
     <h3 id="part-private">Alerts <span data-agent-hidden>kanary part</span></h3>
     <div role="group" aria-labelledby="part-private"></div>
-    <ul><li>Jane Doe <span data-agent-hidden>kanary row</span></li></ul>
+    <ul><li>Jane Doe <span data-agent-hidden>kanary row</span>
+      <textarea data-agent-secret>canary-in-row</textarea></li></ul>
+    <label>Memo <span data-agent-hidden>kanary memo</span>
+      <textarea data-agent-secret>canary-prefilled</textarea></label>
     <p><button aria-labelledby="private-heading"></button></p>
     <p><button aria-labelledby="part-private"></button></p>
     <p><button>Weekly digest <span data-agent-hidden>kanary text</span></button></p>
@@ -117,6 +120,14 @@ test("no tool reads what is private, and no step or look changes what needs a pe
     addSwitch(first, "alerts-1", "Deploy failures"),
     addSwitch(second, "alerts-2", "Deploy failures"),
     addSwitch(headed.querySelector("li")!, "admin", "Admin"),
+    ...[...headed.querySelectorAll("textarea")].map((el, at) => {
+      const instance = textarea({ id: `memo-${at}` })
+      const unbind = bind(instance.part("root"), el)
+      return () => {
+        unbind()
+        instance.destroy()
+      }
+    }),
     ...[...headed.querySelectorAll("p > button, label > button")].map(
       (el, at) => {
         const instance = checkbox({ id: `named-${at}` })
