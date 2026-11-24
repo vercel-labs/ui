@@ -684,6 +684,27 @@ describe("agent", () => {
     expect(instance.get().value).toBe("02")
   })
 
+  test("setValue by a label sets that item's own value when the values are objects", async () => {
+    const agent = createAgent()
+    const ada = { id: 1, name: "Ada" }
+    const grace = { id: 2, name: "Grace" }
+    const instance = select({
+      id: "owner",
+      items: [
+        { value: ada, label: "Ada" },
+        { value: grace, label: "Grace" },
+      ],
+    })
+    const el = document.body.appendChild(document.createElement("button"))
+    el.setAttribute("aria-label", "Owner")
+    cleanups.push(bind(instance.part("trigger"), el), () => instance.destroy())
+    const outcome = await agent.act({
+      steps: [{ ref: "Owner", action: "setValue", args: ["Ada"] }],
+    })
+    expect(outcome.ok, outcome.error?.message).toBe(true)
+    expect(instance.get().value).toBe(ada)
+  })
+
   test("setValue by a label refuses a disabled item of a select with its own keys", async () => {
     const agent = createAgent()
     const instance = select({

@@ -160,13 +160,13 @@ const keyFor = (instance: PrimitiveInstance) =>
   internalOf(instance)?.keyOf ?? keyOf
 
 // A list's items as data, like a select's `items`, flattened out of groups and a tree's branches.
-// `values` takes each item's own value by its text, which reads the same for 2 and "2".
+// `values` takes each listed item's own value, which its text loses: 2 and "2" read the same.
 function fromData(
   items: unknown,
   disabled?: Set<string>,
   key = keyOf,
   known?: Set<string>,
-  values?: Map<string, unknown>
+  values?: Map<object, unknown>
 ) {
   if (!Array.isArray(items)) {
     return
@@ -176,9 +176,10 @@ function fromData(
   const listed = new Set(known)
   const push = (value: unknown, label: string) => {
     if (!listed.has(key(value))) {
-      out.push({ value: String(value), label })
+      const item = { value: String(value), label }
+      out.push(item)
       known?.add(key(value))
-      values?.set(String(value), value)
+      values?.set(item, value)
     }
   }
   const add = (item: unknown) => {
@@ -223,7 +224,7 @@ function dataOf(
   instance: PrimitiveInstance,
   disabled?: Set<string>,
   known = new Set<string>(),
-  values?: Map<string, unknown>
+  values?: Map<object, unknown>
 ) {
   const key = keyFor(instance)
   const items = fromData(
@@ -1477,7 +1478,7 @@ function createAgent(
       // A value by its item's label, like "Germany (Frankfurt)" or an accordion's "Email", so the agent needn't look up the value first.
       const label = typeof args[0] === "string" && fold(args[0])
       if (label) {
-        const values = new Map<string, unknown>()
+        const values = new Map<object, unknown>()
         const data = dataOf(entry, instance, undefined, undefined, values)
         const items =
           action === "setValue"
@@ -1497,15 +1498,15 @@ function createAgent(
           // search text isn't an item. Data with no items, or a popup that opened
           // and showed none, is a list with none. The first 20 keep the error short.
           if (found.length === 1) {
-            const item = found[0].value
+            const listed = data?.find((item) => fold(item.label) === label)
             const part = [...bound(instance), ...openParts].find(
-              (part) => part.key === item
+              (part) => part.key === found[0].value
             )
             args = [
-              values.has(item)
-                ? values.get(item)
+              listed && values.has(listed)
+                ? values.get(listed)
                 : ((part?.props as { value?: unknown } | undefined)?.value ??
-                  item),
+                  found[0].value),
               ...args.slice(1),
             ]
           } else if (
