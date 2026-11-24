@@ -1460,6 +1460,21 @@ function createAgent(
       return
     }
     const { entry, instance } = holder
+    // Looking opens nothing a person must approve: a place inside
+    // `data-agent-confirm` takes a step of its own, which asks them.
+    const marked = () => {
+      const key = String(item.value)
+      const own = internalOf(instance)?.elementOf?.(key)
+      return confirmOf([
+        ...bound(instance)
+          .filter((part) => !part.key || part.key === key)
+          .map((part) => part.el),
+        ...(own ? [own] : []),
+      ])
+    }
+    if (marked()) {
+      return
+    }
     const api = instance.api as {
       open?: (value: unknown) => unknown
       setValue?: (value: unknown) => unknown
@@ -1497,7 +1512,12 @@ function createAgent(
       action,
       args: [item.value],
     }
-    if (!(await allowed(step))) {
+    // The page can change while `allow` waits on a person.
+    if (
+      !(await allowed(step)) ||
+      marked() ||
+      !live().some((other) => other.instance === instance)
+    ) {
       return
     }
     const shut = () => {
@@ -1528,6 +1548,14 @@ function createAgent(
     return async () => {
       asAgent(back)
       await frames()
+      // The same wait going back, or the next place would go back to this one.
+      for (
+        let tries = 0;
+        tries < patience && !shut() && !callerSignal?.aborted;
+        tries++
+      ) {
+        await frames()
+      }
     }
   }
 
@@ -1557,33 +1585,37 @@ function createAgent(
           partial = true
           continue
         }
-        const path = [...trail, place.item.label]
-        // Svelte keeps what a place held bound and inert while it animates out.
-        const brought = live().filter(
-          ({ entry, parts }) => !before.has(entry.ref) && !isInert(parts)
-        )
-        // An empty place may still be loading what it holds, like a lazy panel.
-        partial ||= !brought.length
-        held.set(
-          path.join(" > "),
-          brought.flatMap(({ entry }) => entry.label ?? [])
-        )
-        noted?.push(
-          ...brought.map(({ entry, instance, parts }) => ({
-            ...describe(entry, instance, parts),
-            offPage: true,
-            section: (entry.sections?.length ? entry.sections : path).join(
-              " > "
-            ),
-          }))
-        )
-        if (look()) {
-          ways.push([place])
-        } else if (!known) {
-          const inner = await behind(look, before, left, path)
-          ways.push(...inner.map((way) => [place, ...way]))
+        // A look that stops part way, like an `allow` nobody answers, goes back too.
+        try {
+          const path = [...trail, place.item.label]
+          // Svelte keeps what a place held bound and inert while it animates out.
+          const brought = live().filter(
+            ({ entry, parts }) => !before.has(entry.ref) && !isInert(parts)
+          )
+          // An empty place may still be loading what it holds, like a lazy panel.
+          partial ||= !brought.length
+          held.set(
+            path.join(" > "),
+            brought.flatMap(({ entry }) => entry.label ?? [])
+          )
+          noted?.push(
+            ...brought.map(({ entry, instance, parts }) => ({
+              ...describe(entry, instance, parts),
+              offPage: true,
+              section: (entry.sections?.length ? entry.sections : path).join(
+                " > "
+              ),
+            }))
+          )
+          if (look()) {
+            ways.push([place])
+          } else if (!known) {
+            const inner = await behind(look, before, left, path)
+            ways.push(...inner.map((way) => [place, ...way]))
+          }
+        } finally {
+          await back()
         }
-        await back()
       }
       if (ways.length) {
         break
@@ -1655,13 +1687,19 @@ function createAgent(
   // opens again. A name two places share, like Deploy failures under Email
   // and under Slack, is refused, not guessed.
   async function reveal(ref: string, action?: string, text?: string) {
+    const scope = scoped(ref)
+    // A name with its place matches a whole label, never words in a row: one
+    // someone wrote, like a member named "Email Deploy failures", would take the step.
+    const whole =
+      scope &&
+      ((found: ReturnType<typeof scan>[number]) =>
+        fold(found.entry.label ?? "") === fold(ref))
     try {
-      return find(ref, action, text)
+      return find(ref, action, text, whole)
     } catch (missing) {
       if (!unfound.has(missing as Error)) {
         throw missing
       }
-      const scope = scoped(ref)
       const name = scope?.name ?? ref
       if (scope) {
         try {
@@ -2390,9 +2428,12 @@ function createAgent(
       if (settled.pending) {
         return { ref: entry.ref, result: `${action} is still running.` }
       }
+      // A private value is compared with nothing a step sends: whether a
+      // guess failed or passed would say what it holds.
       const stays = () => {
         const state = instance.get() as Record<string, unknown>
         return (
+          !entry.secret &&
           !!setKey &&
           setKey in state &&
           isPlain(state[setKey]) &&
@@ -2411,20 +2452,26 @@ function createAgent(
         await frames()
       }
       const { step, min } = instance.get() as { step?: unknown; min?: unknown }
+      // One number, or a range slider's, one for each thumb.
+      const numbers = (value: unknown) => {
+        const list = [value].flat()
+        return list.length && list.every((item) => typeof item === "number")
+          ? (list as number[]).sort((a, b) => a - b)
+          : undefined
+      }
+      const asked = numbers(args[0])
       const steps =
-        typeof step === "number" && typeof args[0] === "number"
-          ? `it moves in steps of ${step}`
-          : ""
+        typeof step === "number" && asked ? `it moves in steps of ${step}` : ""
       if (stays()) {
         const state = instance.get() as Record<string, unknown>
         // A number off its steps can land back on the one it was on, like 7.4 on a slider at 7.5.
-        const along =
-          steps &&
-          ((args[0] as number) - (typeof min === "number" ? min : 0)) /
-            (step as number)
         const off =
-          typeof along === "number" &&
-          Math.abs(along - Math.round(along)) > 1e-9
+          !!steps &&
+          asked!.some((value) => {
+            const along =
+              (value - (typeof min === "number" ? min : 0)) / (step as number)
+            return Math.abs(along - Math.round(along)) > 1e-9
+          })
         throw new Error(
           `${action} on ${entry.label ?? entry.component} (${entry.ref}) didn't take: it is still ${JSON.stringify(redact(entry, state[setKey!]) ?? null)}${off ? `, and ${steps}` : ""}.`
         )
@@ -2433,13 +2480,18 @@ function createAgent(
       const now = setKey
         ? (instance.get() as Record<string, unknown>)[setKey]
         : undefined
+      const took = numbers(now)
       if (
-        typeof now === "number" &&
-        typeof args[0] === "number" &&
-        Math.abs(now - args[0]) > 1e-9 * Math.max(1, Math.abs(args[0]))
+        !entry.secret &&
+        asked &&
+        took?.length === asked.length &&
+        asked.some(
+          (value, at) =>
+            Math.abs(took[at] - value) > 1e-9 * Math.max(1, Math.abs(value))
+        )
       ) {
         throw new Error(
-          `${action} on ${entry.label ?? entry.component} (${entry.ref}) took ${JSON.stringify(redact(entry, now))}, not ${args[0]}${steps && `: ${steps}`}. It is ${JSON.stringify(redact(entry, now))} now.`
+          `${action} on ${entry.label ?? entry.component} (${entry.ref}) took ${JSON.stringify(now)}, not ${JSON.stringify(args[0])}${steps && `: ${steps}`}. It is ${JSON.stringify(now)} now.`
         )
       }
       return { ref: entry.ref, result: result ?? null }
@@ -2985,7 +3037,7 @@ const agentTools = [
   {
     name: "act",
     description:
-      'Does a whole task in one call, the save included. Runs steps in order and stops at the first that fails, and a step fails unless it found its component and its change took. So a last step that saves only runs when every change before it is in place: that is the check before saving, and it needs no call of its own, after a query either: one act holds every step and the save. Plan every step up front from the words in your task, without looking at the page first: a step that names nothing changes nothing, fails and lists what is there, and the steps before it stay done, so a wrong guess costs one call. Only a task that can\'t be planned from its words, like "turn off whatever is on", needs a look first, with one query, { "closed": true }. A step names a component by its label, by its row text, like "Jane Doe" for the menu on her row, or by its kind, like "dialog". It finds the component wherever it is, on another tab or in a closed section, and opens what it is behind. When your task says where something is, put that first, like "Email > Weekly summary", since two sections can hold the same label. action is setValue with a value or an item\'s label (fields, selects, tabs), setChecked with true or false, or press with the text of a button or menu item: a closed menu or dialog opens itself first. expect checks and changes nothing: it takes the value, the checked state or the row text a component must have now, like { "ref": "Jane Doe", "action": "expect", "args": ["Admin"] }, and fails when that isn\'t so, so an expect before the save guards it. A step that fails with "Needs a person" is one the person must do or approve: tell them what it does, and look for no other way. Returns what each step changed and every field\'s value after. Example: { "steps": [{ "ref": "Display name", "action": "setValue", "args": ["Acme"] }, { "ref": "Jane Doe", "action": "press", "args": ["Delete"] }, { "ref": "dialog", "action": "press", "args": ["Delete"] }, { "ref": "Email > Weekly summary", "action": "setChecked", "args": [false] }, { "ref": "Save", "action": "press" }] }.',
+      'Does a whole task in one call, the save included. Runs steps in order and stops at the first that fails, and a step fails unless it found its component and its change took. So a last step that saves only runs when every change before it is in place: that is the check before saving, and it needs no call of its own, after a query either: one act holds every step and the save. Plan every step up front from the words in your task, without looking at the page first: a step that names nothing changes nothing, fails and lists what is there, and the steps before it stay done, so a wrong guess costs one call. Only a task that can\'t be planned from its words, like "turn off whatever is on", needs a look first, with one query, { "closed": true }. A step names a component by its label, by its row text, like "Jane Doe" for the menu on her row, or by its kind, like "dialog". It finds the component wherever it is, on another tab or in a closed section, and opens what it is behind. When your task says where something is, put that first, like "Billing > Auto renew", since two sections can hold the same label. action is setValue with a value or an item\'s label (fields, selects, tabs), setChecked with true or false, or press with the text of a button or menu item: a closed menu or dialog opens itself first. expect checks and changes nothing: it takes the value, the checked state or the row text a component must have now, like { "ref": "Jane Doe", "action": "expect", "args": ["Admin"] }, and fails when that isn\'t so, so an expect before the save guards it. A step that fails with "Needs a person" is one the person must do or approve: tell them what it does, and look for no other way. Returns what each step changed and every field\'s value after. Example: { "steps": [{ "ref": "Display name", "action": "setValue", "args": ["Acme"] }, { "ref": "Jane Doe", "action": "press", "args": ["Delete"] }, { "ref": "dialog", "action": "press", "args": ["Delete"] }, { "ref": "Billing > Auto renew", "action": "setChecked", "args": [false] }, { "ref": "Save", "action": "press" }] }.',
     inputSchema: {
       type: "object",
       properties: {

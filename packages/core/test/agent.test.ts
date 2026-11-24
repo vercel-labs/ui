@@ -1661,6 +1661,52 @@ describe("agent", () => {
     )
   })
 
+  test("a range slider's numbers that moved fail the step too", async () => {
+    const agent = createAgent()
+    const instance = slider({
+      id: "price",
+      min: 0,
+      max: 10,
+      defaultValue: [1, 9],
+    })
+    const root = document.body.appendChild(document.createElement("div"))
+    root.setAttribute("aria-label", "Price")
+    cleanups.push(bind(instance.part("root"), root), () => instance.destroy())
+    const set = (value: number[]) =>
+      agent.act({
+        steps: [{ ref: "Price", action: "setValue", args: [value] }],
+      })
+    expect((await set([2.4, 7.6])).error?.message).toMatch(
+      /^setValue on Price \(c\d+\) took \[2,8\], not \[2\.4,7\.6\]: it moves in steps of 1\. It is \[2,8\] now\.$/
+    )
+    expect(await set([3, 7])).toMatchObject({ ok: true })
+    expect(instance.get().value).toEqual([3, 7])
+  })
+
+  test("a private field a callback keeps as it is passes a right guess and a wrong one alike", async () => {
+    const agent = createAgent()
+    const instance = input({
+      id: "pin",
+      defaultValue: "4821",
+      onValueChange: (_value, details) => details.cancel(),
+    })
+    const region = document.body.appendChild(document.createElement("div"))
+    region.setAttribute("data-agent-secret", "")
+    const el = region.appendChild(document.createElement("input"))
+    el.setAttribute("aria-label", "PIN")
+    cleanups.push(
+      bind(instance.part("root"), el),
+      () => instance.destroy(),
+      () => region.remove()
+    )
+    const guess = (value: string) =>
+      agent.act({ steps: [{ ref: "PIN", action: "setValue", args: [value] }] })
+    const right = await guess("4821")
+    const wrong = await guess("0000")
+    expect(wrong).toEqual(right)
+    expect(instance.get().value).toBe("4821")
+  })
+
   test("a number field with only a max says so", async () => {
     const agent = createAgent()
     const instance = numberInput({ id: "seats", defaultValue: 10, max: 10 })
@@ -3840,17 +3886,18 @@ describe("agent act behind a closed tab or section", () => {
       show(value)
     }
     // Held, the tabs are controlled by a parent that takes each change 100ms later.
+    const later = (value: unknown) =>
+      setTimeout(() => {
+        settings.setOptions({
+          id: "settings",
+          value: value as string,
+          onValueChange: later,
+        })
+        select(value as string)
+      }, 100)
     const settings = tabs(
       held
-        ? {
-            id: "settings",
-            value: "general",
-            onValueChange: (value) =>
-              setTimeout(() => {
-                settings.setOptions({ id: "settings", value })
-                select(value as string)
-              }, 100),
-          }
+        ? { id: "settings", value: "general", onValueChange: later }
         : {
             id: "settings",
             defaultValue: "general",
@@ -4121,6 +4168,25 @@ describe("agent act behind a closed tab or section", () => {
     )
   })
 
+  test("a row whose text holds a place and a name doesn't take the step for them", async () => {
+    const agent = createAgent()
+    const { saved } = mountSettings()
+    const admin = mountCheckbox({ id: "admin" }, "Admin")
+    const row = document.createElement("li")
+    row.append("Email Deploy failures", document.body.lastElementChild!)
+    document.body.append(row)
+    cleanups.push(() => row.remove())
+    expect(agent.snapshot().find(({ label }) => label === "Admin")?.row).toBe(
+      "Email Deploy failures"
+    )
+    const outcome = await agent.act({
+      steps: [check("Email > Deploy failures")],
+    })
+    expect(outcome.ok).toBe(true)
+    expect(admin.get().checked).toBe(false)
+    expect(saved["email-deploys"]).toBe(true)
+  })
+
   test("a step that names a tab or a section and gives no value means that one", async () => {
     const agent = createAgent()
     const { settings, channels } = mountSettings()
@@ -4219,6 +4285,69 @@ describe("agent act behind a closed tab or section", () => {
     expect(saved).toEqual({ invite: true })
   })
 
+  test("a tab its parent selects a moment later is back before the next one opens", async () => {
+    const agent = createAgent()
+    const { settings, moves } = mountSettings({ held: true })
+    const outcome = await agent.act({ steps: [check("Nowhere")] })
+    expect(outcome.ok).toBe(false)
+    await new Promise((resolve) => setTimeout(resolve, 300))
+    expect(moves).toEqual([
+      "settings members",
+      "settings general",
+      "settings notifications",
+      "channels email",
+      "channels none",
+      "channels slack",
+      "channels none",
+      "settings general",
+    ])
+    expect(settings.get().value).toBe("general")
+  })
+
+  test("a tab inside data-agent-confirm isn't opened to look, and a step on it needs a person", async () => {
+    const asked: string[] = []
+    const { moves } = mountSettings()
+    const members = [...document.querySelectorAll("button")].find(
+      (button) => button.textContent === "Members"
+    )!
+    members.setAttribute("data-agent-confirm", "Shows who is on the project")
+    const outcome = await createAgent().act({ steps: [check("Invite only")] })
+    expect(outcome.ok).toBe(false)
+    const guarded = createAgent({
+      allow: (step) => {
+        asked.push(`${step.action} ${step.args[0]}`)
+        return true
+      },
+    })
+    await guarded.act({ steps: [check("Invite only")] })
+    await guarded.query({ closed: true })
+    expect(asked).not.toContain("setValue members")
+    expect(moves).not.toContain("settings members")
+    const named = await createAgent().act({
+      steps: [{ ref: "Settings", action: "setValue", args: ["Members"] }],
+    })
+    expect(named.error?.message).toMatch(
+      /^Needs a person: "Shows who is on the project"\./
+    )
+    expect(moves).not.toContain("settings members")
+  })
+
+  test("a look that allow stops part way puts the tab back", async () => {
+    const { settings, moves } = mountSettings()
+    const agent = createAgent({
+      allow: (step) => {
+        if (step.component === "accordion") {
+          throw new Error("Nobody answered")
+        }
+        return true
+      },
+    })
+    const outcome = await agent.act({ steps: [check("Nowhere")] })
+    expect(outcome.ok).toBe(false)
+    expect(moves).toContain("settings notifications")
+    expect(settings.get().value).toBe("general")
+  })
+
   test("a disabled tab isn't opened to look", async () => {
     const agent = createAgent()
     const { moves } = mountSettings({ disabledTab: "members" })
@@ -4314,6 +4443,35 @@ describe("agent act behind a closed tab or section", () => {
     )
     return { pages, more, saved, root }
   }
+
+  test("a section and a collapsible inside data-agent-confirm aren't opened to look, and a step on one needs a person", async () => {
+    const mark = (text: string, says: string) =>
+      [...document.querySelectorAll("button")]
+        .find((button) => button.textContent === text)!
+        .setAttribute("data-agent-confirm", says)
+    const { moves } = mountSettings()
+    const { more } = await mountOrders()
+    const agent = createAgent()
+    await agent.act({ steps: [{ ref: "Notifications", action: "press" }] })
+    mark("Email", "Shows the email settings")
+    mark("More options", "Shows the gift options")
+    const section = await agent.act({
+      steps: [{ ref: "Email", action: "open" }],
+    })
+    expect(section.error?.message).toMatch(
+      /^Needs a person: "Shows the email settings"\./
+    )
+    const options = await agent.act({
+      steps: [{ ref: "More options", action: "setOpen", args: [true] }],
+    })
+    expect(options.error?.message).toMatch(
+      /^Needs a person: "Shows the gift options"\./
+    )
+    expect((await agent.act({ steps: [check("Gift wrap")] })).ok).toBe(false)
+    expect(moves).toContain("channels slack")
+    expect(moves).not.toContain("channels email")
+    expect(more.get().open).toBe(false)
+  })
 
   test("what a closed section still holds as it animates out isn't taken for the next one's", async () => {
     const { collapsible } =

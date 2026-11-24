@@ -185,7 +185,7 @@ When an open modal covers the rest of the page, nothing under it is looked throu
 
 A panel that loads what it holds after it opens, like a code-split tab, is still empty when the bridge looks. The error then lists the closed tabs and sections the component may be behind, so the agent can select that tab in one call and work there in the next.
 
-Each tab or section the bridge opens to look is an action of its own: `allow` is asked first, the component's change callback runs, and a no leaves it closed. A step opens 24 places at most. Disabled tabs and sections stay closed. Selecting another tab can unmount what a person typed in the one they were on, so keep that state above the panels when agents work on the page.
+Each tab or section the bridge opens to look is an action of its own: `allow` is asked first, the component's change callback runs, and a no leaves it closed. A step opens 24 places at most. Disabled tabs and sections stay closed, and so does one inside `data-agent-confirm`: a step that names it opens it, and that step [needs the person](./permissions#mark-what-needs-a-person). Selecting another tab can unmount what a person typed in the one they were on, so keep that state above the panels when agents work on the page.
 
 ### Result
 
@@ -200,7 +200,7 @@ Each tab or section the bridge opens to look is an action of its own: `allow` is
 
 Each change is `{ component, label?, key, value }`. `gone` lists components that left the page, using their refs with labels when available.
 
-A failed step stops the call. Earlier steps stay applied; there is no rollback. The error's message says so, and how many steps are left to send again. A call or a step with the wrong shape fails before any step runs, as [Steps](#steps) describes. A `set` action fails when its value stays as it was and isn't what the step asked for, such as a change a callback canceled: `setValue on Region (c3) didn't take: it is still "europe".` A parent that takes the value after work of its own, like a request, has about a second to do it. So a step that saves can go last in the same call, and it runs only when every change before it took. A step on something an open modal covers fails too, and names what is open.
+A failed step stops the call. Earlier steps stay applied; there is no rollback. The error's message says so, and how many steps are left to send again. A call or a step with the wrong shape fails before any step runs, as [Steps](#steps) describes. A `set` action fails when its value stays as it was and isn't what the step asked for, such as a change a callback canceled: `setValue on Region (c3) didn't take: it is still "europe".` A parent that takes the value after work of its own, like a request, has about a second to do it. So a step that saves can go last in the same call, and it runs only when every change before it took. A secret field's value is compared with nothing a step sends, so a `set` on it passes whether or not the value took. A step on something an open modal covers fails too, and names what is open.
 
 `act` and `query` calls on the same bridge are queued in the order they're called.
 
