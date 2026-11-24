@@ -597,8 +597,12 @@ const described = (entry: Entry) =>
     .join(" ")
 
 // A password, card or one-time code, or a field inside `data-agent-secret`, shows only whether it's filled, never what it holds.
-const redact = (entry: Entry, value: unknown) =>
-  entry.secret && value !== "" && value != null ? "[redacted]" : value
+// How it shows, like a password as text or a list open, isn't what it holds.
+const shows = ["open", "visible"]
+const redact = (entry: Entry, value: unknown, key = "value") =>
+  entry.secret && !shows.includes(key) && value !== "" && value != null
+    ? "[redacted]"
+    : value
 
 type SvelteStack = { file?: string; line?: number; parent?: SvelteStack | null }
 type SvelteElement = Element & {
@@ -729,7 +733,7 @@ function describe(entry: Entry, instance: PrimitiveInstance, parts: Bound[]) {
   }
   for (const key of stateKeys(entry, state)) {
     if (key in state) {
-      out[key] = redact(entry, state[key] ?? null)
+      out[key] = redact(entry, state[key] ?? null, key)
     }
   }
   // A reading nothing sets, like a progress bar's 2 of `max` 4.
@@ -1214,7 +1218,7 @@ function createAgent(
             component: entry.component,
             label: entry.label,
             key,
-            value: redact(entry, state[key]),
+            value: redact(entry, state[key], key),
           })
         }
       }

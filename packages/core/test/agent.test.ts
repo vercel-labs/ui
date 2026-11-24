@@ -595,6 +595,54 @@ describe("agent", () => {
     })
   })
 
+  test("how a private field shows isn't redacted: a password's visible and a list's open", async () => {
+    const agent = createAgent()
+    const password = passwordInput({ id: "secret", defaultValue: "hunter2" })
+    const root = document.body.appendChild(document.createElement("div"))
+    const el = root.appendChild(document.createElement("input"))
+    el.setAttribute("aria-label", "Password")
+    const plan = select({ id: "plan", items: ["Free", "Pro"] })
+    const region = document.body.appendChild(document.createElement("div"))
+    region.setAttribute("data-agent-secret", "")
+    const trigger = region.appendChild(document.createElement("button"))
+    trigger.setAttribute("aria-label", "Plan")
+    cleanups.push(
+      bind(password.part("root"), root),
+      bind(password.part("control"), el),
+      bind(plan.part("trigger"), trigger),
+      () => password.destroy(),
+      () => plan.destroy(),
+      () => root.remove(),
+      () => region.remove()
+    )
+    const read = (label: string) =>
+      agent.snapshot().find((component) => component.label === label)
+    expect(read("Password")).toMatchObject({
+      value: "[redacted]",
+      visible: false,
+    })
+    expect(read("Plan")).toMatchObject({ open: false })
+    const outcome = await agent.act({
+      steps: [
+        { ref: "Password", action: "setVisible", args: [true] },
+        { ref: "Plan", action: "setOpen", args: [true] },
+      ],
+    })
+    expect(outcome).toMatchObject({
+      ok: true,
+      steps: [
+        { changes: [{ key: "visible", value: true }] },
+        { changes: [{ key: "open", value: true }] },
+      ],
+    })
+    expect(read("Password")).toMatchObject({
+      value: "[redacted]",
+      visible: true,
+    })
+    expect(read("Plan")).toMatchObject({ open: true })
+    expect(JSON.stringify(outcome)).not.toContain("hunter2")
+  })
+
   test("registerTools registers the three methods as WebMCP tools, and unregisters them", async () => {
     const tools = new Map<
       string,
