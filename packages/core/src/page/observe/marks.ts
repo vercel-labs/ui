@@ -7,6 +7,11 @@
 // bridge reads them.
 import { checkMarks as warnMarks } from "#dev"
 import { composedClosest } from "../../foundation/platform/platform"
+import {
+  accessibleName,
+  namedByContent,
+  roleOf,
+} from "../../foundation/text/accessible-name"
 
 const marks = ["data-agent-confirm", "data-agent-hidden", "data-agent-secret"]
 
@@ -55,7 +60,47 @@ function textOf(el: Element, skip: Element[] = []) {
   return text.replace(/\s+/g, " ").trim()
 }
 
+const namersOf = (el: Element) => {
+  const root = el.getRootNode() as Node & {
+    getElementById?: (id: string) => Element | null
+  }
+  return (el.getAttribute("aria-labelledby") ?? "")
+    .split(/\s+/)
+    .flatMap((id) => (id && root.getElementById?.(id)) || [])
+}
+
+// An element's accessible name without what `data-agent-hidden` keeps from
+// agents: a heading inside one names nothing, and one that holds some names
+// with its other text.
+function nameOf(el: Element) {
+  const by = namersOf(el)
+  const labels = [...((el as HTMLInputElement).labels ?? [])]
+  const content = namedByContent.has(roleOf(el)) ? [el] : []
+  const sources = [...by, ...labels, ...content]
+  const within = sources.flatMap((source) =>
+    [...source.querySelectorAll("[aria-labelledby]")].flatMap(namersOf)
+  )
+  if (
+    !isOffLimits([...sources, ...within]) &&
+    !sources.some((source) => source.querySelector("[data-agent-hidden]"))
+  ) {
+    return accessibleName(el)
+  }
+  const read = (elements: Element[]) =>
+    elements
+      .filter((each) => !isOffLimits([each]))
+      .map((each) => textOf(each))
+      .join(" ")
+      .trim()
+  return (
+    read(by) ||
+    el.getAttribute("aria-label")?.trim() ||
+    read(labels) ||
+    read(content)
+  )
+}
+
 // A misspelled mark does nothing, so development warns about one.
 const checkMarks = (elements: Element[]) => warnMarks(elements, marks)
 
-export { checkMarks, confirmOf, isOffLimits, isSecret, textOf }
+export { checkMarks, confirmOf, isOffLimits, isSecret, nameOf, textOf }

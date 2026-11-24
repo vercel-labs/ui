@@ -9,9 +9,14 @@ import { isDisabledElement } from "../../foundation/forms/form"
 import { withSource } from "../../foundation/kernel/details"
 import { partState } from "../../foundation/kernel/part"
 import type { PrimitiveInstance } from "../../foundation/kernel/primitive-types"
-import { accessibleName } from "../../foundation/text/accessible-name"
 import { foldText } from "../../foundation/text/match"
-import { confirmOf, isOffLimits, isSecret, textOf } from "../observe/marks"
+import {
+  confirmOf,
+  isOffLimits,
+  isSecret,
+  nameOf,
+  textOf,
+} from "../observe/marks"
 import { guardedActions } from "./guard"
 import {
   bound,
@@ -21,6 +26,7 @@ import {
   install,
   listen,
   offPage,
+  ownParts,
   placeOf,
   remember,
   retire,
@@ -379,9 +385,7 @@ function valueFor(entry: Entry, action: string, value: unknown) {
 
 // A button's text, else its accessible name, like "Close" for an icon-only ×, but
 // not one read from inside `data-agent-hidden`, which never reaches the agent.
-const textOrName = (el: Element) =>
-  textOf(el) ||
-  (el.querySelector("[data-agent-hidden]") ? "" : accessibleName(el))
+const textOrName = (el: Element) => textOf(el) || nameOf(el)
 
 // The items on the page, named by their trigger when they have one, like an
 // accordion's sections, else by their text.
@@ -398,7 +402,7 @@ function renderedItems(parts: Bound[]) {
     const el =
       parts.find((other) => other.slot === "trigger" && other.key === part.key)
         ?.el ?? part.el
-    return { value: part.key, label: textOf(el, nested) || accessibleName(el) }
+    return { value: part.key, label: textOf(el, nested) || nameOf(el) }
   })
 }
 
@@ -782,9 +786,7 @@ function describe(entry: Entry, instance: PrimitiveInstance, parts: Bound[]) {
   if (text.length) {
     out.text = text as string[]
   }
-  const confirm = confirmOf(
-    parts.filter((part) => !part.key).map((part) => part.el)
-  )
+  const confirm = confirmOf(ownParts(parts).map((part) => part.el))
   if (confirm) {
     out.confirm = confirm
   }
@@ -1974,9 +1976,14 @@ function createAgent(
         )
       )
       const every = /All$/.test(action)
+      const own = new Set(
+        [parts, bound(instance)].flatMap(ownParts).map((part) => part.el)
+      )
       // A part unbound since the step began has no element.
       const elements: Element[] = [...parts, ...bound(instance), ...openParts]
-        .filter((part) => part.el && (!part.key || every || keys.has(part.key)))
+        .filter(
+          (part) => part.el && (own.has(part.el) || every || keys.has(part.key))
+        )
         .map((part) => part.el)
       for (const key of keys) {
         const el = internalOf(instance)?.elementOf?.(key)

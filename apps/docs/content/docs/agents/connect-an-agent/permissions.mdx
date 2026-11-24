@@ -106,7 +106,7 @@ Two more marks change what the agent sees:
 </Field>
 ```
 
-Changes inside `data-agent-hidden` still reach [Observe](./observe-changes), so your own logs see them, while `agent.subscribe` stays quiet. A secret value stays out of `snapshot`, `act` results and change events, and the field's error text reads `"[redacted]"` too. A `set` on a secret field is never compared with the value it holds, so a step can't test a guess at it. A secret File Input lists its files without their names. Password, card and one-time-code fields are treated as secret without a mark. A hidden input is left out without one.
+Changes inside `data-agent-hidden` still reach [Observe](./observe-changes), so your own logs see them, while `agent.subscribe` stays quiet. The mark covers names too: a heading inside it names no component or section for the agent, and a label that holds a marked span is read without it. A secret value stays out of `snapshot`, `act` results and change events, and the field's error text reads `"[redacted]"` too. A `set` on a secret field is never compared with the value it holds, so a step can't test a guess at it. A secret File Input lists its files without their names. Password, card and one-time-code fields are treated as secret without a mark. A hidden input is left out without one.
 
 The agent reaches what a person can reach. A component hidden with CSS, the `hidden` attribute, a closed `<details>` or `aria-hidden="true"` is left out without a mark. A component in an `inert` region, like the page behind a modal dialog, is listed as disabled until the region is usable again.
 

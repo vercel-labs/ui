@@ -4307,7 +4307,7 @@ describe("agent act behind a closed tab or section", () => {
     ])
   })
 
-  test("a section isn't named by a heading inside data-agent-hidden, or by one that holds some", async () => {
+  test("a section isn't named by a heading inside data-agent-hidden, and one that holds some names it with its other text", async () => {
     const agent = createAgent()
     const root = document.body.appendChild(document.createElement("div"))
     root.innerHTML = `
@@ -4329,7 +4329,7 @@ describe("agent act behind a closed tab or section", () => {
     const screen = agent.snapshot().filter((component) => !component.offPage)
     expect(screen.map((component) => component.section)).toEqual([
       undefined,
-      undefined,
+      "Slack",
       "Email",
     ])
     const outcome = await agent.act({
@@ -4337,6 +4337,67 @@ describe("agent act behind a closed tab or section", () => {
     })
     expect(outcome.ok).toBe(true)
     expect(JSON.stringify([screen, outcome])).not.toContain("Canary")
+  })
+
+  test("a component isn't named by text inside data-agent-hidden", async () => {
+    const agent = createAgent()
+    const root = document.body.appendChild(document.createElement("div"))
+    root.innerHTML = `
+      <h3 id="owner" data-agent-hidden>Canary owner</h3>
+      <button aria-labelledby="owner"></button>
+      <h3 id="alerts">Alerts <span data-agent-hidden>for Canary</span></h3>
+      <button aria-labelledby="alerts"></button>
+      <label>Deploys <span data-agent-hidden>at Canary</span><button></button></label>
+      <button aria-label="Digest"><span data-agent-hidden>Canary</span></button>
+      <button><span data-agent-hidden>Canary</span> Invoices</button>
+      <button><span aria-labelledby="owner"></span> Receipts</button>`
+    cleanups.push(() => root.remove())
+    for (const [at, el] of [...root.querySelectorAll("button")].entries()) {
+      const instance = checkbox({ id: `named-${at}` })
+      const unbind = bind(instance.part("root"), el)
+      cleanups.push(() => {
+        unbind()
+        instance.destroy()
+      })
+    }
+    const screen = agent.snapshot().filter((component) => !component.offPage)
+    expect(screen.map((component) => component.label)).toEqual([
+      undefined,
+      "Alerts",
+      "Deploys",
+      "Digest",
+      "Invoices",
+      "Receipts",
+    ])
+    const outcome = await agent.act({ steps: [check("Nowhere")] })
+    expect(outcome.ok).toBe(false)
+    expect(JSON.stringify([screen, agent.query({}), outcome])).not.toContain(
+      "Canary"
+    )
+  })
+
+  test("a confirm mark on a part alone in its slot with a key of its own asks on every step, and shows in the snapshot", async () => {
+    const agent = createAgent()
+    const instance = collapsible({ id: "billing" })
+    const trigger = document.body.appendChild(document.createElement("button"))
+    trigger.textContent = "Billing"
+    trigger.setAttribute("data-agent-confirm", "Shows what you pay")
+    const unbind = bind(instance.part("trigger", { id: "auto-1" }), trigger)
+    cleanups.push(() => {
+      unbind()
+      instance.destroy()
+      trigger.remove()
+    })
+    expect(agent.snapshot().find(({ label }) => label === "Billing")).toEqual(
+      expect.objectContaining({ confirm: "Shows what you pay" })
+    )
+    const outcome = await agent.act({
+      steps: [{ ref: "Billing", action: "setOpen", args: [true] }],
+    })
+    expect(outcome.error?.message).toBe(
+      'Needs a person: "Shows what you pay". Ask them to make this change themselves.'
+    )
+    expect(instance.get().open).toBe(false)
   })
 
   test("a field that was never shown isn't in a call's values, on a failed call either", async () => {

@@ -4,6 +4,7 @@ import { defineAccordionElements } from "../src/accordion"
 import { createAgent } from "../src/agent"
 import { defineCheckboxElements } from "../src/checkbox"
 import { defineCollapsibleElements } from "../src/collapsible"
+import { defineMenuElements } from "../src/menu"
 import { defineTabsElements } from "../src/tabs"
 
 const wait = () => new Promise((resolve) => setTimeout(resolve, 20))
@@ -12,11 +13,13 @@ beforeAll(() => {
   ;(
     Element.prototype as { getAnimations?: () => Animation[] }
   ).getAnimations ??= () => []
+  Element.prototype.scrollIntoView ??= () => {}
   ElementInternals.prototype.setFormValue ??= () => {}
   ElementInternals.prototype.setValidity ??= () => {}
   defineAccordionElements()
   defineCheckboxElements()
   defineCollapsibleElements()
+  defineMenuElements()
   defineTabsElements()
 })
 
@@ -68,4 +71,39 @@ test.each(names)("a %s with no mark opens for the step", async (name) => {
   await wait()
   const outcome = await createAgent().act({ steps: [gift] })
   expect(outcome.ok, outcome.error?.message).toBe(true)
+})
+
+test("a mark on a collapsible's trigger asks before any step opens it, and shows in the snapshot", async () => {
+  document.body.innerHTML = places(
+    'data-agent-confirm="Shows the gift options"'
+  ).collapsible
+  await wait()
+  const agent = createAgent()
+  expect(agent.snapshot()[0].confirm).toBe("Shows the gift options")
+  for (const step of [
+    { ref: "More options", action: "setOpen", args: [true] },
+    { ref: "More options", action: "press" },
+  ]) {
+    const outcome = await agent.act({ steps: [step] })
+    expect(outcome.error?.message).toMatch(/^Needs a person: /)
+  }
+  expect(document.querySelector("ui-collapsible")).toHaveProperty("open", false)
+})
+
+test("a mark on one menu item asks for that item only", async () => {
+  document.body.innerHTML = `
+    <ui-menu>
+      <ui-menu-trigger><button>Project</button></ui-menu-trigger>
+      <ui-menu-content>
+        <ui-menu-item>Rename</ui-menu-item>
+        <ui-menu-item data-agent-confirm="Deletes the project">Delete</ui-menu-item>
+      </ui-menu-content>
+    </ui-menu>`
+  await wait()
+  const agent = createAgent()
+  expect(agent.snapshot()[0].confirm).toBeUndefined()
+  const press = (text: string) =>
+    agent.act({ steps: [{ ref: "Project", action: "press", args: [text] }] })
+  expect((await press("Rename")).ok).toBe(true)
+  expect((await press("Delete")).error?.message).toMatch(/^Needs a person: /)
 })

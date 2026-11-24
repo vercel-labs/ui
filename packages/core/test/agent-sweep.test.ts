@@ -46,11 +46,13 @@ function inside(attribute: string, value = "") {
   return region
 }
 
-// A section that mounts what it holds while it's open, as an adapter renders it.
+// A section that mounts what it holds while it's open, as an adapter renders
+// it. With `key`, its trigger has a key of its own, as a web component's does.
 function addSection(
   id: string,
   text: string,
-  fill: (panel: HTMLElement) => (() => void)[]
+  fill: (panel: HTMLElement) => (() => void)[],
+  key?: string
 ) {
   const trigger = document.body.appendChild(document.createElement("button"))
   trigger.textContent = text
@@ -68,7 +70,7 @@ function addSection(
     },
   })
   cleanups.push(
-    bind(instance.part("trigger"), trigger),
+    bind(instance.part("trigger", key ? { id: key } : undefined), trigger),
     bind(instance.part("panel"), panel),
     () => offs.forEach((off) => off()),
     () => instance.destroy()
@@ -105,12 +107,26 @@ test("no tool reads what is private, and no step or look changes what needs a pe
     <div role="group" aria-labelledby="private-heading"></div>
     <h3 id="part-private">Alerts <span data-agent-hidden>kanary part</span></h3>
     <div role="group" aria-labelledby="part-private"></div>
-    <ul><li>Jane Doe <span data-agent-hidden>kanary row</span></li></ul>`
+    <ul><li>Jane Doe <span data-agent-hidden>kanary row</span></li></ul>
+    <p><button aria-labelledby="private-heading"></button></p>
+    <p><button aria-labelledby="part-private"></button></p>
+    <p><button>Weekly digest <span data-agent-hidden>kanary text</span></button></p>
+    <label>Invoices <span data-agent-hidden>kanary label</span><button></button></label>`
   const [first, second] = headed.querySelectorAll("[role=group]")
   cleanups.push(
     addSwitch(first, "alerts-1", "Deploy failures"),
     addSwitch(second, "alerts-2", "Deploy failures"),
-    addSwitch(headed.querySelector("li")!, "admin", "Admin")
+    addSwitch(headed.querySelector("li")!, "admin", "Admin"),
+    ...[...headed.querySelectorAll("p > button, label > button")].map(
+      (el, at) => {
+        const instance = checkbox({ id: `named-${at}` })
+        const unbind = bind(instance.part("root"), el as HTMLElement)
+        return () => {
+          unbind()
+          instance.destroy()
+        }
+      }
+    )
   )
   const advanced = addSection("advanced", "Advanced", (panel) => {
     const secret = panel.appendChild(document.createElement("div"))
@@ -129,6 +145,13 @@ test("no tool reads what is private, and no step or look changes what needs a pe
     addSwitch(panel, "wipe", "Delete everything"),
   ])
   danger.trigger.setAttribute("data-agent-confirm", "Shows what deletes data")
+  const billing = addSection(
+    "billing",
+    "Billing",
+    (panel) => [addSwitch(panel, "renew", "Auto renew")],
+    "auto-1"
+  )
+  billing.trigger.setAttribute("data-agent-confirm", "Shows what you pay")
 
   const agent = createAgent()
   const told: unknown[] = []
@@ -151,6 +174,11 @@ test("no tool reads what is private, and no step or look changes what needs a pe
     args: [true],
   })
   expect(named.error?.message).toMatch(/^Needs a person: /)
+  expect((await act(check("Auto renew"))).ok).toBe(false)
+  const keyed = await act({ ref: "Billing", action: "setOpen", args: [true] })
+  expect(keyed.error?.message).toMatch(/^Needs a person: /)
+  expect((await act(check("Weekly digest"))).ok).toBe(true)
+  expect((await act(check("Invoices"))).ok).toBe(true)
   const read = await act({ ref: "Recovery code", action: "expect", args: [""] })
   expect(read.error?.message).toContain("is private")
   await act({ ref: "PIN", action: "setValue", args: ["0000"] })
@@ -169,6 +197,8 @@ test("no tool reads what is private, and no step or look changes what needs a pe
   told.push(agent.snapshot())
 
   expect(JSON.stringify(told)).not.toMatch(/canary|kanary/i)
-  expect(danger.opened()).toBe(0)
-  expect(danger.instance.get().open).toBe(false)
+  for (const section of [danger, billing]) {
+    expect(section.opened()).toBe(0)
+    expect(section.instance.get().open).toBe(false)
+  }
 })

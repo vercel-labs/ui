@@ -11,8 +11,7 @@ import type {
   PropSpec,
 } from "../../foundation/kernel/primitive-types"
 import { watchEarlier, watchers } from "../../foundation/kernel/watchers"
-import { accessibleName } from "../../foundation/text/accessible-name"
-import { checkMarks, isOffLimits, isSecret, textOf } from "./marks"
+import { checkMarks, isOffLimits, isSecret, nameOf, textOf } from "./marks"
 
 /**
  * A change a person or an agent made to a component, as `observe` and `agent.subscribe` report it.
@@ -241,6 +240,24 @@ function bound(instance: PrimitiveInstance) {
   ) as Bound[]
 }
 
+// The parts every step on a component touches: the ones with no key, and
+// one alone in its slot with a key of its own that no value gave it, like
+// the id the web adapter gives a collapsible's trigger.
+function ownParts<Each extends Pick<Bound, "key" | "slot" | "props">>(
+  parts: Each[]
+) {
+  return parts.filter(
+    (part) =>
+      !part.key ||
+      (part.props?.value == null &&
+        parts.every(
+          (other) =>
+            other === part ||
+            (other.slot !== part.slot && other.key !== part.key)
+        ))
+  )
+}
+
 function componentLabel(parts: Bound[]) {
   const keyless = (slot: string) =>
     parts.find((part) => part.slot === slot && !part.key)?.el
@@ -261,7 +278,7 @@ function componentLabel(parts: Bound[]) {
   }
   // A group's own element names it before its items do.
   const group = keyless("group") ?? keyless("root")
-  const name = group && accessibleName(group)
+  const name = group && nameOf(group)
   if (name) {
     return name
   }
@@ -274,7 +291,7 @@ function componentLabel(parts: Bound[]) {
       (part.slot === "control" && part.el.matches("input, textarea"))
   )?.el
   const popup = parts.find((part) => part.slot === "content")?.el
-  const field = input && !popup?.contains(input) && accessibleName(input)
+  const field = input && !popup?.contains(input) && nameOf(input)
   if (field) {
     return field
   }
@@ -285,8 +302,7 @@ function componentLabel(parts: Bound[]) {
     (root.tagName === "BUTTON" || root.getAttribute("role") === "button")
       ? root
       : undefined
-  const named = (el: Element | undefined) =>
-    (el && accessibleName(el)) || text(el)
+  const named = (el: Element | undefined) => (el && nameOf(el)) || text(el)
   const shown =
     named(first("title")) ??
     named(first("heading")) ??
@@ -315,7 +331,7 @@ function componentLabel(parts: Bound[]) {
     ...sole,
     ...keyed,
   ]) {
-    const name = accessibleName(part.el)
+    const name = nameOf(part.el)
     if (name) {
       return name
     }
@@ -333,21 +349,6 @@ const headerRow = (row: Element) =>
 
 const regions = "[role=tabpanel], [role=region], [role=group], fieldset"
 
-// Whether what names a region is kept from agents: a heading inside
-// `data-agent-hidden`, or one that holds some.
-function namedInPrivate(region: Element) {
-  const root = region.getRootNode() as Node & {
-    getElementById?: (id: string) => Element | null
-  }
-  const labels = (region.getAttribute("aria-labelledby") ?? "")
-    .split(/\s+/)
-    .flatMap((id) => (id && root.getElementById?.(id)) || [])
-  return (
-    isOffLimits(labels) ||
-    labels.some((label) => label.querySelector("[data-agent-hidden]"))
-  )
-}
-
 // The names of the labelled regions a component is in, so two with one
 // label, like a switch under Email and under Slack, are told apart.
 function sectionsOf(parts: Bound[]) {
@@ -358,10 +359,7 @@ function sectionsOf(parts: Bound[]) {
     parts[0]
   )?.el.parentElement?.closest(regions)
   while (region) {
-    const name =
-      !own.has(region) &&
-      !namedInPrivate(region) &&
-      accessibleName(region).slice(0, 80)
+    const name = !own.has(region) && nameOf(region).slice(0, 80)
     if (name) {
       names.unshift(name)
     }
@@ -528,6 +526,7 @@ export {
   listen,
   type ObservedChange,
   offPage,
+  ownParts,
   placeOf,
   remember,
   retire,
