@@ -1,5 +1,12 @@
 # @ui-sdk/svelte
 
+## 0.1.0-beta.17
+
+### Patch Changes
+
+- 922763f: Relative imports in the published files name their file, like `./create-parts.js`, where a folder of the same name sat beside it, so Node and test runners that load the package without a bundler no longer throw `ERR_UNSUPPORTED_DIR_IMPORT`.
+- Updated @ui-sdk/core to 0.1.0-beta.17
+
 ## 0.1.0-beta.16
 
 ### Patch Changes

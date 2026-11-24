@@ -1,5 +1,12 @@
 # @ui-sdk/solid
 
+## 0.1.0-beta.17
+
+### Patch Changes
+
+- 84693d9: A `MenuItemIndicator` inside a controlled `MenuCheckboxItem` now follows its `checked` prop.
+- Updated @ui-sdk/core to 0.1.0-beta.17
+
 ## 0.1.0-beta.16
 
 ### Patch Changes
