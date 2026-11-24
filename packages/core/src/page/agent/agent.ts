@@ -1466,21 +1466,38 @@ function createAgent(
 
   // Opens a place once `allow` lets it, and returns how it goes back. Its
   // holder is read from the page now: opening another place can make it again.
-  async function enter({ ref, item }: Place) {
+  async function enter({ ref, item, swaps }: Place) {
     const holder = live().find(({ entry }) => entry.ref === ref)
     if (!holder) {
       return
     }
     const { entry, instance } = holder
     // Looking opens nothing a person must approve: a place inside
-    // `data-agent-confirm` takes a step of its own, which asks them.
+    // `data-agent-confirm` takes a step of its own, which asks them. Every part
+    // counts but another item's, since the web adapter keys each part.
     const marked = () => {
-      const key = String(item.value)
-      const own = internalOf(instance)?.elementOf?.(key)
+      const parts = bound(instance)
+      const now = instance.get() as {
+        value?: unknown
+        page?: number
+        pageCount?: number
+      }
+      const taken = [item.value, ...(swaps ? [now.value, now.page] : [])].map(
+        String
+      )
+      const others = new Set(
+        [
+          ...(describe(entry, instance, parts).items ?? []).map(
+            ({ value }) => value
+          ),
+          ...Array.from({ length: now.pageCount ?? 0 }, (_, at) => at + 1),
+        ]
+          .map(String)
+          .filter((key) => !taken.includes(key))
+      )
+      const own = internalOf(instance)?.elementOf?.(String(item.value))
       return confirmOf([
-        ...bound(instance)
-          .filter((part) => !part.key || part.key === key)
-          .map((part) => part.el),
+        ...parts.filter((part) => !others.has(part.key)).map((part) => part.el),
         ...(own ? [own] : []),
       ])
     }
