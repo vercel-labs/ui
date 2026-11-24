@@ -14,11 +14,18 @@ afterEach(() => {
   document.body.innerHTML = ""
 })
 
-function addField(parent: Element, id: string, text: string, value: string) {
+function addField(
+  parent: Element,
+  id: string,
+  text: string,
+  value: string,
+  made?: (instance: ReturnType<typeof input>) => void
+) {
   const label = parent.appendChild(document.createElement("label"))
   label.append(text)
   const el = label.appendChild(document.createElement("input"))
   const instance = input({ id, defaultValue: value })
+  made?.(instance)
   const unbind = bind(instance.part("root"), el)
   return () => {
     unbind()
@@ -91,7 +98,11 @@ test("no tool reads what is private, and no step or look changes what needs a pe
       "canary-aria"
     ),
   ]
+  // On the page at first, then hidden and changed.
+  const stowed = document.body.appendChild(document.createElement("div"))
+  let coupon!: ReturnType<typeof input>
   cleanups.push(
+    addField(stowed, "coupon", "Coupon", "SAVE10", (made) => (coupon = made)),
     addSwitch(document.body, "terms", "Accept the terms"),
     addField(
       inside("data-agent-hidden"),
@@ -166,7 +177,8 @@ test("no tool reads what is private, and no step or look changes what needs a pe
 
   const agent = createAgent()
   const told: unknown[] = []
-  cleanups.push(agent.subscribe((change) => told.push(change)))
+  const unsubscribe = agent.subscribe((change) => told.push(change))
+  cleanups.push(unsubscribe)
   const act = async (...steps: Parameters<typeof agent.act>[0]["steps"]) => {
     const outcome = await agent.act({ steps })
     told.push(outcome)
@@ -204,8 +216,15 @@ test("no tool reads what is private, and no step or look changes what needs a pe
     told.push(await agent.query(query))
   }
   unshown.forEach((off) => off())
+  // `subscribe` hears every settled change outside `data-agent-hidden`, so
+  // what the page changes while it's hidden is checked against the tools.
+  unsubscribe()
+  stowed.hidden = true
+  coupon.api.setValue("canary-stowed")
   await act({ ref: "Accept the terms", action: "setChecked", args: [false] })
   told.push(agent.snapshot())
+  told.push(await agent.query({ text: "Coupon" }))
+  told.push(await agent.query({ closed: true }))
 
   expect(JSON.stringify(told)).not.toMatch(/canary|kanary/i)
   for (const section of [danger, billing]) {

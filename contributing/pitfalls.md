@@ -53,6 +53,12 @@ Things that cost real debugging time. Read them before you write core or adapter
 - **Core writes a part's state attribute before `animateOut`,** so exit keyframes keyed on it play.
 - **Right to left:** read direction with `isRTL(el)` from computed style. Swap ArrowLeft and ArrowRight in key handling.
 
+## The agent bridge
+
+- **Page text the bridge returns goes through `textOf` or `nameOf`** in `page/observe/marks.ts`, never `textContent`, `innerText` or `accessibleName`. They leave out text inside `data-agent-hidden`, what an input, a select or a textarea holds, and what `hidden` takes off the page. A raw read can hand an agent a secret field's value as part of a label or a row.
+- **A value the bridge returns goes through `redact`,** and a component's own error text reads `"[redacted]"` on a secret field, since an error can repeat the value.
+- **Anything new the bridge returns gets a case in `packages/core/test/agent-sweep.test.ts`.** It runs every tool on one page that holds hidden, secret, never-shown and marked content, and fails when any of it comes back or anything marked changes.
+
 ## Browsers and assistive technology
 
 - **Safari doesn't focus buttons on click.** After a pointer open, focus may still be on the body when the next key arrives, so closing returns focus when it's on the body too.
