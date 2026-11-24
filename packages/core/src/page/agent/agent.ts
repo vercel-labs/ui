@@ -190,7 +190,13 @@ function fromData(
   const listed = new Set(known)
   const push = (value: unknown, label: string) => {
     if (!listed.has(key(value))) {
-      const item = { value: String(value), label }
+      const item = {
+        value:
+          value !== null && typeof value === "object"
+            ? key(value)
+            : String(value),
+        label,
+      }
       out.push(item)
       known?.add(key(value))
       values?.set(item, value)
@@ -2141,16 +2147,36 @@ function createAgent(
       const askToOpen = () => ask(args, targetsOf(args[0]), "make this change")
       // A value by its item's label, like "Germany (Frankfurt)" or an accordion's "Email", so the agent needn't look up the value first.
       const label = typeof args[0] === "string" && fold(args[0])
+      const values = new Map<object, unknown>()
+      const data =
+        label || Array.isArray(args[0])
+          ? dataOf(entry, instance, undefined, undefined, values)
+          : undefined
+      // An item's own value where it's an object, which its key in a step stands for.
+      const own = (item: { value: string; label: string }) => {
+        const listed = data?.find(
+          (each) => each.value === item.value && each.label === item.label
+        )
+        const part = [...bound(instance), ...openParts].find(
+          (part) => part.key === item.value
+        )
+        const value =
+          listed && values.has(listed)
+            ? values.get(listed)
+            : (part?.props as { value?: unknown } | undefined)?.value
+        return value !== null && typeof value === "object" ? value : item.value
+      }
       if (label) {
-        const values = new Map<object, unknown>()
-        const data = dataOf(entry, instance, undefined, undefined, values)
         const items =
           action === "setValue"
             ? await listItems(entry, instance, askToOpen, seeOpen)
             : data?.length
               ? data
               : unnamed(entry, renderedItems(bound(instance)))
-        if (!items.some((item) => item.value === args[0])) {
+        const keyed = items.find((item) => item.value === args[0])
+        if (keyed && action === "setValue") {
+          args = [own(keyed), ...args.slice(1)]
+        } else if (!keyed) {
           const name = `${entry.label ?? entry.component} (${entry.ref})`
           const found = items.filter((item) => fold(item.label) === label)
           if (found.length > 1) {
@@ -2223,12 +2249,13 @@ function createAgent(
       ) {
         const items = await listItems(entry, instance, askToOpen, seeOpen)
         const name = `${entry.label ?? entry.component} (${entry.ref})`
-        const values = (args[0] as unknown[]).map((value) => {
-          if (
-            typeof value !== "string" ||
-            items.some((item) => item.value === value)
-          ) {
+        const named = (args[0] as unknown[]).map((value) => {
+          if (typeof value !== "string") {
             return value
+          }
+          const keyed = items.find((item) => item.value === value)
+          if (keyed) {
+            return own(keyed)
           }
           const found = items.filter((item) => fold(item.label) === fold(value))
           if (found.length > 1) {
@@ -2236,9 +2263,9 @@ function createAgent(
               `"${value}" names ${found.length} items in ${name}: ${found.map((item) => item.value).join(", ")}. Use a value.`
             )
           }
-          return found.length ? found[0].value : value
+          return found.length ? own(found[0]) : value
         })
-        args = [values, ...args.slice(1)]
+        args = [named, ...args.slice(1)]
       }
       // A closed list refuses values it doesn't have in a list or an object too.
       const elementOf = internalOf(instance)?.elementOf

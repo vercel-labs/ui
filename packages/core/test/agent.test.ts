@@ -1140,6 +1140,126 @@ describe("agent", () => {
     expect(instance.get().value).toBeNull()
   })
 
+  const methods = [
+    { id: "standard", name: "Standard" },
+    { id: "express", name: "Express" },
+  ]
+  const methodKey = (method: { id: string }) => method.id
+
+  // Items with object values, keyed the way an adapter keys them.
+  function mountMethods(
+    instance: {
+      api: { internal: { keyOf: (value: unknown) => string } }
+      part: (slot: "item", props: { id: string; value: unknown }) => unknown
+    },
+    parent: Element = document.body
+  ) {
+    for (const method of methods) {
+      const item = parent.appendChild(document.createElement("div"))
+      item.textContent = method.name
+      cleanups.push(
+        bind(
+          instance.part("item", {
+            id: instance.api.internal.keyOf(method),
+            value: method,
+          }) as Parameters<typeof bind>[0],
+          item
+        )
+      )
+    }
+  }
+
+  test("setValue by an item's key or label sets the item's own object value in a select", async () => {
+    const agent = createAgent()
+    const instance = select({ id: "shipping", itemToValue: methodKey })
+    const trigger = document.body.appendChild(document.createElement("button"))
+    trigger.setAttribute("aria-label", "Shipping")
+    cleanups.push(bind(instance.part("trigger"), trigger), () =>
+      instance.destroy()
+    )
+    mountMethods(instance)
+    for (const [named, held] of [
+      ["express", methods[1]],
+      ["Standard", methods[0]],
+    ] as const) {
+      const outcome = await agent.act({
+        steps: [{ ref: "Shipping", action: "setValue", args: [named] }],
+      })
+      expect(outcome.ok, outcome.error?.message).toBe(true)
+      expect(instance.get().value).toBe(held)
+    }
+  })
+
+  test("setValue by an item's key sets the item's own object value in a combobox", async () => {
+    const agent = createAgent()
+    const instance = combobox({
+      id: "method",
+      itemToValue: methodKey,
+      itemToLabel: (method: { name: string }) => method.name,
+    })
+    const field = document.body.appendChild(document.createElement("input"))
+    field.setAttribute("aria-label", "Method")
+    cleanups.push(bind(instance.part("input"), field), () => instance.destroy())
+    mountMethods(instance)
+    const outcome = await agent.act({
+      steps: [{ ref: "Method", action: "setValue", args: ["express"] }],
+    })
+    expect(outcome.ok, outcome.error?.message).toBe(true)
+    expect(instance.get().value).toBe(methods[1])
+    expect(field.value).toBe("Express")
+  })
+
+  test("setValue by keys and labels sets each item's own object value in a multiple listbox", async () => {
+    const agent = createAgent()
+    const instance = listbox({
+      id: "methods",
+      multiple: true,
+      itemToValue: methodKey,
+    })
+    const root = document.body.appendChild(document.createElement("div"))
+    root.setAttribute("aria-label", "Methods")
+    cleanups.push(bind(instance.part("root"), root), () => instance.destroy())
+    mountMethods(instance, root)
+    expect(
+      agent.snapshot().find(({ label }) => label === "Methods")?.items
+    ).toEqual([
+      { value: "standard", label: "Standard" },
+      { value: "express", label: "Express" },
+    ])
+    const outcome = await agent.act({
+      steps: [
+        { ref: "Methods", action: "setValue", args: [["express", "Standard"]] },
+      ],
+    })
+    expect(outcome.ok, outcome.error?.message).toBe(true)
+    expect(instance.get().value).toEqual([methods[1], methods[0]])
+  })
+
+  test("a list whose data holds object values lists each by its key, and setValue by that key sets the object", async () => {
+    const agent = createAgent()
+    const instance = select({
+      id: "carrier",
+      items: methods.map((method) => ({ value: method, label: method.name })),
+      itemToValue: methodKey,
+    })
+    const trigger = document.body.appendChild(document.createElement("button"))
+    trigger.setAttribute("aria-label", "Carrier")
+    cleanups.push(bind(instance.part("trigger"), trigger), () =>
+      instance.destroy()
+    )
+    expect(
+      agent.snapshot().find(({ label }) => label === "Carrier")?.items
+    ).toEqual([
+      { value: "standard", label: "Standard" },
+      { value: "express", label: "Express" },
+    ])
+    const outcome = await agent.act({
+      steps: [{ ref: "Carrier", action: "setValue", args: ["express"] }],
+    })
+    expect(outcome.ok, outcome.error?.message).toBe(true)
+    expect(instance.get().value).toBe(methods[1])
+  })
+
   test("setValue refuses a disabled option that renders only while its select is open", async () => {
     const agent = createAgent()
     const content = document.body.appendChild(document.createElement("div"))
