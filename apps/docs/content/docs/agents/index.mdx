@@ -84,28 +84,28 @@ On the other libraries, the agent used browser tools: it reads the page's access
 
 |            | Base UI + browser tools | Ark UI + browser tools | ui-sdk + agent bridge | Delta       |
 | ---------- | ----------------------- | ---------------------- | --------------------- | ----------- |
-| Tool calls | 17                      | 18                     | <Won>2</Won>          | 88% fewer   |
-| Tokens     | 291.0k                  | 303.9k                 | <Won>24.6k</Won>      | 92% fewer   |
-| Time       | 54 s                    | 58 s                   | <Won>13 s</Won>       | 76% faster  |
-| Cost       | $0.139                  | $0.143                 | <Won>$0.027</Won>     | 81% cheaper |
+| Tool calls | 17                      | 19                     | <Won>2</Won>          | 88% fewer   |
+| Tokens     | 291.1k                  | 330.3k                 | <Won>21.8k</Won>      | 92% fewer   |
+| Time       | 56 s                    | 58 s                   | <Won>13 s</Won>       | 77% faster  |
+| Cost       | $0.138                  | $0.143                 | <Won>$0.021</Won>     | 85% cheaper |
 
 ### Vue
 
 |            | Reka UI + browser tools | ui-sdk + agent bridge | Delta       |
 | ---------- | ----------------------- | --------------------- | ----------- |
 | Tool calls | 17                      | <Won>2</Won>          | 88% fewer   |
-| Tokens     | 247.6k                  | <Won>22.8k</Won>      | 91% fewer   |
-| Time       | 55 s                    | <Won>14 s</Won>       | 75% faster  |
-| Cost       | $0.117                  | <Won>$0.024</Won>     | 79% cheaper |
+| Tokens     | 247.7k                  | <Won>21.8k</Won>      | 91% fewer   |
+| Time       | 54 s                    | <Won>13 s</Won>       | 76% faster  |
+| Cost       | $0.117                  | <Won>$0.021</Won>     | 82% cheaper |
 
 ### Svelte
 
 |            | Bits UI + browser tools | ui-sdk + agent bridge | Delta       |
 | ---------- | ----------------------- | --------------------- | ----------- |
 | Tool calls | 17                      | <Won>2</Won>          | 88% fewer   |
-| Tokens     | 258.6k                  | <Won>21.9k</Won>      | 92% fewer   |
-| Time       | 50 s                    | <Won>13 s</Won>       | 74% faster  |
-| Cost       | $0.122                  | <Won>$0.021</Won>     | 83% cheaper |
+| Tokens     | 258.5k                  | <Won>22.0k</Won>      | 91% fewer   |
+| Time       | 53 s                    | <Won>13 s</Won>       | 75% faster  |
+| Cost       | $0.122                  | <Won>$0.022</Won>     | 82% cheaper |
 
 These are medians from three runs per column. Every agent used Sonnet through Claude Code with the same task and system prompt, plus instructions for its tools. Every run completed the task. Time runs from the agent's start to its last message. Tokens and cost are what Claude Code reported for the run. Delta compares ui-sdk with the best other result in the row.
 

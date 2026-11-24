@@ -27,26 +27,26 @@ Medians of three runs per row, with Sonnet through Claude Code, on November 24, 
 
 | Library | Tools   | Tool calls | Text read | Time | Tokens | Cost   |
 | ------- | ------- | ---------- | --------- | ---- | ------ | ------ |
-| Base UI | Browser | 17         | 41.0k     | 54 s | 291.0k | $0.139 |
-| Ark UI  | Browser | 18         | 38.6k     | 58 s | 303.9k | $0.143 |
-| ui-sdk  | Browser | 17         | 41.3k     | 58 s | 293.7k | $0.140 |
-| ui-sdk  | Agent   | 2          | 5.3k      | 13 s | 24.6k  | $0.027 |
+| Base UI | Browser | 17         | 41.0k     | 56 s | 291.1k | $0.138 |
+| Ark UI  | Browser | 19         | 39.8k     | 58 s | 330.3k | $0.143 |
+| ui-sdk  | Browser | 17         | 41.3k     | 59 s | 293.8k | $0.140 |
+| ui-sdk  | Agent   | 2          | 2.3k      | 13 s | 21.8k  | $0.021 |
 
 ### Vue
 
 | Library | Tools   | Tool calls | Text read | Time | Tokens | Cost   |
 | ------- | ------- | ---------- | --------- | ---- | ------ | ------ |
-| Reka UI | Browser | 17         | 34.3k     | 55 s | 247.6k | $0.117 |
-| ui-sdk  | Browser | 16         | 41.0k     | 48 s | 267.5k | $0.135 |
-| ui-sdk  | Agent   | 2          | 3.0k      | 14 s | 22.8k  | $0.024 |
+| Reka UI | Browser | 17         | 34.3k     | 54 s | 247.7k | $0.117 |
+| ui-sdk  | Browser | 17         | 41.3k     | 54 s | 293.6k | $0.140 |
+| ui-sdk  | Agent   | 2          | 2.3k      | 13 s | 21.8k  | $0.021 |
 
 ### Svelte
 
 | Library | Tools   | Tool calls | Text read | Time | Tokens | Cost   |
 | ------- | ------- | ---------- | --------- | ---- | ------ | ------ |
-| Bits UI | Browser | 17         | 36.2k     | 50 s | 258.6k | $0.122 |
+| Bits UI | Browser | 17         | 36.2k     | 53 s | 258.5k | $0.122 |
 | ui-sdk  | Browser | 17         | 41.3k     | 49 s | 293.6k | $0.139 |
-| ui-sdk  | Agent   | 2          | 2.5k      | 13 s | 21.9k  | $0.021 |
+| ui-sdk  | Agent   | 2          | 2.5k      | 13 s | 22.0k  | $0.022 |
 
 With browser tools, the ui-sdk screen takes about as much as the others. The difference comes from the agent tools.
 
