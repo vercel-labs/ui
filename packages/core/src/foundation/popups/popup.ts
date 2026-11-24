@@ -629,10 +629,12 @@ function createPopupLayer<
     take?: (target: HTMLElement) => boolean,
     strict?: boolean
   ) => HTMLElement | undefined = () => undefined
+  // Neighbours are held weakly, since the trigger's can be the content, which
+  // they'd keep in memory once it unmounts. One that's gone was out of the page.
   let path: {
     node: Element
-    next: Element | null
-    previous: Element | null
+    next: WeakRef<Element> | null
+    previous: WeakRef<Element> | null
   }[] = []
   const returnTrigger = options.returnTrigger ?? options.trigger
   let place: (() => void) | undefined
@@ -891,14 +893,16 @@ function createPopupLayer<
     if (index === -1) {
       return
     }
-    const { next, previous } = path[index]
+    const step = path[index]
+    const next = step.next?.deref()
+    const previous = step.previous?.deref()
     const parent = path[index + 1].node
-    const inPlace = (sibling: Element | null): sibling is Element =>
+    const inPlace = (sibling: Element | undefined): sibling is Element =>
       !!sibling?.isConnected && sibling.parentNode === parent
     const closed = inPlace(next)
-      ? next.previousElementSibling === previous
-      : !next &&
-        (previous
+      ? next.previousElementSibling === (step.previous ? previous : null)
+      : !step.next &&
+        (step.previous
           ? inPlace(previous) && !previous.nextElementSibling
           : !parent.firstElementChild)
     if (strict && !closed) {
@@ -1125,10 +1129,12 @@ function createPopupLayer<
       node && node !== el.ownerDocument.body;
       node = node.parentElement
     ) {
+      const { nextElementSibling: next, previousElementSibling: previous } =
+        node
       path.push({
         node,
-        next: node.nextElementSibling,
-        previous: node.previousElementSibling,
+        next: next && new WeakRef(next),
+        previous: previous && new WeakRef(previous),
       })
     }
 
