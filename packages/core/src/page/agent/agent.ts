@@ -880,6 +880,8 @@ function createAgent(
         parts.some((part) => isShown(part.el))
       ) {
         found.push({ entry, instance, parts })
+        entry.shown = true
+        shownInCall.add(entry.ref)
       }
     }
     return found
@@ -889,6 +891,8 @@ function createAgent(
   // page, and one step reads it several times. After a wait, like for frames
   // or a person's answer, the page may have changed, so it's read again.
   let scanned: ReturnType<typeof scan> | undefined
+  // The refs an `act` call has had on the page, which its values may list.
+  const shownInCall = new Set<string>()
   const live = () => {
     if (!scanned) {
       scanned = scan()
@@ -1136,13 +1140,20 @@ function createAgent(
     }
     // A field on a tab a step left is listed too, so an agent checks it without another call. React
     // hasn't let go of it yet, so it isn't remembered, and a panel that stays mounted keeps it bound.
+    // Only one this call had on the page: a field hidden all along was never the agent's to read.
     const listed = new Set(fields.map((field) => field.ref))
     for (const entry of entries.values()) {
       const state = entry.instance.deref()?.get() as
         Record<string, unknown> | undefined
       const key =
         state && fieldKey(stateKeys(entry, state).filter((key) => key in state))
-      if (key && entry.key && !entry.offLimits && !listed.has(entry.ref)) {
+      if (
+        key &&
+        entry.key &&
+        !entry.offLimits &&
+        shownInCall.has(entry.ref) &&
+        !listed.has(entry.ref)
+      ) {
         fields.push({
           ref: entry.ref,
           label: entry.label ?? entry.component,
@@ -2625,6 +2636,8 @@ function createAgent(
   async function act(input: unknown, guard?: () => boolean) {
     const invalid = malformed(input)
     const steps = invalid ? [] : (input as { steps: AgentStep[] }).steps
+    scanned = undefined
+    shownInCall.clear()
     const before = capture()
     // What each step did, so a change that a later step undid or took off the page, like a removed row, still shows.
     const log: {

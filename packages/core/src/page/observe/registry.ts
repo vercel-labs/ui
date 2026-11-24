@@ -55,6 +55,9 @@ type Entry = {
   row?: string
   // The labelled regions around it, outermost first, like a tab's panel and an accordion's section in it.
   sections?: string[]
+  // Whether an agent has had it on the page. One hidden all along, like a
+  // field in a dialog nobody opened, isn't kept once it leaves.
+  shown?: boolean
   // A password, card or one-time code, or a field inside `data-agent-secret`,
   // whose value is redacted and isn't kept once it leaves the page.
   secret?: boolean
@@ -134,7 +137,7 @@ function retire(entry: Entry) {
   if (byId.get(entry.id) === entry) {
     byId.delete(entry.id)
   }
-  if (!entry.key || entry.secret || entry.offLimits) {
+  if (!entry.key || !entry.shown || entry.secret || entry.offLimits) {
     return
   }
   const queued = retired.get(entry.key)
@@ -330,6 +333,21 @@ const headerRow = (row: Element) =>
 
 const regions = "[role=tabpanel], [role=region], [role=group], fieldset"
 
+// Whether what names a region is kept from agents: a heading inside
+// `data-agent-hidden`, or one that holds some.
+function namedInPrivate(region: Element) {
+  const root = region.getRootNode() as Node & {
+    getElementById?: (id: string) => Element | null
+  }
+  const labels = (region.getAttribute("aria-labelledby") ?? "")
+    .split(/\s+/)
+    .flatMap((id) => (id && root.getElementById?.(id)) || [])
+  return (
+    isOffLimits(labels) ||
+    labels.some((label) => label.querySelector("[data-agent-hidden]"))
+  )
+}
+
 // The names of the labelled regions a component is in, so two with one
 // label, like a switch under Email and under Slack, are told apart.
 function sectionsOf(parts: Bound[]) {
@@ -340,7 +358,10 @@ function sectionsOf(parts: Bound[]) {
     parts[0]
   )?.el.parentElement?.closest(regions)
   while (region) {
-    const name = !own.has(region) && accessibleName(region).slice(0, 80)
+    const name =
+      !own.has(region) &&
+      !namedInPrivate(region) &&
+      accessibleName(region).slice(0, 80)
     if (name) {
       names.unshift(name)
     }

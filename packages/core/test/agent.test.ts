@@ -4307,6 +4307,70 @@ describe("agent act behind a closed tab or section", () => {
     ])
   })
 
+  test("a section isn't named by a heading inside data-agent-hidden, or by one that holds some", async () => {
+    const agent = createAgent()
+    const root = document.body.appendChild(document.createElement("div"))
+    root.innerHTML = `
+      <h3 id="plan" data-agent-hidden>Canary plan</h3>
+      <div role="group" aria-labelledby="plan"><label><button></button>Deploy failures</label></div>
+      <h3 id="chat">Slack <span data-agent-hidden>for Canary</span></h3>
+      <div role="group" aria-labelledby="chat"><label><button></button>Deploy failures</label></div>
+      <h3 id="mail">Email</h3>
+      <div role="group" aria-labelledby="mail"><label><button></button>Deploy failures</label></div>`
+    cleanups.push(() => root.remove())
+    for (const [at, el] of [...root.querySelectorAll("button")].entries()) {
+      const instance = checkbox({ id: `deploys-${at}` })
+      const unbind = bind(instance.part("root"), el)
+      cleanups.push(() => {
+        unbind()
+        instance.destroy()
+      })
+    }
+    const screen = agent.snapshot().filter((component) => !component.offPage)
+    expect(screen.map((component) => component.section)).toEqual([
+      undefined,
+      undefined,
+      "Email",
+    ])
+    const outcome = await agent.act({
+      steps: [check("Email > Deploy failures")],
+    })
+    expect(outcome.ok).toBe(true)
+    expect(JSON.stringify([screen, outcome])).not.toContain("Canary")
+  })
+
+  test("a field that was never shown isn't in a call's values, on a failed call either", async () => {
+    const agent = createAgent()
+    mountCheckbox({ id: "terms" })
+    for (const [attribute, value] of [
+      ["hidden", ""],
+      ["aria-hidden", "true"],
+    ]) {
+      const region = document.body.appendChild(document.createElement("div"))
+      region.setAttribute(attribute, value)
+      const label = region.appendChild(document.createElement("label"))
+      const el = label.appendChild(document.createElement("input"))
+      label.append(`Promo code ${attribute}`)
+      const code = input({ id: `code-${attribute}`, defaultValue: "zq7canary" })
+      const unbind = bind(code.part("root"), el)
+      cleanups.push(() => {
+        unbind()
+        code.destroy()
+        region.remove()
+      })
+    }
+    const done = await agent.act({ steps: [check("Accept the terms")] })
+    expect(done.ok).toBe(true)
+    const failed = await agent.act({ steps: [check("Nowhere")] })
+    expect(failed.ok).toBe(false)
+    // Gone from the page, they aren't remembered either.
+    cleanups.splice(1).forEach((cleanup) => cleanup())
+    const after = await agent.act({ steps: [check("Accept the terms")] })
+    expect(JSON.stringify([done, failed, after, agent.snapshot()])).not.toMatch(
+      /zq7canary|Promo code/
+    )
+  })
+
   test("a failed step says the steps before it stay done and what to send again", async () => {
     const agent = createAgent()
     const { saved } = mountSettings()
