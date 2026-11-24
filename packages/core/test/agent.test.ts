@@ -663,6 +663,27 @@ describe("agent", () => {
     expect(instance.get().value).toBe(1)
   })
 
+  test("setValue by a label sets that item's own value, not a disabled item's number that reads like it", async () => {
+    const agent = createAgent()
+    const instance = select({
+      id: "seats",
+      items: [
+        { value: 1, label: "One seat" },
+        { value: "02", label: "Two seats" },
+        { value: 2, label: "Two seats, sold out", disabled: true },
+      ],
+      defaultValue: 1,
+    })
+    const el = document.body.appendChild(document.createElement("button"))
+    el.setAttribute("aria-label", "Seats")
+    cleanups.push(bind(instance.part("trigger"), el), () => instance.destroy())
+    const outcome = await agent.act({
+      steps: [{ ref: "Seats", action: "setValue", args: ["Two seats"] }],
+    })
+    expect(outcome.ok, outcome.error?.message).toBe(true)
+    expect(instance.get().value).toBe("02")
+  })
+
   function mountCombobox(
     options: Parameters<typeof combobox>[0],
     label: string
