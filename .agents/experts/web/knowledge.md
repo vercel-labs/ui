@@ -34,6 +34,7 @@ Last checked: 2026-11-09, against `packages/web/src/define-element.ts` and `pack
 - Light DOM keeps the user's markup and styles in charge and ids in one tree, but inside a user's shadow root, document styles don't reach and `document.getElementById` misses; use `getRootNode()`.
 - `document.activeElement` is the shadow host when focus is inside a shadow root; the focused element is `root.activeElement`, recursively.
 - `delegatesFocus: true` on a shadow root forwards focus to the first focusable element inside.
+- Web panels stay mounted with `hidden`, so a component behind a closed tab is in the agent registry's `entries` but not in `live()`, and never in `offPage`.
 
 ### Events
 

@@ -11,8 +11,14 @@ import type {
   PropSpec,
 } from "../../foundation/kernel/primitive-types"
 import { watchEarlier, watchers } from "../../foundation/kernel/watchers"
-import { accessibleName } from "../../foundation/text/accessible-name"
-import { checkMarks, isOffLimits, isSecret, textOf } from "./marks"
+import {
+  checkMarks,
+  isOffLimits,
+  isSecret,
+  nameOf,
+  textOf,
+  unread,
+} from "./marks"
 
 /**
  * A change a person or an agent made to a component, as `observe` and `agent.subscribe` report it.
@@ -53,6 +59,11 @@ type Entry = {
   key?: string
   label?: string
   row?: string
+  // The labelled regions around it, outermost first, like a tab's panel and an accordion's section in it.
+  sections?: string[]
+  // Whether an agent has had it on the page. One hidden all along, like a
+  // field in a dialog nobody opened, isn't kept once it leaves.
+  shown?: boolean
   // A password, card or one-time code, or a field inside `data-agent-secret`,
   // whose value is redacted and isn't kept once it leaves the page.
   secret?: boolean
@@ -88,6 +99,8 @@ const retired = new Map<string, { at: number; refs: string[] }>()
 const retiredLimit = 500
 // What those components showed when they left, so an agent can check a closed tab without opening it.
 const offPage = new Map<string, AgentComponent>()
+// The regions each of those was in, for telling look-alikes apart.
+const placeOf = new WeakMap<AgentComponent, string[]>()
 const partsOf = new WeakMap<PrimitiveInstance, ReadonlyMap<string, Part>>()
 let count = 0
 type Listener = (change: ObservedChange, parts: Bound[]) => void
@@ -130,7 +143,7 @@ function retire(entry: Entry) {
   if (byId.get(entry.id) === entry) {
     byId.delete(entry.id)
   }
-  if (!entry.key || entry.secret || entry.offLimits) {
+  if (!entry.key || !entry.shown || entry.secret || entry.offLimits) {
     return
   }
   const queued = retired.get(entry.key)
@@ -167,6 +180,9 @@ function retire(entry: Entry) {
     if (key === "value" || state[key] !== "") {
       last[key] = state[key] ?? null
     }
+  }
+  if (entry.sections) {
+    placeOf.set(last, entry.sections)
   }
   offPage.delete(entry.ref)
   offPage.set(entry.ref, last)
@@ -206,7 +222,8 @@ function remember(entry: Entry, parts: Bound[]) {
   entry.offLimits =
     isOffLimits(elements) ||
     elements.every((el) => (el as HTMLInputElement).type === "hidden")
-  entry.key = `${entry.component}|${entry.label}|${entry.row}`
+  entry.sections = sectionsOf(parts)
+  entry.key = `${entry.component}|${entry.label}|${entry.row}|${entry.sections.join(">")}`
   if (!first) {
     return
   }
@@ -230,6 +247,24 @@ function bound(instance: PrimitiveInstance) {
   ) as Bound[]
 }
 
+// The parts every step on a component touches: the ones with no key, and
+// one alone in its slot with a key of its own that no value gave it, like
+// the id the web adapter gives a collapsible's trigger.
+function ownParts<Each extends Pick<Bound, "key" | "slot" | "props">>(
+  parts: Each[]
+) {
+  return parts.filter(
+    (part) =>
+      !part.key ||
+      (part.props?.value == null &&
+        parts.every(
+          (other) =>
+            other === part ||
+            (other.slot !== part.slot && other.key !== part.key)
+        ))
+  )
+}
+
 function componentLabel(parts: Bound[]) {
   const keyless = (slot: string) =>
     parts.find((part) => part.slot === slot && !part.key)?.el
@@ -250,7 +285,7 @@ function componentLabel(parts: Bound[]) {
   }
   // A group's own element names it before its items do.
   const group = keyless("group") ?? keyless("root")
-  const name = group && accessibleName(group)
+  const name = group && nameOf(group)
   if (name) {
     return name
   }
@@ -263,7 +298,7 @@ function componentLabel(parts: Bound[]) {
       (part.slot === "control" && part.el.matches("input, textarea"))
   )?.el
   const popup = parts.find((part) => part.slot === "content")?.el
-  const field = input && !popup?.contains(input) && accessibleName(input)
+  const field = input && !popup?.contains(input) && nameOf(input)
   if (field) {
     return field
   }
@@ -274,8 +309,7 @@ function componentLabel(parts: Bound[]) {
     (root.tagName === "BUTTON" || root.getAttribute("role") === "button")
       ? root
       : undefined
-  const named = (el: Element | undefined) =>
-    (el && accessibleName(el)) || text(el)
+  const named = (el: Element | undefined) => (el && nameOf(el)) || text(el)
   const shown =
     named(first("title")) ??
     named(first("heading")) ??
@@ -306,7 +340,7 @@ function componentLabel(parts: Bound[]) {
     ...sole,
     ...keyed,
   ]) {
-    const name = accessibleName(part.el)
+    const name = nameOf(part.el)
     if (name) {
       return name
     }
@@ -321,6 +355,27 @@ const headerRow = (row: Element) =>
       (cell) =>
         cell.localName === "th" || cell.getAttribute("role") === "columnheader"
     ))
+
+const regions = "[role=tabpanel], [role=region], [role=group], fieldset"
+
+// The names of the labelled regions a component is in, so two with one
+// label, like a switch under Email and under Slack, are told apart.
+function sectionsOf(parts: Bound[]) {
+  const own = new Set<Element>(parts.map((part) => part.el))
+  const names: string[] = []
+  let region = (
+    parts.find((part) => part.slot === "trigger" || part.slot === "root") ??
+    parts[0]
+  )?.el.parentElement?.closest(regions)
+  while (region) {
+    const name = !own.has(region) && nameOf(region).slice(0, 80)
+    if (name) {
+      names.unshift(name)
+    }
+    region = region.parentElement?.closest(regions)
+  }
+  return names
+}
 
 // Text in the component's row that isn't the component's own, its parts' or
 // its label's, like the name beside a member's menu, so an agent knows which
@@ -344,6 +399,7 @@ function rowOf(parts: Bound[]) {
     if (
       !own.some((el) => el.contains(node)) &&
       !isOffLimits([node.parentElement!]) &&
+      !node.parentElement!.closest(unread) &&
       node.textContent?.trim()
     ) {
       words.push(node.textContent.trim())
@@ -480,6 +536,8 @@ export {
   listen,
   type ObservedChange,
   offPage,
+  ownParts,
+  placeOf,
   remember,
   retire,
   rowOf,

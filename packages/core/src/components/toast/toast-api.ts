@@ -588,27 +588,30 @@ function toastRegionApiBody(
     }
     // The toast's own height is the stack's, so its width, its padding and its children's sizes tell
     // when the content reflows: a shadow root, a loaded image or a font.
-    const resizes = new ResizeObserver((entries) => {
-      let changed = false
-      for (const entry of entries) {
-        if (entry.target !== el) {
-          changed = true
-        } else {
-          const border = entry.borderBoxSize?.[0]
-          const next = `${border?.inlineSize} ${(border?.blockSize ?? 0) - (entry.contentBoxSize?.[0]?.blockSize ?? 0)}`
-          if (next !== box) {
-            changed = true
-          }
-          box = next
-        }
-      }
-      if (changed) {
-        measure()
-      }
-    })
+    const resizes =
+      typeof ResizeObserver === "undefined"
+        ? undefined
+        : new ResizeObserver((entries) => {
+            let changed = false
+            for (const entry of entries) {
+              if (entry.target !== el) {
+                changed = true
+              } else {
+                const border = entry.borderBoxSize?.[0]
+                const next = `${border?.inlineSize} ${(border?.blockSize ?? 0) - (entry.contentBoxSize?.[0]?.blockSize ?? 0)}`
+                if (next !== box) {
+                  changed = true
+                }
+                box = next
+              }
+            }
+            if (changed) {
+              measure()
+            }
+          })
     const observeChildren = () => {
       for (const child of el.children) {
-        resizes.observe(child, { box: "border-box" })
+        resizes?.observe(child, { box: "border-box" })
       }
     }
     // Content changes, and classes on the toast. The stack's own attributes and variables on it aren't.
@@ -623,7 +626,7 @@ function toastRegionApiBody(
       observeChildren()
       measure()
     })
-    resizes.observe(el)
+    resizes?.observe(el)
     observeChildren()
     mutations.observe(el, {
       subtree: true,
@@ -635,7 +638,7 @@ function toastRegionApiBody(
     cleanups.push(
       () => {
         bound = false
-        resizes.disconnect()
+        resizes?.disconnect()
         mutations.disconnect()
       },
       on(el, "pointerdown", (event) => startSwipe(el, toastId, event))

@@ -46,6 +46,7 @@ Solid 1 habits are the main thing to catch. These changed:
 - Reading a pending async value throws `NotReadyError` up to the nearest `<Loading>`, which shows `fallback` until it's ready. Children stay alive behind the fallback. Once shown, a `<Loading>` shows the fallback again only for its `on` dependencies; other refetches keep content and expose the wait through `isPending()`.
 - Under a pending `<Loading>`, `onSettled` waits for the reveal, and the element is connected by then. Work that shouldn't wait for slow siblings, like starting a request, doesn't belong in it.
 - A frame can be held: a write inside an `action`, or data other readers wait on, lands together with the new page. Code that reads state during a held frame must stay consistent with what's shown.
+- The agent bridge waits two frames after it opens a place or sets a value. A held Solid 2 frame, or a `<Loading>` inside a panel, outlasts that.
 
 ### Control flow and rendering
 

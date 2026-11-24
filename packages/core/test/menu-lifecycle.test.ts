@@ -260,3 +260,14 @@ describe("a root menu closing with focus in a portalled submenu", () => {
     expect(document.activeElement).toBe(trigger)
   })
 })
+
+describe("a submenu that's destroyed", () => {
+  test("leaves its parent, so a menu reopened many times keeps no old submenus", () => {
+    const root = menu({ id: "file" })
+    for (let round = 0; round < 3; round++) {
+      menu({ id: `share-${round}`, parent: root.api }).destroy()
+    }
+    const share = menu({ id: "share", parent: root.api })
+    expect([...root.api.internal.children]).toEqual([share.api])
+  })
+})

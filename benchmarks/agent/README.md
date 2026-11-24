@@ -21,32 +21,32 @@ Browser tools are how agents use most pages today: read the accessibility tree, 
 
 ## Results
 
-Medians of three runs per row, with Sonnet through Claude Code, on November 15, 2026. Every run was correct.
+Medians of three runs per row, with Sonnet through Claude Code, on November 24, 2026. Every run was correct.
 
 ### React
 
 | Library | Tools   | Tool calls | Text read | Time | Tokens | Cost   |
 | ------- | ------- | ---------- | --------- | ---- | ------ | ------ |
-| Base UI | Browser | 17         | 41.0k     | 53 s | 291.7k | $0.139 |
-| Ark UI  | Browser | 19         | 39.8k     | 65 s | 330.9k | $0.144 |
-| ui-sdk  | Browser | 17         | 41.3k     | 56 s | 294.1k | $0.140 |
-| ui-sdk  | Agent   | 7          | 7.0k      | 31 s | 69.5k  | $0.044 |
+| Base UI | Browser | 17         | 41.0k     | 56 s | 291.1k | $0.138 |
+| Ark UI  | Browser | 19         | 39.8k     | 58 s | 330.3k | $0.143 |
+| ui-sdk  | Browser | 17         | 41.3k     | 59 s | 293.8k | $0.140 |
+| ui-sdk  | Agent   | 2          | 2.3k      | 13 s | 21.8k  | $0.021 |
 
 ### Vue
 
 | Library | Tools   | Tool calls | Text read | Time | Tokens | Cost   |
 | ------- | ------- | ---------- | --------- | ---- | ------ | ------ |
-| Reka UI | Browser | 16         | 34.0k     | 56 s | 226.5k | $0.113 |
-| ui-sdk  | Browser | 17         | 41.3k     | 59 s | 294.3k | $0.140 |
-| ui-sdk  | Agent   | 9          | 7.4k      | 34 s | 90.2k  | $0.051 |
+| Reka UI | Browser | 17         | 34.3k     | 54 s | 247.7k | $0.117 |
+| ui-sdk  | Browser | 17         | 41.3k     | 54 s | 293.6k | $0.140 |
+| ui-sdk  | Agent   | 2          | 2.3k      | 13 s | 21.8k  | $0.021 |
 
 ### Svelte
 
 | Library | Tools   | Tool calls | Text read | Time | Tokens | Cost   |
 | ------- | ------- | ---------- | --------- | ---- | ------ | ------ |
-| Bits UI | Browser | 17         | 36.2k     | 56 s | 259.1k | $0.123 |
-| ui-sdk  | Browser | 17         | 41.3k     | 57 s | 294.3k | $0.141 |
-| ui-sdk  | Agent   | 8          | 10.8k     | 30 s | 92.8k  | $0.056 |
+| Bits UI | Browser | 17         | 36.2k     | 53 s | 258.5k | $0.122 |
+| ui-sdk  | Browser | 17         | 41.3k     | 49 s | 293.6k | $0.139 |
+| ui-sdk  | Agent   | 2          | 2.5k      | 13 s | 22.0k  | $0.022 |
 
 With browser tools, the ui-sdk screen takes about as much as the others. The difference comes from the agent tools.
 

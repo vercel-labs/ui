@@ -507,7 +507,9 @@ const menuPrimitive = /* @__PURE__ */ definePrimitive({
   }),
   api: (context) => {
     const api = menuApi(context)
-    context.options().parent?.internal.children.add(api)
+    const parent = context.options().parent
+    parent?.internal.children.add(api)
+    context.onDestroy(() => parent?.internal.children.delete(api))
     return api
   },
   // Checked items keep their state in one record, `values`, so every slot

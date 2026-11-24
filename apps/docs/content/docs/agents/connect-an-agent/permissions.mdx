@@ -80,6 +80,8 @@ If the person says no, the step fails with `The person said no to "…"`.
 
 An `allow` that returns `true` without reading `step.confirm` answers yes for the person. Check it in every `allow` you write, including the one you pass to [`registerTools`](./webmcp).
 
+Put the mark on a tab, on an accordion section's trigger or on a collapsible to keep it closed until the person agrees. A step that looks for its component [behind what is closed](./reference#behind-a-closed-tab-or-section) leaves a marked one closed. A step that names it opens it, and asks the person first.
+
 The mark covers its element and everything inside it, for any action. Put it on a form or section to cover every control in it, or on a dialog's content to cover the buttons inside, wherever the dialog renders.
 
 A mark on one option of a Select or Combobox counts even while the list is closed, since the agent opens it for a moment to look. A list that renders only some of its options, like a virtualized one, or one filtered by text in its field, shows the agent only those. Mark something that stays on the page instead, like its trigger or a wrapper around it, and every choice in it waits for the person.
@@ -104,7 +106,7 @@ Two more marks change what the agent sees:
 </Field>
 ```
 
-Changes inside `data-agent-hidden` still reach [Observe](./observe-changes), so your own logs see them, while `agent.subscribe` stays quiet. A secret value stays out of `snapshot`, `act` results and change events, and the field's error text reads `"[redacted]"` too. A secret File Input lists its files without their names. Password, card and one-time-code fields are treated as secret without a mark. A hidden input is left out without one.
+Changes inside `data-agent-hidden` still reach [Observe](./observe-changes), so your own logs see them, while `agent.subscribe` stays quiet. The mark covers names too: a heading inside it names no component or section for the agent, and a label that holds a marked span is read without it. A secret value stays out of `snapshot`, `act` results and change events, and the field's error text reads `"[redacted]"` too. A `set` on a secret field is never compared with the value it holds, so a step can't test a guess at it. A secret File Input lists its files without their names. Password, card and one-time-code fields are treated as secret without a mark. A hidden input is left out without one.
 
 The agent reaches what a person can reach. A component hidden with CSS, the `hidden` attribute, a closed `<details>` or `aria-hidden="true"` is left out without a mark. A component in an `inert` region, like the page behind a modal dialog, is listed as disabled until the region is usable again.
 
@@ -126,7 +128,7 @@ onValueChange={(value, details) => {
 
 You can still choose Asia Pacific yourself. To apply the rule to every change, remove the `details.source === "agent"` check.
 
-Canceling a value change can leave `act` with `ok: true` and no change for that step. Check each step's `changes` and the returned `values` to confirm what happened.
+Canceling a value change fails that step, and `act` stops there. The error says the value is still what it was.
 
 Put value checks in these change callbacks. Actions such as `setValue` call the component's API directly, so checks in keyboard or pointer handlers won't run.
 
@@ -134,6 +136,6 @@ Put value checks in these change callbacks. Actions such as `setValue` call the 
 
 `allow` checks actions. Components and their actions remain visible in `snapshot()`, and the agent can still read choices with `query()`. Use `data-agent-hidden` to keep a region out of view.
 
-Finding a component or its choices can open a section or popup before the requested action is checked. Use the component's `onOpenChange` or equivalent callback if you need to reject those changes too.
+Finding a component can open a tab or a section first. Each one is checked as an action of its own, such as `setValue` on the tabs or `open` on the accordion, before the requested action is.
 
 The [Reference](./reference) lists the fields passed to `allow` and the results returned by `act`.

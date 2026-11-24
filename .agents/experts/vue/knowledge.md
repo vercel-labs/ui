@@ -48,6 +48,7 @@ Last checked: 2026-10-28, against `node_modules/vue` 3.5.43.
 - **`<Teleport to>`** renders children elsewhere in the DOM while staying in the component tree (provide/inject still work). `defer` (3.5) waits for targets rendered later in the same tick. `disabled` keeps them in place.
 - **`<Transition>`** applies `v-enter-*`/`v-leave-*` classes around `v-if`/`v-show` and waits for the leave transition before removing the element. One element or a component with one root. A library that animates out with its own data attributes has to say how the two interact.
 - **`<Suspense>`** renders the pending branch off the page until async setup resolves, and holds back post-flush effects until the branch shows. Code that binds to elements during render sees them before they're in the page.
+- Vue disposes a component's scope at unmount, before `<Transition>` removes its element, so registry entries retire at once. The agent bridge waits two frames after it opens a place, which async panel content (`defineAsyncComponent`, Nuxt `Lazy*`) outlasts.
 
 ### Server rendering and hydration
 

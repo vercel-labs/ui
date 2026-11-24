@@ -454,7 +454,10 @@ const paginationPrimitive = /* @__PURE__ */ definePrimitive({
       ellipsis: slot({ attrs: () => ({ "aria-hidden": "true" }) }),
     }
   },
-  agent: { actions: ["setPage", "next", "previous", "first", "last"] },
+  agent: {
+    actions: ["setPage", "next", "previous", "first", "last"],
+    reveals: true,
+  },
 })
 
 /**

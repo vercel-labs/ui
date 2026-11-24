@@ -135,6 +135,21 @@ describe("agent", () => {
     expect(instance.get().checked).toBe(false)
   })
 
+  test("a value its parent takes a moment later did take", async () => {
+    const agent = createAgent()
+    const options = { id: "terms", checked: false }
+    const instance = mountCheckbox({
+      ...options,
+      onCheckedChange: (checked) =>
+        setTimeout(() => instance.setOptions({ ...options, checked }), 100),
+    })
+    const outcome = await agent.act({
+      steps: [{ ref: "Accept the terms", action: "setChecked", args: [true] }],
+    })
+    expect(outcome.ok).toBe(true)
+    expect(instance.get().checked).toBe(true)
+  })
+
   test("a number option given text takes the number", async () => {
     const agent = createAgent()
     const instance = pagination({ id: "pages", pageCount: 10 })
@@ -158,11 +173,53 @@ describe("agent", () => {
         }
       },
     })
+    const saved = mountCheckbox({ id: "saved" }, "Saved")
     const [{ ref }] = agent.snapshot()
     const outcome = await agent.act({
-      steps: [{ ref, action: "setChecked", args: [true] }],
+      steps: [
+        { ref, action: "setChecked", args: [true] },
+        { ref: "Saved", action: "setChecked", args: [true] },
+      ],
     })
-    expect(outcome.steps[0].changes).toBeUndefined()
+    expect(outcome.error).toMatchObject({
+      step: 0,
+      message: expect.stringMatching(
+        /^setChecked on Accept the terms \(c\d+\) didn't take: it is still false\./
+      ),
+    })
+    expect(saved.get().checked).toBe(false)
+  })
+
+  test("a set to the value a field already holds, or one it formats, takes", async () => {
+    const agent = createAgent()
+    const instance = input({
+      id: "code",
+      defaultValue: "ATLAS",
+      onValueChange: (_value, details) => details.cancel(),
+    })
+    const el = document.createElement("input")
+    el.setAttribute("aria-label", "Code")
+    document.body.append(el)
+    cleanups.push(bind(instance.part("root"), el), () => instance.destroy())
+    const outcome = await agent.act({
+      steps: [{ ref: "Code", action: "setValue", args: ["atlas "] }],
+    })
+    expect(outcome.ok).toBe(true)
+  })
+
+  test("a step on what an open modal covers is refused, with what is open", async () => {
+    const agent = createAgent()
+    const terms = mountCheckbox({ id: "terms" })
+    const main = document.body.appendChild(document.createElement("main"))
+    main.append(document.querySelector("label")!)
+    main.setAttribute("inert", "")
+    const outcome = await agent.act({
+      steps: [{ ref: "Accept the terms", action: "setChecked", args: [true] }],
+    })
+    expect(outcome.error?.message).toMatch(
+      /^Accept the terms \(c\d+\) is behind what is open\. Finish that or close it first\.$/
+    )
+    expect(terms.get().checked).toBe(false)
   })
 
   test("allow refuses an action before it runs", async () => {
@@ -526,6 +583,12 @@ describe("agent", () => {
     })
     expect(instance.get().value).toBe("swordfish")
     expect(JSON.stringify(outcome)).not.toContain("swordfish")
+    const guess = await agent.act({
+      steps: [{ ref: component.ref, action: "expect", args: ["swordfish"] }],
+    })
+    expect(guess.error?.message).toMatch(
+      / is private, so expect can't check it\.$/
+    )
     expect(agent.snapshot()[0]).toMatchObject({
       component: "password-input",
       value: "[redacted]",
@@ -560,7 +623,7 @@ describe("agent", () => {
         return step.args[0] !== false
       },
     })
-    expect([...tools.keys()]).toEqual(["snapshot", "act", "query"])
+    expect([...tools.keys()]).toEqual(["act", "query", "snapshot"])
     expect(tools.get("snapshot")?.annotations).toEqual({
       readOnlyHint: true,
       untrustedContentHint: true,
@@ -620,6 +683,39 @@ describe("agent", () => {
     return instance
   }
 
+  test("an expect step checks a value or its item's label, changes nothing, and stops the call when it differs", async () => {
+    const agent = createAgent()
+    const onValueChange = vi.fn()
+    const region = mountRegion(
+      [
+        { value: "fra", label: "Frankfurt" },
+        { value: "sin", label: "Singapore" },
+      ],
+      onValueChange
+    )
+    const outcome = await agent.act({
+      steps: [
+        { ref: "Region", action: "setValue", args: ["Singapore"] },
+        { ref: "Region", action: "expect", args: ["Singapore"] },
+        { ref: "Region", action: "expect", args: ["sin"] },
+        { ref: "Region", action: "expect", args: ["Frankfurt"] },
+        { ref: "Region", action: "setValue", args: ["Frankfurt"] },
+      ],
+    })
+    expect(outcome.error?.step).toBe(3)
+    expect(outcome.error?.message).toMatch(
+      /^Region \(c\d+\) is "sin", not "Frankfurt"\. The steps before this one stay done\. Send it again with the step after it, 2 steps in one call\.$/
+    )
+    expect(region.get().value).toBe("sin")
+    expect(onValueChange).toHaveBeenCalledTimes(1)
+    const unsaid = await agent.act({
+      steps: [{ ref: "Region", action: "expect" }],
+    })
+    expect(unsaid.error?.message).toMatch(
+      /^expect on "Region" needs what to check, as "args": \[value\]\. No step ran\.$/
+    )
+  })
+
   test("setValue refuses an item a select doesn't have, and lists its items", async () => {
     const agent = createAgent()
     const onValueChange = vi.fn()
@@ -661,6 +757,77 @@ describe("agent", () => {
       steps: [{ ref: "Project", action: "setValue", args: ["1"] }],
     })
     expect(instance.get().value).toBe(1)
+  })
+
+  test("setValue by a label sets that item's own value, not a disabled item's number that reads like it", async () => {
+    const agent = createAgent()
+    const instance = select({
+      id: "seats",
+      items: [
+        { value: 1, label: "One seat" },
+        { value: "02", label: "Two seats" },
+        { value: 2, label: "Two seats, sold out", disabled: true },
+      ],
+      defaultValue: 1,
+    })
+    const el = document.body.appendChild(document.createElement("button"))
+    el.setAttribute("aria-label", "Seats")
+    cleanups.push(bind(instance.part("trigger"), el), () => instance.destroy())
+    const outcome = await agent.act({
+      steps: [{ ref: "Seats", action: "setValue", args: ["Two seats"] }],
+    })
+    expect(outcome.ok, outcome.error?.message).toBe(true)
+    expect(instance.get().value).toBe("02")
+  })
+
+  test("setValue by a label sets that item's own value when the values are objects", async () => {
+    const agent = createAgent()
+    const ada = { id: 1, name: "Ada" }
+    const grace = { id: 2, name: "Grace" }
+    const instance = select({
+      id: "owner",
+      items: [
+        { value: ada, label: "Ada" },
+        { value: grace, label: "Grace" },
+      ],
+    })
+    const el = document.body.appendChild(document.createElement("button"))
+    el.setAttribute("aria-label", "Owner")
+    cleanups.push(bind(instance.part("trigger"), el), () => instance.destroy())
+    const outcome = await agent.act({
+      steps: [{ ref: "Owner", action: "setValue", args: ["Ada"] }],
+    })
+    expect(outcome.ok, outcome.error?.message).toBe(true)
+    expect(instance.get().value).toBe(ada)
+  })
+
+  test("setValue by a label refuses a disabled item of a select with its own keys", async () => {
+    const agent = createAgent()
+    const instance = select({
+      id: "plan",
+      items: [
+        { value: 1, label: "Free" },
+        { value: 2, label: "Pro" },
+        { value: 3, label: "Team", disabled: true },
+      ],
+      itemToValue: (value: number) => `plan-${value}`,
+      defaultValue: 1,
+    })
+    const el = document.body.appendChild(document.createElement("button"))
+    el.setAttribute("aria-label", "Plan")
+    cleanups.push(bind(instance.part("trigger"), el), () => instance.destroy())
+    const disabled = await agent.act({
+      steps: [{ ref: "Plan", action: "setValue", args: ["Team"] }],
+    })
+    expect(disabled.error?.message).toMatch(
+      / in Plan \(c\d+\) is disabled now\.$/
+    )
+    expect(instance.get().value).toBe(1)
+    const enabled = await agent.act({
+      steps: [{ ref: "Plan", action: "setValue", args: ["Pro"] }],
+    })
+    expect(enabled.ok, enabled.error?.message).toBe(true)
+    expect(instance.get().value).toBe(2)
   })
 
   function mountCombobox(
@@ -1236,8 +1403,8 @@ describe("agent", () => {
     cleanups.push(() => instance.destroy())
     const step = { ref: "Deploy failures", action: "setChecked", args: [true] }
     const refused = await agent.act({ steps: [step] })
-    expect(refused.error?.message).toMatch(
-      /"Deploy failures" is in 2 closed sections: Email, Slack\. Open one first, like \{ "ref": "c\d+", "action": "open", "args": \["Email"\] \}\./
+    expect(refused.error?.message).toBe(
+      '"Deploy failures" is in 2 closed sections: Email, Slack. Put the one you mean first, like "Email > Deploy failures".'
     )
     expect(instance.get().value).toEqual([])
     const outcome = await agent.act({
@@ -1275,7 +1442,7 @@ describe("agent", () => {
     registerTools(createAgent(), { allow: () => true })
     await vi.waitFor(() => expect(warn).toHaveBeenCalledTimes(3))
     expect(warn.mock.calls[0][0]).toContain(
-      "registerTools couldn't register snapshot."
+      "registerTools couldn't register act."
     )
     warn.mockClear()
     const registerTool = refuse("NotAllowedError")
@@ -1430,14 +1597,255 @@ describe("agent", () => {
     expect(noRef.error).toEqual({
       step: 0,
       message:
-        "A step needs a ref: a component's ref from snapshot, or its label.",
+        "steps[0] needs a ref: a component's ref from snapshot, or its label. No step ran.",
     })
     const noAction = await agent.act({
       steps: [{ ref: "Accept the terms" } as unknown as AgentStep],
     })
     expect(noAction.error?.message).toBe(
-      'A step on "Accept the terms" needs an action, like "press".'
+      'steps[0], on "Accept the terms", needs an action, like "press". No step ran.'
     )
+  })
+
+  test("a call that isn't { steps } fails before anything runs, and says what act takes", async () => {
+    const agent = createAgent()
+    const terms = mountCheckbox({ id: "terms" })
+    const step = { ref: "Accept the terms", action: "setChecked", args: [true] }
+    const act = (input: unknown) => agent.act(input as { steps: AgentStep[] })
+    const shape =
+      'act takes { "steps": [{ "ref": "…", "action": "…", "args": […] }] }'
+    expect(await act(step)).toMatchObject({
+      ok: false,
+      steps: [],
+      error: {
+        step: 0,
+        message: `${shape}, not a step on its own. No step ran.`,
+      },
+    })
+    expect((await act([step])).error?.message).toBe(
+      `${shape}, not a list on its own. No step ran.`
+    )
+    expect((await act({ actions: [] })).error?.message).toBe(
+      `${shape}, not {"actions":[]}. No step ran.`
+    )
+    expect((await act(null)).error?.message).toBe(
+      `${shape}, not null. No step ran.`
+    )
+    expect((await act({ steps: [] })).error?.message).toBe(
+      `${shape}, not {"steps":[]}. No step ran.`
+    )
+    expect((await act({ steps: [step], dryRun: true })).error?.message).toBe(
+      'act takes "steps" and nothing else, not "dryRun". No step ran.'
+    )
+    expect(terms.get().checked).toBe(false)
+  })
+
+  test("a step with a key it doesn't take, or args that aren't a list, fails before any step runs", async () => {
+    const agent = createAgent()
+    const terms = mountCheckbox({ id: "terms" })
+    const instance = input({ id: "workspace", defaultValue: "Atlashh" })
+    const el = document.body.appendChild(document.createElement("input"))
+    el.setAttribute("aria-label", "Workspace name")
+    cleanups.push(bind(instance.part("root"), el), () => instance.destroy())
+    const check = {
+      ref: "Accept the terms",
+      action: "setChecked",
+      args: [true],
+    }
+    const act = (...steps: unknown[]) =>
+      agent.act({ steps } as { steps: AgentStep[] })
+    expect(
+      await act(check, {
+        ref: "Workspace name",
+        action: "setValue",
+        value: "Atlas",
+      })
+    ).toMatchObject({
+      ok: false,
+      steps: [],
+      error: {
+        step: 1,
+        message:
+          'steps[1] has "value", which a step doesn\'t take: a step is { "ref": "…", "action": "…", "args": […] }. A value goes in "args", like "args": ["Atlas"]. No step ran.',
+      },
+    })
+    expect(
+      (
+        await act(check, {
+          ref: "Workspace name",
+          action: "setValue",
+          args: ["Atlas"],
+          note: "rename",
+        })
+      ).error?.message
+    ).toBe(
+      'steps[1] has "note", which a step doesn\'t take: a step is { "ref": "…", "action": "…", "args": […] }. No step ran.'
+    )
+    expect(
+      (
+        await act(check, {
+          ref: "Workspace name",
+          action: "setValue",
+          args: "Atlas",
+        })
+      ).error?.message
+    ).toBe(
+      'steps[1] takes "args" as a list, like "args": ["Atlas"], not "Atlas". No step ran.'
+    )
+    expect((await act(check, null)).error?.message).toBe(
+      'steps[1] is null, not { "ref": "…", "action": "…", "args": […] }. No step ran.'
+    )
+    expect(
+      (await act(check, { ref: "Workspace name", action: "setValue" })).error
+        ?.message
+    ).toBe(
+      'setValue on "Workspace name" needs its value, as "args": [value]. No step ran.'
+    )
+    expect(terms.get().checked).toBe(false)
+    expect(instance.get().value).toBe("Atlashh")
+  })
+
+  test("a number past a slider's range is refused, not clamped, and one off its steps fails the step", async () => {
+    const agent = createAgent()
+    const instance = slider({ id: "seats", min: 1, max: 20, defaultValue: 12 })
+    const root = document.body.appendChild(document.createElement("div"))
+    root.setAttribute("aria-label", "Seats")
+    cleanups.push(bind(instance.part("root"), root), () => instance.destroy())
+    const set = (value: unknown) =>
+      agent.act({
+        steps: [{ ref: "Seats", action: "setValue", args: [value] }],
+      })
+    expect((await set(25)).error?.message).toMatch(
+      /^setValue on Seats \(c\d+\) takes a number from 1 to 20, not 25\.$/
+    )
+    expect((await set("0")).error?.message).toMatch(
+      /takes a number from 1 to 20, not 0\.$/
+    )
+    expect(instance.get().value).toBe(12)
+    expect((await set(2.5)).error?.message).toMatch(
+      /^setValue on Seats \(c\d+\) took 3, not 2\.5: it moves in steps of 1\. It is 3 now\.$/
+    )
+    expect(await set(2)).toMatchObject({ ok: true })
+    expect(instance.get().value).toBe(2)
+    expect((await set(2.4)).error?.message).toMatch(
+      /didn't take: it is still 2, and it moves in steps of 1\.$/
+    )
+  })
+
+  test("a range slider's numbers that moved fail the step too", async () => {
+    const agent = createAgent()
+    const instance = slider({
+      id: "price",
+      min: 0,
+      max: 10,
+      defaultValue: [1, 9],
+    })
+    const root = document.body.appendChild(document.createElement("div"))
+    root.setAttribute("aria-label", "Price")
+    cleanups.push(bind(instance.part("root"), root), () => instance.destroy())
+    const set = (value: number[]) =>
+      agent.act({
+        steps: [{ ref: "Price", action: "setValue", args: [value] }],
+      })
+    expect((await set([2.4, 7.6])).error?.message).toMatch(
+      /^setValue on Price \(c\d+\) took \[2,8\], not \[2\.4,7\.6\]: it moves in steps of 1\. It is \[2,8\] now\.$/
+    )
+    expect(await set([3, 7])).toMatchObject({ ok: true })
+    expect(instance.get().value).toEqual([3, 7])
+  })
+
+  test("a private field a callback keeps as it is passes a right guess and a wrong one alike", async () => {
+    const agent = createAgent()
+    const instance = input({
+      id: "pin",
+      defaultValue: "4821",
+      onValueChange: (_value, details) => details.cancel(),
+    })
+    const region = document.body.appendChild(document.createElement("div"))
+    region.setAttribute("data-agent-secret", "")
+    const el = region.appendChild(document.createElement("input"))
+    el.setAttribute("aria-label", "PIN")
+    cleanups.push(
+      bind(instance.part("root"), el),
+      () => instance.destroy(),
+      () => region.remove()
+    )
+    const guess = (value: string) =>
+      agent.act({ steps: [{ ref: "PIN", action: "setValue", args: [value] }] })
+    const right = await guess("4821")
+    const wrong = await guess("0000")
+    expect(wrong).toEqual(right)
+    expect(instance.get().value).toBe("4821")
+  })
+
+  test("a number field with only a max says so", async () => {
+    const agent = createAgent()
+    const instance = numberInput({ id: "seats", defaultValue: 10, max: 10 })
+    const field = document.body.appendChild(document.createElement("input"))
+    field.setAttribute("aria-label", "Seats")
+    cleanups.push(bind(instance.part("control"), field), () =>
+      instance.destroy()
+    )
+    const outcome = await agent.act({
+      steps: [{ ref: "Seats", action: "setValue", args: [11] }],
+    })
+    expect(outcome.error?.message).toMatch(
+      /^setValue on Seats \(c\d+\) takes a number of 10 or less, not 11\.$/
+    )
+    expect(instance.get().value).toBe(10)
+  })
+
+  test("a number is text to a field that holds text", async () => {
+    const agent = createAgent()
+    const instance = input({ id: "zip", defaultValue: "" })
+    const el = document.body.appendChild(document.createElement("input"))
+    el.setAttribute("aria-label", "Zip code")
+    cleanups.push(bind(instance.part("root"), el), () => instance.destroy())
+    const outcome = await agent.act({
+      steps: [{ ref: "Zip code", action: "setValue", args: [94107] }],
+    })
+    expect(outcome.ok).toBe(true)
+    expect(instance.get().value).toBe("94107")
+  })
+
+  test("a number is text to a list of text with nothing chosen, and a number to a list of numbers", async () => {
+    const agent = createAgent()
+    const choose = async (
+      label: string,
+      items: Parameters<typeof select>[0]["items"]
+    ) => {
+      const instance = select({ id: label.toLowerCase(), items })
+      const el = document.body.appendChild(document.createElement("button"))
+      el.setAttribute("aria-label", label)
+      cleanups.push(bind(instance.part("trigger"), el), () =>
+        instance.destroy()
+      )
+      const outcome = await agent.act({
+        steps: [{ ref: label, action: "setValue", args: [2] }],
+      })
+      expect(outcome.ok).toBe(true)
+      return instance.get().value
+    }
+    expect(await choose("Seats", ["1", "2", "3"])).toBe("2")
+    expect(
+      await choose("Project", [
+        { value: 1, label: "Mobile app" },
+        { value: 2, label: "Website" },
+      ])
+    ).toBe(2)
+  })
+
+  test("the bridge carries its tools, for an agent that finds it on the page", () => {
+    const agent = createAgent()
+    expect(agent.tools.map((tool) => tool.name)).toEqual([
+      "act",
+      "query",
+      "snapshot",
+    ])
+    expect(agent.tools[0].inputSchema).toMatchObject({
+      required: ["steps"],
+      additionalProperties: false,
+    })
   })
 
   test("a reading inside data-agent-secret is redacted", () => {
@@ -1886,7 +2294,8 @@ describe("agent query", () => {
       true
     )
     expect(await agent.query({})).toEqual({
-      error: "query takes text, within or kind. snapshot lists everything.",
+      error:
+        "query takes text, within, kind or closed. snapshot lists what is on the page.",
     })
   })
 
@@ -1901,6 +2310,74 @@ describe("agent query", () => {
     })) as AgentComponent[]
     expect(country.items).toHaveLength(50)
     expect(country.more).toBe(20)
+  })
+
+  test("from skips items, so a long list reads past its first 50", async () => {
+    const agent = createAgent()
+    mountSelect(
+      "Country",
+      Array.from({ length: 70 }, (_, index) => `Country ${index + 1}`)
+    )
+    const [next] = (await agent.query({
+      within: "Country",
+      from: 10,
+    })) as AgentComponent[]
+    expect(next.items![0].label).toBe("Country 11")
+    expect(next.items).toHaveLength(50)
+    expect(next.more).toBe(10)
+    const [last] = (await agent.query({
+      within: "Country",
+      from: 50,
+    })) as AgentComponent[]
+    expect(last.items!.map((item) => item.label)).toEqual(
+      Array.from({ length: 20 }, (_, index) => `Country ${index + 51}`)
+    )
+    expect("more" in last).toBe(false)
+    const [matched] = (await agent.query({
+      within: "Country",
+      text: "Country 6",
+      from: 1,
+    })) as AgentComponent[]
+    expect(matched.items!.map((item) => item.label)).toEqual(
+      Array.from({ length: 10 }, (_, index) => `Country ${index + 60}`)
+    )
+  })
+
+  test("from needs within and a count of items to skip", async () => {
+    const agent = createAgent()
+    mountSelect("Country", ["France"])
+    const error = {
+      error:
+        'from goes with within and counts the items to skip, like { "within": "Country", "from": 50 }.',
+    }
+    expect(await agent.query({ text: "Country", from: 50 })).toEqual(error)
+    expect(await agent.query({ within: "Country", from: -1 })).toEqual(error)
+    expect(await agent.query({ within: "Country", from: 1.5 })).toEqual(error)
+  })
+
+  test("a list with more items than a snapshot lists says how many it has", async () => {
+    const agent = createAgent()
+    mountSelect(
+      "Timezone",
+      Array.from({ length: 10 }, (_, index) => `Zone ${index + 1}`)
+    )
+    mountSelect(
+      "Country",
+      Array.from({ length: 12 }, (_, index) => `Country ${index + 1}`)
+    )
+    const named = (label: string) =>
+      agent
+        .snapshot()
+        .find((component) => component.label === label && !component.offPage)!
+    expect(named("Timezone").items).toHaveLength(10)
+    expect("more" in named("Timezone")).toBe(false)
+    expect("items" in named("Country")).toBe(false)
+    expect(named("Country").more).toBe(12)
+    const [country] = (await agent.query({
+      within: "Country",
+    })) as AgentComponent[]
+    expect(country.items).toHaveLength(12)
+    expect("more" in country).toBe(false)
   })
 
   test("a long page's snapshot stops at 100, keeps what's open and ends with how many were left out", () => {
@@ -2000,6 +2477,22 @@ describe("agent rows", () => {
       await agent.act({ steps: [{ ref: "Email", action: "press" }] })
     ).toMatchObject({ ok: true })
     expect(pressed).toEqual(["Email"])
+  })
+
+  test("an expect step checks a row's text and a checked state", async () => {
+    const agent = createAgent()
+    cleanups.push(mountRow("Priya Shah"))
+    const outcome = await agent.act({
+      steps: [
+        { ref: "Priya Shah", action: "expect", args: ["Admin"] },
+        { ref: "Priya Shah", action: "expect", args: [false] },
+        { ref: "Priya Shah", action: "expect", args: ["Member"] },
+      ],
+    })
+    expect(outcome.steps).toHaveLength(2)
+    expect(outcome.error?.message).toMatch(
+      /^Select \(c\d+\) is "Priya Shah Admin", not "Member"\. The steps before this one stay done\.$/
+    )
   })
 
   test("a component that leaves and comes back, like a tab's, keeps its ref", () => {
@@ -2661,6 +3154,39 @@ describe("agent act", () => {
     expect(onClick).toHaveBeenCalledTimes(1)
   })
 
+  test("press takes a button whose words the text holds in order from its first, and refuses any other near miss", async () => {
+    const agent = createAgent()
+    const { popover } = await import("../src/components/popover/popover")
+    const pressed: string[] = []
+    const content = Object.assign(document.createElement("div"), {
+      getAnimations: () => [],
+    })
+    const instance = popover({ id: "row-actions", defaultOpen: true })
+    for (const text of ["Edit", "Mark paid", "Archive"]) {
+      const el = content.appendChild(document.createElement("button"))
+      el.textContent = text
+      el.addEventListener("click", () => pressed.push(text))
+    }
+    content.setAttribute("aria-label", "Actions for Noor Rahman")
+    document.body.append(content)
+    cleanups.push(bind(instance.part("content"), content), () =>
+      instance.destroy()
+    )
+    const press = (text: string) =>
+      agent.act({
+        steps: [{ ref: "Noor Rahman", action: "press", args: [text] }],
+      })
+    expect((await press("Mark as paid")).ok).toBe(true)
+    expect((await press("Mark it paid now")).ok).toBe(true)
+    expect(pressed).toEqual(["Mark paid", "Mark paid"])
+    for (const text of ["Paid mark", "Do not mark paid", "Archive order"]) {
+      expect((await press(text)).error?.message).toContain(
+        `No button "${text}"`
+      )
+    }
+    expect(pressed).toHaveLength(2)
+  })
+
   test("press with no text clicks a closed popup's trigger, which opens it", async () => {
     const agent = createAgent()
     const { instance } = await mountActions()
@@ -2894,12 +3420,24 @@ describe("agent act", () => {
       expect.objectContaining({ items: [] }),
     ])
     const outcome = await agent.act({
-      steps: [{ ref: "Tom Becker", action: "setValue", args: ["x"] }],
+      steps: [{ ref: "Tom Becker", action: "setChecked", args: [true] }],
     })
     expect(outcome.error?.message).toMatch(
       /press takes the text of a button inside it, and opens it first/
     )
     expect(changes).toEqual([])
+  })
+
+  test("a click is a press, and so is a value that names a button on a component with only buttons", async () => {
+    const agent = createAgent()
+    const { onClick } = await mountActions()
+    for (const action of ["click", "setValue"]) {
+      const outcome = await agent.act({
+        steps: [{ ref: "Tom Becker", action, args: ["Remove"] }],
+      })
+      expect(outcome.ok).toBe(true)
+    }
+    expect(onClick).toHaveBeenCalledTimes(2)
   })
 
   // A select without item data, whose items render only while it's open.
@@ -3261,9 +3799,1117 @@ describe("agent source", () => {
     expect(agent.snapshot()[0].source).toBe("src/lib/settings.svelte:7")
   })
 
+  test("names where the app uses a Svelte component with no element of its own around it", () => {
+    const agent = createAgent()
+    const instance = checkbox({ id: "notify" })
+    const el = document.createElement("button")
+    el.setAttribute("aria-label", "Notify me")
+    Object.assign(el, {
+      __svelte_meta: {
+        loc: { file: "packages/svelte/src/part.svelte", line: 33 },
+        parent: {
+          file: "node_modules/@ui-sdk/svelte/dist/checkbox.svelte",
+          line: 73,
+          parent: { file: "src/routes/+page.svelte", line: 10, parent: null },
+        },
+      },
+    })
+    document.body.append(el)
+    const unbind = bind(instance.part("root"), el)
+    cleanups.push(() => {
+      unbind()
+      instance.destroy()
+    })
+    expect(agent.snapshot()[0].source).toBe("src/routes/+page.svelte:10")
+  })
+
+  test("skips the Svelte adapter's own files for the app's", () => {
+    const agent = createAgent()
+    const instance = checkbox({ id: "notify" })
+    const row = document.createElement("div")
+    const el = row.appendChild(document.createElement("button"))
+    el.setAttribute("aria-label", "Notify me")
+    Object.assign(el, {
+      __svelte_meta: {
+        loc: { file: "node_modules/@ui-sdk/svelte/dist/part.svelte", line: 40 },
+      },
+    })
+    Object.assign(row, {
+      __svelte_meta: { loc: { file: "src/lib/settings.svelte", line: 7 } },
+    })
+    document.body.append(row)
+    const unbind = bind(instance.part("root"), el)
+    cleanups.push(() => {
+      unbind()
+      instance.destroy()
+    })
+    expect(agent.snapshot()[0].source).toBe("src/lib/settings.svelte:7")
+  })
+
   test("leaves it out when nothing says where", () => {
     const agent = createAgent()
     mountCheckbox({ id: "terms" })
     expect(agent.snapshot()[0]).not.toHaveProperty("source")
+  })
+})
+
+describe("agent act behind a closed tab or section", () => {
+  // A settings page as an adapter renders it: a panel mounts while its tab is
+  // selected and a section's switches while it's open, with their state kept above.
+  function mountSettings({
+    disabledTab,
+    multiple,
+    held,
+  }: { disabledTab?: string; multiple?: boolean; held?: boolean } = {}) {
+    const saved: Record<string, boolean> = {}
+    const moves: string[] = []
+    // The attributes that name a panel after its tab or trigger, as an adapter renders them.
+    const name = (part: Parameters<typeof bind>[0], el: HTMLElement) => {
+      const rendered = attrs(part)
+      for (const key of ["id", "role", "aria-labelledby"]) {
+        if (typeof rendered[key] === "string") {
+          el.setAttribute(key, rendered[key])
+        }
+      }
+      return el
+    }
+    const addSwitch = (parent: HTMLElement, id: string, text: string) => {
+      const instance = checkbox({
+        id,
+        defaultChecked: saved[id] ?? false,
+        onCheckedChange: (checked) => (saved[id] = checked === true),
+      })
+      const label = parent.appendChild(document.createElement("label"))
+      const el = label.appendChild(document.createElement("button"))
+      label.append(text)
+      const unbind = bind(instance.part("root"), el)
+      return () => {
+        unbind()
+        instance.destroy()
+        label.remove()
+      }
+    }
+    let channels: ReturnType<typeof accordion> | undefined
+    const addChannels = (parent: HTMLElement) => {
+      const open = new Map<string, () => void>()
+      const panels = new Map<string, HTMLElement>()
+      const instance = accordion({
+        id: "channels",
+        multiple,
+        onValueChange: (value) => {
+          moves.push(`channels ${value.join(" ") || "none"}`)
+          for (const [section, panel] of panels) {
+            if (value.includes(section) && !open.has(section)) {
+              const offs = [
+                addSwitch(panel, `${section}-deploys`, "Deploy failures"),
+                ...(section === "email"
+                  ? [addSwitch(panel, "email-digest", "Weekly digest")]
+                  : []),
+              ]
+              open.set(section, () => offs.forEach((off) => off()))
+            } else if (!value.includes(section)) {
+              open.get(section)?.()
+              open.delete(section)
+            }
+          }
+        },
+      })
+      channels = instance
+      const unbinds = [
+        ["email", "Email"],
+        ["slack", "Slack"],
+      ].flatMap(([value, text]) => {
+        const item = parent.appendChild(document.createElement("div"))
+        const trigger = item.appendChild(document.createElement("button"))
+        trigger.textContent = text
+        name(instance.part("trigger", { value }), trigger)
+        const panel = item.appendChild(document.createElement("div"))
+        panels.set(value, name(instance.part("panel", { value }), panel))
+        return [
+          bind(instance.part("item", { value }), item),
+          bind(instance.part("trigger", { value }), trigger),
+        ]
+      })
+      return () => {
+        open.forEach((off) => off())
+        unbinds.forEach((unbind) => unbind())
+        instance.destroy()
+        channels = undefined
+      }
+    }
+    const pages: Record<string, (panel: HTMLElement) => () => void> = {
+      general: (panel) => addSwitch(panel, "public", "Public project"),
+      members: (panel) => addSwitch(panel, "invite", "Invite only"),
+      notifications: addChannels,
+    }
+    let leave: (() => void) | undefined
+    const show = (value: string) => {
+      leave?.()
+      const panel = root.appendChild(document.createElement("div"))
+      const off = pages[value](name(settings.part("panel", { value }), panel))
+      leave = () => {
+        off()
+        panel.remove()
+      }
+    }
+    const select = (value: string) => {
+      moves.push(`settings ${value}`)
+      show(value)
+    }
+    // Held, the tabs are controlled by a parent that takes each change 100ms later.
+    const later = (value: unknown) =>
+      setTimeout(() => {
+        settings.setOptions({
+          id: "settings",
+          value: value as string,
+          onValueChange: later,
+        })
+        select(value as string)
+      }, 100)
+    const settings = tabs(
+      held
+        ? { id: "settings", value: "general", onValueChange: later }
+        : {
+            id: "settings",
+            defaultValue: "general",
+            onValueChange: (value) => select(value as string),
+          }
+    )
+    const root = document.body.appendChild(document.createElement("div"))
+    const list = root.appendChild(document.createElement("div"))
+    list.setAttribute("aria-label", "Settings")
+    cleanups.push(
+      ...["General", "Members", "Notifications"].map((text) => {
+        const tab = list.appendChild(document.createElement("button"))
+        tab.textContent = text
+        const value = text.toLowerCase()
+        const part = settings.part("tab", {
+          value,
+          disabled: value === disabledTab,
+        })
+        return bind(part, name(part, tab))
+      }),
+      bind(settings.part("list"), list),
+      bind(settings.part("root"), root),
+      () => {
+        leave?.()
+        settings.destroy()
+      }
+    )
+    show("general")
+    return { settings, saved, moves, channels: () => channels }
+  }
+
+  const check = (ref: string, checked = true) => ({
+    ref,
+    action: "setChecked",
+    args: [checked],
+  })
+
+  test("a step finds its component on another tab, selects the tab and says what came with it", async () => {
+    const agent = createAgent()
+    const { settings, saved } = mountSettings()
+    const outcome = await agent.act({ steps: [check("Invite only")] })
+    expect(outcome).toMatchObject({
+      ok: true,
+      steps: [
+        {
+          changes: [
+            { component: "tabs", key: "value", value: "members" },
+            { label: "Invite only", key: "checked", value: true },
+          ],
+        },
+      ],
+    })
+    expect(settings.get().value).toBe("members")
+    expect(saved.invite).toBe(true)
+    expect(outcome.appeared.map((component) => component.label)).toContain(
+      "Invite only"
+    )
+    expect(outcome.steps[0].gone).toHaveLength(1)
+  })
+
+  test("a step finds its component in a closed section of another tab", async () => {
+    const agent = createAgent()
+    const { settings, saved, channels } = mountSettings()
+    const outcome = await agent.act({
+      steps: [check("Public project"), check("Weekly digest")],
+    })
+    expect(outcome.ok).toBe(true)
+    expect(settings.get().value).toBe("notifications")
+    expect(channels()?.get().value).toEqual(["email"])
+    expect(saved).toEqual({ public: true, "email-digest": true })
+  })
+
+  test("a name two sections behind a tab share is refused, and the page goes back", async () => {
+    const agent = createAgent()
+    const { settings, saved } = mountSettings()
+    const outcome = await agent.act({ steps: [check("Deploy failures")] })
+    expect(outcome.error?.message).toBe(
+      '"Deploy failures" is in 2 closed sections: Notifications > Email, Notifications > Slack. Put the one you mean first, like "Email > Deploy failures".'
+    )
+    expect(settings.get().value).toBe("general")
+    expect(saved).toEqual({})
+  })
+
+  test("a section before the name picks between look-alikes, by the words it shares with where each is", async () => {
+    const agent = createAgent()
+    const { saved, channels } = mountSettings()
+    const missing = await agent.act({
+      steps: [check("Billing > Deploy failures")],
+    })
+    expect(missing.error?.message).toBe(
+      'No "Deploy failures" in a section or tab named like "Billing". Behind what is closed: Members: Invite only. Notifications > Email: Deploy failures, Weekly digest. Notifications > Slack: Deploy failures.'
+    )
+    expect(
+      await agent.act({ steps: [check("Slack > Deploy failures")] })
+    ).toMatchObject({ ok: true })
+    expect(saved).toEqual({ "slack-deploys": true })
+    expect(
+      await agent.act({
+        steps: [check("Email notifications > Deploy failures")],
+      })
+    ).toMatchObject({ ok: true })
+    expect(saved).toEqual({ "slack-deploys": true, "email-deploys": true })
+    expect(channels()?.get().value).toEqual(["email"])
+  })
+
+  test("a place that only half fits is refused, with what each closed place holds", async () => {
+    const agent = createAgent()
+    const { saved, settings } = mountSettings()
+    const outcome = await agent.act({
+      steps: [check("Slack notifications > Weekly digest")],
+    })
+    expect(outcome.error?.message).toBe(
+      'No "Weekly digest" in a section or tab named like "Slack notifications". Behind what is closed: Members: Invite only. Notifications > Email: Deploy failures, Weekly digest. Notifications > Slack: Deploy failures.'
+    )
+    expect(saved).toEqual({})
+    expect(settings.get().value).toBe("general")
+  })
+
+  test("a wrong guess says what the closed tabs and sections hold, so the steps after it can be fixed with it", async () => {
+    const agent = createAgent()
+    const { settings, moves } = mountSettings()
+    const outcome = await agent.act({
+      steps: [
+        { ref: "Settings", action: "setValue", args: ["Billing"] },
+        check("Email > Weekly summary"),
+      ],
+    })
+    expect(outcome.error?.message).toMatch(
+      /^No item "Billing" in Settings \(c\d+\)\. Its items: General, Members, Notifications\. Behind what is closed: Members: Invite only\. Notifications > Email: Deploy failures, Weekly digest\. Notifications > Slack: Deploy failures\. Send it again with the step after it, 2 steps in one call\.$/
+    )
+    expect(settings.get().value).toBe("general")
+    const looks = moves.length
+    const refused = await agent.act({
+      steps: [
+        check("Public project"),
+        { ref: "Public project", action: "press" },
+      ],
+    })
+    expect(refused.error?.message).not.toContain("Behind what is closed")
+    expect(moves).toHaveLength(looks)
+  })
+
+  test("a closed query reads what the other tabs and closed sections hold, and goes back", async () => {
+    const agent = createAgent()
+    const { settings, saved } = mountSettings()
+    saved["email-digest"] = true
+    const read = (components: unknown) =>
+      (components as AgentComponent[])
+        .filter(
+          (component) =>
+            component.component === "checkbox" &&
+            (!component.offPage || component.section)
+        )
+        .map(
+          ({ label, section, checked, offPage }) =>
+            `${offPage ? `${section} > ` : ""}${label}: ${checked}`
+        )
+    expect(read(await agent.query({ closed: true }))).toEqual([
+      "Public project: false",
+      "Members > Invite only: false",
+      "Notifications > Email > Deploy failures: false",
+      "Notifications > Email > Weekly digest: true",
+      "Notifications > Slack > Deploy failures: false",
+    ])
+    expect(settings.get().value).toBe("general")
+    expect(
+      read(await agent.query({ text: "deploy failures", closed: true }))
+    ).toEqual([
+      "Notifications > Email > Deploy failures: false",
+      "Notifications > Slack > Deploy failures: false",
+    ])
+    // Without it, a query opens nothing.
+    expect(read(await agent.query({ text: "Invite only" }))).toEqual([
+      "Members > Invite only: false",
+    ])
+    const listed = await agent.query({ text: "Weekly digest" })
+    expect(listed).toMatchObject([{ offPage: true, actions: [] }])
+  })
+
+  test("a closed query asks allow before each look, and a browser agent's asks registerTools' allow too", async () => {
+    const asked: string[] = []
+    const agent = createAgent({
+      allow: (step) => {
+        asked.push(`${step.action} ${step.args[0]}`)
+        return step.args[0] !== "members"
+      },
+    })
+    mountSettings()
+    const labels = async (components: unknown) =>
+      ((await components) as AgentComponent[]).flatMap((component) =>
+        component.actions.length ? (component.label ?? []) : []
+      )
+    expect(await labels(agent.query({ closed: true }))).toEqual([
+      "Settings",
+      "Public project",
+      "Deploy failures",
+      "Weekly digest",
+      "Deploy failures",
+    ])
+    expect(asked).toEqual([
+      "setValue members",
+      "setValue notifications",
+      "open email",
+      "open slack",
+    ])
+    const tools = new Map<string, { execute: (input: object) => unknown }>()
+    Object.assign(document, {
+      modelContext: {
+        registerTool: async (tool: {
+          name: string
+          execute: (input: object) => unknown
+        }) => tools.set(tool.name, tool),
+      },
+    })
+    const remove = registerTools(agent, {
+      allow: (step) => step.args[0] !== "notifications",
+    })
+    expect(await labels(tools.get("query")?.execute({ closed: true }))).toEqual(
+      ["Settings", "Public project"]
+    )
+    remove()
+    Reflect.deleteProperty(document, "modelContext")
+  })
+
+  test("a set with no value, or a call with no steps, fails", async () => {
+    const agent = createAgent()
+    const { saved } = mountSettings()
+    const unset = await agent.act({
+      steps: [{ ref: "Public project", action: "setChecked" }],
+    })
+    expect(unset.error?.message).toMatch(
+      /^setChecked on "Public project" needs its value, as "args": \[value\]\. No step ran\.$/
+    )
+    expect(saved).toEqual({})
+    const empty = await agent.act({} as { steps: AgentStep[] })
+    expect(empty).toMatchObject({ ok: false, error: { step: 0 } })
+  })
+
+  test("look-alikes in two sections keep their own refs, and say their section", async () => {
+    const agent = createAgent()
+    mountSettings({ multiple: true })
+    const outcome = await agent.act({
+      steps: [
+        check("Email > Deploy failures"),
+        { ref: "Slack", action: "open" },
+      ],
+    })
+    expect(outcome.ok).toBe(true)
+    const alike = agent
+      .snapshot()
+      .filter(
+        (component) =>
+          component.label === "Deploy failures" && !component.offPage
+      )
+    expect(alike.map((component) => component.section)).toEqual([
+      "Notifications > Email",
+      "Notifications > Slack",
+    ])
+    const [email, slack] = alike
+    expect(email.ref).not.toBe(slack.ref)
+    expect(outcome.values).toMatchObject({
+      [`${email.ref} Email > Deploy failures`]: true,
+      [`${slack.ref} Slack > Deploy failures`]: false,
+    })
+    const both = await agent.act({ steps: [check("Deploy failures", false)] })
+    expect(both.error?.message).toContain(
+      `"Deploy failures" names 2 components: ${email.ref} Deploy failures (in Email), ${slack.ref} Deploy failures (in Slack). Use a ref, or put its section first, like "Email > Deploy failures".`
+    )
+  })
+
+  test("a row whose text holds a place and a name doesn't take the step for them", async () => {
+    const agent = createAgent()
+    const { saved } = mountSettings()
+    const admin = mountCheckbox({ id: "admin" }, "Admin")
+    const row = document.createElement("li")
+    row.append("Email Deploy failures", document.body.lastElementChild!)
+    document.body.append(row)
+    cleanups.push(() => row.remove())
+    expect(agent.snapshot().find(({ label }) => label === "Admin")?.row).toBe(
+      "Email Deploy failures"
+    )
+    const outcome = await agent.act({
+      steps: [check("Email > Deploy failures")],
+    })
+    expect(outcome.ok).toBe(true)
+    expect(admin.get().checked).toBe(false)
+    expect(saved["email-deploys"]).toBe(true)
+  })
+
+  test("a step that names a tab or a section and gives no value means that one", async () => {
+    const agent = createAgent()
+    const { settings, channels } = mountSettings()
+    const outcome = await agent.act({
+      steps: [
+        { ref: "Notifications", action: "press" },
+        { ref: "Email", action: "open" },
+      ],
+    })
+    expect(outcome.ok).toBe(true)
+    expect(settings.get().value).toBe("notifications")
+    expect(channels()?.get().value).toEqual(["email"])
+    expect(
+      await agent.act({
+        steps: [{ ref: "accordion", action: "press", args: ["Slack"] }],
+      })
+    ).toMatchObject({ ok: true })
+    expect(channels()?.get().value).toEqual(["slack"])
+    const unnamed = await agent.act({
+      steps: [{ ref: "accordion", action: "open" }],
+    })
+    expect(unnamed.error?.message).toMatch(
+      /^open on accordion \(c\d+\) takes one of its items: Email, Slack\.$/
+    )
+    expect(channels()?.get().value).toEqual(["slack"])
+  })
+
+  test("values keep a field its framework hasn't let go of yet", async () => {
+    const agent = createAgent()
+    const news = checkbox({ id: "news", defaultChecked: true })
+    const el = document.body.appendChild(document.createElement("button"))
+    el.setAttribute("aria-label", "Newsletter")
+    const unbind = bind(news.part("root"), el)
+    cleanups.push(() => news.destroy())
+    // React unbinds a component when it leaves and destroys it a moment later.
+    mountCheckbox({
+      id: "terms",
+      onCheckedChange: () => {
+        unbind()
+        el.remove()
+      },
+    })
+    const outcome = await agent.act({ steps: [check("Accept the terms")] })
+    expect(Object.entries(outcome.values)).toContainEqual([
+      expect.stringMatching(/^c\d+ Newsletter$/),
+      true,
+    ])
+  })
+
+  test("a section isn't named by a heading inside data-agent-hidden, and one that holds some names it with its other text", async () => {
+    const agent = createAgent()
+    const root = document.body.appendChild(document.createElement("div"))
+    root.innerHTML = `
+      <h3 id="plan" data-agent-hidden>Canary plan</h3>
+      <div role="group" aria-labelledby="plan"><label><button></button>Deploy failures</label></div>
+      <h3 id="chat">Slack <span data-agent-hidden>for Canary</span></h3>
+      <div role="group" aria-labelledby="chat"><label><button></button>Deploy failures</label></div>
+      <h3 id="mail">Email</h3>
+      <div role="group" aria-labelledby="mail"><label><button></button>Deploy failures</label></div>`
+    cleanups.push(() => root.remove())
+    for (const [at, el] of [...root.querySelectorAll("button")].entries()) {
+      const instance = checkbox({ id: `deploys-${at}` })
+      const unbind = bind(instance.part("root"), el)
+      cleanups.push(() => {
+        unbind()
+        instance.destroy()
+      })
+    }
+    const screen = agent.snapshot().filter((component) => !component.offPage)
+    expect(screen.map((component) => component.section)).toEqual([
+      undefined,
+      "Slack",
+      "Email",
+    ])
+    const outcome = await agent.act({
+      steps: [check("Email > Deploy failures")],
+    })
+    expect(outcome.ok).toBe(true)
+    expect(JSON.stringify([screen, outcome])).not.toContain("Canary")
+  })
+
+  test("a component isn't named by text inside data-agent-hidden", async () => {
+    const agent = createAgent()
+    const root = document.body.appendChild(document.createElement("div"))
+    root.innerHTML = `
+      <h3 id="owner" data-agent-hidden>Canary owner</h3>
+      <button aria-labelledby="owner"></button>
+      <h3 id="alerts">Alerts <span data-agent-hidden>for Canary</span></h3>
+      <button aria-labelledby="alerts"></button>
+      <label>Deploys <span data-agent-hidden>at Canary</span><button></button></label>
+      <button aria-label="Digest"><span data-agent-hidden>Canary</span></button>
+      <button><span data-agent-hidden>Canary</span> Invoices</button>
+      <button><span aria-labelledby="owner"></span> Receipts</button>
+      <button><span aria-labelledby="alerts"></span> Refunds</button>`
+    cleanups.push(() => root.remove())
+    for (const [at, el] of [...root.querySelectorAll("button")].entries()) {
+      const instance = checkbox({ id: `named-${at}` })
+      const unbind = bind(instance.part("root"), el)
+      cleanups.push(() => {
+        unbind()
+        instance.destroy()
+      })
+    }
+    const screen = agent.snapshot().filter((component) => !component.offPage)
+    expect(screen.map((component) => component.label)).toEqual([
+      undefined,
+      "Alerts",
+      "Deploys",
+      "Digest",
+      "Invoices",
+      "Receipts",
+      "Refunds",
+    ])
+    const outcome = await agent.act({ steps: [check("Nowhere")] })
+    expect(outcome.ok).toBe(false)
+    expect(JSON.stringify([screen, agent.query({}), outcome])).not.toContain(
+      "Canary"
+    )
+  })
+
+  test("what a field holds, or what hidden takes off the page, is never read as a name or as a row's text", async () => {
+    const agent = createAgent()
+    const root = document.body.appendChild(document.createElement("div"))
+    root.innerHTML = `
+      <label>Notes <span data-agent-hidden>for Canary</span><span hidden>zq7canary</span>
+        <textarea data-agent-secret>zq7canary</textarea></label>
+      <label>Plan <span data-agent-hidden>for Canary</span>
+        <button></button><select><option>zq7canary</option></select></label>
+      <ul><li>Jane <span hidden>zq7canary</span>
+        <textarea data-agent-secret>zq7canary</textarea><button></button></li></ul>`
+    cleanups.push(() => root.remove())
+    for (const [at, el] of [...root.querySelectorAll("textarea")].entries()) {
+      const instance = textarea({ id: `notes-${at}` })
+      const unbind = bind(instance.part("root"), el)
+      cleanups.push(() => {
+        unbind()
+        instance.destroy()
+      })
+    }
+    for (const [at, el] of [...root.querySelectorAll("button")].entries()) {
+      const instance = checkbox({ id: `held-${at}` })
+      const unbind = bind(instance.part("root"), el)
+      cleanups.push(() => {
+        unbind()
+        instance.destroy()
+      })
+    }
+    const screen = agent.snapshot().filter((component) => !component.offPage)
+    expect(screen.map((component) => [component.label, component.row])).toEqual(
+      [
+        ["Notes", undefined],
+        [undefined, "Jane"],
+        ["Plan", undefined],
+        [undefined, "Jane"],
+      ]
+    )
+    const outcome = await agent.act({ steps: [check("Nowhere")] })
+    expect(JSON.stringify([screen, agent.query({}), outcome])).not.toMatch(
+      /canary/i
+    )
+  })
+
+  test("a confirm mark on a part alone in its slot with a key of its own asks on every step, and shows in the snapshot", async () => {
+    const agent = createAgent()
+    const instance = collapsible({ id: "billing" })
+    const trigger = document.body.appendChild(document.createElement("button"))
+    trigger.textContent = "Billing"
+    trigger.setAttribute("data-agent-confirm", "Shows what you pay")
+    const unbind = bind(instance.part("trigger", { id: "auto-1" }), trigger)
+    cleanups.push(() => {
+      unbind()
+      instance.destroy()
+      trigger.remove()
+    })
+    expect(agent.snapshot().find(({ label }) => label === "Billing")).toEqual(
+      expect.objectContaining({ confirm: "Shows what you pay" })
+    )
+    const outcome = await agent.act({
+      steps: [{ ref: "Billing", action: "setOpen", args: [true] }],
+    })
+    expect(outcome.error?.message).toBe(
+      'Needs a person: "Shows what you pay". Ask them to make this change themselves.'
+    )
+    expect(instance.get().open).toBe(false)
+  })
+
+  test("a field that was never shown isn't in a call's values, on a failed call either", async () => {
+    const agent = createAgent()
+    mountCheckbox({ id: "terms" })
+    for (const [attribute, value] of [
+      ["hidden", ""],
+      ["aria-hidden", "true"],
+    ]) {
+      const region = document.body.appendChild(document.createElement("div"))
+      region.setAttribute(attribute, value)
+      const label = region.appendChild(document.createElement("label"))
+      const el = label.appendChild(document.createElement("input"))
+      label.append(`Promo code ${attribute}`)
+      const code = input({ id: `code-${attribute}`, defaultValue: "zq7canary" })
+      const unbind = bind(code.part("root"), el)
+      cleanups.push(() => {
+        unbind()
+        code.destroy()
+        region.remove()
+      })
+    }
+    const done = await agent.act({ steps: [check("Accept the terms")] })
+    expect(done.ok).toBe(true)
+    const failed = await agent.act({ steps: [check("Nowhere")] })
+    expect(failed.ok).toBe(false)
+    // Gone from the page, they aren't remembered either.
+    cleanups.splice(1).forEach((cleanup) => cleanup())
+    const after = await agent.act({ steps: [check("Accept the terms")] })
+    expect(JSON.stringify([done, failed, after, agent.snapshot()])).not.toMatch(
+      /zq7canary|Promo code/
+    )
+  })
+
+  test("a failed step says the steps before it stay done and what to send again", async () => {
+    const agent = createAgent()
+    const { saved } = mountSettings()
+    const outcome = await agent.act({
+      steps: [
+        check("Public project"),
+        check("Nothing by this name"),
+        check("Invite only"),
+        check("Weekly digest"),
+      ],
+    })
+    expect(outcome.error).toMatchObject({
+      step: 1,
+      message: expect.stringMatching(
+        / The steps before this one stay done\. Send it again with the 2 steps after it, 3 steps in one call\.$/
+      ),
+    })
+    expect(outcome.error?.message).toContain("Behind what is closed: Members")
+    expect(outcome.error?.message).not.toContain("which a step can open first")
+    expect(saved).toEqual({ public: true })
+  })
+
+  test("allow is asked before each tab or section opens to look, and a no keeps it closed", async () => {
+    const asked: string[] = []
+    const agent = createAgent({
+      allow: (step) => {
+        asked.push(`${step.action} ${step.args[0]}`)
+        return step.args[0] !== "notifications"
+      },
+    })
+    const { settings, moves } = mountSettings()
+    const outcome = await agent.act({ steps: [check("Weekly digest")] })
+    expect(outcome.error?.message).toMatch(
+      /^No component "Weekly digest" on the page\. .* It may be behind one of these, which a step can open first: Settings \(c\d+\): Members, Notifications\. Behind what is closed: Members: Invite only\.$/
+    )
+    expect(asked).toEqual(["setValue members", "setValue notifications"])
+    expect(moves).toEqual(["settings members", "settings general"])
+    expect(settings.get().value).toBe("general")
+  })
+
+  test("a tab its parent selects a moment later is still looked behind", async () => {
+    const agent = createAgent()
+    const { settings, saved } = mountSettings({ held: true })
+    const outcome = await agent.act({ steps: [check("Invite only")] })
+    expect(outcome.ok).toBe(true)
+    expect(settings.get().value).toBe("members")
+    expect(saved).toEqual({ invite: true })
+  })
+
+  test("a tab its parent selects a moment later is back before the next one opens", async () => {
+    const agent = createAgent()
+    const { settings, moves } = mountSettings({ held: true })
+    const outcome = await agent.act({ steps: [check("Nowhere")] })
+    expect(outcome.ok).toBe(false)
+    await new Promise((resolve) => setTimeout(resolve, 300))
+    expect(moves).toEqual([
+      "settings members",
+      "settings general",
+      "settings notifications",
+      "channels email",
+      "channels none",
+      "channels slack",
+      "channels none",
+      "settings general",
+    ])
+    expect(settings.get().value).toBe("general")
+  })
+
+  test("a tab inside data-agent-confirm isn't opened to look, and a step on it needs a person", async () => {
+    const asked: string[] = []
+    const { moves } = mountSettings()
+    const members = [...document.querySelectorAll("button")].find(
+      (button) => button.textContent === "Members"
+    )!
+    members.setAttribute("data-agent-confirm", "Shows who is on the project")
+    const outcome = await createAgent().act({ steps: [check("Invite only")] })
+    expect(outcome.ok).toBe(false)
+    const guarded = createAgent({
+      allow: (step) => {
+        asked.push(`${step.action} ${step.args[0]}`)
+        return true
+      },
+    })
+    await guarded.act({ steps: [check("Invite only")] })
+    await guarded.query({ closed: true })
+    expect(asked).not.toContain("setValue members")
+    expect(moves).not.toContain("settings members")
+    const named = await createAgent().act({
+      steps: [{ ref: "Settings", action: "setValue", args: ["Members"] }],
+    })
+    expect(named.error?.message).toMatch(
+      /^Needs a person: "Shows who is on the project"\./
+    )
+    expect(moves).not.toContain("settings members")
+  })
+
+  test("a look that allow stops part way puts the tab back", async () => {
+    const { settings, moves } = mountSettings()
+    const agent = createAgent({
+      allow: (step) => {
+        if (step.component === "accordion") {
+          throw new Error("Nobody answered")
+        }
+        return true
+      },
+    })
+    const outcome = await agent.act({ steps: [check("Nowhere")] })
+    expect(outcome.ok).toBe(false)
+    expect(moves).toContain("settings notifications")
+    expect(settings.get().value).toBe("general")
+  })
+
+  test("a disabled tab isn't opened to look", async () => {
+    const agent = createAgent()
+    const { moves } = mountSettings({ disabledTab: "members" })
+    const outcome = await agent.act({ steps: [check("Invite only")] })
+    expect(outcome.ok).toBe(false)
+    expect(moves).not.toContain("settings members")
+  })
+
+  test("sections open to look before tabs do, and tabs stay when a section has it", async () => {
+    const agent = createAgent()
+    const { moves } = mountSettings()
+    await agent.act({ steps: [{ ref: "Notifications", action: "press" }] })
+    moves.length = 0
+    const outcome = await agent.act({ steps: [check("Weekly digest")] })
+    expect(outcome.ok).toBe(true)
+    expect(moves).toEqual([
+      "channels email",
+      "channels none",
+      "channels slack",
+      "channels none",
+      "channels email",
+    ])
+  })
+
+  test("a name the page has twice is refused without opening anything", async () => {
+    const agent = createAgent()
+    const { moves } = mountSettings()
+    mountCheckbox({ id: "public-copy" }, "Public project")
+    const outcome = await agent.act({ steps: [check("Public project")] })
+    expect(outcome.error?.message).toMatch(
+      /^"Public project" names 2 components/
+    )
+    expect(moves).toEqual([])
+  })
+
+  // An orders list as an adapter renders it: a page's rows mount while it's the
+  // current page, and the fields under More options while that is open.
+  async function mountOrders() {
+    const { collapsible } =
+      await import("../src/components/collapsible/collapsible")
+    const saved: Record<string, boolean> = {}
+    const root = document.body.appendChild(document.createElement("div"))
+    const addSwitch = (parent: HTMLElement, id: string, text: string) => {
+      const instance = checkbox({
+        id,
+        defaultChecked: saved[id] ?? false,
+        onCheckedChange: (checked) => (saved[id] = checked === true),
+      })
+      const label = parent.appendChild(document.createElement("label"))
+      const el = label.appendChild(document.createElement("button"))
+      label.append(text)
+      const unbind = bind(instance.part("root"), el)
+      return () => {
+        unbind()
+        instance.destroy()
+        label.remove()
+      }
+    }
+    const rows = root.appendChild(document.createElement("div"))
+    let leave = addSwitch(rows, "order-1", "Order 1")
+    const pages = pagination({
+      id: "pages",
+      pageCount: 3,
+      onPageChange: (page) => {
+        leave()
+        leave = addSwitch(rows, `order-${page}`, `Order ${page}`)
+      },
+    })
+    const nav = root.appendChild(document.createElement("nav"))
+    nav.setAttribute("aria-label", "Pages")
+    const panel = Object.assign(document.createElement("div"), {
+      getAnimations: () => [],
+    })
+    let close: (() => void) | undefined
+    const more = collapsible({
+      id: "more",
+      onOpenChange: (open) => {
+        close?.()
+        close = open ? addSwitch(panel, "gift", "Gift wrap") : undefined
+      },
+    })
+    const trigger = root.appendChild(document.createElement("button"))
+    trigger.textContent = "More options"
+    root.append(panel)
+    cleanups.push(
+      bind(pages.part("root"), nav),
+      bind(more.part("trigger"), trigger),
+      bind(more.part("panel"), panel),
+      () => leave(),
+      () => close?.(),
+      () => pages.destroy(),
+      () => more.destroy()
+    )
+    return { pages, more, saved, root }
+  }
+
+  test("a section and a collapsible inside data-agent-confirm aren't opened to look, and a step on one needs a person", async () => {
+    const mark = (text: string, says: string) =>
+      [...document.querySelectorAll("button")]
+        .find((button) => button.textContent === text)!
+        .setAttribute("data-agent-confirm", says)
+    const { moves } = mountSettings()
+    const { more } = await mountOrders()
+    const agent = createAgent()
+    await agent.act({ steps: [{ ref: "Notifications", action: "press" }] })
+    mark("Email", "Shows the email settings")
+    mark("More options", "Shows the gift options")
+    const section = await agent.act({
+      steps: [{ ref: "Email", action: "open" }],
+    })
+    expect(section.error?.message).toMatch(
+      /^Needs a person: "Shows the email settings"\./
+    )
+    const options = await agent.act({
+      steps: [{ ref: "More options", action: "setOpen", args: [true] }],
+    })
+    expect(options.error?.message).toMatch(
+      /^Needs a person: "Shows the gift options"\./
+    )
+    expect((await agent.act({ steps: [check("Gift wrap")] })).ok).toBe(false)
+    expect(moves).toContain("channels slack")
+    expect(moves).not.toContain("channels email")
+    expect(more.get().open).toBe(false)
+  })
+
+  test("what a closed section still holds as it animates out isn't taken for the next one's", async () => {
+    const { collapsible } =
+      await import("../src/components/collapsible/collapsible")
+    const agent = createAgent()
+    const saved: Record<string, boolean> = {}
+    const sections = [
+      ["Email", "Weekly summary"],
+      ["Slack", "Mentions"],
+    ].map(([name, field]) => {
+      const trigger = document.body.appendChild(
+        document.createElement("button")
+      )
+      trigger.textContent = name
+      const panel = document.body.appendChild(
+        Object.assign(document.createElement("div"), {
+          getAnimations: () => [],
+        })
+      )
+      // Like Svelte, which keeps what's leaving bound and inert for its outro, and brings it back.
+      let content: HTMLElement | undefined
+      let leaving: ReturnType<typeof setTimeout> | undefined
+      const instance = collapsible({
+        id: name,
+        onOpenChange: (open) => {
+          clearTimeout(leaving)
+          if (!open) {
+            content?.setAttribute("inert", "")
+            leaving = setTimeout(() => {
+              content?.remove()
+              content = undefined
+            }, 300)
+            return
+          }
+          content?.removeAttribute("inert")
+          if (content) {
+            return
+          }
+          content = panel.appendChild(document.createElement("label"))
+          const toggle = checkbox({
+            id: field,
+            onCheckedChange: (checked) => (saved[field] = checked === true),
+          })
+          const el = content.appendChild(document.createElement("button"))
+          content.append(field)
+          cleanups.push(bind(toggle.part("root"), el), () => toggle.destroy())
+        },
+      })
+      cleanups.push(
+        bind(instance.part("trigger"), trigger),
+        bind(instance.part("panel"), panel),
+        () => instance.destroy()
+      )
+      return instance
+    })
+    const outcome = await agent.act({ steps: [check("Weekly summary")] })
+    expect(outcome.error).toBeUndefined()
+    expect(saved).toEqual({ "Weekly summary": true })
+    expect(sections.map((section) => section.get().open)).toEqual([true, false])
+  })
+
+  test("a step finds its component on another page of a pagination and goes there", async () => {
+    const agent = createAgent()
+    const { pages, saved } = await mountOrders()
+    const outcome = await agent.act({ steps: [check("Order 3")] })
+    expect(outcome).toMatchObject({
+      ok: true,
+      steps: [
+        {
+          changes: [
+            { component: "pagination", key: "page", value: 3 },
+            { label: "Order 3", key: "checked", value: true },
+          ],
+        },
+      ],
+    })
+    expect(pages.get().page).toBe(3)
+    expect(saved["order-3"]).toBe(true)
+  })
+
+  test("a step finds its component in a closed collapsible and opens it", async () => {
+    const agent = createAgent()
+    const { more, saved } = await mountOrders()
+    const outcome = await agent.act({ steps: [check("Gift wrap")] })
+    expect(outcome.ok).toBe(true)
+    expect(more.get().open).toBe(true)
+    expect(saved.gift).toBe(true)
+  })
+
+  test("a wrong guess says what the other pages and a closed collapsible hold, and the page goes back", async () => {
+    const agent = createAgent()
+    const { pages, more } = await mountOrders()
+    const outcome = await agent.act({ steps: [check("Order 9")] })
+    expect(outcome.error?.message).toMatch(
+      /^No component "Order 9" on the page\. Its labels: Order 1, Pages, More options\. Behind what is closed: More options: Gift wrap\. page 2: Order 2\. page 3: Order 3\.$/
+    )
+    expect(pages.get().page).toBe(1)
+    expect(more.get().open).toBe(false)
+  })
+
+  test("what one step's look found is not said again by a later step that looks nowhere", async () => {
+    const agent = createAgent()
+    const { pages } = await mountOrders()
+    const outcome = await agent.act({
+      steps: [check("Order 2"), { ref: "Order 2", action: "press" }],
+    })
+    expect(pages.get().page).toBe(2)
+    expect(outcome.error?.step).toBe(1)
+    expect(outcome.error?.message).not.toContain("Behind what is closed")
+  })
+
+  test("a name the page lacks under an open modal says what is open over it, with its buttons", async () => {
+    const agent = createAgent()
+    const { root } = await mountOrders()
+    const { popover } = await import("../src/components/popover/popover")
+    const confirm = popover({ id: "confirm", defaultOpen: true })
+    const content = Object.assign(document.createElement("div"), {
+      getAnimations: () => [],
+    })
+    content.setAttribute("aria-label", "Edit order")
+    const apply = content.appendChild(document.createElement("button"))
+    apply.textContent = "Apply"
+    document.body.append(content)
+    cleanups.push(bind(confirm.part("content"), content), () =>
+      confirm.destroy()
+    )
+    root.setAttribute("inert", "")
+    const outcome = await agent.act({ steps: [check("Order 3")] })
+    expect(outcome.error?.message).toMatch(
+      /Edit order \(c\d+\) is open over the rest of the page, with the buttons Apply: finish it or close it before a step on what it covers\.$/
+    )
+  })
+
+  test("a name can put a component around it first, by its label or its kind", async () => {
+    const agent = createAgent()
+    const { saved } = await mountOrders()
+    const { popover } = await import("../src/components/popover/popover")
+    const edit = popover({ id: "edit", defaultOpen: true })
+    const content = Object.assign(document.createElement("div"), {
+      getAnimations: () => [],
+    })
+    content.setAttribute("aria-label", "Edit order")
+    document.body.append(content)
+    const label = content.appendChild(document.createElement("label"))
+    const el = label.appendChild(document.createElement("button"))
+    label.append("Priority")
+    const priority = checkbox({
+      id: "priority",
+      onCheckedChange: (checked) => (saved.priority = checked === true),
+    })
+    cleanups.push(
+      bind(edit.part("content"), content),
+      bind(priority.part("root"), el),
+      () => edit.destroy(),
+      () => priority.destroy()
+    )
+    const byKind = await agent.act({ steps: [check("popover > Priority")] })
+    expect(byKind.ok).toBe(true)
+    expect(saved.priority).toBe(true)
+    const byLabel = await agent.act({
+      steps: [check("Edit order > Priority", false)],
+    })
+    expect(byLabel.ok).toBe(true)
+    expect(saved.priority).toBe(false)
+    const elsewhere = await agent.act({ steps: [check("popover > Order 1")] })
+    expect(elsewhere.error?.message).toMatch(
+      /^No "Order 1" in a section or tab named like "popover"\./
+    )
+  })
+
+  test("a cancelled call stops looking behind what is closed", async () => {
+    const agent = createAgent()
+    const { settings, moves } = mountSettings()
+    const stop = new AbortController()
+    cleanups.push(
+      settings.subscribe(() => {
+        if (settings.get().value !== "general") {
+          stop.abort()
+        }
+      })
+    )
+    const outcome = await agent.act(
+      { steps: [check("Nothing by this name")] },
+      { signal: stop.signal }
+    )
+    expect(outcome.ok).toBe(false)
+    expect(moves).toEqual(["settings members", "settings general"])
+  })
+
+  test("what a closing panel still holds counts as gone", async () => {
+    const agent = createAgent()
+    const instance = checkbox({ id: "leaving" })
+    const panel = document.body.appendChild(document.createElement("div"))
+    panel.setAttribute("data-ending-style", "")
+    const el = panel.appendChild(document.createElement("button"))
+    el.setAttribute("aria-label", "Leaving")
+    cleanups.push(bind(instance.part("root"), el), () => instance.destroy())
+    const outcome = await agent.act({ steps: [check("Leaving")] })
+    expect(outcome.error?.message).toMatch(/^No component "Leaving"/)
   })
 })

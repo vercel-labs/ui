@@ -1,5 +1,12 @@
 # @ui-sdk/web
 
+## 0.1.0-beta.17
+
+### Patch Changes
+
+- fc45598: `@ui-sdk/web/toast` exports `toast()` and `createToaster()`, so a page without a bundler can import them from the CDN's `toast.js`.
+- Updated @ui-sdk/core to 0.1.0-beta.17
+
 ## 0.1.0-beta.16
 
 ### Patch Changes

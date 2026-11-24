@@ -13,8 +13,16 @@ afterEach(() => {
   unmount = undefined
 })
 
-async function mountCase(component: ComponentCase, markup = component.markup) {
-  const mounted = mount(component.primitive, { ...component.options }, markup)
+async function mountCase(
+  component: ComponentCase,
+  markup = component.markup,
+  options: Record<string, unknown> = {}
+) {
+  const mounted = mount(
+    component.primitive,
+    { ...component.options, ...options },
+    markup
+  )
   unmount = mounted.unmount
   await mounted.settle()
   return mounted
@@ -153,14 +161,16 @@ describe.each(componentCases)("$name", (component) => {
     const logged: ObservedChange[] = []
     const stop = observe((change) => logged.push(change))
     const agent = createAgent()
+    // A range wide enough for the number below, which a slider's own would refuse.
     const mounted = await mountCase(
       component,
-      `<div data-agent-secret>${component.markup}</div>`
+      `<div data-agent-secret>${component.markup}</div>`,
+      component.name === "slider" ? { max: 1_000_000 } : {}
     )
     const [entry] = onPage(agent)
     const told: unknown[] = []
     const held: string[] = []
-    for (const value of ["zq7canary", 739146]) {
+    for (const value of ["zq7canary", "2031-07-19", 739146]) {
       const outcome = await agent.act({
         steps: [{ ref: entry.ref, action: "setValue", args: [value] }],
       })

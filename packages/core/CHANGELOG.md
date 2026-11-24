@@ -1,5 +1,29 @@
 # @ui-sdk/core
 
+## 0.1.0-beta.17
+
+### Minor Changes
+
+- cede51f: An agent's step now finds its component on another tab, on another page of a pagination, or in a closed section or collapsible, and opens what it is behind. A place before the name, like `"Email > Deploy failures"`, picks between look-alikes, which carry a `section` in the snapshot. A tab or section inside `data-agent-confirm` isn't opened to look. A `set` step fails when its value didn't take, so a step that saves can go last in the same call. A step that names something that isn't there lists what the closed tabs and sections hold, and names an open modal that covers the page. `press` takes a near miss of a button's text, like `"Mark as paid"` for **Mark paid**, and a name can put a component around it first, like `"dialog > Status"`. An `expect` step checks a value, a checked state or a row's text without changing it, and stops the call when it differs. `query` takes `closed: true` to read the other tabs and closed sections in one call. A list with more than 10 items in its data now says how many it has, as `more` on its snapshot entry, and `query` takes `from` with `within` to read a list past its first 50 items. `act` now checks the shape of the whole call before any step runs: a step with a key other than `ref`, `action` and `args`, or `args` that isn't a list, fails with what to send. A number outside a component's `min` and `max` is refused, where it used to be clamped, and a number sent to a text field, or to a list whose values are text, is stored as text. The bridge carries `agentTools` as `agent.tools`. `agentTools` lists `act` first, with descriptions that plan a whole task in one call. Text inside `data-agent-hidden` no longer names a component or a section, and a field hidden since it mounted is left out of a call's `values`. In web components, `data-agent-confirm` on a part with no value, like a collapsible's trigger, now asks the person before any step on its component, and shows as `confirm` in the snapshot.
+
+### Patch Changes
+
+- 47aac04: The agent's `setValue` names an item of a Select whose values are numbers by its label, as it does for string values.
+- bd24ba4: `@ui-sdk/core` exports `SlotProps`, `Named`, `BaseSlotProps`, `Feature` and `Listener`, every type a primitive's inferred type names, so a package that ships its own primitive can emit or bundle its declarations without a TS2742 error or a copy of core's files.
+- 926dab8: Under `exactOptionalPropertyTypes`, `Tooltip` typechecks in an app that checks its libraries, and a primitive's `change()` takes an `event` that may be `undefined`, like `change("open", false, { reason: "trigger-press", event })` from a method whose `event` parameter is optional.
+- ab68711: The Tabs and Segmented Control indicators measure again when the reading direction changes at runtime, so they stay under the selected item.
+- ab6d721: A `keydown` or `keyup` with no `key`, like the one Chrome's autofill sends a field, no longer throws in a Listbox, Tree, Menu or Select around that field.
+- 30e788c: A menu opened only from its `MenuContextTrigger` now writes shortcuts for the platform, like `⌘D` and `aria-keyshortcuts="Meta+D"` on Apple devices.
+- 26a1326: A menu with submenus lets go of each submenu when it closes. Before, every open and close kept the closed submenus, their elements and their listeners in memory for as long as the menu was on the page.
+- 5c98052: The missing-name warning skips parts inside `aria-hidden="true"`, since screen readers never reach them.
+- 181acce: A popup lets go of its content once the content unmounts. Before, a Popover whose content renders right after its trigger kept that content in memory for as long as the Popover was on the page.
+- 468f37e: A non-modal popup opened without a trigger, like a popover a controller opens from a table row, sends Tab and Shift+Tab on from the element that had focus when it opened. Before, Tab went on from wherever the popup sat in the page, often to the body, and Shift+Tab didn't go back.
+- 27bd6f7: A toast region, or any layer bound with `bindPersistentLayer`, moves back on top only when one of ui-sdk's own popups opens. A popover from the page or a browser extension is left where it is. Before, an extension that also keeps its menu on top, like a password manager's autofill menu, raised itself and the toast region over each other until it gave up.
+- 5609b96: A bottom sheet swiped off the screen closes as soon as it's out of sight, except on iOS, where the page still shows under Safari's toolbar. Before, it stayed open for up to 120px below the screen, and the next swipe could bring it back.
+- 53a2c68: Toasts show where `ResizeObserver` doesn't exist, like jsdom without a polyfill. They measure their height when they mount and when their content changes, but not when they're resized. Before, every toast threw as it mounted.
+- 5dbbc2e: A trigger menu that lets go of its editor now removes the `aria-haspopup`, `aria-autocomplete` and `aria-controls` it wrote there. Before, they stayed on the textarea and pointed at a list that no longer existed.
+- 703af01: web.css no longer makes Chrome restyle the whole page on every DOM insertion when the page has a Combobox input with no trigger right after it, or any Date Picker. Those parts look the same as before.
+
 ## 0.1.0-beta.16
 
 ### Patch Changes

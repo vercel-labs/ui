@@ -48,6 +48,7 @@ Last checked: 2026-10-28, against `node_modules/svelte` 5.57.2 (exports checked:
 ### Transitions
 
 - `transition:`, `in:` and `out:` from `svelte/transition` run when an element enters or leaves through a block (`{#if}`, `{#each}`). Local by default: only the block directly around it triggers them; `|global` for any. An element with an outro stays in the DOM until it ends. `introstart`, `introend`, `outrostart`, `outroend` events fire on the element.
+- Svelte sets `inert` on an element for the length of its outro, while it stays bound and visible. In dev, every `__svelte_meta` has a `parent` stack that gives the component's usage `file:line`.
 
 ### Server rendering and SvelteKit
 
