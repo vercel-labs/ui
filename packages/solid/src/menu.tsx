@@ -329,7 +329,7 @@ function MenuContent<Payload = unknown>(
   )
   const element = () => usePart(menu, "content", content, rest, "div")
   // Submenus render inside their parent's popup.
-  const nested = menu.api.root() !== menu.api
+  const nested = menu.state.nested
   // A root content tells its menu it's there. A submenu's content is no menu's own content.
   const register = nested ? null : useContext(OwnContentContext)
   register?.(true)

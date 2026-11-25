@@ -1238,6 +1238,10 @@ const menuApi: (...args: Parameters<typeof menuApiBody>) => MenuApi =
   menuApiBody
 
 type MenuState = {
+  // Whether it's a submenu, and whether a menubar may hold it, known from the
+  // start: a closed root menu renders its trigger before it has an api.
+  nested: boolean
+  barred: boolean
   open: boolean
   // True while the popup is in the DOM, including while it animates out.
   mounted: boolean

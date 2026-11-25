@@ -464,7 +464,7 @@ const popoverPrimitive = /* @__PURE__ */ definePrimitive({
       // Without keys of its own, it shows the shortcut of the trigger it sits in.
       shortcut: shortcutSlot(
         slot,
-        (_state, api, el) => el && api.internal.shortcutOf(el)
+        (_state, part, el) => el && part.api.internal.shortcutOf(el)
       ),
     }
   },

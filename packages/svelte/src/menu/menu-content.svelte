@@ -50,7 +50,7 @@ The popup that holds the items, positioned against the trigger that opened it.
   // A submenu renders inside its parent's popup and moves with it, so its
   // element stays in its block: Svelte removes a block's nodes by walking
   // from first to last, which an element moved elsewhere would escape.
-  const nested = menu.api.root() !== menu.api
+  const nested = menu.state.nested
   // The root renders its own content when the app gives none, so a root
   // content in the app's children says it's there.
   if (!nested && !untrack(() => fromRoot)) {

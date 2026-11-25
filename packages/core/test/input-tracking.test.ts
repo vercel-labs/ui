@@ -12,7 +12,10 @@ import packageJson from "../package.json"
 // press can come, on a page with nothing else on it. The census comes from the
 // imports, so a primitive that stops reaching `kernel/modality` leaves it.
 
-type Slots = Record<string, { bind?: unknown; connect?: unknown }>
+type Slots = Record<
+  string,
+  { bind?: unknown; connect?: unknown; asleep?: unknown }
+>
 
 const root = path.resolve(import.meta.dirname, "..")
 const modality = path.join(root, "src/foundation/kernel/modality.ts")
@@ -86,10 +89,13 @@ for (const [entry, file] of entries) {
     if (!slots) {
       continue
     }
+    // A primitive that can sleep is pressed first through a part that binds asleep.
     const slot =
+      Object.keys(slots).find((key) => slots[key].asleep) ??
       Object.keys(slots).find(
         (key) => !slots[key].bind && !slots[key].connect
-      ) ?? Object.keys(slots)[0]
+      ) ??
+      Object.keys(slots)[0]
     census.push([entry, name, slot, file])
   }
 }

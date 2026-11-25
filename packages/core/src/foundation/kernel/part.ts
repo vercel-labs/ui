@@ -83,21 +83,40 @@ type PartOwner = {
 // Every part an adapter holds came from `instance.part()`, which makes a record.
 const ownerOf = (part: Part) => (part as PartRecord).owner
 const definitionOf = (part: Part) => ownerOf(part).slots[part.slot]
-// What pure reads see of a part: no element and no store.
-const view = <Api, Props>(part: Part<any, Api>, props: Props) => ({
-  id: part.id,
-  key: part.key,
-  props,
-  api: part.api,
-})
-const context = (part: Part, props = part.props) => ({
-  el: part.el,
-  id: part.id,
-  key: part.key,
-  props,
-  store: part.store,
-  api: part.api,
-})
+// What pure reads see of a part: no element and no store. Reading the api
+// wakes an instance that sleeps, so a part that can render asleep reads none.
+// Only then is it a getter: an object made with one costs ten times a plain one.
+const view = <Api, Props>(part: Part<any, Api>, props: Props) =>
+  ownerOf(part).sleeping
+    ? {
+        id: part.id,
+        key: part.key,
+        props,
+        get api() {
+          return awake(part)
+        },
+      }
+    : { id: part.id, key: part.key, props, api: part.api }
+const context = (part: Part, props = part.props) =>
+  ownerOf(part).sleeping
+    ? {
+        el: part.el,
+        id: part.id,
+        key: part.key,
+        props,
+        store: part.store,
+        get api() {
+          return awake(part)
+        },
+      }
+    : {
+        el: part.el,
+        id: part.id,
+        key: part.key,
+        props,
+        store: part.store,
+        api: part.api,
+      }
 
 // A part the sweep dropped while a framework kept it, like content Suspense
 // hid and shows again, comes back as it's leased.
@@ -386,6 +405,15 @@ function commit(part: Part, props: Part["props"]) {
 // Tells the part's `onProps` listeners it rendered with new props.
 function propsRendered(part: PartRecord) {
   part.propsListeners?.forEach((listener) => listener())
+}
+
+/**
+ * The part's api, for work a part set up while its instance slept, like a
+ * shortcut it registered: the instance wakes first.
+ */
+function awake<Api>(part: Part<object, Api>) {
+  ownerOf(part).sleeping?.wake()
+  return part.api
 }
 
 /** Activation without a DOM event, for headless tests and the docs' generated tables. */
@@ -788,6 +816,7 @@ export {
   aliasReferences,
   attrs,
   authorOwned,
+  awake,
   bind,
   commit,
   conditional,

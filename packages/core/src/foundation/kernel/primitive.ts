@@ -87,8 +87,9 @@ function definePrimitive<
     /**
      * Whether an instance with these options starts asleep: its parts render
      * and run `asleep`, while its api and each part's `bind` wait for the first
-     * event a part handles or the first read of `instance.api`. Like a closed
-     * tooltip, which costs little until its trigger is hovered or focused.
+     * event a part handles or the first read of `instance.api`, or of `api` in
+     * a slot's render. Like a closed tooltip, which costs little until its
+     * trigger is hovered or focused.
      * @experimental
      */
     asleep?: (options: Options) => boolean
@@ -216,23 +217,34 @@ function definePrimitive<
       const mapKey = `${slot}:${key}`
       let found = parts.get(mapKey)
       if (!found) {
-        parts.set(
-          mapKey,
-          (found = {
-            slot,
-            key,
-            id,
-            // Read when used, since an asleep instance builds its api later.
-            get api() {
-              return api
-            },
-            store,
-            props,
-            el: undefined,
-            owner,
-            leases: 0,
-          })
-        )
+        // Read when used while the instance sleeps, since it builds its api
+        // later. An object made with a getter costs ten times a plain one.
+        found = owner.sleeping
+          ? {
+              slot,
+              key,
+              id,
+              get api() {
+                return api
+              },
+              store,
+              props,
+              el: undefined,
+              owner,
+              leases: 0,
+            }
+          : {
+              slot,
+              key,
+              id,
+              api,
+              store,
+              props,
+              el: undefined,
+              owner,
+              leases: 0,
+            }
+        parts.set(mapKey, found)
         if (rendering) {
           provisional(found as PartRecord)
         }
