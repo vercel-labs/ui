@@ -249,6 +249,29 @@ test.describe("loop", () => {
     expect(await backward()).toBeLessThan(12)
   })
 
+  test("a loop with too few slides to go round says so in development", async ({
+    page,
+    open,
+  }) => {
+    const warnings: string[] = []
+    page.on("console", (message) => {
+      if (message.type() === "warning" && message.text().includes("`loop`")) {
+        warnings.push(message.text())
+      }
+    })
+    await settled(page)
+    expect(warnings).toEqual([])
+    await open("carousel", {
+      loop: "",
+      "per-view": "3",
+      "slides-per-page": "3",
+    })
+    await settled(page)
+    expect(warnings).toEqual([
+      expect.stringContaining("can't go round seamlessly"),
+    ])
+  })
+
   test("Next pressed faster than the slides land never scrolls back", async ({
     page,
     open,

@@ -355,6 +355,50 @@ test.describe("changes @enhancement", () => {
     await expect.poll(() => lastAction(page)).not.toBe(at)
   })
 
+  test("--carousel-item-progress on each slide says how far it is from rest @enhancement", async ({
+    page,
+    open,
+  }) => {
+    await open("carousel")
+    const region = page.getByRole("region", { name: carouselFixture.label })
+    const progress = () =>
+      region.evaluate((el) =>
+        [...el.querySelectorAll("[data-slot=carousel-item]")].map((item) =>
+          getComputedStyle(item).getPropertyValue("--carousel-item-progress")
+        )
+      )
+    await expect
+      .poll(progress)
+      .toEqual(["0.0000", "1.0000", "1.0000", "1.0000", "1.0000"])
+    await nextButton(page).click()
+    await expectShown(page, 1)
+    await expect
+      .poll(progress)
+      .toEqual(["-1.0000", "0.0000", "1.0000", "1.0000", "1.0000"])
+  })
+
+  test("with loop, --carousel-item-progress follows the slides round @enhancement", async ({
+    page,
+    open,
+  }) => {
+    await open("carousel", { loop: "" })
+    const region = page.getByRole("region", { name: carouselFixture.label })
+    const progress = () =>
+      region.evaluate((el) =>
+        [...el.querySelectorAll("[data-slot=carousel-item]")].map((item) =>
+          getComputedStyle(item).getPropertyValue("--carousel-item-progress")
+        )
+      )
+    await previousButton(page).click()
+    await expectShown(page, 4)
+    await expect
+      .poll(async () => {
+        const values = await progress()
+        return [values[0], values[3], values[4]]
+      })
+      .toEqual(["1.0000", "-1.0000", "0.0000"])
+  })
+
   test("a press on a slide peeking in at the edge pages to it @enhancement", async ({
     page,
     open,

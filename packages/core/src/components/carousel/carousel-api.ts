@@ -141,6 +141,7 @@ function carouselApiBody(
   // track rotates. The motion's snap points go in this order.
   let visual: number[] = []
   let boxes: CarouselSlideBox[] = []
+  let items: HTMLElement[] = []
   let maxScroll = 0
   let viewportSize = 0
   let measured = false
@@ -175,6 +176,7 @@ function carouselApiBody(
     pages: () => layout,
     visual: () => visual,
     measure,
+    from: { component: "carousel", id: context.id },
   })
 
   const autoplay = createAutoplay({
@@ -306,6 +308,7 @@ function carouselApiBody(
     for (const { el } of slides) {
       resizeObserver?.observe(el)
     }
+    items = slides.map(({ el }) => el)
     readDirection()
     // A loop rotates the slides, unless they don't lay out by CSS order, and
     // then it rewinds.
@@ -395,6 +398,7 @@ function carouselApiBody(
     )
     store.set({ inView })
     writeProgress()
+    writeItemProgress(at)
   }
 
   // How far along the slides are: by scroll position, or round a looping
@@ -437,6 +441,33 @@ function carouselApiBody(
     }
     writtenProgress = value
     root.style.setProperty("--carousel-progress", (value / 10000).toFixed(4))
+  }
+
+  const writtenItemProgress = new WeakMap<HTMLElement, number>()
+  function writeItemProgress(at: number) {
+    visual.forEach((index, step) => {
+      const { position, slides } = layout[index]
+      const before = layout[visual[step - 1]]?.position
+      const after = layout[visual[step + 1]]?.position
+      const gapBefore = before === undefined ? undefined : position - before
+      const gapAfter = after === undefined ? undefined : after - position
+      const span =
+        (position > at ? (gapBefore ?? gapAfter) : (gapAfter ?? gapBefore)) ||
+        viewportSize
+      const value =
+        span > 0 ? Math.round(clamp((position - at) / span, -1, 1) * 10000) : 0
+      for (const slide of slides) {
+        const el = items[slide]
+        if (!el || writtenItemProgress.get(el) === value) {
+          continue
+        }
+        writtenItemProgress.set(el, value)
+        el.style.setProperty(
+          "--carousel-item-progress",
+          (value / 10000).toFixed(4)
+        )
+      }
+    })
   }
 
   // The slides came to rest: a looping track recenters, and the page is complete.
@@ -707,7 +738,11 @@ function carouselApiBody(
     }
     if (state.disabled && !before.disabled) {
       const slides = elements(context, "item")
-      slides.forEach(({ el }) => unlabelSlide(el))
+      slides.forEach(({ el }) => {
+        unlabelSlide(el)
+        el.style.removeProperty("--carousel-item-progress")
+        writtenItemProgress.delete(el)
+      })
       if (snapAreas) {
         removeSnapAreas(slides)
         snapAreas = false
