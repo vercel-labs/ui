@@ -287,6 +287,7 @@ const segmentedControlPrimitive = /* @__PURE__ */ definePrimitive({
                   )
                 }
               }
+              el.toggleAttribute("data-visible", box !== undefined)
             },
           })
         },

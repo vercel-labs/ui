@@ -154,7 +154,7 @@ Arrow keys normally wrap around at either end. Set `loop={false}` to stop there 
 
 ## Indicator
 
-`TabsIndicator` measures the selected tab. Position it inside a relative tab list and use its [CSS variables](#styling-tabsindicator) to make a marker that follows the selection. It measures again when a tab or the list changes size.
+`TabsIndicator` measures the selected tab. Position it inside a relative tab list and use its [CSS variables](#styling-tabsindicator) to make a marker that follows the selection. It measures again when a tab or the list changes size. It gets `data-visible` once it has a position. Until then, like on a page rendered on the server before its script runs, its variables are unset, so hide it while it's `:not([data-visible])`.
 
 ```css
 [data-slot="tabs-list"] {

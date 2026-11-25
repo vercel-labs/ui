@@ -468,6 +468,18 @@ test.describe("indicator", () => {
     await expect.poll(() => coversTab(page, "Notifications")).toBe(true)
   })
 
+  test("the indicator keeps data-visible as the selection moves", async ({
+    page,
+    open,
+  }) => {
+    await open("tabs")
+    const indicator = page.locator('[data-slot="tabs-indicator"]')
+    await expect(indicator).toHaveAttribute("data-visible", "")
+    await tabNamed(page, "Notifications").click()
+    await expect.poll(() => coversTab(page, "Notifications")).toBe(true)
+    await expect(indicator).toHaveAttribute("data-visible", "")
+  })
+
   test("the first move animates when styles skip transitions for the first placement", async ({
     page,
     open,

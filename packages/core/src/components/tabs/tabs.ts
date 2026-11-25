@@ -274,6 +274,7 @@ function writeIndicator(
       el.style.removeProperty(`--active-tab-${name}`)
     }
   }
+  el.toggleAttribute("data-visible", rect !== undefined)
 }
 
 /**
