@@ -443,7 +443,7 @@ test.describe("indicator", () => {
       await list.evaluate(
         (el, style) => {
           Object.assign(el.style, style, {
-            width: "371.5px",
+            width: "571.5px",
             scrollbarGutter: "stable",
           })
         },
@@ -455,7 +455,7 @@ test.describe("indicator", () => {
           const read = (name: string) =>
             parseFloat(indicator.getPropertyValue(`--active-tab-${name}`))
           return Math.abs(
-            el.clientWidth - read("left") - read("width") - read("right")
+            el.scrollWidth - read("left") - read("width") - read("right")
           )
         })
       await expect.poll(gap).toBeLessThanOrEqual(0.5)
