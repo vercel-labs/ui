@@ -52,11 +52,11 @@ type Moved = (
 const isReader = (values: unknown): values is Reader<any, any> =>
   typeof values === "object" && values !== null && !Array.isArray(values)
 
-// A store's selectors, which hear one value of one key, by `key:value`.
+// A store's selectors, which hear one value of one key, by key, then value.
 // Values that print the same share a selector, which only costs a spare run.
 // One is its only listener until a second joins it: a long list has two an item.
 type Narrowed = {
-  selectors: Map<string, Listener | Set<Listener>>
+  selectors: Map<PropertyKey, Map<string, Listener | Set<Listener>>>
   // The keys anything selects on, so a change to a key nobody selects on,
   // like a filtered list on every keystroke, compares nothing. Readers of one
   // key keep their own `moved`, with the parts a `true` from it reaches.
@@ -87,8 +87,9 @@ function narrowedOf(store: Store<any>) {
       if (!movers) {
         continue
       }
+      const selectors = narrowed.selectors.get(key)
       const notify = (value: unknown) => {
-        const selector = narrowed.selectors.get(`${String(key)}:${value}`)
+        const selector = selectors?.get(String(value))
         if (typeof selector === "function") {
           run(selector)
         } else {
@@ -251,13 +252,17 @@ function enter(
   moved: Moved
 ) {
   hold(narrowed, key, moved)
-  const name = `${String(key)}:${value}`
-  const selector = narrowed.selectors.get(name)
+  let selectors = narrowed.selectors.get(key)
+  if (!selectors) {
+    narrowed.selectors.set(key, (selectors = new Map()))
+  }
+  const name = String(value)
+  const selector = selectors.get(name)
   if (!selector) {
-    narrowed.selectors.set(name, listener)
+    selectors.set(name, listener)
   } else if (typeof selector === "function") {
     if (selector !== listener) {
-      narrowed.selectors.set(name, new Set([selector, listener]))
+      selectors.set(name, new Set([selector, listener]))
     }
   } else {
     selector.add(listener)
@@ -271,15 +276,19 @@ function leave(
   listener: Listener,
   moved: Moved
 ) {
-  const name = `${String(key)}:${value}`
-  const selector = narrowed.selectors.get(name)
+  const selectors = narrowed.selectors.get(key)
+  const name = String(value)
+  const selector = selectors?.get(name)
   if (selector === listener) {
-    narrowed.selectors.delete(name)
+    selectors!.delete(name)
   } else if (typeof selector === "object") {
     selector.delete(listener)
     if (!selector.size) {
-      narrowed.selectors.delete(name)
+      selectors!.delete(name)
     }
+  }
+  if (selectors && !selectors.size) {
+    narrowed.selectors.delete(key)
   }
   release(narrowed, key, moved)
 }
