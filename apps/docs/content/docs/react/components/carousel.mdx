@@ -169,7 +169,7 @@ Start work there that would stutter the motion, like loading the next slides' im
 Pass `page` and `onPageChange` to control the page, from 1. The root's state has `pageCount`, which is null
 until the slides are measured.
 
-Every change carries a [reason](#reasons): `next-press` and `previous-press` for the parts, `item-press` for an indicator, `list-navigation` for arrow keys, `swipe` for a finger or a mouse drag, `scroll` for a wheel or trackpad, `timeout` for rotation and `imperative` from a [controller](#controller). Call `details.cancel()` to stay on the page: a swipe or drag springs back. A controlled page that doesn't change scrolls back too.
+Every change carries a [reason](#reasons): `next-press` and `previous-press` for the parts, `item-press` for an indicator or a slide peeking in, `list-navigation` for arrow keys, `swipe` for a finger or a mouse drag, `scroll` for a wheel or trackpad, `timeout` for rotation and `imperative` from a [controller](#controller). Call `details.cancel()` to stay on the page: a swipe or drag springs back. A controlled page that doesn't change scrolls back too.
 
 <ComponentExample
   name="carousel/controlled"
@@ -191,7 +191,7 @@ as `controller` to the carousel, and to `CarouselPrevious`, `CarouselNext`, `Car
 
 ## Swipes and Drags
 
-Touch, trackpads and wheels scroll the viewport natively, with CSS scroll snap doing the paging. Native scrolling and snapping also work before JavaScript loads. A mouse or pen drags the slides too: they follow the pointer, stretch past the ends, and spring from the release velocity to the page a fling would reach. A drag that moved never clicks the link it started on, and fields inside slides keep their pointer.
+Touch, trackpads and wheels scroll the viewport natively, with CSS scroll snap doing the paging. Native scrolling and snapping also work before JavaScript loads. A mouse or pen drags the slides too: they follow the pointer, stretch past the ends, and spring from the release velocity to the page a fling would reach. A drag that moved never clicks the link it started on, and fields inside slides keep their pointer. A press on a slide peeking in at the edge pages to it.
 
 Without `skipSnaps`, one swipe moves at most one page. `dragFree` lets swipes coast to wherever they stop,
 and the nearest page becomes the current one.
