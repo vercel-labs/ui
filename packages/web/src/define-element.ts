@@ -1811,12 +1811,15 @@ function definePartElement(tagName: string, config: SlotConfig) {
         for (const name of config.properties ?? []) {
           Object.defineProperty(PartElement.prototype, name, {
             get(this: PartElement) {
+              const value = this.#properties[name]
+              if (fromAttribute.includes(name)) {
+                return value !== undefined
+                  ? value
+                  : (this.getAttribute(name) ?? undefined)
+              }
               return (
-                this.#properties[name] ??
-                (schema[name] && readAttribute(this, name, schema[name])) ??
-                (fromAttribute.includes(name)
-                  ? (this.getAttribute(name) ?? undefined)
-                  : undefined)
+                value ??
+                (schema[name] && readAttribute(this, name, schema[name]))
               )
             },
             set(this: PartElement, value: unknown) {

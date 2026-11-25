@@ -49,6 +49,16 @@ test("a `payload` property wins over the attribute", async () => {
   expect(popover.api.getPayload()).toBe(walnut)
 })
 
+test("a `payload` property set to null wins over the attribute too", async () => {
+  const { popover, trigger } = render()
+  trigger("walnut").payload = null
+  await wait()
+  expect(trigger("walnut").payload).toBe(null)
+  trigger("walnut").querySelector("button")!.click()
+  await wait()
+  expect(popover.api.getPayload()).toBe(null)
+})
+
 test("a changed `payload` attribute is the next open's payload", async () => {
   const { popover, trigger } = render()
   await wait()
