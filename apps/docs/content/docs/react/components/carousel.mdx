@@ -156,6 +156,8 @@ As the carousel pattern asks, rotation stops when keyboard focus moves in and do
 
 `--carousel-progress` on the root says how far the slides have scrolled, from 0 at the first page to 1 at the last, on every frame of a scroll or a spring, with no re-renders, so a progress bar can follow it in CSS. With `loop`, it goes round from 0 to 1 and back to 0. The controller's `getProgress()` reads the same number.
 
+Each slide gets its own `--carousel-item-progress`, 0 while its page rests. It rises toward 1 as the slide waits a page ahead and falls toward -1 as it moves a page behind, so slides can fade, scale or tilt as they come and go in CSS. Read it as `var(--carousel-item-progress, 0)` so the first paint has a value too.
+
 `onPageChangeComplete` runs once the slides come to rest on a page, after a spring, a drag or a scroll.
 Start work there that would stutter the motion, like loading the next slides' images.
 
@@ -221,6 +223,10 @@ Each part has a `data-slot`, such as `carousel-item`, and its state attributes a
 ### Carousel [#styling-carousel]
 
 <CssVariables component="carousel" part="root" />
+
+### CarouselItem [#styling-carouselitem]
+
+<CssVariables component="carousel" part="item" />
 
 ## Data Attributes
 
