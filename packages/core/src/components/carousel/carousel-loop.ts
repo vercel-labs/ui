@@ -73,14 +73,14 @@ function createCarouselLoop(options: {
   ) {
     const motion = options.motion()
     if (!track || !view || !motion || motion.isHeld()) {
-      return
+      return true
     }
     const slides = options.slides()
     const first = shownFirst(slides)
     const position = motion.position()
     const pick = loopRotation(track, view, { position, first }, to, { lazy })
     if (!pick || pick.first === first) {
-      return
+      return !!pick
     }
     const before = options.visual()
     const key = slides[pick.first].key
@@ -93,12 +93,13 @@ function createCarouselLoop(options: {
     }
     // The slides didn't follow the order, and the measure reset it.
     if (firstKey !== key) {
-      return
+      return true
     }
     const after = options.visual()
     motion.shift(position, pick.delta, (index) =>
       index < 0 ? index : after.indexOf(before[index])
     )
+    return true
   }
 
   return {
@@ -160,11 +161,12 @@ function createCarouselLoop(options: {
     /**
      * Rotates, if it must, so the page at `index` lies ahead the way the
      * carousel heads: `heading`, the step's way, or else the short way round.
+     * Returns false when no rotation fits from where the slides are now.
      */
     rotateToward(index: number, heading?: 1 | -1) {
       const motion = options.motion()
       if (!track || !motion) {
-        return
+        return true
       }
       const pages = options.pages()
       const at = motion.position()
@@ -174,7 +176,7 @@ function createCarouselLoop(options: {
         ahead === 0
           ? Math.sign(pages[index].position - at)
           : (heading ?? (ahead <= pages.length / 2 ? 1 : -1))
-      rotate({ page: index, heading: way < 0 ? -1 : 1 }, { lazy: true })
+      return rotate({ page: index, heading: way < 0 ? -1 : 1 }, { lazy: true })
     },
     /** Rotates at rest, so the current page sits mid-track. */
     recenter() {

@@ -125,6 +125,16 @@ test.describe("keyboard navigation", () => {
     await expect(page.getByRole("menuitem", { name: "Open…" })).toBeFocused()
   })
 
+  test("ArrowDown and ArrowUp skip items the page hides", async ({ page }) => {
+    await page
+      .getByRole("menuitem", { name: "Open…" })
+      .evaluate((el) => el.setAttribute("hidden", ""))
+    await page.keyboard.press("ArrowDown")
+    await expect(page.getByRole("menuitem", { name: "Save" })).toBeFocused()
+    await page.keyboard.press("ArrowUp")
+    await expect(page.getByRole("menuitem", { name: "New file" })).toBeFocused()
+  })
+
   test("disabled items are focusable", async ({ page }) => {
     await page.keyboard.press("ArrowDown")
     await page.keyboard.press("ArrowDown")

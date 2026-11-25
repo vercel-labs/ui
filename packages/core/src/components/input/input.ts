@@ -6,6 +6,7 @@ import {
 import { watchFieldsets } from "../../foundation/forms/form"
 import { createController } from "../../foundation/kernel/controller"
 import type { ChangeOptions } from "../../foundation/kernel/details"
+import { isComposing } from "../../foundation/kernel/events"
 import { definePrimitive } from "../../foundation/kernel/primitive"
 import type {
   Named,
@@ -370,25 +371,45 @@ const inputGroupPrimitive = /* @__PURE__ */ definePrimitive({
     inputSource()
     const control = () =>
       element("group")?.querySelector<TextControl>(fieldSelector) ?? undefined
+    // Empties the field the way typing would, then returns focus to it.
+    function clear(event?: Event) {
+      const el = control()
+      if (!el || store.get().disabled || store.get().readOnly) {
+        return
+      }
+      const field = textFields.get(el)
+      if (field) {
+        field.internal.clearPress(event)
+      } else {
+        writeValue(el, "", { asUser: true })
+      }
+      el.focus()
+    }
     return {
       control,
-      // Empties the field the way typing would, then returns focus to it.
-      clear(event?: Event) {
-        const el = control()
-        if (!el || store.get().disabled || store.get().readOnly) {
-          return
-        }
-        const field = textFields.get(el)
-        if (field) {
-          field.internal.clearPress(event)
-        } else {
-          writeValue(el, "", { asUser: true })
-        }
-        el.focus()
-      },
+      clear,
       internal: {
         // Sets the state the group shows, like the docs' attribute tables do without a field.
         update: (state: InputGroupState) => store.set(state),
+        // Escape empties a filled field that has a Clear part, like a native
+        // search field, and a dialog around it stays open until it's empty.
+        escapeKey(event: KeyboardEvent) {
+          const { filled, disabled, readOnly } = store.get()
+          if (
+            event.key !== "Escape" ||
+            event.defaultPrevented ||
+            isComposing(event) ||
+            event.target !== control() ||
+            !element("clear") ||
+            !filled ||
+            disabled ||
+            readOnly
+          ) {
+            return
+          }
+          event.preventDefault()
+          clear(event)
+        },
       },
     }
   },
@@ -399,6 +420,7 @@ const inputGroupPrimitive = /* @__PURE__ */ definePrimitive({
       // Presses on the group's own text and icons focus the field, like a label would.
       press: ({ api, el }, event) =>
         focusFromSurroundings(event, el, api.control()),
+      on: { keydown: (event, { api }) => api.internal.escapeKey(event) },
       bind: (el, { store, api }) => {
         let field: TextControl | undefined
         let fieldsetDisabled = false

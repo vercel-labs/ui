@@ -248,6 +248,15 @@ function carouselApiBody(
     return change("playing", playing, { reason, event })
   }
 
+  let held: { heading?: 1 | -1 } | undefined
+  function followHeld() {
+    if (held) {
+      heading = held.heading
+      followPage()
+      heading = undefined
+    }
+  }
+
   // Scrolls to the current page, if the viewport isn't there. A spring on
   // its way somewhere else turns toward it; the user's own scroll or drag
   // settles it later.
@@ -265,8 +274,12 @@ function carouselApiBody(
     if (!layout[index]) {
       return
     }
-    if (animate) {
-      loop.rotateToward(index, heading)
+    held = undefined
+    // A step the slides can't turn for yet, pressed again before the last
+    // one lands, waits while the spring goes on, rather than heading back.
+    if (animate && !loop.rotateToward(index, heading) && motion.isMoving()) {
+      held = { heading }
+      return
     }
     const position = clamp(layout[index].position, 0, maxScroll)
     if (Math.abs(motion.position() - position) >= 1 || !store.get().snapping) {
@@ -452,6 +465,41 @@ function carouselApiBody(
     rested()
   }
 
+  // An inert slide peeking in at the edge can't take the click, which lands
+  // on the content or viewport, so the slide under the pointer is found by its box.
+  function pressSlide(event: MouseEvent) {
+    if (
+      event.defaultPrevented ||
+      (event.target !== element("content") &&
+        event.target !== element("viewport"))
+    ) {
+      return
+    }
+    const slides = elements(context, "item")
+    const slide = slides.find(({ el }) => {
+      const box = el.getBoundingClientRect()
+      return (
+        event.clientX >= box.left &&
+        event.clientX < box.right &&
+        event.clientY >= box.top &&
+        event.clientY < box.bottom
+      )
+    })
+    const index = slide
+      ? store.get().pages.findIndex((page) => page.includes(slide.key))
+      : -1
+    if (!slide || index === -1) {
+      return
+    }
+    const box = slide.el.getBoundingClientRect()
+    const view = (element("viewport") ?? slide.el).getBoundingClientRect()
+    const { vertical, rtl } = axis()
+    const ahead = vertical
+      ? box.top + box.bottom > view.top + view.bottom
+      : box.left + box.right > view.left + view.right !== rtl
+    go(index + 1, "item-press", event, ahead ? 1 : -1)
+  }
+
   function bindViewport(viewport: HTMLElement) {
     const cleanups: (() => void)[] = []
     const viewportMotion = createCarouselMotion({
@@ -487,7 +535,12 @@ function carouselApiBody(
         store.set({ dragging })
         autoplay.setPaused("drag", dragging)
       },
-      onScroll: updateInView,
+      onScroll: () => {
+        updateInView()
+        if (held) {
+          queueMicrotask(followHeld)
+        }
+      },
     })
     motion = viewportMotion
     cleanups.push(viewportMotion.destroy, () => {
@@ -497,7 +550,8 @@ function carouselApiBody(
       loop.reset(elements(context, "item"))
     })
     cleanups.push(
-      on(viewport, "pointerdown", followDirection, { capture: true })
+      on(viewport, "pointerdown", followDirection, { capture: true }),
+      on(viewport, "click", pressSlide)
     )
     // A finger down pauses rotation; the swipe it makes stops it.
     cleanups.push(

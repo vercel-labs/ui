@@ -22,10 +22,10 @@ import { orientationOf } from "../../foundation/focus/collection"
 import { live } from "../../foundation/kernel/live"
 
 /**
- * Why the page changed: the Previous or Next part, an indicator, arrow keys,
- * a finger or a mouse drag, another kind of scroll (a wheel, a trackpad, focus
- * or find in page bringing a slide into view), rotation, a layout change that
- * removed the page, or a controller.
+ * Why the page changed: the Previous or Next part, an indicator or a slide
+ * peeking in, arrow keys, a finger or a mouse drag, another kind of scroll (a
+ * wheel, a trackpad, focus or find in page bringing a slide into view),
+ * rotation, a layout change that removed the page, or a controller.
  * @stable
  */
 type CarouselPageChangeReason =
@@ -464,10 +464,12 @@ const carouselPrimitive = /* @__PURE__ */ definePrimitive({
         "aria-live": state.playing ? "off" : "polite",
         "aria-atomic": "false",
         "data-orientation": state.orientation,
+        // Inline, so a server-rendered carousel lays out before it hydrates.
+        // A grid sets the variable, since a class can't beat an inline style.
         style:
           state.orientation === "vertical"
-            ? "display:flex;flex-direction:column"
-            : "display:flex",
+            ? "display:var(--carousel-display,flex);flex-direction:column"
+            : "display:var(--carousel-display,flex)",
       }),
     }),
 

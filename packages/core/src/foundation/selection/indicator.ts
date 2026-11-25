@@ -15,6 +15,11 @@ function bindIndicator(options: {
 }) {
   const update = () => {
     const list = options.list()
+    // A list an ancestor hides measures as an empty box. The last one stays,
+    // so showing it again doesn't animate from nothing.
+    if (list?.checkVisibility?.() === false) {
+      return
+    }
     const item = options.active()
     options.write(item && list ? layoutBox(item, list) : undefined)
   }
