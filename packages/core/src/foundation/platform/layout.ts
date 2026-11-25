@@ -104,6 +104,49 @@ function layoutSize(el: HTMLElement) {
   }
 }
 
+// A container's scrollable area. scrollWidth rounds to whole pixels, so a
+// container that doesn't overflow gives its padding box at full precision.
+function scrollArea(container: HTMLElement) {
+  const style = getComputedStyle(container)
+  const size = layoutSize(container)
+  const edge = (start: string, end: string) =>
+    (parseFloat(style.getPropertyValue(start)) || 0) +
+    (parseFloat(style.getPropertyValue(end)) || 0)
+  // Browsers differ on whether a content-box size leaves out a scrollbar or
+  // its gutter, so one is taken away only while clientWidth says it's still in.
+  const padding = (
+    outer: number,
+    border: number,
+    offset: number,
+    client: number
+  ) => {
+    const inner = outer - border
+    return Math.abs(inner - client) < 1
+      ? inner
+      : inner - Math.max(0, offset - client - Math.round(border))
+  }
+  return {
+    width:
+      container.scrollWidth > container.clientWidth
+        ? container.scrollWidth
+        : padding(
+            size.width,
+            edge("border-left-width", "border-right-width"),
+            container.offsetWidth,
+            container.clientWidth
+          ),
+    height:
+      container.scrollHeight > container.clientHeight
+        ? container.scrollHeight
+        : padding(
+            size.height,
+            edge("border-top-width", "border-bottom-width"),
+            container.offsetHeight,
+            container.clientHeight
+          ),
+  }
+}
+
 // An element's box inside a container's scrollable area: the offset from each
 // edge of that area, and the size. What an indicator positioned inside the
 // container needs to cover the element.
@@ -113,7 +156,7 @@ function layoutBox(el: HTMLElement, container: HTMLElement) {
   const left = at.x - origin.x - container.clientLeft
   const top = at.y - origin.y - container.clientTop
   const { width, height } = layoutSize(el)
-  const area = { width: container.scrollWidth, height: container.scrollHeight }
+  const area = scrollArea(container)
   return {
     left,
     top,

@@ -1767,6 +1767,10 @@ type SlotConfig = {
   keyed?: boolean
 }
 
+// Rich properties that markup can still give a string, like a server-rendered
+// trigger's `payload`. A value set on the property wins.
+const stringAttributes = new Set(["payload"])
+
 // Defines a part element, like <ui-menu-item>. It finds its owner, reads its
 // props from attributes and registers. The owner binds and syncs it.
 function definePartElement(tagName: string, config: SlotConfig) {
@@ -1774,6 +1778,9 @@ function definePartElement(tagName: string, config: SlotConfig) {
     return
   }
   const schema = config.props ?? {}
+  const fromAttribute = (config.properties ?? []).filter((name) =>
+    stringAttributes.has(name)
+  )
   setDisplay(tagName, config.display, "align" in schema)
 
   customElements.define(
@@ -1783,6 +1790,7 @@ function definePartElement(tagName: string, config: SlotConfig) {
       : HTMLElement) {
       static observedAttributes = [
         ...Object.keys(schema).map(kebab),
+        ...fromAttribute,
         "for",
         ...semantics,
       ]
@@ -1803,8 +1811,14 @@ function definePartElement(tagName: string, config: SlotConfig) {
         for (const name of config.properties ?? []) {
           Object.defineProperty(PartElement.prototype, name, {
             get(this: PartElement) {
+              const value = this.#properties[name]
+              if (fromAttribute.includes(name)) {
+                return value !== undefined
+                  ? value
+                  : (this.getAttribute(name) ?? undefined)
+              }
               return (
-                this.#properties[name] ??
+                value ??
                 (schema[name] && readAttribute(this, name, schema[name]))
               )
             },
@@ -1827,6 +1841,8 @@ function definePartElement(tagName: string, config: SlotConfig) {
         for (const name of config.properties ?? []) {
           if (this.#properties[name] !== undefined) {
             props[name] = this.#properties[name]
+          } else if (fromAttribute.includes(name) && this.hasAttribute(name)) {
+            props[name] = this.getAttribute(name)
           }
         }
         for (const [name, { slot, prop }] of Object.entries(

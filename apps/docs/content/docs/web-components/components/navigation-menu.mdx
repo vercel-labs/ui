@@ -89,6 +89,26 @@ The link wraps your own `<a>`, so your router's click handling stays on it. Togg
 
 Routers call `preventDefault()` on a link's click to navigate without a page load. The menu listens on the link element itself, so it still closes after a client-side route change. A press with a modifier key or the middle button opens the link elsewhere and leaves the menu open. Set `closeOnSelect` to false to keep it open on every press, see [Close on Select](#close-on-select).
 
+## Link and Panel
+
+A top-level item can link to its section's page and open a panel too. Put the link and a small trigger next to each other in the item. The link goes to the page, and the trigger opens the panel on hover, from the keyboard and on touch. Tab and the arrow keys reach both. Give the trigger a name of its own, since it may show only an arrow.
+
+```html
+<ui-navigation-menu-item value="products">
+  <ui-navigation-menu-link
+    ><a href="/products">Products</a></ui-navigation-menu-link
+  >
+  <ui-navigation-menu-trigger>
+    <button aria-label="More in Products">▾</button>
+  </ui-navigation-menu-trigger>
+  <ui-navigation-menu-content>
+    <ui-navigation-menu-link>
+      <a href="/products/analytics">Analytics</a>
+    </ui-navigation-menu-link>
+  </ui-navigation-menu-content>
+</ui-navigation-menu-item>
+```
+
 ## Icons
 
 Put a link's icon in a `ui-navigation-menu-link-icon`, before its text, like the With Icon panel in the menu at the top of the page. Screen readers skip it, so an SVG's `<title>`, an icon font's glyph or an emoji never joins the link's name.

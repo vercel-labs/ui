@@ -48,7 +48,7 @@ import {
 import { registerPopupElement } from "./popup-elements"
 import { guardFrames } from "./frame-guards"
 import type { Anchor, position, PositionOptions } from "../platform/position"
-import { animateIn, animateOut, writeOpen } from "../motion/presence"
+import { animateIn, animateOutTogether, writeOpen } from "../motion/presence"
 import {
   composedTabbables,
   nextTabbable,
@@ -414,6 +414,9 @@ type AttachConfig = {
   // at once rather than at the next slow check.
   rendered?: (listener: () => void) => () => void
   initialFocus?: () => HTMLElement | null | undefined | void
+  // Whether the content names where focus goes, which a touch open follows
+  // instead of focusing the popup, like a search dialog's field.
+  chosenFocus?: () => boolean
   // An element shown in the top layer just below the popup, like a dialog's
   // backdrop. It animates in and out with the popup, and pressing it is an outside press.
   backdrop?: () => HTMLElement | undefined
@@ -759,25 +762,21 @@ function createPopupLayer<
     bound?.config.onClose?.()
     const order = layerCount()
     const exiting = [el, ...(shown?.backdrop ? [shown.backdrop] : [])]
-    let left = exiting.length
-    const stops = exiting.map((target) => {
-      // The framework renders `data-closed` after this, too late for exit
-      // keyframes keyed on it, so it's written here first.
-      writeOpen(target, false)
-      return animateOut(target, () => {
-        if (--left > 0) {
-          return
-        }
-        stopExit = undefined
-        store.set({ mounted: false } as Partial<State>)
-        hide()
-        complete(false, closed)
-      })
+    // The framework renders `data-closed` after this, too late for exit
+    // keyframes keyed on it, so it's written here first.
+    exiting.forEach((target) => writeOpen(target, false))
+    let ended = false
+    const stop = animateOutTogether(exiting, () => {
+      ended = true
+      stopExit = undefined
+      store.set({ mounted: false } as Partial<State>)
+      hide()
+      complete(false, closed)
     })
     // An exit with nothing to animate has finished: a cleanup kept for it
     // would hold the closed content until the next open.
-    if (left > 0) {
-      stopExit = () => stops.forEach((stop) => stop())
+    if (!ended) {
+      stopExit = stop
     }
     releaseInert?.()
     releaseInert = undefined
@@ -991,15 +990,20 @@ function createPopupLayer<
     firstUsable(chain, take)
   }
 
-  function initialFocus(resolve?: () => HTMLElement | null | undefined | void) {
+  function initialFocus(
+    resolve?: () => HTMLElement | null | undefined | void,
+    chosen?: () => boolean
+  ) {
     if (!focusPending || !shown || !store.get().open || !behavior.movesFocus) {
       return
     }
     focusPending = false
+    const planned = initialFocusPlan(opener)
     const plan =
-      opener === "initial" && behavior.focusOnMount
+      (opener === "initial" && behavior.focusOnMount) ||
+      (planned === "popup" && chosen?.())
         ? ("auto" as const)
-        : initialFocusPlan(opener)
+        : planned
     if (plan === "none") {
       return
     }
@@ -1278,7 +1282,7 @@ function createPopupLayer<
           !usable(focused as HTMLElement)
         ) {
           focusPending = true
-          initialFocus(config.initialFocus)
+          initialFocus(config.initialFocus, config.chosenFocus)
         }
       })
     }
@@ -1398,7 +1402,7 @@ function createPopupLayer<
       }
     }
     // Children bind in the same commit. Focus once they have.
-    queueMicrotask(() => initialFocus(config.initialFocus))
+    queueMicrotask(() => initialFocus(config.initialFocus, config.chosenFocus))
 
     return () => {
       cleanups.forEach((cleanup) => cleanup())

@@ -538,6 +538,7 @@ const drawerPrimitive = /* @__PURE__ */ definePrimitive({
             api.internal.attach(el, host, api.internal.backdropElement)
             const unbind = api.internal.popup.bind(el, {
               initialFocus: api.internal.initialFocus,
+              chosenFocus: api.internal.chosenFocus,
               backdrop: api.internal.backdropElement,
               host: () => host,
             })

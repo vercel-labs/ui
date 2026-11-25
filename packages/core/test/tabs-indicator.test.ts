@@ -58,3 +58,39 @@ test("the indicator stops watching tabs that left the page", async () => {
     unbind.get(value)!()
   }
 })
+
+test("the indicator keeps its box while an ancestor hides the list", async () => {
+  let resized = () => {}
+  const original = window.ResizeObserver
+  window.ResizeObserver = class {
+    constructor(callback: () => void) {
+      resized = callback
+    }
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  } as unknown as typeof ResizeObserver
+  cleanups.push(() => (window.ResizeObserver = original))
+  const instance = tabs({ id: "t", defaultValue: "a" })
+  const list = document.body.appendChild(document.createElement("div"))
+  cleanups.push(bind(instance.part("list", {}), list)!)
+  const tab = list.appendChild(document.createElement("button"))
+  tab.setAttribute("role", "tab")
+  cleanups.push(bind(instance.part("tab", { value: "a" }), tab)!)
+  const indicator = list.appendChild(document.createElement("span"))
+  cleanups.push(bind(instance.part("indicator", {}), indicator)!)
+  await tick()
+  const writes: string[] = []
+  const write = indicator.style.setProperty.bind(indicator.style)
+  indicator.style.setProperty = (name, ...rest) => {
+    writes.push(name)
+    write(name, ...rest)
+  }
+  let visible = false
+  list.checkVisibility = () => visible
+  resized()
+  expect(writes).toEqual([])
+  visible = true
+  resized()
+  expect(writes.length).toBeGreaterThan(0)
+})

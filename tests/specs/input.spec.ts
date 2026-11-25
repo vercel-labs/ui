@@ -141,6 +141,30 @@ test.describe("input group", { tag: "@enhancement" }, () => {
     await expect(clear(page)).toHaveCount(0)
   })
 
+  test("Escape empties a filled field first, and a dialog around it hears the next one", async ({
+    page,
+  }) => {
+    await page.evaluate(() => {
+      const heard: boolean[] = []
+      Object.assign(window, { heard })
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          heard.push(event.defaultPrevented)
+        }
+      })
+    })
+    await textbox(page, "Website").fill("example.com")
+    await page.keyboard.press("Escape")
+    await expect(textbox(page, "Website")).toHaveValue("")
+    await expect(textbox(page, "Website")).toBeFocused()
+    await page.keyboard.press("Escape")
+    expect(
+      await page.evaluate(
+        () => (window as unknown as { heard: boolean[] }).heard
+      )
+    ).toEqual([true, false])
+  })
+
   test("pressing the group's text focuses its field", async ({ page }) => {
     await page.getByText("https://").click()
     await expect(textbox(page, "Website")).toBeFocused()

@@ -431,6 +431,62 @@ test.describe("indicator", () => {
     await expect.poll(() => coversTab(page, "Account")).toBe(true)
   })
 
+  test("the indicator's far edges stay exact when the list has a fractional width", async ({
+    page,
+    open,
+  }) => {
+    await open("tabs")
+    const list = page.getByRole("tablist")
+    await list.evaluate((el) => {
+      el.style.width = "371.5px"
+    })
+    const gap = () =>
+      list.evaluate((el) => {
+        const style = getComputedStyle(el)
+        const indicator = getComputedStyle(el.querySelector(".indicator")!)
+        const read = (name: string) =>
+          parseFloat(indicator.getPropertyValue(`--active-tab-${name}`))
+        const inner =
+          el.getBoundingClientRect().width -
+          parseFloat(style.borderLeftWidth) -
+          parseFloat(style.borderRightWidth)
+        return Math.abs(inner - read("left") - read("width") - read("right"))
+      })
+    await expect.poll(gap).toBeLessThan(0.01)
+  })
+
+  for (const [boxSizing, overflow] of [
+    ["border-box", "hidden"],
+    ["content-box", "auto"],
+  ]) {
+    test(`the indicator's far edges leave out a reserved scrollbar gutter (${boxSizing}, overflow ${overflow})`, async ({
+      page,
+      open,
+    }) => {
+      await open("tabs")
+      const list = page.getByRole("tablist")
+      await list.evaluate(
+        (el, style) => {
+          Object.assign(el.style, style, {
+            width: "571.5px",
+            scrollbarGutter: "stable",
+          })
+        },
+        { boxSizing, overflow }
+      )
+      const gap = () =>
+        list.evaluate((el) => {
+          const indicator = getComputedStyle(el.querySelector(".indicator")!)
+          const read = (name: string) =>
+            parseFloat(indicator.getPropertyValue(`--active-tab-${name}`))
+          return Math.abs(
+            el.scrollWidth - read("left") - read("width") - read("right")
+          )
+        })
+      await expect.poll(gap).toBeLessThanOrEqual(0.5)
+    })
+  }
+
   test("the indicator follows the selection", async ({ page, open }) => {
     await open("tabs")
     await tabNamed(page, "Notifications").click()

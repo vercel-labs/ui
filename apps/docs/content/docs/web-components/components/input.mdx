@@ -119,7 +119,7 @@ Place text or buttons around an input with `<ui-input-group>`. Pressing the grou
 
 ## Clear Button
 
-`<ui-input-clear>` shows while the input has text it can clear. Pressing its button empties the value, reports `clear-press` and returns focus to the input. `valuechange` and native `input` listeners receive the change too.
+`<ui-input-clear>` shows while the input has text it can clear. Pressing its button empties the value, reports `clear-press` and returns focus to the input. `valuechange` and native `input` listeners receive the change too. Escape in a filled input clears it the same way, so a dialog around it closes only once the input is empty.
 
 ```html
 <ui-input-group>
