@@ -452,16 +452,16 @@ function carouselApiBody(
   }
 
   // An inert slide peeking in at the edge can't take the click, which lands
-  // on the viewport, so the slide under the pointer is found by its box.
+  // on the content or viewport, so the slide under the pointer is found by its box.
   function pressSlide(event: MouseEvent) {
-    const slides = elements(context, "item")
-    const target = event.target as Node
     if (
       event.defaultPrevented ||
-      slides.some(({ el }) => el.contains(target))
+      (event.target !== element("content") &&
+        event.target !== element("viewport"))
     ) {
       return
     }
+    const slides = elements(context, "item")
     const slide = slides.find(({ el }) => {
       const box = el.getBoundingClientRect()
       return (

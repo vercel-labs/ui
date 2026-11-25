@@ -312,6 +312,25 @@ test.describe("changes @enhancement", () => {
     await expect(slideLink(page, 1)).toBeInViewport({ ratio: 1 })
   })
 
+  test("a press on a control laid over a peeking slide doesn't page @enhancement", async ({
+    page,
+    open,
+  }) => {
+    await open("carousel", { "per-view": "1.25" })
+    const viewport = page.locator("[data-slot=carousel-viewport]")
+    await viewport.evaluate((el) => {
+      const button = document.createElement("button")
+      button.textContent = "Save"
+      button.style.cssText =
+        "position:absolute;inset-block:0;inset-inline-end:0;width:40px;z-index:1"
+      el.style.position = "relative"
+      el.append(button)
+    })
+    await page.getByRole("button", { name: "Save" }).click()
+    await expect(slideLink(page, 0)).toBeInViewport({ ratio: 1 })
+    expect(await lastReason(page)).not.toBe("item-press")
+  })
+
   test("with loop, a press on the slide peeking in before the first pages back round to it @enhancement", async ({
     page,
     open,
