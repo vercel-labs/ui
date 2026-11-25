@@ -45,3 +45,35 @@ test("state derived as new objects renders once per change to their values", () 
   expect(renders).toBe(2)
   dispose()
 })
+
+const meter = definePrimitive({
+  name: "state-from-props",
+  state: (_options: {}) => ({ amount: 5 }),
+  api: () => ({}),
+  slots: (slot) => ({
+    text: slot<{ unit?: string }, { label: string }>({
+      props: { unit: "value" },
+      state: (state, { props }) => ({
+        label: `${state.amount}${props.unit ?? ""}`,
+      }),
+    }),
+  }),
+})
+
+test("two elements of one part each read the state their own props make", () => {
+  const root = document.createElement("div")
+  const dispose = render(() => {
+    const handle = usePrimitive(meter, () => ({}))
+    return [
+      usePart(handle, "text", () => ({}), {
+        children: (state) => state.label,
+      }),
+      usePart(handle, "text", () => ({ unit: "kg" }), {
+        children: (state) => state.label,
+      }),
+    ]
+  }, root)
+  flush()
+  expect([...root.children].map((el) => el.textContent)).toEqual(["5", "5kg"])
+  dispose()
+})
