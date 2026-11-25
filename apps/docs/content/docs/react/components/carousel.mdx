@@ -198,6 +198,20 @@ and the nearest page becomes the current one.
 
 Buttons, keys, indicators, rotation, and controllers animate the scroll position. A second press updates the destination while it is moving. Reduced motion makes those changes immediate.
 
+## Turning It Off
+
+`disabled` turns the carousel off for now, like on wide screens where the same slides lay out as a grid. The parts drop their roles, slide labels and inline styles, every slide stays reachable, the viewport stops paging with keys and swipes, and Previous, Next, the indicators and the play toggle hide. Turn it back on and it measures the slides again and shows its page.
+
+```tsx
+const isWide = useMediaQuery("(min-width: 768px)")
+
+return (
+  <Carousel aria-label="Featured products" disabled={isWide}>
+    {/* Viewport, slides and controls. */}
+  </Carousel>
+)
+```
+
 ## Custom Rendering
 
 Every part takes `render`. Pass an element and its props merge with the part's, or a function that receives

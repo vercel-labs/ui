@@ -194,6 +194,25 @@ and the nearest page becomes the current one.
 
 Buttons, keys, indicators, rotation, and controllers animate the scroll position. A second press updates the destination while it is moving. Reduced motion makes those changes immediate.
 
+## Turning It Off
+
+`disabled` turns the carousel off for now, like on wide screens where the same slides lay out as a grid. The parts drop their roles, slide labels and inline styles, every slide stays reachable, the viewport stops paging with keys and swipes, and Previous, Next, the indicators and the play toggle hide. Turn it back on and it measures the slides again and shows its page.
+
+```vue
+<script setup lang="ts">
+import { useMediaQuery } from "@vueuse/core"
+import { Carousel } from "@ui-sdk/vue/carousel"
+
+const isWide = useMediaQuery("(min-width: 768px)")
+</script>
+
+<template>
+  <Carousel aria-label="Featured products" :disabled="isWide">
+    <!-- Viewport, slides and controls. -->
+  </Carousel>
+</template>
+```
+
 ## Custom Rendering
 
 Every part takes a `render` slot, which receives the props to bind and the part's

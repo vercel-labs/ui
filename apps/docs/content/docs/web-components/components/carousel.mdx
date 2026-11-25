@@ -192,6 +192,24 @@ and the nearest page becomes the current one.
 
 Buttons, keys, indicators, rotation, and controllers animate the scroll position. A second press updates the destination while it is moving. Reduced motion makes those changes immediate.
 
+## Turning It Off
+
+`disabled` turns the carousel off for now, like on wide screens where the same slides lay out as a grid. The parts drop their roles, slide labels and inline styles, every slide stays reachable, the viewport stops paging with keys and swipes, and Previous, Next, the indicators and the play toggle hide. Turn it back on and it measures the slides again and shows its page.
+
+```html
+<ui-carousel aria-label="Featured products">
+  <!-- Viewport, slides and controls. -->
+</ui-carousel>
+
+<script type="module">
+  const carousel = document.querySelector("ui-carousel")
+  const isWide = matchMedia("(min-width: 768px)")
+  const follow = () => carousel.toggleAttribute("disabled", isWide.matches)
+  isWide.addEventListener("change", follow)
+  follow()
+</script>
+```
+
 ## Custom Rendering
 
 Elements have no render functions. Style them from their attributes, and watch those attributes to change

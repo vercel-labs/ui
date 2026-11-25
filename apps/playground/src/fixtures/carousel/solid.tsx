@@ -20,8 +20,13 @@ function Fixture() {
   const [action, setAction] = createSignal("")
   const [reason, setReason] = createSignal("")
   const [rested, setRested] = createSignal("")
-  const { perView, cancel, playToggle, controlled, options } = carouselOptions()
+  const { perView, cancel, playToggle, controlled, disabledMedia, options } =
+    carouselOptions()
   const [page, setPage] = createSignal(1)
+  const [disabled, setDisabled] = createSignal(disabledMedia?.matches ?? false)
+  disabledMedia?.addEventListener("change", () =>
+    setDisabled(disabledMedia.matches)
+  )
   return (
     <div class="fixture">
       <button>Before</button>
@@ -30,6 +35,7 @@ function Fixture() {
         aria-label={carouselFixture.label}
         style={{ "--per-view": String(perView) }}
         controller={controller}
+        disabled={disabled()}
         {...options}
         {...(controlled && {
           get page() {

@@ -20,8 +20,17 @@ function Fixture() {
   const [action, setAction] = React.useState("")
   const [reason, setReason] = React.useState("")
   const [rested, setRested] = React.useState("")
-  const { perView, cancel, playToggle, controlled, options } = carouselOptions()
+  const [{ perView, cancel, playToggle, controlled, disabledMedia, options }] =
+    React.useState(carouselOptions)
   const [page, setPage] = React.useState(1)
+  const [disabled, setDisabled] = React.useState(
+    () => disabledMedia?.matches ?? false
+  )
+  React.useEffect(() => {
+    const change = () => setDisabled(!!disabledMedia?.matches)
+    disabledMedia?.addEventListener("change", change)
+    return () => disabledMedia?.removeEventListener("change", change)
+  }, [disabledMedia])
   return (
     <div className="fixture">
       <button>Before</button>
@@ -32,6 +41,7 @@ function Fixture() {
         controller={controller}
         {...options}
         {...(controlled && { page })}
+        disabled={disabled}
         onPageChange={(page, details) => {
           if (page === cancel) {
             return details.cancel()

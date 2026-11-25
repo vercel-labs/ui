@@ -299,6 +299,39 @@ test.describe("changes @enhancement", () => {
     await expect.poll(progress).toBe("0.8000")
   })
 
+  test("disabled, it's no carousel until it's turned back on, like at a breakpoint @enhancement", async ({
+    page,
+    open,
+  }) => {
+    await page.setViewportSize({ width: 1000, height: 720 })
+    await open("carousel", { "disabled-media": "(min-width: 900px)" })
+    const region = page.getByRole("region", { name: carouselFixture.label })
+    const slides = () =>
+      page.evaluate(() =>
+        [...document.querySelectorAll("[data-slot=carousel-item]")].map(
+          (item) =>
+            ["role", "aria-roledescription", "aria-label", "inert"]
+              .filter((name) => item.hasAttribute(name))
+              .concat((item as HTMLElement).style.cssText || [])
+              .join(" ")
+        )
+      )
+    await expect(region).toHaveCount(0)
+    await expect.poll(slides).toEqual(["", "", "", "", ""])
+    await expect(nextButton(page)).toBeHidden()
+    await expect(
+      page.getByRole("tablist", { name: carouselFixture.indicators })
+    ).toBeHidden()
+    await page.setViewportSize({ width: 600, height: 720 })
+    await expect(region).toBeVisible()
+    await nextButton(page).click()
+    await expectShown(page, 1)
+    await page.setViewportSize({ width: 1000, height: 720 })
+    await expect(region).toHaveCount(0)
+    await expect.poll(slides).toEqual(["", "", "", "", ""])
+    await expect(nextButton(page)).toBeHidden()
+  })
+
   test("Next outside the carousel works through its controller @enhancement", async ({
     page,
     open,

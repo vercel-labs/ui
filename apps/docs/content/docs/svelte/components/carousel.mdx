@@ -194,6 +194,23 @@ and the nearest page becomes the current one.
 
 Buttons, keys, indicators, rotation, and controllers animate the scroll position. A second press updates the destination while it is moving. Reduced motion makes those changes immediate.
 
+## Turning It Off
+
+`disabled` turns the carousel off for now, like on wide screens where the same slides lay out as a grid. The parts drop their roles, slide labels and inline styles, every slide stays reachable, the viewport stops paging with keys and swipes, and Previous, Next, the indicators and the play toggle hide. Turn it back on and it measures the slides again and shows its page.
+
+```svelte
+<script lang="ts">
+  import { MediaQuery } from "svelte/reactivity"
+  import { Carousel } from "@ui-sdk/svelte/carousel"
+
+  const isWide = new MediaQuery("min-width: 768px")
+</script>
+
+<Carousel aria-label="Featured products" disabled={isWide.current}>
+  <!-- Viewport, slides and controls. -->
+</Carousel>
+```
+
 ## Custom Rendering
 
 Every part takes a `render` snippet, which receives the props to spread and the

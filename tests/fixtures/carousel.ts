@@ -47,6 +47,10 @@ function carouselOptions() {
     // Whether the page renders the play toggle: with rotation, or ?play-toggle without it.
     playToggle: params.has("playing") || params.has("play-toggle"),
     controlled: params.has("controlled"),
+    // ?disabled-media=<query> turns the carousel off while the query matches.
+    disabledMedia: params.has("disabled-media")
+      ? matchMedia(params.get("disabled-media")!)
+      : null,
     options: {
       ...(perPage && {
         slidesPerPage: perPage === "auto" ? ("auto" as const) : Number(perPage),

@@ -15,8 +15,14 @@ import { carouselFixture, carouselOptions } from "tests/fixtures/carousel.ts"
 import { ref } from "vue"
 
 const controller = createCarouselController()
-const { perView, cancel, playToggle, controlled, options } = carouselOptions()
+const { perView, cancel, playToggle, controlled, disabledMedia, options } =
+  carouselOptions()
 const page = ref(1)
+const disabled = ref(disabledMedia?.matches ?? false)
+disabledMedia?.addEventListener(
+  "change",
+  () => (disabled.value = disabledMedia.matches)
+)
 
 const action = ref("")
 const reason = ref("")
@@ -46,6 +52,7 @@ function onPageChange(
       :style="{ '--per-view': perView }"
       v-bind="controlled ? { ...options, page } : options"
       :controller="controller"
+      :disabled="disabled"
       @page-change="onPageChange"
       @page-change-complete="(page: number) => (rested = String(page))"
     >

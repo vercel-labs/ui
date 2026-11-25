@@ -72,6 +72,7 @@ const Carousel = /* @__PURE__ */ rootScope(function Carousel(
     skipSnaps: props.skipSnaps,
     dragFree: props.dragFree,
     drag: props.drag,
+    disabled: props.disabled,
     controller: props.controller,
     debug: props.debug,
   }))
@@ -92,6 +93,7 @@ const Carousel = /* @__PURE__ */ rootScope(function Carousel(
     "skipSnaps",
     "dragFree",
     "drag",
+    "disabled",
     "controller",
     "debug"
   )

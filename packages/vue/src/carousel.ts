@@ -57,6 +57,7 @@ const Carousel = withElement(
       skipSnaps: optionalBoolean,
       dragFree: optionalBoolean,
       drag: optionalBoolean,
+      disabled: optionalBoolean,
       controller: Object as PropType<CarouselController>,
       debug: optionalBoolean,
     },
@@ -89,6 +90,7 @@ const Carousel = withElement(
         skipSnaps: props.skipSnaps,
         dragFree: props.dragFree,
         drag: props.drag,
+        disabled: props.disabled,
         controller: props.controller,
         debug: props.debug,
         // The change events run first, so canceling one also keeps v-model as it was.

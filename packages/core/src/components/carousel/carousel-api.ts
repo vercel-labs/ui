@@ -12,6 +12,8 @@ import {
   clearSnapAreas,
   labelSlide,
   readCarouselLayout,
+  removeSnapAreas,
+  unlabelSlide,
   writeSnapAreas,
 } from "./carousel-dom"
 import { carouselIndicators } from "./carousel-indicators"
@@ -71,6 +73,7 @@ type State = {
   skipSnaps: boolean
   dragFree: boolean
   drag: boolean
+  disabled: boolean
   interval: number
   pageCount: number | null
   // Off while the carousel moves itself, so the browser doesn't snap each frame.
@@ -279,7 +282,7 @@ function carouselApiBody(
     measureQueued = false
     const viewport = element("viewport")
     const slides = elements(context, "item")
-    if (!viewport || !viewport.isConnected) {
+    if (!viewport || !viewport.isConnected || store.get().disabled) {
       return
     }
     // Slides that bound before they were in the page, as Vue binds them, get watched now.
@@ -451,7 +454,27 @@ function carouselApiBody(
     rested()
   }
 
+  function whileEnabled(attach: () => () => void) {
+    let detach = store.get().disabled ? undefined : attach()
+    const unsubscribe = store.subscribe(() => {
+      if (!store.get().disabled) {
+        detach ??= attach()
+      } else if (detach) {
+        detach()
+        detach = undefined
+      }
+    })
+    return () => {
+      unsubscribe()
+      detach?.()
+    }
+  }
+
   function bindViewport(viewport: HTMLElement) {
+    return whileEnabled(() => attachViewport(viewport))
+  }
+
+  function attachViewport(viewport: HTMLElement) {
     const cleanups: (() => void)[] = []
     const viewportMotion = createCarouselMotion({
       viewport,
@@ -559,6 +582,7 @@ function carouselApiBody(
         const from = event.relatedTarget as Node | null
         if (
           store.get().playing &&
+          !store.get().disabled &&
           isFocusFromKeyboard() &&
           !(from && root.contains(from))
         ) {
@@ -596,7 +620,7 @@ function carouselApiBody(
     ) {
       store.set({ playing: false })
     }
-    autoplay.setRunning(store.get().playing)
+    autoplay.setRunning(store.get().playing && !store.get().disabled)
     return () => autoplay.setRunning(false)
   }
 
@@ -607,8 +631,19 @@ function carouselApiBody(
     const state = store.get()
     const before = previous
     previous = state
-    if (state.playing !== before.playing) {
-      autoplay.setRunning(state.playing)
+    if (
+      state.playing !== before.playing ||
+      state.disabled !== before.disabled
+    ) {
+      autoplay.setRunning(state.playing && !state.disabled)
+    }
+    if (state.disabled && !before.disabled) {
+      const slides = elements(context, "item")
+      slides.forEach(({ el }) => unlabelSlide(el))
+      if (snapAreas) {
+        removeSnapAreas(slides)
+        snapAreas = false
+      }
     }
     if (state.interval !== before.interval) {
       writeInterval()
@@ -637,7 +672,12 @@ function carouselApiBody(
   })
 
   const indicators = carouselIndicators(context, go)
-  const onViewportKeyDown = carouselKeys(context, go, followDirection)
+  const viewportKeys = carouselKeys(context, go, followDirection)
+  const onViewportKeyDown = (event: KeyboardEvent) => {
+    if (!store.get().disabled) {
+      viewportKeys(event)
+    }
+  }
 
   const api = {
     getPage: () => store.get().page,
@@ -667,7 +707,7 @@ function carouselApiBody(
         resizeObserver?.observe(el)
         queueMeasure()
         const cleanups = [
-          labelSlide(el, key, store),
+          whileEnabled(() => labelSlide(el, key, store)),
           on(el, "focusin", () => store.set({ focused: key })),
           on(el, "focusout", (event) => {
             if (
