@@ -141,7 +141,7 @@ Set the element's `open` property and listen for `openchange`. Every change carr
 
 ## Shared
 
-A toolbar, a chart or a long list can share one tooltip instead of rendering one per item. Give the tooltip an `id` and point each trigger at it with `for`, and the triggers can sit anywhere on the page. Each trigger takes a `payload` property, here its label, and you fill the content when `payloadchange` fires, with the payload in `event.detail.value`. `UiTooltipElement<string>` types the payload. The content is in the page before the first open, so handle an `undefined` payload.
+A toolbar, a chart or a long list can share one tooltip instead of rendering one per item. Give the tooltip an `id` and point each trigger at it with `for`, and the triggers can sit anywhere on the page. Each trigger takes a `payload`, here its label from a `payload` attribute, and you fill the content when `payloadchange` fires, with the payload in `event.detail.value`. `UiTooltipElement<string>` types the payload. The content is in the page before the first open, so handle an `undefined` payload.
 
 Only the trigger that opened the tooltip is described by it, so give each trigger a name of its own, like an `aria-label`. The controller's `open()` takes a payload and an `anchor` too, and on an open tooltip, `open({ payload })` replaces the payload, like another trigger taking it over. `payloadchange` reports each change, including the pointer or focus moving on to another trigger, which hands the open tooltip over without an `openchange`.
 
@@ -272,7 +272,7 @@ Props are attributes in kebab case, like `close-delay` and `side-offset`: `"fals
 
 ### TooltipTrigger
 
-A trigger outside the tooltip names it with `for="tooltip-id"`, and takes `payload` as a property.
+A trigger outside the tooltip names it with `for="tooltip-id"`, and takes `payload` as a property, or a string as a `payload` attribute. The property wins.
 
 <TypeTable
   path="../../packages/core/src/components/tooltip/tooltip.ts"
