@@ -28,7 +28,16 @@ import {
   yieldToAuthor,
   type PrimitiveGeneric,
 } from "@ui-sdk/core/renderer"
-import { dynamic, isServer, type JSX, type ValidComponent } from "@solidjs/web"
+import {
+  dynamic,
+  insert,
+  isServer,
+  MathMLElements,
+  spread,
+  SVGElements,
+  type JSX,
+  type ValidComponent,
+} from "@solidjs/web"
 import {
   $PROXY,
   children,
@@ -42,6 +51,7 @@ import {
   getOwner,
   omit,
   isHydrating,
+  isStatic,
   onCleanup,
   onSettled,
   runWithOwner,
@@ -164,6 +174,7 @@ function mergeStyles(user: unknown, part: Record<string, string>) {
 // every change the part hears, `attrsTick` only on those that can reach its
 // attributes, since core writes live attributes itself.
 type Tracked = {
+  part: Part
   props: () => unknown
   owner: () => Owner | null
   tick: () => number
@@ -231,7 +242,10 @@ function createTracker(instance: ReturnType<Primitive>) {
     const part = untrack(() => instance.part(name, props()))
     let entry = entries.get(part)
     if (!entry) {
-      entries.set(part, (entry = createTracked(instance, owner, name, props)))
+      entries.set(
+        part,
+        (entry = createTracked(instance, owner, part, name, props))
+      )
     }
     entry.users++
     const current = entry
@@ -251,6 +265,7 @@ function createTracker(instance: ReturnType<Primitive>) {
 function createTracked(
   instance: ReturnType<Primitive>,
   owner: Owner | null,
+  part: Part,
   name: string,
   props: () => unknown
 ) {
@@ -327,6 +342,7 @@ function createTracked(
   )!
   const state = stateMemos(instance, name, props, tick, () => scope)
   return {
+    part,
     props,
     owner: () => scope,
     tick,
@@ -349,8 +365,9 @@ function stateMemos(
   owner: () => Owner | null
 ) {
   let all: (() => Record<string, unknown>) | undefined
-  const keys = new Map<string, () => unknown>()
+  let keys: Map<string, () => unknown> | undefined
   return (key: string) => {
+    keys ??= new Map()
     let memo = keys.get(key)
     if (!memo) {
       memo = runWithOwner(owner(), () => {
@@ -462,7 +479,7 @@ function slotParts(
   user: Record<string, any>
 ) {
   const partOf = () => instance.part(name, props() as never)
-  const first = untrack(partOf)
+  const first = tracked.part
   // Stable handlers, so the spread never re-attaches them. User handlers
   // run first and can call preventDefault() to skip the built-in behavior.
   const own: Record<string, unknown> = {}
@@ -792,6 +809,63 @@ function elementOf(tag: string) {
   return element
 }
 
+const namespaces = {
+  svg: "http://www.w3.org/2000/svg",
+  mathml: "http://www.w3.org/1998/Math/MathML",
+}
+const skipRender = (key: string) => key === "render"
+
+// The part's element, made here rather than by `<Tag {...props} />`: Solid
+// reads the user's props, the part's attributes and its handlers as layers,
+// the later over the earlier, with no proxy between.
+function createElement(
+  tag: string,
+  user: Record<string, any>,
+  own: Record<string, unknown>,
+  attrs: () => Record<string, unknown>,
+  state: unknown
+) {
+  const el = SVGElements.has(tag)
+    ? document.createElementNS(namespaces.svg, tag)
+    : MathMLElements.has(tag)
+      ? document.createElementNS(namespaces.mathml, tag)
+      : document.createElement(tag)
+  const resolved = () => {
+    const { class: classes, style } = user
+    return typeof classes === "function" || typeof style === "function"
+      ? { class: resolve(classes, state), style: resolve(style, state) }
+      : undefined
+  }
+  const part = () => {
+    const current = attrs()
+    const id = user.id
+    const style = "style" in current ? resolve(user.style, state) : undefined
+    if (id == null && style == null) {
+      return current
+    }
+    const merged = { ...current }
+    if (id != null) {
+      merged.id = id
+    }
+    if (style != null) {
+      merged.style = mergeStyles(style, current.style as Record<string, string>)
+    }
+    return merged
+  }
+  spread(el, [user, resolved, part, own], true, skipRender)
+  // Untracked, since asking reads a source that's a function, like a
+  // controlled value's, and the component's own scope would run again with it.
+  const content = untrack(() =>
+    isStatic(user, "children") ? user.children : () => user.children
+  )
+  if (typeof content === "function") {
+    insert(el, () => resolveChildren(user.children, state))
+  } else if (content != null) {
+    insert(el, content)
+  }
+  return el as unknown as JSX.Element
+}
+
 // The `render` function with its props and state, or the default tag.
 function renderElement(
   tag: string,
@@ -800,17 +874,24 @@ function renderElement(
   attrs: () => Record<string, unknown>,
   state: unknown
 ) {
-  const props = slotProps(user, own, attrs, state)
   const render = untrack(() => user.render)
   // Lazy on the server for the same reason as a part's attributes: the render
   // function reads them.
   if (typeof render === "function") {
+    const props = slotProps(user, own, attrs, state)
     return createMemo(() => render(props, state), {
       lazy: isServer,
     }) as unknown as JSX.Element
   }
-  const Tag = elementOf(tag)
-  return <Tag {...props} />
+  if (
+    isServer ||
+    isHydrating() ||
+    untrack(() => user.is ?? user.xmlns) != null
+  ) {
+    const Tag = elementOf(tag)
+    return <Tag {...slotProps(user, own, attrs, state)} />
+  }
+  return createElement(tag, user, own, attrs, state)
 }
 
 // A `render` for a part whose element follows its props, like a link or a
