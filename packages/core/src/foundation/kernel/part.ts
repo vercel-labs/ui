@@ -41,11 +41,16 @@ type PartRecord = Part & {
   // again, so an earlier bind's cleanup leaves a newer bind's element.
   binding?: object
   leases: number
+  // Whether the sweep dropped it from its instance's parts.
+  dropped?: boolean
   ref?: (el: HTMLElement | null) => void
   // What `onProps` registered, which hears each render.
   propsListeners?: Set<() => void>
   // The bound element's id when it isn't the one the slot makes, like an author's.
   own?: string
+  // The id the slot made when it last rendered, null when it made none, and
+  // undefined when it rendered an author's instead.
+  made?: string | null
 }
 
 // The instance's side of its parts.
@@ -70,8 +75,6 @@ type PartOwner = {
   aliases?: { version: number; map: Map<string, string> }
   // Parts whose element's id to read, a microtask later.
   unread?: Set<PartRecord>
-  // One observer for every bound element's id, and the part each belongs to.
-  ids?: { observer: MutationObserver; parts: WeakMap<Node, PartRecord> }
   // Whether a render took an own id since parts last heard, which they hear
   // once the elements bind, so a part rendered before it points at it too.
   renamed?: boolean
@@ -99,10 +102,13 @@ const context = (part: Part, props = part.props) => ({
 // A part the sweep dropped while a framework kept it, like content Suspense
 // hid and shows again, comes back as it's leased.
 function lease(part: PartRecord) {
-  const { parts } = part.owner
-  const mapKey = `${part.slot}:${part.key}`
-  if (!parts.has(mapKey)) {
-    parts.set(mapKey, part)
+  if (part.dropped) {
+    const { parts } = part.owner
+    const mapKey = `${part.slot}:${part.key}`
+    if (!parts.has(mapKey)) {
+      parts.set(mapKey, part)
+      part.dropped = false
+    }
   }
   part.leases++
   let held = true
@@ -137,6 +143,7 @@ function sweep(owner: PartOwner) {
     const mapKey = `${part.slot}:${part.key}`
     if (!part.leases && owner.parts.get(mapKey) === part) {
       owner.parts.delete(mapKey)
+      part.dropped = true
     }
   }
   owner.released = []
@@ -170,6 +177,12 @@ function attrs(part: Part, props = part.props, state = part.store.get()) {
       definition.live?.read(state, context)
     )
   }
+  // A slot renders an author's id as it is, so any other id is one it made.
+  const authored = (props as { id?: unknown }).id
+  ;(part as PartRecord).made =
+    authored === undefined || own?.id !== authored
+      ? (own?.id ?? null)
+      : undefined
   const { name } = ownerOf(part)
   const result: Attrs = {
     "data-slot": part.slot === "root" ? name : `${name}-${part.slot}`,
@@ -266,10 +279,9 @@ const selectedKeys = (part: Part, props = part.props) =>
  */
 function followed(part: Part, synced: object | undefined, props = part.props) {
   const names = ["#keys"]
-  let reads: Map<PropertyKey, readonly unknown[]> | undefined
+  const narrowed = definitionOf(part).selects
   for (const key in synced) {
-    reads ??= definitionOf(part).selects?.reading(part, props)
-    const values = reads?.get(key)
+    const values = narrowed?.reading(part, props, key)
     if (!values) {
       names.push(key)
     } else {
@@ -646,23 +658,37 @@ function aliasesOf(owner: PartOwner, store: Part["store"]) {
 }
 
 // Reads the element's id as it binds and whenever it changes, like a
-// framework's `id` prop or a script setting it.
+// framework's `id` prop or a script setting it. An element that binds with
+// the id its part just made has nothing to read.
 function followId(part: PartRecord, el: HTMLElement) {
-  if (el.hasAttribute("id") || part.own !== undefined) {
+  const id = idOf(el)
+  if (part.own !== undefined || (id && id !== part.made)) {
     readIdLater(part)
   }
-  const ids = (part.owner.ids ??= idObserver())
-  ids.parts.set(el, part)
-  ids.observer.observe(el, { attributeFilter: ["id"] })
-  // An observer can't let go of one element, so it forgets the part instead.
+  // One observer watches a whole document or shadow root. An element outside
+  // the page is watched alone, since its root can change as it's inserted.
+  const root = el.isConnected ? el.getRootNode() : el
+  let ids = idObservers.get(root)
+  if (!ids) {
+    idObservers.set(root, (ids = idObserver(root)))
+  }
+  const watched = ids
+  watched.parts.set(el, part)
+  watched.bound++
   return () => {
-    if (ids.parts.get(el) === part) {
-      ids.parts.delete(el)
+    if (watched.parts.get(el) === part) {
+      watched.parts.delete(el)
+    }
+    if (!--watched.bound && idObservers.get(root) === watched) {
+      watched.observer.disconnect()
+      idObservers.delete(root)
     }
   }
 }
 
-function idObserver() {
+const idObservers = new WeakMap<Node, ReturnType<typeof idObserver>>()
+
+function idObserver(root: Node) {
   const parts = new WeakMap<Node, PartRecord>()
   const observer = new MutationObserver((records) => {
     for (const { target } of records) {
@@ -672,7 +698,8 @@ function idObserver() {
       }
     }
   })
-  return { observer, parts }
+  observer.observe(root, { attributeFilter: ["id"], subtree: true })
+  return { observer, parts, bound: 0 }
 }
 
 // A microtask later, once every part binding with it has bound, so the

@@ -44,7 +44,7 @@ function setup() {
   const group = {
     isConnected: true,
     querySelector: () => field,
-    hasAttribute: () => false,
+    getRootNode: () => group,
   } as unknown as HTMLElement
   const instance = inputGroup({ id: "g" })
   const bind = () =>

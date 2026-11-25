@@ -377,7 +377,6 @@ export {
   createStore,
   heldState,
   isPlainObject,
-  join,
   type Listener,
   markChangedInPlace,
   renders,
