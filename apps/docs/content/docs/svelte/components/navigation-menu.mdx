@@ -170,6 +170,8 @@ The menu waits for whatever animations run, and only those. Turn them off for pe
 }
 ```
 
+Give it `followHover` and it follows the top-level trigger or link under the pointer, then goes back to the open trigger or the current link when the pointer leaves the list.
+
 ## Viewport Placement
 
 The viewport opens below the open trigger, lined up with its start, or beside it in a vertical menu. `side` and `align` change that, `sideOffset` is the gap (4 pixels by default), `alignOffset` shifts it along the trigger, and `collisionPadding` is the space kept from the window's edges. It flips and shifts to stay on screen.
@@ -452,7 +454,10 @@ Props and callbacks are the same as below, as Svelte props.
 
 ### NavigationMenuIndicator
 
-The indicator takes no props of its own.
+<TypeTable
+  path="../../packages/core/src/components/navigation-menu/navigation-menu.ts"
+  name="NavigationMenuIndicatorProps"
+/>
 
 ### State
 

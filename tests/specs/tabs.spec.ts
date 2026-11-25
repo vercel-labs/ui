@@ -406,6 +406,18 @@ test.describe("indicator", () => {
     await expect.poll(() => coversTab(page, "Account")).toBe(true)
   })
 
+  test("with followHover, the indicator follows the hovered tab and goes back when the pointer leaves", async ({
+    page,
+    open,
+  }) => {
+    await open("tabs", { "follow-hover": "" })
+    await expect.poll(() => coversTab(page, "Account")).toBe(true)
+    await tabNamed(page, "Notifications").hover()
+    await expect.poll(() => coversTab(page, "Notifications")).toBe(true)
+    await page.mouse.move(0, 0)
+    await expect.poll(() => coversTab(page, "Account")).toBe(true)
+  })
+
   test("the indicator follows the selection", async ({ page, open }) => {
     await open("tabs")
     await tabNamed(page, "Notifications").click()

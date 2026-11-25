@@ -1,11 +1,14 @@
 <script lang="ts">
   import {
+    indicatorOptions,
+    segmentedControlOptions,
+  } from "tests/fixtures/page.ts"
+  import {
     createSegmentedControlController,
     SegmentedControl,
     SegmentedControlIndicator,
     SegmentedControlItem,
   } from "@ui-sdk/svelte"
-  import { segmentedControlOptions } from "tests/fixtures/page.ts"
   import { segmentedControlFixture } from "tests/fixtures/segmented-control.ts"
 
   const controller = createSegmentedControlController()
@@ -42,7 +45,7 @@
     {controller}
     {onValueChange}
   >
-    <SegmentedControlIndicator />
+    <SegmentedControlIndicator {...indicatorOptions()} />
     {#each segmentedControlFixture.items as item (item.value)}
       <SegmentedControlItem value={item.value} disabled={item.disabled}
         >{item.label}</SegmentedControlItem

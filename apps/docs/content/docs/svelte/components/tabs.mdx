@@ -164,6 +164,8 @@ Add transitions for the properties you animate. Skip them while `data-activation
   caption="Choose Podcasts, then choose Vertical. The same indicator measures and follows the selected tab in either layout."
 />
 
+Give it `followHover` and it follows the tab under the pointer instead, then goes back to the selected tab when the pointer leaves the list. The same marker becomes a hover highlight.
+
 ## Keep Mounted
 
 Panels normally unmount when another tab is selected. Add `keepMounted` to a panel to keep its content hidden in the page, preserving local state such as a draft.
@@ -332,7 +334,12 @@ The list takes no options of its own, only the props of the element it renders.
 
 ### TabsIndicator
 
-The indicator takes no props of its own. Its [CSS variables](#styling-tabsindicator) hold the selected tab's box.
+<TypeTable
+  path="../../packages/core/src/components/tabs/tabs.ts"
+  name="TabsIndicatorProps"
+/>
+
+Its [CSS variables](#styling-tabsindicator) hold the selected tab's box.
 
 ### TabsPanel
 

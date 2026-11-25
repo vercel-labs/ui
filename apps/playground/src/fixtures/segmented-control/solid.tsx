@@ -6,7 +6,10 @@ import {
 } from "@ui-sdk/solid/segmented-control"
 import { render } from "@solidjs/web"
 import { createSignal, For } from "solid-js"
-import { segmentedControlOptions } from "tests/fixtures/page.ts"
+import {
+  indicatorOptions,
+  segmentedControlOptions,
+} from "tests/fixtures/page.ts"
 import { segmentedControlFixture } from "tests/fixtures/segmented-control.ts"
 
 const controller = createSegmentedControlController()
@@ -39,7 +42,7 @@ function Fixture() {
           setAction(`${value}:${details.reason}`)
         }}
       >
-        <SegmentedControlIndicator />
+        <SegmentedControlIndicator {...indicatorOptions()} />
         <For each={segmentedControlFixture.items}>
           {(item) => (
             <SegmentedControlItem value={item.value} disabled={item.disabled}>

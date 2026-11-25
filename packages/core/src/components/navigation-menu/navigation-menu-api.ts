@@ -784,8 +784,13 @@ function navigationMenuApiBody(
 
   // The indicator covers the open item's trigger, or the top-level link for
   // the current page while nothing is open.
-  function indicator(el: HTMLElement) {
+  function indicator(
+    el: HTMLElement,
+    part: { props: { followHover?: boolean } }
+  ) {
     return bindIndicator(el, {
+      followHover: () => !!part.props.followHover,
+      itemOf: (target) => topLevel().find((item) => item.contains(target)),
       target: () =>
         triggerOf(store.get().value) ??
         topLevel().find((item) =>

@@ -225,6 +225,15 @@ type TabsTabIconProps = ItemIconProps
  */
 type TabsTabIconState = ItemIconState
 /**
+ * Props of the indicator.
+ * @stable
+ */
+type TabsIndicatorProps = {
+  /** Whether it follows the tab under the pointer, and goes back to the selected one when the pointer leaves the list. */
+  followHover?: boolean
+}
+
+/**
  * The state the `indicator` slot of `tabs` hands `render` functions and
  * state-based class names.
  * @stable
@@ -737,8 +746,9 @@ const tabsPrimitive = /* @__PURE__ */ definePrimitive({
       })
     ),
 
-    indicator: slot<{}, TabsIndicatorState>({
+    indicator: slot<TabsIndicatorProps, TabsIndicatorState>({
       role: "presentation",
+      props: { followHover: "boolean" },
       state: (state, { api }) => ({
         orientation: api.internal.orientation(),
         direction: state.direction,
@@ -747,9 +757,11 @@ const tabsPrimitive = /* @__PURE__ */ definePrimitive({
         "data-orientation": api.internal.orientation(),
         "data-activation-direction": state.direction,
       }),
-      bind(el, { api, store }) {
+      bind(el, part) {
+        const { api, store } = part
         let value = store.get().value
         return bindIndicator({
+          followHover: () => !!part.props.followHover,
           list: () => api.internal.listElement() ?? el.parentElement,
           active: () => {
             const { value } = store.get()
@@ -899,6 +911,7 @@ export {
   type TabsChangeOptions,
   type TabsController,
   type TabsDirection,
+  type TabsIndicatorProps,
   type TabsIndicatorState,
   type TabsListState,
   type TabsOptions,

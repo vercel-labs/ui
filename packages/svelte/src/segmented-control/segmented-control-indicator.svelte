@@ -7,15 +7,22 @@ Sits behind the checked item. Its box comes from the
 <script lang="ts">
   import {
     segmentedControl,
+    type SegmentedControlIndicatorProps,
     type SegmentedControlIndicatorState,
   } from "@ui-sdk/core/segmented-control"
   import { usePart } from "../instance"
   import Part from "../part.svelte"
   import type { PartProps } from "../use-primitive.svelte"
 
-  let props: PartProps<"span", SegmentedControlIndicatorState> = $props()
+  let {
+    followHover,
+    ...rest
+  }: PartProps<"span", SegmentedControlIndicatorState> &
+    SegmentedControlIndicatorProps = $props()
 
-  const indicator = usePart(segmentedControl, "indicator")
+  const indicator = usePart(segmentedControl, "indicator", () => ({
+    followHover,
+  }))
 </script>
 
-<Part tag="span" part={indicator} {props} />
+<Part tag="span" part={indicator} props={rest} />

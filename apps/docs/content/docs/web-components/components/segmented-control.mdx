@@ -101,6 +101,8 @@ Name the control with `aria-label`, or put it in a [Field](./field) whose label 
 
 Skip the transitions while `data-activation-direction` is `"none"`, so the indicator doesn't slide in on its first placement. After that it says which way the checked item moved: `left`, `right`, `up` or `down`.
 
+Give it `follow-hover` and it follows the item under the pointer instead, then goes back to the checked item when the pointer leaves the control. It passes over disabled items.
+
 ## Vertical
 
 Set `orientation="vertical"` to stack the items. Arrow keys on both axes still move between them, as in any radio group, and `data-orientation` on every part lets one stylesheet lay out both directions.
@@ -194,6 +196,13 @@ false, so `loop="false"` turns looping off. `value` is a live property and attri
 <TypeTable
   path="../../packages/core/src/components/segmented-control/segmented-control.ts"
   name="SegmentedControlItemProps"
+/>
+
+### ui-segmented-control-indicator
+
+<TypeTable
+  path="../../packages/core/src/components/segmented-control/segmented-control.ts"
+  name="SegmentedControlIndicatorProps"
 />
 
 ### State

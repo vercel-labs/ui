@@ -1,4 +1,7 @@
-import { segmentedControlOptions } from "tests/fixtures/page.ts"
+import {
+  indicatorOptions,
+  segmentedControlOptions,
+} from "tests/fixtures/page.ts"
 import { segmentedControlFixture } from "tests/fixtures/segmented-control.ts"
 
 const escape = (text: string) =>
@@ -15,7 +18,7 @@ function markup() {
     <form class="fixture">
       <button type="button">Before</button>
       <ui-segmented-control aria-label="${segmentedControlFixture.label}" name="${segmentedControlFixture.name}">
-        <ui-segmented-control-indicator></ui-segmented-control-indicator>${items}
+        <ui-segmented-control-indicator${indicatorOptions().followHover ? " follow-hover" : ""}></ui-segmented-control-indicator>${items}
       </ui-segmented-control>
       <button type="button">After</button>
       <button type="submit">Save</button>

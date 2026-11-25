@@ -104,6 +104,7 @@ export type {
   SegmentedControlChangeOptions,
   SegmentedControlController,
   SegmentedControlDirection,
+  SegmentedControlIndicatorProps,
   SegmentedControlIndicatorState,
   SegmentedControlItemProps,
   SegmentedControlItemState,

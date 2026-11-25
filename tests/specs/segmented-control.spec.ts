@@ -166,6 +166,20 @@ test.describe("orientation", () => {
 })
 
 test.describe("indicator", () => {
+  test("with followHover, the indicator follows the hovered item and goes back when the pointer leaves", async ({
+    page,
+    open,
+  }) => {
+    await open("segmented-control", { "follow-hover": "" })
+    await expect.poll(() => coversItem(page, "List")).toBe(true)
+    await item(page, "Calendar").hover()
+    await expect.poll(() => coversItem(page, "Calendar")).toBe(true)
+    await item(page, "Board").hover()
+    await expect.poll(() => coversItem(page, "Calendar")).toBe(true)
+    await page.mouse.move(0, 0)
+    await expect.poll(() => coversItem(page, "List")).toBe(true)
+  })
+
   test("the indicator covers the checked item", async ({ page, open }) => {
     await open("segmented-control")
     await expect.poll(() => coversItem(page, "List")).toBe(true)

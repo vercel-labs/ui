@@ -1,4 +1,4 @@
-import { tabsOptions } from "tests/fixtures/page.ts"
+import { indicatorOptions, tabsOptions } from "tests/fixtures/page.ts"
 import { tabsFixture } from "tests/fixtures/tabs.ts"
 
 const escape = (text: string) =>
@@ -25,7 +25,7 @@ function markup(keepMounted: boolean) {
     <div class="fixture">
       <button>Before</button>
       <ui-tabs class="tabs">
-        <ui-tabs-list class="tablist" aria-label="${tabsFixture.label}">${tabs}<ui-tabs-indicator class="indicator"></ui-tabs-indicator></ui-tabs-list>
+        <ui-tabs-list class="tablist" aria-label="${tabsFixture.label}">${tabs}<ui-tabs-indicator class="indicator"${indicatorOptions().followHover ? " follow-hover" : ""}></ui-tabs-indicator></ui-tabs-list>
         ${panels}
       </ui-tabs>
       <button>After</button>
