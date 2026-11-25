@@ -126,7 +126,8 @@ function callHandler(handler: unknown, event: Event, ...extra: unknown[]) {
  */
 function toSolidProps(attrs: Attrs) {
   const props: Record<string, unknown> = {}
-  for (const [name, value] of Object.entries(attrs)) {
+  for (const name in attrs) {
+    const value = attrs[name]
     if (value === undefined) {
       continue
     }
@@ -180,6 +181,7 @@ type Tracked = {
   tick: () => number
   attrsTick: () => number
   state: (key: string) => unknown
+  follow: (part: Part, from: () => unknown) => void
   rebinds: Set<(part: Part) => void>
   users: number
   dispose: () => void
@@ -227,6 +229,26 @@ function sameRecord(a: Record<string, unknown>, b: Record<string, unknown>) {
     keys.length === Object.keys(b).length &&
     keys.every((key) => key in b && sameValue(a[key], b[key]))
   )
+}
+
+// Whether two renders' props hold the same values, with no list of keys made.
+function sameProps(a: object, b: object) {
+  const one = a as Record<string, unknown>
+  const other = b as Record<string, unknown>
+  if (one === other) {
+    return true
+  }
+  for (const key in one) {
+    if (!Object.is(one[key], other[key])) {
+      return false
+    }
+  }
+  for (const key in other) {
+    if (!(key in one)) {
+      return false
+    }
+  }
+  return true
 }
 
 // Subscribes a part once, and keeps it for as long as any scope renders it.
@@ -293,64 +315,93 @@ function createTracked(
     }
   }
   const rebinds = new Set<(part: Part) => void>()
-  let scope: Owner | null = null
-  const dispose = runWithOwner(owner, () =>
-    createRoot((dispose) => {
-      scope = getOwner()
-      let subscribed: Part | undefined
-      let selected: string | undefined
-      let unsubscribe = () => {}
-      // A new key is a new part, and a new value the part selects on needs a
-      // new subscription. Props are read in the compute half: a prop's getter
-      // may make a memo on its first read, which needs an owner the apply half
-      // doesn't have.
-      createEffect(
-        () => {
-          const current = props()
-          const part = instance.part(name, current)
-          return {
-            part,
-            props: current,
-            selected: selectedKeys(part),
-            seen: writes(part.store),
-          }
-        },
-        ({ part, props, selected: values, seen }) => {
-          if (part === subscribed && values === selected) {
-            return
-          }
-          if (part !== subscribed) {
-            for (const rebind of rebinds) {
-              rebind(part)
-            }
-          }
-          subscribed = part
-          selected = values
-          unsubscribe()
-          unsubscribe = subscribe(part, notify, props)
-          // The part's readers ran in this flush. A change since, like an
-          // effect writing state before this one, reaches them now.
-          if (writes(part.store) !== seen) {
-            notify(false, false)
-          }
-        },
-        { name: `${name} subscription` }
-      )
-      onCleanup(() => unsubscribe())
-      return dispose
+  // Subscribed as it's made, so no effect a part: on the server nothing
+  // changes, and nothing subscribes.
+  let subscribed = part
+  let unsubscribe = isServer ? () => {} : subscribe(part, notify)
+  // What it selects on, worked out once props that differ ask.
+  let selected: string | undefined
+  // The props last seen to select what it's subscribed for, or will be.
+  let seen = part.props
+  let next: { part: Part; selected: string; writes: number } | undefined
+  let disposed = false
+  const follow = (part: Part, from: () => unknown) => {
+    if (isServer || from !== props) {
+      return
+    }
+    const target = next?.part ?? subscribed
+    if (part === target && sameProps(part.props, seen)) {
+      return
+    }
+    selected ??= selectedKeys(subscribed, seen)
+    const values = selectedKeys(part)
+    if (part === target && values === (next?.selected ?? selected)) {
+      seen = part.props
+      return
+    }
+    seen = part.props
+    const waiting = next !== undefined
+    next = { part, selected: values, writes: writes(part.store) }
+    if (waiting) {
+      return
+    }
+    whenSettled(() => {
+      const taken = next
+      next = undefined
+      if (
+        disposed ||
+        !taken ||
+        (taken.part === subscribed && taken.selected === selected)
+      ) {
+        return
+      }
+      if (taken.part !== subscribed) {
+        for (const rebind of rebinds) {
+          rebind(taken.part)
+        }
+      }
+      subscribed = taken.part
+      selected = taken.selected
+      unsubscribe()
+      unsubscribe = subscribe(taken.part, notify)
+      // The part's readers ran in this flush. A change since, like an
+      // effect writing state before this one, reaches them now.
+      if (writes(taken.part.store) !== taken.writes) {
+        notify(false, false)
+      }
     })
-  )!
-  const state = stateMemos(instance, name, props, tick, () => scope)
+  }
+  // Made when a part first reads its state or another element of it does:
+  // most parts never do.
+  let scope: Owner | null = null
+  let disposeScope: (() => void) | undefined
+  const scopeOwner = () => {
+    if (!disposeScope) {
+      disposeScope = runWithOwner(owner, () =>
+        createRoot((dispose) => {
+          scope = getOwner()
+          return dispose
+        })
+      )!
+    }
+    return scope
+  }
+  const state = stateMemos(instance, name, props, tick, scopeOwner, follow)
   return {
     part,
     props,
-    owner: () => scope,
+    owner: scopeOwner,
     tick,
     attrsTick,
     state,
+    follow,
     rebinds,
     users: 0,
-    dispose,
+    dispose() {
+      disposed = true
+      unsubscribe()
+      disposeScope?.()
+    },
   }
 }
 
@@ -362,7 +413,8 @@ function stateMemos(
   name: string,
   props: () => unknown,
   tick: () => number,
-  owner: () => Owner | null
+  owner: () => Owner | null,
+  follow?: Tracked["follow"]
 ) {
   let all: (() => Record<string, unknown>) | undefined
   let keys: Map<string, () => unknown> | undefined
@@ -375,6 +427,7 @@ function stateMemos(
           () => {
             tick()
             const part = instance.part(name, props() as never)
+            follow?.(part, props)
             return readPart(instance, part, "state", () =>
               partState(part, part.props)
             ) as Record<string, unknown>
@@ -469,6 +522,34 @@ const resolve = (value: unknown, state: unknown) =>
 const resolveChildren = (value: unknown, state: unknown) =>
   typeof value === "function" && value.length > 0 ? value(state) : value
 
+// Runs `bind` once the flush that made its element has inserted it. Every
+// part of a flush shares one pass, unowned, so it runs once, with the flush's
+// own effects.
+let settling: (() => void)[] | undefined
+function whenSettled(bind: () => void) {
+  if (settling) {
+    settling.push(bind)
+    return
+  }
+  const binds = (settling = [bind])
+  runWithOwner(null, () =>
+    onSettled(() => {
+      settling = undefined
+      let failed: unknown
+      for (const bind of binds) {
+        try {
+          bind()
+        } catch (error) {
+          failed ??= { error }
+        }
+      }
+      if (failed) {
+        throw (failed as { error: unknown }).error
+      }
+    })
+  )
+}
+
 // What a slot's element takes from its part: its handlers and ref, and a memo
 // of its attributes.
 function slotParts(
@@ -516,24 +597,21 @@ function slotParts(
     if (settled(el)) {
       return attach(el)
     }
-    // Unowned, so it runs once, with the flush's own effects.
-    runWithOwner(null, () =>
-      onSettled(() => {
-        if (element !== el || attached === el) {
-          return
+    whenSettled(() => {
+      if (element !== el || attached === el) {
+        return
+      }
+      if (settled(el)) {
+        return attach(el)
+      }
+      // Still outside the document, like in a container inserted later, or
+      // still hydrating: wait a task.
+      queueMicrotask(() => {
+        if (element === el && attached !== el) {
+          attach(el)
         }
-        if (settled(el)) {
-          return attach(el)
-        }
-        // Still outside the document, like in a container inserted later, or
-        // still hydrating: wait a task.
-        queueMicrotask(() => {
-          if (element === el && attached !== el) {
-            attach(el)
-          }
-        })
       })
-    )
+    })
   }
   // A new key is a new part, which takes over the element.
   const rebind = (part: Part) => {
@@ -564,6 +642,7 @@ function slotParts(
     () => {
       tracked.attrsTick()
       const part = partOf()
+      tracked.follow(part, props)
       takeOwnId(part, user.id)
       const own = readPart(instance, part, "attrs", () =>
         partAttrs(part, part.props)
@@ -715,6 +794,7 @@ function usePrimitive<P extends Primitive>(
       // Presence may read live state, so every change counts.
       tracked.tick()
       const part = instance.part(name, props())
+      tracked.follow(part, props)
       return readPart(instance, part, "present", () =>
         isPresent(part, part.props)
       )
