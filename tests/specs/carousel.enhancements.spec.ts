@@ -332,6 +332,29 @@ test.describe("changes @enhancement", () => {
     await expect(nextButton(page)).toBeHidden()
   })
 
+  test("turned off while a finger is down, it rotates again once it's back on @enhancement", async ({
+    page,
+    open,
+  }) => {
+    await page.setViewportSize({ width: 600, height: 720 })
+    await open("carousel", {
+      playing: "",
+      interval: "300",
+      "disabled-media": "(min-width: 900px)",
+    })
+    const region = page.getByRole("region", { name: carouselFixture.label })
+    await page
+      .locator("[data-slot=carousel-viewport]")
+      .dispatchEvent("touchstart")
+    await expect(region).toHaveAttribute("data-paused", "")
+    await page.setViewportSize({ width: 1000, height: 720 })
+    await expect(region).toHaveCount(0)
+    await page.setViewportSize({ width: 600, height: 720 })
+    await expect(region).not.toHaveAttribute("data-paused")
+    const at = await lastAction(page)
+    await expect.poll(() => lastAction(page)).not.toBe(at)
+  })
+
   test("Next outside the carousel works through its controller @enhancement", async ({
     page,
     open,

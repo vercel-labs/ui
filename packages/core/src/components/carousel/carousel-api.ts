@@ -188,7 +188,11 @@ function carouselApiBody(
     },
     onPausedChange: (paused) => store.set({ paused }),
   })
-  onDestroy(autoplay.destroy)
+  let destroyed = false
+  onDestroy(() => {
+    destroyed = true
+    autoplay.destroy()
+  })
 
   const pageCount = () => store.get().pageCount
   const canStep = (by: 1 | -1) => {
@@ -631,10 +635,20 @@ function carouselApiBody(
     const state = store.get()
     const before = previous
     previous = state
-    if (
-      state.playing !== before.playing ||
-      state.disabled !== before.disabled
-    ) {
+    if (state.disabled !== before.disabled) {
+      // Once the options are handed over, so the pause isn't written beside them.
+      queueMicrotask(() => {
+        const { playing, disabled } = store.get()
+        if (destroyed) {
+          return
+        }
+        autoplay.setRunning(playing && !disabled)
+        if (disabled) {
+          autoplay.setPaused("touch", false)
+          autoplay.setPaused("drag", false)
+        }
+      })
+    } else if (state.playing !== before.playing) {
       autoplay.setRunning(state.playing && !state.disabled)
     }
     if (state.disabled && !before.disabled) {
