@@ -6,6 +6,14 @@ type CarouselFixtureSlide = {
   link: string
 }
 
+const slides: CarouselFixtureSlide[] = [
+  { title: "Desk lamp", link: "View desk lamp" },
+  { title: "Armchair", link: "View armchair" },
+  { title: "Bookshelf", link: "View bookshelf" },
+  { title: "Rug", link: "View rug" },
+  { title: "Plant stand", link: "View plant stand" },
+]
+
 const carouselFixture = {
   // The carousel's accessible name.
   label: "Featured products",
@@ -17,13 +25,14 @@ const carouselFixture = {
   // The play toggle's name while rotating, and while not.
   stop: "Stop slide rotation",
   start: "Start slide rotation",
-  slides: [
-    { title: "Desk lamp", link: "View desk lamp" },
-    { title: "Armchair", link: "View armchair" },
-    { title: "Bookshelf", link: "View bookshelf" },
-    { title: "Rug", link: "View rug" },
-    { title: "Plant stand", link: "View plant stand" },
-  ] satisfies CarouselFixtureSlide[] as CarouselFixtureSlide[],
+  // The first four with ?slides=4.
+  get slides() {
+    const count =
+      typeof location === "undefined"
+        ? null
+        : new URLSearchParams(location.search).get("slides")
+    return count ? slides.slice(0, Number(count)) : slides
+  },
   // A text field in the third slide, which keeps its arrow keys.
   field: "Gift note",
 }

@@ -101,6 +101,23 @@ Set `orientation="vertical"` to use Up and Down Arrow instead. Style the list as
   caption="Focus General, then press Down Arrow to choose Security. Up Arrow moves back through the vertical list."
 />
 
+To change the orientation with the layout, like a column beside the panels on wide screens and a row above them on phones, set `orientation` from a media query. The arrow keys follow it.
+
+```html
+<ui-tabs default-value="account">
+  <!-- List and panels. -->
+</ui-tabs>
+
+<script type="module">
+  const tabs = document.querySelector("ui-tabs")
+  const isWide = matchMedia("(min-width: 768px)")
+  const follow = () =>
+    tabs.setAttribute("orientation", isWide.matches ? "vertical" : "horizontal")
+  isWide.addEventListener("change", follow)
+  follow()
+</script>
+```
+
 ## Disabled
 
 Add `disabled` to a tab to prevent selection. Arrow keys can still focus it so people can discover it.

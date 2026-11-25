@@ -524,7 +524,7 @@ The trigger is a button that opens a dialog, and the drawer follows the [WAI-ARI
 | Tab, Shift+Tab            | Moves through the sheet's controls, staying inside while it's modal           |
 | Escape                    | Closes the topmost drawer when it's dismissible                               |
 
-It shares [Dialog’s focus behavior](./dialog#focus): focus moves inside on open and returns when it closes. A touch open focuses the content so a field does not summon the keyboard immediately. When the on-screen keyboard opens, the viewport shrinks and the focused field can scroll into view inside the sheet.
+It shares [Dialog’s focus behavior](./dialog#focus): focus moves inside on open and returns when it closes. A touch open focuses the content so a field does not summon the keyboard immediately, unless you set `initialFocus`. When the on-screen keyboard opens, the viewport shrinks and the focused field can scroll into view inside the sheet.
 
 ### Tested Behavior
 

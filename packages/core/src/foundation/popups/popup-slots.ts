@@ -64,7 +64,7 @@ type PopupContentProps = PositionProps &
      * popup itself when it has none, `"content"` focuses the popup and `"none"` leaves focus where
      * it is. A CSS selector, an element or a function picks a specific element. Opening on hover
      * never moves focus, opening with touch focuses the popup itself so no on-screen keyboard
-     * appears, and hover presets never take focus.
+     * appears unless this isn't `"auto"`, and hover presets never take focus.
      * @defaultValue "auto"
      */
     initialFocus?:
@@ -205,6 +205,8 @@ function bindPopupContent(
           contentProps().initialFocus,
           rules?.preferredFocus
         )),
+    chosenFocus:
+      press && (() => (contentProps().initialFocus ?? "auto") !== "auto"),
     backdrop: () => element("backdrop"),
     ...rules?.bind?.(),
   })

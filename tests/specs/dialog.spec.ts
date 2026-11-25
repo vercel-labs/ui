@@ -506,6 +506,27 @@ test.describe("focus", () => {
     await context.close()
   })
 
+  test("a touch press focuses the element initialFocus names", async ({
+    browser,
+    framework,
+    baseURL,
+  }) => {
+    const context = await browser.newContext({
+      hasTouch: true,
+      isMobile: true,
+      baseURL,
+    })
+    const page = await context.newPage()
+    await page.goto(
+      `/?fixture=dialog&framework=${framework}&initialFocus=input`
+    )
+    await page.locator("body[data-mounted]").waitFor({ state: "attached" })
+    await trigger(page).tap()
+    await expect(dialog(page)).toBeVisible()
+    await expect(field(page)).toBeFocused()
+    await context.close()
+  })
+
   test("pressing a button inside keeps the dialog open", async ({ page }) => {
     await trigger(page).click()
     await page.getByRole("button", { name: "Save" }).click()
