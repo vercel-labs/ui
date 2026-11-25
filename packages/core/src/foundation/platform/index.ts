@@ -57,6 +57,7 @@ export {
   afterPaint,
   ahead,
   enforceHidden,
+  entering,
   registerUninherited,
   setStyle,
   writeStyle,

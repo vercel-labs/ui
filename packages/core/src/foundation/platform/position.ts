@@ -7,7 +7,7 @@ import {
 } from "./anchoring"
 import { shadowRootsAround, watchMoves, watchShadowRoots } from "./moves"
 import { opposite, physicalSide, type PhysicalSide, type Side } from "./sides"
-import { ahead, registerUninherited } from "./style"
+import { ahead, entering, registerUninherited } from "./style"
 
 /**
  * How a popup lines up along the side it opens on.
@@ -567,8 +567,9 @@ function position(
     // place to move from, and a `left` or `top` transition would fly it in
     // from the corner. Later moves, between anchors, animate.
     const first = !placed
+    const settles = first && entering.has(el)
     const transition = el.style.transition
-    if (first) {
+    if (first && !settles) {
       el.style.transition = "none"
     }
     const a = anchorRect(shown ?? anchor)
@@ -672,7 +673,9 @@ function position(
         near(computePlacement(previous, size, viewport, placement))
       if (!caughtUp && !behind) {
         unanchor()
-        el.style.transition = transition
+        if (!settles) {
+          el.style.transition = transition
+        }
         return update()
       }
       if (behind) {
@@ -699,9 +702,11 @@ function position(
     const across = isVertical(result.side) ? scale.x : scale.y
     if (first) {
       placed = true
-      // Reading a style applies the placement before transitions come back.
-      void style.left
-      el.style.transition = transition
+      if (!settles) {
+        // Reading a style applies the placement before transitions come back.
+        void style.left
+        el.style.transition = transition
+      }
     }
 
     popup.attribute("data-side", result.side)

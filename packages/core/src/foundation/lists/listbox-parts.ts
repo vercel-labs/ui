@@ -6,7 +6,7 @@ import { warn } from "#dev"
 import { type AsyncOptionsStatus } from "./async-options"
 import { keyWhileBound } from "../kernel/bound-keys"
 import { isBrowser } from "../platform/env"
-import { animateIn } from "../motion/presence"
+import { animateEntering } from "../motion/presence"
 import {
   bindInternals,
   bindValueInput,
@@ -470,7 +470,7 @@ function itemIndicatorPart<State extends object, Api extends ListboxApi>() {
     }),
     bind: (el, { api, props }) =>
       api.internal.selection.isSelected(props.item!)
-        ? animateIn(el)
+        ? animateEntering(el)
         : undefined,
   } satisfies SlotDefinition<
     State,

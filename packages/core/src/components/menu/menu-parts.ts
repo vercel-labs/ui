@@ -16,7 +16,7 @@ import {
 } from "../../foundation/popups/popup"
 import { registerPopupElement } from "../../foundation/popups/popup-elements"
 import { placementOptions } from "../../foundation/popups/popup-features"
-import { animateIn } from "../../foundation/motion/presence"
+import { animateEntering } from "../../foundation/motion/presence"
 import { labelOf } from "../../foundation/text/typeahead"
 import {
   itemIconPart,
@@ -840,7 +840,7 @@ const menuCheckable = /* @__PURE__ */ (() => ({
       },
       // Animates in when its item becomes checked.
       bind: (el, { api, props }) =>
-        indicatorState(api, props).checked ? animateIn(el) : undefined,
+        indicatorState(api, props).checked ? animateEntering(el) : undefined,
     }),
   },
 }))()

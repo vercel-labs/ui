@@ -3,6 +3,7 @@
 // animates out. Unmounting waits for every running animation, with a timeout
 // from the computed durations so an infinite or stuck animation cannot block it.
 import { measured } from "#dev"
+import { entering } from "../platform/style"
 
 const pendingResets = new WeakMap<HTMLElement, () => void>()
 
@@ -18,11 +19,13 @@ function animateIn(el: HTMLElement, done?: () => void) {
   // An element already shown would transition to its starting style and back,
   // so it jumps there with what's inside it, like an icon's path. Anything
   // already moving eases back instead. jsdom has no getAnimations.
-  const running = el.getAnimations?.({ subtree: true }).filter(isTransition)
+  const running = entering.delete(el)
+    ? []
+    : el.getAnimations?.({ subtree: true }).filter(isTransition)
   const settled = running?.every((animation) => targetOf(animation) !== el)
   el.setAttribute("data-starting-style", "")
   if (running && settled) {
-    for (const animation of el.getAnimations({ subtree: true })) {
+    for (const animation of el.getAnimations?.({ subtree: true }) ?? []) {
       if (
         isTransition(animation) &&
         !running.some((moving) => continues(animation, moving))
@@ -48,6 +51,12 @@ function animateIn(el: HTMLElement, done?: () => void) {
     stopWaiting?.()
     el.removeAttribute("data-starting-style")
   }
+}
+
+// `animateIn` for an element that wasn't showing before, like one that binds as it mounts.
+function animateEntering(el: HTMLElement, done?: () => void) {
+  entering.add(el)
+  return animateIn(el, done)
 }
 
 const isTransition = (animation: Animation): animation is CSSTransition =>
@@ -214,4 +223,4 @@ function animateOut(el: HTMLElement, done: () => void) {
   }
 }
 
-export { animateIn, animateOut, writeOpen }
+export { animateEntering, animateIn, animateOut, writeOpen }
