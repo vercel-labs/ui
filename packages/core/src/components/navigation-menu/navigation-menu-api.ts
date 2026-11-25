@@ -361,6 +361,8 @@ function navigationMenuApiBody(
   // Crossing other triggers on the way to the open panel doesn't switch to them.
   const aim = createSafeArea()
   let pointerOn: string | null = null
+  let from: { x: number; y: number } | undefined
+  let at: { x: number; y: number } | undefined
   context.onDestroy(stopHover)
 
   function stopHover() {
@@ -414,7 +416,29 @@ function navigationMenuApiBody(
     intent.enter(event)
   }
 
+  // Where the pointer was before its latest move over the triggers. The
+  // events of one move share a point, so the step before it gives the way.
+  function track(event: PointerEvent) {
+    if (at?.x !== event.clientX || at?.y !== event.clientY) {
+      from = at
+      at = { x: event.clientX, y: event.clientY }
+    }
+  }
+
+  // A move along the bar, from one trigger to the next, isn't headed for the
+  // panel, even when a wide panel's safe area covers it.
+  function alongBar() {
+    if (!from || !at) {
+      return false
+    }
+    const horizontal = store.get().orientation === "horizontal"
+    const toward = Math.abs(horizontal ? at.y - from.y : at.x - from.x)
+    const sideways = Math.abs(horizontal ? at.x - from.x : at.y - from.y)
+    return sideways > toward * 3
+  }
+
   function leaveTrigger(event: PointerEvent, key: string) {
+    track(event)
     if (pointerOn === key) {
       pointerOn = null
     }
@@ -431,6 +455,7 @@ function navigationMenuApiBody(
       return
     }
     pointerOn = key
+    track(event)
     if (store.get().value !== null) {
       intent.enter(event)
       if (store.get().value === key) {
@@ -441,6 +466,7 @@ function navigationMenuApiBody(
       // Another trigger takes the open menu over at once, unless the pointer
       // is only crossing it on its way to the open panel.
       if (
+        !alongBar() &&
         aim.contains(
           { x: event.clientX, y: event.clientY },
           () => pointerOn === key && switchTo()
@@ -833,6 +859,7 @@ function navigationMenuApiBody(
       surfaces,
       hoverEnter,
       hoverMove(event: PointerEvent, key: string, disabled?: boolean) {
+        track(event)
         if (aim.active() && store.get().value !== key) {
           hoverEnter(event, key, disabled)
         }

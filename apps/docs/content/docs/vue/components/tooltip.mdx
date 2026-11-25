@@ -140,6 +140,8 @@ A toolbar, a chart or a long list can share one tooltip instead of rendering one
 
 Only the trigger that opened the tooltip is described by it, so give each trigger a name of its own, like an `aria-label`. The controller's `open()` takes a payload and an `anchor` too, and on an open tooltip, `open({ payload })` replaces the payload, like another trigger taking it over. `@payload-change` reports each change.
 
+When another trigger takes the open tooltip over, the tooltip moves to it. Add `left` and `top` to the content's `transition` to slide it there instead of jumping. Its first placement on open never animates, so it doesn't fly in from a corner.
+
 <ComponentExample
   name="tooltip/shared"
   caption="Move along Bold, Italic and Underline. One tooltip follows the pointer and shows each button's label."

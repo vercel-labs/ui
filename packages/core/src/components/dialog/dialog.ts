@@ -301,7 +301,7 @@ type TriggerProps = {
 
 type ContentProps = PortalProps & {
   /**
-   * Where focus goes when the dialog opens. Opening with touch focuses the dialog itself, so no on-screen keyboard appears.
+   * Where focus goes when the dialog opens. Opening with touch focuses the dialog itself, so no on-screen keyboard appears, unless this is set to something other than `"auto"`.
    * @defaultValue "auto"
    */
   initialFocus?: DialogInitialFocus

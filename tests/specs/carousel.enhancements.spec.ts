@@ -355,6 +355,51 @@ test.describe("changes @enhancement", () => {
     await expect.poll(() => lastAction(page)).not.toBe(at)
   })
 
+  test("a press on a slide peeking in at the edge pages to it @enhancement", async ({
+    page,
+    open,
+  }) => {
+    await open("carousel", { "per-view": "1.25" })
+    const viewport = page.locator("[data-slot=carousel-viewport]")
+    const box = (await viewport.boundingBox())!
+    await page.mouse.click(box.x + box.width - 10, box.y + box.height / 2)
+    await expect.poll(() => lastReason(page)).toBe("item-press")
+    expect(await lastAction(page)).toBe("2")
+    await expect(slideLink(page, 1)).toBeInViewport({ ratio: 1 })
+  })
+
+  test("a press on a control laid over a peeking slide doesn't page @enhancement", async ({
+    page,
+    open,
+  }) => {
+    await open("carousel", { "per-view": "1.25" })
+    const viewport = page.locator("[data-slot=carousel-viewport]")
+    await viewport.evaluate((el) => {
+      const button = document.createElement("button")
+      button.textContent = "Save"
+      button.style.cssText =
+        "position:absolute;inset-block:0;inset-inline-end:0;width:40px;z-index:1"
+      el.style.position = "relative"
+      el.append(button)
+    })
+    await page.getByRole("button", { name: "Save" }).click()
+    await expect(slideLink(page, 0)).toBeInViewport({ ratio: 1 })
+    expect(await lastReason(page)).not.toBe("item-press")
+  })
+
+  test("with loop, a press on the slide peeking in before the first pages back round to it @enhancement", async ({
+    page,
+    open,
+  }) => {
+    await open("carousel", { "per-view": "1.25", align: "center", loop: "" })
+    const viewport = page.locator("[data-slot=carousel-viewport]")
+    const box = (await viewport.boundingBox())!
+    await page.mouse.click(box.x + 10, box.y + box.height / 2)
+    await expect.poll(() => lastReason(page)).toBe("item-press")
+    expect(await lastAction(page)).toBe("5")
+    await expect(slideLink(page, 4)).toBeInViewport({ ratio: 1 })
+  })
+
   test("Next outside the carousel works through its controller @enhancement", async ({
     page,
     open,

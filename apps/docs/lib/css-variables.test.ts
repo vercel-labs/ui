@@ -43,6 +43,9 @@ function written(file: string) {
   return names
 }
 
+const read = (file: string) =>
+  [...code(file).matchAll(/var\((--[a-z][\w-]*)/g)].map(([, name]) => name)
+
 // Scroll locking sets the first on <html> for any modal popup. The second is
 // the `anchor-name` a popup's anchor gets, not a variable. The docs list neither.
 const undocumented = ["--scrollbar-width", "--ui-anchor-*"]
@@ -174,8 +177,11 @@ const behaviors = [
   "foundation/lists/scroll-picker.ts",
 ]
 
-test("every variable listed for a component is one core writes, with what it holds", () => {
-  const all = sourceFiles(src).flatMap((file) => [...written(file)])
+test("every variable listed for a component is one core writes or reads, with what it holds", () => {
+  const all = sourceFiles(src).flatMap((file) => [
+    ...written(file),
+    ...read(file),
+  ])
   for (const component of Object.keys(cssVariableGroups)) {
     for (const name of declared(component)) {
       expect(

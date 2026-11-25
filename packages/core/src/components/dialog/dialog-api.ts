@@ -363,6 +363,8 @@ function dialogApiBody(
           rules?.preferredFocus
         )
       },
+      chosenFocus: () =>
+        (popup.internal.contentProps().initialFocus ?? "auto") !== "auto",
       closePress,
       shortcutPress,
       // The shortcut of the trigger an element sits in or beside.

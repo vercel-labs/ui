@@ -75,7 +75,7 @@ Import the parts and put them together:
 
 `loop` makes the slides go round. Next on the last page goes to the first, which comes in after the last, and a swipe, a drag or a wheel back from the first page reaches the last, with native scrolling all the way. Rotation always wraps.
 
-The slides take turns at the ends of the content with CSS `order` while the carousel rests, so the current page always has slides on both sides. They keep their place in the document, so screen readers and Tab follow the slides' own order. The content needs to lay its slides out in a row with even gaps, as flex and grid do, and hold a page of slides to either side of the current one. With fewer, like two slides one to a view, Next on the last page scrolls back to the first instead.
+The slides take turns at the ends of the content with CSS `order` while the carousel rests, so the current page always has slides on both sides. They keep their place in the document, so screen readers and Tab follow the slides' own order. The content needs to lay its slides out in a row with even gaps, as flex and grid do, and hold a page of slides to either side of the current one. With fewer, like two slides one to a view, Next on the last page scrolls back to the first instead. To move a card, like one that slides away as it leaves, transform an element inside its slide rather than the slide, and give the slide `overflow: clip`. The browser counts anything that moves past a slide when it measures how far the slides scroll, and the loop would wrap in the wrong place.
 
 <ComponentExample
   name="carousel/loop"
@@ -165,7 +165,7 @@ carousel may change until `x` changes. Bind it with `bind:page={x}` to keep them
 binding, `bind:page={() => x, (next) => (x = next)}`, to decide. The root's `children` snippet receives its
 state, which has `pageCount`, null until the slides are measured.
 
-Every change carries a [reason](#reasons): `next-press` and `previous-press` for the parts, `item-press` for an indicator, `list-navigation` for arrow keys, `swipe` for a finger or a mouse drag, `scroll` for a wheel or trackpad, `timeout` for rotation and `imperative` from a [controller](#controller). Call `details.cancel()` to stay on the page: a swipe or drag springs back. A controlled page that doesn't change scrolls back too.
+Every change carries a [reason](#reasons): `next-press` and `previous-press` for the parts, `item-press` for an indicator or a slide peeking in, `list-navigation` for arrow keys, `swipe` for a finger or a mouse drag, `scroll` for a wheel or trackpad, `timeout` for rotation and `imperative` from a [controller](#controller). Call `details.cancel()` to stay on the page: a swipe or drag springs back. A controlled page that doesn't change scrolls back too.
 
 <ComponentExample
   name="carousel/controlled"
@@ -187,7 +187,7 @@ as `controller` to the carousel, and to `CarouselPrevious`, `CarouselNext`, `Car
 
 ## Swipes and Drags
 
-Touch, trackpads and wheels scroll the viewport natively, with CSS scroll snap doing the paging. Native scrolling and snapping also work before JavaScript loads. A mouse or pen drags the slides too: they follow the pointer, stretch past the ends, and spring from the release velocity to the page a fling would reach. A drag that moved never clicks the link it started on, and fields inside slides keep their pointer.
+Touch, trackpads and wheels scroll the viewport natively, with CSS scroll snap doing the paging. Native scrolling and snapping also work before JavaScript loads. A mouse or pen drags the slides too: they follow the pointer, stretch past the ends, and spring from the release velocity to the page a fling would reach. A drag that moved never clicks the link it started on, and fields inside slides keep their pointer. A press on a slide peeking in at the edge pages to it.
 
 Without `skipSnaps`, one swipe moves at most one page. `dragFree` lets swipes coast to wherever they stop,
 and the nearest page becomes the current one.
@@ -226,13 +226,17 @@ step's `disabled`, an indicator's `page` and `selected`, the play toggle's `play
 
 Use `data-disabled` on Previous and Next at their end, `data-selected` on the current indicator, `data-active` on the current page's slides, `data-in-view` on slides in view, and `data-playing` and `data-paused` on the root.
 
-Slides size themselves: give them a `flex-basis` of 100% for one to a view or a third for three, and put the gap on the content, taking it out of each basis. The viewport writes the few styles scrolling needs inline: its overflow, `scroll-snap-type` and `overscroll-behavior`. Slides get `flex-shrink: 0` and their snap alignment. Hide the scrollbar with `scrollbar-width: none` if you like.
+Slides size themselves: give them a `flex-basis` of 100% for one to a view or a third for three, and put the gap on the content, taking it out of each basis. The viewport writes the few styles scrolling needs inline: its overflow, `scroll-snap-type` and `overscroll-behavior`. Slides get `flex-shrink: 0` and their snap alignment. The content is a flex row, or a column when vertical. To lay the slides out in a grid instead, set `--carousel-display: grid` on it. Hide the scrollbar with `scrollbar-width: none` if you like.
 
 Each part has a `data-slot`, such as `carousel-item`, and its state attributes are listed under [Data Attributes](#data-attributes).
 
 ### Carousel [#styling-carousel]
 
 <CssVariables component="carousel" part="root" />
+
+### CarouselContent [#styling-carouselcontent]
+
+<CssVariables component="carousel" part="content" />
 
 ## Data Attributes
 

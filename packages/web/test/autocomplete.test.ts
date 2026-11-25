@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { afterEach, expect, test } from "vitest"
 import { defineAutocompleteElements } from "../src/autocomplete"
+import type { UiAutocompleteElement } from "../src/events"
 
 const wait = () => new Promise((resolve) => setTimeout(resolve, 10))
 
@@ -40,4 +41,18 @@ test("an autocomplete's submit reaches the host of the shadow root it renders in
   input.dispatchEvent(enter)
   expect(heard).toBe("kiwi")
   expect(enter.defaultPrevented).toBe(true)
+})
+
+test("an autocomplete's api highlights a suggestion and says which one is highlighted", async () => {
+  ;(
+    Element.prototype as { getAnimations?: () => Animation[] }
+  ).getAnimations ??= () => []
+  defineAutocompleteElements()
+  document.body.innerHTML = `<ui-autocomplete><ui-autocomplete-input><input aria-label="Fruit" /></ui-autocomplete-input><ui-autocomplete-content hidden><ui-autocomplete-list><ui-autocomplete-item value="Apple"><ui-autocomplete-item-text>Apple</ui-autocomplete-item-text></ui-autocomplete-item><ui-autocomplete-item value="Banana"><ui-autocomplete-item-text>Banana</ui-autocomplete-item-text></ui-autocomplete-item></ui-autocomplete-list></ui-autocomplete-content></ui-autocomplete>`
+  await wait()
+  const el = document.querySelector("ui-autocomplete") as UiAutocompleteElement
+  el.api.open()
+  await wait()
+  expect(el.api.highlight("Banana")).toBe(true)
+  expect(el.api.getHighlighted()).toBe("Banana")
 })
