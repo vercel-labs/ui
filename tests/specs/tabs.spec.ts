@@ -418,6 +418,19 @@ test.describe("indicator", () => {
     await expect.poll(() => coversTab(page, "Account")).toBe(true)
   })
 
+  test("with followHover, the indicator goes back to the selected tab when the hovered one is removed", async ({
+    page,
+    open,
+  }) => {
+    await open("tabs", { "follow-hover": "" })
+    await tabNamed(page, "Notifications").hover()
+    await expect.poll(() => coversTab(page, "Notifications")).toBe(true)
+    await tabNamed(page, "Notifications").evaluate((tab) =>
+      (tab.closest("ui-tabs-tab") ?? tab).remove()
+    )
+    await expect.poll(() => coversTab(page, "Account")).toBe(true)
+  })
+
   test("the indicator follows the selection", async ({ page, open }) => {
     await open("tabs")
     await tabNamed(page, "Notifications").click()

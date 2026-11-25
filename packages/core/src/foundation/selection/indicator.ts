@@ -36,7 +36,10 @@ function trackHover(options: {
     listened = undefined
   }
   return {
-    hovered: () => (options.enabled() ? hovered : undefined),
+    hovered: () =>
+      options.enabled() && hovered && listened?.contains(hovered)
+        ? hovered
+        : undefined,
     listen() {
       const list = options.list() ?? undefined
       if (list === listened) {
