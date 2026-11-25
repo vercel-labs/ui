@@ -73,6 +73,22 @@ const namedByTrigger = (state: MenuState, nested: boolean) =>
 const triggerElement = (state: MenuState, key: string) =>
   state.triggerElements[key] ?? "button"
 
+// State the items never read: what the popup, its triggers and its groups show.
+const unreadByItems = {
+  open: [],
+  mounted: [],
+  presentation: [],
+  openChild: [],
+  trigger: [],
+  payload: [],
+  barStop: [],
+  barDisabled: [],
+  groupLabels: [],
+  triggers: [],
+  triggerElements: [],
+  shortcutItems: [],
+} as const
+
 // The menu's slots, which its features' slots join.
 const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
   trigger: slot<TriggerProps, MenuTriggerState>({
@@ -509,6 +525,7 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
       onSelect: "action",
     },
     selects: selects({
+      ...unreadByItems,
       highlighted: ({ key }) => [key],
       pending: ({ key }) => [key],
       values: [],
@@ -683,6 +700,7 @@ const menuCheckable = /* @__PURE__ */ (() => ({
         closeOnSelect: "boolean",
       },
       selects: selects({
+        ...unreadByItems,
         highlighted: ({ key }) => [key],
         values: ({ props }) => [props.value],
       }),
@@ -752,6 +770,7 @@ const menuCheckable = /* @__PURE__ */ (() => ({
       },
       // Registered under its group too, since radio groups may share values.
       selects: selects({
+        ...unreadByItems,
         highlighted: ({ key, props }) => [`${props.group}:${key}`],
         values: ({ props }) => [`radio:${props.group}`],
       }),

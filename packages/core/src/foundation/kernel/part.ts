@@ -70,6 +70,8 @@ type PartOwner = {
   aliases?: { version: number; map: Map<string, string> }
   // Parts whose element's id to read, a microtask later.
   unread?: Set<PartRecord>
+  // One observer for every bound element's id, and the part each belongs to.
+  ids?: { observer: MutationObserver; parts: WeakMap<Node, PartRecord> }
   // Whether a render took an own id since parts last heard, which they hear
   // once the elements bind, so a part rendered before it points at it too.
   renamed?: boolean
@@ -263,9 +265,10 @@ const selectedKeys = (part: Part, props = part.props) =>
  * when a key starts or stops being delivered.
  */
 function followed(part: Part, synced: object | undefined, props = part.props) {
-  const reads = definitionOf(part).selects?.reading(part, props)
   const names = ["#keys"]
+  let reads: Map<PropertyKey, readonly unknown[]> | undefined
   for (const key in synced) {
+    reads ??= definitionOf(part).selects?.reading(part, props)
     const values = reads?.get(key)
     if (!values) {
       names.push(key)
@@ -445,12 +448,11 @@ function bind(part: Part, el: HTMLElement, host: Host = { by: "core" }) {
     enforceHidden(el.ownerDocument)
   }
 
-  for (const [type, handler] of Object.entries(handlers(part))) {
-    if (
-      host.by === "core" ||
-      (host.attaches !== "all" && !host.attaches.includes(type))
-    ) {
-      cleanups.push(on(el, type as keyof EventMap, handler))
+  if (host.by === "core" || host.attaches !== "all") {
+    for (const [type, handler] of Object.entries(handlers(part))) {
+      if (host.by === "core" || !host.attaches.includes(type)) {
+        cleanups.push(on(el, type as keyof EventMap, handler))
+      }
     }
   }
 
@@ -649,9 +651,28 @@ function followId(part: PartRecord, el: HTMLElement) {
   if (el.hasAttribute("id") || part.own !== undefined) {
     readIdLater(part)
   }
-  const observer = new MutationObserver(() => readIdLater(part))
-  observer.observe(el, { attributeFilter: ["id"] })
-  return () => observer.disconnect()
+  const ids = (part.owner.ids ??= idObserver())
+  ids.parts.set(el, part)
+  ids.observer.observe(el, { attributeFilter: ["id"] })
+  // An observer can't let go of one element, so it forgets the part instead.
+  return () => {
+    if (ids.parts.get(el) === part) {
+      ids.parts.delete(el)
+    }
+  }
+}
+
+function idObserver() {
+  const parts = new WeakMap<Node, PartRecord>()
+  const observer = new MutationObserver((records) => {
+    for (const { target } of records) {
+      const part = parts.get(target)
+      if (part) {
+        readIdLater(part)
+      }
+    }
+  })
+  return { observer, parts }
 }
 
 // A microtask later, once every part binding with it has bound, so the
