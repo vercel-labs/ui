@@ -112,39 +112,38 @@ function scrollArea(container: HTMLElement) {
   const edge = (start: string, end: string) =>
     (parseFloat(style.getPropertyValue(start)) || 0) +
     (parseFloat(style.getPropertyValue(end)) || 0)
-  const borderX = edge("border-left-width", "border-right-width")
-  const borderY = edge("border-top-width", "border-bottom-width")
-  // A scrollbar takes whole pixels, and only where the container can scroll.
-  const scrollbar = (
-    overflow: string,
+  // Browsers differ on whether a content-box size leaves out a scrollbar or
+  // its gutter, so one is taken away only while clientWidth says it's still in.
+  const padding = (
     outer: number,
-    inner: number,
-    border: number
-  ) =>
-    overflow === "scroll" || overflow === "auto"
-      ? Math.max(0, outer - inner - Math.round(border))
-      : 0
-  const scrollbarX = scrollbar(
-    style.overflowX,
-    container.offsetHeight,
-    container.clientHeight,
-    borderY
-  )
-  const scrollbarY = scrollbar(
-    style.overflowY,
-    container.offsetWidth,
-    container.clientWidth,
-    borderX
-  )
+    border: number,
+    offset: number,
+    client: number
+  ) => {
+    const inner = outer - border
+    return Math.abs(inner - client) < 1
+      ? inner
+      : inner - Math.max(0, offset - client - Math.round(border))
+  }
   return {
     width:
       container.scrollWidth > container.clientWidth
         ? container.scrollWidth
-        : size.width - borderX - scrollbarY,
+        : padding(
+            size.width,
+            edge("border-left-width", "border-right-width"),
+            container.offsetWidth,
+            container.clientWidth
+          ),
     height:
       container.scrollHeight > container.clientHeight
         ? container.scrollHeight
-        : size.height - borderY - scrollbarX,
+        : padding(
+            size.height,
+            edge("border-top-width", "border-bottom-width"),
+            container.offsetHeight,
+            container.clientHeight
+          ),
   }
 }
 
