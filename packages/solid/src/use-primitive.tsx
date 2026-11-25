@@ -644,9 +644,10 @@ function usePrimitive<P extends Primitive>(
   // Made without tracking, the options and what the primitive's first state
   // calls, like an `itemToLabel` that reads a signal: the effect below keeps
   // the options fresh.
-  const instance = untrack(() =>
-    primitive(snapshot({ ...options(), id }))
-  ) as ReturnType<P>
+  let initial: ReturnType<typeof snapshot> | undefined = untrack(() =>
+    snapshot({ ...options(), id })
+  )
+  const instance = untrack(() => primitive(initial)) as ReturnType<P>
   // Leaving the page settles a pending controller `open()` and detaches the controller.
   onCleanup(() => instance.destroy())
   // The options, made again only when a prop changes to another value.
@@ -665,10 +666,12 @@ function usePrimitive<P extends Primitive>(
   let before: ReturnType<typeof current> | undefined
   const marks = createProjection<Record<string, number>>((draft) => {
     const next = current()
-    const previous = before && delivered(undefined, before)
-    touched(previous, delivered(), (name) => {
-      draft[name] = (draft[name] ?? 0) + 1
-    })
+    // Nothing has read a name before the first run.
+    if (before) {
+      touched(delivered(undefined, before), delivered(), (name) => {
+        draft[name] = (draft[name] ?? 0) + 1
+      })
+    }
     before = next
   }, {})
   deliveries.set(instance, {
@@ -681,11 +684,19 @@ function usePrimitive<P extends Primitive>(
       Record<string, Record<string, unknown>> | undefined,
   })
   // Keeps callbacks fresh and hands the options to the instance, for its
-  // own listeners. Parts already read what they deliver, so they skip it.
+  // own listeners, from the first change after the ones it was made with.
   // Untracked, since the instance reads a store's items as it takes a new list.
-  createEffect(current, (next) => untrack(() => instance.setOptions(next)), {
-    name: "options",
-  })
+  createEffect(
+    current,
+    (next) => {
+      const made = initial
+      initial = undefined
+      if (!made || !sameRecord(made as typeof next, next)) {
+        untrack(() => instance.setOptions(next))
+      }
+    },
+    { name: "options" }
+  )
   const track = createTracker(instance)
   trackers.set(instance, track)
 
