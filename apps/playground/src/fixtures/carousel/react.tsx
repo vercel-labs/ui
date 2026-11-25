@@ -23,11 +23,10 @@ function Fixture() {
   const [{ perView, cancel, playToggle, controlled, disabledMedia, options }] =
     React.useState(carouselOptions)
   const [page, setPage] = React.useState(1)
-  const [disabled, setDisabled] = React.useState(
-    () => disabledMedia?.matches ?? false
-  )
+  const [disabled, setDisabled] = React.useState(false)
   React.useEffect(() => {
     const change = () => setDisabled(!!disabledMedia?.matches)
+    change()
     disabledMedia?.addEventListener("change", change)
     return () => disabledMedia?.removeEventListener("change", change)
   }, [disabledMedia])

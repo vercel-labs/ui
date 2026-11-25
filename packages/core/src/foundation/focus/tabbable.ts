@@ -246,6 +246,14 @@ function bindTabStop(
   return { check, stop: () => observer.disconnect() }
 }
 
+/** Takes back a tab stop `bindTabStop` wrote, for an element it no longer keeps. */
+function releaseTabStop(el: HTMLElement) {
+  if (ownTabStops.has(el)) {
+    el.removeAttribute("tabindex")
+    ownTabStops.delete(el)
+  }
+}
+
 export {
   bindTabStop,
   composedTabbables,
@@ -254,5 +262,6 @@ export {
   nextTabbable,
   positiveTabStops,
   radioGroup,
+  releaseTabStop,
   tabbables,
 }

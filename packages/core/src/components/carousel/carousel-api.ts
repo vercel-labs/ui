@@ -41,7 +41,7 @@ import type {
 import { isFocusFromKeyboard } from "../../foundation/kernel/modality"
 import { isRTL } from "../../foundation/platform/env"
 import { prefersReducedMotion } from "../../foundation/platform/platform"
-import { bindTabStop } from "../../foundation/focus/tabbable"
+import { bindTabStop, releaseTabStop } from "../../foundation/focus/tabbable"
 import { sheetPhysics } from "../../foundation/motion/physics"
 import { on } from "../../foundation/kernel/events"
 import type { PrimitiveContext } from "../../foundation/kernel/primitive-types"
@@ -644,6 +644,12 @@ function carouselApiBody(
         removeSnapAreas(slides)
         snapAreas = false
       }
+      const viewport = element("viewport")
+      if (viewport) {
+        releaseTabStop(viewport)
+      }
+      element("root")?.style.removeProperty("--carousel-progress")
+      writtenProgress = -1
     }
     if (state.interval !== before.interval) {
       writeInterval()

@@ -17,11 +17,13 @@
   const { perView, cancel, playToggle, controlled, disabledMedia, options } =
     carouselOptions()
   let page = $state(1)
-  let disabled = $state(disabledMedia?.matches ?? false)
-  disabledMedia?.addEventListener(
-    "change",
-    () => (disabled = disabledMedia.matches)
-  )
+  let disabled = $state(false)
+  $effect(() => {
+    const change = () => (disabled = !!disabledMedia?.matches)
+    change()
+    disabledMedia?.addEventListener("change", change)
+    return () => disabledMedia?.removeEventListener("change", change)
+  })
 
   let action = $state("")
   let reason = $state("")

@@ -428,6 +428,13 @@ const carouselPrimitive = /* @__PURE__ */ definePrimitive({
     dragFree: options.dragFree ?? false,
     drag: options.drag ?? true,
     disabled: options.disabled ?? false,
+    // Turned off, it holds no measured slides, as if it never measured them.
+    ...(options.disabled && {
+      pageCount: null,
+      pages: [],
+      order: [],
+      inView: [],
+    }),
     interval: options.interval ?? 5000,
     ...(options.page === undefined ? {} : { page: options.page }),
     ...(options.playing === undefined ? {} : { playing: options.playing }),
