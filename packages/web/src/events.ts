@@ -2533,7 +2533,8 @@ declare global {
     >
     "ui-navigation-menu-indicator": UiPartElement<
       typeof navigationMenu,
-      "indicator"
+      "indicator",
+      "followHover"
     >
     "ui-number-input-group": UiPartElement<typeof numberInput, "group">
     "ui-number-input-control": UiPartElement<typeof numberInput, "control">
@@ -2737,12 +2738,13 @@ declare global {
     "ui-switch-thumb": UiPartElement<typeof switchPrimitive, "thumb">
     "ui-segmented-control-indicator": UiPartElement<
       typeof segmentedControl,
-      "indicator"
+      "indicator",
+      "followHover"
     >
     "ui-tabs-list": UiPartElement<typeof tabs, "list">
     "ui-tabs-tab": UiPartElement<typeof tabs, "tab", "value" | "disabled">
     "ui-tabs-tab-icon": UiPartElement<typeof tabs, "tab-icon", "mirror">
-    "ui-tabs-indicator": UiPartElement<typeof tabs, "indicator">
+    "ui-tabs-indicator": UiPartElement<typeof tabs, "indicator", "followHover">
     "ui-tabs-panel": UiPartElement<
       typeof tabs,
       "panel",
