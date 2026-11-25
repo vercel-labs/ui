@@ -345,7 +345,7 @@ test.describe("changes @enhancement", () => {
     const region = page.getByRole("region", { name: carouselFixture.label })
     await page
       .locator("[data-slot=carousel-viewport]")
-      .dispatchEvent("touchstart")
+      .evaluate((viewport) => viewport.dispatchEvent(new Event("touchstart")))
     await expect(region).toHaveAttribute("data-paused", "")
     await page.setViewportSize({ width: 1000, height: 720 })
     await expect(region).toHaveCount(0)
