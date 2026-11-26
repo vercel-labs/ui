@@ -528,18 +528,24 @@ function selectApiBody(
     }
   }
 
+  const hasValueIcon = () => context.props("value-icon") !== undefined
+  // Whether the closed list must mount hidden for the value: for a label only
+  // its item knows, or for a value icon, which copies its item's icon.
+  // `items` and `itemToLabel` know every label, but not an icon.
+  const needsList = () =>
+    store.get().items || options().itemToLabel
+      ? hasValueIcon() && selection.keys().length > 0
+      : selection.needsItems(hasValueIcon())
+
   // Values whose items never mounted, like from a controller: mount the list hidden so they say their labels.
   let previousValue = store.get().value
   store.subscribe(() => {
-    const { value, items, prepared } = store.get()
+    const { value, prepared } = store.get()
     if (value === previousValue) {
       return
     }
     previousValue = value
-    if (prepared || items || options().itemToLabel) {
-      return
-    }
-    if (selection.needsItems(false)) {
+    if (!prepared && needsList()) {
       store.set({ prepared: true })
     }
   })
@@ -585,7 +591,8 @@ function selectApiBody(
       hide,
       choose,
       // Whether a value icon rendered, which copies the selected item's icon.
-      hasValueIcon: () => context.props("value-icon") !== undefined,
+      hasValueIcon,
+      needsList,
       prepare,
       initialFocus,
       loadMore,
