@@ -37,6 +37,10 @@ type Host =
 // What the kernel keeps on a part beside what adapters read.
 type PartRecord = Part & {
   readonly owner: PartOwner
+  // Its place in its instance's parts, `slot:key`.
+  readonly mapKey: string
+  // Where it comes among them, which rises as it joins and as it binds.
+  rank?: number
   // The bind that set `el`. Unbinding can change state that binds the part
   // again, so an earlier bind's cleanup leaves a newer bind's element.
   binding?: object
@@ -60,8 +64,14 @@ type PartOwner = {
   readonly label: string
   readonly slots: Record<string, AnySlot>
   // One record per part, by `slot:key`. Binding moves a part to the end, so
-  // `element(slot)` finds the part of a slot that bound first.
+  // `element(slot)` finds the part of a slot that bound first. Read in that
+  // order through `ordered`: a bind only ranks its part last.
   readonly parts: Map<string, PartRecord>
+  rank: number
+  unordered?: boolean
+  // The same records by slot, then key, which a render finds its part in
+  // without making `slot:key`.
+  readonly keyed: Map<string, Map<string, PartRecord>>
   // While the instance is asleep: what wakes it, and the binds that wait for it.
   sleeping?: { wake: () => void; binds: Set<() => void> }
   // A part stays while something leases it: its bound element or a
@@ -121,13 +131,9 @@ const context = (part: Part, props = part.props) =>
 // A part the sweep dropped while a framework kept it, like content Suspense
 // hid and shows again, comes back as it's leased.
 function lease(part: PartRecord) {
-  if (part.dropped) {
-    const { parts } = part.owner
-    const mapKey = `${part.slot}:${part.key}`
-    if (!parts.has(mapKey)) {
-      parts.set(mapKey, part)
-      part.dropped = false
-    }
+  if (part.dropped && !part.owner.parts.has(part.mapKey)) {
+    enlist(part)
+    part.dropped = false
   }
   part.leases++
   let held = true
@@ -159,13 +165,52 @@ function provisional(part: PartRecord) {
 
 function sweep(owner: PartOwner) {
   for (const part of owner.released) {
-    const mapKey = `${part.slot}:${part.key}`
-    if (!part.leases && owner.parts.get(mapKey) === part) {
-      owner.parts.delete(mapKey)
+    if (!part.leases && owner.parts.get(part.mapKey) === part) {
+      owner.parts.delete(part.mapKey)
+      owner.keyed.get(part.slot)?.delete(part.key)
       part.dropped = true
     }
   }
   owner.released = []
+}
+
+// The instance's parts in the order they joined and bound. Parts mostly bind
+// in the order they joined, which leaves them in order already.
+function ordered(owner: PartOwner) {
+  const { parts } = owner
+  if (owner.unordered) {
+    owner.unordered = false
+    let last = 0
+    let sorted = true
+    for (const part of parts.values()) {
+      if (part.rank! < last) {
+        sorted = false
+        break
+      }
+      last = part.rank!
+    }
+    if (!sorted) {
+      const all = [...parts.values()].sort((a, b) => a.rank! - b.rank!)
+      parts.clear()
+      for (const part of all) {
+        parts.set(part.mapKey, part)
+      }
+    }
+  }
+  return parts
+}
+
+// Adds a part to its instance's parts, last.
+function enlist(part: PartRecord) {
+  const { owner } = part
+  const { parts, keyed } = owner
+  part.rank = ++owner.rank
+  parts.set(part.mapKey, part)
+  let slot = keyed.get(part.slot)
+  if (!slot) {
+    keyed.set(part.slot, (slot = new Map()))
+  }
+  slot.set(part.key, part)
 }
 
 // Reads take the props to read with, so an adapter can compare against the
@@ -459,11 +504,13 @@ function canHide(part: Part) {
 /** Attaches behavior to an element. Leases the part while bound. Returns the cleanup. */
 function bind(part: Part, el: HTMLElement, host: Host = { by: "core" }) {
   const kept = part as PartRecord
-  const { parts } = kept.owner
-  const mapKey = `${part.slot}:${part.key}`
-  if (!part.el && (parts.get(mapKey) ?? kept) === kept) {
-    parts.delete(mapKey)
-    parts.set(mapKey, kept)
+  const { owner } = kept
+  const listed = part.el ? kept : owner.parts.get(kept.mapKey)
+  if (!listed) {
+    enlist(kept)
+  } else if (!part.el && listed === kept && kept.rank !== owner.rank) {
+    kept.rank = ++owner.rank
+    owner.unordered = true
   }
   if (dev) {
     checkShared(part, part.el, el)
@@ -758,10 +805,14 @@ function readIds(owner: PartOwner, store: Part["store"]) {
 }
 
 // Every bound element with an id is read once, so through the `id` property,
-// which needs no lookup by name. A form's `id` property is a control named
-// "id", so a form's comes from its attribute.
-const idOf = (el: HTMLElement) =>
-  el.localName === "form" ? el.getAttribute("id") : el.id
+// which needs no lookup by name. A form's `id` property can be a control named
+// "id", so then it comes from its attribute.
+function idOf(el: HTMLElement) {
+  const id: unknown = el.id
+  return id && typeof id === "object"
+    ? el.getAttribute("id")
+    : (id as string | undefined)
+}
 
 /**
  * Takes the id an author gives a part's element as the part renders, so the
@@ -829,6 +880,8 @@ export {
   madeLabel,
   onProps,
   type PartOwner,
+  enlist,
+  ordered,
   provisional,
   type PartRecord,
   partState,

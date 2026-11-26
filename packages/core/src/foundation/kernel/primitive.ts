@@ -19,6 +19,8 @@ import {
   withLifecycle,
 } from "./keep"
 import {
+  enlist,
+  ordered,
   propsRendered,
   provisional,
   type PartOwner,
@@ -189,6 +191,8 @@ function definePrimitive<
       label,
       slots: own,
       parts: new Map(),
+      keyed: new Map(),
+      rank: 0,
       released: [],
     }
     const { parts } = owner
@@ -214,15 +218,16 @@ function definePrimitive<
       rendering = false
     ) {
       const key = keyOf(props)
-      const mapKey = `${slot}:${key}`
-      let found = parts.get(mapKey)
+      let found = owner.keyed.get(slot)?.get(key)
       if (!found) {
+        const mapKey = `${slot}:${key}`
         // Read when used while the instance sleeps, since it builds its api
         // later. An object made with a getter costs ten times a plain one.
         found = owner.sleeping
           ? {
               slot,
               key,
+              mapKey,
               id,
               get api() {
                 return api
@@ -236,6 +241,7 @@ function definePrimitive<
           : {
               slot,
               key,
+              mapKey,
               id,
               api,
               store,
@@ -244,7 +250,7 @@ function definePrimitive<
               owner,
               leases: 0,
             }
-        parts.set(mapKey, found)
+        enlist(found)
         if (rendering) {
           provisional(found as PartRecord)
         }
@@ -260,7 +266,7 @@ function definePrimitive<
     // until its cleanup runs.
     function element(slot: Slot, key?: string) {
       if (key === undefined) {
-        for (const part of parts.values()) {
+        for (const part of ordered(owner).values()) {
           if (part.slot === slot && part.el?.isConnected) {
             return part.el
           }
@@ -278,7 +284,7 @@ function definePrimitive<
       options: () => options,
       onOptions: (listener) => optionsListeners.push(listener),
       onDestroy: (cleanup) => destroys.push(cleanup),
-      parts: () => parts.values(),
+      parts: () => ordered(owner).values(),
       element,
       props: (slot, key = "") => {
         const shown = viewedParts?.[slot]
