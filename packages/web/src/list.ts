@@ -55,12 +55,15 @@ function listAttribute(value: string) {
 
 // An item text part marks what it holds now, since marks keep the same text,
 // so its props come from it, never from attributes. Written empty, it shows
-// its item's label, like React's.
+// its item's label, like React's, found by tag: its value can be a property.
 const itemText = {
   context: (el: HTMLElement) => ({
     text:
       el.textContent ||
-      (el.parentElement?.closest("[value]")?.getAttribute("label") ?? ""),
+      (el.parentElement
+        ?.closest(el.localName.replace(/-text$/, ""))
+        ?.getAttribute("label") ??
+        ""),
     write: true,
   }),
   kinds: { text: null, write: null },

@@ -59,3 +59,15 @@ test.each([
     expect(Array.isArray(value) ? value[0] : value).toBe(plans[1])
   }
 )
+
+test("an empty item text shows the label of its item whose value is a property", async () => {
+  document.body.innerHTML = `<ui-combobox open><ui-combobox-input><input aria-label="Plan" /></ui-combobox-input><ui-combobox-content><ui-combobox-list><ui-combobox-item label="Hobby"><ui-combobox-item-text></ui-combobox-item-text></ui-combobox-item></ui-combobox-list></ui-combobox-content></ui-combobox>`
+  const item = document.querySelector("ui-combobox-item") as HTMLElement & {
+    value: unknown
+  }
+  item.value = "hobby"
+  await wait()
+  expect(document.querySelector("ui-combobox-item-text")!.textContent).toBe(
+    "Hobby"
+  )
+})
