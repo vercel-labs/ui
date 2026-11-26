@@ -28,12 +28,15 @@ import {
   yieldToAuthor,
 } from "@ui-sdk/core/renderer"
 import {
+  cloneVNode,
   computed,
   defineComponent,
+  Fragment,
   getCurrentInstance,
   h,
   hasInjectionContext,
   inject,
+  isVNode,
   normalizeClass,
   normalizeStyle,
   onMounted,
@@ -41,6 +44,7 @@ import {
   onUnmounted,
   provide,
   shallowRef,
+  Teleport,
   toRaw,
   useAttrs,
   useId,
@@ -54,6 +58,7 @@ import {
   type Slots,
   type SlotsType,
   type VNode,
+  type VNodeRef,
 } from "vue"
 import { slotContent } from "./children"
 import { useBindings } from "./lifecycle"
@@ -704,11 +709,17 @@ function renderElement(
     ? () => children(state)
     : () => slots.default?.({ state })
   if (slots.render) {
+    // `v-bind` keeps one ref per element, so the part's goes on the vnode the
+    // slot returns, beside a template ref of the app's own.
+    const { ref, ...slotProps } = props
     const rendered = slots.render({
-      props,
+      props: slotProps,
       state,
       children: contentOf(slots, own),
     })
+    if (ref) {
+      attachRef(rendered, ref as VNodeRef, props["data-slot"])
+    }
     if (hidden) {
       return [...rendered, hidden()]
     }
@@ -717,6 +728,34 @@ function renderElement(
   }
   const content = hidden ? () => [own(), hidden()] : own
   return h(tag, props, content() as never)
+}
+
+// Vnodes Vue reuses, like those under `v-memo`, keep the ref they got.
+const withPartRef = new WeakSet<VNode>()
+
+// The part's element is the one bound to its props, which a fragment or a
+// teleport can hold, like a slot passed on through another component's.
+function attachRef(rendered: VNode[], ref: VNodeRef, slot: unknown) {
+  const nodes: unknown[] = [...rendered]
+  while (nodes.length) {
+    const node = nodes.shift()
+    if (Array.isArray(node)) {
+      nodes.unshift(...node)
+    } else if (isVNode(node) && node.props?.["data-slot"] === slot) {
+      if (!withPartRef.has(node)) {
+        withPartRef.add(node)
+        // In place, so a block's dynamic children still patch this vnode.
+        node.ref = cloneVNode(node, { ref }, true).ref
+      }
+      return
+    } else if (
+      isVNode(node) &&
+      (node.type === Fragment || node.type === Teleport) &&
+      Array.isArray(node.children)
+    ) {
+      nodes.unshift(...node.children)
+    }
+  }
 }
 
 /**
