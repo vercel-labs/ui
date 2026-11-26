@@ -153,3 +153,34 @@ test("the part binds to its element inside a transition or another component's s
     document.body.replaceChildren()
   }
 })
+
+test("an item inside another component's slot follows a new value", async () => {
+  const picked = ref("apple")
+  const second = ref("pear")
+  const el = document.body.appendChild(document.createElement("div"))
+  app = createApp({
+    components: { Listbox, ListboxItem, Card },
+    setup: () => ({ picked, second }),
+    render: compile(`
+      <Listbox aria-label="Fruit" v-model:value="picked">
+        <ListboxItem value="apple">Apple</ListboxItem>
+        <ListboxItem :value="second">
+          <template #render="{ props }">
+            <Card><div v-bind="props">Second</div></Card>
+          </template>
+        </ListboxItem>
+      </Listbox>`),
+  })
+  app.mount(el)
+  await settle()
+  second.value = "plum"
+  await settle()
+  el.querySelector<HTMLElement>('[role="option"]')!.focus()
+  for (const key of ["ArrowDown", " "]) {
+    document.activeElement!.dispatchEvent(
+      new KeyboardEvent("keydown", { key, bubbles: true, cancelable: true })
+    )
+    await settle()
+  }
+  expect(picked.value).toBe("plum")
+})

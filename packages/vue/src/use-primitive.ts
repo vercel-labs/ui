@@ -740,16 +740,20 @@ const hooked = new WeakMap<RefFunction, unknown>()
 function vnodeHooks(ref: RefFunction) {
   let own = hooks.get(ref)
   if (!own) {
+    // Updated too, since a part's ref changes with its key, like an item's value.
+    const bind = (vnode: VNode) => {
+      if (
+        !withPartRef.has(vnode) &&
+        vnode.el?.nodeType === Node.ELEMENT_NODE &&
+        hooked.get(ref) !== vnode.el
+      ) {
+        hooked.set(ref, vnode.el)
+        ref(vnode.el)
+      }
+    }
     own = {
-      onVnodeMounted: (vnode: VNode) => {
-        if (
-          !withPartRef.has(vnode) &&
-          vnode.el?.nodeType === Node.ELEMENT_NODE
-        ) {
-          hooked.set(ref, vnode.el)
-          ref(vnode.el)
-        }
-      },
+      onVnodeMounted: bind,
+      onVnodeUpdated: bind,
       onVnodeUnmounted: (vnode: VNode) => {
         if (hooked.get(ref) === vnode.el) {
           hooked.delete(ref)
