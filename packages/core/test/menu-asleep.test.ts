@@ -36,11 +36,11 @@ describe("a closed menu", () => {
 
   test("runs its trigger's shortcut and its items' shortcuts while it sleeps", () => {
     const onAction = vi.fn()
-    const { instance, trigger } = closedMenu({
+    const { instance } = closedMenu({
       items: [{ value: "save", label: "Save", shortcut: "mod+s" }],
       onAction,
     })
-    trigger.props = { id: "file-trigger", shortcut: "mod+f" }
+    instance.part("trigger", { id: "file-trigger", shortcut: "mod+f" })
     const press = (key: string) =>
       document.dispatchEvent(
         new KeyboardEvent("keydown", {

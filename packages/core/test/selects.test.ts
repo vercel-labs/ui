@@ -158,6 +158,23 @@ describe("menu items select on the highlighted item and on their checked entry",
     expect(heard["open"]).toBe(loud.length + 1)
     expect(heard["close"]).toBe(loud.length + 2)
   })
+
+  test("the trigger drops aria-controls once an animated close unmounts the content", async () => {
+    const instance = menu({ id: "m-exit" })
+    const trigger = instance.part("trigger")
+    const heard = await expectNoMissedUpdates(
+      instance,
+      [
+        { slot: "trigger", props: {} },
+        { slot: "content", props: {} },
+      ],
+      [
+        ["exiting", () => trigger.store.set({ mounted: true })],
+        ["finish exit", () => trigger.store.set({ mounted: false })],
+      ]
+    )
+    expect(heard["finish exit"]).toBe(2)
+  })
 })
 
 // The lists built on the listbox engine. Their items select on the highlight.

@@ -19,6 +19,7 @@ import {
   withLifecycle,
 } from "./keep"
 import {
+  AsleepPart,
   enlist,
   ordered,
   propsRendered,
@@ -172,16 +173,18 @@ function definePrimitive<
       checkControlled(from, controlled, options)
     }
 
-    const own: Record<string, AnySlot> = Object.create(
-      dev ? warnMissing(slots, from) : slots
-    )
-    const used = new Set<Feature>()
+    const baseSlots = dev ? warnMissing(slots, from) : slots
+    let used: Set<Feature> | undefined
     function use(feature: Feature<Api>) {
-      if (used.has(feature)) {
+      if (used?.has(feature)) {
         return
       }
+      if (!used) {
+        used = new Set()
+        owner.slots = Object.create(baseSlots)
+      }
       used.add(feature)
-      Object.assign(own, feature.slots)
+      Object.assign(owner.slots, feature.slots)
       wake()
       feature.extend?.(api)
     }
@@ -189,7 +192,7 @@ function definePrimitive<
     const owner: PartOwner = {
       name,
       label,
-      slots: own,
+      slots: baseSlots,
       parts: new Map(),
       keyed: new Map(),
       rank: 0,
@@ -221,23 +224,8 @@ function definePrimitive<
       let found = owner.keyed.get(slot)?.get(key)
       if (!found) {
         const mapKey = `${slot}:${key}`
-        // Read when used while the instance sleeps, since it builds its api
-        // later. An object made with a getter costs ten times a plain one.
         found = owner.sleeping
-          ? {
-              slot,
-              key,
-              mapKey,
-              id,
-              get api() {
-                return api
-              },
-              store,
-              props,
-              el: undefined,
-              owner,
-              leases: 0,
-            }
+          ? new AsleepPart(slot, key, mapKey, id, store, props, owner)
           : {
               slot,
               key,
@@ -296,6 +284,7 @@ function definePrimitive<
     let api = undefined as unknown as Api
     function build() {
       api = definition.api(context)
+      owner.api = api
       connectController(context, api)
       if (dev) {
         for (const action of definition.agent?.actions ?? []) {

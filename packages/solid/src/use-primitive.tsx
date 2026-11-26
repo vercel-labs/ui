@@ -288,14 +288,9 @@ function claim(entry: Tracked, props: () => unknown) {
   }
 }
 
-// Subscribes a part once, and keeps it for as long as any scope renders it.
-// A scope that re-runs, like a `Show` condition, releases and takes the part
-// again. Parts live under a root of their own, made now: a part first tracked
-// later, from a children effect, must not take a child index under the
-// component, or the elements made after it would hydrate against the wrong
-// server keys.
-function createTracker(instance: ReturnType<Primitive>) {
-  const owner = createRoot(() => getOwner())
+// Subscribes a part once for as long as any scope renders it. Parts hang off
+// an owner made in the component body so lazy scopes never shift hydration ids.
+function createTracker(instance: ReturnType<Primitive>, owner: Owner | null) {
   const entries = new Map<Part, Tracked>()
   return (name: string, props: () => unknown) => {
     const part = untrack(() => instance.part(name, props()))
@@ -815,25 +810,57 @@ function usePrimitive<P extends Primitive>(
   // `open`, from here: a read sees it in the same flush as the app's own
   // signals, before the effect below hands it over.
   const delivered = instance.follow(() => untrack(current))
-  // What the props changed in it, by the names parts read it by
-  // (`followed`), so a part reruns only for its own: a value moving between
-  // two of 500 items reruns two. Both sides read the state held now, so
-  // parts hear from the store what state changed since.
-  let before: ReturnType<typeof current> | undefined
-  const marks = createProjection<Record<string, number>>((draft) => {
-    const next = current()
-    // Nothing has read a name before the first run.
-    if (before) {
-      touched(delivered(undefined, before), delivered(), (name) => {
-        draft[name] = (draft[name] ?? 0) + 1
-      })
+  // Shared root created in the body so lazy projections and part scopes never
+  // take child hydration ids from the component itself.
+  const lazyOwner = createRoot(() => getOwner())
+  // Tracks delivered keys finely via a projection, but waits until a part
+  // reads a delivered key so uncontrolled components track only key changes.
+  const syncedKeys = createMemo(() => {
+    current()
+    const synced = delivered()
+    if (!synced) {
+      return ""
     }
-    before = next
-  }, {})
+    let keys = ""
+    for (const key in synced) {
+      keys += `${key}\0`
+    }
+    return keys
+  })
+  let marks: Record<string, number> | undefined
+  const getMarks = () => {
+    if (marks) {
+      return marks
+    }
+    const created = untrack(() =>
+      runWithOwner(lazyOwner, () => {
+        let before: ReturnType<typeof current> | undefined
+        return createProjection<Record<string, number>>((draft) => {
+          const next = current()
+          // Nothing has read a name before the first run.
+          if (before) {
+            touched(delivered(undefined, before), delivered(), (name) => {
+              draft[name] = (draft[name] ?? 0) + 1
+            })
+          }
+          before = next
+        }, {})
+      })
+    )!
+    marks = created
+    return created
+  }
   deliveries.set(instance, {
     track(part) {
-      for (const name of followed(part, untrack(delivered), part.props)) {
-        void marks[name]
+      const synced = untrack(delivered)
+      const names = followed(part, synced, part.props)
+      if (names.length === 1) {
+        syncedKeys()
+        return
+      }
+      const active = getMarks()
+      for (const name of names) {
+        void active[name]
       }
     },
     slots: primitive.slots as
@@ -853,7 +880,7 @@ function usePrimitive<P extends Primitive>(
     },
     { name: "options" }
   )
-  const track = createTracker(instance)
+  const track = createTracker(instance, lazyOwner)
   trackers.set(instance, track)
 
   const handle: PrimitiveHandle<P> = {

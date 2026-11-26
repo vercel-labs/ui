@@ -14,6 +14,8 @@ import {
 } from "../src/trigger-menu"
 import { Tree } from "../src/tree"
 
+Element.prototype.scrollIntoView ??= () => {}
+
 let dispose = () => {}
 
 function mount(code: () => any) {
@@ -292,5 +294,33 @@ describe("a data list changed in place", () => {
     press("ArrowDown")
     await settle()
     expect(label(document.activeElement)).toBe("Two")
+  })
+
+  test("a closed data menu renders its items only while open and disposes them on close", async () => {
+    mount(() => (
+      <Menu
+        items={[
+          { value: "a", label: "Alpha" },
+          { value: "b", label: "Beta" },
+        ]}
+      >
+        <MenuTrigger>Open</MenuTrigger>
+      </Menu>
+    ))
+    await settle()
+    expect(document.querySelector('[role="menuitem"]')).toBeNull()
+    const trigger = document.querySelector("button")!
+    trigger.click()
+    await settle()
+    const first = rowNamed("menuitem", "Alpha")
+    expect(first).toBeDefined()
+    trigger.click()
+    await settle()
+    expect(document.querySelector('[role="menuitem"]')).toBeNull()
+    trigger.click()
+    await settle()
+    const second = rowNamed("menuitem", "Alpha")
+    expect(second).toBeDefined()
+    expect(second).not.toBe(first)
   })
 })

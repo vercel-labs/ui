@@ -184,6 +184,9 @@ function selects<State extends object, Api, Props>(
     subscribe(part: Part<State, Api, Props>, listener: Listener, props: Props) {
       const { store } = part
       const leaveSkipping = subscribeSkipping(store, reads, listener)
+      if (!narrowing.length) {
+        return leaveSkipping
+      }
       const narrowed = narrowedOf(store)
       const joined = selected(part, props)
       for (const [key, values] of joined) {

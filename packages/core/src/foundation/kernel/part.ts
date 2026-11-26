@@ -60,7 +60,8 @@ type PartOwner = {
   readonly name: string
   // What warnings call the component.
   readonly label: string
-  readonly slots: Record<string, AnySlot>
+  slots: Record<string, AnySlot>
+  api?: unknown
   // One record per part, by `slot:key`. Binding moves a part to the end, so
   // `element(slot)` finds the part of a slot that bound first. Read in that
   // order through `ordered`: a bind only ranks its part last.
@@ -93,33 +94,90 @@ const viewed = Symbol()
 // Every part an adapter holds came from `instance.part()`, which makes a record.
 const ownerOf = (part: Part) => (part as PartRecord).owner
 const definitionOf = (part: Part) => ownerOf(part).slots[part.slot]
+
+// Prototype getters avoid per-object `DefineGetterProperty` overhead while an instance sleeps.
+class AsleepPart implements PartRecord {
+  readonly slot: string
+  readonly key: string
+  readonly mapKey: string
+  readonly id: string
+  readonly store: Part["store"]
+  props: Part["props"]
+  el: HTMLElement | undefined = undefined
+  readonly owner: PartOwner
+  leases = 0
+  constructor(
+    slot: string,
+    key: string,
+    mapKey: string,
+    id: string,
+    store: Part["store"],
+    props: Part["props"],
+    owner: PartOwner
+  ) {
+    this.slot = slot
+    this.key = key
+    this.mapKey = mapKey
+    this.id = id
+    this.store = store
+    this.props = props
+    this.owner = owner
+  }
+  get api() {
+    return this.owner.api
+  }
+}
+
+class AsleepView<Props> {
+  readonly id: string
+  readonly key: string
+  readonly props: Props
+  readonly [viewed]: PartRecord
+  constructor(part: PartRecord, props: Props) {
+    this.id = part.id
+    this.key = part.key
+    this.props = props
+    this[viewed] = part
+  }
+  get api() {
+    return awake(this[viewed])
+  }
+}
+
+class AsleepContext {
+  readonly el: HTMLElement | undefined
+  readonly id: string
+  readonly key: string
+  readonly props: Part["props"]
+  readonly store: Part["store"]
+  #part: Part
+  constructor(part: Part, props: Part["props"]) {
+    this.el = part.el
+    this.id = part.id
+    this.key = part.key
+    this.props = props
+    this.store = part.store
+    this.#part = part
+  }
+  get api() {
+    return awake(this.#part)
+  }
+}
+
 // What pure reads see of a part: no element and no store. Reading the api
 // wakes an instance that sleeps, so a part that can render asleep reads none.
-// Only then is it a getter: an object made with one costs ten times a plain one.
 const view = <Api, Props>(part: Part<any, Api>, props: Props) =>
   ownerOf(part).sleeping
-    ? {
-        id: part.id,
-        key: part.key,
-        props,
-        get api() {
-          return awake(part)
-        },
-        [viewed]: part as PartRecord,
-      }
+    ? (new AsleepView(part as PartRecord, props) as unknown as {
+        id: string
+        key: string
+        props: Props
+        api: Api
+      })
     : { id: part.id, key: part.key, props, api: part.api }
 const context = (part: Part, props = part.props) =>
   ownerOf(part).sleeping
-    ? {
-        el: part.el,
-        id: part.id,
-        key: part.key,
-        props,
-        store: part.store,
-        get api() {
-          return awake(part)
-        },
-      }
+    ? new AsleepContext(part, props)
     : {
         el: part.el,
         id: part.id,
@@ -334,6 +392,8 @@ const directNames = (part: Part) => definitionOf(part).direct?.names
 const selectedKeys = (part: Part, props = part.props) =>
   definitionOf(part).selects?.selection(part, props) ?? ""
 
+const onlyKeys = ["#keys"]
+
 /**
  * The names a part reads `synced` by, the state a framework delivers through
  * `instance.follow`: a key's name for a key it reads whole, and `key:value`
@@ -342,19 +402,23 @@ const selectedKeys = (part: Part, props = part.props) =>
  * when a key starts or stops being delivered.
  */
 function followed(part: Part, synced: object | undefined, props = part.props) {
-  const names = ["#keys"]
+  if (!synced) {
+    return onlyKeys
+  }
+  let names: string[] | undefined
   const narrowed = definitionOf(part).selects
   for (const key in synced) {
     const values = narrowed?.reading(part, props, key)
     if (!values) {
-      names.push(key)
-    } else {
+      ;(names ??= ["#keys"]).push(key)
+    } else if (values.length) {
+      names ??= ["#keys"]
       for (const value of values) {
         names.push(`${key}:${value}`)
       }
     }
   }
-  return names
+  return names ?? onlyKeys
 }
 
 /**
@@ -905,6 +969,7 @@ function ignoredKey(event: Event) {
 }
 
 export {
+  AsleepPart,
   aliasReferences,
   attrs,
   authorOwned,

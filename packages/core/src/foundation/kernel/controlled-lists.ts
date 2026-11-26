@@ -102,11 +102,16 @@ function trackList(list: readonly unknown[], memo: Memo) {
  */
 function createListSnapshots(primitive: Primitive, memo: Memo) {
   const keys = keysOf(primitive)
-  const snapshots: Record<string, unknown[]> = {}
-  const trackers: Record<
-    string,
-    { list: readonly unknown[]; handed: () => readonly unknown[] }
-  > = {}
+  if (!keys.controlled.length && !keys.data.length) {
+    return <Options extends object>(options: Options) => options
+  }
+  let snapshots: Record<string, unknown[]> | undefined
+  let trackers:
+    | Record<
+        string,
+        { list: readonly unknown[]; handed: () => readonly unknown[] }
+      >
+    | undefined
   return <Options extends object>(options: Options) => {
     // Options are read by key, whatever primitive they're for.
     const given = options as Record<string, unknown>
@@ -119,6 +124,7 @@ function createListSnapshots(primitive: Primitive, memo: Memo) {
       // Copied before comparing: a Vue `reactive` array then tracks one
       // dependency for its items, not one per index.
       const items = [...list]
+      snapshots ??= {}
       let snapshot = snapshots[key]
       if (!snapshot || !sameValue(snapshot, items)) {
         snapshots[key] = snapshot = items
@@ -129,9 +135,12 @@ function createListSnapshots(primitive: Primitive, memo: Memo) {
     for (const key of keys.data) {
       const list = given[key]
       if (!Array.isArray(list)) {
-        delete trackers[key]
+        if (trackers && key in trackers) {
+          delete trackers[key]
+        }
         continue
       }
+      trackers ??= {}
       let tracker = trackers[key]
       if (tracker?.list !== list) {
         trackers[key] = tracker = { list, handed: trackList(list, memo) }

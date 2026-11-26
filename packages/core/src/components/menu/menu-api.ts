@@ -290,44 +290,50 @@ function bindItemShortcuts(
   run: (value: string, event?: Event) => unknown
 ) {
   let bound: MenuData | undefined
-  let offs: (() => void)[] = []
-  // Pending and failing like a press on the item. `onAction` hears no event,
-  // since the key press happened outside the menu.
-  const runShortcut = (value: string) => {
-    const key = `shortcut:${value}`
-    if (store.get().pending.includes(key)) {
-      return
-    }
-    if (store.get().error?.key === key) {
-      store.set({ error: null })
-    }
-    const result = run(value)
-    if (isPromise(result)) {
-      wait(store, key, result, () => {})
-    }
-  }
+  let offs: (() => void)[] | undefined
   const sync = () => {
     const { shortcutItems } = store.get()
     if (shortcutItems === bound) {
       return
     }
     bound = shortcutItems
-    offs.forEach((off) => off())
-    offs = []
+    if (offs) {
+      offs.forEach((off) => off())
+      offs = undefined
+    }
     if (!shortcutItems) {
       return
     }
+    // Pending and failing like a press on the item. `onAction` hears no event,
+    // since the key press happened outside the menu.
+    const runShortcut = (value: string) => {
+      const key = `shortcut:${value}`
+      if (store.get().pending.includes(key)) {
+        return
+      }
+      if (store.get().error?.key === key) {
+        store.set({ error: null })
+      }
+      const result = run(value)
+      if (isPromise(result)) {
+        wait(store, key, result, () => {})
+      }
+    }
+    const registered: (() => void)[] = []
     eachShortcut(shortcutItems, (value, shortcut) =>
-      offs.push(
+      registered.push(
         shortcutManager.register(shortcut, () => runShortcut(value), { layer })
       )
     )
+    if (registered.length) {
+      offs = registered
+    }
   }
   sync()
   const unsubscribe = store.subscribe(sync)
   return () => {
     unsubscribe()
-    offs.forEach((off) => off())
+    offs?.forEach((off) => off())
   }
 }
 
