@@ -33,6 +33,7 @@ import {
   placeOf,
   remember,
   retire,
+  shownParts,
   stateKeys,
   type Bound,
   type Entry,
@@ -462,11 +463,16 @@ function buttonsOf(parts: Bound[]) {
       "button, [role=button], [role^=menuitem]"
     ),
   ])
+  // A web popup's root holds its trigger, which `setOpen` covers. A
+  // disclosure's trigger, like a collapsible's, stays one of its buttons.
+  const popup = parts.some((part) => part.slot === "content")
+  const triggers = popup ? parts.filter((part) => part.slot === "trigger") : []
   return [...new Set([...toastButtons(parts), ...inside])]
     .filter(
       (el) =>
         el.checkVisibility?.(visible) !== false &&
-        !el.closest("[inert], [data-agent-hidden]")
+        !el.closest("[inert], [data-agent-hidden]") &&
+        !triggers.some((part) => part.el.contains(el))
     )
     .sort(documentOrder)
 }
@@ -803,7 +809,7 @@ function describe(entry: Entry, instance: PrimitiveInstance, parts: Bound[]) {
       out.more = data.length
     }
   }
-  const text = parts
+  const text = shownParts(parts)
     .filter((part) => /title|description|error/.test(part.slot))
     .map((part) =>
       entry.secret && /error/.test(part.slot) ? "[redacted]" : textOf(part.el)
