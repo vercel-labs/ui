@@ -86,9 +86,9 @@ type RovingFocusOptions<State extends object, Props = any> = {
   onItemsChange?: () => void
 }
 
-// Each bound item's way to find its group's stop. The stop moves in the store
-// before a framework renders its new `tabindex`, so a popup that picks focus
-// in between asks here instead of reading the page.
+// Each bound item's way to find its group's stop. The stop can move before a
+// framework renders its new `tabindex`, so a popup that picks focus in between
+// asks the group's rules here instead of reading the page.
 const stops = new WeakMap<Element, () => HTMLElement | undefined>()
 
 /** The element with the stop in the roving group `el` is an item of, if it's bound. */
@@ -335,7 +335,7 @@ function createRovingFocus<State extends object, Props = any>(
       el.addEventListener("focus", focused)
       el.addEventListener("blur", blurred)
       stops.set(el, () => {
-        const stop = store.get()[key]
+        const stop = stopFor() ?? store.get()[key]
         return order.list().find((item) => item.part.key === stop)?.el
       })
       // An item disabled, enabled or preferred after it joined, like a radio
