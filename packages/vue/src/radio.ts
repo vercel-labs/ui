@@ -38,9 +38,7 @@ const GroupFieldKey: InjectionKey<FieldContext | null> =
 
 // Generic over the value, like React's `RadioGroup<T>`: `v-model` and
 // `@value-change` share `T`.
-type RadioGroupProps<T extends string> = RadioGroupOptions<T> & {
-  debug?: boolean
-}
+type RadioGroupProps<T extends string> = RadioGroupOptions<T>
 type RadioGroupComponent = {
   new <T extends string = string>(
     props: RootPropsOf<RadioGroupProps<T>, "div">

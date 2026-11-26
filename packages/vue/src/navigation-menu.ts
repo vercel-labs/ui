@@ -88,13 +88,11 @@ const placementProps = {
 
 // Generic over the value, like React's `NavigationMenu<T>`: `v-model` and
 // `@value-change` share `T`.
-type NavigationMenuProps<T extends string> = NavigationMenuOptions<T> & {
-  debug?: boolean
-}
+type NavigationMenuProps<T extends string> = NavigationMenuOptions<T>
 type NavigationMenuComponent = {
   new <T extends string = string>(
     props: RootPropsOf<NavigationMenuProps<T>, "nav">
-  ): RootInstanceOf<NavigationMenuProps<T>, NavigationMenuState, "nav">
+  ): RootInstanceOf<NavigationMenuProps<T>, NavigationMenuState<T>, "nav">
 } & RenderableWith<NavigationMenuProps<string>, NavigationMenuState, "nav">
 
 /**

@@ -31,9 +31,7 @@ const parts = createParts(segmentedControl, { indicator: "span" })
 
 // Generic over the value, like React's `SegmentedControl<T>`: `v-model` and
 // `@value-change` share `T`.
-type SegmentedControlProps<T extends string> = SegmentedControlOptions<T> & {
-  debug?: boolean
-}
+type SegmentedControlProps<T extends string> = SegmentedControlOptions<T>
 type SegmentedControlComponent = {
   new <T extends string = string>(
     props: RootPropsOf<SegmentedControlProps<T>, "div">
