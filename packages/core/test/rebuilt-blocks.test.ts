@@ -677,6 +677,22 @@ describe("createStickToBottom", () => {
       expect(el.scrollTop).toBe(400)
     })
   })
+
+  test("prepend while a change is still unmeasured keeps the distance it last measured", () => {
+    let content = 500
+    const el = scroller(100, () => content)
+    const log = createStickToBottom({ initial: false })
+    cleanups.push(log.connect(el))
+    el.scrollTop = 100
+    el.dispatchEvent(new Event("scroll"))
+    content = 520
+    log.prepend()
+    content = 820
+    el.append(document.createElement("p"))
+    return Promise.resolve().then(() => {
+      expect(el.scrollTop).toBe(420)
+    })
+  })
 })
 
 describe("createTransfer", () => {
