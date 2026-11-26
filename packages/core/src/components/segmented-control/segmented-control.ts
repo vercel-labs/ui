@@ -156,6 +156,15 @@ type SegmentedControlItemState = {
 }
 
 /**
+ * Props of the indicator.
+ * @experimental
+ */
+type SegmentedControlIndicatorProps = {
+  /** Whether it follows the item under the pointer, and goes back to the checked one when the pointer leaves the control. */
+  followHover?: boolean
+}
+
+/**
  * The state the `indicator` slot of `segmentedControl` hands `render`
  * functions and state-based class names.
  * @experimental
@@ -233,8 +242,12 @@ const segmentedControlPrimitive = /* @__PURE__ */ definePrimitive({
       root: group,
       item,
       input,
-      indicator: slot<{}, SegmentedControlIndicatorState>({
+      indicator: slot<
+        SegmentedControlIndicatorProps,
+        SegmentedControlIndicatorState
+      >({
         role: "presentation",
+        props: { followHover: "boolean" },
         state: (state) => ({
           value: state.value,
           orientation: state.orientation ?? "horizontal",
@@ -244,13 +257,15 @@ const segmentedControlPrimitive = /* @__PURE__ */ definePrimitive({
           "data-orientation": state.orientation,
           "data-activation-direction": state.direction ?? "none",
         }),
-        bind(el, { api, store }) {
+        bind(el, part) {
+          const { api, store } = part
           let value = store.get().value
           const rect = (key: string | null) =>
             key === null
               ? undefined
               : api.internal.radio(key)?.getBoundingClientRect()
           return bindIndicator({
+            followHover: () => !!part.props.followHover,
             list: () => api.internal.group() ?? el.parentElement,
             active: () => {
               const { value } = store.get()
@@ -287,6 +302,7 @@ const segmentedControlPrimitive = /* @__PURE__ */ definePrimitive({
                   )
                 }
               }
+              el.toggleAttribute("data-visible", box !== undefined)
             },
           })
         },
@@ -321,6 +337,7 @@ export {
   type SegmentedControlChangeOptions,
   type SegmentedControlController,
   type SegmentedControlDirection,
+  type SegmentedControlIndicatorProps,
   type SegmentedControlIndicatorState,
   type SegmentedControlItemProps,
   type SegmentedControlItemState,

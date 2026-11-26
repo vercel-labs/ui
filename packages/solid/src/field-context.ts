@@ -83,17 +83,25 @@ function joinField(
   if (!field) {
     return props
   }
-  const render = untrack(() => props.render)
+  let last: unknown
+  let joined: ((merged: Record<string, any>, state: unknown) => any) | undefined
   return merge(props, {
-    render: (merged: Record<string, any>, state: unknown) => {
-      const joined = field.props(merged)
-      if (typeof render === "function") {
-        return render(joined, state)
+    get render() {
+      const render = props.render
+      if (!joined || render !== last) {
+        last = render
+        joined = (merged: Record<string, any>, state: unknown) => {
+          const element = field.props(merged)
+          if (typeof render === "function") {
+            return render(element, state)
+          }
+          return createComponent(
+            dynamic(() => tag),
+            element
+          )
+        }
       }
-      return createComponent(
-        dynamic(() => tag),
-        joined
-      )
+      return joined
     },
   })
 }

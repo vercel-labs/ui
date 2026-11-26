@@ -168,6 +168,19 @@ test.describe("keyboard navigation", () => {
     await expect(panelNamed(page, "Account")).toBeVisible()
   })
 
+  test("ArrowRight and ArrowLeft skip tabs the page hides", async ({
+    page,
+  }) => {
+    await tabNamed(page, "Password").evaluate((el) =>
+      el.setAttribute("hidden", "")
+    )
+    await page.keyboard.press("ArrowRight")
+    await expect(tabNamed(page, "Billing")).toBeFocused()
+    await page.keyboard.press("ArrowLeft")
+    await expect(tabNamed(page, "Account")).toBeFocused()
+    await expect(panelNamed(page, "Account")).toBeVisible()
+  })
+
   test("disabled tabs are focusable but never selected", async ({ page }) => {
     await page.keyboard.press("ArrowRight")
     await expect(tabNamed(page, "Password")).toBeFocused()
@@ -262,6 +275,29 @@ test.describe("manual activation", () => {
     await page.getByRole("button", { name: "Before" }).focus()
     await tab()
     await expect(tabNamed(page, "Account")).toBeFocused()
+  })
+
+  test("Tab leaves the list from a focused tab before the selected one", async ({
+    page,
+    tab,
+  }) => {
+    await tabNamed(page, "Password").click()
+    await page.keyboard.press("ArrowLeft")
+    await expect(tabNamed(page, "Account")).toBeFocused()
+    await tab()
+    await expect(
+      page.getByRole("textbox", { name: "Current password" })
+    ).toBeFocused()
+  })
+
+  test("Shift+Tab leaves the list from a focused tab after the selected one", async ({
+    page,
+    tab,
+  }) => {
+    await page.keyboard.press("ArrowRight")
+    await expect(tabNamed(page, "Password")).toBeFocused()
+    await tab({ shift: true })
+    await expect(page.getByRole("button", { name: "Before" })).toBeFocused()
   })
 
   test("arrow keys move focus without selecting", async ({ page }) => {
@@ -406,10 +442,103 @@ test.describe("indicator", () => {
     await expect.poll(() => coversTab(page, "Account")).toBe(true)
   })
 
+  test("with followHover, the indicator follows the hovered tab and goes back when the pointer leaves", async ({
+    page,
+    open,
+  }) => {
+    await open("tabs", { "follow-hover": "" })
+    await expect.poll(() => coversTab(page, "Account")).toBe(true)
+    await tabNamed(page, "Notifications").hover()
+    await expect.poll(() => coversTab(page, "Notifications")).toBe(true)
+    await page.mouse.move(0, 0)
+    await expect.poll(() => coversTab(page, "Account")).toBe(true)
+  })
+
+  test("with followHover, the indicator goes back to the selected tab when the hovered one is removed", async ({
+    page,
+    open,
+  }) => {
+    await open("tabs", { "follow-hover": "" })
+    await tabNamed(page, "Notifications").hover()
+    await expect.poll(() => coversTab(page, "Notifications")).toBe(true)
+    await tabNamed(page, "Notifications").evaluate((tab) =>
+      (tab.closest("ui-tabs-tab") ?? tab).remove()
+    )
+    await expect.poll(() => coversTab(page, "Account")).toBe(true)
+  })
+
+  test("the indicator's far edges stay exact when the list has a fractional width", async ({
+    page,
+    open,
+  }) => {
+    await open("tabs")
+    const list = page.getByRole("tablist")
+    await list.evaluate((el) => {
+      el.style.width = "371.5px"
+    })
+    const gap = () =>
+      list.evaluate((el) => {
+        const style = getComputedStyle(el)
+        const indicator = getComputedStyle(el.querySelector(".indicator")!)
+        const read = (name: string) =>
+          parseFloat(indicator.getPropertyValue(`--active-tab-${name}`))
+        const inner =
+          el.getBoundingClientRect().width -
+          parseFloat(style.borderLeftWidth) -
+          parseFloat(style.borderRightWidth)
+        return Math.abs(inner - read("left") - read("width") - read("right"))
+      })
+    await expect.poll(gap).toBeLessThan(0.01)
+  })
+
+  for (const [boxSizing, overflow] of [
+    ["border-box", "hidden"],
+    ["content-box", "auto"],
+  ]) {
+    test(`the indicator's far edges leave out a reserved scrollbar gutter (${boxSizing}, overflow ${overflow})`, async ({
+      page,
+      open,
+    }) => {
+      await open("tabs")
+      const list = page.getByRole("tablist")
+      await list.evaluate(
+        (el, style) => {
+          Object.assign(el.style, style, {
+            width: "571.5px",
+            scrollbarGutter: "stable",
+          })
+        },
+        { boxSizing, overflow }
+      )
+      const gap = () =>
+        list.evaluate((el) => {
+          const indicator = getComputedStyle(el.querySelector(".indicator")!)
+          const read = (name: string) =>
+            parseFloat(indicator.getPropertyValue(`--active-tab-${name}`))
+          return Math.abs(
+            el.scrollWidth - read("left") - read("width") - read("right")
+          )
+        })
+      await expect.poll(gap).toBeLessThanOrEqual(0.5)
+    })
+  }
+
   test("the indicator follows the selection", async ({ page, open }) => {
     await open("tabs")
     await tabNamed(page, "Notifications").click()
     await expect.poll(() => coversTab(page, "Notifications")).toBe(true)
+  })
+
+  test("the indicator keeps data-visible as the selection moves", async ({
+    page,
+    open,
+  }) => {
+    await open("tabs")
+    const indicator = page.locator('[data-slot="tabs-indicator"]')
+    await expect(indicator).toHaveAttribute("data-visible", "")
+    await tabNamed(page, "Notifications").click()
+    await expect.poll(() => coversTab(page, "Notifications")).toBe(true)
+    await expect(indicator).toHaveAttribute("data-visible", "")
   })
 
   test("the first move animates when styles skip transitions for the first placement", async ({

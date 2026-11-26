@@ -179,7 +179,12 @@ function createRovingFocus<State extends object, Props = any>(
       focusable: isFocusable(part),
       preferred: preferred(part),
     }))
-    return rovingStop(candidates, remembered)
+    // While focus is in a group that doesn't remember, the stop stays on the
+    // focused item, so Tab leaves the group instead of stopping on the preferred one.
+    const held = remember
+      ? remembered
+      : (list.find(({ el }) => el === holder)?.part.key ?? null)
+    return rovingStop(candidates, held)
   }
 
   // Moves the stop to where the group's rules put it now.
@@ -312,6 +317,9 @@ function createRovingFocus<State extends object, Props = any>(
       const blurred = () => {
         if (holder === el) {
           holder = null
+          if (!remember) {
+            queue(false)
+          }
         }
       }
       el.addEventListener("focus", focused)

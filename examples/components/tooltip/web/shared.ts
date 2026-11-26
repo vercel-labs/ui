@@ -15,7 +15,7 @@ function mount(root: HTMLElement) {
       ${formats
         .map(
           (format) => `
-            <ui-tooltip-trigger for="${id}">
+            <ui-tooltip-trigger for="${id}" payload="${format.label}">
               <button aria-label="${format.label}">${createElement(format.icon, { "aria-hidden": "true" }).outerHTML}</button>
             </ui-tooltip-trigger>
           `
@@ -26,9 +26,6 @@ function mount(root: HTMLElement) {
       </ui-tooltip>
     </div>
   `
-  root.querySelectorAll("ui-tooltip-trigger").forEach((trigger, index) => {
-    trigger.payload = formats[index].label
-  })
   const tooltip = root.querySelector<UiTooltipElement<string>>("ui-tooltip")!
   const content = root.querySelector("ui-tooltip-content")!
   tooltip.addEventListener("payloadchange", (event) => {

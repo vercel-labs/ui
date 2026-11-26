@@ -520,7 +520,9 @@ function slotProps(
       return attrs()[key]
     }
     // A key only the user passed never tracks the attributes.
-    return key in user || key === "children" ? user[key] : attrs()[key]
+    return key in user || key === "children" || key === "render"
+      ? user[key]
+      : attrs()[key]
   }
   const get = element
     ? (key: string) =>
@@ -1023,24 +1025,36 @@ function renderElement(
   attrs: () => Record<string, unknown>,
   state: unknown
 ) {
-  const render = untrack(() => user.render)
-  // Lazy on the server for the same reason as a part's attributes: the render
-  // function reads them.
-  if (typeof render === "function") {
-    const props = slotProps(user, own, attrs, state)
-    return createMemo(() => render(props, state), {
-      lazy: isServer,
-    }) as unknown as JSX.Element
+  const make = (render: unknown) => {
+    // Lazy on the server for the same reason as a part's attributes: the
+    // render function reads them.
+    if (typeof render === "function") {
+      const props = slotProps(user, own, attrs, state)
+      return createMemo(() => render(props, state), {
+        lazy: isServer,
+      }) as unknown as JSX.Element
+    }
+    if (
+      isServer ||
+      isHydrating() ||
+      untrack(() => user.is ?? user.xmlns) != null
+    ) {
+      const Tag = elementOf(tag)
+      return <Tag {...slotProps(user, own, attrs, state)} />
+    }
+    return createElement(tag, user, own, attrs, state)
   }
-  if (
-    isServer ||
-    isHydrating() ||
-    untrack(() => user.is ?? user.xmlns) != null
-  ) {
-    const Tag = elementOf(tag)
-    return <Tag {...slotProps(user, own, attrs, state)} />
+  // A `render` that can't change needs nothing to follow it. Untracked for the
+  // same reason as the children above.
+  if (untrack(() => isStatic(user, "render"))) {
+    return make(untrack(() => user.render))
   }
-  return createElement(tag, user, own, attrs, state)
+  // The getter reads more than `render`, so the same function keeps its element.
+  const render = createMemo(() => user.render)
+  return createMemo(() => {
+    const current = render()
+    return untrack(() => make(current))
+  }) as unknown as JSX.Element
 }
 
 // A `render` for a part whose element follows its props, like a link or a

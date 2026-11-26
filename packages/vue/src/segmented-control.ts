@@ -2,11 +2,19 @@ import type { ChangeDetails } from "@ui-sdk/core"
 import {
   segmentedControl,
   type SegmentedControlController,
+  type SegmentedControlOptions,
+  type SegmentedControlState,
   type SegmentedControlOrientation,
   type SegmentedControlValueChangeReason,
 } from "@ui-sdk/core/segmented-control"
 import { defineComponent, h, type PropType } from "vue"
-import { createParts, withElement } from "./create-parts"
+import {
+  createParts,
+  withElement,
+  type RenderableWith,
+  type RootInstanceOf,
+  type RootPropsOf,
+} from "./create-parts"
 import { useFieldControl } from "./field-context"
 import { readOnlyOf } from "./text-control"
 import {
@@ -20,6 +28,15 @@ import {
 } from "./use-primitive"
 
 const parts = createParts(segmentedControl, { indicator: "span" })
+
+// Generic over the value, like React's `SegmentedControl<T>`: `v-model` and
+// `@value-change` share `T`.
+type SegmentedControlProps<T extends string> = SegmentedControlOptions<T>
+type SegmentedControlComponent = {
+  new <T extends string = string>(
+    props: RootPropsOf<SegmentedControlProps<T>, "div">
+  ): RootInstanceOf<SegmentedControlProps<T>, SegmentedControlState, "div">
+} & RenderableWith<SegmentedControlProps<string>, SegmentedControlState, "div">
 
 /**
  * A row of options where exactly one is on, like a radio group drawn as
@@ -93,7 +110,7 @@ const SegmentedControl = withElement(
       })
     },
   })
-)
+) as unknown as SegmentedControlComponent
 
 /**
  * One option, and the hidden native radio that takes part in the form.
@@ -137,6 +154,7 @@ export type {
   SegmentedControlChangeOptions,
   SegmentedControlController,
   SegmentedControlDirection,
+  SegmentedControlIndicatorProps,
   SegmentedControlIndicatorState,
   SegmentedControlItemProps,
   SegmentedControlItemState,

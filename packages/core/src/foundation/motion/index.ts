@@ -22,7 +22,13 @@ export {
   supportsHiddenUntilFound,
 } from "./panel"
 export { sheetPhysics, type SheetPhysics } from "./physics"
-export { animateEntering, animateIn, animateOut, writeOpen } from "./presence"
+export {
+  animateEntering,
+  animateIn,
+  animateOut,
+  animateOutTogether,
+  writeOpen,
+} from "./presence"
 export { nearestIndex, projectDistance } from "./projection"
 export { rubberBand } from "./rubber-band"
 export {

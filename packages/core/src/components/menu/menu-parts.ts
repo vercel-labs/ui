@@ -26,7 +26,7 @@ import {
 import { checkedAttrs, idPart, openAttrs } from "../../foundation/kernel/attrs"
 import { on, selectEvent } from "../../foundation/kernel/events"
 import { trackInput } from "../../foundation/kernel/modality"
-import { awake, onProps } from "../../foundation/kernel/part"
+import { awake, firstAsleep, onProps } from "../../foundation/kernel/part"
 import type { SlotFactory } from "../../foundation/kernel/primitive-types"
 import { adoptPlatform } from "../../foundation/shortcuts/shortcut-slot"
 import { shortcuts as shortcutManager } from "../../foundation/shortcuts/shortcuts"
@@ -66,6 +66,13 @@ const menuGroupLabelledBy = (state: MenuState, id: string, group: string) =>
 // Only a menu a menubar may hold reads the api for it, since reading it wakes a sleeping menu.
 const inMenubar = (state: MenuState, part: { api: MenuApi }) =>
   state.barred ? part.api.menubar() : undefined
+
+// The trigger the id goes to before one binds. A sleeping menu has no api to
+// ask, and reading it would wake the menu.
+const firstTrigger = (state: MenuState, part: { api: MenuApi }) =>
+  state.trigger === null
+    ? (firstAsleep(part, "trigger") ?? part.api.internal.firstTrigger())
+    : undefined
 
 // The content is named by the trigger that opened it, which a context area or
 // a controller's open without a trigger isn't. A submenu's trigger always names it.
@@ -138,7 +145,13 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
         const disabled = triggerDisabled(state, props)
         const stop = state.barStop ?? menubar.internal.isStop(id, !disabled)
         return {
-          ...popupTriggerAttrs(state, id, "menu", key),
+          ...popupTriggerAttrs(
+            state,
+            id,
+            "menu",
+            key,
+            firstTrigger(state, part)
+          ),
           type: "button",
           tabindex: stop ? "0" : "-1",
           "aria-disabled": disabled ? "true" : undefined,
@@ -149,7 +162,7 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
         }
       }
       return {
-        ...popupTriggerAttrs(state, id, "menu", key),
+        ...popupTriggerAttrs(state, id, "menu", key, firstTrigger(state, part)),
         ...buttonElementAttrs(triggerElement(state, key), {
           type: "button",
           disabled: !!props.disabled,
@@ -301,6 +314,10 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
       }
       if (change.trigger !== undefined || change.triggerElements) {
         store.set(change)
+      }
+      // Where hydration kept another trigger's attributes, as for a popover's.
+      if (store.get().trigger === key && !el.hasAttribute("id")) {
+        el.id = `${id}-trigger`
       }
       const cleanups = [
         keyWhileBound(store, "triggers", key),

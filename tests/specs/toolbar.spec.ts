@@ -314,3 +314,20 @@ test.describe("disabled groups", () => {
     expect(await lastAction(page)).toBe("undo")
   })
 })
+
+test("a toolbar button that renders a toggle is one item and one tab stop", async ({
+  page,
+  open,
+  tab,
+}) => {
+  await open("toolbar", { "rendered-toggle": "" })
+  await walkTo(page, tab, "Help")
+  await page.keyboard.press("ArrowLeft")
+  await expectFocus(page, "Spellcheck")
+  await page.keyboard.press("Space")
+  expect(await lastAction(page)).toBe("spellcheck: on")
+  await tab()
+  await expectFocus(page, "After")
+  await tab({ shift: true })
+  await expectFocus(page, "Spellcheck")
+})

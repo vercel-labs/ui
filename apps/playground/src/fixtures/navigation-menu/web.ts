@@ -4,6 +4,7 @@ import {
   navigationMenuLayout,
   navigationMenuOptions,
 } from "tests/fixtures/navigation-menu.ts"
+import { indicatorOptions } from "tests/fixtures/page.ts"
 
 const kebab = (name: string) =>
   name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
@@ -52,7 +53,7 @@ function markup() {
             <ui-navigation-menu-link current><a class="nav-link" href="${fixture.link.href}">${fixture.link.label}</a></ui-navigation-menu-link>
           </ui-navigation-menu-item>
         </ui-navigation-menu-list>
-        <ui-navigation-menu-indicator class="nav-indicator"></ui-navigation-menu-indicator>
+        <ui-navigation-menu-indicator class="nav-indicator"${indicatorOptions().followHover ? " follow-hover" : ""}></ui-navigation-menu-indicator>
         ${layout.viewport ? `<ui-navigation-menu-viewport class="nav-viewport"></ui-navigation-menu-viewport>` : ""}
       </ui-navigation-menu>
       <button>After</button>

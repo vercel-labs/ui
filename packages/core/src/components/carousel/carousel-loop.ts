@@ -4,6 +4,7 @@
 // springs. Nothing moves in the document, so focus, iframes and frameworks
 // are untouched, which clones or DOM moves would not leave them. The geometry
 // is pure, in `carousel-layout.ts`.
+import { dev, note } from "#dev"
 import { clearSlideOrder, writeSlideOrder } from "./carousel-dom"
 import {
   canLoop,
@@ -29,6 +30,7 @@ function createCarouselLoop(options: {
   visual: () => readonly number[]
   /** Measures again, after a rotation wrote the slides' order. */
   measure: () => void
+  from: { component: string; id: string }
 }) {
   let track: CarouselTrack | null = null
   let view: CarouselLoopView | undefined
@@ -38,6 +40,17 @@ function createCarouselLoop(options: {
   let rotating = false
   // The content doesn't lay out by CSS order, so the carousel rewinds.
   let unsupported = false
+  let warned = false
+
+  function warnRewind(why: string) {
+    if (dev && !warned) {
+      warned = true
+      note(
+        `\`loop\` can't go round seamlessly, so Next on the last page scrolls back to the first: ${why}`,
+        options.from
+      )
+    }
+  }
 
   const shownFirst = (slides: Slide[]) =>
     Math.max(
@@ -60,14 +73,14 @@ function createCarouselLoop(options: {
   ) {
     const motion = options.motion()
     if (!track || !view || !motion || motion.isHeld()) {
-      return
+      return true
     }
     const slides = options.slides()
     const first = shownFirst(slides)
     const position = motion.position()
     const pick = loopRotation(track, view, { position, first }, to, { lazy })
     if (!pick || pick.first === first) {
-      return
+      return !!pick
     }
     const before = options.visual()
     const key = slides[pick.first].key
@@ -80,12 +93,13 @@ function createCarouselLoop(options: {
     }
     // The slides didn't follow the order, and the measure reset it.
     if (firstKey !== key) {
-      return
+      return true
     }
     const after = options.visual()
     motion.shift(position, pick.delta, (index) =>
       index < 0 ? index : after.indexOf(before[index])
     )
+    return true
   }
 
   return {
@@ -125,9 +139,13 @@ function createCarouselLoop(options: {
       track = first === undefined ? null : measureTrack(boxes, first)
       if (first && !track) {
         unsupported = true
+        warnRewind("the content doesn't lay its slides out by CSS `order`.")
       }
       if (track && !canLoop(track, view)) {
         track = null
+        warnRewind(
+          "it needs a page of slides to either side of the current one. Add slides, or show fewer to a page."
+        )
       }
       // A rotation that didn't hold goes back to the slides' own order on the next measure.
       if (first && !track) {
@@ -143,11 +161,12 @@ function createCarouselLoop(options: {
     /**
      * Rotates, if it must, so the page at `index` lies ahead the way the
      * carousel heads: `heading`, the step's way, or else the short way round.
+     * Returns false when no rotation fits from where the slides are now.
      */
     rotateToward(index: number, heading?: 1 | -1) {
       const motion = options.motion()
       if (!track || !motion) {
-        return
+        return true
       }
       const pages = options.pages()
       const at = motion.position()
@@ -157,7 +176,7 @@ function createCarouselLoop(options: {
         ahead === 0
           ? Math.sign(pages[index].position - at)
           : (heading ?? (ahead <= pages.length / 2 ? 1 : -1))
-      rotate({ page: index, heading: way < 0 ? -1 : 1 }, { lazy: true })
+      return rotate({ page: index, heading: way < 0 ? -1 : 1 }, { lazy: true })
     },
     /** Rotates at rest, so the current page sits mid-track. */
     recenter() {

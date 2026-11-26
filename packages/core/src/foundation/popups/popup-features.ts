@@ -197,7 +197,13 @@ function pressOpening(core: PopupCore) {
       const haspopup =
         role === "menu" || role === "listbox" ? role : role && "dialog"
       return {
-        ...popupTriggerAttrs(state, id, haspopup ?? "", key),
+        ...popupTriggerAttrs(
+          state,
+          id,
+          haspopup ?? "",
+          key,
+          core.firstTrigger()
+        ),
         "aria-haspopup": haspopup,
         type: "button",
         ...disabledTriggerAttrs(props),

@@ -528,6 +528,7 @@ function bindInternals(
 }
 
 // Shared on `globalThis` like anchor names, so two copies of core never give two labels one id.
+// Its own prefix keeps them apart from a web component's id, like `<ui-label>`'s `ui-sdk-label-1`.
 const labelCount = ((globalThis as Record<symbol, unknown>)[
   Symbol.for("ui-sdk.label-ids@1")
 ] ??= { count: 0 }) as { count: number }
@@ -601,7 +602,7 @@ function labelledBy(
     const labels = findLabels()
     for (const label of labels) {
       if (!label.id) {
-        label.id = `ui-sdk-label-${++labelCount.count}`
+        label.id = `ui-sdk-native-label-${++labelCount.count}`
       }
     }
     const ids = labels.map((label) => label.id).join(" ")

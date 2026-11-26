@@ -10,7 +10,9 @@ import {
 import * as React from "react"
 import {
   controlRender,
-  useFieldControl,
+  FieldContext,
+  type FieldContextValue,
+  useJoinField,
   type ButtonControlProps,
 } from "./field-context"
 import {
@@ -28,6 +30,9 @@ const parts = createParts(checkbox, { root: "button", indicator: "span" })
 const CheckboxGroupContext = React.createContext<PrimitiveHandle<
   typeof checkboxGroup
 > | null>(null)
+
+// The field the group joined, so a checkbox joins only a field of its own.
+const GroupFieldContext = React.createContext<FieldContextValue | null>(null)
 
 // The hidden native inputs that take part in the form.
 function CheckboxInput() {
@@ -49,14 +54,17 @@ function Checkbox({
   ...props
 }: Omit<CheckboxOptions, "group"> & ButtonControlProps<CheckboxState>) {
   const group = React.useContext(CheckboxGroupContext)
-  // Inside a group, the group is the field's control.
-  const field = useFieldControl()
-  const fieldControl = group ? null : field
+  // A checkbox in a field of its own is that field's control. In the group's field, the group is.
+  const nearest = React.useContext(FieldContext)
+  const groupField = React.useContext(GroupFieldContext)
+  const fieldControl = useJoinField(
+    group && nearest === groupField ? null : nearest
+  )
   return (
     <parts.Root
       {...props}
       disabled={disabled || fieldControl?.disabled}
-      name={name ?? fieldControl?.name}
+      name={name ?? (group ? undefined : fieldControl?.name)}
       group={group ? reading(group, () => group.api) : undefined}
       render={controlRender(fieldControl, "button", render, <CheckboxInput />)}
     />
@@ -94,7 +102,8 @@ function CheckboxGroup<T extends string = string>({
     PartProps<"div", CheckboxGroupState>,
     "defaultValue" | "onChange" | "onSelect"
   >) {
-  const field = useFieldControl()
+  const groupField = React.useContext(FieldContext)
+  const field = useJoinField(groupField)
   const group = usePrimitive(checkboxGroup, {
     value,
     defaultValue,
@@ -110,16 +119,18 @@ function CheckboxGroup<T extends string = string>({
   })
   return (
     <CheckboxGroupContext value={group}>
-      {usePart(
-        group,
-        "group",
-        {},
-        {
-          ...props,
-          render: controlRender(field, "div", render, <GroupInput />),
-        },
-        "div"
-      )}
+      <GroupFieldContext value={groupField}>
+        {usePart(
+          group,
+          "group",
+          {},
+          {
+            ...props,
+            render: controlRender(field, "div", render, <GroupInput />),
+          },
+          "div"
+        )}
+      </GroupFieldContext>
     </CheckboxGroupContext>
   )
 }

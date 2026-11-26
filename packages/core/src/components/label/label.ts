@@ -19,15 +19,20 @@ function forTarget(el: HTMLElement, id: string) {
 }
 
 // A native <label> names only a labelable element, like an input or a button.
-// The label names anything else itself, like a radio group or a slider.
+// The label names anything else itself, like a radio group or a slider, and
+// the control inside a form-associated element, like a slider's thumb.
 function ownControl(el: HTMLElement) {
   const id = el.getAttribute("for")
   const native = el instanceof HTMLLabelElement
   const target = id ? forTarget(el, id) : native && el.control ? null : el
-  if (!target || (native && el.control === target)) {
+  if (!target) {
     return
   }
-  return findControl(target)
+  const control = findControl(target)
+  if (native && el.control === target && control === target) {
+    return
+  }
+  return control
 }
 
 const labelsByControl = new WeakMap<HTMLElement, HTMLElement[]>()
@@ -97,9 +102,18 @@ function watchTree(root: Node, check: () => void) {
   }
 }
 
-// Attributes on the label or its control that change which control it names, or whether it names one.
+// Attributes on the label or its control that change which control it names,
+// or whether it names one, like a component taking back its own label reference.
 const naming = {
-  attributeFilter: ["for", "id", "role", "type", "aria-hidden", "aria-label"],
+  attributeFilter: [
+    "for",
+    "id",
+    "role",
+    "type",
+    "aria-hidden",
+    "aria-label",
+    "aria-labelledby",
+  ],
 }
 
 function bindLabel(el: HTMLElement) {

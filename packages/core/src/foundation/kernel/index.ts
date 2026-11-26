@@ -58,6 +58,7 @@ export {
   attrs,
   awake,
   bind,
+  firstAsleep,
   held,
   madeLabel,
   onProps,

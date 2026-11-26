@@ -50,6 +50,8 @@ type ReasonVocabulary = {
   "submenu-switch": PointerEvent | KeyboardEvent
   /** The parent layer closed. */
   "parent-close": undefined
+  /** The element the popup sits beside stopped rendering, like a trigger a breakpoint hides. */
+  "anchor-hidden": undefined
   /** A press-and-hold open was released outside the popup. */
   "trigger-release": PointerEvent
   /** The browser's find in page matched hidden content. */
@@ -74,7 +76,7 @@ type ReasonVocabulary = {
   "content-resize": undefined
   /** Going back: the Android back button or gesture, or Backspace in an empty command input, which returns to the previous page. */
   back: Event
-  /** A controller or `api` call, or a property set on a web component. */
+  /** A controller or `api` call. */
   imperative: undefined
   /** A keyboard shortcut, like a trigger's `shortcut`. */
   shortcut: KeyboardEvent

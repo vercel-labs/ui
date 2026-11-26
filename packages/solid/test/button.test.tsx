@@ -1,5 +1,5 @@
 import { render } from "@solidjs/web"
-import { flush } from "solid-js"
+import { createSignal, flush } from "solid-js"
 import { afterEach, expect, test } from "vitest"
 import { Button } from "../src/button"
 import { withSource } from "../src/observe"
@@ -56,4 +56,33 @@ test("a bound handler's Promise keeps the button pending until it settles", asyn
   finish()
   await settle()
   expect(el.hasAttribute("aria-busy")).toBe(false)
+})
+
+test("a part follows a render that changes after it mounts", () => {
+  const [link, setLink] = createSignal(true)
+  const root = document.createElement("div")
+  document.body.append(root)
+  dispose = render(
+    () => (
+      <Button
+        disabled={!link()}
+        render={link() ? (props) => <a {...props} href="#x" /> : undefined}
+      >
+        Open
+      </Button>
+    ),
+    root
+  )
+  flush()
+  expect(root.querySelector("[data-slot=button]")!.tagName).toBe("A")
+  setLink(false)
+  flush()
+  const button = root.querySelector("[data-slot=button]")!
+  expect(button.tagName).toBe("BUTTON")
+  expect(button.hasAttribute("disabled")).toBe(true)
+  setLink(true)
+  flush()
+  expect(root.querySelector("[data-slot=button]")!.getAttribute("href")).toBe(
+    "#x"
+  )
 })

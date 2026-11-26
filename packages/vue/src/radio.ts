@@ -2,6 +2,8 @@ import type { ChangeDetails } from "@ui-sdk/core"
 import {
   radioGroup as radioGroupPrimitive,
   type RadioGroupController,
+  type RadioGroupOptions,
+  type RadioGroupState,
   type RadioGroupValueChangeReason,
 } from "@ui-sdk/core/radio"
 import {
@@ -12,7 +14,12 @@ import {
   type InjectionKey,
   type PropType,
 } from "vue"
-import { withElement } from "./create-parts"
+import {
+  withElement,
+  type RenderableWith,
+  type RootInstanceOf,
+  type RootPropsOf,
+} from "./create-parts"
 import { type FieldContext, FieldKey, useFieldControl } from "./field-context"
 import {
   optionalBoolean,
@@ -28,6 +35,15 @@ import { readOnlyOf } from "./text-control"
 // The field the group joined, so a radio joins only a field of its own.
 const GroupFieldKey: InjectionKey<FieldContext | null> =
   Symbol("radio-group-field")
+
+// Generic over the value, like React's `RadioGroup<T>`: `v-model` and
+// `@value-change` share `T`.
+type RadioGroupProps<T extends string> = RadioGroupOptions<T>
+type RadioGroupComponent = {
+  new <T extends string = string>(
+    props: RootPropsOf<RadioGroupProps<T>, "div">
+  ): RootInstanceOf<RadioGroupProps<T>, RadioGroupState, "div">
+} & RenderableWith<RadioGroupProps<string>, RadioGroupState, "div">
 
 /**
  * Radios that share one value, with one tab stop and arrow keys between them.
@@ -99,7 +115,7 @@ const RadioGroup = withElement(
       })
     },
   })
-)
+) as unknown as RadioGroupComponent
 
 /**
  * A radio and the hidden native radio that takes part in the form.

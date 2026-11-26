@@ -66,6 +66,30 @@ test.describe("trigger", () => {
     })
   }
 
+  test("the popover closes when its trigger stops rendering, and stays closed when it's back", async ({
+    page,
+    fixtureOptions,
+  }) => {
+    test.skip(
+      isSheet(fixtureOptions),
+      "A sheet isn't placed against its trigger."
+    )
+    await trigger(page).click()
+    await expect(dialog(page)).toBeVisible()
+    const host = await trigger(page).evaluateHandle(
+      (el) => (el.closest("ui-popover-trigger") ?? el) as HTMLElement
+    )
+    const hide = (display: string) =>
+      host.evaluate((el, display) => {
+        el.style.display = display
+      }, display)
+    await hide("none")
+    await expect(dialog(page)).toBeHidden()
+    await hide("")
+    await expect(trigger(page)).toHaveAttribute("aria-expanded", "false")
+    await expect(dialog(page)).toBeHidden()
+  })
+
   test("points to the popover it controls while open", async ({ page }) => {
     await trigger(page).click()
     const id = await dialog(page).getAttribute("id")

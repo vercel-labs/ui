@@ -135,6 +135,8 @@ const components: Record<string, Group[]> = {
   resizable: [{ part: "panel", variables: ["--resizable-panel-size"] }],
   carousel: [
     { part: "root", variables: ["--carousel-interval", "--carousel-progress"] },
+    { part: "content", variables: ["--carousel-display"] },
+    { part: "item", variables: ["--carousel-item-progress"] },
   ],
   timeline: [
     { part: "root", variables: ["--timeline-count"] },
@@ -323,6 +325,10 @@ const meaning: Record<string, string> = {
     "How long each page shows while rotating, like `500ms`. Time a progress bar's animation with it.",
   "--carousel-progress":
     "How far the slides have scrolled, from 0 at the first page to 1 at the last, or round the loop. It follows every frame of a scroll or spring.",
+  "--carousel-display":
+    "Set it yourself: how the content lays out its slides, like `grid`. Flex by default.",
+  "--carousel-item-progress":
+    "How far the slide is from its page's resting place, from -1 a page behind to 1 a page ahead, and 0 at rest. It follows every frame of a scroll or spring.",
   "--drawer-progress":
     "How far open the sheet is, from 0 closed to 1 at its largest snap point. Never past 1.",
   "--drawer-dim":

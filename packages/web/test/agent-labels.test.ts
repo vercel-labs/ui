@@ -6,6 +6,7 @@ import { createAgent } from "../src/agent"
 import { defineComboboxElements } from "../src/combobox"
 import { defineDialogElements } from "../src/dialog"
 import { defineFieldElements } from "../src/field"
+import { definePopoverElements } from "../src/popover"
 import { defineSliderElements } from "../src/slider"
 import { defineTabsElements } from "../src/tabs"
 
@@ -22,6 +23,7 @@ beforeAll(() => {
   defineDialogElements()
   defineFieldElements()
   defineSliderElements()
+  definePopoverElements()
 })
 
 test("a combobox is named by its label, not by its trigger", async () => {
@@ -133,4 +135,52 @@ test("a slider's name leaves out what its field's label keeps from agents", asyn
     }),
   ]
   expect(JSON.stringify(read)).not.toMatch(/canary/i)
+})
+
+test("a closed popup is named by its trigger, not by its hidden content", async () => {
+  const agent = createAgent()
+  document.body.innerHTML = `
+    <ui-popover>
+      <ui-popover-trigger><button>Share</button></ui-popover-trigger>
+      <ui-popover-content>
+        <ui-popover-title as-child><h2>Share this project</h2></ui-popover-title>
+        <ui-popover-description as-child><p>Anyone with the link can view it.</p></ui-popover-description>
+      </ui-popover-content>
+    </ui-popover>
+    <ui-combobox default-value="jp">
+      <ui-combobox-trigger>
+        <button id="country" aria-labelledby="country-name country-value">
+          <span id="country-name">Country</span> <span id="country-value">Japan</span>
+        </button>
+      </ui-combobox-trigger>
+      <ui-combobox-content anchor="#country">
+        <ui-combobox-input><input aria-label="Search countries" /></ui-combobox-input>
+        <ui-combobox-list><ui-combobox-item value="jp">Japan</ui-combobox-item></ui-combobox-list>
+      </ui-combobox-content>
+    </ui-combobox>`
+  await wait()
+  const [popover, combobox] = agent.snapshot()
+  expect(popover).toMatchObject({ component: "popover", label: "Share" })
+  expect(popover).not.toHaveProperty("text")
+  expect(combobox).toMatchObject({
+    component: "combobox",
+    label: "Country Japan",
+  })
+})
+
+test("a closed dialog opened from many rows is named by its title", async () => {
+  const agent = createAgent()
+  document.body.innerHTML = `
+    <ui-dialog-trigger for="member"><button>Edit</button></ui-dialog-trigger>
+    <ui-dialog-trigger for="member"><button>Edit</button></ui-dialog-trigger>
+    <ui-dialog id="member">
+      <ui-dialog-content>
+        <ui-dialog-title>Edit member</ui-dialog-title>
+        <ui-dialog-close><button>Done</button></ui-dialog-close>
+      </ui-dialog-content>
+    </ui-dialog>`
+  await wait()
+  expect(agent.snapshot()).toContainEqual(
+    expect.objectContaining({ component: "dialog", label: "Edit member" })
+  )
 })

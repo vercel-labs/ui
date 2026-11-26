@@ -2,14 +2,18 @@ import {
   button as buttonPrimitive,
   type ButtonActionDetails,
 } from "@ui-sdk/core/button"
+import { isPromise } from "@ui-sdk/core/renderer"
 import { defineComponent, type PropType } from "vue"
 import { withElement } from "./create-parts"
 import {
   optionalBoolean,
+  partListeners,
   usePart,
   usePrimitive,
   type PartSlots,
 } from "./use-primitive"
+
+type Click = (event: MouseEvent, details: ButtonActionDetails) => unknown
 
 /**
  * A button, or a link or any element that acts as one through the `render` slot.
@@ -27,10 +31,9 @@ const Button = withElement(
       pendingAnnouncement: String,
       debug: optionalBoolean,
       // `@click="save"` binds here, so the button gets the handler's Promise and
-      // stays pending until it settles.
-      onClick: Function as PropType<
-        (event: MouseEvent, details: ButtonActionDetails) => unknown
-      >,
+      // stays pending until it settles. Beside a slot's `v-bind="props"`, Vue
+      // merges both listeners into an array.
+      onClick: [Function, Array] as PropType<Click | Click[]>,
     },
     slots: Object as PartSlots<typeof buttonPrimitive, "root">,
     setup(props) {
@@ -40,8 +43,29 @@ const Button = withElement(
         type: props.type,
         pendingAnnouncement: props.pendingAnnouncement,
         debug: props.debug,
-        action: (event, details) =>
-          props.onClick?.(event as MouseEvent, details),
+        action(event, details) {
+          const handlers = [props.onClick ?? []].flat()
+          const own = handlers.filter((fn) => !partListeners.has(fn))
+          const results = own.map((fn) => fn(event as MouseEvent, details))
+          for (const fn of handlers) {
+            if (partListeners.has(fn)) {
+              fn(event as MouseEvent, details)
+            }
+          }
+          // A popup's `open()` isn't a wait, so it keeps the button idle.
+          const waits = results.filter(isPromise)
+          if (waits.length < 2) {
+            return waits[0] ?? results[0]
+          }
+          // Pending until every wait settles, then failed with the first error.
+          return Promise.allSettled(waits).then((settled) => {
+            for (const result of settled) {
+              if (result.status === "rejected") {
+                throw result.reason
+              }
+            }
+          })
+        },
       }))
       return usePart(button, "root", undefined, undefined, "button")
     },

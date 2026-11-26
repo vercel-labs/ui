@@ -108,6 +108,27 @@ describe("server rendering form controls", () => {
     expect(html.match(/name="toppings"/g)).toHaveLength(2)
   })
 
+  test("a checkbox in a field of its own inside a group takes that field", async () => {
+    const html = await render(() =>
+      h(Field, null, () => [
+        h(FieldLabel, null, () => "Cities"),
+        h(CheckboxGroup, null, () =>
+          h(Field, { disabled: true, name: "tokyo-field" }, () => [
+            h(Checkbox, { value: "tokyo" }),
+            h(FieldLabel, null, () => "Tokyo"),
+          ])
+        ),
+      ])
+    )
+    const button = html.match(/<button[^>]*>/)![0]
+    const id = button.match(/ id="([^"]+)"/)![1]
+    expect(html).toContain(`for="${id}"`)
+    expect(button).toContain('aria-disabled="true"')
+    expect(button).not.toContain("tabindex")
+    expect(html).toMatch(/<div[^>]*role="group"[^>]*aria-labelledby=/)
+    expect(html).not.toContain('name="tokyo-field"')
+  })
+
   test("a field ties its label to the control", async () => {
     const html = await render(() =>
       h(Field, null, () => [

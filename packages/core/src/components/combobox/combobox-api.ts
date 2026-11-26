@@ -903,7 +903,10 @@ function comboboxApiBody(
       choose,
       remove,
       create,
-      createShown: (state: ComboboxState) => createShown(state, createProps()),
+      createShown: (
+        state: ComboboxState,
+        props: ComboboxCreateProps = createProps()
+      ) => createShown(state, props),
       maxReached,
       typed,
       onInput: (event: Event) =>

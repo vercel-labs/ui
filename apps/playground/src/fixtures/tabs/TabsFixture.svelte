@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { indicatorOptions, tabsOptions } from "tests/fixtures/page.ts"
   import { createTabsController } from "@ui-sdk/core/tabs"
   import {
     Tabs,
@@ -7,7 +8,6 @@
     TabsPanel,
     TabsTab,
   } from "@ui-sdk/svelte"
-  import { tabsOptions } from "tests/fixtures/page.ts"
   import { tabsFixture } from "tests/fixtures/tabs.ts"
 
   const controller = createTabsController()
@@ -35,7 +35,7 @@
           >{tab.label}</TabsTab
         >
       {/each}
-      <TabsIndicator class="indicator" />
+      <TabsIndicator class="indicator" {...indicatorOptions()} />
     </TabsList>
     {#each tabsFixture.tabs as tab (tab.value)}
       <TabsPanel class="panel" value={tab.value} {keepMounted}>

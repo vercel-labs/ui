@@ -12,11 +12,18 @@ import {
   createCarouselController,
 } from "@ui-sdk/vue"
 import { carouselFixture, carouselOptions } from "tests/fixtures/carousel.ts"
-import { ref } from "vue"
+import { onMounted, ref } from "vue"
 
 const controller = createCarouselController()
-const { perView, cancel, playToggle, controlled, options } = carouselOptions()
+const { perView, cancel, playToggle, controlled, disabledMedia, options } =
+  carouselOptions()
 const page = ref(1)
+const disabled = ref(false)
+onMounted(() => {
+  const change = () => (disabled.value = !!disabledMedia?.matches)
+  change()
+  disabledMedia?.addEventListener("change", change)
+})
 
 const action = ref("")
 const reason = ref("")
@@ -46,6 +53,7 @@ function onPageChange(
       :style="{ '--per-view': perView }"
       v-bind="controlled ? { ...options, page } : options"
       :controller="controller"
+      :disabled="disabled"
       @page-change="onPageChange"
       @page-change-complete="(page: number) => (rested = String(page))"
     >

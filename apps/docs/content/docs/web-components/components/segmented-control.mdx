@@ -56,7 +56,7 @@ Name the control with `aria-label`, or put it in a [Field](./field) whose label 
 
 ## Indicator
 
-`ui-segmented-control-indicator` measures the checked item. Position it inside the control and use its [CSS variables](#styling-indicator) to draw the background that slides to the choice. It measures again when an item or the control changes size, and has no box while nothing is checked.
+`ui-segmented-control-indicator` measures the checked item. Position it inside the control and use its [CSS variables](#styling-indicator) to draw the background that slides to the choice. It measures again when an item or the control changes size, and has no box while nothing is checked. It gets `data-visible` once it has a position. Until then, like on a page rendered on the server before its script runs, its variables are unset, so hide it while it's `:not([data-visible])`.
 
 <StyleTabs>
 
@@ -100,6 +100,8 @@ Name the control with `aria-label`, or put it in a [Field](./field) whose label 
 </StyleTabs>
 
 Skip the transitions while `data-activation-direction` is `"none"`, so the indicator doesn't slide in on its first placement. After that it says which way the checked item moved: `left`, `right`, `up` or `down`.
+
+Give it `follow-hover` and it follows the item under the pointer instead, then goes back to the checked item when the pointer leaves the control. It passes over disabled items.
 
 ## Vertical
 
@@ -194,6 +196,13 @@ false, so `loop="false"` turns looping off. `value` is a live property and attri
 <TypeTable
   path="../../packages/core/src/components/segmented-control/segmented-control.ts"
   name="SegmentedControlItemProps"
+/>
+
+### ui-segmented-control-indicator
+
+<TypeTable
+  path="../../packages/core/src/components/segmented-control/segmented-control.ts"
+  name="SegmentedControlIndicatorProps"
 />
 
 ### State

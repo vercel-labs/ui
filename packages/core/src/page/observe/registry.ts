@@ -63,6 +63,8 @@ type Entry = {
   row?: string
   // The labelled regions around it, outermost first, like a tab's panel and an accordion's section in it.
   sections?: string[]
+  // Its place among the components on the page when an agent last listed them.
+  listed?: number
   // Whether an agent has had it on the page. One hidden all along, like a
   // field in a dialog nobody opened, isn't kept once it leaves.
   shown?: boolean
@@ -103,6 +105,7 @@ const retiredLimit = 500
 const offPage = new Map<string, AgentComponent>()
 // The regions each of those was in, for telling look-alikes apart.
 const placeOf = new WeakMap<AgentComponent, string[]>()
+const leftFrom = new WeakMap<AgentComponent, number>()
 const partsOf = new WeakMap<PrimitiveInstance, ReadonlyMap<string, Part>>()
 const optionsOf = new WeakMap<PrimitiveInstance, () => object>()
 // What an agent's step changed on a key its component commits, like a
@@ -193,6 +196,9 @@ function retire(entry: Entry) {
   if (entry.sections) {
     placeOf.set(last, entry.sections)
   }
+  if (entry.listed !== undefined) {
+    leftFrom.set(last, entry.listed)
+  }
   offPage.delete(entry.ref)
   offPage.set(entry.ref, last)
   // The most recent 50, for a page that swaps many components in and out.
@@ -204,6 +210,37 @@ function retire(entry: Entry) {
 // Fields a browser tool stops seeing when they close, so the bridge doesn't keep them either.
 const secret =
   /\b(password|current-password|new-password|one-time-code|cc-[a-z-]+)\b/i
+
+const secretControl = (el: Element) =>
+  secret.test(`${el.getAttribute("type")} ${el.getAttribute("autocomplete")}`)
+
+// A field's error text describes its control, so a secret control keeps it
+// secret too, even where the control isn't one of the field's parts, like a
+// web component's input or a password input whose text shows.
+function holdsSecret(field: Entry, parts: Bound[]) {
+  const root = parts.find((part) => part.slot === "root")?.el
+  const own = (el: Element) => el.closest('[data-slot="field"]') === root
+  if (!root) {
+    return false
+  }
+  if (
+    Array.from(root.querySelectorAll("input, textarea, select")).some(
+      (el) => own(el) && (secretControl(el) || isSecret([el]))
+    )
+  ) {
+    return true
+  }
+  for (const other of entries.values()) {
+    const instance = other !== field && other.secret && other.instance.deref()
+    const parts = instance ? partsOf.get(instance)?.values() : undefined
+    for (const { el } of parts ?? []) {
+      if (el && root.contains(el) && own(el)) {
+        return true
+      }
+    }
+  }
+  return false
+}
 
 const stateKeys = (entry: Entry, state: Record<string, unknown>) =>
   entry.controlled ?? ["open", "value", "checked"].filter((key) => key in state)
@@ -221,11 +258,8 @@ function remember(entry: Entry, parts: Bound[]) {
   entry.row = rowOf(parts)
   entry.secret ||=
     isSecret(elements) ||
-    parts.some(({ el }) =>
-      secret.test(
-        `${el.getAttribute("type")} ${el.getAttribute("autocomplete")}`
-      )
-    )
+    parts.some(({ el }) => secretControl(el)) ||
+    (entry.component === "field" && holdsSecret(entry, parts))
   // A region can turn off-limits and back, like a panel an app locks while it's busy.
   // A hidden input holds what the page keeps from people, like a token.
   entry.offLimits =
@@ -274,7 +308,21 @@ function ownParts<Each extends Pick<Bound, "key" | "slot" | "props">>(
   )
 }
 
-function componentLabel(parts: Bound[]) {
+// A closed popup's content stays in the web page, hidden. While any part of
+// the component shows, like its trigger, the hidden ones don't name or describe it.
+function shownParts(parts: Bound[]) {
+  const shown = parts.filter((part) => !part.el.closest("[hidden]"))
+  return shown.length ? shown : parts
+}
+
+// The hidden parts name it only when the shown ones can't, like a dialog
+// opened from a trigger on every row, which its title names.
+function componentLabel(all: Bound[]) {
+  const shown = shownParts(all)
+  return labelOf(shown) ?? (shown === all ? undefined : labelOf(all))
+}
+
+function labelOf(parts: Bound[]) {
   const keyless = (slot: string) =>
     parts.find((part) => part.slot === slot && !part.key)?.el
   // Not when the slot has many keys: an accordion's first trigger names its
@@ -599,6 +647,7 @@ export {
   entries,
   type Entry,
   install,
+  leftFrom,
   listen,
   type ObservedChange,
   offPage,
@@ -608,5 +657,6 @@ export {
   retire,
   rowOf,
   setterOf,
+  shownParts,
   stateKeys,
 }

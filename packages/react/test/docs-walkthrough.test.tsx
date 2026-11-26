@@ -104,7 +104,10 @@ test("all four arrows check, focus and wrap, and a click checks one", async () =
       stars.map((_, index) => (index === value - 1 ? 0 : -1))
     )
   }
-  await React.act(async () => stars[0].click())
+  await React.act(async () => {
+    stars[0].focus()
+    stars[0].click()
+  })
   expect(changes).toEqual([
     [4, "list-navigation"],
     [5, "list-navigation"],

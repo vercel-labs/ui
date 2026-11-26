@@ -70,3 +70,25 @@ test("tabs with kept panels hydrate without mismatches", async ({
   await expect(panelNamed(page, "Notifications")).toBeVisible()
   expect(await hydrationErrors(page)).toEqual([])
 })
+
+test("the indicator gets data-visible only once it has a position", async ({
+  page,
+  open,
+}) => {
+  await open("tabs")
+  const visible = await page.evaluate(() => {
+    const template = document.createElement("template")
+    template.innerHTML = (
+      window as unknown as { __serverHtml: string }
+    ).__serverHtml
+    return template.content
+      .querySelector('[data-slot="tabs-indicator"]')
+      ?.hasAttribute("data-visible")
+  })
+  expect(visible).toBe(false)
+  await expect(page.locator('[data-slot="tabs-indicator"]')).toHaveAttribute(
+    "data-visible",
+    ""
+  )
+  expect(await hydrationErrors(page)).toEqual([])
+})

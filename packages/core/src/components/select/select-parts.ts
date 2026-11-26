@@ -271,13 +271,7 @@ const selectSlots = (slot: SlotFactory<SelectState, SelectApi>) => ({
       bindPageLocale(el, (pageLocale) => store.set({ pageLocale }))
       // A value whose label or icon only its item knows: render the list
       // hidden so the item registers, once the parts that render now have.
-      if (!store.get().items && !api.internal.options().itemToLabel) {
-        queueMicrotask(
-          () =>
-            api.internal.selection.needsItems(api.internal.hasValueIcon()) &&
-            api.internal.prepare()
-        )
-      }
+      queueMicrotask(() => api.internal.needsList() && api.internal.prepare())
       if (dev) {
         warnIfUnnamed(
           el,

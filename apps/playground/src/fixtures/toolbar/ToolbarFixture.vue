@@ -20,6 +20,7 @@ import {
   toolbarFixture as f,
   toolbarLocked,
   toolbarOptions,
+  toolbarRenderedToggle,
 } from "tests/fixtures/toolbar.ts"
 import { ref, type SetupContext } from "vue"
 
@@ -28,6 +29,7 @@ const controller = createToolbarController()
 const options = toolbarOptions()
 // For ?locked: disabled groups around Text style, Spellcheck, History and Help until Unlock.
 const lockable = toolbarLocked()
+const renderedToggle = toolbarRenderedToggle()
 const locked = ref(lockable)
 // Renders its children alone, where a locked fixture has a group.
 const Plain = (_: unknown, { slots }: SetupContext) => slots.default?.()
@@ -128,7 +130,22 @@ const groups = [
           lockable ? { 'aria-label': 'Locked proofing', disabled: locked } : {}
         "
       >
+        <ToolbarButton v-if="renderedToggle">
+          <template #render="{ props }">
+            <Toggle
+              v-bind="props"
+              class="toggle"
+              @pressed-change="
+                (pressed: boolean) =>
+                  (action = `spellcheck: ${pressed ? 'on' : 'off'}`)
+              "
+            >
+              {{ f.spellcheck.label }}
+            </Toggle>
+          </template>
+        </ToolbarButton>
         <Toggle
+          v-else
           class="toggle"
           @pressed-change="
             (pressed: boolean) =>

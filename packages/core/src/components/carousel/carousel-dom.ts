@@ -121,6 +121,15 @@ function clearSnapAreas(slides: readonly Slide[], align: string) {
   }
 }
 
+function removeSnapAreas(slides: readonly Slide[]) {
+  for (const { el } of slides) {
+    el.style.removeProperty("scroll-snap-align")
+    for (const property of snapMargins) {
+      el.style.removeProperty(property)
+    }
+  }
+}
+
 // The "1 of 5" labels the carousel wrote, so binding again knows them from an author's.
 const ownLabels = new WeakMap<Element, string>()
 
@@ -165,11 +174,19 @@ function labelSlide(
   return store.subscribe(label)
 }
 
+function unlabelSlide(el: HTMLElement) {
+  if (el.getAttribute("aria-label") === ownLabels.get(el)) {
+    el.removeAttribute("aria-label")
+  }
+}
+
 export {
   clearSlideOrder,
   clearSnapAreas,
   labelSlide,
   readCarouselLayout,
+  removeSnapAreas,
+  unlabelSlide,
   writeSlideOrder,
   writeSnapAreas,
 }

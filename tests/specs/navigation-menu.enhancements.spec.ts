@@ -212,6 +212,24 @@ test.describe("enhancements", { tag: "@enhancement" }, () => {
         .toBe(true)
     })
 
+    test("with followHover, the indicator follows the hovered item and goes back when the pointer leaves", async ({
+      page,
+      open,
+    }) => {
+      await open("navigation-menu", { hover: "false", "follow-hover": "" })
+      await expect
+        .poll(() => indicatorUnder(page, link(page, "Pricing")))
+        .toBe(true)
+      await trigger(page, "Products").hover()
+      await expect
+        .poll(() => indicatorUnder(page, trigger(page, "Products")))
+        .toBe(true)
+      await page.mouse.move(0, 0)
+      await expect
+        .poll(() => indicatorUnder(page, link(page, "Pricing")))
+        .toBe(true)
+    })
+
     test("the indicator moves under the open trigger", async ({ page }) => {
       await trigger(page, "Resources").hover()
       await expect(link(page, "Blog")).toBeVisible()

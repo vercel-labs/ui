@@ -90,6 +90,41 @@ test.describe("enhancements", { tag: "@enhancement" }, () => {
     await expect(opener).toBeFocused()
   })
 
+  test("Tab past the last control closes the popover when nothing on the page follows", async ({
+    page,
+    open,
+    tab,
+  }) => {
+    await open("popover")
+    for (const name of ["After", "Open with controller"]) {
+      await page
+        .getByRole("button", { name })
+        .evaluate((el) => ((el as HTMLButtonElement).disabled = true))
+    }
+    await trigger(page).click()
+    await page.getByRole("button", { name: "Close" }).focus()
+    await tab()
+    // Automated Firefox keeps focus inside when Tab has nowhere to go.
+    await page.evaluate(() => (document.activeElement as HTMLElement).blur())
+    await expect(dialog(page)).toBeHidden()
+  })
+
+  test("a control that turns disabled after Tab reaches it keeps the popover open", async ({
+    page,
+    open,
+    tab,
+  }) => {
+    await open("popover")
+    await trigger(page).click()
+    await page.getByRole("button", { name: "Save" }).focus()
+    await tab()
+    const close = page.getByRole("button", { name: "Close" })
+    await expect(close).toBeFocused()
+    await close.evaluate((el) => ((el as HTMLButtonElement).disabled = true))
+    await page.waitForTimeout(100)
+    await expect(dialog(page)).toBeVisible()
+  })
+
   test("a popover open from the start leaves focus alone", async ({
     page,
     open,

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { indicatorOptions } from "tests/fixtures/page.ts"
   import type { ChangeDetails } from "@ui-sdk/core"
   import {
     NavigationMenu,
@@ -90,7 +91,7 @@
         >
       </NavigationMenuItem>
     </NavigationMenuList>
-    <NavigationMenuIndicator class="nav-indicator" />
+    <NavigationMenuIndicator class="nav-indicator" {...indicatorOptions()} />
     {#if layout.viewport}
       <NavigationMenuViewport class="nav-viewport" {...layout.placement} />
     {/if}

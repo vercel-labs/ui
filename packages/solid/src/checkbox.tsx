@@ -9,6 +9,8 @@ import {
 } from "@ui-sdk/core/checkbox"
 import { createContext, omit, useContext } from "solid-js"
 import {
+  FieldContext,
+  type FieldContextValue,
   joinField,
   useFieldControl,
   type ButtonControlProps,
@@ -30,6 +32,9 @@ const CheckboxGroupContext = createContext<PrimitiveHandle<
   typeof checkboxGroupPrimitive
 > | null>(null)
 
+// The field the group joined, so a checkbox joins only a field of its own.
+const GroupFieldContext = createContext<FieldContextValue | null>(null)
+
 /**
  * The control and the hidden native input that takes part in the form.
  * @stable
@@ -38,9 +43,12 @@ const Checkbox = /* @__PURE__ */ rootScope(function Checkbox(
   props: Omit<CheckboxOptions, "group"> & ButtonControlProps<CheckboxState>
 ) {
   const group = useContext(CheckboxGroupContext)
-  // Inside a group, the group is the field's control.
-  const field = useFieldControl()
-  const fieldControl = group ? null : field
+  // A checkbox in a field of its own is that field's control. In the group's field, the group is.
+  const nearest = useContext(FieldContext)
+  const fieldControl =
+    nearest && !(group && nearest === useContext(GroupFieldContext))
+      ? useFieldControl()
+      : null
   // Made once. A new function on each options run hands the options over again
   // in the group's own update, and the parent checkbox then shows stale state.
   const groupApi = group ? () => group.api : undefined
@@ -51,7 +59,7 @@ const Checkbox = /* @__PURE__ */ rootScope(function Checkbox(
     disabled: props.disabled || fieldControl?.disabled(),
     readOnly: props.readOnly,
     required: props.required,
-    name: props.name ?? fieldControl?.name(),
+    name: props.name ?? (group ? undefined : fieldControl?.name()),
     value: props.value,
     form: props.form,
     parent: props.parent,
@@ -137,8 +145,16 @@ const CheckboxGroup = /* @__PURE__ */ rootScope(function CheckboxGroup<
   )
   return provided(
     <CheckboxGroupContext value={group}>
-      {usePart(group, "group", undefined, joinField(field, rest, "div"), "div")}
-      {usePart(group, "group-input", undefined, {}, "input")}
+      <GroupFieldContext value={useContext(FieldContext)}>
+        {usePart(
+          group,
+          "group",
+          undefined,
+          joinField(field, rest, "div"),
+          "div"
+        )}
+        {usePart(group, "group-input", undefined, {}, "input")}
+      </GroupFieldContext>
     </CheckboxGroupContext>
   )
 })

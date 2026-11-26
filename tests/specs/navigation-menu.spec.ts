@@ -74,6 +74,26 @@ test.describe("pointer", () => {
     await expect(link(page, "Analytics")).toBeHidden()
   })
 
+  test("moving along the bar to another trigger switches before the pointer rests", async ({
+    page,
+  }) => {
+    await pointAt(page, trigger(page, "Products"))
+    await expect(link(page, "Analytics")).toBeVisible()
+    const products = (await trigger(page, "Products").boundingBox())!
+    const resources = (await trigger(page, "Resources").boundingBox())!
+    const gap = (products.x + products.width + resources.x) / 2
+    const y = products.y + products.height / 2
+    for (const [x, drift] of [
+      [gap - 6, 0],
+      [gap, 1],
+      [gap + 6, 2],
+      [gap + 12, 3],
+    ]) {
+      await page.mouse.move(x, y + drift)
+    }
+    await expect(link(page, "Blog")).toBeVisible({ timeout: 200 })
+  })
+
   test("crossing another trigger on the way to the open panel keeps the panel", async ({
     page,
   }) => {

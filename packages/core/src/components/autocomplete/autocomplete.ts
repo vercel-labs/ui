@@ -79,6 +79,7 @@ type AutocompleteOpenChangeReason =
   | "window-blur"
   | "back"
   | "swipe"
+  | "anchor-hidden"
   | "imperative"
 
 /**

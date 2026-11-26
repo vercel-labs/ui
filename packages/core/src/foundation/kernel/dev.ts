@@ -384,6 +384,7 @@ const reasonEvents: Record<string, string[]> = {
   "window-blur": ["Event"],
   "submenu-switch": ["PointerEvent", "KeyboardEvent"],
   "parent-close": [],
+  "anchor-hidden": [],
   "trigger-release": ["PointerEvent"],
   "find-in-page": ["Event"],
   "item-removed": [],

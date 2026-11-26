@@ -4,7 +4,7 @@ A row of options where exactly one is on, like a radio group drawn as
 buttons, with an indicator that slides to the checked item.
 @experimental
 -->
-<script lang="ts">
+<script lang="ts" generics="T extends string = string">
   import type { ChangeDetails } from "@ui-sdk/core"
   import {
     segmentedControl,
@@ -42,9 +42,9 @@ buttons, with an indicator that slides to the checked item.
     ...rest
   }: PartProps<"div", SegmentedControlState> & {
     /** The checked item's value. Bind it with `bind:value` to control it. `null` checks nothing. */
-    value?: string | null
+    value?: T | null
     /** The item checked at first, when uncontrolled. A form reset returns to it. */
-    defaultValue?: string | null
+    defaultValue?: T | null
     /** Disables every item: they can't be focused or changed, and the value isn't submitted. */
     disabled?: boolean
     /** Keeps the items focusable and the value submitted, but stops changes. */
@@ -60,11 +60,11 @@ buttons, with an indicator that slides to the checked item.
     /** Which way the items run, for styling and for screen readers. */
     orientation?: SegmentedControlOrientation
     /** Checks items from anywhere. Create one with `createSegmentedControlController()`. */
-    controller?: SegmentedControlController
+    controller?: SegmentedControlController<T>
     /** Logs every state change with its reason. */
     debug?: boolean
     /** Runs when an item or a form reset wants to change the value. `details.cancel()` stops it. */
-    onValueChange?: (value: string | null, details: Details) => void
+    onValueChange?: (value: T | null, details: Details) => void
   } = $props()
 
   const id = $props.id()
@@ -82,13 +82,13 @@ buttons, with an indicator that slides to the checked item.
     form,
     loop,
     orientation,
-    controller,
+    controller: controller as SegmentedControlController | undefined,
     debug,
     onValueChange: (next: string | null, details: Details) => {
       // The callback runs first, so canceling there also keeps a bound `value` as it was.
-      onValueChange?.(next, details)
+      onValueChange?.(next as T | null, details)
       if (!details.canceled) {
-        value = next
+        value = next as T | null
       }
     },
   }))

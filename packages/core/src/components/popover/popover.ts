@@ -63,6 +63,7 @@ type PopoverOpenChangeReason =
   | "back"
   | "shortcut"
   | "swipe"
+  | "anchor-hidden"
   | "imperative"
 
 /**
@@ -228,7 +229,7 @@ type ContentProps = PositionProps &
      */
     alignOffset?: number
     /**
-     * Where focus goes when the popover opens. Opening on hover never moves focus, and opening with touch focuses the popover itself so no on-screen keyboard appears.
+     * Where focus goes when the popover opens. Opening on hover never moves focus, and opening with touch focuses the popover itself so no on-screen keyboard appears, unless this is set to something other than `"auto"`.
      * @defaultValue "auto"
      */
     initialFocus?: PopoverInitialFocus

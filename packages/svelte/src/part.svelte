@@ -7,6 +7,16 @@ with the part's attributes, so most parts need no more than
 `<Part tag="div" part={item} {props} />`.
 @stable
 -->
+<script module lang="ts">
+  // Names only SVG uses. `a`, `title`, `style` and `script` are HTML too, so
+  // they stay HTML, as a tag outside an `<svg>` of the same component does.
+  const svgTags = new Set(
+    "animate animateMotion animateTransform circle clipPath defs desc ellipse feBlend feColorMatrix feComponentTransfer feComposite feConvolveMatrix feDiffuseLighting feDisplacementMap feDistantLight feDropShadow feFlood feFuncA feFuncB feFuncG feFuncR feGaussianBlur feImage feMerge feMergeNode feMorphology feOffset fePointLight feSpecularLighting feSpotLight feTile feTurbulence filter foreignObject g image line linearGradient marker mask metadata mpath path pattern polygon polyline radialGradient rect set stop svg switch symbol text textPath tspan use view".split(
+      " "
+    )
+  )
+</script>
+
 <script lang="ts" generics="State">
   import type { Snippet } from "svelte"
   import type { PartBinding, SlotAttributes } from "./use-primitive.svelte"
@@ -28,6 +38,9 @@ with the part's attributes, so most parts need no more than
   } = $props()
 
   const attributes = $derived(part.slot(props))
+  const xmlns = $derived(
+    svgTags.has(tag) ? "http://www.w3.org/2000/svg" : undefined
+  )
 </script>
 
 {#if props.render}
@@ -37,9 +50,9 @@ with the part's attributes, so most parts need no more than
     children: props.children,
   })}
 {:else if props.children}
-  <svelte:element this={tag} {...attributes}
+  <svelte:element this={tag} {xmlns} {...attributes}
     >{@render props.children(part.state)}</svelte:element
   >
 {:else}
-  <svelte:element this={tag} {...attributes} />
+  <svelte:element this={tag} {xmlns} {...attributes} />
 {/if}

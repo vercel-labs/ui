@@ -327,6 +327,15 @@ type NavigationMenuViewportState = {
   orientation: NavigationMenuOrientation
 }
 /**
+ * Props of the indicator.
+ * @stable
+ */
+type NavigationMenuIndicatorProps = {
+  /** Whether it follows the top-level trigger or link under the pointer, and goes back to the open or current one when the pointer leaves the list. */
+  followHover?: boolean
+}
+
+/**
  * The state the `indicator` slot of `navigationMenu` hands `render` functions
  * and state-based class names.
  * @stable
@@ -558,18 +567,21 @@ const navigationMenuPrimitive = /* @__PURE__ */ definePrimitive({
     }),
 
     // Covers the open trigger, or the current page's link while closed.
-    indicator: slot<{}, NavigationMenuIndicatorState>({
-      state: (state) => ({
-        open: state.value !== null,
-        orientation: state.orientation,
-      }),
-      attrs: (state) => ({
-        "aria-hidden": "true",
-        "data-orientation": state.orientation,
-        ...openAttrs(state.value !== null),
-      }),
-      bind: (el, { api }) => api.internal.bindIndicator(el),
-    }),
+    indicator: slot<NavigationMenuIndicatorProps, NavigationMenuIndicatorState>(
+      {
+        props: { followHover: "boolean" },
+        state: (state) => ({
+          open: state.value !== null,
+          orientation: state.orientation,
+        }),
+        attrs: (state) => ({
+          "aria-hidden": "true",
+          "data-orientation": state.orientation,
+          ...openAttrs(state.value !== null),
+        }),
+        bind: (el, part) => part.api.internal.bindIndicator(el, part),
+      }
+    ),
   }),
   agent: { actions: ["setValue", "close"], reveals: true },
 })
@@ -598,6 +610,7 @@ export {
   type NavigationMenuContentProps,
   type NavigationMenuContentState,
   type NavigationMenuController,
+  type NavigationMenuIndicatorProps,
   type NavigationMenuIndicatorState,
   type NavigationMenuItemProps,
   type NavigationMenuItemState,

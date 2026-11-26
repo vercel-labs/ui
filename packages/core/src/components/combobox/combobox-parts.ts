@@ -45,7 +45,7 @@ import {
   valueInputPart,
   warnIfUnnamed,
 } from "../../foundation/lists/listbox-parts"
-import { flagWhileBound } from "../../foundation/kernel/bound-keys"
+import { flagWhileBound, later } from "../../foundation/kernel/bound-keys"
 import { takeTypedText } from "../../foundation/forms/form"
 import { bindFieldName } from "../../foundation/lists/field-name"
 import {
@@ -323,10 +323,24 @@ const comboboxSlots = (slot: SlotFactory<ComboboxState, ComboboxApi>) => ({
         )
       }
       const off = store.subscribe(write)
-      // Inside the content, like in a popup a button opens, the input can't open the list itself.
-      const offInline = el.closest('[data-slot="combobox-content"]')
-        ? () => {}
-        : flagWhileBound(store, "inlineInput")
+      // Inside the content, like in a popup a button opens, the input can't open the list
+      // itself. Vue binds the input before the content is in the page, so this looks later.
+      let bound = true
+      let inline = false
+      later(store, (draft) => {
+        inline = bound && !el.closest('[data-slot="combobox-content"]')
+        if (inline) {
+          draft.inlineInput = true
+        }
+      })
+      const offInline = () => {
+        bound = false
+        later(store, (draft) => {
+          if (inline) {
+            draft.inlineInput = false
+          }
+        })
+      }
       const offSheet = bindSheetInput(el, {
         store,
         presentation: api.internal.presentation,
@@ -540,7 +554,8 @@ const comboboxCreate = /* @__PURE__ */ (() => ({
     create: comboboxSlot<CreateProps, ComboboxCreateState>({
       // `onCreate`'s Promise makes the option pending. `text` is internal: passed by renderers.
       props: { onCreate: "action", minLength: "number", text: "boolean" },
-      present: (state, { api }) => api.internal.createShown(state),
+      present: (state, { api, props }) =>
+        api.internal.createShown(state, props),
       role: "option",
       focus: "active-descendant",
       state: (state) => ({

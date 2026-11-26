@@ -87,6 +87,10 @@ function defineListboxElements() {
           return
         }
         adoptDefaultValue(el, items as ListData<unknown>, api)
+        // A windowed list writes its rows itself and passes every item as data.
+        if (el.querySelector("ui-listbox-item")) {
+          return
+        }
         const fresh = renderListItems(
           "ui-listbox",
           items as ListData<unknown>,

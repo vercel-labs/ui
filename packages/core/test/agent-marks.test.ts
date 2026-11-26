@@ -313,6 +313,72 @@ describe("data-agent-confirm", () => {
     expect(onClick).not.toHaveBeenCalled()
   })
 
+  test("aborting a call waiting for its turn settles it at once, and it never runs", async () => {
+    let answer: (ok: boolean) => void = () => {}
+    let signal: AbortSignal | undefined
+    const agent = createAgent({
+      allow: (step, context) => {
+        if (!step.confirm) {
+          return true
+        }
+        signal = context.signal
+        return new Promise<boolean>((resolve) => (answer = resolve))
+      },
+    })
+    const buy = mountButton("Buy credits")
+    buy.el.setAttribute("data-agent-confirm", "Charges $20")
+    const save = mountButton("Save")
+    const first = agent.act({
+      steps: [{ ref: "Buy credits", action: "press" }],
+    })
+    await vi.waitFor(() => expect(signal).toBeDefined())
+    const stop = new AbortController()
+    const second = agent.act(
+      { steps: [{ ref: "Save", action: "press" }] },
+      { signal: stop.signal }
+    )
+    stop.abort()
+    expect(await second).toMatchObject({
+      ok: false,
+      error: { step: 0, message: "press on Save was cancelled." },
+      steps: [],
+      values: {},
+    })
+    expect(signal?.aborted).toBe(false)
+    answer(true)
+    expect(await first).toMatchObject({ ok: true })
+    expect(buy.onClick).toHaveBeenCalledTimes(1)
+    await agent.query({ kind: "button" })
+    expect(save.onClick).not.toHaveBeenCalled()
+  })
+
+  test("a call cancelled while it waits for its turn rejects when its input can't be read", async () => {
+    let answer: (ok: boolean) => void = () => {}
+    let asked = false
+    const agent = createAgent({
+      allow: () => {
+        asked = true
+        return new Promise<boolean>((resolve) => (answer = resolve))
+      },
+    })
+    mountButton("Buy credits")
+    const save = mountButton("Save")
+    const first = agent.act({
+      steps: [{ ref: "Buy credits", action: "press" }],
+    })
+    await vi.waitFor(() => expect(asked).toBe(true))
+    const stop = new AbortController()
+    const second = agent.act(
+      { steps: [{ ref: "Save", action: "press", unexpected: 1n } as never] },
+      { signal: stop.signal }
+    )
+    stop.abort()
+    await expect(second).rejects.toThrow(TypeError)
+    answer(false)
+    await first
+    expect(save.onClick).not.toHaveBeenCalled()
+  })
+
   test("a step nobody answers fails after the timeout, aborts allow's signal and frees the next call", async () => {
     let signal: AbortSignal | undefined
     const agent = createAgent({

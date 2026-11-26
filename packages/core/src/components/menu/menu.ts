@@ -70,6 +70,7 @@ type MenuOpenChangeReason =
   | "back"
   | "shortcut"
   | "swipe"
+  | "anchor-hidden"
   | "imperative"
 
 /**

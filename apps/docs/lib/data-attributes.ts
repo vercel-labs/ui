@@ -820,8 +820,15 @@ const components: Record<
     },
     parts: { root: { react: "Tabs", web: "<ui-tabs>" } },
     interactive: [{ file: "motion/presence.ts", slot: "panel" }],
-    extra: { tab: ["data-has-icon"], list: ["data-has-icons"] },
+    extra: {
+      tab: ["data-has-icon"],
+      list: ["data-has-icons"],
+      indicator: ["data-visible"],
+    },
     descriptions: {
+      "data-visible": {
+        text: "Present once the indicator has a position. Its variables are unset until then.",
+      },
       "data-mirror": {
         text: "Present on an icon that flips in right-to-left text, with `mirror`.",
       },
@@ -1577,7 +1584,11 @@ const components: Record<
       indicator: [{}],
     },
     interactive: [],
+    extra: { indicator: ["data-visible"] },
     descriptions: {
+      "data-visible": {
+        text: "Present once the indicator has a position. Its variables are unset until then.",
+      },
       "data-orientation": { text: "Which way the items run." },
       "data-checked": { text: "Present on the checked item." },
       "data-unchecked": { text: "Present on items that aren't checked." },

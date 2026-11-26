@@ -9,6 +9,7 @@ export type {
   NavigationMenuContentProps,
   NavigationMenuContentState,
   NavigationMenuController,
+  NavigationMenuIndicatorProps,
   NavigationMenuIndicatorState,
   NavigationMenuItemProps,
   NavigationMenuItemState,

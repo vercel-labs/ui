@@ -113,7 +113,7 @@ Keep overflow visible around an arrow that extends outside the panel. If the bod
 
 ## Anchor
 
-Set `anchor` to position against something other than the trigger. It accepts an element, a selector, a point such as `{ x, y }`, or an object with `getBoundingClientRect()`, such as a text range. The position is read again as the anchor moves.
+Set `anchor` to position against something other than the trigger. It accepts an element, a selector, a point such as `{ x, y }`, or an object with `getBoundingClientRect()`, such as a text range. The position is read again as the anchor moves. If the anchor stops rendering while the popover is open, like a trigger a breakpoint hides, the popover closes with reason `anchor-hidden`.
 
 <ComponentExample
   name="popover/anchor"
@@ -135,7 +135,7 @@ Set `anchor` to position against something other than the trigger. It accepts an
 
 ## Focus
 
-Use `initialFocus` to choose the first focused element, or `"none"` to leave focus where it is. `finalFocus` controls where focus returns. Opening on hover leaves focus alone; opening with touch focuses the panel itself so no on-screen keyboard appears. See [popup focus](../popups#focus) for the shared focus rules.
+Use `initialFocus` to choose the first focused element, or `"none"` to leave focus where it is. `finalFocus` controls where focus returns. Opening on hover leaves focus alone; opening with touch focuses the panel itself so no on-screen keyboard appears, unless you set `initialFocus`. See [popup focus](../popups#focus) for the shared focus rules.
 
 <ComponentExample
   name="popover/focus"

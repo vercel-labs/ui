@@ -20,6 +20,7 @@
     toolbarFixture as f,
     toolbarLocked,
     toolbarOptions,
+    toolbarRenderedToggle,
   } from "tests/fixtures/toolbar.ts"
 
   let action = $state("")
@@ -36,13 +37,28 @@
 
 <!-- Declared outside the toolbar: a snippet inside a component's tag becomes one of its props. -->
 {#snippet spellcheckToggle()}
-  <Toggle
-    class="toggle"
-    onPressedChange={(pressed) =>
-      (action = `spellcheck: ${pressed ? "on" : "off"}`)}
-  >
-    {f.spellcheck.label}
-  </Toggle>
+  {#if toolbarRenderedToggle()}
+    <ToolbarButton>
+      {#snippet render({ props })}
+        <Toggle
+          {...props}
+          class="toggle"
+          onPressedChange={(pressed) =>
+            (action = `spellcheck: ${pressed ? "on" : "off"}`)}
+        >
+          {f.spellcheck.label}
+        </Toggle>
+      {/snippet}
+    </ToolbarButton>
+  {:else}
+    <Toggle
+      class="toggle"
+      onPressedChange={(pressed) =>
+        (action = `spellcheck: ${pressed ? "on" : "off"}`)}
+    >
+      {f.spellcheck.label}
+    </Toggle>
+  {/if}
 {/snippet}
 {#snippet helpLink()}
   <ToolbarLink href={f.help.href}>{f.help.label}</ToolbarLink>

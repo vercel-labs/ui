@@ -4,6 +4,7 @@
 // offsets once something moved.
 import { supportsHiddenUntilFound } from "../../foundation/disclosure/disclosure"
 import { layoutBox, layoutSize } from "../../foundation/platform/layout"
+import { trackHover } from "../../foundation/selection/indicator"
 
 // Writes the open content's size onto the viewport as `--viewport-width` and
 // `--viewport-height`, which a size transition can animate. Contents are
@@ -172,10 +173,20 @@ function bindIndicator(
     root: () => HTMLElement | undefined
     // Calls back when the open item changes. Returns an unsubscribe.
     onChange: (listener: () => void) => () => void
+    // Whether it follows the top-level item under the pointer instead.
+    followHover: () => boolean
+    // The top-level item a pointer event's target is in.
+    itemOf: (target: Element) => HTMLElement | undefined
   }
 ) {
+  const hover = trackHover({
+    list: () => config.watched()[0],
+    itemOf: config.itemOf,
+    enabled: config.followHover,
+    onChange: () => update(),
+  })
   const update = () => {
-    const target = config.target()
+    const target = hover.hovered() ?? config.target()
     const container =
       (el.offsetParent as HTMLElement | null) ?? el.parentElement
     if (!target || !container) {
@@ -238,6 +249,7 @@ function bindIndicator(
     if (list) {
       items?.observe(list, { childList: true, subtree: true })
     }
+    hover.listen()
     update()
   })
   return () => {
@@ -246,6 +258,7 @@ function bindIndicator(
     sized?.disconnect()
     current?.disconnect()
     items?.disconnect()
+    hover.stop()
   }
 }
 

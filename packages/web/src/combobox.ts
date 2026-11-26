@@ -378,16 +378,31 @@ function renderData(el: ComboboxElement, api: ComboboxApi) {
     if (!markup && !content && !list.isConnected) {
       return
     }
-    const own = Array.from(list.children).some(
-      (child) =>
-        child.localName === "ui-combobox-item" && !generatedItems.has(child)
+    // Rows the page writes, anywhere in the list, like a windowed list's box,
+    // replace the ones rendered from data, as in select.
+    const own = Array.from(list.querySelectorAll("ui-combobox-item")).some(
+      (item) => !generatedItems.has(item)
     )
-    if (own || rendered.get(list) === visible) {
+    if (own) {
+      for (const child of Array.from(list.children)) {
+        if (generatedItems.has(child)) {
+          child.remove()
+        }
+      }
+      rendered.delete(list)
+      return
+    }
+    if (rendered.get(list) === visible) {
       return
     }
     rendered.set(list, visible)
     const fresh = renderListItems("ui-combobox", visible, toKey, templateOf(el))
-    fresh.forEach((item) => generatedItems.add(item))
+    for (const item of fresh) {
+      generatedItems.add(item)
+      item
+        .querySelectorAll("ui-combobox-item")
+        .forEach((nested) => generatedItems.add(nested))
+    }
     placeItems(
       list,
       fresh,

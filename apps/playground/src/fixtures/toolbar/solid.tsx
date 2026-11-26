@@ -17,6 +17,7 @@ import {
   toolbarFixture as f,
   toolbarLocked,
   toolbarOptions,
+  toolbarRenderedToggle,
 } from "tests/fixtures/toolbar.ts"
 
 const controller = createToolbarController()
@@ -116,16 +117,32 @@ function Fixture() {
             )}
           </For>
         </ToolbarGroup>
-        {lock("Locked proofing", () => (
-          <Toggle
-            class="toggle"
-            onPressedChange={(pressed) =>
-              setAction(`spellcheck: ${pressed ? "on" : "off"}`)
-            }
-          >
-            {f.spellcheck.label}
-          </Toggle>
-        ))}
+        {lock("Locked proofing", () =>
+          toolbarRenderedToggle() ? (
+            <ToolbarButton
+              render={(props) => (
+                <Toggle
+                  {...props}
+                  class="toggle"
+                  onPressedChange={(pressed) =>
+                    setAction(`spellcheck: ${pressed ? "on" : "off"}`)
+                  }
+                />
+              )}
+            >
+              {f.spellcheck.label}
+            </ToolbarButton>
+          ) : (
+            <Toggle
+              class="toggle"
+              onPressedChange={(pressed) =>
+                setAction(`spellcheck: ${pressed ? "on" : "off"}`)
+              }
+            >
+              {f.spellcheck.label}
+            </Toggle>
+          )
+        )}
         {lock("Locked help", () => (
           <ToolbarLink href={f.help.href}>{f.help.label}</ToolbarLink>
         ))}

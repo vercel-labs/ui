@@ -15,6 +15,7 @@ import {
   type PortalProps,
   type PositionProps,
 } from "../../foundation/platform/position"
+import { apart } from "../../foundation/text/accessible-name"
 import { textOf } from "../../foundation/text/typeahead"
 import {
   createPopup,
@@ -54,6 +55,7 @@ type TooltipOpenChangeReason =
   | "outside-press"
   | "window-blur"
   | "back"
+  | "anchor-hidden"
   | "imperative"
 
 /**
@@ -286,11 +288,33 @@ function hasOwnName(el: HTMLElement, contentId: string) {
   )
 }
 
-// The content's text as a screen reader hears it open: without the parts
-// hidden from it, like a shortcut's keys, even while the content is hidden.
-// `textOf` reads past the content's own `hidden`, and skips hidden parts inside it.
-const spokenText = (content: HTMLElement) =>
-  textOf(content).replace(/\s+/g, " ").trim()
+// The content's text as it reads, with a space between its blocks as the
+// browser's own name has, since markup often has no whitespace there. `spoken`
+// leaves out the parts hidden from a screen reader, like a shortcut's keys.
+function readText(el: Element, spoken: boolean) {
+  let text = ""
+  for (const node of el.childNodes) {
+    if (node.nodeType === Node.TEXT_NODE) {
+      text += node.nodeValue
+    } else if (
+      node.nodeType === Node.ELEMENT_NODE &&
+      !(spoken && isHiddenPart(node as Element))
+    ) {
+      const inner = readText(node as Element, spoken)
+      text +=
+        inner.trim() && apart(node as Element, inner) ? ` ${inner} ` : inner
+    }
+  }
+  return text
+}
+
+const isHiddenPart = (el: Element) =>
+  el.hasAttribute("hidden") || el.getAttribute("aria-hidden") === "true"
+
+const collapse = (text: string) => text.replace(/\s+/g, " ").trim()
+
+// Read even while the content itself is hidden, as a closed tooltip's is.
+const spokenText = (content: HTMLElement) => collapse(readText(content, true))
 
 // A closed tooltip's content is hidden, and hidden content names or describes
 // its trigger in full, so an icon button whose tooltip shows "Save ⌘S" was
@@ -305,10 +329,7 @@ function labelContent(el: HTMLElement) {
       return
     }
     const spoken = spokenText(el)
-    const label =
-      spoken === (el.textContent ?? "").replace(/\s+/g, " ").trim()
-        ? null
-        : spoken
+    const label = spoken === collapse(readText(el, false)) ? null : spoken
     if (label === written) {
       return
     }
@@ -378,7 +399,7 @@ function tooltipApiBody(
       queueMicrotask(() => {
         const content = popup.internal.popup.element()
         if (content) {
-          announce(textOf(content).trim(), { doc: content.ownerDocument })
+          announce(spokenText(content), { doc: content.ownerDocument })
         }
       })
     }
@@ -387,7 +408,12 @@ function tooltipApiBody(
 
   // A press toggles a toggleable tooltip. Any other closes it, unless `closeOnPress` is false,
   // and it stays closed until the pointer leaves.
-  function press(key: string, payload: unknown, event?: Event) {
+  function press(
+    key: string,
+    payload: unknown,
+    event?: Event,
+    el?: HTMLElement
+  ) {
     const by = openerOf(event)
     if (options().toggleable) {
       if (store.get().open && popup.internal.popup.opener() !== "hover") {
@@ -406,7 +432,11 @@ function tooltipApiBody(
       })
       return
     }
-    if (options().closeOnPress === false) {
+    // An aria-disabled trigger keeps the tooltip that says why it's unavailable.
+    if (
+      options().closeOnPress === false ||
+      el?.getAttribute("aria-disabled") === "true"
+    ) {
       return
     }
     hover?.clear()
@@ -500,8 +530,8 @@ const tooltipPrimitive = /* @__PURE__ */ definePrimitive({
             api.internal.enter(event, key, props.payload),
           pointerleave: (event, { api }) => api.internal.leave(event),
         },
-        press: ({ api, key, props }, event) =>
-          api.internal.tooltipPress(key, props.payload, event),
+        press: ({ api, key, props, el }, event) =>
+          api.internal.tooltipPress(key, props.payload, event, el),
         // Asleep too, since the trigger is named or described before it's hovered or focused.
         bind: undefined,
         asleep(el, { key, store, id }) {

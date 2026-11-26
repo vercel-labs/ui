@@ -14,8 +14,16 @@
   import { carouselFixture, carouselOptions } from "tests/fixtures/carousel.ts"
 
   const controller = createCarouselController()
-  const { perView, cancel, playToggle, controlled, options } = carouselOptions()
+  const { perView, cancel, playToggle, controlled, disabledMedia, options } =
+    carouselOptions()
   let page = $state(1)
+  let disabled = $state(false)
+  $effect(() => {
+    const change = () => (disabled = !!disabledMedia?.matches)
+    change()
+    disabledMedia?.addEventListener("change", change)
+    return () => disabledMedia?.removeEventListener("change", change)
+  })
 
   let action = $state("")
   let reason = $state("")
@@ -45,6 +53,7 @@
     {...options}
     {...controlled ? { page } : {}}
     {controller}
+    {disabled}
     {onPageChange}
     onPageChangeComplete={(page) => (rested = String(page))}
   >

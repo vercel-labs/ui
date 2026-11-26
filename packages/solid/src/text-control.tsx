@@ -120,14 +120,22 @@ function defaultValueProps(
  * renders them.
  */
 function startingText(props: Record<string, any>) {
-  const render = untrack(() => props.render)
+  let last: unknown
+  let made: ((merged: Record<string, any>, state: unknown) => any) | undefined
   return merge(props, {
-    render: (merged: Record<string, any>, state: unknown) => {
-      const element = defaultValueProps(merged)
-      if (typeof render === "function") {
-        return render(element, state)
+    get render() {
+      const render = props.render
+      if (!made || render !== last) {
+        last = render
+        made = (merged: Record<string, any>, state: unknown) => {
+          const element = defaultValueProps(merged)
+          if (typeof render === "function") {
+            return render(element, state)
+          }
+          return <input {...element} />
+        }
       }
-      return <input {...element} />
+      return made
     },
   })
 }

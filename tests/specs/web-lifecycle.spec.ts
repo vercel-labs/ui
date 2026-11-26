@@ -122,6 +122,132 @@ test("a field labels a select built one element at a time, outer elements first"
   await expect(trigger).toBeFocused()
 })
 
+test("a ui-label names the select trigger its `for` points at", async ({
+  page,
+}) => {
+  await page.evaluate(() => {
+    document.querySelector("#stage")!.innerHTML =
+      `<ui-label for="country">Country</ui-label><ui-select placeholder="Choose a country"><ui-select-trigger><button id="country"><ui-select-value></ui-select-value></button></ui-select-trigger><ui-select-content><ui-select-item value="jp">Japan</ui-select-item></ui-select-content></ui-select>`
+  })
+  await expect(page.getByRole("combobox", { name: "Country" })).toBeVisible()
+})
+
+test("radios in card labels around fields with descriptions are each named by their card", async ({
+  page,
+}) => {
+  await page.evaluate(() => {
+    const card = (value: string, text: string) =>
+      `<label><ui-field><ui-radio value="${value}"></ui-radio><span>${text}</span><ui-field-description>More</ui-field-description></ui-field></label>`
+    document.querySelector("#stage")!.innerHTML =
+      `<ui-radio-group aria-label="Plan" default-value="team">${card("starter", "Starter")}${card("team", "Team")}${card("business", "Business")}</ui-radio-group>`
+  })
+  for (const name of ["Starter More", "Team More", "Business More"]) {
+    await expect(page.getByRole("radio", { name })).toBeVisible()
+  }
+})
+
+test("a press on a ui-label checks its checkbox and focuses it", async ({
+  page,
+}) => {
+  await page.evaluate(() => {
+    document.querySelector("#stage")!.innerHTML =
+      `<ui-label><ui-checkbox></ui-checkbox> Wrapped</ui-label><ui-checkbox id="pointed"></ui-checkbox><ui-label for="pointed">Pointing</ui-label>`
+  })
+  for (const name of ["Wrapped", "Pointing"]) {
+    const box = page.getByRole("checkbox", { name })
+    await page.getByText(name, { exact: true }).click()
+    await expect(box).toBeChecked()
+    await expect(box).toBeFocused()
+  }
+})
+
+test("a press on a field label leaves a radio its group disables unfocused", async ({
+  page,
+}) => {
+  await page.evaluate(() => {
+    document.querySelector("#stage")!.innerHTML =
+      `<ui-radio-group aria-label="Plan" disabled><ui-field><ui-radio value="team"></ui-radio><ui-field-label>Team</ui-field-label></ui-field></ui-radio-group>`
+  })
+  const radio = page.getByRole("radio", { name: "Team" })
+  await expect(radio).toBeVisible()
+  await page.getByText("Team", { exact: true }).click()
+  await expect(radio).not.toBeChecked()
+  await expect(radio).not.toBeFocused()
+})
+
+for (const kind of ["dialog", "popover"]) {
+  test(`a ${kind} with no exit animation sends focus to its \`final-focus\` as it closes`, async ({
+    page,
+  }) => {
+    await page.evaluate((kind) => {
+      document.querySelector("#stage")!.innerHTML =
+        `<ui-${kind}><ui-${kind}-trigger><button>Open</button></ui-${kind}-trigger><ui-${kind}-content final-focus="#next"><input aria-label="Name" /><ui-${kind}-close><button>Done</button></ui-${kind}-close></ui-${kind}-content></ui-${kind}><button id="next">Next step</button>`
+    }, kind)
+    await page.getByRole("button", { name: "Open" }).click()
+    await page.getByRole("button", { name: "Done" }).click()
+    await expect(page.getByRole("button", { name: "Next step" })).toBeFocused()
+    await page.getByRole("button", { name: "Open" }).click()
+    await expect(page.getByRole("textbox", { name: "Name" })).toBeFocused()
+    await page.keyboard.press("Escape")
+    await expect(page.getByRole("button", { name: "Next step" })).toBeFocused()
+  })
+}
+
+test("a label built on a native label names and reaches the control inside a slider, number input or checkbox group", async ({
+  page,
+}) => {
+  await page.evaluate(() => {
+    document.querySelector("#stage")!.innerHTML = `
+      <x-label><label for="volume">Volume</label></x-label>
+      <ui-slider id="volume" default-value="65"><ui-slider-control><ui-slider-track><ui-slider-indicator></ui-slider-indicator><ui-slider-thumb></ui-slider-thumb></ui-slider-track></ui-slider-control></ui-slider>
+      <x-label><label for="guests">Guests</label></x-label>
+      <ui-number-input id="guests" default-value="2"><ui-number-input-group><ui-number-input-control><input /></ui-number-input-control></ui-number-input-group></ui-number-input>
+      <x-label><label for="topics">Topics</label></x-label>
+      <ui-checkbox-group id="topics"><ui-checkbox value="news" aria-label="News"></ui-checkbox><ui-checkbox value="tips" aria-label="Tips"></ui-checkbox></ui-checkbox-group>`
+  })
+  const slider = page.getByRole("slider", { name: "Volume" })
+  const guests = page.getByRole("textbox", { name: "Guests" })
+  await expect(slider).toBeAttached()
+  await expect(guests).toBeAttached()
+  await page.getByText("Volume", { exact: true }).click()
+  await expect(slider).toBeFocused()
+  await page.getByText("Guests", { exact: true }).click()
+  await expect(guests).toBeFocused()
+  await page.getByText("Topics", { exact: true }).click()
+  await expect(page.getByRole("checkbox", { name: "News" })).toBeFocused()
+})
+
+for (const [kind, anchor] of [
+  ["an element", "element"],
+  ["a point", { x: 400, y: 300 }],
+] as const) {
+  test(`a popover content's \`anchor\` property places it against ${kind}`, async ({
+    page,
+  }) => {
+    const errors: string[] = []
+    page.on("pageerror", (error) => errors.push(error.message))
+    await page.evaluate((anchor) => {
+      document.querySelector("#stage")!.innerHTML =
+        `<ui-popover><ui-popover-trigger><button>Share</button></ui-popover-trigger><ui-popover-content side="bottom" align="start" side-offset="0">Link</ui-popover-content></ui-popover><span id="mark" style="position: fixed; left: 400px; top: 280px; width: 10px; height: 20px"></span>`
+      const content = document.querySelector(
+        "ui-popover-content"
+      ) as HTMLElement & { anchor: unknown }
+      content.anchor =
+        anchor === "element" ? document.querySelector("#mark") : anchor
+    }, anchor)
+    await page.getByRole("button", { name: "Share" }).click()
+    const content = page.locator("ui-popover-content")
+    await expect(content).toBeVisible()
+    await expect
+      .poll(async () => {
+        const box = (await content.boundingBox())!
+        return [Math.round(box.x), Math.round(box.y)]
+      })
+      .toEqual([400, 300])
+    expect(errors).toEqual([])
+  })
+}
+
 test("a button moved out of its tab is a plain button again", async ({
   page,
 }) => {

@@ -36,6 +36,7 @@ type HoverCardOpenChangeReason =
   | "outside-press"
   | "window-blur"
   | "back"
+  | "anchor-hidden"
   | "imperative"
 
 /**

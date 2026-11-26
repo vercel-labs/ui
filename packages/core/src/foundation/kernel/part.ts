@@ -88,6 +88,8 @@ type PartOwner = {
   renamed?: boolean
 }
 
+// The part a sleeping instance's view was made for, which `firstAsleep` reads.
+const viewed = Symbol()
 // Every part an adapter holds came from `instance.part()`, which makes a record.
 const ownerOf = (part: Part) => (part as PartRecord).owner
 const definitionOf = (part: Part) => ownerOf(part).slots[part.slot]
@@ -103,6 +105,7 @@ const view = <Api, Props>(part: Part<any, Api>, props: Props) =>
         get api() {
           return awake(part)
         },
+        [viewed]: part as PartRecord,
       }
     : { id: part.id, key: part.key, props, api: part.api }
 const context = (part: Part, props = part.props) =>
@@ -442,6 +445,27 @@ function commit(part: Part, props: Part["props"]) {
   }
   part.props = props
   propsRendered(part as PartRecord)
+}
+
+/**
+ * For a render while the instance sleeps and has no api to ask: the key of
+ * the slot's first part that's bound and in the page, else the first rendered.
+ */
+function firstAsleep(view: object, slot: string) {
+  const part = (view as { [viewed]?: PartRecord })[viewed]
+  if (!part) {
+    return undefined
+  }
+  let first: string | undefined
+  for (const other of ordered(part.owner).values()) {
+    if (other.slot === slot) {
+      if (other.el?.isConnected) {
+        return other.key
+      }
+      first ??= other.key
+    }
+  }
+  return first
 }
 
 // Tells the part's `onProps` listeners it rendered with new props.
@@ -891,6 +915,7 @@ export {
   connect,
   directNames,
   enlist,
+  firstAsleep,
   followed,
   handlers,
   held,

@@ -87,6 +87,7 @@ type ComboboxQueryChangeReason =
   | "back"
   | "swipe"
   | "reset"
+  | "anchor-hidden"
   | "imperative"
 
 /**
@@ -104,6 +105,7 @@ type ComboboxOpenChangeReason =
   | "window-blur"
   | "back"
   | "swipe"
+  | "anchor-hidden"
   | "imperative"
 
 /**

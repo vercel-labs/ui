@@ -16,6 +16,7 @@ import {
   navigationMenuLayout,
   navigationMenuOptions,
 } from "tests/fixtures/navigation-menu.ts"
+import { indicatorOptions } from "tests/fixtures/page.ts"
 
 function Nested() {
   const nested = fixture.nested
@@ -107,7 +108,10 @@ function Fixture() {
             </NavigationMenuLink>
           </NavigationMenuItem>
         </NavigationMenuList>
-        <NavigationMenuIndicator class="nav-indicator" />
+        <NavigationMenuIndicator
+          class="nav-indicator"
+          {...indicatorOptions()}
+        />
         <Show when={layout.viewport}>
           <NavigationMenuViewport class="nav-viewport" {...layout.placement} />
         </Show>

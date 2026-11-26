@@ -91,6 +91,24 @@ Set `orientation="vertical"` to use Up and Down Arrow instead. Style the list as
   caption="Focus General, then press Down Arrow to choose Security. Up Arrow moves back through the vertical list."
 />
 
+To change the orientation with the layout, like a column beside the panels on wide screens and a row above them on phones, set `orientation` from a media query. The arrow keys follow it.
+
+```svelte
+<script lang="ts">
+  import { MediaQuery } from "svelte/reactivity"
+  import { Tabs } from "@ui-sdk/svelte/tabs"
+
+  const isWide = new MediaQuery("min-width: 768px")
+</script>
+
+<Tabs
+  defaultValue="account"
+  orientation={isWide.current ? "vertical" : "horizontal"}
+>
+  <!-- List and panels. -->
+</Tabs>
+```
+
 ## Disabled
 
 Add `disabled` to a tab to prevent selection. Arrow keys can still focus it so people can discover it.
@@ -135,7 +153,7 @@ Arrow keys normally wrap around at either end. Set `loop={false}` to stop there 
 
 ## Indicator
 
-`TabsIndicator` measures the selected tab. Position it inside a relative tab list and use its [CSS variables](#styling-tabsindicator) to make a marker that follows the selection. It measures again when a tab or the list changes size.
+`TabsIndicator` measures the selected tab. Position it inside a relative tab list and use its [CSS variables](#styling-tabsindicator) to make a marker that follows the selection. It measures again when a tab or the list changes size. It gets `data-visible` once it has a position. Until then, like on a page rendered on the server before its script runs, its variables are unset, so hide it while it's `:not([data-visible])`.
 
 ```css
 [data-slot="tabs-list"] {
@@ -163,6 +181,8 @@ Add transitions for the properties you animate. Skip them while `data-activation
   name="tabs/indicator"
   caption="Choose Podcasts, then choose Vertical. The same indicator measures and follows the selected tab in either layout."
 />
+
+Give it `followHover` and it follows the tab under the pointer instead, then goes back to the selected tab when the pointer leaves the list. The same marker becomes a hover highlight.
 
 ## Keep Mounted
 
@@ -332,7 +352,12 @@ The list takes no options of its own, only the props of the element it renders.
 
 ### TabsIndicator
 
-The indicator takes no props of its own. Its [CSS variables](#styling-tabsindicator) hold the selected tab's box.
+<TypeTable
+  path="../../packages/core/src/components/tabs/tabs.ts"
+  name="TabsIndicatorProps"
+/>
+
+Its [CSS variables](#styling-tabsindicator) hold the selected tab's box.
 
 ### TabsPanel
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { indicatorOptions, tabsOptions } from "tests/fixtures/page.ts"
 import { createTabsController } from "@ui-sdk/core/tabs"
 import { Tabs, TabsIndicator, TabsList, TabsPanel, TabsTab } from "@ui-sdk/vue"
-import { tabsOptions } from "tests/fixtures/page.ts"
 import { tabsFixture } from "tests/fixtures/tabs.ts"
 import { ref } from "vue"
 
@@ -37,7 +37,7 @@ function onValueChange(value: string | null, details: { cancel: () => void }) {
         >
           {{ tab.label }}
         </TabsTab>
-        <TabsIndicator class="indicator" />
+        <TabsIndicator class="indicator" v-bind="indicatorOptions()" />
       </TabsList>
       <TabsPanel
         v-for="tab in tabsFixture.tabs"

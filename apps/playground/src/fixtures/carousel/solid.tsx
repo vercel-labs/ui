@@ -11,7 +11,7 @@ import {
   createCarouselController,
 } from "@ui-sdk/solid/carousel"
 import { render } from "@solidjs/web"
-import { createSignal, For, Show } from "solid-js"
+import { createEffect, createSignal, For, Show } from "solid-js"
 import { carouselFixture, carouselOptions } from "tests/fixtures/carousel.ts"
 
 const controller = createCarouselController()
@@ -20,8 +20,19 @@ function Fixture() {
   const [action, setAction] = createSignal("")
   const [reason, setReason] = createSignal("")
   const [rested, setRested] = createSignal("")
-  const { perView, cancel, playToggle, controlled, options } = carouselOptions()
+  const { perView, cancel, playToggle, controlled, disabledMedia, options } =
+    carouselOptions()
   const [page, setPage] = createSignal(1)
+  const [disabled, setDisabled] = createSignal(false)
+  createEffect(
+    () => 0,
+    () => {
+      const change = () => setDisabled(!!disabledMedia?.matches)
+      change()
+      disabledMedia?.addEventListener("change", change)
+      return () => disabledMedia?.removeEventListener("change", change)
+    }
+  )
   return (
     <div class="fixture">
       <button>Before</button>
@@ -30,6 +41,7 @@ function Fixture() {
         aria-label={carouselFixture.label}
         style={{ "--per-view": String(perView) }}
         controller={controller}
+        disabled={disabled()}
         {...options}
         {...(controlled && {
           get page() {

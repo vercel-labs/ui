@@ -59,6 +59,10 @@ const toolbarItems = [
 // Spellcheck toggle, History and Help, until the Unlock button outside enables them.
 const toolbarLocked = () => new URLSearchParams(location.search).has("locked")
 
+// With ?rendered-toggle, Spellcheck is a ToolbarButton that renders a Toggle.
+const toolbarRenderedToggle = () =>
+  new URLSearchParams(location.search).has("rendered-toggle")
+
 // Toolbar options a spec can set through the URL: ?orientation=vertical&loop=false&disabled.
 function toolbarOptions() {
   const params = new URLSearchParams(location.search)
@@ -72,4 +76,10 @@ function toolbarOptions() {
   }
 }
 
-export { toolbarFixture, toolbarItems, toolbarLocked, toolbarOptions }
+export {
+  toolbarFixture,
+  toolbarItems,
+  toolbarLocked,
+  toolbarOptions,
+  toolbarRenderedToggle,
+}

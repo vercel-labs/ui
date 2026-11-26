@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import {
+  indicatorOptions,
+  segmentedControlOptions,
+} from "tests/fixtures/page.ts"
+import {
   createSegmentedControlController,
   SegmentedControl,
   SegmentedControlIndicator,
   SegmentedControlItem,
 } from "@ui-sdk/vue"
-import { segmentedControlOptions } from "tests/fixtures/page.ts"
 import { segmentedControlFixture } from "tests/fixtures/segmented-control.ts"
 import { ref } from "vue"
 
@@ -44,7 +47,7 @@ function onSubmit(event: SubmitEvent) {
       :controller="controller"
       @value-change="onValueChange"
     >
-      <SegmentedControlIndicator />
+      <SegmentedControlIndicator v-bind="indicatorOptions()" />
       <SegmentedControlItem
         v-for="item in segmentedControlFixture.items"
         :key="item.value"

@@ -16,7 +16,7 @@ import {
   type InjectionKey,
   type PropType,
 } from "vue"
-import { useFieldControl } from "./field-context"
+import { type FieldContext, FieldKey, useFieldControl } from "./field-context"
 import { toggleProps } from "./toggle-props"
 import { createParts, withElement } from "./create-parts"
 import {
@@ -35,6 +35,11 @@ const parts = createParts(checkboxPrimitive, { indicator: "span" })
 const CheckboxGroupKey: InjectionKey<
   PrimitiveHandle<typeof checkboxGroupPrimitive>
 > = Symbol("checkbox-group")
+
+// The field the group joined, so a checkbox joins only a field of its own.
+const GroupFieldKey: InjectionKey<FieldContext | null> = Symbol(
+  "checkbox-group-field"
+)
 
 /**
  * The control and the hidden native input that takes part in the form.
@@ -73,8 +78,12 @@ const Checkbox = withElement(
     slots: Object as PartSlots<typeof checkboxPrimitive, "root">,
     setup(props, { attrs, emit }) {
       const group = inject(CheckboxGroupKey, null)
-      // Inside a group, the group is the field's control.
-      const field = group ? null : useFieldControl()
+      // A checkbox in a field of its own is that field's control. In the group's field, the group is.
+      const nearest = inject(FieldKey, null)
+      const field =
+        nearest && !(group && nearest === inject(GroupFieldKey, null))
+          ? useFieldControl()
+          : null
       const checkbox = usePrimitive(checkboxPrimitive, () => ({
         parent: props.parent,
         group: group ? () => group.api : undefined,
@@ -83,7 +92,7 @@ const Checkbox = withElement(
         disabled: props.disabled || field?.disabled(),
         readOnly: readOnlyOf(props, attrs),
         required: props.required,
-        name: props.name ?? field?.name(),
+        name: props.name ?? (group ? undefined : field?.name()),
         value: props.value,
         form: props.form,
         controller: props.controller,
@@ -175,6 +184,7 @@ const CheckboxGroup = /* @__PURE__ */ withElement(
         },
       }))
       provide(CheckboxGroupKey, group)
+      provide(GroupFieldKey, inject(FieldKey, null))
       const root = usePart(group, "group", undefined, undefined, {
         tag: "div",
         extend: field?.props,
