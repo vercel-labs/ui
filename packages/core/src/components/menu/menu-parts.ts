@@ -116,7 +116,13 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
         const stop =
           state.barStop ?? api.menubar()!.internal.isStop(id, !disabled)
         return {
-          ...popupTriggerAttrs(state, id, "menu", key),
+          ...popupTriggerAttrs(
+            state,
+            id,
+            "menu",
+            key,
+            api.internal.firstTrigger()
+          ),
           type: "button",
           tabindex: stop ? "0" : "-1",
           "aria-disabled": disabled ? "true" : undefined,
@@ -127,7 +133,13 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
         }
       }
       return {
-        ...popupTriggerAttrs(state, id, "menu", key),
+        ...popupTriggerAttrs(
+          state,
+          id,
+          "menu",
+          key,
+          api.internal.firstTrigger()
+        ),
         ...buttonElementAttrs(triggerElement(state, key), {
           type: "button",
           disabled: !!props.disabled,

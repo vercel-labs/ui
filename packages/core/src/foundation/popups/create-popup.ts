@@ -97,6 +97,7 @@ type PopupCore = {
   control: ReturnType<typeof createOpenSteps<string>>
   triggerElement: () => HTMLElement | undefined
   triggerSlot: string
+  firstTrigger: () => string | undefined
   triggerDisabled: (key: string) => boolean
   contentProps: (key?: string) => PopupContentProps
   rules?: PopupRules
@@ -355,6 +356,21 @@ function createPopup<
     },
     triggerElement,
     triggerSlot,
+    // The first rendered that's in the page, or before any binds, like on a
+    // server, the first rendered.
+    firstTrigger() {
+      let first: string | undefined
+      for (const part of context.parts()) {
+        if (part.slot !== triggerSlot) {
+          continue
+        }
+        if (part.el?.isConnected) {
+          return part.key
+        }
+        first ??= part.key
+      }
+      return first
+    },
     triggerDisabled: (key) =>
       !!context.props<{ disabled?: boolean }>(triggerSlot, key)?.disabled,
     contentProps,

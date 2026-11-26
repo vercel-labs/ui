@@ -865,6 +865,7 @@ function menuApiBody(
       },
       popup,
       presentation,
+      firstTrigger: kit.internal.firstTrigger,
       layer: () => popup.layer(),
       barArrow,
       barKeydown,

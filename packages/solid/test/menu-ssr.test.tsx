@@ -12,6 +12,20 @@ import {
 
 // Runs with no DOM: any access to window or document during render throws.
 describe("server rendering a menu", () => {
+  test("of several triggers, only the first renders the id", () => {
+    const html = renderToString(() => (
+      <Menu>
+        <MenuTrigger>Row actions</MenuTrigger>
+        <MenuTrigger>Quick actions</MenuTrigger>
+        <MenuContent>
+          <MenuItem value="edit">Edit</MenuItem>
+        </MenuContent>
+      </Menu>
+    ))
+    expect(html.match(/ id="[^"]*-trigger"/g)).toHaveLength(1)
+    expect(html).toMatch(/-trigger"[^>]*>Row actions</)
+  })
+
   test("a closed menu renders its trigger only", () => {
     const html = renderToString(() => (
       <Menu>

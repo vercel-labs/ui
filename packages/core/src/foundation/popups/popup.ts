@@ -316,17 +316,19 @@ function deriveOpen<State extends { open: boolean }>(
 
 // ARIA every popup trigger carries. Only the kind of popup differs. With
 // several triggers, only the one that opened the popup is expanded and named
-// by it.
+// by it. Before one binds, the id goes to `first`, the first rendered.
 function popupTriggerAttrs(
   state: { open: boolean; mounted: boolean; trigger?: string | null },
   id: string,
   haspopup: string,
-  key = ""
+  key = "",
+  first?: string
 ) {
   const active = state.trigger == null || state.trigger === key
   const open = state.open && active
+  const named = (state.trigger ?? first ?? key) === key
   return {
-    id: active ? `${id}-trigger` : undefined,
+    id: named ? `${id}-trigger` : undefined,
     "aria-haspopup": haspopup,
     "aria-expanded": String(open),
     "aria-controls": active && state.mounted ? `${id}-content` : undefined,
