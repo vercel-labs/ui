@@ -120,12 +120,17 @@ test("a closed dialog's fields keep the rows and values they had when it closed"
     { label: "Admin", row: "Ada Lovelace" },
   ])
   document.querySelector("#key")!.setAttribute("data-agent-hidden", "")
+  document.querySelector("li")!.setAttribute("data-agent-secret", "")
   await wait(50)
-  expect(fields().map(({ label }) => label)).toEqual(["Admin", "Admin"])
+  expect(fields().map(({ label, row }) => [label, row])).toEqual([
+    ["Admin", "Grace Hopper"],
+  ])
   dialog.open = true
   await wait(50)
-  expect(fields().map(({ label, offPage }) => [label, offPage])).toEqual([
-    ["Admin", false],
-    ["Admin", false],
+  expect(
+    fields().map(({ label, offPage, checked }) => [label, offPage, checked])
+  ).toEqual([
+    ["Admin", false, "[redacted]"],
+    ["Admin", false, false],
   ])
 })
