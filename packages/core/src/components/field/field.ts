@@ -560,9 +560,12 @@ const fieldPrimitive = /* @__PURE__ */ definePrimitive({
           : undefined,
         ...dataAttrs(state, api),
       }),
-      // A label that isn't a native one for the control activates it all the same.
+      // A label that isn't a native one for the control activates it all the
+      // same, and so does a native one whose control takes no focus itself,
+      // like a color picker's group, which the browser would leave unfocused.
       press({ api, el }, event) {
-        if (el instanceof HTMLLabelElement && el.control) {
+        const control = el instanceof HTMLLabelElement ? el.control : null
+        if (control && control.tabIndex >= 0) {
           return
         }
         api.activate(event)

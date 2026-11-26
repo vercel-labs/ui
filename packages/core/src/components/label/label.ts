@@ -35,6 +35,15 @@ function ownControl(el: HTMLElement) {
   return control
 }
 
+// A native label's control that takes no focus itself, like a color picker's
+// group: the browser activates it and focuses nothing, so the label does.
+function unfocusableControl(el: HTMLElement) {
+  const control = el instanceof HTMLLabelElement ? el.control : null
+  return control instanceof HTMLElement && control.tabIndex < 0
+    ? control
+    : undefined
+}
+
 const labelsByControl = new WeakMap<HTMLElement, HTMLElement[]>()
 const written = new WeakMap<HTMLElement, string>()
 
@@ -199,7 +208,7 @@ const labelPrimitive = /* @__PURE__ */ definePrimitive({
         },
       },
       press({ el }, event) {
-        const control = el && ownControl(el)
+        const control = el && (ownControl(el) ?? unfocusableControl(el))
         if (
           !control ||
           isDisabledElement(control) ||
