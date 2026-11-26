@@ -169,7 +169,7 @@ function checkboxGroupApiBody(
   const disabled = () => isDisabled(store.get())
   const all = () => store.get().allValues ?? store.get().children
 
-  // The checkboxes' order, like the form's, also for a value given out of order.
+  // So a value given out of order reads the way the form submits it.
   deriveState(context, ["value"], ({ value, allValues, children }) => {
     const ordered = inOrder(value, allValues ?? children)
     return same(ordered, value) ? undefined : { value: ordered }
@@ -307,7 +307,9 @@ function checkboxGroupApiBody(
         if (keepsValueOnReset(value, defaultValue)) {
           return
         }
-        change("value", store.get().initial, { reason: "reset" })
+        change("value", inOrder(store.get().initial, all()), {
+          reason: "reset",
+        })
       },
       // The browser restores a disabled group too, as a native one.
       restore(saved: string) {
