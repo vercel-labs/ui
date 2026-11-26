@@ -33,6 +33,7 @@ import {
   placeOf,
   remember,
   retire,
+  shownParts,
   stateKeys,
   type Bound,
   type Entry,
@@ -803,7 +804,7 @@ function describe(entry: Entry, instance: PrimitiveInstance, parts: Bound[]) {
       out.more = data.length
     }
   }
-  const text = parts
+  const text = shownParts(parts)
     .filter((part) => /title|description|error/.test(part.slot))
     .map((part) =>
       entry.secret && /error/.test(part.slot) ? "[redacted]" : textOf(part.el)
