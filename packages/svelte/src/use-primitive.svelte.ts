@@ -415,7 +415,9 @@ function useHandlePart<P extends Primitive, S extends SlotName<P>>(
     back = portal?.(el)
     const current = untrack(() => instance.part(name, props()))
     const ref = partRef(current, { by: "framework", attaches: "all" })
-    ref(el)
+    // A slot's `bind` runs in here, and what it reads, like app state behind
+    // a function option, would bind the element again each time it changes.
+    untrack(() => ref(el))
     bound = el
     // The declarations the spread wrote are recorded, so a later change can drop them.
     if (typeof styleShown === "string") {
