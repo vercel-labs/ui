@@ -225,6 +225,9 @@ function selectApiBody(
     onLoadMore: () => options().onLoadMore,
   })
 
+  // Where the pointer last moved over an item.
+  let pointerX = NaN
+  let pointerY = NaN
   const listbox = createFilteredListbox({
     store,
     focus: () => (searching() ? "virtual" : "real"),
@@ -630,10 +633,17 @@ function selectApiBody(
       // The pointer highlights what it moves onto, focusing it unless focus stays in the search field.
       hover(key: string, event: PointerEvent) {
         const { open, highlighted } = store.get()
+        if (event.pointerType === "touch") {
+          return
+        }
+        // WebKit fires pointermove without movement when the list scrolls under the pointer.
+        const moved = pointerX !== event.clientX || pointerY !== event.clientY
+        pointerX = event.clientX
+        pointerY = event.clientY
         if (
-          event.pointerType === "touch" ||
           !open ||
-          listbox.isItemDisabled(key)
+          listbox.isItemDisabled(key) ||
+          (!moved && highlighted !== null)
         ) {
           return
         }
