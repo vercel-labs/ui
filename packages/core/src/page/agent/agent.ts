@@ -3081,11 +3081,20 @@ function createAgent(
      * Calls `listener` with every change to a component, from a person or an
      * agent, with its ref, label, reason, source and value before, until the
      * returned function runs. The same as `observe`: a change an interaction
-     * commits, like a slider's drag, comes once, when it commits.
+     * commits, like a slider's drag, comes once, when it commits. A change to
+     * a component that's hidden, which `snapshot` leaves out, isn't reported,
+     * apart from it opening or closing.
      */
     subscribe: (listener: (change: ObservedChange) => void) =>
-      listen((change) => {
-        if (!entries.get(change.ref)?.offLimits) {
+      listen((change, parts) => {
+        // Nothing bound yet says nothing about whether it shows, like a
+        // click replayed while the page hydrates.
+        const hidden =
+          parts.length > 0 && !parts.some((part) => isShown(part.el))
+        if (
+          !entries.get(change.ref)?.offLimits &&
+          (change.key === "open" || !hidden)
+        ) {
           listener(change)
         }
       }),
