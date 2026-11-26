@@ -386,6 +386,10 @@ function fieldApiBody(
         store.set({ focused: false })
       }),
     ]
+    // A control can take focus before the field binds, like React's `autoFocus`.
+    if (el.contains(el.ownerDocument.activeElement)) {
+      store.set({ focused: true })
+    }
 
     // React applies a controlled input's onChange in a microtask it queues from
     // its root listener. Rendering the field before that would put the input
