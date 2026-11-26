@@ -11,7 +11,6 @@ import {
   merge,
   omit,
   Show,
-  untrack,
   useContext,
   type ComponentProps,
 } from "solid-js"
@@ -92,8 +91,8 @@ function joinRange(
   field: NonNullable<ReturnType<typeof useFieldControl>>,
   range: () => boolean
 ) {
-  const render = untrack(() => props.render)
   return (merged: Record<string, any>, state: SliderState) => {
+    const render = props.render
     const joined = range() ? field.props(merged) : merged
     if (typeof render === "function") {
       return render(joined, state)

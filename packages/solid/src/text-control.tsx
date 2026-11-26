@@ -120,9 +120,9 @@ function defaultValueProps(
  * renders them.
  */
 function startingText(props: Record<string, any>) {
-  const render = untrack(() => props.render)
   return merge(props, {
     render: (merged: Record<string, any>, state: unknown) => {
+      const render = props.render
       const element = defaultValueProps(merged)
       if (typeof render === "function") {
         return render(element, state)

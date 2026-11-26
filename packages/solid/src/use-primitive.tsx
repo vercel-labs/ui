@@ -751,15 +751,20 @@ function renderElement(
       return resolveChildren(props.children, state)
     },
   })
-  const render = untrack(() => props.render)
-  // Lazy on the server for the same reason as a part's attributes: the render
-  // function reads them.
-  if (typeof render === "function") {
-    return createMemo(() => render(resolved, state), {
-      lazy: isServer,
-    }) as unknown as JSX.Element
-  }
-  const Tag = dynamic(() => tag)
+  const Tag = dynamic(() => {
+    const render = props.render
+    if (typeof render !== "function") {
+      return tag
+    }
+    // Lazy on the server for the same reason as a part's attributes: the
+    // render function reads them.
+    return () => {
+      const element = createMemo(() => render(resolved, state), {
+        lazy: isServer,
+      })
+      return element as unknown as JSX.Element
+    }
+  })
   return <Tag {...resolved} />
 }
 
