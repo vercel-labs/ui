@@ -1715,6 +1715,8 @@ function createAgent(
   // What each closed place a call looked behind holds, by its path, like
   // "Notifications > Email", whether a look ran and whether it may have missed some.
   const held = new Map<string, string[]>()
+  // The lists a step opened to read their items.
+  const looked = new Set<PrimitiveInstance>()
   let surveyed = false
   let partial = false
   // The component the step running now is on, and whether it's private.
@@ -2682,20 +2684,27 @@ function createAgent(
           !bound(instance).some((part) => part.key === item)
       )
     // An `agent` key's items are all it has, so opening it shows no more.
+    // Only a list with an open state, once a step, like one its app keeps closed.
     if (
       ((!data && !items.length) || unseen()) &&
       !entry.agent?.items &&
       beforeOpen &&
       api.setOpen &&
-      !state.open
+      state.open === false &&
+      !looked.has(instance)
     ) {
+      looked.add(instance)
       await beforeOpen()
       asAgent(() => api.setOpen!(true))
       let shown = renderedItems(bound(instance))
-      // Items that load can take a while. Ones the data already lists mount with the list.
+      const open = () => (instance.get() as { open?: boolean }).open
+      // Items that load can take a while. Ones the data already lists mount
+      // with the list, and a list that didn't open shows none.
       for (
         let tries = 0;
-        tries < (data ? 4 : 60) && (!shown.length || unseen());
+        tries < (data ? 4 : 60) &&
+        (!shown.length || unseen()) &&
+        (tries < 4 || open());
         tries++
       ) {
         await frames()
@@ -2737,6 +2746,7 @@ function createAgent(
       }
       // What an earlier step's look found is stale once the page has moved on.
       held.clear()
+      looked.clear()
       surveyed = false
       partial = false
       stepped = undefined
