@@ -122,6 +122,16 @@ test("a field labels a select built one element at a time, outer elements first"
   await expect(trigger).toBeFocused()
 })
 
+test("a ui-label names the select trigger its `for` points at", async ({
+  page,
+}) => {
+  await page.evaluate(() => {
+    document.querySelector("#stage")!.innerHTML =
+      `<ui-label for="country">Country</ui-label><ui-select placeholder="Choose a country"><ui-select-trigger><button id="country"><ui-select-value></ui-select-value></button></ui-select-trigger><ui-select-content><ui-select-item value="jp">Japan</ui-select-item></ui-select-content></ui-select>`
+  })
+  await expect(page.getByRole("combobox", { name: "Country" })).toBeVisible()
+})
+
 test("a button moved out of its tab is a plain button again", async ({
   page,
 }) => {

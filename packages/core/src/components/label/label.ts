@@ -97,9 +97,18 @@ function watchTree(root: Node, check: () => void) {
   }
 }
 
-// Attributes on the label or its control that change which control it names, or whether it names one.
+// Attributes on the label or its control that change which control it names,
+// or whether it names one, like a component taking back its own label reference.
 const naming = {
-  attributeFilter: ["for", "id", "role", "type", "aria-hidden", "aria-label"],
+  attributeFilter: [
+    "for",
+    "id",
+    "role",
+    "type",
+    "aria-hidden",
+    "aria-label",
+    "aria-labelledby",
+  ],
 }
 
 function bindLabel(el: HTMLElement) {

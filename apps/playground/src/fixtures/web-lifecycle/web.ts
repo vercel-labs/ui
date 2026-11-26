@@ -1,4 +1,4 @@
-// An empty page with toggles, tabs, popovers, dialogs, checkboxes, inputs, fields and the elements
+// An empty page with toggles, tabs, popovers, dialogs, checkboxes, inputs, fields, labels and the elements
 // that render content from their state defined, for specs that build
 // elements the way frameworks and scripts do.
 async function mount(root: HTMLElement) {
@@ -19,6 +19,7 @@ async function mount(root: HTMLElement) {
   await import("@ui-sdk/web/file-input")
   await import("@ui-sdk/web/token-input")
   await import("@ui-sdk/web/field")
+  await import("@ui-sdk/web/label")
 }
 
 export { mount }
