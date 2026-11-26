@@ -352,7 +352,9 @@ function slotProps(
     if (skipped.has(key)) {
       return undefined
     }
-    return key in user || key === "children" ? user[key] : attrs()[key]
+    return key in user || key === "children" || key === "render"
+      ? user[key]
+      : attrs()[key]
   }
   const proxy: Record<string, any> = new Proxy({} as Record<string, any>, {
     get: (_, key) =>
@@ -751,19 +753,25 @@ function renderElement(
       return resolveChildren(props.children, state)
     },
   })
+  let last: unknown
+  let Render: (() => JSX.Element) | undefined
   const Tag = dynamic(() => {
     const current = props.render
     if (typeof current !== "function") {
       return tag
     }
-    // Lazy on the server for the same reason as a part's attributes: the
-    // render function reads them.
-    return () => {
-      const element = createMemo(() => current(resolved, state), {
-        lazy: isServer,
-      })
-      return element as unknown as JSX.Element
+    // The props read more than `render`, so the same function keeps its
+    // element. Lazy on the server: the render function reads the attributes.
+    if (current !== last || !Render) {
+      last = current
+      Render = () => {
+        const element = createMemo(() => current(resolved, state), {
+          lazy: isServer,
+        })
+        return element as unknown as JSX.Element
+      }
     }
+    return Render
   })
   return <Tag {...resolved} />
 }
