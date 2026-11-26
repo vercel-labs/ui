@@ -38,7 +38,7 @@ ui-toast-region
             └── button
 ```
 
-The region clones the `ui-toast` in its `template` for each toast in its queue, newest first. A toast is named by its title and described by its description. Empty title, description and action parts show the text from the toast's data, so a region's template is usually the same few parts. An empty `ui-toast-close` shows the toast's cancel and runs its `onCancel`, and hides when the toast has none.
+The region clones the `ui-toast` in its `template` for each toast in its queue, newest first. A toast is named by its title and described by its description. Empty title, description and action parts show the text from the toast's data, so a region's template is usually the same few parts. An empty `ui-toast-close` shows the toast's cancel and runs its `onCancel`, and hides when the toast has none. A close button named by `aria-label`, `aria-labelledby` or `title`, like an icon drawn in CSS, stays your own close.
 
 ## Usage
 

@@ -63,13 +63,19 @@ function fromData() {
 }
 
 // A toast's parts, cloned from the region's template. An empty close button
-// is the toast's cancel, like one built from data.
+// with no name of its own is the toast's cancel, like one built from data.
 function fromTemplate(template: HTMLTemplateElement) {
   const root = (
     template.content.cloneNode(true) as DocumentFragment
   ).querySelector("ui-toast") as HTMLElement
-  for (const close of root.querySelectorAll("ui-toast-close")) {
-    if (!(wrappedButton(close as HTMLElement) ?? close).childNodes.length) {
+  for (const close of root.querySelectorAll<HTMLElement>("ui-toast-close")) {
+    const target = wrappedButton(close) ?? close
+    if (
+      !target.childNodes.length &&
+      !["aria-label", "aria-labelledby", "title"].some((name) =>
+        target.hasAttribute(name)
+      )
+    ) {
       dataCloses.add(close)
     }
   }
