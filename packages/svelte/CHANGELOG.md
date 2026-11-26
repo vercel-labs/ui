@@ -1,5 +1,18 @@
 # @ui-sdk/svelte
 
+## 0.1.0-beta.18
+
+### Patch Changes
+
+- 0dbff31: A Checkbox in a Field of its own inside a CheckboxGroup takes that field from the server's HTML on: its label names it and the field's `disabled` disables it, like a checkbox outside a group.
+- a3f6abe: RadioGroup, SegmentedControl and NavigationMenu in Svelte and Vue, and Tabs in Svelte, type their value from `value`, `defaultValue` or the change handler, as the docs say, so a handler typed with your own union of values type-checks.
+- 8829403: A handler on an element inside a part, like `onkeydown` on a field in a tree row, now runs before the part's own keys and clicks, so its `stopPropagation()` keeps the event from the part, as in React.
+- 6ec9019: A part from `createParts` mapped to an SVG tag, like `circle` or `path`, is created as an SVG element, as in the other adapters.
+- 1de2cde: A click or key press on a part inside a popup that renders outside the app, like a button in a popover, reaches the popup's own handlers again.
+- 875a20b: A part made with `createParts` and given an `id`, like one rendered through a trigger's `render`, no longer takes that id as its key, so an agent can press it as in the other frameworks.
+- ab810de: A Textarea's default value leaves the caret at the start of the text, as a native textarea does.
+- Updated @ui-sdk/core to 0.1.0-beta.18
+
 ## 0.1.0-beta.17
 
 ### Patch Changes

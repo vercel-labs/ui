@@ -1,5 +1,15 @@
 # @ui-sdk/vue
 
+## 0.1.0-beta.18
+
+### Patch Changes
+
+- 0dbff31: A Checkbox in a Field of its own inside a CheckboxGroup takes that field from the server's HTML on: its label names it and the field's `disabled` disables it, like a checkbox outside a group.
+- a3f6abe: RadioGroup, SegmentedControl and NavigationMenu in Svelte and Vue, and Tabs in Svelte, type their value from `value`, `defaultValue` or the change handler, as the docs say, so a handler typed with your own union of values type-checks.
+- f018051: A Button with its own `@click` in a part's `#render` slot runs both its click and the part's, its own first, instead of neither.
+- ce05f34: A template ref on the element a `#render` slot returns now gets that element, and the part stays bound to it, whether the ref is written before or after `v-bind="props"`. The slot's `props` no longer carry the part's `ref`, since the part attaches it to the returned element itself. Code that called `props.ref(el)` from a function ref can drop that call.
+- Updated @ui-sdk/core to 0.1.0-beta.18
+
 ## 0.1.0-beta.17
 
 ### Patch Changes
