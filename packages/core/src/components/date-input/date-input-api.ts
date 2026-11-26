@@ -595,6 +595,17 @@ function dateInputApiBody(
     ) {
       return
     }
+    // A native label clicks the input at the label's own point, outside its box.
+    const box = elements(context, "root")[0]?.el.getBoundingClientRect()
+    if (
+      box &&
+      (event.clientX < box.left ||
+        event.clientX > box.right ||
+        event.clientY < box.top ||
+        event.clientY > box.bottom)
+    ) {
+      return list[0]?.el
+    }
     const distance = (el: HTMLElement) => {
       const { left, right } = el.getBoundingClientRect()
       return Math.max(left - event.clientX, event.clientX - right, 0)

@@ -331,6 +331,29 @@ test("the field's label focuses the first segment", async ({ page, open }) => {
   await expect(segment(page, "month")).toBeFocused()
 })
 
+test("a native label for the input focuses the first segment wherever it's pressed", async ({
+  page,
+  open,
+  framework,
+}) => {
+  test.skip(
+    !framework.startsWith("web"),
+    "Only a form-associated element has a native label."
+  )
+  await open("date-input")
+  await page.evaluate(() => {
+    document.body.insertAdjacentHTML(
+      "afterbegin",
+      `<label for="probe" style="display: block; width: 600px">Probe</label><ui-date-input id="probe"></ui-date-input>`
+    )
+  })
+  const label = (await page.getByText("Probe", { exact: true }).boundingBox())!
+  await page.mouse.click(label.x + label.width - 10, label.y + label.height / 2)
+  await expect(
+    page.locator("#probe").getByRole("spinbutton").first()
+  ).toBeFocused()
+})
+
 test("a read-only date takes focus but doesn't change", async ({
   page,
   open,
