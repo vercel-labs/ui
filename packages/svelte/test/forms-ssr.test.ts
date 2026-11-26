@@ -5,8 +5,9 @@ import FieldHintApp from "./apps/field-hint-ssr-app.svelte"
 import FieldApp from "./apps/field-ssr-app.svelte"
 import App from "./apps/forms-app.svelte"
 
-const html = (which: "checkbox" | "switch" | "radio" | "group" | "field") =>
-  render(App, { props: { which } }).body
+const html = (
+  which: "checkbox" | "switch" | "radio" | "group" | "group-fields" | "field"
+) => render(App, { props: { which } }).body
 
 // Opening tags, and an attribute of one.
 const tags = (html: string) => html.match(/<[a-z][^>]*>/g) ?? []
@@ -53,6 +54,16 @@ describe("server rendering form controls", () => {
     const body = html("group")
     expect(body).toContain('aria-checked="mixed"')
     expect(body.match(/name="toppings"/g)).toHaveLength(2)
+  })
+
+  test("a checkbox in a field of its own inside a group takes that field", () => {
+    const body = html("group-fields")
+    const button = body.match(/<button[^>]*>/)![0]
+    const id = button.match(/ id="([^"]+)"/)![1]
+    expect(body).toContain(`for="${id}"`)
+    expect(button).toContain('aria-disabled="true"')
+    expect(button).not.toContain("tabindex")
+    expect(body).toMatch(/<div[^>]*role="group"[^>]*aria-labelledby=/)
   })
 
   test("a field ties its label to the control", () => {

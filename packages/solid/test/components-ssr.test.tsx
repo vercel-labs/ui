@@ -144,6 +144,26 @@ describe("server rendering form controls", () => {
     expect(html.match(/name="toppings"/g)).toHaveLength(2)
   })
 
+  test("a checkbox in a field of its own inside a group takes that field", () => {
+    const html = renderToString(() => (
+      <Field>
+        <FieldLabel>Cities</FieldLabel>
+        <CheckboxGroup>
+          <Field disabled>
+            <Checkbox value="tokyo" />
+            <FieldLabel>Tokyo</FieldLabel>
+          </Field>
+        </CheckboxGroup>
+      </Field>
+    ))
+    const [button] = html.match(/<button[^>]*>/)!
+    const [, id] = button.match(/ id="([^"]+)"/)!
+    expect(html).toContain(`for="${id}"`)
+    expect(button).toContain('aria-disabled="true"')
+    expect(button).not.toContain("tabindex")
+    expect(html).toMatch(/<div[^>]*role="group"[^>]*aria-labelledby=/)
+  })
+
   test("a field ties its label to the control", () => {
     const html = renderToString(() => (
       <Field>

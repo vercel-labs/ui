@@ -6,7 +6,9 @@
 
   let {
     which,
-  }: { which: "checkbox" | "switch" | "radio" | "group" | "field" } = $props()
+  }: {
+    which: "checkbox" | "switch" | "radio" | "group" | "group-fields" | "field"
+  } = $props()
 </script>
 
 {#if which === "checkbox"}
@@ -29,6 +31,16 @@
     <Checkbox value="cheese" />
     <Checkbox value="olives" />
   </CheckboxGroup>
+{:else if which === "group-fields"}
+  <Field>
+    <FieldLabel>Cities</FieldLabel>
+    <CheckboxGroup>
+      <Field disabled>
+        <Checkbox value="tokyo" />
+        <FieldLabel>Tokyo</FieldLabel>
+      </Field>
+    </CheckboxGroup>
+  </Field>
 {:else}
   <Field>
     <FieldLabel>Email</FieldLabel>
