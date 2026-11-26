@@ -693,6 +693,22 @@ describe("createStickToBottom", () => {
       expect(el.scrollTop).toBe(420)
     })
   })
+
+  test("prepend right after a scroll, before its event, keeps the new position", () => {
+    let content = 500
+    const el = scroller(100, () => content)
+    const log = createStickToBottom({ initial: false })
+    cleanups.push(log.connect(el))
+    el.scrollTop = 100
+    el.dispatchEvent(new Event("scroll"))
+    el.scrollTop = 250
+    log.prepend()
+    content = 800
+    el.append(document.createElement("p"))
+    return Promise.resolve().then(() => {
+      expect(el.scrollTop).toBe(550)
+    })
+  })
 })
 
 describe("createTransfer", () => {

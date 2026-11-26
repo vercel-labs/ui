@@ -307,10 +307,10 @@ function createStickToBottom(options: StickToBottomOptions = {}) {
      * whose rows it can't track, like one block that grows at its top.
      */
     prepend() {
-      // Measured as of the last resize, so a call made just after the content
+      // The height as of the last resize, so a call made just after the content
       // changed, or while a change is still unmeasured, keeps the same place.
       if (scroller) {
-        anchor = lastHeight - scroller.clientHeight - lastTop
+        anchor = lastHeight - scroller.clientHeight - scroller.scrollTop
       }
     },
   }
