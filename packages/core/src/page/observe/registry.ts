@@ -205,6 +205,37 @@ function retire(entry: Entry) {
 const secret =
   /\b(password|current-password|new-password|one-time-code|cc-[a-z-]+)\b/i
 
+const secretControl = (el: Element) =>
+  secret.test(`${el.getAttribute("type")} ${el.getAttribute("autocomplete")}`)
+
+// A field's error text describes its control, so a secret control keeps it
+// secret too, even where the control isn't one of the field's parts, like a
+// web component's input or a password input whose text shows.
+function holdsSecret(field: Entry, parts: Bound[]) {
+  const root = parts.find((part) => part.slot === "root")?.el
+  const own = (el: Element) => el.closest('[data-slot="field"]') === root
+  if (!root) {
+    return false
+  }
+  if (
+    Array.from(root.querySelectorAll("input, textarea")).some(
+      (el) => own(el) && secretControl(el)
+    )
+  ) {
+    return true
+  }
+  for (const other of entries.values()) {
+    const instance = other !== field && other.secret && other.instance.deref()
+    if (
+      instance &&
+      bound(instance).some(({ el }) => root.contains(el) && own(el))
+    ) {
+      return true
+    }
+  }
+  return false
+}
+
 const stateKeys = (entry: Entry, state: Record<string, unknown>) =>
   entry.controlled ?? ["open", "value", "checked"].filter((key) => key in state)
 
@@ -221,11 +252,8 @@ function remember(entry: Entry, parts: Bound[]) {
   entry.row = rowOf(parts)
   entry.secret ||=
     isSecret(elements) ||
-    parts.some(({ el }) =>
-      secret.test(
-        `${el.getAttribute("type")} ${el.getAttribute("autocomplete")}`
-      )
-    )
+    parts.some(({ el }) => secretControl(el)) ||
+    (entry.component === "field" && holdsSecret(entry, parts))
   // A region can turn off-limits and back, like a panel an app locks while it's busy.
   // A hidden input holds what the page keeps from people, like a token.
   entry.offLimits =
