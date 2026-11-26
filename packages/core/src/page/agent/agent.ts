@@ -801,8 +801,21 @@ function describe(entry: Entry, instance: PrimitiveInstance, parts: Bound[]) {
   // they're few, and through `query` when they may be many.
   const opens = typeof api.setOpen === "function"
   if (typeof api.setValue === "function" || entry.agent?.items) {
-    const rendered = opens ? [] : unnamed(entry, renderedItems(parts))
-    const data = rendered.length ? undefined : dataOf(entry, instance)
+    const listed = dataOf(entry, instance)
+    // An item on the page goes by its data's label, the one `act` takes. Data
+    // of bare values, like an accordion's, names nothing the page doesn't.
+    const labels = new Map(
+      listed
+        ?.filter((item) => item.label !== item.value)
+        .map((item) => [item.value, item.label])
+    )
+    const rendered = opens
+      ? []
+      : unnamed(entry, renderedItems(parts)).map((item) => ({
+          ...item,
+          label: labels.get(item.value) || item.label,
+        }))
+    const data = rendered.length ? undefined : listed
     const items = data ? (data.length <= 10 ? data : []) : rendered
     if (items.length) {
       out.items = items
