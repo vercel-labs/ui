@@ -49,13 +49,17 @@ const ForwardingListbox = defineComponent({
     </Listbox>`),
 })
 
+const Card = defineComponent({
+  render: compile(`<section><slot /></section>`),
+})
+
 async function mountListbox(root: string, close = "</div>", tag = "Listbox") {
   const list = ref<HTMLElement | null>(null)
   const extra = ref(0)
   let mounted: HTMLElement | null = null
   const el = document.body.appendChild(document.createElement("div"))
   app = createApp({
-    components: { Listbox, ListboxItem, ForwardingListbox },
+    components: { Listbox, ListboxItem, ForwardingListbox, Card },
     setup() {
       onMounted(() => (mounted = list.value))
       return { list, extra }
@@ -126,6 +130,20 @@ test("the part binds to its element beside others in a fragment or a teleport", 
       '<Teleport to="body"><div v-bind="props" ref="list">',
       "</div></Teleport>",
     ],
+  ]) {
+    const { listbox, mounted, options } = await mountListbox(root, close)
+    expect(mounted).toBe(listbox)
+    expect(document.activeElement).toBe(options()[1])
+    app?.unmount()
+    app = undefined
+    document.body.replaceChildren()
+  }
+})
+
+test("the part binds to its element inside a transition or another component's slot", async () => {
+  for (const [root, close] of [
+    ['<Transition><div v-bind="props" ref="list">', "</div></Transition>"],
+    ['<Card><div v-bind="props" ref="list">', "</div></Card>"],
   ]) {
     const { listbox, mounted, options } = await mountListbox(root, close)
     expect(mounted).toBe(listbox)

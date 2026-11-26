@@ -713,7 +713,9 @@ function renderElement(
     // slot returns, beside a template ref of the app's own.
     const { ref, ...slotProps } = props
     const rendered = slots.render({
-      props: slotProps,
+      props: ref
+        ? { ...slotProps, ...vnodeHooks(ref as RefFunction) }
+        : slotProps,
       state,
       children: contentOf(slots, own),
     })
@@ -728,6 +730,36 @@ function renderElement(
   }
   const content = hidden ? () => [own(), hidden()] : own
   return h(tag, props, content() as never)
+}
+
+// Vue merges vnode hooks where it keeps one ref, so these bind the part where
+// `attachRef` can't reach its element, like in a transition or another
+// component's slot.
+const hooks = new WeakMap<RefFunction, object>()
+const hooked = new WeakMap<RefFunction, unknown>()
+function vnodeHooks(ref: RefFunction) {
+  let own = hooks.get(ref)
+  if (!own) {
+    own = {
+      onVnodeMounted: (vnode: VNode) => {
+        if (
+          !withPartRef.has(vnode) &&
+          vnode.el?.nodeType === Node.ELEMENT_NODE
+        ) {
+          hooked.set(ref, vnode.el)
+          ref(vnode.el)
+        }
+      },
+      onVnodeUnmounted: (vnode: VNode) => {
+        if (hooked.get(ref) === vnode.el) {
+          hooked.delete(ref)
+          ref(null)
+        }
+      },
+    }
+    hooks.set(ref, own)
+  }
+  return own
 }
 
 // Vnodes Vue reuses, like those under `v-memo`, keep the ref they got.
