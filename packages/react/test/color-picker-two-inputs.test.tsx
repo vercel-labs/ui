@@ -50,9 +50,6 @@ test("every input of a picker shows its value and takes a typed color", async ()
       new KeyboardEvent("keydown", { key: "Enter", bubbles: true })
     )
   })
-  expect(onValueChange).toHaveBeenLastCalledWith(
-    "#123456",
-    expect.anything()
-  )
+  expect(onValueChange).toHaveBeenLastCalledWith("#123456", expect.anything())
   expect(values()).toEqual(["#123456", "#123456"])
 })
