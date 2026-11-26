@@ -312,14 +312,16 @@ function remember(entry: Entry, parts: Bound[]) {
   checkMarks(elements)
   // A name given through one keyed part, like a resizable's handle, can't be
   // read while every part is hidden, as in a closed tab: the last one stays.
+  const hidden = parts.every((part) => part.el.closest("[hidden]"))
   entry.label =
-    componentLabel(parts, entry) ??
-    (parts.every((part) => part.el.closest("[hidden]"))
-      ? entry.label
-      : undefined)
+    componentLabel(parts, entry) ?? (hidden ? entry.label : undefined)
   entry.row = rowOf(parts)
   guard(entry, parts)
   entry.sections = sectionsOf(parts)
+  // A fresh one can't be named yet, so it claims a ref once it shows.
+  if (first && hidden && entry.label === undefined) {
+    return
+  }
   entry.key = `${entry.component}|${entry.label}|${entry.row}|${entry.sections.join(">")}`
   if (!first) {
     return

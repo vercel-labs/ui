@@ -46,8 +46,11 @@ test("a component replaced while its tab is hidden takes back its ref, with no n
   expect(label).toBe("Resize files")
   tabs.value = "notes"
   await wait()
-  resizables()
+  const readWhileHidden = resizables
+  readWhileHidden()
   document.querySelector("#editor")!.innerHTML = editor
+  await wait()
+  readWhileHidden()
   tabs.value = "code"
   await wait()
   expect(
