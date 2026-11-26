@@ -533,6 +533,9 @@ function tokenInputApiBody(
         view = next
         if (next) {
           render()
+          // An editor's followers, like a trigger menu writing its ARIA, may
+          // have connected before it was in the page.
+          emit({ type: "selection" })
         }
       },
       view: () => view,
