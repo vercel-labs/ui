@@ -177,13 +177,14 @@ function mergeStyles(user: unknown, part: Record<string, string>) {
 type Tracked = {
   part: Part
   props: () => unknown
+  primaryUsers: number
+  others?: (() => unknown)[]
   owner: () => Owner | null
   tick: () => number
   attrsTick: () => number
   state: (key: string) => unknown
   follow: (part: Part, from: () => unknown) => void
   rebinds: Set<(part: Part) => void>
-  users: number
   dispose: () => void
 }
 
@@ -251,6 +252,41 @@ function sameProps(a: object, b: object) {
   return true
 }
 
+// Records a scope's props accessor on `entry`, and hands ownership to an
+// active accessor when the primary scope cleans up. Returns whether none remain.
+function claim(entry: Tracked, props: () => unknown) {
+  if (props === entry.props) {
+    entry.primaryUsers++
+  } else {
+    ;(entry.others ??= []).push(props)
+  }
+  return () => {
+    if (props === entry.props) {
+      if (--entry.primaryUsers > 0) {
+        return false
+      }
+      const next = entry.others?.shift()
+      if (!next) {
+        return true
+      }
+      entry.props = next
+      entry.primaryUsers = 1
+      for (let index = entry.others!.length - 1; index >= 0; index--) {
+        if (entry.others![index] === next) {
+          entry.others!.splice(index, 1)
+          entry.primaryUsers++
+        }
+      }
+      return false
+    }
+    const index = entry.others?.indexOf(props) ?? -1
+    if (index >= 0) {
+      entry.others!.splice(index, 1)
+    }
+    return entry.primaryUsers === 0 && !entry.others?.length
+  }
+}
+
 // Subscribes a part once, and keeps it for as long as any scope renders it.
 // A scope that re-runs, like a `Show` condition, releases and takes the part
 // again. Parts live under a root of their own, made now: a part first tracked
@@ -269,11 +305,11 @@ function createTracker(instance: ReturnType<Primitive>) {
         (entry = createTracked(instance, owner, part, name, props))
       )
     }
-    entry.users++
     const current = entry
+    const release = claim(current, props)
     if (getOwner()) {
       onCleanup(() => {
-        if (--current.users > 0 || entries.get(part) !== current) {
+        if (!release() || entries.get(part) !== current) {
           return
         }
         current.dispose()
@@ -326,7 +362,7 @@ function createTracked(
   let next: { part: Part; selected: string; writes: number } | undefined
   let disposed = false
   const follow = (part: Part, from: () => unknown) => {
-    if (isServer || from !== props) {
+    if (isServer || from !== entry.props) {
       return
     }
     const target = next?.part ?? subscribed
@@ -386,23 +422,31 @@ function createTracked(
     }
     return scope
   }
-  const state = stateMemos(instance, name, props, tick, scopeOwner, follow)
-  return {
+  const entry: Tracked = {
     part,
     props,
+    primaryUsers: 0,
     owner: scopeOwner,
     tick,
     attrsTick,
-    state,
+    state: () => undefined,
     follow,
     rebinds,
-    users: 0,
     dispose() {
       disposed = true
       unsubscribe()
       disposeScope?.()
     },
   }
+  entry.state = stateMemos(
+    instance,
+    name,
+    () => entry.props,
+    tick,
+    scopeOwner,
+    follow
+  )
+  return entry
 }
 
 // A part's state, one memo per key. Each is made when its key is first read,
@@ -411,7 +455,7 @@ function createTracked(
 function stateMemos(
   instance: ReturnType<Primitive>,
   name: string,
-  props: () => unknown,
+  propsOf: () => () => unknown,
   tick: () => number,
   owner: () => Owner | null,
   follow?: Tracked["follow"]
@@ -426,6 +470,7 @@ function stateMemos(
         const read = (all ??= createMemo(
           () => {
             tick()
+            const props = propsOf()
             const part = instance.part(name, props() as never)
             follow?.(part, props)
             return readPart(instance, part, "state", () =>
@@ -851,7 +896,13 @@ function slotState(
     if (getOwner()) {
       onCleanup(dispose)
     }
-    read = stateMemos(instance, name, props, tracked.tick, () => owner)
+    read = stateMemos(
+      instance,
+      name,
+      () => props,
+      tracked.tick,
+      () => owner
+    )
   }
   return new Proxy({} as Record<string, unknown>, {
     get: (_, key) => (typeof key === "string" ? read(key) : undefined),
@@ -889,7 +940,6 @@ type PartProps<Tag extends keyof JSX.IntrinsicElements, State = {}> = Omit<
   children?: JSX.Element | ((state: State) => JSX.Element)
 }
 
-// Each tag's element, as a component that takes its props.
 const elements = new Map<string, (props: Record<string, any>) => JSX.Element>()
 function elementOf(tag: string) {
   let element = elements.get(tag)
@@ -923,9 +973,17 @@ function createElement(
       : document.createElement(tag)
   const resolved = () => {
     const { class: classes, style } = user
-    return typeof classes === "function" || typeof style === "function"
-      ? { class: resolve(classes, state), style: resolve(style, state) }
-      : undefined
+    const hasClass = typeof classes === "function"
+    // `part` merges a user's style with the slot's own, so leave it to `part` there.
+    const hasStyle = typeof style === "function" && !("style" in attrs())
+    if (!hasClass && !hasStyle) {
+      return undefined
+    }
+    return hasClass && hasStyle
+      ? { class: classes(state), style: style(state) }
+      : hasClass
+        ? { class: classes(state) }
+        : { style: style(state) }
   }
   const part = () => {
     const current = attrs()
