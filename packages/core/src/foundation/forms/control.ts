@@ -47,6 +47,10 @@ function activateControl(control: HTMLElement, event?: Event) {
   // A native label clicks a plain button it names, like a FileInputTrigger's.
   const plainButton = control instanceof HTMLButtonElement && !role
   if (checkable || plainButton || role === "radiogroup") {
+    // A native label moves focus to a checkbox or radio it presses.
+    if (checkable) {
+      control.focus()
+    }
     control.click()
   }
   // A group, like a range slider, focuses its first control.

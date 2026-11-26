@@ -146,6 +146,21 @@ test("radios in card labels around fields with descriptions are each named by th
   }
 })
 
+test("a press on a ui-label checks its checkbox and focuses it", async ({
+  page,
+}) => {
+  await page.evaluate(() => {
+    document.querySelector("#stage")!.innerHTML =
+      `<ui-label><ui-checkbox></ui-checkbox> Wrapped</ui-label><ui-checkbox id="pointed"></ui-checkbox><ui-label for="pointed">Pointing</ui-label>`
+  })
+  for (const name of ["Wrapped", "Pointing"]) {
+    const box = page.getByRole("checkbox", { name })
+    await page.getByText(name, { exact: true }).click()
+    await expect(box).toBeChecked()
+    await expect(box).toBeFocused()
+  }
+})
+
 test("a button moved out of its tab is a plain button again", async ({
   page,
 }) => {
