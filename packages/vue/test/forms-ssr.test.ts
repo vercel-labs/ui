@@ -113,7 +113,7 @@ describe("server rendering form controls", () => {
       h(Field, null, () => [
         h(FieldLabel, null, () => "Cities"),
         h(CheckboxGroup, null, () =>
-          h(Field, { disabled: true }, () => [
+          h(Field, { disabled: true, name: "tokyo-field" }, () => [
             h(Checkbox, { value: "tokyo" }),
             h(FieldLabel, null, () => "Tokyo"),
           ])
@@ -126,6 +126,7 @@ describe("server rendering form controls", () => {
     expect(button).toContain('aria-disabled="true"')
     expect(button).not.toContain("tabindex")
     expect(html).toMatch(/<div[^>]*role="group"[^>]*aria-labelledby=/)
+    expect(html).not.toContain('name="tokyo-field"')
   })
 
   test("a field ties its label to the control", async () => {

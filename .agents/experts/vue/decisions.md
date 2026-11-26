@@ -39,7 +39,6 @@ Last reviewed: PRs 86 to 92 (2026-10-30, the audit fixes), 158 and 159 (2026-11-
 - **`bind` runs in a render**: `useConnectedPart` calls it there, so a bind must not call lifecycle hooks, `provide` or `useId`.
 - **A trigger that switches instances** keeps its old `PartWatch` subscription until it unmounts.
 - **Payload types**: a popup content's payload type is asserted by the user, not tied to the controller's type.
-- **A Checkbox in its own Field inside a CheckboxGroup** is unnamed in server markup until hydration.
 - **A Field with no FieldLabel or no FieldDescription** points its control's `aria-labelledby` or `aria-describedby` at an id that doesn't exist, in server markup until hydration. Most fields have no description, so the dangling `aria-describedby` is the common one. The server can't know which parts will render, and every adapter's server tests check that a label names and a description describes the control before hydration, wherever it renders.
 - **`Intl` text Node and browsers word differently** mismatches on hydration: Korean `formatDateRange` defaults in Chrome (`16일~20일` vs `16일 ~ 20일`), ranges in es, ru, da, el, pl, sk and ca in Safari, and every label in the locales Chrome ships no data for (eu, kk, ka, hy, az, my, km, mn). Vue patches the text but keeps the server's `aria-label`s on `h()` parts. Thin spaces in ranges are fixed in `formatDateRange`.
 - **A popup stays shown when its anchor is clipped by a scroll container.** A marker like `data-anchor-hidden` is a public API and waits on discussion.

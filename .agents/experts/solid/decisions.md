@@ -41,7 +41,6 @@ Last reviewed: PRs 86 to 92 (2026-10-30, the audit fixes), 158 and 159 (2026-11-
 - **Parts hear every change** (`WASTED_RECOMPUTE`): the fix records which state keys a part reads.
 - **No `solid-ssr` hydration fixture with author ids.**
 - **Payload types**: a popup content's payload type is asserted by the user, not tied to the controller's type.
-- **A Checkbox in its own Field inside a CheckboxGroup** is unnamed in server markup until hydration.
 - **Callbacks behind core's caches**, like a combobox `filter` (cached by identity in `listbox-engine.ts`) or what `sync` derives, are tracked only by the first part that reads them and stay stale while their identity holds. Suspected, not reproduced.
 - **`useAsyncOptions` called inside an `onSettled` callback** throws `CLEANUP_IN_FORBIDDEN_SCOPE` from its `onCleanup` calls (same on main before PR 14).
 - **A popup stays shown when its anchor is clipped by a scroll container.** A marker like `data-anchor-hidden` is a public API and waits on discussion.

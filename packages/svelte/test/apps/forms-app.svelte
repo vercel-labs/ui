@@ -35,7 +35,7 @@
   <Field>
     <FieldLabel>Cities</FieldLabel>
     <CheckboxGroup>
-      <Field disabled>
+      <Field disabled name="tokyo-field">
         <Checkbox value="tokyo" />
         <FieldLabel>Tokyo</FieldLabel>
       </Field>

@@ -92,7 +92,7 @@ const Checkbox = withElement(
         disabled: props.disabled || field?.disabled(),
         readOnly: readOnlyOf(props, attrs),
         required: props.required,
-        name: props.name ?? field?.name(),
+        name: props.name ?? (group ? undefined : field?.name()),
         value: props.value,
         form: props.form,
         controller: props.controller,

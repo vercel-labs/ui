@@ -59,7 +59,7 @@ const Checkbox = /* @__PURE__ */ rootScope(function Checkbox(
     disabled: props.disabled || fieldControl?.disabled(),
     readOnly: props.readOnly,
     required: props.required,
-    name: props.name ?? fieldControl?.name(),
+    name: props.name ?? (group ? undefined : fieldControl?.name()),
     value: props.value,
     form: props.form,
     parent: props.parent,

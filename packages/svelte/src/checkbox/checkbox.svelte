@@ -74,7 +74,7 @@ The control and the hidden native input that takes part in the form.
     disabled: disabled || field?.disabled(),
     readOnly: readOnlyOf(readOnly, rest),
     required,
-    name: name ?? field?.name(),
+    name: name ?? (group ? undefined : field?.name()),
     value,
     form,
     controller,

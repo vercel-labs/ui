@@ -64,6 +64,7 @@ describe("server rendering form controls", () => {
     expect(button).toContain('aria-disabled="true"')
     expect(button).not.toContain("tabindex")
     expect(body).toMatch(/<div[^>]*role="group"[^>]*aria-labelledby=/)
+    expect(body).not.toContain('name="tokyo-field"')
   })
 
   test("a field ties its label to the control", () => {

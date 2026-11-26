@@ -64,7 +64,7 @@ function Checkbox({
     <parts.Root
       {...props}
       disabled={disabled || fieldControl?.disabled}
-      name={name ?? fieldControl?.name}
+      name={name ?? (group ? undefined : fieldControl?.name)}
       group={group ? reading(group, () => group.api) : undefined}
       render={controlRender(fieldControl, "button", render, <CheckboxInput />)}
     />
