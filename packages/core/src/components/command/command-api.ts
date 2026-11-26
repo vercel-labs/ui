@@ -183,6 +183,7 @@ function commandApiBody(
     const changed = setQuery(query, reason, event, composing)
     if (
       changed &&
+      !composing &&
       options().query !== undefined &&
       options().value !== undefined &&
       options().filter !== false
@@ -470,6 +471,7 @@ function commandApiBody(
         ),
       onCompositionEnd: (el: HTMLInputElement, event: Event) => {
         if (el.value === store.get().query) {
+          core.cause("input-change", event)
           endComposition(context, store, "query", el.value, event)
         } else {
           search(el.value, "input-change", event)

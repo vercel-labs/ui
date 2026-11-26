@@ -78,3 +78,22 @@ test("text typed after a filter keeps filtering from it while composing", () => 
   expect(listed()).toEqual(["Zürich"])
   view.unmount()
 })
+
+test("composing over a selected value's label keeps the items, not the empty list's", () => {
+  const view = mount(
+    combobox,
+    {
+      items: ["東京", "大阪"],
+      emptyItems: ["Recent"],
+      defaultValue: "東京",
+    },
+    markup
+  )
+  const input = view.part("input") as HTMLInputElement
+  input.focus()
+  const listed = () => view.api.internal.listbox.entries().map((e) => e.label)
+  expect(listed()).toEqual(["東京", "大阪"])
+  compose(input, "東京お")
+  expect(listed()).toEqual(["東京", "大阪"])
+  view.unmount()
+})

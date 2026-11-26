@@ -403,14 +403,18 @@ function selectApiBody(
     if (!change("query", query, { reason, event, composing })) {
       return false
     }
+    highlightFirst(event)
+    return true
+  }
+
+  function highlightFirst(event?: Event) {
     if (!store.get().open) {
-      return true
+      return
     }
     const first = listbox.firstEnabled() ?? null
     if (store.get().highlighted !== first) {
       listbox.highlight(first, { focus: false, event })
     }
-    return true
   }
 
   // The element that takes part in the form: the custom element, or the hidden input.
@@ -611,6 +615,7 @@ function selectApiBody(
         const text = (event.target as HTMLInputElement).value
         if (text === store.get().query) {
           endComposition(context, store, "query", text, event)
+          highlightFirst(event)
         } else {
           setQuery(text, "input-change", event)
         }

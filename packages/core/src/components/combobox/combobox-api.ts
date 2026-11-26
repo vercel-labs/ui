@@ -316,6 +316,10 @@ function comboboxApiBody(
     )
   }
 
+  // Whether the list showed `emptyItems` when a composition began. Composing
+  // over a value's label filters by nothing, but the list keeps its items.
+  let emptyBeforeComposition = false
+
   // The text the list filters by. A single combobox showing its value's label
   // shows every item until the user types.
   const filterQuery = () => {
@@ -335,7 +339,10 @@ function comboboxApiBody(
     items: () => store.get().items,
     emptyItems: () => options().emptyItems,
     // While the input is empty, not while it shows the value's label.
-    showEmpty: () => !(store.get().composingFrom ?? store.get().query).trim(),
+    showEmpty: () =>
+      store.get().composingFrom === null
+        ? !store.get().query.trim()
+        : emptyBeforeComposition,
     toKey,
     filter: () => options().filter ?? "contains",
     rank: () => typeof options().filter === "function",
@@ -774,6 +781,9 @@ function comboboxApiBody(
       return
     }
     const input = inputElement() as HTMLInputElement | undefined
+    if (store.get().composingFrom === null) {
+      emptyBeforeComposition = !store.get().query.trim()
+    }
     const composing = composingInput(store, event, filterQuery)
     if (
       !setQuery(text, {
@@ -926,6 +936,7 @@ function comboboxApiBody(
         const text = (event.target as HTMLInputElement).value
         if (text === store.get().query) {
           endComposition(context, store, "query", text, event)
+          settleHighlight()
         } else {
           typed(text, event)
         }
