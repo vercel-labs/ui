@@ -146,6 +146,30 @@ test("radios in card labels around fields with descriptions are each named by th
   }
 })
 
+test("a label built on a native label names and reaches the control inside a slider, number input or checkbox group", async ({
+  page,
+}) => {
+  await page.evaluate(() => {
+    document.querySelector("#stage")!.innerHTML = `
+      <x-label><label for="volume">Volume</label></x-label>
+      <ui-slider id="volume" default-value="65"><ui-slider-control><ui-slider-track><ui-slider-indicator></ui-slider-indicator><ui-slider-thumb></ui-slider-thumb></ui-slider-track></ui-slider-control></ui-slider>
+      <x-label><label for="guests">Guests</label></x-label>
+      <ui-number-input id="guests" default-value="2"><ui-number-input-group><ui-number-input-control><input /></ui-number-input-control></ui-number-input-group></ui-number-input>
+      <x-label><label for="topics">Topics</label></x-label>
+      <ui-checkbox-group id="topics"><ui-checkbox value="news" aria-label="News"></ui-checkbox><ui-checkbox value="tips" aria-label="Tips"></ui-checkbox></ui-checkbox-group>`
+  })
+  const slider = page.getByRole("slider", { name: "Volume" })
+  const guests = page.getByRole("textbox", { name: "Guests" })
+  await expect(slider).toBeAttached()
+  await expect(guests).toBeAttached()
+  await page.getByText("Volume", { exact: true }).click()
+  await expect(slider).toBeFocused()
+  await page.getByText("Guests", { exact: true }).click()
+  await expect(guests).toBeFocused()
+  await page.getByText("Topics", { exact: true }).click()
+  await expect(page.getByRole("checkbox", { name: "News" })).toBeFocused()
+})
+
 test("a button moved out of its tab is a plain button again", async ({
   page,
 }) => {

@@ -1,6 +1,7 @@
-// An empty page with toggles, tabs, popovers, dialogs, checkboxes, inputs, fields, labels and the elements
-// that render content from their state defined, for specs that build
-// elements the way frameworks and scripts do.
+// An empty page with toggles, tabs, popovers, dialogs, checkboxes, inputs,
+// fields, labels (and `x-label`, built on a native label) and the elements that
+// render content from their state defined, for specs that build elements the
+// way frameworks and scripts do.
 async function mount(root: HTMLElement) {
   root.innerHTML = `<button>Before</button><div id="stage"></div><button>After</button>`
   await import("@ui-sdk/web/toggle")
@@ -20,6 +21,19 @@ async function mount(root: HTMLElement) {
   await import("@ui-sdk/web/token-input")
   await import("@ui-sdk/web/field")
   await import("@ui-sdk/web/label")
+  await import("@ui-sdk/web/slider")
+  await import("@ui-sdk/web/number-input")
+  const { createParts, wrappedChild } = await import("@ui-sdk/web")
+  const { label } = await import("@ui-sdk/core/label")
+  if (!customElements.get("x-label")) {
+    createParts(label, {
+      root: {
+        tag: "x-label",
+        target: wrappedChild("label"),
+        display: "contents",
+      },
+    })
+  }
 }
 
 export { mount }
