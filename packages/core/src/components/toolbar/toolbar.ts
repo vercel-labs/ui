@@ -260,9 +260,33 @@ function toolbarApiBody(
     )
   }
 
+  // An element that is both an item and a toggle, like a ToolbarButton that
+  // renders a Toggle, is one stop: the toggle's, whose tab index it shows.
+  const items = new Map<
+    HTMLElement,
+    { join: () => () => void; leave?: () => void }
+  >()
+  const toggles = new Set<HTMLElement>()
+
   // What toggles and toggle groups inside see.
   const scope: RovingScope = {
-    bind: roving.bind,
+    bind(el, item) {
+      const own = items.get(el)
+      own?.leave?.()
+      if (own) {
+        own.leave = undefined
+      }
+      toggles.add(el)
+      const leave = roving.bind(el, item)
+      return () => {
+        leave()
+        toggles.delete(el)
+        const own = items.get(el)
+        if (own && !own.leave) {
+          own.leave = own.join()
+        }
+      }
+    },
     claim: (item) => roving.tabIndex(store.get(), item) === "0",
     queueCheck: queued(roving.check),
     keydown: move,
@@ -289,7 +313,14 @@ function toolbarApiBody(
     const { slot, key } = part
     const disabled = () => isDisabled(store.get(), itemProps(slot, key))
     const focusable = () => isFocusable(store.get(), itemProps(slot, key))
-    const leave = roving.bind(el, { key, props: { disabled, focusable } })
+    const own = {
+      join: () => roving.bind(el, { key, props: { disabled, focusable } }),
+      leave: undefined as (() => void) | undefined,
+    }
+    if (!toggles.has(el)) {
+      own.leave = own.join()
+    }
+    items.set(el, own)
     // A prop that disables the item, its own or its group's, can move the stop.
     let rules = [disabled(), focusable()]
     const unwatch = onProps(part, () => {
@@ -331,7 +362,10 @@ function toolbarApiBody(
     }
     return () => {
       unwatch()
-      leave()
+      own.leave?.()
+      if (items.get(el) === own) {
+        items.delete(el)
+      }
       if (fields.get(el) === keeps) {
         fields.delete(el)
       }

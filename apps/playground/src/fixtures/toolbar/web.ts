@@ -2,6 +2,7 @@ import {
   toolbarFixture as f,
   toolbarLocked,
   toolbarOptions,
+  toolbarRenderedToggle,
 } from "tests/fixtures/toolbar.ts"
 
 const group = (
@@ -48,7 +49,7 @@ const markup = () => `
           )
           .join("")}
       </ui-toolbar-group>
-      ${lock("Locked proofing", `<ui-toggle id="spellcheck"><button class="toggle">${f.spellcheck.label}</button></ui-toggle>`)}
+      ${lock("Locked proofing", toolbarRenderedToggle() ? `<ui-toolbar-button><ui-toggle id="spellcheck"><button class="toggle">${f.spellcheck.label}</button></ui-toggle></ui-toolbar-button>` : `<ui-toggle id="spellcheck"><button class="toggle">${f.spellcheck.label}</button></ui-toggle>`)}
       ${lock("Locked help", `<ui-toolbar-link><a href="${f.help.href}">${f.help.label}</a></ui-toolbar-link>`)}
     </ui-toolbar>
     <button>After</button>
