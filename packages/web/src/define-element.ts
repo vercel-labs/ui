@@ -1018,11 +1018,11 @@ function defineRootElement<P extends Primitive>(
   if (!claimTag(tagName)) {
     return
   }
-  setDisplay(tagName, config.display)
   const schema: Record<string, AttributeType> = {
     debug: "boolean",
     ...config.attributes,
   }
+  setDisplay(tagName, config.display, "align" in schema)
   const state = config.state ?? {}
   // Options from attributes and properties. A state attribute, like `open`,
   // sets where the state starts, unless its `default-` attribute does.
