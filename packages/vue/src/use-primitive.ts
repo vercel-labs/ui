@@ -355,6 +355,7 @@ function usePrimitive<P extends Primitive>(
               handler(event)
             }
           : handler
+        partListeners.add(result[prop])
       }
       result.ref = bothRefs(
         user.ref,
@@ -777,11 +778,16 @@ function usePart<P extends Primitive, S extends SlotName<P>>(
   return Object.assign(render, { state })
 }
 
+// The listeners `slot()` hands a part's element, which a component that takes
+// `v-bind="props"` as its own props, like Button's `onClick`, runs after its own.
+const partListeners = new WeakSet<Function>()
+
 export {
   copyProps,
   defaultSlot,
   optionalBoolean,
   orModel,
+  partListeners,
   pascal,
   type PartElement,
   type PartSlots,
