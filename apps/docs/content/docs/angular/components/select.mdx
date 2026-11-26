@@ -622,18 +622,18 @@ Every write method takes an optional `{ reason, event }`, passed to the change o
 
 A `before` output emits `{ value, reason, event, cancel() }` before the change, and its plain output follows with the value alone. A bound value only updates when the change isn't canceled.
 
-| Binding                | On         | Receives                                                                   |
-| ---------------------- | ---------- | -------------------------------------------------------------------------- |
-| `[(value)]`            | `uiSelect` | The selected value                                                         |
-| `[(open)]`             | `uiSelect` | Whether the list is open                                                   |
-| `[(query)]`            | `uiSelect` | The search text                                                            |
-| `(beforeValueChange)`  | `uiSelect` | `{ value, reason, cancel() }`: the new value, and the [reason](#reasons)   |
-| `(beforeOpenChange)`   | `uiSelect` | `{ value, reason, cancel() }`: the new state, and the [reason](#reasons)   |
-| `(openChangeComplete)` | `uiSelect` | `$event`, whether it's open, after the animation                           |
-| `(highlight)`          | `uiSelect` | `{ value, index, event }`: the highlighted item and its row                |
-| `(beforeQueryChange)`  | `uiSelect` | `{ value, reason, cancel() }`: the search text, and the [reason](#reasons) |
-| `(loadMore)`           | `uiSelect` | `()`, when the last item is reached                                        |
-| `(dismissAttempt)`     | `uiSelect` | `{ reason, event }`, when a dismissal was refused                          |
+| Binding                | On         | Receives                                                                                                  |
+| ---------------------- | ---------- | --------------------------------------------------------------------------------------------------------- |
+| `[(value)]`            | `uiSelect` | The selected value                                                                                        |
+| `[(open)]`             | `uiSelect` | Whether the list is open                                                                                  |
+| `[(query)]`            | `uiSelect` | The search text                                                                                           |
+| `(beforeValueChange)`  | `uiSelect` | `{ value, reason, cancel() }`: the new value, and the [reason](#reasons)                                  |
+| `(beforeOpenChange)`   | `uiSelect` | `{ value, reason, cancel() }`: the new state, and the [reason](#reasons)                                  |
+| `(openChangeComplete)` | `uiSelect` | `$event`, whether it's open, after the animation                                                          |
+| `(highlight)`          | `uiSelect` | `{ value, index, event }`: the highlighted item and its row                                               |
+| `(beforeQueryChange)`  | `uiSelect` | `{ value, reason, cancel() }`: the search text, the [reason](#reasons) and whether it's still `composing` |
+| `(loadMore)`           | `uiSelect` | `()`, when the last item is reached                                                                       |
+| `(dismissAttempt)`     | `uiSelect` | `{ reason, event }`, when a dismissal was refused                                                         |
 
 ## Accessibility
 

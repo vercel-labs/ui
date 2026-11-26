@@ -452,6 +452,8 @@ The selection, text, and popup have separate values:
 
 Control only the values you need; `value`, `query` and `open` can also be bound with `[(…)]`. The `before` outputs include a reason and `$event.cancel()` to reject the request. Choosing an item writes its label into the input, and a canceled choice keeps the current one. Closing without choosing restores the value’s label unless custom values are allowed. [State and Events](../state-and-events) covers the binding pattern.
 
+While an input method composes text, like a Japanese conversion or a dead key's accent, the list keeps its filter and `(beforeQueryChange)` gets `$event.composing: true`. Search a server once it's `false`; async options wait for that on their own.
+
 Focus leaving the input closes the popup with the reason `focus-out`, even when code moves it, like a notice that takes focus. To keep the popup open, cancel that close in `(beforeOpenChange)`.
 
 <ComponentExample
@@ -940,19 +942,19 @@ Every write method takes an optional `{ reason, event }`, passed to the change o
 
 A `before` output emits `{ value, reason, event, cancel() }` before the change, and its plain output follows with the value alone. A bound value only updates when the change isn't canceled.
 
-| Binding                | On                 | Receives                                                                  |
-| ---------------------- | ------------------ | ------------------------------------------------------------------------- |
-| `[(value)]`            | `uiCombobox`       | The selected value                                                        |
-| `[(query)]`            | `uiCombobox`       | The input's text                                                          |
-| `[(open)]`             | `uiCombobox`       | Whether the list is open                                                  |
-| `(beforeValueChange)`  | `uiCombobox`       | `{ value, reason, cancel() }`: the new value, and the [reason](#reasons)  |
-| `(beforeQueryChange)`  | `uiCombobox`       | `{ value, reason, cancel() }`: the new text, and the [reason](#reasons)   |
-| `(beforeOpenChange)`   | `uiCombobox`       | `{ value, reason, cancel() }`: the new state, and the [reason](#reasons)  |
-| `(openChangeComplete)` | `uiCombobox`       | `$event`, whether it's open, after the animation                          |
-| `(highlight)`          | `uiCombobox`       | `{ value, index, event }`: the highlighted item and its row               |
-| `(loadMore)`           | `uiCombobox`       | `()`, when the last item is reached                                       |
-| `(dismissAttempt)`     | `uiCombobox`       | `{ reason, event }`, when a dismissal was refused                         |
-| `(create)`             | `uiComboboxCreate` | `{ query, waitUntil() }`: the text. `waitUntil(promise)` marks it pending |
+| Binding                | On                 | Receives                                                                                               |
+| ---------------------- | ------------------ | ------------------------------------------------------------------------------------------------------ |
+| `[(value)]`            | `uiCombobox`       | The selected value                                                                                     |
+| `[(query)]`            | `uiCombobox`       | The input's text                                                                                       |
+| `[(open)]`             | `uiCombobox`       | Whether the list is open                                                                               |
+| `(beforeValueChange)`  | `uiCombobox`       | `{ value, reason, cancel() }`: the new value, and the [reason](#reasons)                               |
+| `(beforeQueryChange)`  | `uiCombobox`       | `{ value, reason, cancel() }`: the new text, the [reason](#reasons) and whether it's still `composing` |
+| `(beforeOpenChange)`   | `uiCombobox`       | `{ value, reason, cancel() }`: the new state, and the [reason](#reasons)                               |
+| `(openChangeComplete)` | `uiCombobox`       | `$event`, whether it's open, after the animation                                                       |
+| `(highlight)`          | `uiCombobox`       | `{ value, index, event }`: the highlighted item and its row                                            |
+| `(loadMore)`           | `uiCombobox`       | `()`, when the last item is reached                                                                    |
+| `(dismissAttempt)`     | `uiCombobox`       | `{ reason, event }`, when a dismissal was refused                                                      |
+| `(create)`             | `uiComboboxCreate` | `{ query, waitUntil() }`: the text. `waitUntil(promise)` marks it pending                              |
 
 ## Accessibility
 

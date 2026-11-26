@@ -496,17 +496,17 @@ Create one with `createCommandController()` and pass it as `controller`.
 
 A `before` output emits `{ value, reason, event, cancel() }` before the change, and its plain output follows with the value alone. A bound `value`, `query` or `pages` only updates when its change isn't canceled.
 
-| Binding               | On              | Receives                                                                                       |
-| --------------------- | --------------- | ---------------------------------------------------------------------------------------------- |
-| `[(value)]`           | `uiCommand`     | The highlighted command                                                                        |
-| `[(query)]`           | `uiCommand`     | The search text                                                                                |
-| `[(pages)]`           | `uiCommand`     | The stack of pages                                                                             |
-| `(beforeValueChange)` | `uiCommand`     | `{ value, reason, cancel() }`: the highlighted command, the [reason](#reasons) and its `index` |
-| `(beforeQueryChange)` | `uiCommand`     | `{ value, reason, cancel() }`: the new text, and the [reason](#reasons)                        |
-| `(beforePagesChange)` | `uiCommand`     | `{ value, reason, cancel() }`: the new stack, and the [reason](#reasons)                       |
-| `(action)`            | `uiCommand`     | `{ value, event, waitUntil() }`: the command that ran. `waitUntil(promise)` marks it pending   |
-| `(loadMore)`          | `uiCommand`     | `()`, when the last command is reached                                                         |
-| `(select)`            | `uiCommandItem` | `{ event, waitUntil() }`: before `(action)`. `$event.event.preventDefault()` skips it          |
+| Binding               | On              | Receives                                                                                               |
+| --------------------- | --------------- | ------------------------------------------------------------------------------------------------------ |
+| `[(value)]`           | `uiCommand`     | The highlighted command                                                                                |
+| `[(query)]`           | `uiCommand`     | The search text                                                                                        |
+| `[(pages)]`           | `uiCommand`     | The stack of pages                                                                                     |
+| `(beforeValueChange)` | `uiCommand`     | `{ value, reason, cancel() }`: the highlighted command, the [reason](#reasons) and its `index`         |
+| `(beforeQueryChange)` | `uiCommand`     | `{ value, reason, cancel() }`: the new text, the [reason](#reasons) and whether it's still `composing` |
+| `(beforePagesChange)` | `uiCommand`     | `{ value, reason, cancel() }`: the new stack, and the [reason](#reasons)                               |
+| `(action)`            | `uiCommand`     | `{ value, event, waitUntil() }`: the command that ran. `waitUntil(promise)` marks it pending           |
+| `(loadMore)`          | `uiCommand`     | `()`, when the last command is reached                                                                 |
+| `(select)`            | `uiCommandItem` | `{ event, waitUntil() }`: before `(action)`. `$event.event.preventDefault()` skips it                  |
 
 ## Accessibility
 

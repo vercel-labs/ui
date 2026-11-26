@@ -108,7 +108,7 @@ Place text or buttons around an input with `uiInputGroup`. Pressing the group's 
 
 ## Clear Button
 
-`uiInputClear` shows while the input has text it can clear. Pressing it empties the value, reports `clear-press` and returns focus to the input. Controlled state and native input listeners receive the change too.
+`uiInputClear` shows while the input has text it can clear. Pressing it empties the value, reports `clear-press` and returns focus to the input. Controlled state and native input listeners receive the change too. Escape in a filled input clears it the same way, so a dialog around it closes only once the input is empty.
 
 ```angular-html
 <div uiInputGroup>

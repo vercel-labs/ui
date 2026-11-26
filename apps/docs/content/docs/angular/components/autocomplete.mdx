@@ -660,17 +660,17 @@ Create one with `createAutocompleteController()` and pass it as `controller`.
 
 A `before` output emits `{ value, reason, event, cancel() }` before the change, and its plain output follows with the value alone. A bound value only updates when the change isn't canceled.
 
-| Binding                | On               | Receives                                                                 |
-| ---------------------- | ---------------- | ------------------------------------------------------------------------ |
-| `[(value)]`            | `uiAutocomplete` | The text                                                                 |
-| `[(open)]`             | `uiAutocomplete` | Whether the suggestions are open                                         |
-| `(beforeValueChange)`  | `uiAutocomplete` | `{ value, reason, cancel() }`: the new text, and the [reason](#reasons)  |
-| `(beforeOpenChange)`   | `uiAutocomplete` | `{ value, reason, cancel() }`: the new state, and the [reason](#reasons) |
-| `(openChangeComplete)` | `uiAutocomplete` | `$event`, whether it's open, after the animation                         |
-| `(submit)`             | `uiAutocomplete` | `{ value, event }`: the text, when Enter submits                         |
-| `(highlight)`          | `uiAutocomplete` | `{ value, index, event }`: the highlighted suggestion                    |
-| `(loadMore)`           | `uiAutocomplete` | `()`, when the last suggestion is reached                                |
-| `(dismissAttempt)`     | `uiAutocomplete` | `{ reason, event }`, when a dismissal was refused                        |
+| Binding                | On               | Receives                                                                                               |
+| ---------------------- | ---------------- | ------------------------------------------------------------------------------------------------------ |
+| `[(value)]`            | `uiAutocomplete` | The text                                                                                               |
+| `[(open)]`             | `uiAutocomplete` | Whether the suggestions are open                                                                       |
+| `(beforeValueChange)`  | `uiAutocomplete` | `{ value, reason, cancel() }`: the new text, the [reason](#reasons) and whether it's still `composing` |
+| `(beforeOpenChange)`   | `uiAutocomplete` | `{ value, reason, cancel() }`: the new state, and the [reason](#reasons)                               |
+| `(openChangeComplete)` | `uiAutocomplete` | `$event`, whether it's open, after the animation                                                       |
+| `(submit)`             | `uiAutocomplete` | `{ value, event }`: the text, when Enter submits                                                       |
+| `(highlight)`          | `uiAutocomplete` | `{ value, index, event }`: the highlighted suggestion                                                  |
+| `(loadMore)`           | `uiAutocomplete` | `()`, when the last suggestion is reached                                                              |
+| `(dismissAttempt)`     | `uiAutocomplete` | `{ reason, event }`, when a dismissal was refused                                                      |
 
 ## Accessibility
 
