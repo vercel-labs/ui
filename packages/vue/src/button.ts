@@ -2,6 +2,7 @@ import {
   button as buttonPrimitive,
   type ButtonActionDetails,
 } from "@ui-sdk/core/button"
+import { isPromise } from "@ui-sdk/core/renderer"
 import { defineComponent, type PropType } from "vue"
 import { withElement } from "./create-parts"
 import {
@@ -13,10 +14,6 @@ import {
 } from "./use-primitive"
 
 type Click = (event: MouseEvent, details: ButtonActionDetails) => unknown
-
-// A lone Promise goes back as it is, so a popup's `open()` keeps the button idle.
-const isThenable = (value: unknown): value is PromiseLike<unknown> =>
-  typeof (value as PromiseLike<unknown> | null)?.then === "function"
 
 /**
  * A button, or a link or any element that acts as one through the `render` slot.
@@ -55,7 +52,8 @@ const Button = withElement(
               fn(event as MouseEvent, details)
             }
           }
-          const waits = results.filter(isThenable)
+          // A popup's `open()` isn't a wait, so it keeps the button idle.
+          const waits = results.filter(isPromise)
           if (waits.length < 2) {
             return waits[0] ?? results[0]
           }

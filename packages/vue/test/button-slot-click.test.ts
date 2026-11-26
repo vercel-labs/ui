@@ -2,6 +2,7 @@
 import { afterEach, expect, test } from "vitest"
 import { createApp, h, mergeProps, nextTick, type App } from "vue"
 import { Button } from "../src/button"
+import { createDialogController, Dialog, DialogContent } from "../src/dialog"
 import { Popover, PopoverContent, PopoverTrigger } from "../src/popover"
 
 Element.prototype.getAnimations ??= () => []
@@ -78,5 +79,35 @@ test("a Button with several waits stays pending until the last settles", async (
   expect(button.hasAttribute("data-pending")).toBe(true)
   finish()
   await new Promise((resolve) => setTimeout(resolve))
+  expect(button.hasAttribute("data-pending")).toBe(false)
+})
+
+test("a dialog a handler opens beside a wait doesn't keep the button pending", async () => {
+  const dialog = createDialogController()
+  let finish = () => {}
+  const root = document.body.appendChild(document.createElement("div"))
+  app = createApp(() => [
+    h(
+      Button,
+      {
+        onClick: [
+          () => dialog.open(),
+          () => new Promise<void>((resolve) => (finish = resolve)),
+        ],
+      },
+      () => "Save"
+    ),
+    h(Dialog, { controller: dialog }, () =>
+      h(DialogContent, null, () => "Saved")
+    ),
+  ])
+  app.mount(root)
+  const button = root.querySelector("button")!
+  button.click()
+  await new Promise((resolve) => setTimeout(resolve))
+  expect(button.hasAttribute("data-pending")).toBe(true)
+  finish()
+  await new Promise((resolve) => setTimeout(resolve))
+  expect(dialog.isOpen()).toBe(true)
   expect(button.hasAttribute("data-pending")).toBe(false)
 })
