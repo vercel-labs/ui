@@ -40,7 +40,6 @@ const thread = definePrimitive({
             messages: [...messages, `Message ${messages.length + 1 - older}`],
           })
         } else if (action === "older") {
-          stick.prepend()
           store.set({
             older: older + 5,
             messages: [
