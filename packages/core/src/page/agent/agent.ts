@@ -7,6 +7,7 @@
 import { dev, warn } from "#dev"
 import { isDisabledElement } from "../../foundation/forms/form"
 import { withSource } from "../../foundation/kernel/details"
+import { documentOrder, inDocumentOrder } from "../../foundation/kernel/order"
 import { partState } from "../../foundation/kernel/part"
 import type { PrimitiveInstance } from "../../foundation/kernel/primitive-types"
 import { foldText } from "../../foundation/text/match"
@@ -394,15 +395,24 @@ function valueFor(entry: Entry, action: string, value: unknown) {
 // not one read from inside `data-agent-hidden`, which never reaches the agent.
 const textOrName = (el: Element) => textOf(el) || nameOf(el)
 
+// What left the page in the order its components were made, as the page's are
+// listed, since adapters unbind in different orders.
+const leftPage = () =>
+  [...offPage.values()].sort(
+    (a, b) => Number(a.ref.slice(1)) - Number(b.ref.slice(1))
+  )
+
 // The items on the page, named by their trigger when they have one, like an
 // accordion's sections, else by their text.
 function renderedItems(parts: Bound[]) {
-  const items = parts.filter(
-    (part) =>
-      part.key &&
-      (part.slot === "item" ||
-        part.slot === "tab" ||
-        (part.slot === "root" && part.el.getAttribute("role") === "radio"))
+  const items = inDocumentOrder(
+    parts.filter(
+      (part) =>
+        part.key &&
+        (part.slot === "item" ||
+          part.slot === "tab" ||
+          (part.slot === "root" && part.el.getAttribute("role") === "radio"))
+    )
   )
   const nested = items.map((part) => part.el)
   return items.map((part) => {
@@ -449,11 +459,13 @@ function buttonsOf(parts: Bound[]) {
       "button, [role=button], [role^=menuitem]"
     ),
   ])
-  return [...new Set([...toastButtons(parts), ...inside])].filter(
-    (el) =>
-      el.checkVisibility?.(visible) !== false &&
-      !el.closest("[inert], [data-agent-hidden]")
-  )
+  return [...new Set([...toastButtons(parts), ...inside])]
+    .filter(
+      (el) =>
+        el.checkVisibility?.(visible) !== false &&
+        !el.closest("[inert], [data-agent-hidden]")
+    )
+    .sort(documentOrder)
 }
 
 const rootOf = (parts: Bound[]) =>
@@ -1139,7 +1151,7 @@ function createAgent(
         first: touched.has(entry.ref) || !was || differs(was[key], state[key]),
       })
     }
-    for (const component of offPage.values()) {
+    for (const component of leftPage()) {
       const key = fieldKey(Object.keys(component))
       if (key) {
         fields.push({
@@ -2906,7 +2918,7 @@ function createAgent(
     const read = new Set(behindClosed.map((component) => component.ref))
     for (const component of [
       ...behindClosed,
-      ...[...offPage.values()].filter((component) => !read.has(component.ref)),
+      ...leftPage().filter((component) => !read.has(component.ref)),
     ]) {
       if (ofKind(component) && named(component)) {
         found.push(component)
@@ -3002,7 +3014,7 @@ function createAgent(
       const shown = found
         .filter((item) => !echoesTrigger(item, found))
         .map(({ entry, instance, parts }) => describe(entry, instance, parts))
-      const all = apart([...shown, ...offPage.values()])
+      const all = apart([...shown, ...leftPage()])
       if (all.length <= limit) {
         return all
       }
