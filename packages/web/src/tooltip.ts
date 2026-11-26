@@ -17,6 +17,7 @@ function defineTooltipElements() {
   createParts(tooltip, {
     root: {
       tag: owner,
+      display: "contents",
       defaults: { closeOnPress: true },
       kinds: popupKinds,
       // `portal` handles the `container` attribute, so core never gets it.

@@ -19,6 +19,8 @@ import {
   withLifecycle,
 } from "./keep"
 import {
+  enlist,
+  ordered,
   propsRendered,
   provisional,
   type PartOwner,
@@ -87,8 +89,9 @@ function definePrimitive<
     /**
      * Whether an instance with these options starts asleep: its parts render
      * and run `asleep`, while its api and each part's `bind` wait for the first
-     * event a part handles or the first read of `instance.api`. Like a closed
-     * tooltip, which costs little until its trigger is hovered or focused.
+     * event a part handles or the first read of `instance.api`, or of `api` in
+     * a slot's render. Like a closed tooltip, which costs little until its
+     * trigger is hovered or focused.
      * @experimental
      */
     asleep?: (options: Options) => boolean
@@ -188,6 +191,8 @@ function definePrimitive<
       label,
       slots: own,
       parts: new Map(),
+      keyed: new Map(),
+      rank: 0,
       released: [],
     }
     const { parts } = owner
@@ -213,26 +218,39 @@ function definePrimitive<
       rendering = false
     ) {
       const key = keyOf(props)
-      const mapKey = `${slot}:${key}`
-      let found = parts.get(mapKey)
+      let found = owner.keyed.get(slot)?.get(key)
       if (!found) {
-        parts.set(
-          mapKey,
-          (found = {
-            slot,
-            key,
-            id,
-            // Read when used, since an asleep instance builds its api later.
-            get api() {
-              return api
-            },
-            store,
-            props,
-            el: undefined,
-            owner,
-            leases: 0,
-          })
-        )
+        const mapKey = `${slot}:${key}`
+        // Read when used while the instance sleeps, since it builds its api
+        // later. An object made with a getter costs ten times a plain one.
+        found = owner.sleeping
+          ? {
+              slot,
+              key,
+              mapKey,
+              id,
+              get api() {
+                return api
+              },
+              store,
+              props,
+              el: undefined,
+              owner,
+              leases: 0,
+            }
+          : {
+              slot,
+              key,
+              mapKey,
+              id,
+              api,
+              store,
+              props,
+              el: undefined,
+              owner,
+              leases: 0,
+            }
+        enlist(found)
         if (rendering) {
           provisional(found as PartRecord)
         }
@@ -248,7 +266,7 @@ function definePrimitive<
     // until its cleanup runs.
     function element(slot: Slot, key?: string) {
       if (key === undefined) {
-        for (const part of parts.values()) {
+        for (const part of ordered(owner).values()) {
           if (part.slot === slot && part.el?.isConnected) {
             return part.el
           }
@@ -266,7 +284,7 @@ function definePrimitive<
       options: () => options,
       onOptions: (listener) => optionsListeners.push(listener),
       onDestroy: (cleanup) => destroys.push(cleanup),
-      parts: () => parts.values(),
+      parts: () => ordered(owner).values(),
       element,
       props: (slot, key = "") => {
         const shown = viewedParts?.[slot]

@@ -123,6 +123,7 @@ const unreadByItems = {
   trigger: [],
   query: [],
   dirty: [],
+  composingFrom: [],
   status: [],
   listed: [],
   labeled: [],
@@ -250,6 +251,8 @@ const comboboxSlots = (slot: SlotFactory<ComboboxState, ComboboxApi>) => ({
     })),
     on: {
       input: (event, { api }) => api.internal.onInput(event),
+      // Browsers differ on whether an `input` follows the end of a composition.
+      compositionend: (event, { api }) => api.internal.onCompositionEnd(event),
       keydown: (event, { api }) => api.internal.onInputKeyDown(event),
       focusout(event, { api, store }) {
         const next = event.relatedTarget as Node | null

@@ -2,6 +2,10 @@
 // its labels, and what the form asks of it.
 import { afterBind } from "../../foundation/kernel/after-bind"
 import { type AsyncOptionsStatus } from "../../foundation/lists/async-options"
+import {
+  composingInput,
+  endComposition,
+} from "../../foundation/lists/composition"
 import { modalityOf, trackModality } from "../../foundation/kernel/modality"
 import {
   deriveOpen,
@@ -78,6 +82,7 @@ type SelectState = PopupState & {
   pageLocale: string | null
   // The text in the search field, which filters the list while it's open.
   query: string
+  composingFrom: string | null
   // A search field is in the list, so typing filters and focus stays in the field.
   searchable: boolean
   // Real focus moved into the list for a touch screen reader, instead of staying in the search field.
@@ -146,6 +151,7 @@ function initialSelectState(options: SelectOptions<any, any>): SelectState {
     icons: 0,
     pageLocale: null,
     query: options.query ?? options.defaultQuery ?? "",
+    composingFrom: null,
     searchable: false,
     focusInList: false,
     virtualFocus: !!options.virtualFocus,
@@ -209,8 +215,8 @@ function selectApiBody(
   const searching = () => virtual(store.get())
   // The text the list is filtered by: the search field's, while the list is in the page.
   const filterQuery = () => {
-    const { searchable, mounted, query } = store.get()
-    return searchable && mounted ? query : ""
+    const { searchable, mounted, query, composingFrom } = store.get()
+    return searchable && mounted ? (composingFrom ?? query) : ""
   }
 
   const loadMore = createLoadMore({
@@ -228,7 +234,7 @@ function selectApiBody(
     showEmpty: () =>
       store.get().searchable &&
       store.get().mounted &&
-      !store.get().query.trim(),
+      !(store.get().composingFrom ?? store.get().query).trim(),
     toKey,
     filter: () =>
       store.get().searchable ? (options().filter ?? "contains") : undefined,
@@ -391,19 +397,24 @@ function selectApiBody(
   function setQuery(
     query: string,
     reason: SelectQueryChangeReason,
-    event?: Event
+    event?: Event,
+    composing = false
   ) {
-    if (!change("query", query, { reason, event })) {
+    if (!change("query", query, { reason, event, composing })) {
       return false
     }
+    highlightFirst(event)
+    return true
+  }
+
+  function highlightFirst(event?: Event) {
     if (!store.get().open) {
-      return true
+      return
     }
     const first = listbox.firstEnabled() ?? null
     if (store.get().highlighted !== first) {
       listbox.highlight(first, { focus: false, event })
     }
-    return true
   }
 
   // The element that takes part in the form: the custom element, or the hidden input.
@@ -604,8 +615,18 @@ function selectApiBody(
         setQuery(
           (event.target as HTMLInputElement).value,
           "input-change",
-          event
+          event,
+          composingInput(store, event, filterQuery)
         ),
+      onCompositionEnd: (event: Event) => {
+        const text = (event.target as HTMLInputElement).value
+        if (text === store.get().query) {
+          endComposition(context, store, "query", text, event)
+          highlightFirst(event)
+        } else {
+          setQuery(text, "input-change", event)
+        }
+      },
       // The pointer highlights what it moves onto, focusing it unless focus stays in the search field.
       hover(key: string, event: PointerEvent) {
         const { open, highlighted } = store.get()

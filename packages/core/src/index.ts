@@ -11,6 +11,7 @@ export type {
   DismissAttemptReason,
   DismissReason,
   ReasonVocabulary,
+  TextChangeDetails,
 } from "./foundation/kernel/details"
 export type {
   Attrs,

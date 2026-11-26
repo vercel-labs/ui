@@ -459,7 +459,7 @@ Events fire on their own element and don't bubble, with the new state in `event.
 | `pages` property    | `ui-command`      | The stack of pages                                                    |
 | `api` property      | `ui-command`      | The [controller](#controller-1)                                       |
 | `valuechange` event | `ui-command`      | `detail: { value, reason, event, source, index }`                     |
-| `querychange` event | `ui-command`      | `detail: { value: query, reason, event, source }`                     |
+| `querychange` event | `ui-command`      | `detail: { value: query, reason, event, source, composing }`          |
 | `pageschange` event | `ui-command`      | `detail: { value: pages, reason, event, source }`                     |
 | `action` event      | `ui-command`      | `detail: { value, waitUntil(promise) }`, when a command runs          |
 | `loadmore` event    | `ui-command`      | When the last command is reached                                      |

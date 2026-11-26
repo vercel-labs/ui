@@ -34,7 +34,13 @@ import {
 } from "../kernel/modality"
 import { isAfter } from "../kernel/order"
 import { isBrowser } from "../platform/env"
-import { afterPaint, ahead, enforceHidden, writeStyle } from "../platform/style"
+import {
+  afterPaint,
+  ahead,
+  enforceHidden,
+  entering,
+  writeStyle,
+} from "../platform/style"
 import {
   activeElement,
   composedContains,
@@ -626,6 +632,7 @@ function createPopupLayer<
   let openedByKey = false
   let returnMode: ReturnMode = true
   let before: HTMLElement | undefined
+  let tabbing = false
   // The caret in a contenteditable it opened from, which focus alone puts back at the start.
   let caret: ReturnType<typeof readCaret> | undefined
   let openedWithoutTrigger = store.get().open
@@ -1052,7 +1059,7 @@ function createPopupLayer<
     }
   }
 
-  function attach(el: HTMLElement, config: AttachConfig) {
+  function attach(el: HTMLElement, config: AttachConfig, binding: boolean) {
     const cleanups: (() => void)[] = []
     const trigger = options.trigger()
     const host = config.host?.() ?? el
@@ -1084,6 +1091,10 @@ function createPopupLayer<
       try {
         host.showPopover()
       } catch {}
+    }
+    // Content that binds open wasn't showing before, so nothing in it is moving.
+    if (binding) {
+      entering.add(el)
     }
     if (config.position && options.position) {
       const placement = options.position(
@@ -1337,6 +1348,7 @@ function createPopupLayer<
           "mousedown",
           (event) => {
             press = event
+            tabbing = false
             setTimeout(() => {
               if (press === event) {
                 press = undefined
@@ -1346,6 +1358,7 @@ function createPopupLayer<
           { capture: true }
         ),
         on(el.ownerDocument, "focusin", (event) => {
+          tabbing = false
           const target = (focusedFrom(el) ?? event.target) as Node
           if (!store.get().open || layerContains(own, target)) {
             return
@@ -1354,6 +1367,19 @@ function createPopupLayer<
             return
           }
           options.close("focus-out", { event, focus: false })
+        }),
+        // Tab out of the page lands on the body, which fires no focusin. Other
+        // blurs to nothing, like a focused control going away, leave it open.
+        on(el, "focusout", (event) => {
+          if (!tabbing || event.relatedTarget) {
+            return
+          }
+          setTimeout(() => {
+            const now = activeElement(el.ownerDocument)
+            if (store.get().open && !(now && layerContains(own, now))) {
+              options.close("focus-out", { event, focus: false })
+            }
+          })
         })
       )
     }
@@ -1428,13 +1454,13 @@ function createPopupLayer<
     }
   }
 
-  function show() {
+  function show(binding = false) {
     if (!bound || shown) {
       return
     }
     const { el, config } = bound
     shown = { el, cleanup: () => {}, backdrop: config.backdrop?.() }
-    shown.cleanup = attach(el, config)
+    shown.cleanup = attach(el, config, binding)
   }
 
   function showBackdrop(backdrop: HTMLElement, inline = false) {
@@ -1473,6 +1499,7 @@ function createPopupLayer<
   // inside a trapping popup, goes back to the page after the trigger from a
   // flowing one, wherever it renders, and closes a menu-like one.
   function keydown(event: KeyboardEvent) {
+    tabbing = event.key === "Tab"
     if (event.key === "Escape" && layer) {
       return escapeLayer(layer, event)
     }
@@ -1594,7 +1621,7 @@ function createPopupLayer<
           if (shown && shown.el !== el) {
             hide()
           }
-          show()
+          show(true)
         }
       }
       if (el.isConnected) {

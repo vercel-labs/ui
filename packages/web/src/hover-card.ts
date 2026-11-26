@@ -17,6 +17,7 @@ function defineHoverCardElements() {
   createParts(hoverCard, {
     root: {
       tag: owner,
+      display: "contents",
       kinds: popupKinds,
       // `portal` handles the `container` attribute, so core never gets it.
       options: () => ({ container: undefined }),

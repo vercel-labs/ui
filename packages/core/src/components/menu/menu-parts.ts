@@ -16,7 +16,7 @@ import {
 } from "../../foundation/popups/popup"
 import { registerPopupElement } from "../../foundation/popups/popup-elements"
 import { placementOptions } from "../../foundation/popups/popup-features"
-import { animateIn } from "../../foundation/motion/presence"
+import { animateEntering } from "../../foundation/motion/presence"
 import { labelOf } from "../../foundation/text/typeahead"
 import {
   itemIconPart,
@@ -25,7 +25,8 @@ import {
 } from "../../foundation/lists/item-icon"
 import { checkedAttrs, idPart, openAttrs } from "../../foundation/kernel/attrs"
 import { on, selectEvent } from "../../foundation/kernel/events"
-import { onProps } from "../../foundation/kernel/part"
+import { trackInput } from "../../foundation/kernel/modality"
+import { awake, firstAsleep, onProps } from "../../foundation/kernel/part"
 import type { SlotFactory } from "../../foundation/kernel/primitive-types"
 import { adoptPlatform } from "../../foundation/shortcuts/shortcut-slot"
 import { shortcuts as shortcutManager } from "../../foundation/shortcuts/shortcuts"
@@ -62,6 +63,17 @@ import {
 const menuGroupLabelledBy = (state: MenuState, id: string, group: string) =>
   state.groupLabels.includes(group) ? `${id}-label-${idPart(group)}` : undefined
 
+// Only a menu a menubar may hold reads the api for it, since reading it wakes a sleeping menu.
+const inMenubar = (state: MenuState, part: { api: MenuApi }) =>
+  state.barred ? part.api.menubar() : undefined
+
+// The trigger the id goes to before one binds. A sleeping menu has no api to
+// ask, and reading it would wake the menu.
+const firstTrigger = (state: MenuState, part: { api: MenuApi }) =>
+  state.trigger === null
+    ? (firstAsleep(part, "trigger") ?? part.api.internal.firstTrigger())
+    : undefined
+
 // The content is named by the trigger that opened it, which a context area or
 // a controller's open without a trigger isn't. A submenu's trigger always names it.
 const namedByTrigger = (state: MenuState, nested: boolean) =>
@@ -72,6 +84,22 @@ const namedByTrigger = (state: MenuState, nested: boolean) =>
 
 const triggerElement = (state: MenuState, key: string) =>
   state.triggerElements[key] ?? "button"
+
+// State the items never read: what the popup, its triggers and its groups show.
+const unreadByItems = {
+  open: [],
+  mounted: [],
+  presentation: [],
+  openChild: [],
+  trigger: [],
+  payload: [],
+  barStop: [],
+  barDisabled: [],
+  groupLabels: [],
+  triggers: [],
+  triggerElements: [],
+  shortcutItems: [],
+} as const
 
 // The menu's slots, which its features' slots join.
 const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
@@ -86,22 +114,23 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
     selects: selects({ values: [], triggerElements: ({ key }) => [key] }),
     // A submenu's trigger is an item of its parent menu, and a menubar's an item
     // of the menubar. Any other is a button, whatever it's rendered as.
-    role: (state, { api, key }) => {
-      if (api.root() !== api || api.menubar()) {
+    role: (state, part) => {
+      if (state.nested || inMenubar(state, part)) {
         return "menuitem"
       }
-      return triggerElement(state, key) === "other" ? "button" : undefined
+      return triggerElement(state, part.key) === "other" ? "button" : undefined
     },
     roles: ["menuitem", "button"],
     focus: "roving",
-    state: (state, { api, key, props }) => ({
+    state: (state, { key, props }) => ({
       open:
         state.open &&
-        (api.root() !== api || state.trigger === null || state.trigger === key),
+        (state.nested || state.trigger === null || state.trigger === key),
       disabled: triggerDisabled(state, props),
     }),
-    attrs: (state, { id, key, api, props }) => {
-      if (api.root() !== api) {
+    attrs: (state, part) => {
+      const { id, key, props } = part
+      if (state.nested) {
         return {
           ...popupTriggerAttrs({ ...state, trigger: null }, id, "menu"),
           tabindex: "-1",
@@ -111,17 +140,17 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
       }
       // A menubar's triggers are its items: one tab stop between them, and
       // disabled ones stay focusable, as the APG menubar asks.
-      if (api.menubar()) {
+      const menubar = inMenubar(state, part)
+      if (menubar) {
         const disabled = triggerDisabled(state, props)
-        const stop =
-          state.barStop ?? api.menubar()!.internal.isStop(id, !disabled)
+        const stop = state.barStop ?? menubar.internal.isStop(id, !disabled)
         return {
           ...popupTriggerAttrs(
             state,
             id,
             "menu",
             key,
-            api.internal.firstTrigger()
+            firstTrigger(state, part)
           ),
           type: "button",
           tabindex: stop ? "0" : "-1",
@@ -133,13 +162,7 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
         }
       }
       return {
-        ...popupTriggerAttrs(
-          state,
-          id,
-          "menu",
-          key,
-          api.internal.firstTrigger()
-        ),
+        ...popupTriggerAttrs(state, id, "menu", key, firstTrigger(state, part)),
         ...buttonElementAttrs(triggerElement(state, key), {
           type: "button",
           disabled: !!props.disabled,
@@ -267,124 +290,125 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
         })
       }
     },
-    bind(el, { api, store, key, id }) {
+    // A root trigger's own state and shortcuts are in place while its menu sleeps.
+    asleep(el, part) {
+      const { store, key, id } = part
       // The client knows its platform now. Vue binds refs mid-hydration, so
       // the switch waits a microtask, which still lands before paint.
       adoptPlatform(store)
       checkName(el, "The trigger", { component: "menu", id })
-      const parentMenu = api.parentMenu()
-      const cleanups: (() => void)[] = []
-      if (parentMenu) {
-        cleanups.push(
-          parentMenu.internal.register(el, {
-            key: el.id,
-            kind: "submenu",
-            label: () => labelOf(el),
-            disabled: () =>
-              !!api.itemProps<SubTriggerProps>("trigger", key)?.disabled ||
-              el.getAttribute("aria-disabled") === "true",
-            activate: (event) =>
-              api.show({ focus: "first", event, reason: "trigger-press" }),
-            openSubmenu: (focus, reason, event) =>
-              api.show({ focus, reason, event }),
-          })
-        )
+      // A key press that wakes the menu opens it as the keyboard does, which this tells from the start.
+      trackInput()
+      const state = store.get()
+      if (state.nested) {
+        return
       }
+      const change: Partial<MenuState> = {}
       // The first trigger is the one focus returns to until another opens the menu.
-      if (!parentMenu && store.get().trigger === null) {
-        store.set({ trigger: key })
+      if (state.trigger === null) {
+        change.trigger = key
+      }
+      const element = buttonElement(el)
+      if (!inMenubar(state, part) && triggerElement(state, key) !== element) {
+        change.triggerElements = { ...state.triggerElements, [key]: element }
+      }
+      if (change.trigger !== undefined || change.triggerElements) {
+        store.set(change)
       }
       // Where hydration kept another trigger's attributes, as for a popover's.
-      if (
-        !parentMenu &&
-        store.get().trigger === key &&
-        !el.hasAttribute("id")
-      ) {
+      if (store.get().trigger === key && !el.hasAttribute("id")) {
         el.id = `${id}-trigger`
       }
-      if (!parentMenu) {
-        cleanups.push(keyWhileBound(store, "triggers", key))
-      }
-      const menubar = api.menubar()
-      const element = buttonElement(el)
-      if (
-        !parentMenu &&
-        !menubar &&
-        triggerElement(store.get(), key) !== element
-      ) {
-        store.set({
-          triggerElements: { ...store.get().triggerElements, [key]: element },
-        })
-      }
-      if (menubar) {
-        const latest = () => api.itemProps<TriggerProps>("trigger", key) ?? {}
-        // The menubar's tab stop and disabled state render on this trigger.
-        const follow = () => {
-          const stop = menubar.internal.stop()
-          store.set({
-            barStop: stop === null ? store.get().barStop : stop === id,
-            barDisabled: menubar.internal.disabled(),
-          })
-        }
-        cleanups.push(
-          menubar.internal.join(id, el, {
-            isOpen: api.isOpen,
-            disabled: () => triggerDisabled(store.get(), latest()),
-            open: (options) =>
-              api.show({ ...options, trigger: key, payload: latest().payload }),
-            close: (options) => api.hide(options),
-          }),
-          menubar.internal.subscribe(follow)
-        )
-        follow()
-      }
-      // A root trigger's shortcut opens the menu with its first item focused, or closes it.
-      if (!parentMenu) {
-        cleanups.push(
-          shortcutManager.register(
-            () => api.itemProps<TriggerProps>("trigger", key)?.shortcut,
-            (event) => {
-              const props = api.itemProps<TriggerProps>("trigger", key) ?? {}
-              // A disabled menubar disables its triggers' shortcuts too.
-              if (triggerDisabled(store.get(), props)) {
-                return
-              }
-              if (api.isOpen()) {
-                api.hide({ reason: "shortcut", event })
-              } else {
-                api.show({
-                  focus: "first",
-                  event,
-                  trigger: key,
-                  payload: props.payload,
-                  reason: "shortcut",
-                })
-              }
-            },
-            { layer: el }
-          )
-        )
-      }
-      // Data menus run their items' shortcuts while closed.
-      if (!parentMenu) {
-        cleanups.push(bindItemShortcuts(store, el, api.runAction), () => {
+      const cleanups = [
+        keyWhileBound(store, "triggers", key),
+        // A root trigger's shortcut opens the menu with its first item focused, or closes it.
+        shortcutManager.register(
+          () => part.props.shortcut,
+          (event) => {
+            // A disabled menubar disables its triggers' shortcuts too.
+            if (triggerDisabled(store.get(), part.props)) {
+              return
+            }
+            const api = awake(part)
+            if (api.isOpen()) {
+              api.hide({ reason: "shortcut", event })
+            } else {
+              api.show({
+                focus: "first",
+                event,
+                trigger: key,
+                payload: part.props.payload,
+                reason: "shortcut",
+              })
+            }
+          },
+          { layer: el }
+        ),
+        // Data menus run their items' shortcuts while closed.
+        bindItemShortcuts(store, el, (value, event) =>
+          awake(part).runAction(value, event)
+        ),
+        () => {
           if (store.get().trigger === key && !store.get().open) {
             store.set({ trigger: null })
           }
           // The trigger that opened the menu left, like a row a filter hid, so nothing updates its
           // payload anymore. A task later, so a rebind an adapter queues as a microtask lands first.
           setTimeout(() => {
+            const api = part.api as MenuApi | undefined
             if (
               store.get().trigger === key &&
-              api.isOpen() &&
+              api?.isOpen() &&
               api.popupElement() &&
               !api.triggerElement()
             ) {
               api.hide({ reason: "imperative" })
             }
           })
+        },
+      ]
+      return () => cleanups.forEach((cleanup) => cleanup())
+    },
+    bind(el, { api, store, key, id }) {
+      const parentMenu = api.parentMenu()
+      if (parentMenu) {
+        return parentMenu.internal.register(el, {
+          key: el.id,
+          kind: "submenu",
+          label: () => labelOf(el),
+          disabled: () =>
+            !!api.itemProps<SubTriggerProps>("trigger", key)?.disabled ||
+            el.getAttribute("aria-disabled") === "true",
+          activate: (event) =>
+            api.show({ focus: "first", event, reason: "trigger-press" }),
+          openSubmenu: (focus, reason, event) =>
+            api.show({ focus, reason, event }),
         })
       }
+      const menubar = api.menubar()
+      if (!menubar) {
+        return
+      }
+      const latest = () => api.itemProps<TriggerProps>("trigger", key) ?? {}
+      // The menubar's tab stop and disabled state render on this trigger.
+      const follow = () => {
+        const stop = menubar.internal.stop()
+        store.set({
+          barStop: stop === null ? store.get().barStop : stop === id,
+          barDisabled: menubar.internal.disabled(),
+        })
+      }
+      const cleanups = [
+        menubar.internal.join(id, el, {
+          isOpen: api.isOpen,
+          disabled: () => triggerDisabled(store.get(), latest()),
+          open: (options) =>
+            api.show({ ...options, trigger: key, payload: latest().payload }),
+          close: (options) => api.hide(options),
+        }),
+        menubar.internal.subscribe(follow),
+      ]
+      follow()
       return () => cleanups.forEach((cleanup) => cleanup())
     },
   }),
@@ -422,21 +446,21 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
       "Tab",
       "typeahead",
     ],
-    state: (state, { api }) => ({
+    state: (state, part) => ({
       open: state.open,
-      nested: api.root() !== api,
+      nested: state.nested,
       presentation: state.presentation,
       // Submenus show the payload their root menu opened with.
-      payload: api.root() === api ? state.payload : api.root().getPayload(),
+      payload: state.nested ? part.api.root().getPayload() : state.payload,
     }),
     present: (state, { props }) => state.mounted || !!props.keepMounted,
-    attrs: (state, { id, api }) => ({
+    attrs: (state, { id }) => ({
       ...popupContentAttrs(state, id),
-      "aria-labelledby": namedByTrigger(state, api.root() !== api)
+      "aria-labelledby": namedByTrigger(state, state.nested)
         ? `${id}-trigger`
         : undefined,
       "data-presentation": state.presentation,
-      "data-nested": api.root() === api ? undefined : "",
+      "data-nested": state.nested ? "" : undefined,
     }),
     on: {
       keydown: (event, { api }) => api.internal.onKeyDown(event),
@@ -513,8 +537,7 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
   // adapters render it around the content, which they render only while present.
   viewport: slot({
     selects: selects({ values: [] }),
-    present: (state, { api }) =>
-      state.presentation === "sheet" && api.root() === api,
+    present: (state) => state.presentation === "sheet" && !state.nested,
   }),
 
   item: slot<ItemProps, MenuItemState>({
@@ -529,6 +552,7 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
       onSelect: "action",
     },
     selects: selects({
+      ...unreadByItems,
       highlighted: ({ key }) => [key],
       pending: ({ key }) => [key],
       values: [],
@@ -703,6 +727,7 @@ const menuCheckable = /* @__PURE__ */ (() => ({
         closeOnSelect: "boolean",
       },
       selects: selects({
+        ...unreadByItems,
         highlighted: ({ key }) => [key],
         values: ({ props }) => [props.value],
       }),
@@ -772,6 +797,7 @@ const menuCheckable = /* @__PURE__ */ (() => ({
       },
       // Registered under its group too, since radio groups may share values.
       selects: selects({
+        ...unreadByItems,
         highlighted: ({ key, props }) => [`${props.group}:${key}`],
         values: ({ props }) => [`radio:${props.group}`],
       }),
@@ -841,7 +867,7 @@ const menuCheckable = /* @__PURE__ */ (() => ({
       },
       // Animates in when its item becomes checked.
       bind: (el, { api, props }) =>
-        indicatorState(api, props).checked ? animateIn(el) : undefined,
+        indicatorState(api, props).checked ? animateEntering(el) : undefined,
     }),
   },
 }))()
@@ -858,6 +884,7 @@ const menuItemIcons = /* @__PURE__ */ (() => ({
         component: "menu",
         item: itemSelector,
         list: '[role="menu"], [role="menubar"]',
+        subscribe: (api) => api.parentMenu()?.internal.subscribe,
       }),
       selects: selects({ values: [] }),
     }),

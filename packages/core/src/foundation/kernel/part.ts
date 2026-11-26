@@ -37,15 +37,22 @@ type Host =
 // What the kernel keeps on a part beside what adapters read.
 type PartRecord = Part & {
   readonly owner: PartOwner
+  readonly mapKey: string
+  // Where it comes among them, which rises as it joins and as it binds.
+  rank?: number
   // The bind that set `el`. Unbinding can change state that binds the part
   // again, so an earlier bind's cleanup leaves a newer bind's element.
   binding?: object
   leases: number
+  dropped?: boolean
   ref?: (el: HTMLElement | null) => void
   // What `onProps` registered, which hears each render.
   propsListeners?: Set<() => void>
   // The bound element's id when it isn't the one the slot makes, like an author's.
   own?: string
+  // The id the slot made when it last rendered, null when it made none, and
+  // undefined when it rendered an author's instead.
+  made?: string | null
 }
 
 // The instance's side of its parts.
@@ -55,8 +62,14 @@ type PartOwner = {
   readonly label: string
   readonly slots: Record<string, AnySlot>
   // One record per part, by `slot:key`. Binding moves a part to the end, so
-  // `element(slot)` finds the part of a slot that bound first.
+  // `element(slot)` finds the part of a slot that bound first. Read in that
+  // order through `ordered`: a bind only ranks its part last.
   readonly parts: Map<string, PartRecord>
+  rank: number
+  unordered?: boolean
+  // The same records by slot, then key, which a render finds its part in
+  // without making `slot:key`.
+  readonly keyed: Map<string, Map<string, PartRecord>>
   // While the instance is asleep: what wakes it, and the binds that wait for it.
   sleeping?: { wake: () => void; binds: Set<() => void> }
   // A part stays while something leases it: its bound element or a
@@ -75,32 +88,53 @@ type PartOwner = {
   renamed?: boolean
 }
 
+// The part a sleeping instance's view was made for, which `firstAsleep` reads.
+const viewed = Symbol()
 // Every part an adapter holds came from `instance.part()`, which makes a record.
 const ownerOf = (part: Part) => (part as PartRecord).owner
 const definitionOf = (part: Part) => ownerOf(part).slots[part.slot]
-// What pure reads see of a part: no element and no store.
-const view = <Api, Props>(part: Part<any, Api>, props: Props) => ({
-  id: part.id,
-  key: part.key,
-  props,
-  api: part.api,
-})
-const context = (part: Part, props = part.props) => ({
-  el: part.el,
-  id: part.id,
-  key: part.key,
-  props,
-  store: part.store,
-  api: part.api,
-})
+// What pure reads see of a part: no element and no store. Reading the api
+// wakes an instance that sleeps, so a part that can render asleep reads none.
+// Only then is it a getter: an object made with one costs ten times a plain one.
+const view = <Api, Props>(part: Part<any, Api>, props: Props) =>
+  ownerOf(part).sleeping
+    ? {
+        id: part.id,
+        key: part.key,
+        props,
+        get api() {
+          return awake(part)
+        },
+        [viewed]: part as PartRecord,
+      }
+    : { id: part.id, key: part.key, props, api: part.api }
+const context = (part: Part, props = part.props) =>
+  ownerOf(part).sleeping
+    ? {
+        el: part.el,
+        id: part.id,
+        key: part.key,
+        props,
+        store: part.store,
+        get api() {
+          return awake(part)
+        },
+      }
+    : {
+        el: part.el,
+        id: part.id,
+        key: part.key,
+        props,
+        store: part.store,
+        api: part.api,
+      }
 
 // A part the sweep dropped while a framework kept it, like content Suspense
 // hid and shows again, comes back as it's leased.
 function lease(part: PartRecord) {
-  const { parts } = part.owner
-  const mapKey = `${part.slot}:${part.key}`
-  if (!parts.has(mapKey)) {
-    parts.set(mapKey, part)
+  if (part.dropped && !part.owner.parts.has(part.mapKey)) {
+    enlist(part)
+    part.dropped = false
   }
   part.leases++
   let held = true
@@ -132,12 +166,51 @@ function provisional(part: PartRecord) {
 
 function sweep(owner: PartOwner) {
   for (const part of owner.released) {
-    const mapKey = `${part.slot}:${part.key}`
-    if (!part.leases && owner.parts.get(mapKey) === part) {
-      owner.parts.delete(mapKey)
+    if (!part.leases && owner.parts.get(part.mapKey) === part) {
+      owner.parts.delete(part.mapKey)
+      owner.keyed.get(part.slot)?.delete(part.key)
+      part.dropped = true
     }
   }
   owner.released = []
+}
+
+// The instance's parts in the order they joined and bound. Parts mostly bind
+// in the order they joined, which leaves them in order already.
+function ordered(owner: PartOwner) {
+  const { parts } = owner
+  if (owner.unordered) {
+    owner.unordered = false
+    let last = 0
+    let sorted = true
+    for (const part of parts.values()) {
+      if (part.rank! < last) {
+        sorted = false
+        break
+      }
+      last = part.rank!
+    }
+    if (!sorted) {
+      const all = [...parts.values()].sort((a, b) => a.rank! - b.rank!)
+      parts.clear()
+      for (const part of all) {
+        parts.set(part.mapKey, part)
+      }
+    }
+  }
+  return parts
+}
+
+function enlist(part: PartRecord) {
+  const { owner } = part
+  const { parts, keyed } = owner
+  part.rank = ++owner.rank
+  parts.set(part.mapKey, part)
+  let slot = keyed.get(part.slot)
+  if (!slot) {
+    keyed.set(part.slot, (slot = new Map()))
+  }
+  slot.set(part.key, part)
 }
 
 // Reads take the props to read with, so an adapter can compare against the
@@ -168,6 +241,12 @@ function attrs(part: Part, props = part.props, state = part.store.get()) {
       definition.live?.read(state, context)
     )
   }
+  // A slot renders an author's id as it is, so any other id is one it made.
+  const authored = (props as { id?: unknown }).id
+  ;(part as PartRecord).made =
+    authored === undefined || own?.id !== authored
+      ? (own?.id ?? null)
+      : undefined
   const { name } = ownerOf(part)
   const result: Attrs = {
     "data-slot": part.slot === "root" ? name : `${name}-${part.slot}`,
@@ -263,10 +342,10 @@ const selectedKeys = (part: Part, props = part.props) =>
  * when a key starts or stops being delivered.
  */
 function followed(part: Part, synced: object | undefined, props = part.props) {
-  const reads = definitionOf(part).selects?.reading(part, props)
   const names = ["#keys"]
+  const narrowed = definitionOf(part).selects
   for (const key in synced) {
-    const values = reads?.get(key)
+    const values = narrowed?.reading(part, props, key)
     if (!values) {
       names.push(key)
     } else {
@@ -368,9 +447,39 @@ function commit(part: Part, props: Part["props"]) {
   propsRendered(part as PartRecord)
 }
 
+/**
+ * For a render while the instance sleeps and has no api to ask: the key of
+ * the slot's first part that's bound and in the page, else the first rendered.
+ */
+function firstAsleep(view: object, slot: string) {
+  const part = (view as { [viewed]?: PartRecord })[viewed]
+  if (!part) {
+    return undefined
+  }
+  let first: string | undefined
+  for (const other of ordered(part.owner).values()) {
+    if (other.slot === slot) {
+      if (other.el?.isConnected) {
+        return other.key
+      }
+      first ??= other.key
+    }
+  }
+  return first
+}
+
 // Tells the part's `onProps` listeners it rendered with new props.
 function propsRendered(part: PartRecord) {
   part.propsListeners?.forEach((listener) => listener())
+}
+
+/**
+ * The part's api, for work a part set up while its instance slept, like a
+ * shortcut it registered: the instance wakes first.
+ */
+function awake<Api>(part: Part<object, Api>) {
+  ownerOf(part).sleeping?.wake()
+  return part.api
 }
 
 /** Activation without a DOM event, for headless tests and the docs' generated tables. */
@@ -416,11 +525,13 @@ function canHide(part: Part) {
 /** Attaches behavior to an element. Leases the part while bound. Returns the cleanup. */
 function bind(part: Part, el: HTMLElement, host: Host = { by: "core" }) {
   const kept = part as PartRecord
-  const { parts } = kept.owner
-  const mapKey = `${part.slot}:${part.key}`
-  if (!part.el && (parts.get(mapKey) ?? kept) === kept) {
-    parts.delete(mapKey)
-    parts.set(mapKey, kept)
+  const { owner } = kept
+  const listed = part.el ? kept : owner.parts.get(kept.mapKey)
+  if (!listed) {
+    enlist(kept)
+  } else if (!part.el && listed === kept && kept.rank !== owner.rank) {
+    kept.rank = ++owner.rank
+    owner.unordered = true
   }
   if (dev) {
     checkShared(part, part.el, el)
@@ -445,12 +556,11 @@ function bind(part: Part, el: HTMLElement, host: Host = { by: "core" }) {
     enforceHidden(el.ownerDocument)
   }
 
-  for (const [type, handler] of Object.entries(handlers(part))) {
-    if (
-      host.by === "core" ||
-      (host.attaches !== "all" && !host.attaches.includes(type))
-    ) {
-      cleanups.push(on(el, type as keyof EventMap, handler))
+  if (host.by === "core" || host.attaches !== "all") {
+    for (const [type, handler] of Object.entries(handlers(part))) {
+      if (host.by === "core" || !host.attaches.includes(type)) {
+        cleanups.push(on(el, type as keyof EventMap, handler))
+      }
     }
   }
 
@@ -644,14 +754,68 @@ function aliasesOf(owner: PartOwner, store: Part["store"]) {
 }
 
 // Reads the element's id as it binds and whenever it changes, like a
-// framework's `id` prop or a script setting it.
+// framework's `id` prop or a script setting it. An element that binds with
+// the id its part just made has nothing to read.
 function followId(part: PartRecord, el: HTMLElement) {
-  if (el.hasAttribute("id") || part.own !== undefined) {
+  const id = idOf(el)
+  if (part.own !== undefined || (id && id !== part.made)) {
     readIdLater(part)
   }
-  const observer = new MutationObserver(() => readIdLater(part))
-  observer.observe(el, { attributeFilter: ["id"] })
-  return () => observer.disconnect()
+  // One observer watches each element directly, so moving into another shadow
+  // root or document keeps following it, and shared elements notify every part.
+  const existing = idParts.get(el)
+  if (!existing) {
+    idParts.set(el, part)
+    watchIds().observe(el, idWatchOptions)
+  } else if (existing instanceof Set) {
+    existing.add(part)
+  } else if (existing !== part) {
+    idParts.set(el, new Set([existing, part]))
+  }
+  idBound++
+  let active = true
+  return () => {
+    if (!active) {
+      return
+    }
+    active = false
+    const current = idParts.get(el)
+    if (current === part) {
+      idParts.delete(el)
+    } else if (current instanceof Set) {
+      current.delete(part)
+      if (!current.size) {
+        idParts.delete(el)
+      }
+    }
+    if (!--idBound && idWatcher) {
+      idWatcher.disconnect()
+      idWatcher = undefined
+    }
+  }
+}
+
+const idWatchOptions = { attributeFilter: ["id"] }
+const idParts = new WeakMap<Node, PartRecord | Set<PartRecord>>()
+let idWatcher: MutationObserver | undefined
+let idBound = 0
+
+function watchIds() {
+  if (!idWatcher) {
+    idWatcher = new MutationObserver((records) => {
+      for (const { target } of records) {
+        const entry = idParts.get(target)
+        if (entry instanceof Set) {
+          for (const part of entry) {
+            readIdLater(part)
+          }
+        } else if (entry) {
+          readIdLater(entry)
+        }
+      }
+    })
+  }
+  return idWatcher
 }
 
 // A microtask later, once every part binding with it has bound, so the
@@ -682,10 +846,14 @@ function readIds(owner: PartOwner, store: Part["store"]) {
 }
 
 // Every bound element with an id is read once, so through the `id` property,
-// which needs no lookup by name. A form's `id` property is a control named
-// "id", so a form's comes from its attribute.
-const idOf = (el: HTMLElement) =>
-  el.localName === "form" ? el.getAttribute("id") : el.id
+// which needs no lookup by name. A form's `id` property can be a control named
+// "id", so then it comes from its attribute.
+function idOf(el: HTMLElement) {
+  const id: unknown = el.id
+  return id && typeof id === "object"
+    ? el.getAttribute("id")
+    : (id as string | undefined)
+}
 
 /**
  * Takes the id an author gives a part's element as the part renders, so the
@@ -740,17 +908,21 @@ export {
   aliasReferences,
   attrs,
   authorOwned,
+  awake,
   bind,
   commit,
   conditional,
   connect,
   directNames,
+  enlist,
+  firstAsleep,
   followed,
   handlers,
   held,
   liveAttrs,
   madeLabel,
   onProps,
+  ordered,
   type PartOwner,
   provisional,
   type PartRecord,

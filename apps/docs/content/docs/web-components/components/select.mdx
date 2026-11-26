@@ -621,7 +621,7 @@ Events fire on their own element and don't bubble, with the new state in `event.
 | `openchangecomplete` event | `ui-select`         | `detail: { value: open }`, after the animation                |
 | `highlight` event          | `ui-select`         | `detail: { value, index, event }`                             |
 | `query` property           | `ui-select`         | The search text                                               |
-| `querychange` event        | `ui-select`         | `detail: { value: query, reason, event, source }`             |
+| `querychange` event        | `ui-select`         | `detail: { value: query, reason, event, source, composing }`  |
 | `loadmore` event           | `ui-select`         | When the last item is reached                                 |
 | `dismissattempt` event     | `ui-select`         | `detail: { reason, event }`, when a dismissal was refused     |
 | `for` attribute            | `ui-select-trigger` | The `id` of a select the trigger opens from outside it        |

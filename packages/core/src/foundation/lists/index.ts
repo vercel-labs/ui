@@ -15,6 +15,11 @@ export {
   type SearchFilter,
 } from "./autocomplete-core"
 export {
+  composingInput,
+  type ComposingState,
+  endComposition,
+} from "./composition"
+export {
   createItemIcons,
   itemIconPart,
   type ItemIconProps,

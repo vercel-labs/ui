@@ -392,6 +392,7 @@ type MenuNode = {
     trackPointer: (event: PointerEvent) => void
     layer: () => Layer | undefined
     barArrow: (by: 1 | -1, event: KeyboardEvent) => boolean
+    subscribe: (listener: () => void) => () => void
   }
 }
 
@@ -823,6 +824,7 @@ function menuApiBody(
       entryOf,
       children,
       safeArea,
+      subscribe: store.subscribe,
       register(el: HTMLElement, item: Omit<Entry, "el">) {
         const entry = { ...item, el }
         const remove = entries.add(entry)
@@ -1254,6 +1256,10 @@ const menuApi: (...args: Parameters<typeof menuApiBody>) => MenuApi =
   menuApiBody
 
 type MenuState = {
+  // Whether it's a submenu, and whether a menubar may hold it, known from the
+  // start: a closed root menu renders its trigger before it has an api.
+  nested: boolean
+  barred: boolean
   open: boolean
   // True while the popup is in the DOM, including while it animates out.
   mounted: boolean

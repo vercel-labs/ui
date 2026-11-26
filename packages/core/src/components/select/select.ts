@@ -32,6 +32,7 @@ import { type ListSelectAllState } from "../../foundation/lists/listbox-select-a
 import { createController } from "../../foundation/kernel/controller"
 import type {
   ChangeDetails,
+  TextChangeDetails,
   ChangeOptions,
   DismissAttemptReason,
 } from "../../foundation/kernel/details"
@@ -288,7 +289,7 @@ type SelectSharedOptions<T> = PortalProps & {
   /** Runs when the search field's text wants to change: typing, or closing the list, which empties it. */
   onQueryChange?: (
     query: string,
-    details: ChangeDetails<SelectQueryChangeReason>
+    details: TextChangeDetails<SelectQueryChangeReason>
   ) => void
   /**
    * How a `SelectInput` narrows the list: `"contains"`, `"startsWith"`, a function of the item and the text, whose numeric result also sorts data items, or `false` to keep every item, for results a server already filtered.

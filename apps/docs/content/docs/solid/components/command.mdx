@@ -459,14 +459,14 @@ Create one with `createCommandController()` and pass it as `controller`.
 
 Callbacks get the new state first, then the details.
 
-| Prop            | On            | Receives                                                                              |
-| --------------- | ------------- | ------------------------------------------------------------------------------------- |
-| `onValueChange` | `Command`     | `(value, details)`: the highlighted command, the [reason](#reasons) and its `index`   |
-| `onQueryChange` | `Command`     | `(query, details)`: the new text, and the [reason](#reasons)                          |
-| `onPagesChange` | `Command`     | `(pages, details)`: the new stack, and the [reason](#reasons)                         |
-| `onAction`      | `Command`     | `(value, { event })`: the command that ran. Return a Promise to mark it pending       |
-| `onLoadMore`    | `Command`     | `()`, when the last command is reached                                                |
-| `onSelect`      | `CommandItem` | `(event)`: before `onAction`. `preventDefault()` skips it. A Promise marks it pending |
+| Prop            | On            | Receives                                                                                    |
+| --------------- | ------------- | ------------------------------------------------------------------------------------------- |
+| `onValueChange` | `Command`     | `(value, details)`: the highlighted command, the [reason](#reasons) and its `index`         |
+| `onQueryChange` | `Command`     | `(query, details)`: the new text, the [reason](#reasons) and whether it's still `composing` |
+| `onPagesChange` | `Command`     | `(pages, details)`: the new stack, and the [reason](#reasons)                               |
+| `onAction`      | `Command`     | `(value, { event })`: the command that ran. Return a Promise to mark it pending             |
+| `onLoadMore`    | `Command`     | `()`, when the last command is reached                                                      |
+| `onSelect`      | `CommandItem` | `(event)`: before `onAction`. `preventDefault()` skips it. A Promise marks it pending       |
 
 ## Accessibility
 

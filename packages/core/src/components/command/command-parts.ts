@@ -61,6 +61,7 @@ const unreadByItems = {
   open: [],
   value: [],
   query: [],
+  composingFrom: [],
   queries: [],
   items: [],
   status: [],

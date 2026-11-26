@@ -608,15 +608,15 @@ Every write method takes an optional `{ reason, event }`, passed to the change c
 
 Callbacks get the new state first, then the details.
 
-| Prop                   | On       | Receives                                                        |
-| ---------------------- | -------- | --------------------------------------------------------------- |
-| `onValueChange`        | `Select` | `(value, details)`: the new value, and the [reason](#reasons)   |
-| `onOpenChange`         | `Select` | `(open, details)`: the new state, and the [reason](#reasons)    |
-| `onOpenChangeComplete` | `Select` | `(open)`, after the animation                                   |
-| `onHighlight`          | `Select` | `(value, { index, event })`: the highlighted item and its row   |
-| `onQueryChange`        | `Select` | `(query, details)`: the search text, and the [reason](#reasons) |
-| `onLoadMore`           | `Select` | `()`, when the last item is reached                             |
-| `onDismissAttempt`     | `Select` | `({ reason, event })`, when a dismissal was refused             |
+| Prop                   | On       | Receives                                                                                       |
+| ---------------------- | -------- | ---------------------------------------------------------------------------------------------- |
+| `onValueChange`        | `Select` | `(value, details)`: the new value, and the [reason](#reasons)                                  |
+| `onOpenChange`         | `Select` | `(open, details)`: the new state, and the [reason](#reasons)                                   |
+| `onOpenChangeComplete` | `Select` | `(open)`, after the animation                                                                  |
+| `onHighlight`          | `Select` | `(value, { index, event })`: the highlighted item and its row                                  |
+| `onQueryChange`        | `Select` | `(query, details)`: the search text, the [reason](#reasons) and whether it's still `composing` |
+| `onLoadMore`           | `Select` | `()`, when the last item is reached                                                            |
+| `onDismissAttempt`     | `Select` | `({ reason, event })`, when a dismissal was refused                                            |
 
 ## Accessibility
 

@@ -339,6 +339,8 @@ The selection, text, and popup have separate values:
 
 Read or write the element’s properties and listen for these events. Call `preventDefault()` on a change event to reject it. Choosing an item writes its label into the input, and a canceled choice keeps the current one. Closing without choosing restores the value’s label unless custom values are allowed. [State and Events](../state-and-events) covers the binding pattern.
 
+While an input method composes text, like a Japanese conversion or a dead key's accent, the list keeps its filter and `querychange` has `detail.composing: true`. Search a server once it's `false`.
+
 Focus leaving the input closes the popup with the reason `focus-out`, even when code moves it, like a notice that takes focus. To keep the popup open, call `preventDefault()` on that `openchange`.
 
 <ComponentExample
@@ -833,7 +835,7 @@ Events fire on their own element and don't bubble, with the new state in `event.
 | `open` property, attribute | `ui-combobox` | Whether the list is open. The attribute sets where it starts         |
 | `api` property             | `ui-combobox` | The [controller](#controller-1)                                      |
 | `valuechange` event        | `ui-combobox` | `detail: { value, reason, event, source }`                           |
-| `querychange` event        | `ui-combobox` | `detail: { value: query, reason, event, source }`                    |
+| `querychange` event        | `ui-combobox` | `detail: { value: query, reason, event, source, composing }`         |
 | `openchange` event         | `ui-combobox` | `detail: { value: open, reason, event, source }`                     |
 | `openchangecomplete` event | `ui-combobox` | `detail: { value: open }`, after the animation                       |
 | `highlight` event          | `ui-combobox` | `detail: { value, index, event }`                                    |

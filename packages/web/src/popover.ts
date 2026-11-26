@@ -27,6 +27,7 @@ function definePopoverElements() {
   createParts(popover, {
     root: {
       tag: owner,
+      display: "contents",
       defaults: { dismissible: true },
       kinds: popupKinds,
       // `portal` handles the `container` attribute, so core never gets it.

@@ -24,14 +24,14 @@ import {
   type MenuTriggerProps,
   type MenuTriggerState,
 } from "@ui-sdk/core/menu"
-import type { JSX } from "@solidjs/web"
+import { isServer, type JSX } from "@solidjs/web"
 import {
   createContext,
-  createEffect,
   createMemo,
   createSignal,
   createUniqueId,
   For,
+  isStatic,
   merge,
   omit,
   onCleanup,
@@ -160,27 +160,25 @@ const Menu = /* @__PURE__ */ rootScope(function Menu(props: MenuProps) {
 const withState = (children: unknown, state: unknown) =>
   (typeof children === "function" ? children(state) : children) as JSX.Element
 
-// Shortcut text is neutral until the client binds, so the server and the
-// first client render agree, and the platform's glyphs follow a moment later.
-// Item state doesn't carry it, so the root menu listens once for every item.
+// Shortcut text is neutral until the client binds, so the server and the first
+// client render agree. Item state doesn't carry the platform, so the root menu
+// listens for it, once for every item, from the first shortcut that renders.
 function appleSignal(menu: MenuContextValue) {
-  // Written from core's listeners, which can fire inside a disposal, like a
-  // `For` removing a row whose trigger names this menu's controller.
-  const [apple, setApple] = createSignal(
-    untrack(() => menu.state.apple),
-    { ownedWrite: true }
-  )
-  createEffect(
-    () => 0,
-    () => {
-      const sync = () => setApple(menu.state.apple)
-      const unsubscribe = menu.instance.subscribe(sync)
-      // The client may have bound between the first read and now.
-      sync()
-      return unsubscribe
+  let apple: (() => boolean) | undefined
+  let unsubscribe: (() => void) | undefined
+  onCleanup(() => unsubscribe?.())
+  return () => {
+    if (!apple) {
+      // Written from core's listeners, which can fire inside a disposal, like a
+      // `For` removing a row whose trigger names this menu's controller.
+      const [read, write] = createSignal(menu.state.apple, { ownedWrite: true })
+      apple = read
+      if (!isServer) {
+        unsubscribe = menu.instance.subscribe(() => write(menu.state.apple))
+      }
     }
-  )
-  return apple
+    return apple()
+  }
 }
 
 type TriggerProps = MenuTriggerProps
@@ -331,7 +329,7 @@ function MenuContent<Payload = unknown>(
   )
   const element = () => usePart(menu, "content", content, rest, "div")
   // Submenus render inside their parent's popup.
-  const nested = menu.api.root() !== menu.api
+  const nested = menu.state.nested
   // A root content tells its menu it's there. A submenu's content is no menu's own content.
   const register = nested ? null : useContext(OwnContentContext)
   register?.(true)
@@ -353,7 +351,6 @@ function MenuItem(
   props: Omit<PartProps<"div", MenuItemState>, Clashing> & MenuItemProps
 ) {
   const menu = useMenu()
-  const apple = useContext(AppleContext)
   const id = createUniqueId()
   const item = () => ({
     id,
@@ -375,6 +372,10 @@ function MenuItem(
     "destructive",
     "onSelect"
   )
+  if (isStatic(props, "shortcut") && !untrack(() => props.shortcut)) {
+    return usePart(menu, "item", item, rest, "div")
+  }
+  const apple = useContext(AppleContext)
   const withShortcut = merge(rest, {
     get children() {
       return (state: MenuItemState) => (

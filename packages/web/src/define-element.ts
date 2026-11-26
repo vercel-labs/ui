@@ -1369,8 +1369,13 @@ function defineRootElement<P extends Primitive>(
       #childObserver?: MutationObserver
       #selfPart?: Part
 
+      // An own slot on a wrapped element, like a Button's <button>, shares it
+      // with the parts around it, so it's found as the inner one.
       #registerSelf(el: HTMLElement) {
         this.#selfPart = { slot: config.self!, el, props: {} }
+        if (el !== this) {
+          slotParts.set(this, this.#selfPart)
+        }
         this.register(this.#selfPart)
       }
 

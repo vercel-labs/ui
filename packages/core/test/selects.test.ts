@@ -155,6 +155,10 @@ describe("menu items select on the highlighted item and on their checked entry",
     expect(heard["highlight another item"]).toBe(
       parts.length - items.length + 2
     )
+    // Items show nothing of the popup, so opening it reaches none of them,
+    // and closing it only the one that loses the highlight.
+    expect(heard["open"]).toBe(parts.length - items.length)
+    expect(heard["close"]).toBe(parts.length - items.length + 1)
   })
 })
 

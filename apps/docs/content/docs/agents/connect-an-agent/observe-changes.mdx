@@ -55,6 +55,8 @@ Changes canceled with `details.cancel()` aren't reported. For a controlled compo
 
 Password, card and one-time-code fields report `"[redacted]"` for both `value` and `previous`.
 
+A component that's hidden when it changes isn't reported, like a field in a hidden section that your code fills in. The agent reads it from a snapshot once it shows. A popup opening or closing is always reported.
+
 ## When Changes Arrive
 
 A slider drag reports one change when it finishes, with `previous` set to the value before the drag. State that doesn't commit, such as a text field's input, reports each change. Changes made by the agent or application arrive immediately.

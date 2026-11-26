@@ -23,6 +23,7 @@ export {
 } from "./panel"
 export { sheetPhysics, type SheetPhysics } from "./physics"
 export {
+  animateEntering,
   animateIn,
   animateOut,
   animateOutTogether,

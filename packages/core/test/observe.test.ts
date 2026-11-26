@@ -5,6 +5,7 @@
 import { afterEach, describe, expect, test, vi } from "vitest"
 import { createAgent } from "../src/page/agent/agent"
 import { checkbox } from "../src/components/checkbox/checkbox"
+import { collapsible } from "../src/components/collapsible/collapsible"
 import { input } from "../src/components/input/input"
 import { slider } from "../src/components/slider/slider"
 import {
@@ -307,5 +308,50 @@ describe("observe", () => {
     el.click()
     expect(heard).toHaveBeenCalledTimes(1)
     expect(heard).toHaveBeenCalledWith(changes[0])
+  })
+
+  test("agent.subscribe leaves out a change to a hidden component, which observe reports", () => {
+    const agent = createAgent()
+    const heard = vi.fn()
+    cleanups.push(agent.subscribe(heard))
+    const changes = listen()
+    const { instance } = mountCheckbox({ id: "digest" })
+    document.body.hidden = true
+    instance.api.setChecked(true)
+    expect(heard).not.toHaveBeenCalled()
+    expect(changes).toHaveLength(1)
+    document.body.hidden = false
+    instance.api.setChecked(false)
+    expect(heard).toHaveBeenCalledTimes(1)
+    expect(heard).toHaveBeenCalledWith(changes[1])
+  })
+
+  test("agent.subscribe hears a component before its element binds", () => {
+    const agent = createAgent()
+    const heard = vi.fn()
+    cleanups.push(agent.subscribe(heard))
+    const instance = checkbox({ id: "digest" })
+    cleanups.push(() => instance.destroy())
+    instance.api.setChecked(true)
+    expect(heard).toHaveBeenCalledTimes(1)
+  })
+
+  test("agent.subscribe hears a panel open and close while it's hidden", () => {
+    const agent = createAgent()
+    const heard: unknown[] = []
+    cleanups.push(agent.subscribe(({ key, value }) => heard.push([key, value])))
+    const instance = collapsible({ id: "details" })
+    const panel = document.body.appendChild(
+      Object.assign(document.createElement("div"), { getAnimations: () => [] })
+    )
+    panel.hidden = true
+    cleanups.push(bind(instance.part("panel"), panel), () => instance.destroy())
+    instance.api.setOpen(true)
+    panel.hidden = true
+    instance.api.setOpen(false)
+    expect(heard).toEqual([
+      ["open", true],
+      ["open", false],
+    ])
   })
 })

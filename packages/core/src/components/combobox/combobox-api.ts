@@ -64,6 +64,10 @@ import {
 } from "../../foundation/kernel/input-source"
 import { createDetails } from "../../foundation/kernel/details"
 import { log } from "../../foundation/kernel/change"
+import {
+  composingInput,
+  endComposition,
+} from "../../foundation/lists/composition"
 import { watchers } from "../../foundation/kernel/watchers"
 import { elements } from "../../foundation/kernel/elements"
 import { deriveFromOptions } from "../../foundation/kernel/derive"
@@ -80,6 +84,7 @@ type ComboboxState = PopupState & {
   // Typed since the last choice, so the list filters. A single combobox shows
   // its value's label without filtering until the user types.
   dirty: boolean
+  composingFrom: string | null
   status: AsyncOptionsStatus
   listed: boolean
   labeled: boolean
@@ -167,6 +172,7 @@ function initialComboboxState(
     query:
       options.query ?? options.defaultQuery ?? initialQuery(options, value),
     dirty: false,
+    composingFrom: null,
     status: options.status ?? "idle",
     listed: false,
     labeled: false,
@@ -310,11 +316,15 @@ function comboboxApiBody(
     )
   }
 
+  // Whether the list showed `emptyItems` when a composition began. Composing
+  // over a value's label filters by nothing, but the list keeps its items.
+  let emptyBeforeComposition = false
+
   // The text the list filters by. A single combobox showing its value's label
   // shows every item until the user types.
   const filterQuery = () => {
-    const { query, dirty, multiple } = store.get()
-    return multiple || dirty ? query : ""
+    const { query, dirty, multiple, composingFrom } = store.get()
+    return composingFrom ?? (multiple || dirty ? query : "")
   }
 
   const loadMore = createLoadMore({
@@ -329,7 +339,10 @@ function comboboxApiBody(
     items: () => store.get().items,
     emptyItems: () => options().emptyItems,
     // While the input is empty, not while it shows the value's label.
-    showEmpty: () => !store.get().query.trim(),
+    showEmpty: () =>
+      store.get().composingFrom === null
+        ? !store.get().query.trim()
+        : emptyBeforeComposition,
     toKey,
     filter: () => options().filter ?? "contains",
     rank: () => typeof options().filter === "function",
@@ -460,21 +473,23 @@ function comboboxApiBody(
       reason = "imperative",
       event,
       dirty = false,
+      composing = false,
     }: {
       reason?: ComboboxQueryChangeReason
       event?: Event
       dirty?: boolean
+      composing?: boolean
     } = {}
   ) {
     store.set({ dirty })
-    return change("query", query, { reason, event })
+    return change("query", query, { reason, event, composing })
   }
 
   // A label a value from options showed in its own pass is past refusing, so
   // `onQueryChange` hears it, and canceling keeps the text.
   function reportQuery({ from, to }: { from: string; to: string }) {
     const details = createDetails(
-      { reason: "imperative" as const },
+      { reason: "imperative" as const, composing: false },
       changeSource("imperative")
     )
     log(context, "query", to, details)
@@ -766,8 +781,17 @@ function comboboxApiBody(
       return
     }
     const input = inputElement() as HTMLInputElement | undefined
+    if (store.get().composingFrom === null) {
+      emptyBeforeComposition = !store.get().query.trim()
+    }
+    const composing = composingInput(store, event, filterQuery)
     if (
-      !setQuery(text, { reason: "input-change", event, dirty: true }) &&
+      !setQuery(text, {
+        reason: "input-change",
+        event,
+        dirty: true,
+        composing,
+      }) &&
       input &&
       input.value !== store.get().query
     ) {
@@ -911,6 +935,15 @@ function comboboxApiBody(
       typed,
       onInput: (event: Event) =>
         typed((event.target as HTMLInputElement).value, event),
+      onCompositionEnd: (event: Event) => {
+        const text = (event.target as HTMLInputElement).value
+        if (text === store.get().query) {
+          endComposition(context, store, "query", text, event)
+          settleHighlight()
+        } else {
+          typed(text, event)
+        }
+      },
       onInputKeyDown: keyboard.onInputKeyDown,
       onListKeyDown: keyboard.onListKeyDown,
       onChipKeyDown: keyboard.onChipKeyDown,

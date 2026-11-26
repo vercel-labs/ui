@@ -32,6 +32,7 @@ import { type ListSelectAllState } from "../../foundation/lists/listbox-select-a
 import { createController } from "../../foundation/kernel/controller"
 import type {
   ChangeDetails,
+  TextChangeDetails,
   ChangeOptions,
   DismissAttemptReason,
 } from "../../foundation/kernel/details"
@@ -307,10 +308,10 @@ type ComboboxSharedOptions<T> = PortalProps & {
   query?: string
   /** The input's text at first, when uncontrolled. Defaults to the selected item's label. */
   defaultQuery?: string
-  /** Runs when the input's text wants to change: typing, choosing an item, or closing with text that wasn't chosen. */
+  /** Runs when the input's text wants to change: typing, choosing an item, or closing with text that wasn't chosen. While an input method composes, `details.composing` is `true`; search once it's `false`. */
   onQueryChange?: (
     query: string,
-    details: ChangeDetails<ComboboxQueryChangeReason>
+    details: TextChangeDetails<ComboboxQueryChangeReason>
   ) => void
   /** Whether the list is open. Pass it to control it. */
   open?: boolean

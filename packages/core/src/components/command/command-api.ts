@@ -22,6 +22,10 @@ import { initialApple } from "../../foundation/platform/platform"
 import { noListing } from "../../foundation/lists/listbox-listing"
 import { announcePending, isPromise } from "../../foundation/kernel/action"
 import { isComposing, selectEvent } from "../../foundation/kernel/events"
+import {
+  composingInput,
+  endComposition,
+} from "../../foundation/lists/composition"
 import type { PrimitiveContext } from "../../foundation/kernel/primitive-types"
 import {
   adoptPlatform,
@@ -37,6 +41,7 @@ type CommandStore = Omit<AutocompleteCoreState, "items"> & {
   // The highlighted command's value, which is its key. The highlight follows it.
   value: string | null
   query: string
+  composingFrom: string | null
   pages: string[]
   // The search text of each page below the current one, put back on the way back.
   queries: string[]
@@ -67,6 +72,7 @@ function initialCommandState(options: CommandOptions): CommandStore {
         : (options.defaultValue ?? null),
     highlighted: null,
     query: options.query ?? options.defaultQuery ?? "",
+    composingFrom: null,
     pages: options.pages ?? options.defaultPages ?? [],
     queries: [],
     items: options.items,
@@ -141,7 +147,7 @@ function commandApiBody(
     store.get().pages.length ? undefined : options().emptyItems
 
   const core = createAutocompleteCore(context, {
-    query: () => store.get().query,
+    query: () => store.get().composingFrom ?? store.get().query,
     items,
     emptyItems,
     // Commands are strings, so a filter for them reads every item the engine passes.
@@ -158,10 +164,11 @@ function commandApiBody(
   function setQuery(
     query: string,
     reason: CommandQueryChangeReason,
-    event?: Event
+    event?: Event,
+    composing = false
   ) {
     core.cause(reason, event)
-    return change("query", query, { reason, event })
+    return change("query", query, { reason, event, composing })
   }
 
   // The text changing on its own, not with a page. An app that holds the text
@@ -170,11 +177,13 @@ function commandApiBody(
   function search(
     query: string,
     reason: CommandQueryChangeReason,
-    event?: Event
+    event?: Event,
+    composing = false
   ) {
-    const changed = setQuery(query, reason, event)
+    const changed = setQuery(query, reason, event, composing)
     if (
       changed &&
+      !composing &&
       options().query !== undefined &&
       options().value !== undefined &&
       options().filter !== false
@@ -454,7 +463,20 @@ function commandApiBody(
       press: (key: string, event?: Event) => run(key, { event }),
       text: (state: CommandStore) => state.query,
       typed: (el: HTMLInputElement, event?: Event) =>
-        search(el.value, "input-change", event),
+        search(
+          el.value,
+          "input-change",
+          event,
+          composingInput(store, event, () => store.get().query)
+        ),
+      onCompositionEnd: (el: HTMLInputElement, event: Event) => {
+        if (el.value === store.get().query) {
+          core.cause("input-change", event)
+          endComposition(context, store, "query", el.value, event)
+        } else {
+          search(el.value, "input-change", event)
+        }
+      },
       onInputKeyDown,
       // Whether a command is on the page shown: outside any page, or on the current one.
       onCurrentPage: (state: CommandStore, page: string | null | undefined) =>

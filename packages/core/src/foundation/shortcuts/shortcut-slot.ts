@@ -76,10 +76,15 @@ function shortcutOf(
 }
 
 // `inherited` names the keys a part without its own `shortcut` shows, like the
-// shortcut of the trigger it sits in. Renders call it without an element.
+// shortcut of the trigger it sits in. Renders call it without an element. It
+// takes the part, since reading the api wakes a sleeping component.
 function shortcutSlot<State extends { apple: boolean }, Api>(
   slot: SlotFactory<State, Api>,
-  inherited: (state: State, api: Api, el?: HTMLElement) => string | undefined
+  inherited: (
+    state: State,
+    part: { api: Api },
+    el?: HTMLElement
+  ) => string | undefined
 ) {
   return slot<
     {
@@ -89,11 +94,15 @@ function shortcutSlot<State extends { apple: boolean }, Api>(
     { text: string }
   >({
     props: { shortcut: "string" },
-    state: (state, { props, api }) => ({
-      text: shortcutText(props.shortcut ?? inherited(state, api), state.apple),
+    state: (state, part) => ({
+      text: shortcutText(
+        part.props.shortcut ?? inherited(state, part),
+        state.apple
+      ),
     }),
     attrs: () => ({ "aria-hidden": "true", translate: "no" }),
-    bind(el, { store, api, props }) {
+    bind(el, part) {
+      const { store, props } = part
       // A popup opened only through a controller has no trigger to learn the platform from.
       adoptPlatform(store)
       // An empty element shows the keys itself, like a web component without children.
@@ -103,7 +112,7 @@ function shortcutSlot<State extends { apple: boolean }, Api>(
       const write = () => {
         const state = store.get()
         el.textContent = shortcutText(
-          props.shortcut ?? inherited(state, api, el),
+          props.shortcut ?? inherited(state, part, el),
           state.apple
         )
       }

@@ -35,3 +35,37 @@ for (const [fixture, name] of [
     )
   })
 }
+
+for (const [fixture, names] of [
+  ["popover", ["popover", "menu"]],
+  ["tooltip", ["tooltip"]],
+  ["hover-card", ["hover-card"]],
+  ["dialog", ["dialog", "alert-dialog"]],
+  ["drawer", ["drawer"]],
+] as const) {
+  test(`the trigger of a ${names.join(" or ")} in a flex row is one of its items`, async ({
+    page,
+    open,
+  }) => {
+    await open(fixture)
+    const heights = await page.evaluate(async (names) => {
+      const row = document.createElement("div")
+      row.style.cssText = "display: flex; height: 48px"
+      row.innerHTML = names
+        .map(
+          (name) =>
+            `<ui-${name}><ui-${name}-trigger><button>${name}</button></ui-${name}-trigger></ui-${name}>`
+        )
+        .join("")
+      document.body.append(row)
+      await new Promise(requestAnimationFrame)
+      return Object.fromEntries(
+        [...row.querySelectorAll("button")].map((button) => [
+          button.textContent,
+          button.getBoundingClientRect().height,
+        ])
+      )
+    }, names)
+    expect(heights).toEqual(Object.fromEntries(names.map((name) => [name, 48])))
+  })
+}

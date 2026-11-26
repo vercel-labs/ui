@@ -38,6 +38,7 @@ import {
 import { createController } from "../../foundation/kernel/controller"
 import type {
   ChangeDetails,
+  TextChangeDetails,
   ChangeOptions,
   DismissAttemptReason,
 } from "../../foundation/kernel/details"
@@ -96,7 +97,7 @@ type AutocompleteDismissReason = Extract<
  * @stable
  */
 type AutocompleteValueChangeDetails =
-  ChangeDetails<AutocompleteValueChangeReason> & {
+  TextChangeDetails<AutocompleteValueChangeReason> & {
     /** The suggestion chosen, for `"item-press"`, so two with the same label can be told apart. */
     item?: { value: string; label: string }
   }

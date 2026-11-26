@@ -90,8 +90,15 @@ const check = (ref: string) => ({ ref, action: "setChecked", args: [true] })
 
 test("no tool reads what is private, and no step or look changes what needs a person", async () => {
   // Hidden since they mounted, and gone before the test ends.
+  let draft!: ReturnType<typeof input>
   const unshown = [
-    addField(inside("hidden"), "draft", "Kanary draft", "canary-unshown"),
+    addField(
+      inside("hidden"),
+      "draft",
+      "Kanary draft",
+      "canary-unshown",
+      (made) => (draft = made)
+    ),
     addField(
       inside("aria-hidden", "true"),
       "ghost",
@@ -235,10 +242,8 @@ test("no tool reads what is private, and no step or look changes what needs a pe
   ]) {
     told.push(await agent.query(query))
   }
+  draft.api.setValue("canary-changed")
   unshown.forEach((off) => off())
-  // `subscribe` hears every settled change outside `data-agent-hidden`, so
-  // what the page changes while it's hidden is checked against the tools.
-  unsubscribe()
   stowed.hidden = true
   coupon.api.setValue("canary-stowed")
   await act({ ref: "Accept the terms", action: "setChecked", args: [false] })
