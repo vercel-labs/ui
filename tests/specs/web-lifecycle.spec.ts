@@ -161,6 +161,20 @@ test("a press on a ui-label checks its checkbox and focuses it", async ({
   }
 })
 
+test("a press on a field label leaves a radio its group disables unfocused", async ({
+  page,
+}) => {
+  await page.evaluate(() => {
+    document.querySelector("#stage")!.innerHTML =
+      `<ui-radio-group aria-label="Plan" disabled><ui-field><ui-radio value="team"></ui-radio><ui-field-label>Team</ui-field-label></ui-field></ui-radio-group>`
+  })
+  const radio = page.getByRole("radio", { name: "Team" })
+  await expect(radio).toBeVisible()
+  await page.getByText("Team", { exact: true }).click()
+  await expect(radio).not.toBeChecked()
+  await expect(radio).not.toBeFocused()
+})
+
 test("a button moved out of its tab is a plain button again", async ({
   page,
 }) => {
