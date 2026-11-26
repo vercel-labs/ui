@@ -54,6 +54,7 @@ type TooltipOpenChangeReason =
   | "outside-press"
   | "window-blur"
   | "back"
+  | "anchor-hidden"
   | "imperative"
 
 /**

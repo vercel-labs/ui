@@ -50,6 +50,8 @@ type ReasonVocabulary = {
   "submenu-switch": PointerEvent | KeyboardEvent
   /** The parent layer closed. */
   "parent-close": undefined
+  /** The element the popup sits beside stopped rendering, like a trigger a breakpoint hides. */
+  "anchor-hidden": undefined
   /** A press-and-hold open was released outside the popup. */
   "trigger-release": PointerEvent
   /** The browser's find in page matched hidden content. */

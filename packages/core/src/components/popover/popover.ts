@@ -63,6 +63,7 @@ type PopoverOpenChangeReason =
   | "back"
   | "shortcut"
   | "swipe"
+  | "anchor-hidden"
   | "imperative"
 
 /**

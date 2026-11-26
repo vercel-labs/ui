@@ -109,7 +109,7 @@ Keep overflow visible around an arrow that extends outside the panel. If the bod
 
 ## Anchor
 
-Set `anchor` to position against something other than the trigger. It accepts an element, a selector, a point such as `{ x, y }`, or an object with `getBoundingClientRect()`, such as a text range. The position is read again as the anchor moves.
+Set `anchor` to position against something other than the trigger. It accepts an element, a selector, a point such as `{ x, y }`, or an object with `getBoundingClientRect()`, such as a text range. The position is read again as the anchor moves. If the anchor stops rendering while the popover is open, like a trigger a breakpoint hides, the popover closes with reason `anchor-hidden`.
 
 <ComponentExample
   name="popover/anchor"

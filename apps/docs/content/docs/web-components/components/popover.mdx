@@ -115,7 +115,7 @@ Keep overflow visible around an arrow that extends outside the panel. If the bod
 
 ## Anchor
 
-Set `anchor` to a CSS selector to position against something other than the trigger. The position is read again as the anchor moves.
+Set `anchor` to a CSS selector to position against something other than the trigger. The position is read again as the anchor moves. If the anchor stops rendering while the popover is open, like a trigger a breakpoint hides, the popover closes with reason `anchor-hidden`.
 
 <ComponentExample
   name="popover/anchor"

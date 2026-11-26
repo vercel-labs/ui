@@ -117,7 +117,8 @@ type PopupClose<Reason extends string = string, Result = unknown> = {
 
 /**
  * Why a popup asks its component to close: a dismissal its behavior allows, a
- * form with `method="dialog"`, an aborted `signal`, or a sheet swiped away.
+ * form with `method="dialog"`, an aborted `signal`, a sheet swiped away, or
+ * an anchor that stopped rendering.
  * Presets and presentations decide which of these a given popup can report.
  */
 type PopupCloseReason =
@@ -129,6 +130,7 @@ type PopupCloseReason =
   | "close-press"
   | "imperative"
   | "swipe"
+  | "anchor-hidden"
 
 // Every `modal` value is a point in the triple.
 function modalTriple(modal: Modal) {
@@ -1083,7 +1085,10 @@ function createPopupLayer<
       const placement = options.position(
         () => config.anchor?.() ?? options.trigger(),
         el,
-        config.position
+        config.position,
+        // Nothing shows the popup's place, but it would still take the next
+        // Escape or outside press, and come back open with its anchor.
+        () => options.close("anchor-hidden", { focus: false })
       )
       place = placement.place
       checkPlacement = placement.follow
