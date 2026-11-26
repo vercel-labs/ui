@@ -363,7 +363,9 @@ function fieldInput(entry: Entry | undefined) {
   const control = instance
     ? (instance.api as { control?: () => HTMLElement | undefined }).control?.()
     : undefined
-  return control?.matches("input, textarea") ? control : undefined
+  return control?.matches("input, textarea") && !isOffLimits([control])
+    ? control
+    : undefined
 }
 
 // A closed popup's content stays in the web page, hidden. While any part of

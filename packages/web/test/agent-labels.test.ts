@@ -154,6 +154,30 @@ test("a field without a label is named by its control, like React's", async () =
   )
 })
 
+test("a field leaves out the name of a control kept from agents", async () => {
+  const agent = createAgent()
+  const heard: unknown[] = []
+  const unsubscribe = agent.subscribe((change) => heard.push(change))
+  document.body.innerHTML = `
+    <ui-field>
+      <div data-agent-hidden>
+        <ui-input><input aria-label="Canary token" required /></ui-input>
+      </div>
+      <ui-field-error match="valueMissing">Enter a value.</ui-field-error>
+    </ui-field>`
+  await wait()
+  document.querySelector("input")!.checkValidity()
+  await wait()
+  const read = [
+    agent.snapshot(),
+    await agent.query({ kind: "field" }),
+    await agent.query({ text: "canary" }),
+    heard,
+  ]
+  unsubscribe()
+  expect(JSON.stringify(read)).not.toMatch(/canary/i)
+})
+
 test("a closed popup is named by its trigger, not by its hidden content", async () => {
   const agent = createAgent()
   document.body.innerHTML = `
