@@ -168,6 +168,19 @@ test.describe("keyboard navigation", () => {
     await expect(panelNamed(page, "Account")).toBeVisible()
   })
 
+  test("ArrowRight and ArrowLeft skip tabs the page hides", async ({
+    page,
+  }) => {
+    await tabNamed(page, "Password").evaluate((el) =>
+      el.setAttribute("hidden", "")
+    )
+    await page.keyboard.press("ArrowRight")
+    await expect(tabNamed(page, "Billing")).toBeFocused()
+    await page.keyboard.press("ArrowLeft")
+    await expect(tabNamed(page, "Account")).toBeFocused()
+    await expect(panelNamed(page, "Account")).toBeVisible()
+  })
+
   test("disabled tabs are focusable but never selected", async ({ page }) => {
     await page.keyboard.press("ArrowRight")
     await expect(tabNamed(page, "Password")).toBeFocused()

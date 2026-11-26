@@ -26,6 +26,7 @@ import {
 } from "../../foundation/lists/item-icon"
 import { animateIn, animateOut } from "../../foundation/motion/presence"
 import { createRovingFocus } from "../../foundation/focus/roving-focus"
+import { moveIndex, stepFor } from "../../foundation/focus/collection"
 import { bindTabStop } from "../../foundation/focus/tabbable"
 import { idPart } from "../../foundation/kernel/attrs"
 import { createController } from "../../foundation/kernel/controller"
@@ -326,6 +327,23 @@ function tabsApiBody(
     preferred: (tab) => store.get().value === tab.key,
     claims: (state, tab) =>
       state.value === null ? enabled(tab) : state.value === tab.key,
+    // Tabs the page hides, like one shown only in some states, are out of the
+    // arrows' reach. They stay tabs, so a hidden selected tab keeps its value.
+    move: (event, { from, items, rtl }) => {
+      const step = stepFor(event.key, orientation(), rtl)
+      if (step === undefined) {
+        return
+      }
+      const shown = items.filter((tab) => tab === from || rendered(tab.el))
+      return shown[
+        moveIndex(
+          shown.indexOf(from),
+          step,
+          shown.length,
+          options().loop ?? true
+        )
+      ]?.key
+    },
     onItemsChange: check,
   })
   // The arrow key moving to a link tab while it clicks the link.
@@ -606,6 +624,11 @@ function tabsApiBody(
 
 const tabsApi: (...args: Parameters<typeof tabsApiBody>) => TabsApi =
   tabsApiBody
+
+const rendered = (el: HTMLElement) =>
+  !el.closest("[inert]") &&
+  (el.checkVisibility?.({ visibilityProperty: true }) ??
+    !el.closest("[hidden]"))
 
 const findable = (state: TabsStore, props: PanelProps) =>
   props.hiddenUntilFound ?? state.hiddenUntilFound
