@@ -4,6 +4,7 @@
 // in the other adapters, which use a hidden input, never ship it.
 import {
   claimInvalidFocus,
+  fieldsetDisabled,
   focusWith,
   labelledBy,
   labelsOf,
@@ -137,8 +138,9 @@ function bindElementInternals(
   sync()
   const unsubscribe = options.subscribe(sync)
   const unfocus = options.focus ? focusWith(el, options.focus) : () => {}
-  // A fieldset may have disabled it before the core was listening.
-  if (el.matches(":disabled")) {
+  // A fieldset may have disabled it before the core was listening. Its own
+  // `disabled` is an option, which jsdom never undoes with formDisabledCallback.
+  if (fieldsetDisabled(el)) {
     options.disabled(true)
   }
 
