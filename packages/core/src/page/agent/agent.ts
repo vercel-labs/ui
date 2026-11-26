@@ -26,6 +26,7 @@ import {
   rowOf,
   entries,
   install,
+  keepOffPage,
   leftFrom,
   listen,
   offPage,
@@ -396,6 +397,8 @@ function valueFor(entry: Entry, action: string, value: unknown) {
 // A button's text, else its accessible name, like "Close" for an icon-only ×, but
 // not one read from inside `data-agent-hidden`, which never reaches the agent.
 const textOrName = (el: Element) => textOf(el) || nameOf(el)
+
+const closedPopup = '[data-slot$="-content"][hidden]'
 
 // What left the page in the order it was on the page, since adapters unbind
 // and number components in different orders.
@@ -916,6 +919,13 @@ function createAgent(
         found.push({ entry, instance, parts })
         entry.shown = true
         shownInCall.add(entry.ref)
+        offPage.delete(entry.ref)
+      } else if (
+        parts.length &&
+        parts.every((part) => part.el.closest(closedPopup))
+      ) {
+        // React unmounts a closed popup's content, so its fields leave the page there too.
+        keepOffPage(entry)
       }
     }
     inDocumentOrder(

@@ -169,6 +169,15 @@ function retire(entry: Entry) {
       retired.delete(retired.keys().next().value!)
     }
   }
+  keepOffPage(entry)
+}
+
+// Lists a component that left the page, or hid in a closed popup's content
+// the web keeps in the page, with the state it had.
+function keepOffPage(entry: Entry) {
+  if (!entry.key || !entry.shown || entry.secret || entry.offLimits) {
+    return
+  }
   // Values and checks are worth keeping. A closed menu's `open: false` isn't.
   const state = entry.instance.deref()?.get() as
     Record<string, unknown> | undefined
@@ -647,6 +656,7 @@ export {
   entries,
   type Entry,
   install,
+  keepOffPage,
   leftFrom,
   listen,
   type ObservedChange,
