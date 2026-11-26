@@ -1,3 +1,5 @@
+import { isDisabledElement } from "./form"
+
 // The element a label names and activates: a control of this package, or the
 // first native one. A radio is the control of a label for it alone. A label
 // for its whole group finds the group first, since it comes first in the page.
@@ -47,6 +49,10 @@ function activateControl(control: HTMLElement, event?: Event) {
   // A native label clicks a plain button it names, like a FileInputTrigger's.
   const plainButton = control instanceof HTMLButtonElement && !role
   if (checkable || plainButton || role === "radiogroup") {
+    // A native label moves focus to a checkbox or radio it presses.
+    if (checkable && !isDisabledElement(control)) {
+      control.focus()
+    }
     control.click()
   }
   // A group, like a range slider, focuses its first control.

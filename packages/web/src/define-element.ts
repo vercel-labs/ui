@@ -1062,6 +1062,9 @@ function defineRootElement<P extends Primitive>(
         ...semantics,
       ]
       #view?: object
+      // Kept for the element, so one put back on the page keeps the id its
+      // controls already point at, like a label whose `target` holds the id.
+      #ownId?: string
       get #instance() {
         return instances.get(this) as ReturnType<P> | undefined
       }
@@ -1278,7 +1281,8 @@ function defineRootElement<P extends Primitive>(
                 ...optionsOf(this, this.#properties, this.#rendered),
                 ...last,
                 id:
-                  this.id || `ui-sdk-${tagName.replace(/^ui-/, "")}-${++count}`,
+                  this.id ||
+                  (this.#ownId ??= `ui-sdk-${tagName.replace(/^ui-/, "")}-${++count}`),
               },
               config.silent,
               config.actions,
