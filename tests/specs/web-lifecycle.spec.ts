@@ -146,6 +146,35 @@ test("radios in card labels around fields with descriptions are each named by th
   }
 })
 
+test("a press on a ui-label checks its checkbox and focuses it", async ({
+  page,
+}) => {
+  await page.evaluate(() => {
+    document.querySelector("#stage")!.innerHTML =
+      `<ui-label><ui-checkbox></ui-checkbox> Wrapped</ui-label><ui-checkbox id="pointed"></ui-checkbox><ui-label for="pointed">Pointing</ui-label>`
+  })
+  for (const name of ["Wrapped", "Pointing"]) {
+    const box = page.getByRole("checkbox", { name })
+    await page.getByText(name, { exact: true }).click()
+    await expect(box).toBeChecked()
+    await expect(box).toBeFocused()
+  }
+})
+
+test("a press on a field label leaves a radio its group disables unfocused", async ({
+  page,
+}) => {
+  await page.evaluate(() => {
+    document.querySelector("#stage")!.innerHTML =
+      `<ui-radio-group aria-label="Plan" disabled><ui-field><ui-radio value="team"></ui-radio><ui-field-label>Team</ui-field-label></ui-field></ui-radio-group>`
+  })
+  const radio = page.getByRole("radio", { name: "Team" })
+  await expect(radio).toBeVisible()
+  await page.getByText("Team", { exact: true }).click()
+  await expect(radio).not.toBeChecked()
+  await expect(radio).not.toBeFocused()
+})
+
 for (const kind of ["dialog", "popover"]) {
   test(`a ${kind} with no exit animation sends focus to its \`final-focus\` as it closes`, async ({
     page,
