@@ -5,6 +5,8 @@ import { defineButtonElements } from "../src/button"
 import { defineCollapsibleElements } from "../src/collapsible"
 import { createParts, wrappedButton } from "../src/index"
 import { definePopoverElements } from "../src/popover"
+import { defineToggleElements } from "../src/toggle"
+import { defineTooltipElements } from "../src/tooltip"
 
 const wait = (ms = 10) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -25,6 +27,8 @@ beforeAll(() => {
   defineButtonElements()
   definePopoverElements()
   defineCollapsibleElements()
+  defineToggleElements()
+  defineTooltipElements()
   createParts(badgeButton, {
     root: { tag: "x-badge-button", target: wrappedButton, display: "contents" },
   })
@@ -74,4 +78,19 @@ test("a button two parts bind keeps the inner part's data-slot, however it arriv
   parsedButton.disabled = true
   await wait(50)
   expect(slots()).toEqual(all)
+})
+
+test("a toggle in a tooltip trigger keeps its data-slot as it's pressed", async () => {
+  document.body.innerHTML = `
+    <ui-tooltip>
+      <ui-tooltip-trigger><ui-toggle><button>Bold</button></ui-toggle></ui-tooltip-trigger>
+      <ui-tooltip-content>Bold</ui-tooltip-content>
+    </ui-tooltip>`
+  await wait(50)
+  const button = document.querySelector("button")!
+  expect(button.dataset.slot).toBe("toggle")
+  button.click()
+  await wait(50)
+  expect(button.getAttribute("aria-pressed")).toBe("true")
+  expect(button.dataset.slot).toBe("toggle")
 })

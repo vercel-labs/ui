@@ -64,7 +64,6 @@ Last reviewed: PRs 86 to 92 (2026-10-30, the audit fixes), 158 and 159 (2026-11-
 - **A submit shortcut also submits a read-only `<ui-textarea>`.**
 - **Holding Enter submits on every key repeat** with a submit shortcut: it doesn't skip `event.repeat`.
 - **`submit-shortcut="enter"` leaves phones no way to add a line**: a soft keyboard has no Shift+Enter, and the textarea sets no `enterkeyhint`.
-- **`<ui-tooltip-trigger><ui-toggle><button>`** flips the button's `data-slot` after a click: the rule that gives the inner part's `data-slot` to an element two parts share (`innerPart`) misses owners that bind their own element.
 - **`pressedText` doesn't see `user-select: none` across a shadow root**: it walks `parentElement`, which stops at the root, so a toast in one doesn't swipe from text its host makes unselectable.
 - **`ui-token-input` gets no `disabled` or `data-disabled` from a disabled field**, though its editor does.
 - **Date input segments** removed by a page morph stay gone until the locale or the clock changes.
