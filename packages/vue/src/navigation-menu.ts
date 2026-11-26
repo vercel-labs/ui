@@ -2,6 +2,8 @@ import type { Anchor, ChangeDetails, Side } from "@ui-sdk/core"
 import {
   navigationMenu as navigationMenuPrimitive,
   type NavigationMenuController,
+  type NavigationMenuOptions,
+  type NavigationMenuState,
   type NavigationMenuValueChangeReason,
 } from "@ui-sdk/core/navigation-menu"
 import {
@@ -19,7 +21,13 @@ import {
   usePopupContainer,
   type PopupContainer,
 } from "./popup"
-import { createParts, withElement } from "./create-parts"
+import {
+  createParts,
+  withElement,
+  type RenderableWith,
+  type RootInstanceOf,
+  type RootPropsOf,
+} from "./create-parts"
 import {
   optionalBoolean,
   orModel,
@@ -77,6 +85,17 @@ const placementProps = {
   // Renders the popup into this element instead of in place.
   container: containerProp,
 }
+
+// Generic over the value, like React's `NavigationMenu<T>`: `v-model` and
+// `@value-change` share `T`.
+type NavigationMenuProps<T extends string> = NavigationMenuOptions<T> & {
+  debug?: boolean
+}
+type NavigationMenuComponent = {
+  new <T extends string = string>(
+    props: RootPropsOf<NavigationMenuProps<T>, "nav">
+  ): RootInstanceOf<NavigationMenuProps<T>, NavigationMenuState, "nav">
+} & RenderableWith<NavigationMenuProps<string>, NavigationMenuState, "nav">
 
 /**
  * A <nav> landmark. Inside another menu's content it's a nested menu, which
@@ -148,7 +167,7 @@ const NavigationMenu = withElement(
       return usePart(menu, "root", undefined, undefined, parent ? "div" : "nav")
     },
   })
-)
+) as unknown as NavigationMenuComponent
 
 /**
  * The list of top-level items.
