@@ -76,7 +76,7 @@ type ReasonVocabulary = {
   "content-resize": undefined
   /** Going back: the Android back button or gesture, or Backspace in an empty command input, which returns to the previous page. */
   back: Event
-  /** A controller or `api` call, or a property set on a web component. */
+  /** A controller or `api` call. */
   imperative: undefined
   /** A keyboard shortcut, like a trigger's `shortcut`. */
   shortcut: KeyboardEvent

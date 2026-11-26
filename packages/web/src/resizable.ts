@@ -16,7 +16,7 @@ function defineResizableElements() {
       tag: "ui-resizable",
       display: "block",
       // `layout` is live: setting the property or the attribute resizes the
-      // panels, like the controller, and fires `layoutchange`. A layout can't be
+      // panels, like the controller, without `layoutchange`. A layout can't be
       // cleared, so removing the attribute leaves the panels where they are.
       state: {
         layout: {
