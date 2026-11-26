@@ -167,3 +167,20 @@ test("a closed popup is named by its trigger, not by its hidden content", async 
     label: "Country Japan",
   })
 })
+
+test("a closed dialog opened from many rows is named by its title", async () => {
+  const agent = createAgent()
+  document.body.innerHTML = `
+    <ui-dialog-trigger for="member"><button>Edit</button></ui-dialog-trigger>
+    <ui-dialog-trigger for="member"><button>Edit</button></ui-dialog-trigger>
+    <ui-dialog id="member">
+      <ui-dialog-content>
+        <ui-dialog-title>Edit member</ui-dialog-title>
+        <ui-dialog-close><button>Done</button></ui-dialog-close>
+      </ui-dialog-content>
+    </ui-dialog>`
+  await wait()
+  expect(agent.snapshot()).toContainEqual(
+    expect.objectContaining({ component: "dialog", label: "Edit member" })
+  )
+})

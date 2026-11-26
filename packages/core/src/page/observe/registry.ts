@@ -315,8 +315,14 @@ function shownParts(parts: Bound[]) {
   return shown.length ? shown : parts
 }
 
+// The hidden parts name it only when the shown ones can't, like a dialog
+// opened from a trigger on every row, which its title names.
 function componentLabel(all: Bound[]) {
-  const parts = shownParts(all)
+  const shown = shownParts(all)
+  return labelOf(shown) ?? (shown === all ? undefined : labelOf(all))
+}
+
+function labelOf(parts: Bound[]) {
   const keyless = (slot: string) =>
     parts.find((part) => part.slot === slot && !part.key)?.el
   // Not when the slot has many keys: an accordion's first trigger names its
