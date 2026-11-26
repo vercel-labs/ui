@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { Component } from "@angular/core"
 import { describe, expect, test } from "vitest"
-import { Checkbox } from "../src/checkbox"
+import { Checkbox, CheckboxGroup } from "../src/checkbox"
 import { Field, FieldDescription, FieldError, FieldLabel } from "../src/field"
 import { Input } from "../src/input"
 import { Radio, RadioGroup } from "../src/radio"
@@ -48,6 +48,23 @@ import { render, tagWith } from "./render"
 })
 class Page {}
 
+@Component({
+  selector: "test-root",
+  imports: [Checkbox, CheckboxGroup, Field, FieldLabel],
+  template: `
+    <div uiField>
+      <span uiFieldLabel>Cities</span>
+      <div uiCheckboxGroup>
+        <div uiField disabled name="tokyo-field">
+          <button uiCheckbox value="tokyo"></button>
+          <label uiFieldLabel>Tokyo</label>
+        </div>
+      </div>
+    </div>
+  `,
+})
+class GroupedField {}
+
 describe("forms on the server", () => {
   test("a field's label, description and control point at each other", async () => {
     const html = await render(Page)
@@ -66,6 +83,18 @@ describe("forms on the server", () => {
     expect(input).toContain('value="a@b.co"')
     expect(input).toContain("required")
     expect(tagWith(html, "Wrong")).toContain("hidden")
+  })
+
+  test("a checkbox in a field of its own inside a group takes that field", async () => {
+    const html = await render(GroupedField)
+    const button = html.match(/<button[^>]*>/)![0]
+    const id = button.match(/ id="([^"]+)"/)![1]
+    expect(html).toContain(`for="${id}"`)
+    expect(button).toContain('aria-disabled="true"')
+    expect(button).not.toContain("tabindex")
+    expect(html).toMatch(/<div[^>]*role="group"[^>]*aria-labelledby=/)
+    const hidden = html.match(/<input[^>]*data-slot="checkbox-input"[^>]*>/)![0]
+    expect(hidden).not.toContain("name=")
   })
 
   test("controls render their state and the hidden inputs that submit it", async () => {

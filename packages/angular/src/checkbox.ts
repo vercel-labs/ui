@@ -14,7 +14,11 @@ import {
 } from "@ui-sdk/core/checkbox"
 import { optionalBoolean } from "./inputs.ts"
 import { emitChange } from "./outputs.ts"
-import { useFieldControl } from "./field-context.ts"
+import {
+  FieldContext,
+  type FieldScope,
+  useFieldControl,
+} from "./field-context.ts"
 import { useNativeInput } from "./native-input.ts"
 import { usePart, usePrimitive } from "./use-primitive.ts"
 
@@ -45,6 +49,9 @@ const checkedState = (value: unknown) =>
     ? ("indeterminate" as const)
     : optionalBoolean(value)
 
+// The field each group joined, so a checkbox joins only a field of its own.
+const groupFields = new WeakMap<object, FieldScope | null>()
+
 /**
  * The control and the hidden native input that takes part in the form.
  * @experimental
@@ -52,8 +59,13 @@ const checkedState = (value: unknown) =>
 @Directive({ selector: "[uiCheckbox]", exportAs: "uiCheckbox" })
 class Checkbox {
   readonly #group = inject(CheckboxGroup, { optional: true })
-  // Inside a group, the group is the field's control.
-  readonly #field = this.#group ? undefined : useFieldControl()
+  readonly #nearest = inject(FieldContext, { optional: true })
+  // A checkbox in a field of its own is that field's control. In the group's field, the group is.
+  readonly #field =
+    this.#nearest &&
+    !(this.#group && this.#nearest === groupFields.get(this.#group))
+      ? useFieldControl()
+      : undefined
   /** Logs every state change with its reason to the console, in development builds. */
   readonly debug = input(undefined, { transform: optionalBoolean })
   /** Whether it's checked. Bind it with `[(checked)]` to control the checkbox. */
@@ -89,7 +101,7 @@ class Checkbox {
     disabled: this.disabled() || this.#field?.disabled(),
     readOnly: this.readOnly(),
     required: this.required(),
-    name: this.name() ?? this.#field?.name(),
+    name: this.name() ?? (this.#group ? undefined : this.#field?.name()),
     value: this.value(),
     form: this.form(),
     controller: this.controller(),
@@ -183,6 +195,7 @@ class CheckboxGroup {
   }).state
 
   constructor() {
+    groupFields.set(this, inject(FieldContext, { optional: true }))
     useNativeInput(this.handle, "group-input")
   }
 }
