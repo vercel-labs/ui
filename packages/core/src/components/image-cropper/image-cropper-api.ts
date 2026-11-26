@@ -295,6 +295,13 @@ function imageCropperApiBody(
         ) {
           return
         }
+        // A default given once the instance exists, like a web property set
+        // after the element connects, still starts the first image's crop.
+        const given = context.options().defaultCrop
+        if (given && !state.crop) {
+          store.set({ crop: complete(given), cropFor: state.src })
+          return
+        }
         store.set({ cropFor: state.src })
         startFrom(null)
         setCrop(initialCrop(natural, limitsOf(state), state.mode), {

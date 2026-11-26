@@ -1448,6 +1448,7 @@ interface UiImageCropperElement
     UiElement<ImageCropperEvents>,
     AttributeProperties<typeof imageCropper, "api" | "controller" | "crop"> {
   crop: Required<ImageCrop> | null
+  defaultCrop?: ImageCrop
   api: ImageCropperController
   controller?: ImageCropperController
 }
