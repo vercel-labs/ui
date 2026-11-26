@@ -68,7 +68,12 @@ test.describe("trigger", () => {
 
   test("the popover closes when its trigger stops rendering, and stays closed when it's back", async ({
     page,
+    fixtureOptions,
   }) => {
+    test.skip(
+      isSheet(fixtureOptions),
+      "A sheet isn't placed against its trigger."
+    )
     await trigger(page).click()
     await expect(dialog(page)).toBeVisible()
     const host = await trigger(page).evaluateHandle(
