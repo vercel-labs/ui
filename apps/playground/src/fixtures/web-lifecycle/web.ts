@@ -1,7 +1,6 @@
-// An empty page with toggles, tabs, popovers, dialogs, checkboxes, inputs,
-// fields, labels (and `x-label`, built on a native label) and the elements that
-// render content from their state defined, for specs that build elements the
-// way frameworks and scripts do.
+// An empty page with toggles, tabs, popups, form controls, fields and labels
+// defined, plus `x-label` built on a native label, for specs that build
+// elements the way frameworks and scripts do.
 async function mount(root: HTMLElement) {
   root.innerHTML = `<button>Before</button><div id="stage"></div><button>After</button>`
   await import("@ui-sdk/web/toggle")
