@@ -32,6 +32,7 @@ function defineDrawerElements() {
   createParts(drawer, {
     root: {
       tag: "ui-drawer",
+      display: "contents",
       kinds: popupKinds,
       defaults: {
         modal: true,

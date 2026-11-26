@@ -85,6 +85,7 @@ function defineDialogElements() {
   createParts(dialog, {
     root: {
       tag: "ui-dialog",
+      display: "contents",
       kinds: popupKinds,
       defaults: {
         modal: true,
@@ -108,6 +109,7 @@ function defineAlertDialogElements() {
   createParts(alertDialog, {
     root: {
       tag: "ui-alert-dialog",
+      display: "contents",
       kinds: popupKinds,
       defaults: { dismissible: true },
       properties: ["persistentElements"],
