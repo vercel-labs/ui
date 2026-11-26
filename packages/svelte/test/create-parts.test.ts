@@ -4,6 +4,7 @@ import App from "./apps/picker-app.svelte"
 import ControlledApp from "./apps/picker-controlled-app.svelte"
 import ListboxApp from "./apps/listbox-parts-app.svelte"
 import ParentApp from "./apps/picker-parent-app.svelte"
+import SvgApp from "./apps/svg-parts-app.svelte"
 
 afterEach(() => document.body.replaceChildren())
 
@@ -90,6 +91,17 @@ describe("parts from createParts", () => {
     expect(() =>
       mount(ListboxApp, { target: document.body, props: { stray: true } })
     ).toThrow("A listbox item-indicator part must be used inside its item.")
+  })
+
+  test("a part mapped to an SVG tag is an SVG element", () => {
+    const app = mount(SvgApp, { target: document.body })
+    flushSync()
+    const circle = document.querySelector("circle")!
+    expect(circle.namespaceURI).toBe("http://www.w3.org/2000/svg")
+    expect(document.querySelector("div")!.namespaceURI).toBe(
+      "http://www.w3.org/1999/xhtml"
+    )
+    unmount(app)
   })
 
   test("generated ids are unique per part", () => {
