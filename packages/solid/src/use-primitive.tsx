@@ -752,14 +752,14 @@ function renderElement(
     },
   })
   const Tag = dynamic(() => {
-    const render = props.render
-    if (typeof render !== "function") {
+    const current = props.render
+    if (typeof current !== "function") {
       return tag
     }
     // Lazy on the server for the same reason as a part's attributes: the
     // render function reads them.
     return () => {
-      const element = createMemo(() => render(resolved, state), {
+      const element = createMemo(() => current(resolved, state), {
         lazy: isServer,
       })
       return element as unknown as JSX.Element

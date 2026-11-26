@@ -83,9 +83,9 @@ function joinField(
   if (!field) {
     return props
   }
+  const render = untrack(() => props.render)
   return merge(props, {
     render: (merged: Record<string, any>, state: unknown) => {
-      const render = props.render
       const joined = field.props(merged)
       if (typeof render === "function") {
         return render(joined, state)
