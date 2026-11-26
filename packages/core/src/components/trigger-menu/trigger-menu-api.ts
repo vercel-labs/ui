@@ -449,7 +449,8 @@ function triggerMenuApiBody(
   // matching, or the argument being typed.
   function statusMessage() {
     const state = store.get()
-    if (!state.open && !levels.current()) {
+    // With `open` controlled, the menu is still open while it closes.
+    if (!levels.current()) {
       return ""
     }
     if (loadingStatus() === "loading") {
