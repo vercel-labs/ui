@@ -655,7 +655,7 @@ function createPointerDriver(options: SheetDriverOptions) {
         if (immediate || Math.abs(extent - from) < 0.5) {
           state = initialState(extent, index)
           writeTranslate(extent)
-          if (!immediate) {
+          if (!immediate && id === targetId) {
             return
           }
           if (id !== targetId) {

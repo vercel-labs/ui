@@ -22,14 +22,21 @@ function setup() {
   const sheet = document.createElement("div")
   host.append(sheet)
   document.body.append(host)
-  const seen = { size: 400, rests: [] as (string | null)[] }
+  const seen = {
+    size: 400,
+    rests: [] as (string | null)[],
+    snaps: [] as string[],
+  }
   const none = () => {}
   driver = createPointerDriver({
     sheet,
     host,
     side: () => "bottom",
     config: () => ({
-      snapPoints: [{ id: "content", extent: seen.size }],
+      snapPoints: [
+        ...(seen.size > 300 ? [{ id: "half", extent: 300 }] : []),
+        { id: "content", extent: seen.size },
+      ],
       dimension: 800,
       dismissible: true,
       expandOnScroll: true,
@@ -40,7 +47,7 @@ function setup() {
     reducedMotion: () => false,
     owns: () => true,
     canMouseDrag: () => true,
-    onSnap: none,
+    onSnap: (id) => seen.snaps.push(id),
     onRest: (id) => seen.rests.push(id),
     onDismiss: none,
     onDismissAttempt: none,
@@ -50,12 +57,12 @@ function setup() {
     onMotion: none,
     onMotionStart: none,
   })
-  driver.open("content", false)
   return { sheet, seen }
 }
 
 test("a resting sheet whose content shrinks stays on the edge it's attached to", () => {
   const { sheet, seen } = setup()
+  driver!.open("content", false)
   seen.size = 200
   driver!.relayout(false)
   expect(animations).toEqual([])
@@ -64,7 +71,20 @@ test("a resting sheet whose content shrinks stays on the edge it's attached to",
 
 test("a resting sheet whose content grows still slides to its new size", () => {
   const { seen } = setup()
+  driver!.open("content", false)
   seen.size = 600
   driver!.relayout(false)
   expect(animations).toHaveLength(1)
+})
+
+test("a resting sheet whose snap point goes as its content shrinks settles on the one left", () => {
+  const { sheet, seen } = setup()
+  driver!.open("half", false)
+  seen.size = 200
+  driver!.relayout(false)
+  expect(animations).toEqual([])
+  expect(sheet.style.translate).toBe("0 0px")
+  expect(seen.snaps).toEqual(["content"])
+  expect(seen.rests.at(-1)).toBe("content")
+  expect(driver!.target()).toBe("content")
 })
