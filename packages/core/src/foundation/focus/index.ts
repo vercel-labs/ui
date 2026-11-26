@@ -15,7 +15,7 @@ export { createFocusRecovery } from "./focus-recovery"
 export { type GridCell, type GridFocus } from "./grid-focus"
 export { keepFocus } from "./keep-focus"
 export { holdFocus, pressKeepsFocus } from "./press-keeps-focus"
-export { createClaim, createRovingFocus } from "./roving-focus"
+export { createClaim, createRovingFocus, rovingStopOf } from "./roving-focus"
 export {
   followStop,
   memberDisabled,

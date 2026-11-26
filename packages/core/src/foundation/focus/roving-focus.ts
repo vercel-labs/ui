@@ -86,9 +86,6 @@ type RovingFocusOptions<State extends object, Props = any> = {
   onItemsChange?: () => void
 }
 
-// Whether an item rendering before any has bound, like on the server, holds
-// the tab stop: the first one its group calls eligible does, and keeps it
-// until the real stop is known, so the markup has exactly one.
 // Each bound item's way to find its group's stop. The stop moves in the store
 // before a framework renders its new `tabindex`, so a popup that picks focus
 // in between asks here instead of reading the page.
@@ -99,6 +96,9 @@ function rovingStopOf(el: Element) {
   return stops.get(el)?.()
 }
 
+// Whether an item rendering before any has bound, like on the server, holds
+// the tab stop: the first one its group calls eligible does, and keeps it
+// until the real stop is known, so the markup has exactly one.
 function createClaim() {
   let claimed: string | undefined
   return (key: string, eligible: boolean) => {
