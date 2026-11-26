@@ -101,7 +101,7 @@ function defineListboxElements() {
         el.append(...fresh)
       },
     },
-    item: { tag: "ui-listbox-item", display: "block" },
+    item: { tag: "ui-listbox-item", display: "block", properties: ["value"] },
     "item-indicator": "ui-listbox-item-indicator",
     // An icon inside an item. Screen readers and typeahead skip it.
     "item-icon": "ui-listbox-item-icon",

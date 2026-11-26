@@ -168,7 +168,7 @@ function defineComboboxElements() {
     },
     content: { tag: "ui-combobox-content", kinds: popupKinds },
     list: { tag: "ui-combobox-list", display: "block" },
-    item: { tag: "ui-combobox-item", display: "block" },
+    item: { tag: "ui-combobox-item", display: "block", properties: ["value"] },
     "item-indicator": "ui-combobox-item-indicator",
     // An icon inside an item. Screen readers and filtering skip it.
     "item-icon": { tag: "ui-combobox-item-icon", feature: comboboxItemIcons },
