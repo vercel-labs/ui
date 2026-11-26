@@ -521,7 +521,9 @@ const tooltipPrimitive = /* @__PURE__ */ definePrimitive({
             api.internal.enter(event, key, props.payload),
           pointerleave: (event, { api }) => api.internal.leave(event),
         },
-        press: ({ api, key, props }, event) =>
+        // An aria-disabled trigger keeps its tooltip, which says why it's unavailable.
+        press: ({ api, key, props, el }, event) =>
+          el?.getAttribute("aria-disabled") !== "true" &&
           api.internal.tooltipPress(key, props.payload, event),
         // Asleep too, since the trigger is named or described before it's hovered or focused.
         bind: undefined,
