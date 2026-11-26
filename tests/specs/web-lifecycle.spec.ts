@@ -217,6 +217,37 @@ test("a label built on a native label names and reaches the control inside a sli
   await expect(page.getByRole("checkbox", { name: "News" })).toBeFocused()
 })
 
+for (const [kind, anchor] of [
+  ["an element", "element"],
+  ["a point", { x: 400, y: 300 }],
+] as const) {
+  test(`a popover content's \`anchor\` property places it against ${kind}`, async ({
+    page,
+  }) => {
+    const errors: string[] = []
+    page.on("pageerror", (error) => errors.push(error.message))
+    await page.evaluate((anchor) => {
+      document.querySelector("#stage")!.innerHTML =
+        `<ui-popover><ui-popover-trigger><button>Share</button></ui-popover-trigger><ui-popover-content side="bottom" align="start" side-offset="0">Link</ui-popover-content></ui-popover><span id="mark" style="position: fixed; left: 400px; top: 280px; width: 10px; height: 20px"></span>`
+      const content = document.querySelector(
+        "ui-popover-content"
+      ) as HTMLElement & { anchor: unknown }
+      content.anchor =
+        anchor === "element" ? document.querySelector("#mark") : anchor
+    }, anchor)
+    await page.getByRole("button", { name: "Share" }).click()
+    const content = page.locator("ui-popover-content")
+    await expect(content).toBeVisible()
+    await expect
+      .poll(async () => {
+        const box = (await content.boundingBox())!
+        return [Math.round(box.x), Math.round(box.y)]
+      })
+      .toEqual([400, 300])
+    expect(errors).toEqual([])
+  })
+}
+
 test("a button moved out of its tab is a plain button again", async ({
   page,
 }) => {

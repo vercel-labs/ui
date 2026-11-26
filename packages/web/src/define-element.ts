@@ -2255,7 +2255,15 @@ function partElement<P extends Primitive>(
     ),
     props: attributes,
     ...props,
-    properties: [...new Set([...props.properties, ...properties])],
+    // A popup content's `anchor` is a selector attribute, or an element or a
+    // point set as the property.
+    properties: [
+      ...new Set([
+        ...props.properties,
+        ...properties,
+        ...("anchor" in slotSchema ? ["anchor"] : []),
+      ]),
+    ],
   }
   return { kind: "part" as const, key, tagName: tag, config }
 }
