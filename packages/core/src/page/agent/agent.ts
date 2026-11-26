@@ -741,7 +741,7 @@ function describe(entry: Entry, instance: PrimitiveInstance, parts: Bound[]) {
     component: entry.component,
     actions: [],
   }
-  const label = componentLabel(parts)
+  const label = componentLabel(parts, entry)
   if (label) {
     out.label = label
   }

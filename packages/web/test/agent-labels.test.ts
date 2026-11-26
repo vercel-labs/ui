@@ -6,6 +6,7 @@ import { createAgent } from "../src/agent"
 import { defineComboboxElements } from "../src/combobox"
 import { defineDialogElements } from "../src/dialog"
 import { defineFieldElements } from "../src/field"
+import { defineInputElements } from "../src/input"
 import { defineSliderElements } from "../src/slider"
 import { defineTabsElements } from "../src/tabs"
 
@@ -22,6 +23,7 @@ beforeAll(() => {
   defineDialogElements()
   defineFieldElements()
   defineSliderElements()
+  defineInputElements()
 })
 
 test("a combobox is named by its label, not by its trigger", async () => {
@@ -133,4 +135,19 @@ test("a slider's name leaves out what its field's label keeps from agents", asyn
     }),
   ]
   expect(JSON.stringify(read)).not.toMatch(/canary/i)
+})
+
+test("a field without a label is named by its control, like React's", async () => {
+  const agent = createAgent()
+  document.body.innerHTML = `
+    <ui-field>
+      <ui-input><input aria-label="Work email" required /></ui-input>
+      <ui-field-error match="valueMissing">Enter a work email.</ui-field-error>
+    </ui-field>`
+  await wait()
+  document.querySelector("input")!.checkValidity()
+  await wait()
+  expect(agent.snapshot()).toContainEqual(
+    expect.objectContaining({ component: "field", label: "Work email" })
+  )
 })

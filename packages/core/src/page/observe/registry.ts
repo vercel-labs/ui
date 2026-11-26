@@ -254,7 +254,7 @@ function remember(entry: Entry, parts: Bound[]) {
   const first = !entry.key
   const elements = parts.map((part) => part.el)
   checkMarks(elements)
-  entry.label = componentLabel(parts)
+  entry.label = componentLabel(parts, entry)
   entry.row = rowOf(parts)
   entry.secret ||=
     isSecret(elements) ||
@@ -308,7 +308,17 @@ function ownParts<Each extends Pick<Bound, "key" | "slot" | "props">>(
   )
 }
 
-function componentLabel(parts: Bound[]) {
+// A web field's control binds its own component's parts, not the field's,
+// so the field finds it.
+function fieldInput(entry: Entry | undefined) {
+  const instance = entry?.component === "field" && entry.instance.deref()
+  const control = instance
+    ? (instance.api as { control?: () => HTMLElement | undefined }).control?.()
+    : undefined
+  return control?.matches("input, textarea") ? control : undefined
+}
+
+function componentLabel(parts: Bound[], entry?: Entry) {
   const keyless = (slot: string) =>
     parts.find((part) => part.slot === slot && !part.key)?.el
   // Not when the slot has many keys: an accordion's first trigger names its
@@ -335,11 +345,12 @@ function componentLabel(parts: Bound[]) {
   // Then its field's name, like a date picker's input labelled "Due date",
   // before a heading that changes with what it shows, like "November 2026",
   // and a step button before it. Not a search field in its popup, which comes and goes.
-  const input = parts.find(
-    (part) =>
-      part.slot === "input" ||
-      (part.slot === "control" && part.el.matches("input, textarea"))
-  )?.el
+  const input =
+    parts.find(
+      (part) =>
+        part.slot === "input" ||
+        (part.slot === "control" && part.el.matches("input, textarea"))
+    )?.el ?? fieldInput(entry)
   const popup = parts.find((part) => part.slot === "content")?.el
   const field = input && !popup?.contains(input) && nameOf(input)
   if (field) {
