@@ -48,13 +48,17 @@ function createFocus(config: {
     }
   }
 
-  // A content bound: focus moves in if an arrow key opened its item.
+  // A content bound: focus moves in if an arrow key opened its item, and not
+  // once focus left its trigger, like after an open the app refused.
   function contentBound(key: string, el: HTMLElement) {
     if (pending !== key || config.value() !== key) {
       return
     }
     pending = null
-    queueMicrotask(() => tabbables(el)[0]?.focus())
+    const trigger = config.trigger(key)
+    if (trigger?.contains(trigger.ownerDocument.activeElement)) {
+      queueMicrotask(() => tabbables(el)[0]?.focus())
+    }
   }
 
   // Top-level triggers and links in this menu's list, in document order:
