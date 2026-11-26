@@ -294,6 +294,14 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
       if (!parentMenu && store.get().trigger === null) {
         store.set({ trigger: key })
       }
+      // Where hydration kept another trigger's attributes, as for a popover's.
+      if (
+        !parentMenu &&
+        store.get().trigger === key &&
+        !el.hasAttribute("id")
+      ) {
+        el.id = `${id}-trigger`
+      }
       if (!parentMenu) {
         cleanups.push(keyWhileBound(store, "triggers", key))
       }

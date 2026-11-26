@@ -213,16 +213,18 @@ function bindPopupContent(
 }
 
 // The first trigger is the one focus returns to until another opens the popup.
+// One that leaves while closed hands that on to `next`, the next one bound.
 function bindTrigger<State extends PopupState>(
   store: Store<State>,
-  key: string
+  key: string,
+  next?: (leaving: string) => string | undefined
 ) {
   if (store.get().trigger === null) {
     store.set({ trigger: key } as Partial<State>)
   }
   return () => {
     if (store.get().trigger === key && !store.get().open) {
-      store.set({ trigger: null } as Partial<State>)
+      store.set({ trigger: next?.(key) ?? null } as Partial<State>)
     }
   }
 }
@@ -270,7 +272,13 @@ function popupTrigger<State extends PopupState, Api extends PopupApi>(
       if (dev) {
         checkName(el, "The trigger", { component: api.internal.label, id })
       }
-      return bindTrigger(store, key)
+      const unbind = bindTrigger(store, key, api.internal.nextTrigger)
+      // A framework keeps the server's attributes where hydration differs, like
+      // beside a boundary the server rendered and the client renders later.
+      if (store.get().trigger === key && !el.hasAttribute("id")) {
+        el.id = `${id}-trigger`
+      }
+      return unbind
     },
   })
 }

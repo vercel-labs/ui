@@ -30,6 +30,20 @@ describe("popover server rendering", () => {
       ])
     )
 
+  test("of several triggers, only the first renders the id", async () => {
+    const html = await renderToString(
+      createSSRApp(() =>
+        h(Popover, null, () => [
+          h(PopoverTrigger, null, () => "Profile"),
+          h(PopoverTrigger, null, () => "Account"),
+          h(PopoverContent, null, () => "Edit profile"),
+        ])
+      )
+    )
+    expect(html.match(/ id="[^"]*-trigger"/g)).toHaveLength(1)
+    expect(html).toMatch(/-trigger"[^>]*>Profile</)
+  })
+
   test("a closed popover renders its trigger only, with its shortcut", async () => {
     const html = await renderToString(app(false))
     expect(typeof window).toBe("undefined")
