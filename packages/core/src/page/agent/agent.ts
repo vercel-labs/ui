@@ -1715,8 +1715,11 @@ function createAgent(
   // What each closed place a call looked behind holds, by its path, like
   // "Notifications > Email", whether a look ran and whether it may have missed some.
   const held = new Map<string, string[]>()
-  // The lists a step opened to read their items.
-  const looked = new Set<PrimitiveInstance>()
+  // What each list a step opened showed, so later reads in the step don't open it again.
+  const looked = new Map<
+    PrimitiveInstance,
+    { value: string; label: string }[]
+  >()
   let surveyed = false
   let partial = false
   // The component the step running now is on, and whether it's private.
@@ -2690,10 +2693,12 @@ function createAgent(
       !entry.agent?.items &&
       beforeOpen &&
       api.setOpen &&
-      state.open === false &&
-      !looked.has(instance)
+      state.open === false
     ) {
-      looked.add(instance)
+      const seen = looked.get(instance)
+      if (seen) {
+        return data ?? seen
+      }
       await beforeOpen()
       asAgent(() => api.setOpen!(true))
       let shown = renderedItems(bound(instance))
@@ -2714,6 +2719,7 @@ function createAgent(
         whileOpen?.(disabledItems(entry, instance), bound(instance))
       }
       items = data ?? shown
+      looked.set(instance, shown)
       asAgent(() => api.setOpen!(false))
       await frames()
     }
