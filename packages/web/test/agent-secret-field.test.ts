@@ -62,7 +62,9 @@ test("a field around a password input showing its text keeps its error text secr
   document
     .querySelector("ui-password-input")!
     .dispatchEvent(new Event("invalid"))
-  for (const input of document.querySelectorAll("input")) input.checkValidity()
+  for (const input of document.querySelectorAll("input")) {
+    input.checkValidity()
+  }
   await wait()
   expect(JSON.stringify(createAgent().snapshot())).not.toContain(
     "Enter your password"
