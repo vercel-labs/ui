@@ -218,19 +218,19 @@ function holdsSecret(field: Entry, parts: Bound[]) {
     return false
   }
   if (
-    Array.from(root.querySelectorAll("input, textarea")).some(
-      (el) => own(el) && secretControl(el)
+    Array.from(root.querySelectorAll("input, textarea, select")).some(
+      (el) => own(el) && (secretControl(el) || isSecret([el]))
     )
   ) {
     return true
   }
   for (const other of entries.values()) {
     const instance = other !== field && other.secret && other.instance.deref()
-    if (
-      instance &&
-      bound(instance).some(({ el }) => root.contains(el) && own(el))
-    ) {
-      return true
+    const parts = instance ? partsOf.get(instance)?.values() : undefined
+    for (const { el } of parts ?? []) {
+      if (el && root.contains(el) && own(el)) {
+        return true
+      }
     }
   }
   return false

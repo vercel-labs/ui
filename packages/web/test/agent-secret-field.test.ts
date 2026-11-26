@@ -69,6 +69,33 @@ test("a field around a password input showing its text keeps its error text secr
   )
 })
 
+test.each([
+  `<div data-agent-secret><ui-input><input required /></ui-input></div>`,
+  `<div data-agent-secret><input required /></div>`,
+  `<select required autocomplete="cc-exp-month"><option value=""></option></select>`,
+])(
+  "a field around a secret control keeps its error text secret: %s",
+  async (control) => {
+    document.body.innerHTML = `
+    <form>
+      <ui-field name="secret">
+        <ui-field-label>Secret</ui-field-label>
+        ${control}
+        <ui-field-error match="valueMissing">Fill this in.</ui-field-error>
+      </ui-field>
+    </form>`
+    await wait()
+    document.querySelector("input, select")!.dispatchEvent(new Event("invalid"))
+    ;(
+      document.querySelector("input, select") as HTMLInputElement
+    ).checkValidity()
+    await wait()
+    expect(JSON.stringify(createAgent().snapshot())).not.toContain(
+      "Fill this in"
+    )
+  }
+)
+
 test("a field around a plain input keeps its error text", async () => {
   document.body.innerHTML = `
     <form>
