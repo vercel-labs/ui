@@ -442,15 +442,41 @@ function tabsApiBody(
     )
   }
 
+  // A tab selected in the same update that adds it, before it's on the page:
+  // where the selection moves from, for its direction and scroll once it binds.
+  let arriving: { value: string; from: DOMRect } | undefined
+
+  function arrived(key: string, el: HTMLElement) {
+    if (arriving?.value !== key || store.get().value !== key) {
+      return
+    }
+    const { from } = arriving
+    arriving = undefined
+    const to = el.getBoundingClientRect()
+    store.set({
+      direction: directionBetween(
+        from,
+        to,
+        store.get().orientation
+      ) as TabsDirection,
+    })
+    reveal(key)
+  }
+
   // What selecting `value` brings with it from `state`: the direction the
   // selection moves, and the panel it leaves animating out.
   function selecting(state: TabsStore, value: string | null) {
     const from = state.value
     const rect = (key: string | null) =>
       key === null ? undefined : element("tab", key)?.getBoundingClientRect()
+    const start = rect(from)
+    arriving =
+      value !== null && start && !element("tab", value)
+        ? { value, from: start }
+        : undefined
     return {
       direction: directionBetween(
-        rect(from),
+        start,
         rect(value),
         state.orientation
       ) as TabsDirection,
@@ -543,6 +569,7 @@ function tabsApiBody(
           })
         }
       },
+      arrived,
       setElement(key: string, el: HTMLElement) {
         const element = buttonElement(el)
         const { elements } = store.get()
@@ -758,6 +785,7 @@ const tabsPrimitive = /* @__PURE__ */ definePrimitive({
       },
       bind(el, part) {
         part.api.internal.setElement(part.key, el)
+        part.api.internal.arrived(part.key, el)
         return part.api.internal.roving.bind(el, part)
       },
     }),
