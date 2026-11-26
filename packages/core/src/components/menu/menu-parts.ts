@@ -429,12 +429,12 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
       "Tab",
       "typeahead",
     ],
-    state: (state, { api }) => ({
+    state: (state, part) => ({
       open: state.open,
       nested: state.nested,
       presentation: state.presentation,
       // Submenus show the payload their root menu opened with.
-      payload: state.nested ? api.root().getPayload() : state.payload,
+      payload: state.nested ? part.api.root().getPayload() : state.payload,
     }),
     present: (state, { props }) => state.mounted || !!props.keepMounted,
     attrs: (state, { id }) => ({

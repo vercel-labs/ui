@@ -37,7 +37,6 @@ type Host =
 // What the kernel keeps on a part beside what adapters read.
 type PartRecord = Part & {
   readonly owner: PartOwner
-  // Its place in its instance's parts, `slot:key`.
   readonly mapKey: string
   // Where it comes among them, which rises as it joins and as it binds.
   rank?: number
@@ -45,7 +44,6 @@ type PartRecord = Part & {
   // again, so an earlier bind's cleanup leaves a newer bind's element.
   binding?: object
   leases: number
-  // Whether the sweep dropped it from its instance's parts.
   dropped?: boolean
   ref?: (el: HTMLElement | null) => void
   // What `onProps` registered, which hears each render.
@@ -200,7 +198,6 @@ function ordered(owner: PartOwner) {
   return parts
 }
 
-// Adds a part to its instance's parts, last.
 function enlist(part: PartRecord) {
   const { owner } = part
   const { parts, keyed } = owner
@@ -740,41 +737,61 @@ function followId(part: PartRecord, el: HTMLElement) {
   if (part.own !== undefined || (id && id !== part.made)) {
     readIdLater(part)
   }
-  // One observer watches a whole document or shadow root. An element outside
-  // the page is watched alone, since its root can change as it's inserted.
-  const root = el.isConnected ? el.getRootNode() : el
-  let ids = idObservers.get(root)
-  if (!ids) {
-    idObservers.set(root, (ids = idObserver(root)))
+  // One observer watches each element directly, so moving into another shadow
+  // root or document keeps following it, and shared elements notify every part.
+  const existing = idParts.get(el)
+  if (!existing) {
+    idParts.set(el, part)
+    watchIds().observe(el, idWatchOptions)
+  } else if (existing instanceof Set) {
+    existing.add(part)
+  } else if (existing !== part) {
+    idParts.set(el, new Set([existing, part]))
   }
-  const watched = ids
-  watched.parts.set(el, part)
-  watched.bound++
+  idBound++
+  let active = true
   return () => {
-    if (watched.parts.get(el) === part) {
-      watched.parts.delete(el)
+    if (!active) {
+      return
     }
-    if (!--watched.bound && idObservers.get(root) === watched) {
-      watched.observer.disconnect()
-      idObservers.delete(root)
+    active = false
+    const current = idParts.get(el)
+    if (current === part) {
+      idParts.delete(el)
+    } else if (current instanceof Set) {
+      current.delete(part)
+      if (!current.size) {
+        idParts.delete(el)
+      }
+    }
+    if (!--idBound && idWatcher) {
+      idWatcher.disconnect()
+      idWatcher = undefined
     }
   }
 }
 
-const idObservers = new WeakMap<Node, ReturnType<typeof idObserver>>()
+const idWatchOptions = { attributeFilter: ["id"] }
+const idParts = new WeakMap<Node, PartRecord | Set<PartRecord>>()
+let idWatcher: MutationObserver | undefined
+let idBound = 0
 
-function idObserver(root: Node) {
-  const parts = new WeakMap<Node, PartRecord>()
-  const observer = new MutationObserver((records) => {
-    for (const { target } of records) {
-      const part = parts.get(target)
-      if (part) {
-        readIdLater(part)
+function watchIds() {
+  if (!idWatcher) {
+    idWatcher = new MutationObserver((records) => {
+      for (const { target } of records) {
+        const entry = idParts.get(target)
+        if (entry instanceof Set) {
+          for (const part of entry) {
+            readIdLater(part)
+          }
+        } else if (entry) {
+          readIdLater(entry)
+        }
       }
-    }
-  })
-  observer.observe(root, { attributeFilter: ["id"], subtree: true })
-  return { observer, parts, bound: 0 }
+    })
+  }
+  return idWatcher
 }
 
 // A microtask later, once every part binding with it has bound, so the
@@ -873,15 +890,15 @@ export {
   conditional,
   connect,
   directNames,
+  enlist,
   followed,
   handlers,
   held,
   liveAttrs,
   madeLabel,
   onProps,
-  type PartOwner,
-  enlist,
   ordered,
+  type PartOwner,
   provisional,
   type PartRecord,
   partState,

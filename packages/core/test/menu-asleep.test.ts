@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, test, vi } from "vitest"
 import { menu } from "../src/components/menu/menu"
-import { attrs, bind, handlers } from "../src/foundation/kernel/part"
+import { attrs, bind, handlers, partState } from "../src/foundation/kernel/part"
 
 Element.prototype.getAnimations ??= () => []
 Element.prototype.scrollIntoView ??= () => {}
@@ -57,5 +57,14 @@ describe("a closed menu", () => {
 
   test("stays awake when it starts open", () => {
     expect(asleep(closedMenu({ defaultOpen: true }).instance)).toBe(false)
+  })
+
+  test("stays asleep when its content state is read while closed", () => {
+    const { instance } = closedMenu()
+    expect(partState(instance.part("content"))).toMatchObject({
+      open: false,
+      nested: false,
+    })
+    expect(asleep(instance)).toBe(true)
   })
 })
