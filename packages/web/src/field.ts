@@ -107,6 +107,7 @@ function defineFieldElements() {
             if (
               "message" in error.dataset &&
               written.has(error) &&
+              error.textContent &&
               error.textContent !== written.get(error)
             ) {
               delete error.dataset.message

@@ -49,3 +49,19 @@ test("an error the page empties shows the current message again", async () => {
   expect(error.dataset.message).toBe("")
   expect(error.textContent).toBe(input.validationMessage)
 })
+
+test("emptying the browser's message shows it again", async () => {
+  const { error } = await mount()
+  const input = document.querySelector("input")!
+  input.value = ""
+  input.dispatchEvent(new Event("input", { bubbles: true }))
+  input.dispatchEvent(new Event("invalid", { cancelable: true }))
+  await wait()
+  expect(error.textContent).toBe(input.validationMessage)
+  expect(error.textContent).not.toBe("")
+  error.textContent = ""
+  input.value = "not an email"
+  input.dispatchEvent(new Event("input", { bubbles: true }))
+  await wait()
+  expect(error.textContent).toBe(input.validationMessage)
+})
