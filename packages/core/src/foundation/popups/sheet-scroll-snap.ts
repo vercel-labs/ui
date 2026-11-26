@@ -28,6 +28,7 @@ import { nearestIndex } from "../motion/projection"
 import { settleTime, solveSpring, springLinearEasing } from "../motion/spring"
 import { on } from "../kernel/events"
 import { isIOS } from "../platform/env"
+import { setStyle } from "../platform/style"
 import {
   afterFirstFrame,
   openHold,
@@ -66,6 +67,7 @@ function createScrollSnapDriver(options: SheetDriverOptions) {
   let dragging = false
   // A swipe's close holds until the popup confirms it: a refused one snaps back.
   let closing: "swipe" | "close" | null = null
+  let stopScroll: (() => void) | undefined
   let restTimer = 0
   let frame = 0
   let targetId: string | null = null
@@ -393,6 +395,7 @@ function createScrollSnapDriver(options: SheetDriverOptions) {
   return {
     open(id, animate) {
       closing = null
+      stopScroll?.()
       targetId = id
       layout()
       const point = options.config().snapPoints.find((entry) => entry.id === id)
@@ -423,6 +426,8 @@ function createScrollSnapDriver(options: SheetDriverOptions) {
         return
       }
       targetId = null
+      // A swipe on the leaving sheet would scroll it back onto the screen.
+      stopScroll = setStyle(host, "overflow-y", "hidden")
       const from = flip
         ? flip.extentAt(performance.now() - flip.startTime)
         : scrollExtent()
@@ -508,6 +513,7 @@ function createScrollSnapDriver(options: SheetDriverOptions) {
         options.onDragChange(false)
       }
       sheet.style.removeProperty("top")
+      stopScroll?.()
       restoreSheet()
       restoreHost()
     },
