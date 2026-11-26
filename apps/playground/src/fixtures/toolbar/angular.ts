@@ -15,6 +15,7 @@ import {
   toolbarFixture,
   toolbarLocked,
   toolbarOptions,
+  toolbarRenderedToggle,
 } from "../../../../../tests/fixtures/toolbar"
 import { mountAngular, state } from "../../angular-mount"
 
@@ -151,6 +152,39 @@ import { mountAngular, state } from "../../angular-mount"
             aria-label="Locked proofing"
             [disabled]="locked()"
           >
+            @if (renderedToggle) {
+              <button
+                uiToolbarButton
+                uiToggle
+                class="toggle"
+                (beforePressedChange)="spellcheck($event.value)"
+              >
+                {{ f.spellcheck.label }}
+              </button>
+            } @else {
+              <button
+                uiToggle
+                class="toggle"
+                (beforePressedChange)="spellcheck($event.value)"
+              >
+                {{ f.spellcheck.label }}
+              </button>
+            }
+          </div>
+          <div uiToolbarGroup aria-label="Locked help" [disabled]="locked()">
+            <a uiToolbarLink [href]="f.help.href">{{ f.help.label }}</a>
+          </div>
+        } @else {
+          @if (renderedToggle) {
+            <button
+              uiToolbarButton
+              uiToggle
+              class="toggle"
+              (beforePressedChange)="spellcheck($event.value)"
+            >
+              {{ f.spellcheck.label }}
+            </button>
+          } @else {
             <button
               uiToggle
               class="toggle"
@@ -158,18 +192,7 @@ import { mountAngular, state } from "../../angular-mount"
             >
               {{ f.spellcheck.label }}
             </button>
-          </div>
-          <div uiToolbarGroup aria-label="Locked help" [disabled]="locked()">
-            <a uiToolbarLink [href]="f.help.href">{{ f.help.label }}</a>
-          </div>
-        } @else {
-          <button
-            uiToggle
-            class="toggle"
-            (beforePressedChange)="spellcheck($event.value)"
-          >
-            {{ f.spellcheck.label }}
-          </button>
+          }
           <a uiToolbarLink [href]="f.help.href">{{ f.help.label }}</a>
         }
       </div>
@@ -189,6 +212,7 @@ class Fixture {
     disabled?: boolean
   } = toolbarOptions()
   readonly lockable = toolbarLocked()
+  readonly renderedToggle = toolbarRenderedToggle()
   readonly locked = state(this.lockable)
   readonly action = state("")
 
