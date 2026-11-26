@@ -125,7 +125,7 @@ Sizes are percentages as numbers, or strings with `%`, `px` or `rem`. Pixel and 
 
 ## Controlled
 
-Set the element's `layout` property, and listen for `layoutchange` for the reason. The layout is one percentage per panel, in order, adding up to 100. Every change carries a [reason](#reasons), like `drag`, `step-key` or `collapse`, and `event.preventDefault()` keeps the current layout. Setting `layout` fires `layoutchange` too, with the `imperative` reason.
+Set the element's `layout` property, and listen for `layoutchange` for the reason. The layout is one percentage per panel, in order, adding up to 100. Every change carries a [reason](#reasons), like `drag`, `step-key` or `collapse`, and `event.preventDefault()` keeps the current layout. Setting `layout` resizes the panels without firing `layoutchange`, so a listener that sets it back doesn't hear its own write. The [`api`](#controller) fires it, with the `imperative` reason.
 
 <ComponentExample
   name="resizable/controlled"

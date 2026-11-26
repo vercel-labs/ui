@@ -369,6 +369,7 @@ type CoreApi = {
     // The text the field shows.
     text: (state: never) => string
     typed: (el: HTMLInputElement, event?: Event) => void
+    onCompositionEnd: (el: HTMLInputElement, event: Event) => void
     onInputKeyDown: (event: KeyboardEvent) => void
     press: (key: string, event?: Event) => void
   }
@@ -400,6 +401,9 @@ function fieldPart<State extends AutocompleteCoreState, Api extends CoreApi>() {
     on: {
       input: (event, { api, el }) =>
         api.internal.typed(el as HTMLInputElement, event),
+      // Browsers differ on whether an `input` follows the end of a composition.
+      compositionend: (event, { api, el }) =>
+        api.internal.onCompositionEnd(el as HTMLInputElement, event),
       keydown: (event, { api }) => api.internal.onInputKeyDown(event),
     },
     bind(el, { api, id, store }) {

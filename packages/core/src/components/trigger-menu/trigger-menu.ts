@@ -152,6 +152,7 @@ type TriggerMenuOpenChangeReason =
   | "outside-press"
   | "focus-out"
   | "window-blur"
+  | "anchor-hidden"
   | "imperative"
   | "shortcut"
 

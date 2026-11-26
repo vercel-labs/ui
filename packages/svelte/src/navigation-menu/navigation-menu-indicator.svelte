@@ -7,15 +7,22 @@ skip it.
 <script lang="ts">
   import {
     navigationMenu,
+    type NavigationMenuIndicatorProps,
     type NavigationMenuIndicatorState,
   } from "@ui-sdk/core/navigation-menu"
   import Part from "../part.svelte"
   import { usePart } from "../instance"
   import type { PartProps } from "../use-primitive.svelte"
 
-  let props: PartProps<"div", NavigationMenuIndicatorState> = $props()
+  let {
+    followHover,
+    ...rest
+  }: PartProps<"div", NavigationMenuIndicatorState> &
+    NavigationMenuIndicatorProps = $props()
 
-  const indicator = usePart(navigationMenu, "indicator")
+  const indicator = usePart(navigationMenu, "indicator", () => ({
+    followHover,
+  }))
 </script>
 
-<Part tag="div" part={indicator} {props} />
+<Part tag="div" part={indicator} props={rest} />

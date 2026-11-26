@@ -76,6 +76,14 @@ function tabsOptions() {
   }
 }
 
+// Indicator props a spec can set through the URL: ?follow-hover follows the
+// item under the pointer.
+function indicatorOptions() {
+  return {
+    followHover: new URLSearchParams(location.search).has("follow-hover"),
+  }
+}
+
 // Rating options a spec can set through the URL: ?disabled, and ?cancel=<score>
 // cancels the change to that score.
 function ratingOptions() {
@@ -242,6 +250,7 @@ export {
   changedValue,
   collapsibleOptions,
   formatShortcut,
+  indicatorOptions,
   loadScreenReader,
   menuOptions,
   ratingOptions,

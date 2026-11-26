@@ -47,3 +47,24 @@ test("the server renders the default item checked", async ({ page, open }) => {
     checked: ["List"],
   })
 })
+
+test("the indicator gets data-visible only once it has a position", async ({
+  page,
+  open,
+}) => {
+  await open("segmented-control")
+  const visible = await page.evaluate(() => {
+    const template = document.createElement("template")
+    template.innerHTML = (
+      window as unknown as { __serverHtml: string }
+    ).__serverHtml
+    return template.content
+      .querySelector('[data-slot="segmented-control-indicator"]')
+      ?.hasAttribute("data-visible")
+  })
+  expect(visible).toBe(false)
+  await expect(
+    page.locator('[data-slot="segmented-control-indicator"]')
+  ).toHaveAttribute("data-visible", "")
+  expect(await hydrationErrors(page)).toEqual([])
+})

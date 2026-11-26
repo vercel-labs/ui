@@ -8,6 +8,8 @@ import {
 import { createParts } from "./define-element"
 
 const owner = "ui-field"
+// The message each empty error was last given.
+const written = new WeakMap<HTMLElement, string>()
 
 // A part outside any field is plain, with the same attributes the other
 // adapters write, so styles that select it, and the rule that keeps a hidden
@@ -100,11 +102,25 @@ function defineFieldElements() {
             if (!("message" in error.dataset) && error.childNodes.length) {
               continue
             }
+            // Text the page wrote over ours while it marks the field invalid, like
+            // a server's message, is its own until it empties the error. Otherwise
+            // it's a rewrite of ours, like a page translator's, so ours stays live.
+            if (
+              (el as HTMLElement & { invalid?: boolean }).invalid === true &&
+              "message" in error.dataset &&
+              written.has(error) &&
+              error.textContent &&
+              error.textContent !== written.get(error)
+            ) {
+              delete error.dataset.message
+              continue
+            }
             error.dataset.message = ""
             const message = instance.api.internal.message()
             if (error.textContent !== message) {
               error.textContent = message
             }
+            written.set(error, message)
           }
         }
         queueMicrotask(update)

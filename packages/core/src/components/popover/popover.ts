@@ -63,6 +63,7 @@ type PopoverOpenChangeReason =
   | "back"
   | "shortcut"
   | "swipe"
+  | "anchor-hidden"
   | "imperative"
 
 /**
@@ -228,7 +229,7 @@ type ContentProps = PositionProps &
      */
     alignOffset?: number
     /**
-     * Where focus goes when the popover opens. Opening on hover never moves focus, and opening with touch focuses the popover itself so no on-screen keyboard appears.
+     * Where focus goes when the popover opens. Opening on hover never moves focus, and opening with touch focuses the popover itself so no on-screen keyboard appears, unless this is set to something other than `"auto"`.
      * @defaultValue "auto"
      */
     initialFocus?: PopoverInitialFocus
@@ -464,7 +465,7 @@ const popoverPrimitive = /* @__PURE__ */ definePrimitive({
       // Without keys of its own, it shows the shortcut of the trigger it sits in.
       shortcut: shortcutSlot(
         slot,
-        (_state, api, el) => el && api.internal.shortcutOf(el)
+        (_state, part, el) => el && part.api.internal.shortcutOf(el)
       ),
     }
   },

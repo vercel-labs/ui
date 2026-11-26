@@ -334,3 +334,40 @@ test("writing attributes replaces a label reference to an id ui-sdk made, like o
   applyAttrs(copy, { "aria-labelledby": "ui-sdk-tabs-4-tab-a" })
   expect(copy.getAttribute("aria-labelledby")).toBe("ui-sdk-tabs-4-tab-a")
 })
+
+test("references follow an author's id after its bound element moves into a shadow root", async () => {
+  const instance = tabs({ id: "t" })
+  const panel = instance.part("panel", { value: "a" })
+  const el = document.body.appendChild(element("t-tab-a"))
+  const unbind = bind(instance.part("tab", { value: "a" }), el)
+  await settle()
+  const host = document.body.appendChild(element())
+  const shadow = host.attachShadow({ mode: "open" })
+  shadow.appendChild(el)
+  el.id = "moved"
+  await settleChange()
+  expect(attrs(panel)["aria-labelledby"]).toBe("moved")
+  unbind()
+  document.body.replaceChildren()
+})
+
+test("two parts sharing one element both follow its id, and unbinding one leaves the other watching", async () => {
+  const first = tabs({ id: "a" })
+  const second = tabs({ id: "b" })
+  const panelA = first.part("panel", { value: "x" })
+  const panelB = second.part("panel", { value: "x" })
+  const el = document.body.appendChild(element("first"))
+  const unbindA = bind(first.part("tab", { value: "x" }), el)
+  const unbindB = bind(second.part("tab", { value: "x" }), el)
+  await settle()
+  el.id = "renamed"
+  await settleChange()
+  expect(attrs(panelA)["aria-labelledby"]).toBe("renamed")
+  expect(attrs(panelB)["aria-labelledby"]).toBe("renamed")
+  unbindB()
+  el.id = "after-second-left"
+  await settleChange()
+  expect(attrs(panelA)["aria-labelledby"]).toBe("after-second-left")
+  unbindA()
+  document.body.replaceChildren()
+})

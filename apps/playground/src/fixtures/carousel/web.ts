@@ -56,7 +56,8 @@ function markup(playToggle: boolean) {
 }
 
 async function mount(root: HTMLElement) {
-  const { perView, cancel, playToggle, options } = carouselOptions()
+  const { perView, cancel, playToggle, disabledMedia, options } =
+    carouselOptions()
   root.innerHTML = markup(playToggle)
   const carousel = root.querySelector<
     HTMLElement & { api?: { setPage: (page: number) => void } }
@@ -65,6 +66,10 @@ async function mount(root: HTMLElement) {
   for (const [name, value] of Object.entries(options)) {
     carousel.setAttribute(attribute(name), value === true ? "" : String(value))
   }
+  const followMedia = () =>
+    carousel.toggleAttribute("disabled", !!disabledMedia?.matches)
+  followMedia()
+  disabledMedia?.addEventListener("change", followMedia)
   await import("@ui-sdk/web/carousel")
   root
     .querySelector("#controller")!

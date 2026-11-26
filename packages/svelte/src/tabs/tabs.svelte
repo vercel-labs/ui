@@ -3,7 +3,7 @@
 Layered sections of content, one shown at a time.
 @stable
 -->
-<script lang="ts">
+<script lang="ts" generics="T extends string = string">
   import type { ChangeDetails } from "@ui-sdk/core"
   import {
     tabs as tabsPrimitive,
@@ -34,9 +34,9 @@ Layered sections of content, one shown at a time.
     ...rest
   }: PartProps<"div", TabsState> & {
     /** The selected tab's value. Bind it with `bind:value` to control the tabs. `null` selects nothing. */
-    value?: string | null
+    value?: T | null
     /** The tab selected at first, when uncontrolled. Defaults to the first enabled tab. */
-    defaultValue?: string | null
+    defaultValue?: T | null
     /** Which arrow keys move between tabs: left and right, or up and down. */
     orientation?: "horizontal" | "vertical"
     /** `"automatic"` selects a tab as soon as arrow keys focus it. `"manual"` waits for Enter or Space. */
@@ -46,11 +46,11 @@ Layered sections of content, one shown at a time.
     /** Keeps hidden panels in the page as `hidden="until-found"`, so find in page can select their tab. */
     hiddenUntilFound?: boolean
     /** Selects tabs from anywhere. Create one with `createTabsController()`. */
-    controller?: TabsController
+    controller?: TabsController<T>
     /** Logs every state change with its reason. */
     debug?: boolean
     /** Runs when the selection wants to change. `details.reason` says why, and `details.cancel()` stops it. */
-    onValueChange?: (value: string | null, details: Details) => void
+    onValueChange?: (value: T | null, details: Details) => void
   } = $props()
 
   const id = $props.id()
@@ -64,13 +64,13 @@ Layered sections of content, one shown at a time.
     activation,
     loop,
     hiddenUntilFound,
-    controller,
+    controller: controller as TabsController | undefined,
     debug,
     onValueChange: (next: string | null, details: Details) => {
       // The callback runs first, so canceling there also keeps a bound `value` as it was.
-      onValueChange?.(next, details)
+      onValueChange?.(next as T | null, details)
       if (!details.canceled) {
-        value = next
+        value = next as T | null
       }
     },
   }))

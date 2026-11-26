@@ -40,6 +40,7 @@ A region of slides that scroll a page at a time. Name it with `aria-label`.
     skipSnaps,
     dragFree,
     drag,
+    disabled,
     controller,
     debug,
     onPageChange,
@@ -71,6 +72,8 @@ A region of slides that scroll a page at a time. Name it with `aria-label`.
     dragFree?: boolean
     /** Whether swiping, dragging and scrolling move the slides. */
     drag?: boolean
+    /** Whether it stops being a carousel for now, like at a breakpoint where the slides lay out as a grid. */
+    disabled?: boolean
     /** Pages the carousel from anywhere, and connects parts outside it. Create one with `createCarouselController()`. */
     controller?: CarouselController
     /** Logs every state change with its reason. */
@@ -102,6 +105,7 @@ A region of slides that scroll a page at a time. Name it with `aria-label`.
     skipSnaps,
     dragFree,
     drag,
+    disabled,
     controller,
     debug,
     // The callbacks run first, so canceling there also keeps a bound value as it was.

@@ -37,6 +37,23 @@ test.describe("structure", () => {
   test("the first slide shows first", async ({ page }) => {
     await expectShown(page, 0)
   })
+
+  test("the content lays its slides out as --carousel-display says", async ({
+    page,
+  }) => {
+    const content = page.locator('[data-slot="carousel-content"]')
+    await expect(content).toHaveCSS("display", "flex")
+    await page.addStyleTag({
+      content: `[data-slot="carousel-content"] {
+        --carousel-display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: 100%;
+      }`,
+    })
+    await expect(content).toHaveCSS("display", "grid")
+    await nextButton(page).click()
+    await expectShown(page, 1)
+  })
 })
 
 test.describe("previous and next", () => {
@@ -229,6 +246,46 @@ test.describe("loop", () => {
     }
     await expectShown(page, 2)
     expect(await lastAction(page)).toBe("3")
+    expect(await backward()).toBeLessThan(12)
+  })
+
+  test("a loop with too few slides to go round says so in development", async ({
+    page,
+    open,
+  }) => {
+    const warnings: string[] = []
+    page.on("console", (message) => {
+      if (message.type() === "warning" && message.text().includes("`loop`")) {
+        warnings.push(message.text())
+      }
+    })
+    await settled(page)
+    expect(warnings).toEqual([])
+    await open("carousel", {
+      loop: "",
+      "per-view": "3",
+      "slides-per-page": "3",
+    })
+    await settled(page)
+    expect(warnings).toEqual([
+      expect.stringContaining("can't go round seamlessly"),
+    ])
+  })
+
+  test("Next pressed faster than the slides land never scrolls back", async ({
+    page,
+    open,
+  }) => {
+    await open("carousel", { loop: "", slides: "4", "per-view": "2" })
+    await settled(page)
+    const backward = await watchBackward(page)
+    await nextButton(page).evaluate(async (button: HTMLElement) => {
+      for (let press = 0; press < 6; press++) {
+        button.click()
+        await new Promise((resolve) => setTimeout(resolve, 60))
+      }
+    })
+    await expectShown(page, 2, 3)
     expect(await backward()).toBeLessThan(12)
   })
 

@@ -4,7 +4,7 @@ A <nav> landmark. Inside another menu's content it's a nested menu, which
 renders a <div> and closes with its parent.
 @stable
 -->
-<script lang="ts">
+<script lang="ts" generics="T extends string = string">
   import type { ChangeDetails } from "@ui-sdk/core"
   import {
     navigationMenu as navigationMenuPrimitive,
@@ -47,9 +47,9 @@ renders a <div> and closes with its parent.
     ...rest
   }: PartProps<"nav", NavigationMenuState> & {
     /** The open item's value. Bind it with `bind:value` to control the menu. `null` closes every panel. */
-    value?: string | null
+    value?: T | null
     /** The item open at first, when uncontrolled. */
-    defaultValue?: string | null
+    defaultValue?: T | null
     /** Milliseconds the pointer rests on a trigger before its panel opens. */
     delay?: number
     /** Milliseconds before the open panel closes once the pointer leaves its trigger and the panel. */
@@ -61,13 +61,13 @@ renders a <div> and closes with its parent.
     /** Which arrow keys move between the top-level items, and the side panels open on. */
     orientation?: "horizontal" | "vertical"
     /** Opens and closes panels from anywhere. Create one with `createNavigationMenuController()`. */
-    controller?: NavigationMenuController
+    controller?: NavigationMenuController<T>
     /** Logs every state change with its reason. */
     debug?: boolean
     /** Renders the popups into this element instead of in place. */
     container?: PopupContainer
     /** Runs when an item wants to open or the open one to close. `details.reason` says why, and `details.cancel()` stops it. */
-    onValueChange?: (value: string | null, details: Details) => void
+    onValueChange?: (value: T | null, details: Details) => void
     /** Runs once the menu has finished opening or closing, after any animation. Switching items doesn't count. */
     onOpenChangeComplete?: (open: boolean) => void
   } = $props()
@@ -92,14 +92,14 @@ renders a <div> and closes with its parent.
     openOnHover,
     closeOnSelect,
     orientation,
-    controller,
+    controller: controller as NavigationMenuController | undefined,
     debug,
     parent,
     onValueChange: (next: string | null, details: Details) => {
       // The callback runs first, so canceling there also keeps a bound `value` as it was.
-      onValueChange?.(next, details)
+      onValueChange?.(next as T | null, details)
       if (!details.canceled) {
-        value = next
+        value = next as T | null
       }
     },
     onOpenChangeComplete,

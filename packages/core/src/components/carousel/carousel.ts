@@ -22,10 +22,10 @@ import { orientationOf } from "../../foundation/focus/collection"
 import { live } from "../../foundation/kernel/live"
 
 /**
- * Why the page changed: the Previous or Next part, an indicator, arrow keys,
- * a finger or a mouse drag, another kind of scroll (a wheel, a trackpad, focus
- * or find in page bringing a slide into view), rotation, a layout change that
- * removed the page, or a controller.
+ * Why the page changed: the Previous or Next part, an indicator or a slide
+ * peeking in, arrow keys, a finger or a mouse drag, another kind of scroll (a
+ * wheel, a trackpad, focus or find in page bringing a slide into view),
+ * rotation, a layout change that removed the page, or a controller.
  * @stable
  */
 type CarouselPageChangeReason =
@@ -192,6 +192,11 @@ type CarouselOptions = {
    * @defaultValue true
    */
   drag?: boolean
+  /**
+   * Whether it stops being a carousel for now, like at a breakpoint where the slides lay out as a grid. The parts drop their roles, inline styles and listeners, and the controls hide.
+   * @defaultValue false
+   */
+  disabled?: boolean
   /** Pages the carousel from anywhere. Create one with `createCarouselController()`. */
   controller?: CarouselController
 } & PrimitiveOptions
@@ -329,6 +334,9 @@ const checkPartName =
 
 // Inline styles a part needs to work at all, as a `style` attribute.
 function viewportStyle(state: State) {
+  if (state.disabled) {
+    return undefined
+  }
   const vertical = state.orientation === "vertical"
   const overflow = state.drag ? "auto" : "hidden"
   return [
@@ -341,6 +349,9 @@ function viewportStyle(state: State) {
 }
 
 function itemStyle(state: State) {
+  if (state.disabled) {
+    return undefined
+  }
   const declarations = ["flex-shrink:0"]
   if (state.slidesPerPage === 1) {
     declarations.push(`scroll-snap-align:${state.align}`)
@@ -354,11 +365,12 @@ function itemStyle(state: State) {
 const contentId = (id: string) => `${id}-content`
 const slideId = (id: string, key: string) => `${id}-slide-${idPart(key)}`
 
-const stepAttrs = (disabled: boolean, id: string) => ({
+const stepAttrs = (state: State, disabled: boolean, id: string) => ({
   type: "button",
   "aria-controls": contentId(id),
   "aria-disabled": disabled ? "true" : undefined,
   "data-disabled": disabled ? "" : undefined,
+  hidden: state.disabled ? "" : undefined,
 })
 
 const carouselPrimitive = /* @__PURE__ */ definePrimitive({
@@ -379,6 +391,7 @@ const carouselPrimitive = /* @__PURE__ */ definePrimitive({
     skipSnaps: "boolean",
     dragFree: "boolean",
     drag: "boolean",
+    disabled: "boolean",
     controller: "value",
   },
   state: (options: CarouselOptions): State => ({
@@ -391,6 +404,7 @@ const carouselPrimitive = /* @__PURE__ */ definePrimitive({
     skipSnaps: false,
     dragFree: false,
     drag: true,
+    disabled: false,
     interval: 5000,
     pageCount: null,
     snapping: true,
@@ -413,6 +427,14 @@ const carouselPrimitive = /* @__PURE__ */ definePrimitive({
     skipSnaps: options.skipSnaps ?? false,
     dragFree: options.dragFree ?? false,
     drag: options.drag ?? true,
+    disabled: options.disabled ?? false,
+    // Turned off, it holds no measured slides, as if it never measured them.
+    ...(options.disabled && {
+      pageCount: null,
+      pages: [],
+      order: [],
+      inView: [],
+    }),
     interval: options.interval ?? 5000,
     ...(options.page === undefined ? {} : { page: options.page }),
     ...(options.playing === undefined ? {} : { playing: options.playing }),
@@ -420,7 +442,8 @@ const carouselPrimitive = /* @__PURE__ */ definePrimitive({
   api: carouselApi,
   slots: (slot) => ({
     root: slot<{}, CarouselState>({
-      role: "region",
+      role: (state) => (state.disabled ? undefined : "region"),
+      roles: ["region"],
       state: (state) => ({
         page: state.page,
         pageCount: state.pageCount,
@@ -428,7 +451,7 @@ const carouselPrimitive = /* @__PURE__ */ definePrimitive({
         orientation: state.orientation,
       }),
       attrs: (state) => ({
-        "aria-roledescription": "carousel",
+        "aria-roledescription": state.disabled ? undefined : "carousel",
         "data-orientation": state.orientation,
         "data-playing": state.playing ? "" : undefined,
       }),
@@ -461,27 +484,35 @@ const carouselPrimitive = /* @__PURE__ */ definePrimitive({
       attrs: (state, { id }) => ({
         id: contentId(id),
         // Slides coming into view are read out, except while rotating, as the carousel pattern asks.
-        "aria-live": state.playing ? "off" : "polite",
-        "aria-atomic": "false",
+        "aria-live": state.disabled
+          ? undefined
+          : state.playing
+            ? "off"
+            : "polite",
+        "aria-atomic": state.disabled ? undefined : "false",
         "data-orientation": state.orientation,
-        style:
-          state.orientation === "vertical"
-            ? "display:flex;flex-direction:column"
-            : "display:flex",
+        // Inline, so a server-rendered carousel lays out before it hydrates.
+        // A grid sets the variable, since a class can't beat an inline style.
+        style: state.disabled
+          ? undefined
+          : state.orientation === "vertical"
+            ? "display:var(--carousel-display,flex);flex-direction:column"
+            : "display:var(--carousel-display,flex)",
       }),
     }),
 
     item: slot<{}, CarouselItemState>({
-      role: "group",
+      role: (state) => (state.disabled ? undefined : "group"),
+      roles: ["group"],
       props: { id: "id" },
       state: (state, { key }) => ({
         index: state.order.indexOf(key),
         active: !!state.pages[state.page - 1]?.includes(key),
-        inView: state.inView.includes(key),
+        inView: !state.disabled && state.inView.includes(key),
       }),
       attrs: (state, { id, key }) => ({
         id: slideId(id, key),
-        "aria-roledescription": "slide",
+        "aria-roledescription": state.disabled ? undefined : "slide",
         "data-orientation": state.orientation,
         style: itemStyle(state),
       }),
@@ -489,6 +520,7 @@ const carouselPrimitive = /* @__PURE__ */ definePrimitive({
       // except one that holds focus, until focus leaves it.
       live: live((state, { key }) => {
         const hidden =
+          !state.disabled &&
           state.pageCount !== null &&
           !state.inView.includes(key) &&
           state.focused !== key
@@ -498,7 +530,8 @@ const carouselPrimitive = /* @__PURE__ */ definePrimitive({
           "data-active": state.pages[state.page - 1]?.includes(key)
             ? ""
             : undefined,
-          "data-in-view": state.inView.includes(key) ? "" : undefined,
+          "data-in-view":
+            !state.disabled && state.inView.includes(key) ? "" : undefined,
         }
       }),
       bind: (el, { api, key }) => api.internal.bindItem(el, key),
@@ -506,7 +539,8 @@ const carouselPrimitive = /* @__PURE__ */ definePrimitive({
 
     previous: slot<{}, CarouselPreviousState>({
       state: (state, { api }) => ({ disabled: !api.internal.canStep(-1) }),
-      attrs: (state, { id, api }) => stepAttrs(!api.internal.canStep(-1), id),
+      attrs: (state, { id, api }) =>
+        stepAttrs(state, !api.internal.canStep(-1), id),
       press: ({ api }, event) => {
         api.previous({ reason: "previous-press", event })
       },
@@ -515,7 +549,8 @@ const carouselPrimitive = /* @__PURE__ */ definePrimitive({
 
     next: slot<{}, CarouselNextState>({
       state: (state, { api }) => ({ disabled: !api.internal.canStep(1) }),
-      attrs: (state, { id, api }) => stepAttrs(!api.internal.canStep(1), id),
+      attrs: (state, { id, api }) =>
+        stepAttrs(state, !api.internal.canStep(1), id),
       press: ({ api }, event) => {
         api.next({ reason: "next-press", event })
       },
@@ -526,6 +561,7 @@ const carouselPrimitive = /* @__PURE__ */ definePrimitive({
       role: "tablist",
       keys: ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Home", "End"],
       state: (state) => ({ page: state.page, pageCount: state.pageCount }),
+      attrs: (state) => ({ hidden: state.disabled ? "" : undefined }),
       on: {
         keydown: (event, { api }) => api.internal.onIndicatorKeyDown(event),
       },
@@ -571,6 +607,7 @@ const carouselPrimitive = /* @__PURE__ */ definePrimitive({
         type: "button",
         "aria-controls": contentId(id),
         "data-playing": state.playing ? "" : undefined,
+        hidden: state.disabled ? "" : undefined,
       }),
       live: live((state) => ({
         "data-paused": state.playing && state.paused ? "" : undefined,

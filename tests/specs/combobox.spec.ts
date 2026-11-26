@@ -42,6 +42,30 @@ test.describe("input", () => {
     await expect(input(page)).toHaveAttribute("aria-expanded", "true")
   })
 
+  test("text an input method is composing filters once it's committed", async ({
+    page,
+    browserName,
+  }) => {
+    test.skip(
+      browserName !== "chromium",
+      "Only Chromium can drive an input method."
+    )
+    await input(page).fill("b")
+    const session = await page.context().newCDPSession(page)
+    await session.send("Input.imeSetComposition", {
+      text: "ra",
+      selectionStart: 2,
+      selectionEnd: 2,
+    })
+    await expect(input(page)).toHaveValue("bra")
+    await expect(options(page)).toHaveText(["Belgium", "Brazil"], {
+      useInnerText: true,
+    })
+    await session.send("Input.insertText", { text: "ra" })
+    await expect(input(page)).toHaveValue("bra")
+    await expect(options(page)).toHaveText(["Brazil"], { useInnerText: true })
+  })
+
   test("matching ignores case and accents", async ({ page }) => {
     await input(page).fill("FRÁ")
     await expect(options(page)).toHaveText(["France"], { useInnerText: true })

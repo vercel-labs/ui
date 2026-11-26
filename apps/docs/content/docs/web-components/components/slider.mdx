@@ -122,7 +122,7 @@ Set `disabled`. A disabled slider can't be focused or moved, and isn't submitted
 
 ## Controlled
 
-Listen for `valuechange`, and set the element's `value` property to change it from your app. The value keeps its shape: a number stays a number and an array stays an array. Every change carries a [reason](#reasons), like `drag`, `track-press` or `step-key`, and `event.detail.thumb` says which thumb moved. Call `event.preventDefault()` to keep the current value. Setting `value` fires `valuechange` too, with the `imperative` reason, so Reset logs a line as well.
+Listen for `valuechange`, and set the element's `value` property to change it from your app. The value keeps its shape: a number stays a number and an array stays an array. Every change carries a [reason](#reasons), like `drag`, `track-press` or `step-key`, and `event.detail.thumb` says which thumb moved. Call `event.preventDefault()` to keep the current value. Setting `value` changes it without firing `valuechange`, like a native input's `value`, so Reset logs nothing. The [`api`](#controller) fires it, with the `imperative` reason.
 
 <ComponentExample
   name="slider/controlled"

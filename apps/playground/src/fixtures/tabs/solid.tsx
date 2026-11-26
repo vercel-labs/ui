@@ -8,7 +8,7 @@ import {
 } from "@ui-sdk/solid/tabs"
 import { render } from "@solidjs/web"
 import { createSignal, For, Show } from "solid-js"
-import { tabsOptions } from "tests/fixtures/page.ts"
+import { indicatorOptions, tabsOptions } from "tests/fixtures/page.ts"
 import { tabsFixture } from "tests/fixtures/tabs.ts"
 
 const controller = createTabsController()
@@ -38,7 +38,7 @@ function Fixture() {
               </TabsTab>
             )}
           </For>
-          <TabsIndicator class="indicator" />
+          <TabsIndicator class="indicator" {...indicatorOptions()} />
         </TabsList>
         <For each={tabsFixture.tabs}>
           {(tab) => (

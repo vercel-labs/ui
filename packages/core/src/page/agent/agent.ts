@@ -7,6 +7,7 @@
 import { dev, warn } from "#dev"
 import { isDisabledElement } from "../../foundation/forms/form"
 import { withSource } from "../../foundation/kernel/details"
+import { documentOrder, inDocumentOrder } from "../../foundation/kernel/order"
 import { partState } from "../../foundation/kernel/part"
 import type { PrimitiveInstance } from "../../foundation/kernel/primitive-types"
 import { foldText } from "../../foundation/text/match"
@@ -25,12 +26,15 @@ import {
   rowOf,
   entries,
   install,
+  keepOffPage,
+  leftFrom,
   listen,
   offPage,
   ownParts,
   placeOf,
-  remember,
+  refresh,
   retire,
+  shownParts,
   stateKeys,
   type Bound,
   type Entry,
@@ -394,15 +398,26 @@ function valueFor(entry: Entry, action: string, value: unknown) {
 // not one read from inside `data-agent-hidden`, which never reaches the agent.
 const textOrName = (el: Element) => textOf(el) || nameOf(el)
 
+// What left the page in the order it was on the page, since adapters unbind
+// and number components in different orders.
+const leftPage = () =>
+  [...offPage.values()].sort(
+    (a, b) =>
+      (leftFrom.get(a) ?? Infinity) - (leftFrom.get(b) ?? Infinity) ||
+      Number(a.ref.slice(1)) - Number(b.ref.slice(1))
+  )
+
 // The items on the page, named by their trigger when they have one, like an
 // accordion's sections, else by their text.
 function renderedItems(parts: Bound[]) {
-  const items = parts.filter(
-    (part) =>
-      part.key &&
-      (part.slot === "item" ||
-        part.slot === "tab" ||
-        (part.slot === "root" && part.el.getAttribute("role") === "radio"))
+  const items = inDocumentOrder(
+    parts.filter(
+      (part) =>
+        part.key &&
+        (part.slot === "item" ||
+          part.slot === "tab" ||
+          (part.slot === "root" && part.el.getAttribute("role") === "radio"))
+    )
   )
   const nested = items.map((part) => part.el)
   return items.map((part) => {
@@ -449,11 +464,18 @@ function buttonsOf(parts: Bound[]) {
       "button, [role=button], [role^=menuitem]"
     ),
   ])
-  return [...new Set([...toastButtons(parts), ...inside])].filter(
-    (el) =>
-      el.checkVisibility?.(visible) !== false &&
-      !el.closest("[inert], [data-agent-hidden]")
-  )
+  // A web popup's root holds its trigger, which `setOpen` covers. A
+  // disclosure's trigger, like a collapsible's, stays one of its buttons.
+  const popup = parts.some((part) => part.slot === "content")
+  const triggers = popup ? parts.filter((part) => part.slot === "trigger") : []
+  return [...new Set([...toastButtons(parts), ...inside])]
+    .filter(
+      (el) =>
+        el.checkVisibility?.(visible) !== false &&
+        !el.closest("[inert], [data-agent-hidden]") &&
+        !triggers.some((part) => part.el.contains(el))
+    )
+    .sort(documentOrder)
 }
 
 const rootOf = (parts: Bound[]) =>
@@ -726,7 +748,7 @@ function describe(entry: Entry, instance: PrimitiveInstance, parts: Bound[]) {
     component: entry.component,
     actions: [],
   }
-  const label = componentLabel(parts)
+  const label = componentLabel(parts, entry)
   if (label) {
     out.label = label
   }
@@ -788,7 +810,7 @@ function describe(entry: Entry, instance: PrimitiveInstance, parts: Bound[]) {
       out.more = data.length
     }
   }
-  const text = parts
+  const text = shownParts(parts)
     .filter((part) => /title|description|error/.test(part.slot))
     .map((part) =>
       entry.secret && /error/.test(part.slot) ? "[redacted]" : textOf(part.el)
@@ -873,7 +895,7 @@ function createAgent(
       instance: PrimitiveInstance
       parts: Bound[]
     }[] = []
-    // A copy, since `remember` can move an entry to the ref it had.
+    // A copy, since `refresh` can move an entry to the ref it had.
     for (const entry of [...entries.values()]) {
       const instance = entry.instance.deref()
       if (!instance) {
@@ -881,8 +903,9 @@ function createAgent(
         continue
       }
       const parts = bound(instance)
-      if (parts.length) {
-        remember(entry, parts)
+      const closed = refresh(entry, parts)
+      if (entry.secret || entry.offLimits) {
+        offPage.delete(entry.ref)
       }
       // Some show only now and then, like a field while it has errors: its control carries its label.
       // One whose every element is hidden, like a field in a closed dialog, isn't on the page yet.
@@ -894,9 +917,20 @@ function createAgent(
       ) {
         found.push({ entry, instance, parts })
         entry.shown = true
+        entry.seen = instance.get()
         shownInCall.add(entry.ref)
+        offPage.delete(entry.ref)
+      } else if (closed) {
+        // React unmounts a closed popup's content, so its fields leave the page there too.
+        keepOffPage(entry, entry.seen)
       }
     }
+    inDocumentOrder(
+      found.map(({ entry, parts }) => ({
+        entry,
+        el: parts.find((part) => isShown(part.el))!.el,
+      }))
+    ).forEach(({ entry }, index) => (entry.listed = index))
     return found
   }
   // The components on the page for `act` and `query`, read once until the
@@ -1139,7 +1173,7 @@ function createAgent(
         first: touched.has(entry.ref) || !was || differs(was[key], state[key]),
       })
     }
-    for (const component of offPage.values()) {
+    for (const component of leftPage()) {
       const key = fieldKey(Object.keys(component))
       if (key) {
         fields.push({
@@ -2515,11 +2549,13 @@ function createAgent(
       if (settled.pending) {
         return { ref: entry.ref, result: `${action} is still running.` }
       }
-      // A private value is compared with nothing a step sends: whether a
-      // guess failed or passed would say what it holds.
+      // A private value is compared with nothing a step sends, since the outcome
+      // would say what it holds. One that unmounts in the step, like a to-do
+      // that moves to another list, can't be read again, so it isn't a refusal.
       const stays = () => {
         const state = instance.get() as Record<string, unknown>
         return (
+          entries.get(entry.ref) === entry &&
           !entry.secret &&
           !!setKey &&
           setKey in state &&
@@ -2752,6 +2788,23 @@ function createAgent(
     }
   }
 
+  // What `act` returns for a call cancelled before its turn, with no values,
+  // since reading the page then would show what the running call has.
+  const cancelledAct = (input: unknown) => {
+    const invalid = malformed(input)
+    const [step] = invalid ? [] : (input as { steps: AgentStep[] }).steps
+    return {
+      ok: false,
+      error: invalid ?? {
+        step: 0,
+        message: `${step.action} on ${step.ref} was cancelled.`,
+      },
+      steps: [],
+      appeared: [],
+      values: {},
+    }
+  }
+
   // Components that match, then how many more there were, when there were.
   const capped = (found: AgentComponent[]) =>
     found.length > limit
@@ -2887,7 +2940,7 @@ function createAgent(
     const read = new Set(behindClosed.map((component) => component.ref))
     for (const component of [
       ...behindClosed,
-      ...[...offPage.values()].filter((component) => !read.has(component.ref)),
+      ...leftPage().filter((component) => !read.has(component.ref)),
     ]) {
       if (ofKind(component) && named(component)) {
         found.push(component)
@@ -2931,20 +2984,44 @@ function createAgent(
     return next
   }
 
+  // A call cancelled while it waits for its turn, like behind a confirm the
+  // person hasn't answered, settles at once and never runs.
   const askingToo = <T>(
     allow: Allow | undefined,
     signal: AbortSignal | undefined,
-    run: () => Promise<T>
+    run: () => Promise<T>,
+    cancelled?: () => T
   ) =>
-    inTurn(async () => {
-      callerAllow = allow
-      callerSignal = signal
-      try {
-        return await run()
-      } finally {
-        callerAllow = undefined
-        callerSignal = undefined
+    new Promise<T>((resolve, reject) => {
+      const stop = () => {
+        try {
+          resolve(cancelled!())
+        } catch (error) {
+          reject(error)
+        }
       }
+      if (cancelled && signal?.aborted) {
+        return stop()
+      }
+      if (cancelled) {
+        signal?.addEventListener("abort", stop, { once: true })
+      }
+      inTurn(async () => {
+        signal?.removeEventListener("abort", stop)
+        if (cancelled && signal?.aborted) {
+          return
+        }
+        callerAllow = allow
+        callerSignal = signal
+        try {
+          resolve(await run())
+        } catch (error) {
+          reject(error)
+        } finally {
+          callerAllow = undefined
+          callerSignal = undefined
+        }
+      })
     })
   const agent = {
     /**
@@ -2959,7 +3036,7 @@ function createAgent(
       const shown = found
         .filter((item) => !echoesTrigger(item, found))
         .map(({ entry, instance, parts }) => describe(entry, instance, parts))
-      const all = apart([...shown, ...offPage.values()])
+      const all = apart([...shown, ...leftPage()])
       if (all.length <= limit) {
         return all
       }
@@ -2983,7 +3060,12 @@ function createAgent(
      * a step waiting on `allow` fails as cancelled and later steps don't run.
      */
     act: (input: { steps: AgentStep[] }, options?: { signal?: AbortSignal }) =>
-      askingToo(undefined, options?.signal, () => act(input)),
+      askingToo(
+        undefined,
+        options?.signal,
+        () => act(input),
+        () => cancelledAct(input)
+      ),
     /**
      * Finds components without listing the page. `text` matches a
      * component's label or row text by whole words, and a list's items, which
@@ -3006,11 +3088,20 @@ function createAgent(
      * Calls `listener` with every change to a component, from a person or an
      * agent, with its ref, label, reason, source and value before, until the
      * returned function runs. The same as `observe`: a change an interaction
-     * commits, like a slider's drag, comes once, when it commits.
+     * commits, like a slider's drag, comes once, when it commits. A change to
+     * a component that's hidden, which `snapshot` leaves out, isn't reported,
+     * apart from it opening or closing.
      */
     subscribe: (listener: (change: ObservedChange) => void) =>
-      listen((change) => {
-        if (!entries.get(change.ref)?.offLimits) {
+      listen((change, parts) => {
+        // Nothing bound yet says nothing about whether it shows, like a
+        // click replayed while the page hydrates.
+        const hidden =
+          parts.length > 0 && !parts.some((part) => isShown(part.el))
+        if (
+          !entries.get(change.ref)?.offLimits &&
+          (change.key === "open" || !hidden)
+        ) {
           listener(change)
         }
       }),
@@ -3024,7 +3115,13 @@ function createAgent(
     inTurn(() => act({ steps }, guard))
   )
   allowing.set(agent, {
-    act: (input, allow, signal) => askingToo(allow, signal, () => act(input)),
+    act: (input, allow, signal) =>
+      askingToo(
+        allow,
+        signal,
+        () => act(input),
+        () => cancelledAct(input)
+      ),
     query: (input, allow, signal) =>
       askingToo(allow, signal, () => query(input ?? {})),
   })

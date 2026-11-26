@@ -591,7 +591,7 @@ Events fire on `<ui-autocomplete>` and don't bubble, with the new state in `even
 | `value` property           | `ui-autocomplete` | The text. Setting it changes the text, as a controller would    |
 | `open` property, attribute | `ui-autocomplete` | Whether the suggestions are open                                |
 | `api` property             | `ui-autocomplete` | The [controller](#controller-1)                                 |
-| `valuechange` event        | `ui-autocomplete` | `detail: { value, reason, event, source }`                      |
+| `valuechange` event        | `ui-autocomplete` | `detail: { value, reason, event, source, composing }`           |
 | `openchange` event         | `ui-autocomplete` | `detail: { value: open, reason, event, source }`                |
 | `openchangecomplete` event | `ui-autocomplete` | `detail: { value: open }`, after the animation                  |
 | `highlight` event          | `ui-autocomplete` | `detail: { value, index, event }`                               |

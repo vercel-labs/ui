@@ -32,6 +32,7 @@ import {
 import { createController } from "../../foundation/kernel/controller"
 import type {
   ChangeDetails,
+  TextChangeDetails,
   ChangeOptions,
 } from "../../foundation/kernel/details"
 import { definePrimitive } from "../../foundation/kernel/primitive"
@@ -202,7 +203,7 @@ type CommandOptions = {
   /** Runs when the search text wants to change: typing, opening a page, going back, or a controller. */
   onQueryChange?: (
     query: string,
-    details: ChangeDetails<CommandQueryChangeReason>
+    details: TextChangeDetails<CommandQueryChangeReason>
   ) => void
   /** The stack of open pages, from the first page opened to the current one. Pass it to control it. */
   pages?: string[]

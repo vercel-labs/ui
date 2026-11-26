@@ -170,8 +170,11 @@ function createAsyncOptions<Item>(
         listeners.delete(listener)
       }
     },
-    /** Loads for new text once typing pauses, replacing any load still running. */
-    setQuery(next: string) {
+    /** Loads for new text once typing pauses, replacing any load still running. Text an input method is still composing, with `details.composing`, waits until it's committed. */
+    setQuery(next: string, details?: { composing?: boolean }) {
+      if (details?.composing) {
+        return
+      }
       if (
         next === state.query &&
         (state.status === "loading" || timer !== undefined)

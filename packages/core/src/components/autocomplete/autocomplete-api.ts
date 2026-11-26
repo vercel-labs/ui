@@ -39,6 +39,10 @@ import { listKeyDown } from "../../foundation/lists/listbox-keyboard"
 import { opensIntoList } from "../../foundation/lists/listbox-search"
 import { deriveFromOptions } from "../../foundation/kernel/derive"
 import { on } from "../../foundation/kernel/events"
+import {
+  composingInput,
+  endComposition,
+} from "../../foundation/lists/composition"
 import type { PrimitiveContext } from "../../foundation/kernel/primitive-types"
 import { createChange } from "../../foundation/kernel/input-source"
 import { elements } from "../../foundation/kernel/elements"
@@ -50,6 +54,7 @@ type AutocompleteState = PopupState &
     // What the user typed, which filters the list. It differs from the value
     // while an inline completion or a highlighted suggestion fills the field.
     query: string
+    composingFrom: string | null
     // The value a form reset returns to.
     initial: string
     listed: boolean
@@ -77,6 +82,7 @@ function initialAutocompleteState(
     ...popupState(options),
     value,
     query: value,
+    composingFrom: null,
     initial: options.defaultValue ?? "",
     highlighted: null,
     items: options.items,
@@ -157,7 +163,7 @@ function autocompleteApiBody(
   }
 
   const core = createAutocompleteCore(context, {
-    query: () => store.get().query,
+    query: () => store.get().composingFrom ?? store.get().query,
     items: () => store.get().items,
     emptyItems: () => options().emptyItems,
     // Suggestions are strings, so a filter for them reads every item the engine passes.
@@ -266,10 +272,12 @@ function autocompleteApiBody(
       event,
       query = value,
       item,
+      composing = false,
     }: {
       event?: Event
       query?: string
       item?: { value: string; label: string }
+      composing?: boolean
     } = {}
   ) {
     const state = store.get()
@@ -280,7 +288,12 @@ function autocompleteApiBody(
     core.cause(reason, event)
     if (
       value === state.value ||
-      change("value", value, { reason, event, ...(item && { item }) })
+      change("value", value, {
+        reason,
+        event,
+        composing,
+        ...(item && { item }),
+      })
     ) {
       // A value that `onValueChange` set in its place stored its own query.
       if (requested === value) {
@@ -313,7 +326,10 @@ function autocompleteApiBody(
       input.selectionEnd === text.length
     const match = completing ? completionFor(text, core.listbox) : undefined
     const completed = match ? text + match.label.slice(text.length) : text
-    if (!setValue(completed, "input-change", { event, query: text })) {
+    const composing = composingInput(store, event, () => store.get().query)
+    if (
+      !setValue(completed, "input-change", { event, query: text, composing })
+    ) {
       return
     }
     if (match && completed !== text) {
@@ -526,6 +542,13 @@ function autocompleteApiBody(
       hide,
       press,
       typed,
+      onCompositionEnd: (input: HTMLInputElement, event: Event) => {
+        if (input.value === store.get().value) {
+          endComposition(context, store, "value", input.value, event)
+        } else {
+          typed(input, event)
+        }
+      },
       onInputKeyDown,
       ownsElement,
       bindReset,

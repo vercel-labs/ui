@@ -51,6 +51,7 @@ function Carousel({
   skipSnaps,
   dragFree,
   drag,
+  disabled,
   controller,
   debug,
   ...props
@@ -71,6 +72,7 @@ function Carousel({
     skipSnaps,
     dragFree,
     drag,
+    disabled,
     controller,
     debug,
   })

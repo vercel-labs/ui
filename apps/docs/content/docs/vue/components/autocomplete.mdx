@@ -596,17 +596,17 @@ Create one with `createAutocompleteController()` and pass it as `controller`.
 
 Events get the new state first, then the details. `v-model` only updates when the change event wasn't canceled.
 
-| Binding                 | On             | Receives                                                     |
-| ----------------------- | -------------- | ------------------------------------------------------------ |
-| `v-model:value`         | `Autocomplete` | The text                                                     |
-| `v-model:open`          | `Autocomplete` | Whether the suggestions are open                             |
-| `@value-change`         | `Autocomplete` | `(value, details)`: the new text, and the [reason](#reasons) |
-| `@open-change`          | `Autocomplete` | `(open, details)`: the new state, and the [reason](#reasons) |
-| `@open-change-complete` | `Autocomplete` | `(open)`, after the animation                                |
-| `@submit`               | `Autocomplete` | `(value, { event })`: the text, when Enter submits           |
-| `@highlight`            | `Autocomplete` | `(value, { index, event })`: the highlighted suggestion      |
-| `@load-more`            | `Autocomplete` | When the last suggestion is reached                          |
-| `@dismiss-attempt`      | `Autocomplete` | `({ reason, event })`, when a dismissal was refused          |
+| Binding                 | On             | Receives                                                                                    |
+| ----------------------- | -------------- | ------------------------------------------------------------------------------------------- |
+| `v-model:value`         | `Autocomplete` | The text                                                                                    |
+| `v-model:open`          | `Autocomplete` | Whether the suggestions are open                                                            |
+| `@value-change`         | `Autocomplete` | `(value, details)`: the new text, the [reason](#reasons) and whether it's still `composing` |
+| `@open-change`          | `Autocomplete` | `(open, details)`: the new state, and the [reason](#reasons)                                |
+| `@open-change-complete` | `Autocomplete` | `(open)`, after the animation                                                               |
+| `@submit`               | `Autocomplete` | `(value, { event })`: the text, when Enter submits                                          |
+| `@highlight`            | `Autocomplete` | `(value, { index, event })`: the highlighted suggestion                                     |
+| `@load-more`            | `Autocomplete` | When the last suggestion is reached                                                         |
+| `@dismiss-attempt`      | `Autocomplete` | `({ reason, event })`, when a dismissal was refused                                         |
 
 ## Accessibility
 

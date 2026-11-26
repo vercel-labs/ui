@@ -3,7 +3,7 @@
 Radios that share one value, with one tab stop and arrow keys between them.
 @stable
 -->
-<script lang="ts">
+<script lang="ts" generics="T extends string = string">
   import type { ChangeDetails } from "@ui-sdk/core"
   import {
     radioGroup as radioGroupPrimitive,
@@ -40,9 +40,9 @@ Radios that share one value, with one tab stop and arrow keys between them.
     ...rest
   }: PartProps<"div", RadioGroupState> & {
     /** The checked value, or null. Bind it with `bind:value` to control the group. */
-    value?: string | null
+    value?: T | null
     /** The checked value at first, when uncontrolled. A form reset returns to it. */
-    defaultValue?: string | null
+    defaultValue?: T | null
     /** Disables every radio in the group. */
     disabled?: boolean
     /** Keeps the radios focusable and submitted, but stops changes. */
@@ -56,11 +56,11 @@ Radios that share one value, with one tab stop and arrow keys between them.
     /** Whether arrow keys wrap around at the ends. */
     loop?: boolean
     /** Drives the group from anywhere. Create one with `createRadioGroupController()`. */
-    controller?: RadioGroupController
+    controller?: RadioGroupController<T>
     /** Logs every state change with its reason. */
     debug?: boolean
     /** Runs when a radio or a form reset wants to change the value. `details.cancel()` stops it. */
-    onValueChange?: (value: string | null, details: Details) => void
+    onValueChange?: (value: T | null, details: Details) => void
   } = $props()
 
   const id = $props.id()
@@ -78,13 +78,13 @@ Radios that share one value, with one tab stop and arrow keys between them.
     name: name ?? field?.name(),
     form,
     loop,
-    controller,
+    controller: controller as RadioGroupController | undefined,
     debug,
     onValueChange: (next: string | null, details: Details) => {
       // The callback runs first, so canceling there also keeps a bound `value` as it was.
-      onValueChange?.(next, details)
+      onValueChange?.(next as T | null, details)
       if (!details.canceled) {
-        value = next
+        value = next as T | null
       }
     },
   }))

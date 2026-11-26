@@ -63,9 +63,13 @@ type Entry = {
   row?: string
   // The labelled regions around it, outermost first, like a tab's panel and an accordion's section in it.
   sections?: string[]
+  // Its place among the components on the page when an agent last listed them.
+  listed?: number
   // Whether an agent has had it on the page. One hidden all along, like a
   // field in a dialog nobody opened, isn't kept once it leaves.
   shown?: boolean
+  // Its state when an agent last had it on the page.
+  seen?: object
   // A password, card or one-time code, or a field inside `data-agent-secret`,
   // whose value is redacted and isn't kept once it leaves the page.
   secret?: boolean
@@ -103,6 +107,7 @@ const retiredLimit = 500
 const offPage = new Map<string, AgentComponent>()
 // The regions each of those was in, for telling look-alikes apart.
 const placeOf = new WeakMap<AgentComponent, string[]>()
+const leftFrom = new WeakMap<AgentComponent, number>()
 const partsOf = new WeakMap<PrimitiveInstance, ReadonlyMap<string, Part>>()
 const optionsOf = new WeakMap<PrimitiveInstance, () => object>()
 // What an agent's step changed on a key its component commits, like a
@@ -166,9 +171,23 @@ function retire(entry: Entry) {
       retired.delete(retired.keys().next().value!)
     }
   }
+  keepOffPage(entry)
+}
+
+// Lists a component that left the page, or hid in a closed popup's content
+// the web keeps in the page, with the state it had.
+function keepOffPage(entry: Entry, seen = entry.instance.deref()?.get()) {
+  if (
+    !entry.key ||
+    !entry.shown ||
+    entry.secret ||
+    entry.offLimits ||
+    offPage.has(entry.ref)
+  ) {
+    return
+  }
   // Values and checks are worth keeping. A closed menu's `open: false` isn't.
-  const state = entry.instance.deref()?.get() as
-    Record<string, unknown> | undefined
+  const state = seen as Record<string, unknown> | undefined
   const keys = stateKeys(entry, state ?? {}).filter((key) => key !== "open")
   if (!state || !keys.length) {
     return
@@ -193,6 +212,9 @@ function retire(entry: Entry) {
   if (entry.sections) {
     placeOf.set(last, entry.sections)
   }
+  if (entry.listed !== undefined) {
+    leftFrom.set(last, entry.listed)
+  }
   offPage.delete(entry.ref)
   offPage.set(entry.ref, last)
   // The most recent 50, for a page that swaps many components in and out.
@@ -205,11 +227,82 @@ function retire(entry: Entry) {
 const secret =
   /\b(password|current-password|new-password|one-time-code|cc-[a-z-]+)\b/i
 
+const secretControl = (el: Element) =>
+  secret.test(`${el.getAttribute("type")} ${el.getAttribute("autocomplete")}`)
+
+// A field's error text describes its control, so a secret control keeps it
+// secret too, even where the control isn't one of the field's parts, like a
+// web component's input or a password input whose text shows.
+function holdsSecret(field: Entry, parts: Bound[]) {
+  const root = parts.find((part) => part.slot === "root")?.el
+  const own = (el: Element) => el.closest('[data-slot="field"]') === root
+  if (!root) {
+    return false
+  }
+  if (
+    Array.from(root.querySelectorAll("input, textarea, select")).some(
+      (el) => own(el) && (secretControl(el) || isSecret([el]))
+    )
+  ) {
+    return true
+  }
+  for (const other of entries.values()) {
+    const instance = other !== field && other.secret && other.instance.deref()
+    const parts = instance ? partsOf.get(instance)?.values() : undefined
+    for (const { el } of parts ?? []) {
+      if (el && root.contains(el) && own(el)) {
+        return true
+      }
+    }
+  }
+  return false
+}
+
 const stateKeys = (entry: Entry, state: Record<string, unknown>) =>
   entry.controlled ?? ["open", "value", "checked"].filter((key) => key in state)
 
 // The api method that sets a state key, like `setOpen` for `open`.
 const setterOf = (key: string) => `set${key[0].toUpperCase()}${key.slice(1)}`
+
+function guard(entry: Entry, parts: Bound[]) {
+  const elements = parts.map((part) => part.el)
+  entry.secret ||=
+    isSecret(elements) ||
+    parts.some(({ el }) => secretControl(el)) ||
+    (entry.component === "field" && holdsSecret(entry, parts))
+  // A region can turn off-limits and back, like a panel an app locks while it's busy.
+  // A hidden input holds what the page keeps from people, like a token.
+  entry.offLimits =
+    isOffLimits(elements) ||
+    elements.every((el) => (el as HTMLInputElement).type === "hidden")
+}
+
+const closedPopup = '[data-slot$="-content"][hidden]'
+
+// A component in a closed web popup keeps the name, row and state it had when
+// it closed, like one React unmounts, and only its guards stay current.
+function refresh(entry: Entry, parts: Bound[]) {
+  const closed =
+    !!entry.shown &&
+    parts.length > 0 &&
+    parts.every((part) => part.el.closest(closedPopup))
+  if (closed) {
+    guard(entry, parts)
+  } else if (parts.length) {
+    remember(entry, parts)
+  }
+  return closed
+}
+
+// A change a person makes before a popup closes is part of the state its
+// fields close with, though an agent may not look in between.
+function keepSeen(entry: Entry) {
+  const instance = entry.instance.deref()
+  const parts = instance ? bound(instance) : []
+  if (!parts.every((part) => part.el.closest(closedPopup))) {
+    entry.seen = instance!.get()
+  }
+}
 
 // Keeps the component's key current, and the first time it's seen gives it
 // the ref it had before it left the page, when one with its key did.
@@ -217,20 +310,9 @@ function remember(entry: Entry, parts: Bound[]) {
   const first = !entry.key
   const elements = parts.map((part) => part.el)
   checkMarks(elements)
-  entry.label = componentLabel(parts)
+  entry.label = componentLabel(parts, entry)
   entry.row = rowOf(parts)
-  entry.secret ||=
-    isSecret(elements) ||
-    parts.some(({ el }) =>
-      secret.test(
-        `${el.getAttribute("type")} ${el.getAttribute("autocomplete")}`
-      )
-    )
-  // A region can turn off-limits and back, like a panel an app locks while it's busy.
-  // A hidden input holds what the page keeps from people, like a token.
-  entry.offLimits =
-    isOffLimits(elements) ||
-    elements.every((el) => (el as HTMLInputElement).type === "hidden")
+  guard(entry, parts)
   entry.sections = sectionsOf(parts)
   entry.key = `${entry.component}|${entry.label}|${entry.row}|${entry.sections.join(">")}`
   if (!first) {
@@ -274,7 +356,35 @@ function ownParts<Each extends Pick<Bound, "key" | "slot" | "props">>(
   )
 }
 
-function componentLabel(parts: Bound[]) {
+// A web field's control binds its own component's parts, not the field's,
+// so the field finds it.
+function fieldInput(entry: Entry | undefined) {
+  const instance = entry?.component === "field" && entry.instance.deref()
+  const control = instance
+    ? (instance.api as { control?: () => HTMLElement | undefined }).control?.()
+    : undefined
+  return control?.matches("input, textarea") && !isOffLimits([control])
+    ? control
+    : undefined
+}
+
+// A closed popup's content stays in the web page, hidden. While any part of
+// the component shows, like its trigger, the hidden ones don't name or describe it.
+function shownParts(parts: Bound[]) {
+  const shown = parts.filter((part) => !part.el.closest("[hidden]"))
+  return shown.length ? shown : parts
+}
+
+// The hidden parts name it only when the shown ones can't, like a dialog
+// opened from a trigger on every row, which its title names.
+function componentLabel(all: Bound[], entry?: Entry) {
+  const shown = shownParts(all)
+  return (
+    labelOf(shown, entry) ?? (shown === all ? undefined : labelOf(all, entry))
+  )
+}
+
+function labelOf(parts: Bound[], entry?: Entry) {
   const keyless = (slot: string) =>
     parts.find((part) => part.slot === slot && !part.key)?.el
   // Not when the slot has many keys: an accordion's first trigger names its
@@ -301,11 +411,12 @@ function componentLabel(parts: Bound[]) {
   // Then its field's name, like a date picker's input labelled "Due date",
   // before a heading that changes with what it shows, like "November 2026",
   // and a step button before it. Not a search field in its popup, which comes and goes.
-  const input = parts.find(
-    (part) =>
-      part.slot === "input" ||
-      (part.slot === "control" && part.el.matches("input, textarea"))
-  )?.el
+  const input =
+    parts.find(
+      (part) =>
+        part.slot === "input" ||
+        (part.slot === "control" && part.el.matches("input, textarea"))
+    )?.el ?? fieldInput(entry)
   const popup = parts.find((part) => part.slot === "content")?.el
   const field = input && !popup?.contains(input) && nameOf(input)
   if (field) {
@@ -434,6 +545,9 @@ function report(
   if (!entry) {
     return
   }
+  if (entry.shown) {
+    keepSeen(entry)
+  }
   const { source } = details
   if (source === "agent" && entry.commits?.includes(key)) {
     const changed: Uncommitted = uncommitted.get(entry) ?? new Map()
@@ -531,9 +645,7 @@ function send(
     return
   }
   const parts = bound(instance)
-  if (parts.length) {
-    remember(entry, parts)
-  }
+  refresh(entry, parts)
   const change: ObservedChange = {
     ref: entry.ref,
     component: entry.component,
@@ -599,14 +711,17 @@ export {
   entries,
   type Entry,
   install,
+  keepOffPage,
+  leftFrom,
   listen,
   type ObservedChange,
   offPage,
   ownParts,
   placeOf,
-  remember,
+  refresh,
   retire,
   rowOf,
   setterOf,
+  shownParts,
   stateKeys,
 }

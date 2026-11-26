@@ -347,9 +347,12 @@ test.describe("disabled buttons", () => {
     await expect(page.getByRole("status", { name: "Last action" })).toHaveText(
       ""
     )
+    await expect(page.getByText("Add a title to publish")).toBeVisible()
     await moveAway(page)
     await page.getByRole("button", { name: "About billing" }).focus()
     await tabTo(page, tab, "Publish")
+    await expect(page.getByText("Add a title to publish")).toBeVisible()
+    await page.keyboard.press("Enter")
     await expect(page.getByText("Add a title to publish")).toBeVisible()
   })
 })

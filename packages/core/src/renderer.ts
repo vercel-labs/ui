@@ -64,7 +64,7 @@ export {
   formCallback,
 } from "./foundation/forms/form-internals"
 export { writeFromScript } from "./foundation/forms/value"
-export { canceledAction } from "./foundation/kernel/action"
+export { canceledAction, isPromise } from "./foundation/kernel/action"
 export { createListSnapshots } from "./foundation/kernel/controlled-lists"
 export { on } from "./foundation/kernel/events"
 export {

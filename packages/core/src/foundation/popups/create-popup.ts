@@ -97,6 +97,8 @@ type PopupCore = {
   control: ReturnType<typeof createOpenSteps<string>>
   triggerElement: () => HTMLElement | undefined
   triggerSlot: string
+  firstTrigger: () => string | undefined
+  nextTrigger: (except?: string) => string | undefined
   triggerDisabled: (key: string) => boolean
   contentProps: (key?: string) => PopupContentProps
   rules?: PopupRules
@@ -335,6 +337,19 @@ function createPopup<
     onlyTrigger = elements(context, triggerSlot).length <= 1
   })
 
+  // The first trigger rendered that's bound and in the page, besides `except`.
+  function nextTrigger(except?: string) {
+    for (const part of context.parts()) {
+      if (
+        part.slot === triggerSlot &&
+        part.key !== except &&
+        part.el?.isConnected
+      ) {
+        return part.key
+      }
+    }
+  }
+
   const core: PopupCore = {
     label: context.label,
     role: config.role ?? preset.role,
@@ -355,6 +370,15 @@ function createPopup<
     },
     triggerElement,
     triggerSlot,
+    nextTrigger,
+    // Before any binds, like on a server, the first rendered.
+    firstTrigger() {
+      for (const part of context.parts()) {
+        if (part.slot === triggerSlot) {
+          return nextTrigger() ?? part.key
+        }
+      }
+    },
     triggerDisabled: (key) =>
       !!context.props<{ disabled?: boolean }>(triggerSlot, key)?.disabled,
     contentProps,

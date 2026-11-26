@@ -648,11 +648,16 @@ function createPointerDriver(options: SheetDriverOptions) {
               )
       const { id, extent } = points[index]
       if (state.phase === "idle") {
-        state = initialState(shown, kept)
-        if (immediate || Math.abs(extent - shown) < 0.5) {
+        // A sheet whose content shrank can't show more than its new size,
+        // or its edge would leave the side of the viewport it's attached to.
+        const from = Math.min(shown, options.size())
+        state = initialState(from, kept)
+        if (immediate || Math.abs(extent - from) < 0.5) {
           state = initialState(extent, index)
           writeTranslate(extent)
-          if (!immediate) {
+          if (!immediate && id === targetId) {
+            // Effects follow the new extent too, like a dim that ends below it.
+            options.onFrame(extent)
             return
           }
           if (id !== targetId) {

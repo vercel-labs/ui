@@ -1,6 +1,7 @@
 import { render } from "@solidjs/web"
 import { createSignal, flush } from "solid-js"
 import { expect, test } from "vitest"
+import { Field, FieldLabel } from "../src/field"
 import { Input } from "../src/input"
 import { Textarea } from "../src/textarea"
 
@@ -56,5 +57,37 @@ test("a controlled input shows what its parent accepts", async () => {
   }
   expect(value()).toBe("abc")
   expect(input.value).toBe("abc")
+  dispose()
+})
+
+test("a controlled input with a render keeps its element as the text changes", async () => {
+  const [value, setValue] = createSignal("")
+  const { root, dispose } = mount(() => (
+    <Input
+      aria-label="Name"
+      value={value()}
+      onValueChange={setValue}
+      render={(props) => <input {...props} />}
+    />
+  ))
+  const input = root.querySelector("input")!
+  await type(input, "ab")
+  expect(value()).toBe("ab")
+  expect(root.querySelector("input")).toBe(input)
+  dispose()
+})
+
+test("an input in a field follows a render that changes after it mounts", () => {
+  const [area, setArea] = createSignal(true)
+  const { root, dispose } = mount(() => (
+    <Field>
+      <FieldLabel>Notes</FieldLabel>
+      <Input render={area() ? (props) => <textarea {...props} /> : undefined} />
+    </Field>
+  ))
+  expect(root.querySelector("[data-slot=input]")!.tagName).toBe("TEXTAREA")
+  setArea(false)
+  flush()
+  expect(root.querySelector("[data-slot=input]")!.tagName).toBe("INPUT")
   dispose()
 })

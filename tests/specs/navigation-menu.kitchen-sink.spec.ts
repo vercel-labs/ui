@@ -669,3 +669,20 @@ test("an item open from the start lands next to its trigger once scrolled into v
     )
     .toBe("positioned")
 })
+
+test("ArrowDown moves focus into the panel it opens with value controlled", async ({
+  page,
+  framework,
+}) => {
+  await load(page, framework)
+  const trigger = firstTrigger(page, "controlled")
+  await center(trigger)
+  await trigger.focus()
+  await page.keyboard.press("ArrowDown")
+  await expect(trigger).toHaveAttribute("aria-expanded", "true")
+  await expect(
+    page.locator('[data-variant="controlled"]').getByRole("link", {
+      name: /^Analytics/,
+    })
+  ).toBeFocused()
+})

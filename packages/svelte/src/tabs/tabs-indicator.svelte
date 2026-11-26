@@ -4,14 +4,21 @@ Marks the selected tab. Its box comes from the `--active-tab-*` variables, measu
 @stable
 -->
 <script lang="ts">
-  import { tabs, type TabsIndicatorState } from "@ui-sdk/core/tabs"
+  import {
+    tabs,
+    type TabsIndicatorProps,
+    type TabsIndicatorState,
+  } from "@ui-sdk/core/tabs"
   import Part from "../part.svelte"
   import { usePart } from "../instance"
   import type { PartProps } from "../use-primitive.svelte"
 
-  let props: PartProps<"span", TabsIndicatorState> = $props()
+  let {
+    followHover,
+    ...rest
+  }: PartProps<"span", TabsIndicatorState> & TabsIndicatorProps = $props()
 
-  const indicator = usePart(tabs, "indicator")
+  const indicator = usePart(tabs, "indicator", () => ({ followHover }))
 </script>
 
-<Part tag="span" part={indicator} {props} />
+<Part tag="span" part={indicator} props={rest} />

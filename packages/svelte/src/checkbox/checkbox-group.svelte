@@ -13,7 +13,7 @@ each checkbox, sits in a field.
     type CheckboxGroupValueChangeReason,
   } from "@ui-sdk/core/checkbox"
   import { setContext } from "svelte"
-  import { useFieldControl } from "../field/context"
+  import { useField, useFieldControl } from "../field/context"
   import Part from "../part.svelte"
   import {
     useHandlePart,
@@ -21,7 +21,7 @@ each checkbox, sits in a field.
     wrapPart,
     type PartProps,
   } from "../use-primitive.svelte"
-  import { CheckboxGroupKey } from "./context"
+  import { CheckboxGroupKey, GroupFieldKey } from "./context"
 
   type Details = ChangeDetails<CheckboxGroupValueChangeReason>
 
@@ -88,6 +88,7 @@ each checkbox, sits in a field.
     },
   }))
   setContext(CheckboxGroupKey, group)
+  setContext(GroupFieldKey, useField())
   const root = useHandlePart(group, "group")
   const input = useHandlePart(group, "group-input")
   const control = field?.control(

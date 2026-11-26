@@ -11,7 +11,7 @@ export {
   buttonRole,
   opensElsewhere,
 } from "./button"
-export { isBrowser, isIOS, isRTL } from "./env"
+export { isAndroid, isBrowser, isIOS, isRTL } from "./env"
 export { measureViewportEarly, trackKeyboard } from "./keyboard"
 export {
   activeLayers,
@@ -57,6 +57,7 @@ export {
   afterPaint,
   ahead,
   enforceHidden,
+  entering,
   registerUninherited,
   setStyle,
   writeStyle,

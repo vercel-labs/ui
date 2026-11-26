@@ -82,6 +82,7 @@ type DatePickerOpenChangeReason =
   | "close-press"
   | "back"
   | "swipe"
+  | "anchor-hidden"
   | "imperative"
 
 /**

@@ -244,7 +244,7 @@ function MenuContent<Payload = unknown>({
     keepMounted,
   }
   // Submenus render inside their parent's popup.
-  const nested = menu.api.root() !== menu.api
+  const nested = menu.state.nested
   // The payload's type is the app's, from `Payload`; the part hands its state on as it is.
   const partProps = {
     ...props,

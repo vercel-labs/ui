@@ -26,6 +26,7 @@ export {
   type DismissReason,
   isDismissal,
   resolveSource,
+  type TextChangeDetails,
   withSource,
 } from "./details"
 export { settleDraft } from "./draft"
@@ -52,11 +53,14 @@ export {
   trackInput,
   trackModality,
 } from "./modality"
+export { callbackName } from "./option-names"
 export { createOrder, documentOrder, inDocumentOrder, isAfter } from "./order"
 export {
   aliasReferences,
   attrs,
+  awake,
   bind,
+  firstAsleep,
   held,
   madeLabel,
   onProps,

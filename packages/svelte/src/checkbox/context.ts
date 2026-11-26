@@ -7,6 +7,8 @@ type CheckboxGroupContext = PrimitiveHandle<typeof checkboxGroup>
 
 const CheckboxKey = Symbol("checkbox")
 const CheckboxGroupKey = Symbol("checkbox-group")
+// The field the group joined, so a checkbox joins only a field of its own.
+const GroupFieldKey = Symbol("checkbox-group-field")
 
 /** The group a checkbox belongs to, if any. */
 function useCheckboxGroup() {
@@ -18,5 +20,6 @@ export {
   type CheckboxGroupContext,
   CheckboxGroupKey,
   CheckboxKey,
+  GroupFieldKey,
   useCheckboxGroup,
 }

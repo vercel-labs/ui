@@ -161,6 +161,7 @@ const unreadByItems = {
   icons: [],
   pageLocale: [],
   query: [],
+  composingFrom: [],
   searchable: [],
   focusInList: [],
   virtualFocus: [],
@@ -271,13 +272,7 @@ const selectSlots = (slot: SlotFactory<SelectState, SelectApi>) => ({
       bindPageLocale(el, (pageLocale) => store.set({ pageLocale }))
       // A value whose label or icon only its item knows: render the list
       // hidden so the item registers, once the parts that render now have.
-      if (!store.get().items && !api.internal.options().itemToLabel) {
-        queueMicrotask(
-          () =>
-            api.internal.selection.needsItems(api.internal.hasValueIcon()) &&
-            api.internal.prepare()
-        )
-      }
+      queueMicrotask(() => api.internal.needsList() && api.internal.prepare())
       if (dev) {
         warnIfUnnamed(
           el,
@@ -425,7 +420,11 @@ const selectSlots = (slot: SlotFactory<SelectState, SelectApi>) => ({
     live: live((state, { api }) => ({
       "aria-activedescendant": api.internal.activeDescendant(state),
     })),
-    on: { input: (event, { api }) => api.internal.typed(event) },
+    on: {
+      input: (event, { api }) => api.internal.typed(event),
+      // Browsers differ on whether an `input` follows the end of a composition.
+      compositionend: (event, { api }) => api.internal.onCompositionEnd(event),
+    },
     bind(el, { api, id, store }) {
       // At once, since focus moves in a microtask after the list binds, and it must find the field.
       store.set({ searchable: true })

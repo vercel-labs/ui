@@ -505,3 +505,12 @@ test.describe("submit", () => {
     await expect(submitted(page)).toHaveText("")
   })
 })
+
+test("the editor says it offers suggestions from mount, before focus", async ({
+  page,
+  open,
+}) => {
+  await open("token-input")
+  await expect(editor(page)).toHaveAttribute("aria-autocomplete", "list")
+  await expect(editor(page)).toHaveAttribute("aria-haspopup", "listbox")
+})

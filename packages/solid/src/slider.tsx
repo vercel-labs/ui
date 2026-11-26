@@ -11,7 +11,6 @@ import {
   merge,
   omit,
   Show,
-  untrack,
   useContext,
   type ComponentProps,
 } from "solid-js"
@@ -76,7 +75,7 @@ function Slider<Value extends number | number[] = number | number[]>(
       },
       thumbInputId: controlId,
     },
-    field ? { render: joinRange(props, field, range) } : {}
+    field ? joinRange(props, field, range) : {}
   )
   return (
     <ThumbFieldContext value={() => (range() ? null : field)}>
@@ -92,13 +91,24 @@ function joinRange(
   field: NonNullable<ReturnType<typeof useFieldControl>>,
   range: () => boolean
 ) {
-  const render = untrack(() => props.render)
-  return (merged: Record<string, any>, state: SliderState) => {
-    const joined = range() ? field.props(merged) : merged
-    if (typeof render === "function") {
-      return render(joined, state)
-    }
-    return <div {...joined} />
+  let last: unknown
+  let made:
+    ((merged: Record<string, any>, state: SliderState) => any) | undefined
+  return {
+    get render() {
+      const render = props.render
+      if (!made || render !== last) {
+        last = render
+        made = (merged: Record<string, any>, state: SliderState) => {
+          const joined = range() ? field.props(merged) : merged
+          if (typeof render === "function") {
+            return render(joined, state)
+          }
+          return <div {...joined} />
+        }
+      }
+      return made
+    },
   }
 }
 

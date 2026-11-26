@@ -255,7 +255,7 @@ The listener receives an `ObservedChange`:
 | `key`, `value`, `previous` | The state key, requested value, and previous value.                     |
 | `reason`, `source`         | Why the change happened and which input caused it, including `"agent"`. |
 
-Both people's and agents' changes are reported. A committed interaction, such as a slider drag, arrives once at the end. A controlled component's parent may not accept the requested value. Sensitive field values are reported as `"[redacted]"`.
+Both people's and agents' changes are reported. A committed interaction, such as a slider drag, arrives once at the end. A change to a component that's hidden when it changes, which `snapshot` leaves out, isn't reported. Opening and closing always are. A controlled component's parent may not accept the requested value. Sensitive field values are reported as `"[redacted]"`.
 
 Call `unsubscribe()` when you're done. See [Observe Changes](./observe-changes) for keeping an agent up to date, or [History and Undo](./history-and-undo) for recording and reverting changes.
 

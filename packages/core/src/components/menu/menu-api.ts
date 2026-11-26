@@ -392,6 +392,7 @@ type MenuNode = {
     trackPointer: (event: PointerEvent) => void
     layer: () => Layer | undefined
     barArrow: (by: 1 | -1, event: KeyboardEvent) => boolean
+    subscribe: (listener: () => void) => () => void
   }
 }
 
@@ -823,6 +824,7 @@ function menuApiBody(
       entryOf,
       children,
       safeArea,
+      subscribe: store.subscribe,
       register(el: HTMLElement, item: Omit<Entry, "el">) {
         const entry = { ...item, el }
         const remove = entries.add(entry)
@@ -865,6 +867,7 @@ function menuApiBody(
       },
       popup,
       presentation,
+      firstTrigger: kit.internal.firstTrigger,
       layer: () => popup.layer(),
       barArrow,
       barKeydown,
@@ -1073,11 +1076,21 @@ function menuApiBody(
     return [...children].some((child) => child.treeContains(target))
   }
 
+  // Items the page hides, like one shown only in some states, are out of the
+  // keys' reach. A popup that isn't showing yet hides them all, so they stay.
+  function shownEntries() {
+    const list = entries.list()
+    const el = popup.element()
+    return el && rendered(el)
+      ? list.filter((entry) => rendered(entry.el))
+      : list
+  }
+
   // Moves focus to the item asked for, or returns the popup for the layer to focus.
   function runPendingFocus() {
     const focus = pendingFocus
     pendingFocus = "none"
-    const list = entries.list()
+    const list = shownEntries()
     if (focus === "first" && list.length) {
       highlight(list[0].key, { scroll: true })
     } else if (focus === "last" && list.length) {
@@ -1093,7 +1106,7 @@ function menuApiBody(
     if (target.closest('[role="menu"]') !== popup.element()) {
       return
     }
-    const list = entries.list()
+    const list = shownEntries()
     const focused = entryOf(document.activeElement as HTMLElement)
     const currentKey = focused?.key ?? store.get().highlighted
     const index = list.findIndex((entry) => entry.key === currentKey)
@@ -1234,10 +1247,19 @@ function menuApiBody(
   return api
 }
 
+const rendered = (el: HTMLElement) =>
+  !el.closest("[inert]") &&
+  (el.checkVisibility?.({ visibilityProperty: true }) ??
+    !el.closest("[hidden]"))
+
 const menuApi: (...args: Parameters<typeof menuApiBody>) => MenuApi =
   menuApiBody
 
 type MenuState = {
+  // Whether it's a submenu, and whether a menubar may hold it, known from the
+  // start: a closed root menu renders its trigger before it has an api.
+  nested: boolean
+  barred: boolean
   open: boolean
   // True while the popup is in the DOM, including while it animates out.
   mounted: boolean

@@ -7,7 +7,7 @@ import {
 } from "./anchoring"
 import { shadowRootsAround, watchMoves, watchShadowRoots } from "./moves"
 import { opposite, physicalSide, type PhysicalSide, type Side } from "./sides"
-import { ahead, registerUninherited } from "./style"
+import { ahead, entering, registerUninherited } from "./style"
 
 /**
  * How a popup lines up along the side it opens on.
@@ -438,7 +438,8 @@ function visibleViewport() {
  * `data-side`, `data-align`, `--available-width`, `--available-height` and
  * `--transform-origin`. Works in the top layer and inside transformed
  * containers. Options can be a function, read on every check, so a popup
- * follows changes like a new side while it's open. Returns the cleanup.
+ * follows changes like a new side while it's open. `onAnchorHidden` runs once
+ * each time an anchor element still on the page stops rendering. Returns the cleanup.
  *
  * ```ts
  * const stop = position({ x: event.clientX, y: event.clientY }, menu, { side: "bottom", align: "start", sideOffset: 2 })
@@ -448,7 +449,8 @@ function visibleViewport() {
 function position(
   anchorOrGetter: Anchor | (() => Anchor | null | undefined),
   el: HTMLElement,
-  optionsOrGetter: PositionOptions | (() => PositionOptions) = {}
+  optionsOrGetter: PositionOptions | (() => PositionOptions) = {},
+  onAnchorHidden?: () => void
 ) {
   const read = () =>
     typeof optionsOrGetter === "function" ? optionsOrGetter() : optionsOrGetter
@@ -477,6 +479,7 @@ function position(
   let last = ""
   let insideAt = ""
   let placed = false
+  let renderedAnchor: Element | undefined
   // Sizes are left to `platform/moves.ts` and the slow check, not a
   // `ResizeObserver`: components whose own observers resize a popup, like a
   // navigation menu's viewport, would make the browser report "ResizeObserver
@@ -528,8 +531,15 @@ function position(
       if (anchoring) {
         unanchor(anchoredAt)
       }
+      // Only an anchor seen rendering, since jsdom renders nothing, and once
+      // each time it hides, so a close that was canceled isn't asked again.
+      if (node.isConnected && renderedAnchor === node) {
+        renderedAnchor = undefined
+        onAnchorHidden?.()
+      }
       return false
     }
+    renderedAnchor = shown ? node : undefined
     // Read each time, since the same anchor can move to another shadow root.
     const around = node ? shadowRootsAround(node) : []
     if (
@@ -567,8 +577,9 @@ function position(
     // place to move from, and a `left` or `top` transition would fly it in
     // from the corner. Later moves, between anchors, animate.
     const first = !placed
+    const settles = first && entering.has(el)
     const transition = el.style.transition
-    if (first) {
+    if (first && !settles) {
       el.style.transition = "none"
     }
     const a = anchorRect(shown ?? anchor)
@@ -672,7 +683,9 @@ function position(
         near(computePlacement(previous, size, viewport, placement))
       if (!caughtUp && !behind) {
         unanchor()
-        el.style.transition = transition
+        if (!settles) {
+          el.style.transition = transition
+        }
         return update()
       }
       if (behind) {
@@ -699,9 +712,11 @@ function position(
     const across = isVertical(result.side) ? scale.x : scale.y
     if (first) {
       placed = true
-      // Reading a style applies the placement before transitions come back.
-      void style.left
-      el.style.transition = transition
+      if (!settles) {
+        // Reading a style applies the placement before transitions come back.
+        void style.left
+        el.style.transition = transition
+      }
     }
 
     popup.attribute("data-side", result.side)

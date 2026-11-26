@@ -6,6 +6,14 @@ type CarouselFixtureSlide = {
   link: string
 }
 
+const slides: CarouselFixtureSlide[] = [
+  { title: "Desk lamp", link: "View desk lamp" },
+  { title: "Armchair", link: "View armchair" },
+  { title: "Bookshelf", link: "View bookshelf" },
+  { title: "Rug", link: "View rug" },
+  { title: "Plant stand", link: "View plant stand" },
+]
+
 const carouselFixture = {
   // The carousel's accessible name.
   label: "Featured products",
@@ -17,13 +25,14 @@ const carouselFixture = {
   // The play toggle's name while rotating, and while not.
   stop: "Stop slide rotation",
   start: "Start slide rotation",
-  slides: [
-    { title: "Desk lamp", link: "View desk lamp" },
-    { title: "Armchair", link: "View armchair" },
-    { title: "Bookshelf", link: "View bookshelf" },
-    { title: "Rug", link: "View rug" },
-    { title: "Plant stand", link: "View plant stand" },
-  ] satisfies CarouselFixtureSlide[] as CarouselFixtureSlide[],
+  // The first four with ?slides=4.
+  get slides() {
+    const count =
+      typeof location === "undefined"
+        ? null
+        : new URLSearchParams(location.search).get("slides")
+    return count ? slides.slice(0, Number(count)) : slides
+  },
   // A text field in the third slide, which keeps its arrow keys.
   field: "Gift note",
 }
@@ -47,6 +56,12 @@ function carouselOptions() {
     // Whether the page renders the play toggle: with rotation, or ?play-toggle without it.
     playToggle: params.has("playing") || params.has("play-toggle"),
     controlled: params.has("controlled"),
+    // ?disabled-media=<query> turns the carousel off while the query matches,
+    // once the page is running, since the server has no media to match.
+    disabledMedia:
+      params.has("disabled-media") && typeof matchMedia === "function"
+        ? matchMedia(params.get("disabled-media")!)
+        : null,
     options: {
       ...(perPage && {
         slidesPerPage: perPage === "auto" ? ("auto" as const) : Number(perPage),

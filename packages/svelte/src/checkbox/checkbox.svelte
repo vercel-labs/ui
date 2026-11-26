@@ -12,8 +12,8 @@ The control and the hidden native input that takes part in the form.
     type CheckboxState,
     type CheckedState,
   } from "@ui-sdk/core/checkbox"
-  import { setContext } from "svelte"
-  import { useFieldControl } from "../field/context"
+  import { getContext, setContext } from "svelte"
+  import { useField, useFieldControl } from "../field/context"
   import Part from "../part.svelte"
   import type { ToggleProps } from "../toggle-props"
   import { readOnlyOf } from "../text-control"
@@ -23,7 +23,7 @@ The control and the hidden native input that takes part in the form.
     wrapPart,
     type PartProps,
   } from "../use-primitive.svelte"
-  import { CheckboxKey, useCheckboxGroup } from "./context"
+  import { CheckboxKey, GroupFieldKey, useCheckboxGroup } from "./context"
 
   type Details = ChangeDetails<CheckboxCheckedChangeReason>
 
@@ -57,8 +57,12 @@ The control and the hidden native input that takes part in the form.
 
   const id = $props.id()
   const group = useCheckboxGroup()
-  // Inside a group, the group is the field's control.
-  const field = group ? null : useFieldControl()
+  // A checkbox in a field of its own is that field's control. In the group's field, the group is.
+  const nearest = useField()
+  const field =
+    nearest && !(group && nearest === getContext(GroupFieldKey))
+      ? useFieldControl()
+      : null
   const checkbox = usePrimitive(checkboxPrimitive, () => ({
     id,
     parent,
@@ -70,7 +74,7 @@ The control and the hidden native input that takes part in the form.
     disabled: disabled || field?.disabled(),
     readOnly: readOnlyOf(readOnly, rest),
     required,
-    name: name ?? field?.name(),
+    name: name ?? (group ? undefined : field?.name()),
     value,
     form,
     controller,

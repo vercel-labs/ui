@@ -71,6 +71,8 @@ function defineAutocompleteElements() {
         "getValue",
         "setValue",
         "clear",
+        "getHighlighted",
+        "highlight",
         "focus",
       ],
       // container="#id" renders the suggestions there. As a sheet, they sit in a

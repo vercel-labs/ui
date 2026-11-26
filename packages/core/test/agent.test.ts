@@ -190,6 +190,32 @@ describe("agent", () => {
     expect(saved.get().checked).toBe(false)
   })
 
+  test("a set whose component unmounts in its change callback takes", async () => {
+    const agent = createAgent()
+    let unmount = () => {}
+    const instance = checkbox({
+      id: "todo",
+      checked: false,
+      onCheckedChange: () => queueMicrotask(unmount),
+    })
+    const label = document.createElement("label")
+    const el = document.createElement("button")
+    label.append(el, "Water the plants")
+    document.body.append(label)
+    const unbind = bind(instance.part("root"), el)
+    unmount = () => {
+      unmount = () => {}
+      unbind()
+      instance.destroy()
+      label.remove()
+    }
+    cleanups.push(() => unmount())
+    const outcome = await agent.act({
+      steps: [{ ref: "Water the plants", action: "setChecked", args: [true] }],
+    })
+    expect(outcome.error).toBeUndefined()
+  })
+
   test("a set to the value a field already holds, or one it formats, takes", async () => {
     const agent = createAgent()
     const instance = input({

@@ -305,13 +305,15 @@ const MenuContent = withPayload(
           return position
         }
         const part = usePart(menu, "content", position)
+        // Submenus render inside their parent's popup. Read once, since the
+        // render would otherwise run again for every change to the menu's state.
+        const { nested } = menu.state
         return () => {
           const element = part()
           if (!element) {
             return null
           }
-          // Submenus render inside their parent's popup.
-          return menu.api.root() !== menu.api
+          return nested
             ? element
             : renderPopup(sheetViewport(menu, element), target())
         }

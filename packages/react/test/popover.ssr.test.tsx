@@ -12,6 +12,9 @@ import {
   PopoverTitle,
   PopoverTrigger,
 } from "../src/popover"
+import { Menu, MenuContent, MenuItem, MenuTrigger } from "../src/menu"
+
+const ids = (html: string) => html.match(/ id="[^"]*-trigger"/g) ?? []
 
 // Runs with no DOM: any access to window or document during render throws.
 describe("popover server rendering", () => {
@@ -30,6 +33,28 @@ describe("popover server rendering", () => {
       </PopoverContent>
     </Popover>
   )
+
+  test("of several triggers, only the first renders the id", () => {
+    const html = renderToString(
+      <>
+        <Popover>
+          <PopoverTrigger>Profile</PopoverTrigger>
+          <PopoverTrigger>Account</PopoverTrigger>
+          <PopoverContent>Edit profile</PopoverContent>
+        </Popover>
+        <Menu>
+          <MenuTrigger>Row actions</MenuTrigger>
+          <MenuTrigger>Quick actions</MenuTrigger>
+          <MenuContent>
+            <MenuItem value="edit">Edit</MenuItem>
+          </MenuContent>
+        </Menu>
+      </>
+    )
+    expect(ids(html)).toHaveLength(2)
+    expect(html).toMatch(/-trigger"[^>]*>Profile</)
+    expect(html).toMatch(/-trigger"[^>]*>Row actions</)
+  })
 
   test("a closed popover renders its trigger only", () => {
     const html = renderToString(popover(false))

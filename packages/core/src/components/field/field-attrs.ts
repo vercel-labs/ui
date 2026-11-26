@@ -137,6 +137,9 @@ function bindFoundControl(
   // The element the field named and the name it gave, which follows the
   // field's own. Another element with that name chose it itself.
   let gave: { el: Element; name: string | undefined } | undefined
+  // The name the field's label replaced, like a native <label>'s around the
+  // control, which comes back when the field has no label of its own.
+  let replaced: string | undefined
   const write = () => {
     const control = current
     // A control moved out, maybe into another field, is no longer this one's to write.
@@ -161,19 +164,25 @@ function bindFoundControl(
     for (const [name, value] of Object.entries(attrs)) {
       if (value === undefined) {
         if (written.has(name)) {
-          control.removeAttribute(name)
+          if (name === "aria-labelledby" && replaced) {
+            control.setAttribute(name, replaced)
+          } else {
+            control.removeAttribute(name)
+          }
         }
         continue
       }
       const current = control.getAttribute(name)
-      // The author's own label reference names the control over the field's label.
       if (
         name === "aria-labelledby" &&
         current !== null &&
-        current !== written.get(name) &&
-        !madeLabel(current)
+        current !== written.get(name)
       ) {
-        continue
+        // The author's own label reference names the control over the field's label.
+        if (!madeLabel(current)) {
+          continue
+        }
+        replaced = current
       }
       next.set(name, value)
       if (current !== value) {
@@ -231,6 +240,7 @@ function bindFoundControl(
     }
     current = next
     added = new Set()
+    replaced = undefined
     adopt(next)
     described?.disconnect()
     described?.observe(next, { attributeFilter: ["aria-describedby", "id"] })

@@ -214,10 +214,15 @@ function afterPaint(work: () => void) {
   }
 }
 
+// Elements about to play their first enter. `animateIn` ends every transition
+// that showing and placing one starts, so `position` leaves its own alone.
+const entering = new WeakSet<HTMLElement>()
+
 export {
   afterPaint,
   ahead,
   enforceHidden,
+  entering,
   registerUninherited,
   setStyle,
   writeStyle,

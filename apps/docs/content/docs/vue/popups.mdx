@@ -73,6 +73,8 @@ import {
 
 Use `@dismiss-attempt` to hear each refused dismissal. [State and Events](./state-and-events) shows how to cancel just one reason.
 
+Escape reaches the elements inside a popup first. One that handles the key and calls `preventDefault()`, like a search field clearing its text, keeps the popup open. To close it on that Escape anyway, listen for `keydown` on the content in the capture phase, before the element inside hears it, and close the popup there with its controller or open state.
+
 ## Modals and Sheets
 
 `modal` set to true makes the rest of the page inert and locks scrolling. Each component documents its default.
@@ -83,12 +85,12 @@ Menu, Select, Combobox, Autocomplete, Popover, and Dialog support `presentation=
 
 Dialogs, alert dialogs, drawers, and popovers move focus into their content when they open. Where it lands depends on how they opened:
 
-| Opened With                                  | Focus Goes To                                                |
-| -------------------------------------------- | ------------------------------------------------------------ |
-| Keyboard, screen reader, mouse, pen, or code | The element `initial-focus` picks.                           |
-| Touch                                        | The content itself, so no on-screen keyboard appears.        |
-| Hover                                        | Nowhere. Focus stays where it is.                            |
-| Rendered open                                | Nowhere, except in a dialog, which takes focus as it mounts. |
+| Opened With                                  | Focus Goes To                                                                        |
+| -------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Keyboard, screen reader, mouse, pen, or code | The element `initial-focus` picks.                                                   |
+| Touch                                        | The content itself, so no on-screen keyboard appears, unless you set `initialFocus`. |
+| Hover                                        | Nowhere. Focus stays where it is.                                                    |
+| Rendered open                                | Nowhere, except in a dialog, which takes focus as it mounts.                         |
 
 `initial-focus` defaults to `"auto"`: the first focusable element, or the content when it has none. A dialog tries an element with `autofocus` first, and an alert dialog tries its first Close part. Pass `"content"` to focus the content itself, `"none"` to leave focus alone, or a CSS selector, an element, or a function that returns one. When focus lands on a text field that already holds a value, its text is selected, so typing replaces it.
 

@@ -596,15 +596,15 @@ Create one with `createAutocompleteController()` and pass it as `controller`.
 
 Callbacks get the new state first, then the details.
 
-| Prop                   | On             | Receives                                                     |
-| ---------------------- | -------------- | ------------------------------------------------------------ |
-| `onValueChange`        | `Autocomplete` | `(value, details)`: the new text, and the [reason](#reasons) |
-| `onOpenChange`         | `Autocomplete` | `(open, details)`: the new state, and the [reason](#reasons) |
-| `onOpenChangeComplete` | `Autocomplete` | `(open)`, after the animation                                |
-| `onSubmit`             | `Autocomplete` | `(value, { event })`: the text, when Enter submits           |
-| `onHighlight`          | `Autocomplete` | `(value, { index, event })`: the highlighted suggestion      |
-| `onLoadMore`           | `Autocomplete` | `()`, when the last suggestion is reached                    |
-| `onDismissAttempt`     | `Autocomplete` | `({ reason, event })`, when a dismissal was refused          |
+| Prop                   | On             | Receives                                                                                    |
+| ---------------------- | -------------- | ------------------------------------------------------------------------------------------- |
+| `onValueChange`        | `Autocomplete` | `(value, details)`: the new text, the [reason](#reasons) and whether it's still `composing` |
+| `onOpenChange`         | `Autocomplete` | `(open, details)`: the new state, and the [reason](#reasons)                                |
+| `onOpenChangeComplete` | `Autocomplete` | `(open)`, after the animation                                                               |
+| `onSubmit`             | `Autocomplete` | `(value, { event })`: the text, when Enter submits                                          |
+| `onHighlight`          | `Autocomplete` | `(value, { index, event })`: the highlighted suggestion                                     |
+| `onLoadMore`           | `Autocomplete` | `()`, when the last suggestion is reached                                                   |
+| `onDismissAttempt`     | `Autocomplete` | `({ reason, event })`, when a dismissal was refused                                         |
 
 ## Accessibility
 

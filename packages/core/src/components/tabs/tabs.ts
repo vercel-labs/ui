@@ -26,6 +26,7 @@ import {
 } from "../../foundation/lists/item-icon"
 import { animateIn, animateOut } from "../../foundation/motion/presence"
 import { createRovingFocus } from "../../foundation/focus/roving-focus"
+import { moveIndex, stepFor } from "../../foundation/focus/collection"
 import { bindTabStop } from "../../foundation/focus/tabbable"
 import { idPart } from "../../foundation/kernel/attrs"
 import { createController } from "../../foundation/kernel/controller"
@@ -225,6 +226,15 @@ type TabsTabIconProps = ItemIconProps
  */
 type TabsTabIconState = ItemIconState
 /**
+ * Props of the indicator.
+ * @stable
+ */
+type TabsIndicatorProps = {
+  /** Whether it follows the tab under the pointer, and goes back to the selected one when the pointer leaves the list. */
+  followHover?: boolean
+}
+
+/**
  * The state the `indicator` slot of `tabs` hands `render` functions and
  * state-based class names.
  * @stable
@@ -274,6 +284,7 @@ function writeIndicator(
       el.style.removeProperty(`--active-tab-${name}`)
     }
   }
+  el.toggleAttribute("data-visible", rect !== undefined)
 }
 
 /**
@@ -316,6 +327,23 @@ function tabsApiBody(
     preferred: (tab) => store.get().value === tab.key,
     claims: (state, tab) =>
       state.value === null ? enabled(tab) : state.value === tab.key,
+    // Tabs the page hides, like one shown only in some states, are out of the
+    // arrows' reach. They stay tabs, so a hidden selected tab keeps its value.
+    move: (event, { from, items, rtl }) => {
+      const step = stepFor(event.key, orientation(), rtl)
+      if (step === undefined) {
+        return
+      }
+      const shown = items.filter((tab) => tab === from || rendered(tab.el))
+      return shown[
+        moveIndex(
+          shown.indexOf(from),
+          step,
+          shown.length,
+          options().loop ?? true
+        )
+      ]?.key
+    },
     onItemsChange: check,
   })
   // The arrow key moving to a link tab while it clicks the link.
@@ -414,15 +442,41 @@ function tabsApiBody(
     )
   }
 
+  // A tab selected in the same update that adds it, before it's on the page:
+  // where the selection moves from, for its direction and scroll once it binds.
+  let arriving: { value: string; from: DOMRect } | undefined
+
+  function arrived(key: string, el: HTMLElement) {
+    if (arriving?.value !== key || store.get().value !== key) {
+      return
+    }
+    const { from } = arriving
+    arriving = undefined
+    const to = el.getBoundingClientRect()
+    store.set({
+      direction: directionBetween(
+        from,
+        to,
+        store.get().orientation
+      ) as TabsDirection,
+    })
+    reveal(key)
+  }
+
   // What selecting `value` brings with it from `state`: the direction the
   // selection moves, and the panel it leaves animating out.
   function selecting(state: TabsStore, value: string | null) {
     const from = state.value
     const rect = (key: string | null) =>
       key === null ? undefined : element("tab", key)?.getBoundingClientRect()
+    const start = rect(from)
+    arriving =
+      value !== null && start && !element("tab", value)
+        ? { value, from: start }
+        : undefined
     return {
       direction: directionBetween(
-        rect(from),
+        start,
         rect(value),
         state.orientation
       ) as TabsDirection,
@@ -515,6 +569,7 @@ function tabsApiBody(
           })
         }
       },
+      arrived,
       setElement(key: string, el: HTMLElement) {
         const element = buttonElement(el)
         const { elements } = store.get()
@@ -596,6 +651,11 @@ function tabsApiBody(
 
 const tabsApi: (...args: Parameters<typeof tabsApiBody>) => TabsApi =
   tabsApiBody
+
+const rendered = (el: HTMLElement) =>
+  !el.closest("[inert]") &&
+  (el.checkVisibility?.({ visibilityProperty: true }) ??
+    !el.closest("[hidden]"))
 
 const findable = (state: TabsStore, props: PanelProps) =>
   props.hiddenUntilFound ?? state.hiddenUntilFound
@@ -725,6 +785,7 @@ const tabsPrimitive = /* @__PURE__ */ definePrimitive({
       },
       bind(el, part) {
         part.api.internal.setElement(part.key, el)
+        part.api.internal.arrived(part.key, el)
         return part.api.internal.roving.bind(el, part)
       },
     }),
@@ -737,8 +798,9 @@ const tabsPrimitive = /* @__PURE__ */ definePrimitive({
       })
     ),
 
-    indicator: slot<{}, TabsIndicatorState>({
+    indicator: slot<TabsIndicatorProps, TabsIndicatorState>({
       role: "presentation",
+      props: { followHover: "boolean" },
       state: (state, { api }) => ({
         orientation: api.internal.orientation(),
         direction: state.direction,
@@ -747,9 +809,11 @@ const tabsPrimitive = /* @__PURE__ */ definePrimitive({
         "data-orientation": api.internal.orientation(),
         "data-activation-direction": state.direction,
       }),
-      bind(el, { api, store }) {
+      bind(el, part) {
+        const { api, store } = part
         let value = store.get().value
         return bindIndicator({
+          followHover: () => !!part.props.followHover,
           list: () => api.internal.listElement() ?? el.parentElement,
           active: () => {
             const { value } = store.get()
@@ -899,6 +963,7 @@ export {
   type TabsChangeOptions,
   type TabsController,
   type TabsDirection,
+  type TabsIndicatorProps,
   type TabsIndicatorState,
   type TabsListState,
   type TabsOptions,

@@ -55,7 +55,7 @@ type PartConfig = {
 }
 
 /**
- * A slot's props as a getter: those its schema names and the `id`, with
+ * A slot's props as a getter: those its schema names, with
  * `"id"` props left out made from `id`, the part's `$props.id()`, and those
  * it takes `from` another slot filled in from the nearest part of that slot:
  * `"item"` reads the item's prop of the same name, `"group.id"` the group's
@@ -86,7 +86,7 @@ function slotPropsOf(
     ? (useHandle(primitive).api as ListApi).internal.keyOf
     : undefined
   const own = () => {
-    const result: Record<string, unknown> = { id: props.id }
+    const result: Record<string, unknown> = {}
     for (const name in schema) {
       const spec = schema[name]
       let value = props[name]

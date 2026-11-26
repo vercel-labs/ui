@@ -33,5 +33,6 @@ export {
   nextTabbable,
   positiveTabStops,
   radioGroup,
+  releaseTabStop,
   tabbables,
 } from "./tabbable"

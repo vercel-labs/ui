@@ -70,6 +70,7 @@ type MenuOpenChangeReason =
   | "back"
   | "shortcut"
   | "swipe"
+  | "anchor-hidden"
   | "imperative"
 
 /**
@@ -482,6 +483,8 @@ const menuPrimitive = /* @__PURE__ */ definePrimitive({
     menubar: "value",
   },
   state: (options: MenuInternalOptions): MenuState => ({
+    nested: !!options.parent,
+    barred: !options.parent && !!options.menubar,
     open: options.defaultOpen ?? false,
     mounted: options.open ?? options.defaultOpen ?? false,
     highlighted: null,
@@ -501,6 +504,13 @@ const menuPrimitive = /* @__PURE__ */ definePrimitive({
     error: null,
   }),
   live: ["highlighted", "shortcutItems"],
+  // Closed and on its own, it waits for its trigger to be used.
+  asleep: (options) =>
+    options.open === undefined &&
+    !options.defaultOpen &&
+    !options.controller &&
+    !options.parent &&
+    !options.menubar,
   sync: (options) => ({
     shortcutItems: options.itemShortcuts === false ? undefined : options.items,
     ...(options.open === undefined ? {} : { open: options.open }),

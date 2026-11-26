@@ -42,6 +42,7 @@ type DataElement = HTMLElement & { items?: MenuData }
 function defineMenuElements() {
   definePart(menu, "root", {
     tag: "ui-menu",
+    display: "contents",
     kinds: { ...popupKinds, parent: null, menubar: null },
     defaults: { loop: true, itemShortcuts: true, dismissible: true },
     // Read when needed, since the menubar may upgrade after the menu.

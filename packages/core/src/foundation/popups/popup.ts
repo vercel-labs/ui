@@ -34,7 +34,13 @@ import {
 } from "../kernel/modality"
 import { isAfter } from "../kernel/order"
 import { isBrowser } from "../platform/env"
-import { afterPaint, ahead, enforceHidden, writeStyle } from "../platform/style"
+import {
+  afterPaint,
+  ahead,
+  enforceHidden,
+  entering,
+  writeStyle,
+} from "../platform/style"
 import {
   activeElement,
   composedContains,
@@ -48,7 +54,7 @@ import {
 import { registerPopupElement } from "./popup-elements"
 import { guardFrames } from "./frame-guards"
 import type { Anchor, position, PositionOptions } from "../platform/position"
-import { animateIn, animateOut, writeOpen } from "../motion/presence"
+import { animateIn, animateOutTogether, writeOpen } from "../motion/presence"
 import {
   composedTabbables,
   nextTabbable,
@@ -117,7 +123,8 @@ type PopupClose<Reason extends string = string, Result = unknown> = {
 
 /**
  * Why a popup asks its component to close: a dismissal its behavior allows, a
- * form with `method="dialog"`, an aborted `signal`, or a sheet swiped away.
+ * form with `method="dialog"`, an aborted `signal`, a sheet swiped away, or
+ * an anchor that stopped rendering.
  * Presets and presentations decide which of these a given popup can report.
  */
 type PopupCloseReason =
@@ -129,6 +136,7 @@ type PopupCloseReason =
   | "close-press"
   | "imperative"
   | "swipe"
+  | "anchor-hidden"
 
 // Every `modal` value is a point in the triple.
 function modalTriple(modal: Modal) {
@@ -314,17 +322,19 @@ function deriveOpen<State extends { open: boolean }>(
 
 // ARIA every popup trigger carries. Only the kind of popup differs. With
 // several triggers, only the one that opened the popup is expanded and named
-// by it.
+// by it. Before one binds, the id goes to `first`, the first rendered.
 function popupTriggerAttrs(
   state: { open: boolean; mounted: boolean; trigger?: string | null },
   id: string,
   haspopup: string,
-  key = ""
+  key = "",
+  first?: string
 ) {
   const active = state.trigger == null || state.trigger === key
   const open = state.open && active
+  const named = (state.trigger ?? first ?? key) === key
   return {
-    id: active ? `${id}-trigger` : undefined,
+    id: named ? `${id}-trigger` : undefined,
     "aria-haspopup": haspopup,
     "aria-expanded": String(open),
     "aria-controls": active && state.mounted ? `${id}-content` : undefined,
@@ -414,6 +424,9 @@ type AttachConfig = {
   // at once rather than at the next slow check.
   rendered?: (listener: () => void) => () => void
   initialFocus?: () => HTMLElement | null | undefined | void
+  // Whether the content names where focus goes, which a touch open follows
+  // instead of focusing the popup, like a search dialog's field.
+  chosenFocus?: () => boolean
   // An element shown in the top layer just below the popup, like a dialog's
   // backdrop. It animates in and out with the popup, and pressing it is an outside press.
   backdrop?: () => HTMLElement | undefined
@@ -619,6 +632,7 @@ function createPopupLayer<
   let openedByKey = false
   let returnMode: ReturnMode = true
   let before: HTMLElement | undefined
+  let tabbing = false
   // The caret in a contenteditable it opened from, which focus alone puts back at the start.
   let caret: ReturnType<typeof readCaret> | undefined
   let openedWithoutTrigger = store.get().open
@@ -758,26 +772,24 @@ function createPopupLayer<
     options.onOpenChange?.(false, closed)
     bound?.config.onClose?.()
     const order = layerCount()
+    // Read before the exit, which unbinds content with nothing to animate at once.
+    const setting = options.finalFocus?.() ?? "trigger"
     const exiting = [el, ...(shown?.backdrop ? [shown.backdrop] : [])]
-    let left = exiting.length
-    const stops = exiting.map((target) => {
-      // The framework renders `data-closed` after this, too late for exit
-      // keyframes keyed on it, so it's written here first.
-      writeOpen(target, false)
-      return animateOut(target, () => {
-        if (--left > 0) {
-          return
-        }
-        stopExit = undefined
-        store.set({ mounted: false } as Partial<State>)
-        hide()
-        complete(false, closed)
-      })
+    // The framework renders `data-closed` after this, too late for exit
+    // keyframes keyed on it, so it's written here first.
+    exiting.forEach((target) => writeOpen(target, false))
+    let ended = false
+    const stop = animateOutTogether(exiting, () => {
+      ended = true
+      stopExit = undefined
+      store.set({ mounted: false } as Partial<State>)
+      hide()
+      complete(false, closed)
     })
     // An exit with nothing to animate has finished: a cleanup kept for it
     // would hold the closed content until the next open.
-    if (left > 0) {
-      stopExit = () => stops.forEach((stop) => stop())
+    if (!ended) {
+      stopExit = stop
     }
     releaseInert?.()
     releaseInert = undefined
@@ -787,7 +799,7 @@ function createPopupLayer<
       return
     }
     if (mode === true) {
-      returnFocus(el, from, false, range)
+      returnFocus(el, from, false, range, setting)
       // What focus went back to can leave as the framework renders the close,
       // like the row a confirm dialog's action removes. The chain goes on then.
       const target = activeElement()
@@ -798,7 +810,7 @@ function createPopupLayer<
           focusIsLost() &&
           !openedSince(order)
         ) {
-          returnFocus(el, from)
+          returnFocus(el, from, false, undefined, setting)
         }
       })
       return
@@ -809,7 +821,7 @@ function createPopupLayer<
         const moved =
           !!now && now !== el.ownerDocument.body && !composedContains(el, now)
         if (!moved && !openedSince(order)) {
-          returnFocus(el, from, false, range)
+          returnFocus(el, from, false, range, setting)
         }
       })
       return
@@ -820,7 +832,7 @@ function createPopupLayer<
       setTimeout(() => {
         const active = activeElement()
         if (!active || active === el.ownerDocument.body) {
-          returnFocus(el, from, false, range)
+          returnFocus(el, from, false, range, setting)
         }
       })
     }
@@ -991,15 +1003,20 @@ function createPopupLayer<
     firstUsable(chain, take)
   }
 
-  function initialFocus(resolve?: () => HTMLElement | null | undefined | void) {
+  function initialFocus(
+    resolve?: () => HTMLElement | null | undefined | void,
+    chosen?: () => boolean
+  ) {
     if (!focusPending || !shown || !store.get().open || !behavior.movesFocus) {
       return
     }
     focusPending = false
+    const planned = initialFocusPlan(opener)
     const plan =
-      opener === "initial" && behavior.focusOnMount
+      (opener === "initial" && behavior.focusOnMount) ||
+      (planned === "popup" && chosen?.())
         ? ("auto" as const)
-        : initialFocusPlan(opener)
+        : planned
     if (plan === "none") {
       return
     }
@@ -1042,7 +1059,7 @@ function createPopupLayer<
     }
   }
 
-  function attach(el: HTMLElement, config: AttachConfig) {
+  function attach(el: HTMLElement, config: AttachConfig, binding: boolean) {
     const cleanups: (() => void)[] = []
     const trigger = options.trigger()
     const host = config.host?.() ?? el
@@ -1075,11 +1092,18 @@ function createPopupLayer<
         host.showPopover()
       } catch {}
     }
+    // Content that binds open wasn't showing before, so nothing in it is moving.
+    if (binding) {
+      entering.add(el)
+    }
     if (config.position && options.position) {
       const placement = options.position(
         () => config.anchor?.() ?? options.trigger(),
         el,
-        config.position
+        config.position,
+        // Nothing shows the popup's place, but it would still take the next
+        // Escape or outside press, and come back open with its anchor.
+        () => options.close("anchor-hidden", { focus: false })
       )
       place = placement.place
       checkPlacement = placement.follow
@@ -1278,7 +1302,7 @@ function createPopupLayer<
           !usable(focused as HTMLElement)
         ) {
           focusPending = true
-          initialFocus(config.initialFocus)
+          initialFocus(config.initialFocus, config.chosenFocus)
         }
       })
     }
@@ -1324,6 +1348,7 @@ function createPopupLayer<
           "mousedown",
           (event) => {
             press = event
+            tabbing = false
             setTimeout(() => {
               if (press === event) {
                 press = undefined
@@ -1333,6 +1358,7 @@ function createPopupLayer<
           { capture: true }
         ),
         on(el.ownerDocument, "focusin", (event) => {
+          tabbing = false
           const target = (focusedFrom(el) ?? event.target) as Node
           if (!store.get().open || layerContains(own, target)) {
             return
@@ -1341,6 +1367,19 @@ function createPopupLayer<
             return
           }
           options.close("focus-out", { event, focus: false })
+        }),
+        // Tab out of the page lands on the body, which fires no focusin. Other
+        // blurs to nothing, like a focused control going away, leave it open.
+        on(el, "focusout", (event) => {
+          if (!tabbing || event.relatedTarget) {
+            return
+          }
+          setTimeout(() => {
+            const now = activeElement(el.ownerDocument)
+            if (store.get().open && !(now && layerContains(own, now))) {
+              options.close("focus-out", { event, focus: false })
+            }
+          })
         })
       )
     }
@@ -1398,7 +1437,7 @@ function createPopupLayer<
       }
     }
     // Children bind in the same commit. Focus once they have.
-    queueMicrotask(() => initialFocus(config.initialFocus))
+    queueMicrotask(() => initialFocus(config.initialFocus, config.chosenFocus))
 
     return () => {
       cleanups.forEach((cleanup) => cleanup())
@@ -1415,13 +1454,13 @@ function createPopupLayer<
     }
   }
 
-  function show() {
+  function show(binding = false) {
     if (!bound || shown) {
       return
     }
     const { el, config } = bound
     shown = { el, cleanup: () => {}, backdrop: config.backdrop?.() }
-    shown.cleanup = attach(el, config)
+    shown.cleanup = attach(el, config, binding)
   }
 
   function showBackdrop(backdrop: HTMLElement, inline = false) {
@@ -1460,6 +1499,7 @@ function createPopupLayer<
   // inside a trapping popup, goes back to the page after the trigger from a
   // flowing one, wherever it renders, and closes a menu-like one.
   function keydown(event: KeyboardEvent) {
+    tabbing = event.key === "Tab"
     if (event.key === "Escape" && layer) {
       return escapeLayer(layer, event)
     }
@@ -1581,7 +1621,7 @@ function createPopupLayer<
           if (shown && shown.el !== el) {
             hide()
           }
-          show()
+          show(true)
         }
       }
       if (el.isConnected) {

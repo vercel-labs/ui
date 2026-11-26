@@ -3,6 +3,7 @@
 // animates out. Unmounting waits for every running animation, with a timeout
 // from the computed durations so an infinite or stuck animation cannot block it.
 import { measured } from "#dev"
+import { entering } from "../platform/style"
 
 const pendingResets = new WeakMap<HTMLElement, () => void>()
 
@@ -18,11 +19,13 @@ function animateIn(el: HTMLElement, done?: () => void) {
   // An element already shown would transition to its starting style and back,
   // so it jumps there with what's inside it, like an icon's path. Anything
   // already moving eases back instead. jsdom has no getAnimations.
-  const running = el.getAnimations?.({ subtree: true }).filter(isTransition)
+  const running = entering.delete(el)
+    ? []
+    : el.getAnimations?.({ subtree: true }).filter(isTransition)
   const settled = running?.every((animation) => targetOf(animation) !== el)
   el.setAttribute("data-starting-style", "")
   if (running && settled) {
-    for (const animation of el.getAnimations({ subtree: true })) {
+    for (const animation of el.getAnimations?.({ subtree: true }) ?? []) {
       if (
         isTransition(animation) &&
         !running.some((moving) => continues(animation, moving))
@@ -48,6 +51,12 @@ function animateIn(el: HTMLElement, done?: () => void) {
     stopWaiting?.()
     el.removeAttribute("data-starting-style")
   }
+}
+
+// `animateIn` for an element that wasn't showing before, like one that binds as it mounts.
+function animateEntering(el: HTMLElement, done?: () => void) {
+  entering.add(el)
+  return animateIn(el, done)
 }
 
 const isTransition = (animation: Animation): animation is CSSTransition =>
@@ -169,6 +178,37 @@ function writeOpen(el: HTMLElement, open: boolean) {
  * @stable
  */
 function animateOut(el: HTMLElement, done: () => void) {
+  return exit(el, (settle, animated) => {
+    settle(animated)
+    done()
+  })
+}
+
+// Parts that leave together, like a popup's content and its backdrop, keep
+// their ending styles until the last one finishes, so a shorter exit doesn't
+// run back to the open look while the others still play.
+function animateOutTogether(els: HTMLElement[], done: () => void) {
+  let left = els.length
+  let animated = false
+  const settles: ((animated: boolean) => void)[] = []
+  const stops = els.map((el) =>
+    exit(el, (settle, moved) => {
+      settles.push(settle)
+      animated ||= moved
+      if (--left > 0) {
+        return
+      }
+      settles.forEach((settle) => settle(animated))
+      done()
+    })
+  )
+  return () => stops.forEach((stop) => stop())
+}
+
+function exit(
+  el: HTMLElement,
+  finished: (settle: (animated: boolean) => void, animated: boolean) => void
+) {
   pendingResets.get(el)?.()
   el.removeAttribute("data-starting-style")
   el.setAttribute("data-ending-style", "")
@@ -191,22 +231,21 @@ function animateOut(el: HTMLElement, done: () => void) {
       el.toggleAttribute("inert", wasInert)
     }
   }
-  let isAnimating = false
   // Frameworks unmount on their next render, and CSS keyed on the ending style
   // would show the open look until then. A frame requested as animations
   // finish can still run before this frame's paint, hence two.
-  const stop = whenFinished(el, () => {
-    if (!isAnimating) {
-      reset()
-      return done()
+  const settle = (animated: boolean) => {
+    if (!animated) {
+      return reset()
     }
     pendingResets.set(el, reset)
     frame = requestAnimationFrame(() => {
       frame = requestAnimationFrame(reset)
     })
-    done()
-  })
-  // Without animations `done` ran already, before anything painted the ending style.
+  }
+  let isAnimating = false
+  const stop = whenFinished(el, () => finished(settle, isAnimating))
+  // Without animations `finished` ran already, before anything painted the ending style.
   isAnimating = true
   return () => {
     stop()
@@ -214,4 +253,4 @@ function animateOut(el: HTMLElement, done: () => void) {
   }
 }
 
-export { animateIn, animateOut, writeOpen }
+export { animateEntering, animateIn, animateOut, animateOutTogether, writeOpen }

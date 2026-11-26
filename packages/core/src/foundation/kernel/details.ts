@@ -50,6 +50,8 @@ type ReasonVocabulary = {
   "submenu-switch": PointerEvent | KeyboardEvent
   /** The parent layer closed. */
   "parent-close": undefined
+  /** The element the popup sits beside stopped rendering, like a trigger a breakpoint hides. */
+  "anchor-hidden": undefined
   /** A press-and-hold open was released outside the popup. */
   "trigger-release": PointerEvent
   /** The browser's find in page matched hidden content. */
@@ -74,7 +76,7 @@ type ReasonVocabulary = {
   "content-resize": undefined
   /** Going back: the Android back button or gesture, or Backspace in an empty command input, which returns to the previous page. */
   back: Event
-  /** A controller or `api` call, or a property set on a web component. */
+  /** A controller or `api` call. */
   imperative: undefined
   /** A keyboard shortcut, like a trigger's `shortcut`. */
   shortcut: KeyboardEvent
@@ -182,6 +184,16 @@ type ChangeDetails<Reason extends string = string> = Reason extends unknown
       readonly canceled: boolean
     }
   : never
+
+/**
+ * The details of a change to text the user types, like a combobox's query.
+ * @stable
+ */
+type TextChangeDetails<Reason extends string = string> =
+  ChangeDetails<Reason> & {
+    /** Whether an input method is still converting the text, like a half-typed `とうk` on its way to `東京`. Search once it's `false`: when a conversion ends, its text is reported again with `false`. Android keyboards and Hangul compose plain typing, so it stays `false` for them. */
+    composing: boolean
+  }
 
 /**
  * What every write method on a controller takes, like
@@ -377,5 +389,6 @@ export {
   isDismissal,
   type ReasonVocabulary,
   resolveSource,
+  type TextChangeDetails,
   withSource,
 }

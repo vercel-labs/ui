@@ -606,18 +606,18 @@ Every write method takes an optional `{ reason, event }`, passed to the change c
 
 Events get the new state first, then the details. `v-model` only updates when the change event wasn't canceled.
 
-| Binding                 | On       | Receives                                                        |
-| ----------------------- | -------- | --------------------------------------------------------------- |
-| `v-model:value`         | `Select` | The selected value                                              |
-| `v-model:open`          | `Select` | Whether the list is open                                        |
-| `@value-change`         | `Select` | `(value, details)`: the new value, and the [reason](#reasons)   |
-| `@open-change`          | `Select` | `(open, details)`: the new state, and the [reason](#reasons)    |
-| `@open-change-complete` | `Select` | `(open)`, after the animation                                   |
-| `@highlight`            | `Select` | `(value, { index, event })`: the highlighted item and its row   |
-| `v-model:query`         | `Select` | The search text                                                 |
-| `@query-change`         | `Select` | `(query, details)`: the search text, and the [reason](#reasons) |
-| `@load-more`            | `Select` | When the last item is reached                                   |
-| `@dismiss-attempt`      | `Select` | `({ reason, event })`, when a dismissal was refused             |
+| Binding                 | On       | Receives                                                                                       |
+| ----------------------- | -------- | ---------------------------------------------------------------------------------------------- |
+| `v-model:value`         | `Select` | The selected value                                                                             |
+| `v-model:open`          | `Select` | Whether the list is open                                                                       |
+| `@value-change`         | `Select` | `(value, details)`: the new value, and the [reason](#reasons)                                  |
+| `@open-change`          | `Select` | `(open, details)`: the new state, and the [reason](#reasons)                                   |
+| `@open-change-complete` | `Select` | `(open)`, after the animation                                                                  |
+| `@highlight`            | `Select` | `(value, { index, event })`: the highlighted item and its row                                  |
+| `v-model:query`         | `Select` | The search text                                                                                |
+| `@query-change`         | `Select` | `(query, details)`: the search text, the [reason](#reasons) and whether it's still `composing` |
+| `@load-more`            | `Select` | When the last item is reached                                                                  |
+| `@dismiss-attempt`      | `Select` | `({ reason, event })`, when a dismissal was refused                                            |
 
 ## Accessibility
 

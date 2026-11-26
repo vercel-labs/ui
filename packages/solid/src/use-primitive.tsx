@@ -3,7 +3,6 @@ import type {
   OptionsOf,
   Part,
   Primitive,
-  PrimitiveInstance,
   PropSpec,
   PropsOf,
   SlotName,
@@ -29,7 +28,16 @@ import {
   yieldToAuthor,
   type PrimitiveGeneric,
 } from "@ui-sdk/core/renderer"
-import { dynamic, isServer, type JSX, type ValidComponent } from "@solidjs/web"
+import {
+  dynamic,
+  insert,
+  isServer,
+  MathMLElements,
+  spread,
+  SVGElements,
+  type JSX,
+  type ValidComponent,
+} from "@solidjs/web"
 import {
   $PROXY,
   children,
@@ -41,9 +49,9 @@ import {
   createSignal,
   createUniqueId,
   getOwner,
-  merge,
   omit,
   isHydrating,
+  isStatic,
   onCleanup,
   onSettled,
   runWithOwner,
@@ -118,7 +126,8 @@ function callHandler(handler: unknown, event: Event, ...extra: unknown[]) {
  */
 function toSolidProps(attrs: Attrs) {
   const props: Record<string, unknown> = {}
-  for (const [name, value] of Object.entries(attrs)) {
+  for (const name in attrs) {
+    const value = attrs[name]
     if (value === undefined) {
       continue
     }
@@ -162,14 +171,20 @@ function mergeStyles(user: unknown, part: Record<string, string>) {
     : combine(user)
 }
 
-// One part's subscription to its instance, shared by every scope rendering
-// that part. `tick` bumps on every change the part hears, live ones too, for
-// a part's state and presence, which may read live state; `attrsTick` only for
-// changes that can affect attributes, since core writes live attributes itself.
+// One part's subscription, shared by every scope rendering it. `tick` bumps on
+// every change the part hears, `attrsTick` only on those that can reach its
+// attributes, since core writes live attributes itself.
 type Tracked = {
+  part: Part
+  props: () => unknown
+  primaryUsers: number
+  others?: (() => unknown)[]
+  owner: () => Owner | null
   tick: () => number
   attrsTick: () => number
-  users: number
+  state: (key: string) => unknown
+  follow: (part: Part, from: () => unknown) => void
+  rebinds: Set<(part: Part) => void>
   dispose: () => void
 }
 
@@ -217,6 +232,61 @@ function sameRecord(a: Record<string, unknown>, b: Record<string, unknown>) {
   )
 }
 
+// Whether two renders' props hold the same values, with no list of keys made.
+function sameProps(a: object, b: object) {
+  const one = a as Record<string, unknown>
+  const other = b as Record<string, unknown>
+  if (one === other) {
+    return true
+  }
+  for (const key in one) {
+    if (!Object.is(one[key], other[key])) {
+      return false
+    }
+  }
+  for (const key in other) {
+    if (!(key in one)) {
+      return false
+    }
+  }
+  return true
+}
+
+// Records a scope's props accessor on `entry`, and hands ownership to an
+// active accessor when the primary scope cleans up. Returns whether none remain.
+function claim(entry: Tracked, props: () => unknown) {
+  if (props === entry.props) {
+    entry.primaryUsers++
+  } else {
+    ;(entry.others ??= []).push(props)
+  }
+  return () => {
+    if (props === entry.props) {
+      if (--entry.primaryUsers > 0) {
+        return false
+      }
+      const next = entry.others?.shift()
+      if (!next) {
+        return true
+      }
+      entry.props = next
+      entry.primaryUsers = 1
+      for (let index = entry.others!.length - 1; index >= 0; index--) {
+        if (entry.others![index] === next) {
+          entry.others!.splice(index, 1)
+          entry.primaryUsers++
+        }
+      }
+      return false
+    }
+    const index = entry.others?.indexOf(props) ?? -1
+    if (index >= 0) {
+      entry.others!.splice(index, 1)
+    }
+    return entry.primaryUsers === 0 && !entry.others?.length
+  }
+}
+
 // Subscribes a part once, and keeps it for as long as any scope renders it.
 // A scope that re-runs, like a `Show` condition, releases and takes the part
 // again. Parts live under a root of their own, made now: a part first tracked
@@ -230,13 +300,16 @@ function createTracker(instance: ReturnType<Primitive>) {
     const part = untrack(() => instance.part(name, props()))
     let entry = entries.get(part)
     if (!entry) {
-      entries.set(part, (entry = createTracked(instance, owner, name, props)))
+      entries.set(
+        part,
+        (entry = createTracked(instance, owner, part, name, props))
+      )
     }
-    entry.users++
     const current = entry
+    const release = claim(current, props)
     if (getOwner()) {
       onCleanup(() => {
-        if (--current.users > 0 || entries.get(part) !== current) {
+        if (!release() || entries.get(part) !== current) {
           return
         }
         current.dispose()
@@ -250,6 +323,7 @@ function createTracker(instance: ReturnType<Primitive>) {
 function createTracked(
   instance: ReturnType<Primitive>,
   owner: Owner | null,
+  part: Part,
   name: string,
   props: () => unknown
 ) {
@@ -276,67 +350,163 @@ function createTracked(
       setAttrsTick((count) => count + 1)
     }
   }
-  const dispose = runWithOwner(owner, () =>
-    createRoot((dispose) => {
-      let subscribed: Part | undefined
-      let selected: string | undefined
-      let unsubscribe = () => {}
-      // A new key is a new part, and a new value the part selects on needs a
-      // new subscription. Props are read in the compute half: a prop's getter
-      // may make a memo on its first read, which needs an owner the apply half
-      // doesn't have.
-      createEffect(
-        () => {
-          const current = props()
-          const part = instance.part(name, current)
-          return {
-            part,
-            props: current,
-            selected: selectedKeys(part),
-            seen: writes(part.store),
-          }
-        },
-        ({ part, props, selected: values, seen }) => {
-          if (part === subscribed && values === selected) {
-            return
-          }
-          subscribed = part
-          selected = values
-          unsubscribe()
-          unsubscribe = subscribe(part, notify, props)
-          // The part's readers ran in this flush. A change since, like an
-          // effect writing state before this one, reaches them now.
-          if (writes(part.store) !== seen) {
-            notify(false, false)
-          }
-        },
-        { name: `${name} subscription` }
-      )
-      onCleanup(() => unsubscribe())
-      return dispose
+  const rebinds = new Set<(part: Part) => void>()
+  // Subscribed as it's made, so no effect a part: on the server nothing
+  // changes, and nothing subscribes.
+  let subscribed = part
+  let unsubscribe = isServer ? () => {} : subscribe(part, notify)
+  // What it selects on, worked out once props that differ ask.
+  let selected: string | undefined
+  // The props last seen to select what it's subscribed for, or will be.
+  let seen = part.props
+  let next: { part: Part; selected: string; writes: number } | undefined
+  let disposed = false
+  const follow = (part: Part, from: () => unknown) => {
+    if (isServer || from !== entry.props) {
+      return
+    }
+    const target = next?.part ?? subscribed
+    if (part === target && sameProps(part.props, seen)) {
+      return
+    }
+    selected ??= selectedKeys(subscribed, seen)
+    const values = selectedKeys(part)
+    if (part === target && values === (next?.selected ?? selected)) {
+      seen = part.props
+      return
+    }
+    seen = part.props
+    const waiting = next !== undefined
+    next = { part, selected: values, writes: writes(part.store) }
+    if (waiting) {
+      return
+    }
+    whenSettled(() => {
+      const taken = next
+      next = undefined
+      if (
+        disposed ||
+        !taken ||
+        (taken.part === subscribed && taken.selected === selected)
+      ) {
+        return
+      }
+      if (taken.part !== subscribed) {
+        for (const rebind of rebinds) {
+          rebind(taken.part)
+        }
+      }
+      subscribed = taken.part
+      selected = taken.selected
+      unsubscribe()
+      unsubscribe = subscribe(taken.part, notify)
+      // The part's readers ran in this flush. A change since, like an
+      // effect writing state before this one, reaches them now.
+      if (writes(taken.part.store) !== taken.writes) {
+        notify(false, false)
+      }
     })
-  )!
-  return { tick, attrsTick, users: 0, dispose }
+  }
+  // Made when a part first reads its state or another element of it does:
+  // most parts never do.
+  let scope: Owner | null = null
+  let disposeScope: (() => void) | undefined
+  const scopeOwner = () => {
+    if (!disposeScope) {
+      disposeScope = runWithOwner(owner, () =>
+        createRoot((dispose) => {
+          scope = getOwner()
+          return dispose
+        })
+      )!
+    }
+    return scope
+  }
+  const entry: Tracked = {
+    part,
+    props,
+    primaryUsers: 0,
+    owner: scopeOwner,
+    tick,
+    attrsTick,
+    state: () => undefined,
+    follow,
+    rebinds,
+    dispose() {
+      disposed = true
+      unsubscribe()
+      disposeScope?.()
+    },
+  }
+  entry.state = stateMemos(
+    instance,
+    name,
+    () => entry.props,
+    tick,
+    scopeOwner,
+    follow
+  )
+  return entry
 }
 
-// A slot's props: core's attributes, listeners and ref over the user's props.
-// A key the user passed resolves without touching the attributes, so reading
-// `children` or `class` never tracks them, while the attributes themselves
-// track, so a spread writes them again when they change. Core's win, like in
-// the other adapters, except styles, which combine as they do there, and an
-// `id` the user gives, which the parts rendered after it point at, and every
-// part once the element binds. A user handler core also listens for was
-// wrapped into `own`, so the user's original is skipped. Marked as a proxy, so
-// Solid enumerates its keys on every spread instead of tabling them once.
+// A part's state, one memo per key. Each is made when its key is first read,
+// under `owner`, not whatever memo reads it first: most parts never read
+// their state.
+function stateMemos(
+  instance: ReturnType<Primitive>,
+  name: string,
+  propsOf: () => () => unknown,
+  tick: () => number,
+  owner: () => Owner | null,
+  follow?: Tracked["follow"]
+) {
+  let all: (() => Record<string, unknown>) | undefined
+  let keys: Map<string, () => unknown> | undefined
+  return (key: string) => {
+    keys ??= new Map()
+    let memo = keys.get(key)
+    if (!memo) {
+      memo = runWithOwner(owner(), () => {
+        const read = (all ??= createMemo(
+          () => {
+            tick()
+            const props = propsOf()
+            const part = instance.part(name, props() as never)
+            follow?.(part, props)
+            return readPart(instance, part, "state", () =>
+              partState(part, part.props)
+            ) as Record<string, unknown>
+          },
+          { equals: sameSlotState, name: `${name} state` }
+        ))
+        // A list rebuilt with the same items, like a calendar's weekdays, is the same value.
+        return createMemo(() => read()[key], {
+          equals: sameSlotState,
+          name: `${name} state.${key}`,
+        })
+      })!
+      keys.set(key, memo)
+    }
+    return memo()
+  }
+}
+
+// A slot's props: core's attributes, listeners and ref win over the user's,
+// except styles, which combine, and a user's `id`. Marked as a proxy, so Solid
+// enumerates its keys on every spread instead of tabling them once.
 function slotProps(
   user: Record<string, any>,
-  skipped: Set<string>,
   own: Record<string, unknown>,
-  attrs: () => Record<string, unknown>
+  attrs: () => Record<string, unknown>,
+  state?: unknown
 ) {
+  // With the part's state, the props of its element: functions resolve
+  // against it, and `render` stays out.
+  const element = state !== undefined
   const has = (key: string) =>
-    key in own || key in untrack(attrs) || (!skipped.has(key) && key in user)
-  const get = (key: string) => {
+    !(element && key === "render") &&
+    (key in own || key in untrack(attrs) || key in user)
+  const read = (key: string) => {
     if (key in own) {
       return own[key]
     }
@@ -349,22 +519,32 @@ function slotProps(
     if (key in untrack(attrs)) {
       return attrs()[key]
     }
-    if (skipped.has(key)) {
-      return undefined
-    }
-    return key in user || key === "children" ? user[key] : attrs()[key]
+    // A key only the user passed never tracks the attributes.
+    return key in user || key === "children" || key === "render"
+      ? user[key]
+      : attrs()[key]
   }
+  const get = element
+    ? (key: string) =>
+        key === "class" || key === "style"
+          ? resolve(read(key), state)
+          : key === "children"
+            ? resolveChildren(read(key), state)
+            : key === "render"
+              ? undefined
+              : read(key)
+    : read
   const proxy: Record<string, any> = new Proxy({} as Record<string, any>, {
     get: (_, key) =>
       typeof key === "string" ? get(key) : key === $PROXY ? proxy : undefined,
     has: (_, key) => (typeof key === "string" ? has(key) : key === $PROXY),
     ownKeys() {
       const keys = new Set<string>(Object.keys(attrs()))
-      for (const key of Object.keys(own)) {
+      for (const key in own) {
         keys.add(key)
       }
       for (const key of Reflect.ownKeys(user)) {
-        if (typeof key === "string" && !skipped.has(key)) {
+        if (typeof key === "string" && !(element && key === "render")) {
           keys.add(key)
         }
       }
@@ -378,6 +558,147 @@ function slotProps(
     },
   })
   return proxy
+}
+
+const resolve = (value: unknown, state: unknown) =>
+  typeof value === "function" ? value(state) : value
+
+// Children that take the part's state are called with it. One that takes
+// nothing is a child component's accessor, left to the element's children
+// effect: read here, it would rebuild the subtree when a nested popup opened.
+const resolveChildren = (value: unknown, state: unknown) =>
+  typeof value === "function" && value.length > 0 ? value(state) : value
+
+// Runs `bind` once the flush that made its element has inserted it. Every
+// part of a flush shares one pass, unowned, so it runs once, with the flush's
+// own effects.
+let settling: (() => void)[] | undefined
+function whenSettled(bind: () => void) {
+  if (settling) {
+    settling.push(bind)
+    return
+  }
+  const binds = (settling = [bind])
+  runWithOwner(null, () =>
+    onSettled(() => {
+      settling = undefined
+      let failed: unknown
+      for (const bind of binds) {
+        try {
+          bind()
+        } catch (error) {
+          failed ??= { error }
+        }
+      }
+      if (failed) {
+        throw (failed as { error: unknown }).error
+      }
+    })
+  )
+}
+
+// What a slot's element takes from its part: its handlers and ref, and a memo
+// of its attributes.
+function slotParts(
+  instance: ReturnType<Primitive>,
+  tracked: Tracked,
+  name: string,
+  props: () => unknown,
+  user: Record<string, any>
+) {
+  const partOf = () => instance.part(name, props() as never)
+  const first = tracked.part
+  // Stable handlers, so the spread never re-attaches them. User handlers
+  // run first and can call preventDefault() to skip the built-in behavior.
+  const own: Record<string, unknown> = {}
+  for (const type in partHandlers(first)) {
+    const prop = propOf(type)
+    // Untracked, since an event can fire inside another component's body,
+    // like one that moves focus, and Solid would blame that body's reads.
+    own[prop] = (event: Event) =>
+      untrack(() => {
+        callHandler(user[prop], event)
+        if (!event.defaultPrevented) {
+          ;(partHandlers(partOf()) as Record<string, (event: Event) => void>)[
+            type
+          ]?.(event)
+        }
+      })
+  }
+  // Solid runs refs before the element is in the document, and parts measure
+  // when they bind, so a disconnected element binds once its flush has inserted
+  // it. Solid never calls a ref with null, so the part unbinds when it leaves.
+  let element: HTMLElement | null = null
+  let attached: HTMLElement | null = null
+  let bound = ref(first, { by: "framework", attaches: "all" })
+  const attach = (el: HTMLElement) => {
+    attached = el
+    hand(bound, el)
+  }
+  // While hydrating, attributes and children render after the ref, and Solid
+  // keeps the server's, so a part that reads or writes them from `bind` binds
+  // from the microtask after `hydrate()`.
+  const settled = (el: HTMLElement) => el.isConnected && !isHydrating()
+  const bind = (el: HTMLElement) => {
+    element = el
+    if (settled(el)) {
+      return attach(el)
+    }
+    whenSettled(() => {
+      if (element !== el || attached === el) {
+        return
+      }
+      if (settled(el)) {
+        return attach(el)
+      }
+      // Still outside the document, like in a container inserted later, or
+      // still hydrating: wait a task.
+      queueMicrotask(() => {
+        if (element === el && attached !== el) {
+          attach(el)
+        }
+      })
+    })
+  }
+  // A new key is a new part, which takes over the element.
+  const rebind = (part: Part) => {
+    const next = ref(part, { by: "framework", attaches: "all" })
+    if (next === bound) {
+      return
+    }
+    release(bound, attached)
+    bound = next
+    if (attached) {
+      hand(bound, attached)
+    }
+  }
+  tracked.rebinds.add(rebind)
+  onCleanup(() => {
+    tracked.rebinds.delete(rebind)
+    if (attached) {
+      release(bound, attached)
+    }
+    element = attached = null
+  })
+  const userRef = untrack(() => user.ref)
+  own.ref = userRef ? [userRef, bind] : bind
+  // Computed when the element renders, not when the part's body runs: the
+  // server computes memos as they're made, and a part behind a context
+  // provider renders later than its siblings' bodies run.
+  const attrs = createMemo(
+    () => {
+      tracked.attrsTick()
+      const part = partOf()
+      tracked.follow(part, props)
+      takeOwnId(part, user.id)
+      const own = readPart(instance, part, "attrs", () =>
+        partAttrs(part, part.props)
+      )
+      return toSolidProps(yieldToAuthor(own, (name) => user[name] != null))
+    },
+    { lazy: isServer, equals: sameRecord, name: `${name} attrs` }
+  )
+  return [own, attrs] as const
 }
 
 /**
@@ -449,9 +770,10 @@ function usePrimitive<P extends Primitive>(
   // Made without tracking, the options and what the primitive's first state
   // calls, like an `itemToLabel` that reads a signal: the effect below keeps
   // the options fresh.
-  const instance = untrack(() =>
-    primitive(snapshot({ ...options(), id }))
-  ) as ReturnType<P>
+  let initial: ReturnType<typeof snapshot> | undefined = untrack(() =>
+    snapshot({ ...options(), id })
+  )
+  const instance = untrack(() => primitive(initial)) as ReturnType<P>
   // Leaving the page settles a pending controller `open()` and detaches the controller.
   onCleanup(() => instance.destroy())
   // The options, made again only when a prop changes to another value.
@@ -470,10 +792,12 @@ function usePrimitive<P extends Primitive>(
   let before: ReturnType<typeof current> | undefined
   const marks = createProjection<Record<string, number>>((draft) => {
     const next = current()
-    const previous = before && delivered(undefined, before)
-    touched(previous, delivered(), (name) => {
-      draft[name] = (draft[name] ?? 0) + 1
-    })
+    // Nothing has read a name before the first run.
+    if (before) {
+      touched(delivered(undefined, before), delivered(), (name) => {
+        draft[name] = (draft[name] ?? 0) + 1
+      })
+    }
     before = next
   }, {})
   deliveries.set(instance, {
@@ -486,11 +810,19 @@ function usePrimitive<P extends Primitive>(
       Record<string, Record<string, unknown>> | undefined,
   })
   // Keeps callbacks fresh and hands the options to the instance, for its
-  // own listeners. Parts already read what they deliver, so they skip it.
+  // own listeners, from the first change after the ones it was made with.
   // Untracked, since the instance reads a store's items as it takes a new list.
-  createEffect(current, (next) => untrack(() => instance.setOptions(next)), {
-    name: "options",
-  })
+  createEffect(
+    current,
+    (next) => {
+      const made = initial
+      initial = undefined
+      if (!made || !sameRecord(made as typeof next, next)) {
+        untrack(() => instance.setOptions(next))
+      }
+    },
+    { name: "options" }
+  )
   const track = createTracker(instance)
   trackers.set(instance, track)
 
@@ -509,123 +841,20 @@ function usePrimitive<P extends Primitive>(
       // Presence may read live state, so every change counts.
       tracked.tick()
       const part = instance.part(name, props())
+      tracked.follow(part, props)
       return readPart(instance, part, "present", () =>
         isPresent(part, part.props)
       )
     },
     slot(name, props = noProps as never, user = {}) {
-      const tracked = track(name, props)
-      // Stable handlers, so the spread never re-attaches them. User handlers
-      // run first and can call preventDefault() to skip the built-in behavior.
-      const handlers: Record<string, (event: Event) => void> = {}
-      for (const type of Object.keys(
-        partHandlers(untrack(() => instance.part(name, props())))
-      )) {
-        const prop = propOf(type)
-        // Untracked, since an event can fire inside another component's body,
-        // like one that moves focus, and Solid would blame that body's reads.
-        handlers[prop] = (event) =>
-          untrack(() => {
-            callHandler(user[prop], event)
-            if (!event.defaultPrevented) {
-              ;(
-                partHandlers(instance.part(name, props())) as Record<
-                  string,
-                  (event: Event) => void
-                >
-              )[type]?.(event)
-            }
-          })
-      }
-      // Solid runs refs before the element is in the document, and parts
-      // measure when they bind. So a disconnected element binds once the flush
-      // that made it has inserted it, with the flush's own effects: a panel's
-      // id is on its tab before a screen reader following focus reads the
-      // tree. Binding writes what only the element knows, like whether an
-      // image loaded, so it runs settled, like an event handler. Solid never
-      // calls a ref with null, so the part unbinds when it leaves.
-      let element: HTMLElement | null = null
-      let attached: HTMLElement | null = null
-      let bound = ref(
-        untrack(() => instance.part(name, props())),
-        { by: "framework", attaches: "all" }
+      const [own, attrs] = slotParts(
+        instance,
+        track(name, props),
+        name,
+        props,
+        user
       )
-      const attach = (el: HTMLElement) => {
-        attached = el
-        hand(bound, el)
-      }
-      // While hydrating, every element is connected already, but its
-      // attributes and children render after the ref, so a part that reads
-      // or writes them from `bind` would see the server's and Solid would keep
-      // them (it skips text writes and never removes server attributes while
-      // hydrating): a carousel's play toggle kept "Stop slide rotation" under
-      // reduced motion. Those bind from the microtask after `hydrate()`.
-      const settled = (el: HTMLElement) => el.isConnected && !isHydrating()
-      const bind = (el: HTMLElement) => {
-        element = el
-        if (settled(el)) {
-          return attach(el)
-        }
-        // Unowned, so it runs once, with the flush's own effects.
-        runWithOwner(null, () =>
-          onSettled(() => {
-            if (element !== el || attached === el) {
-              return
-            }
-            if (settled(el)) {
-              return attach(el)
-            }
-            // Still outside the document, like in a container inserted later, or
-            // still hydrating: wait a task.
-            queueMicrotask(() => {
-              if (element === el && attached !== el) {
-                attach(el)
-              }
-            })
-          })
-        )
-      }
-      // A new key is a new part, which takes over the element.
-      createEffect(
-        () => instance.part(name, props()),
-        (part) => {
-          const next = ref(part, { by: "framework", attaches: "all" })
-          if (next === bound) {
-            return
-          }
-          release(bound, attached)
-          bound = next
-          if (attached) {
-            hand(bound, attached)
-          }
-        },
-        { name: `${name} rebind` }
-      )
-      onCleanup(() => {
-        if (attached) {
-          release(bound, attached)
-        }
-        element = attached = null
-      })
-      const userRef = untrack(() => user.ref)
-      const own = { ...handlers, ref: userRef ? [userRef, bind] : bind }
-      // Computed when the element renders, not when the part's body runs: the
-      // server computes memos as they're made, and a part behind a context
-      // provider renders later than its siblings' bodies run, so a toolbar
-      // input claimed the tab stop before the toggles in a group ahead of it.
-      const attrs = createMemo(
-        () => {
-          tracked.attrsTick()
-          const part = instance.part(name, props())
-          takeOwnId(part, user.id)
-          const own = readPart(instance, part, "attrs", () =>
-            partAttrs(part, part.props)
-          )
-          return toSolidProps(yieldToAuthor(own, (name) => user[name] != null))
-        },
-        { lazy: isServer, equals: sameRecord, name: `${name} attrs` }
-      )
-      return slotProps(user, new Set(Object.keys(own)), own, attrs)
+      return slotProps(user, own, attrs)
     },
   }
   return handle
@@ -645,48 +874,40 @@ function rootScope<Root extends (props: never) => JSX.Element>(root: Root) {
 
 /**
  * A part's state for `render` functions and state-based class names. Each
- * key is a memo, so a part re-renders for a key only when its value changes:
- * one that never reads `highlighted` never renders for it.
+ * key is a memo, made when it's first read, so a part re-renders for a key
+ * only when its value changes: one that never reads `highlighted` never
+ * renders for it.
  */
 function slotState(
-  instance: PrimitiveInstance,
+  instance: ReturnType<Primitive>,
+  tracked: Tracked,
   name: string,
   props: () => unknown
 ) {
-  const track = trackers.get(instance)!
-  const tracked = track(name, props)
-  // The keys' memos live under a root made now, for the same reason parts do.
-  const owner = createRoot(() => getOwner())
-  const all = createMemo(
-    () => {
-      tracked.tick()
-      const part = instance.part(name, props() as never)
-      return readPart(instance, part, "state", () =>
-        partState(part, part.props)
-      ) as Record<string, unknown>
-    },
-    { equals: sameSlotState, name: `${name} state` }
-  )
-  const keys = new Map<string, () => unknown>()
+  let read = tracked.state
+  // Another element of the same part reads the state its own props make,
+  // like a second value text with its own `maxLabels`.
+  if (props !== tracked.props) {
+    let owner: Owner | null = null
+    const dispose = runWithOwner(tracked.owner(), () =>
+      createRoot((dispose) => {
+        owner = getOwner()
+        return dispose
+      })
+    )!
+    if (getOwner()) {
+      onCleanup(dispose)
+    }
+    read = stateMemos(
+      instance,
+      name,
+      () => props,
+      tracked.tick,
+      () => owner
+    )
+  }
   return new Proxy({} as Record<string, unknown>, {
-    get(_, key) {
-      if (typeof key !== "string") {
-        return undefined
-      }
-      let memo = keys.get(key)
-      if (!memo) {
-        // Owned by the part's root, not by whatever memo reads the key first.
-        memo = runWithOwner(owner, () =>
-          // A list rebuilt with the same items, like a calendar's weekdays, is the same value.
-          createMemo(() => all()[key], {
-            equals: sameSlotState,
-            name: `${name} state.${key}`,
-          })
-        )!
-        keys.set(key, memo)
-      }
-      return memo()
-    },
+    get: (_, key) => (typeof key === "string" ? read(key) : undefined),
   })
 }
 
@@ -721,46 +942,119 @@ type PartProps<Tag extends keyof JSX.IntrinsicElements, State = {}> = Omit<
   children?: JSX.Element | ((state: State) => JSX.Element)
 }
 
-const resolve = (value: unknown, state: unknown) =>
-  typeof value === "function" ? value(state) : value
+const elements = new Map<string, (props: Record<string, any>) => JSX.Element>()
+function elementOf(tag: string) {
+  let element = elements.get(tag)
+  if (!element) {
+    element = dynamic(() => tag, { static: true })
+    elements.set(tag, element)
+  }
+  return element
+}
 
-// Children that take the part's state are called with it. A function that
-// takes nothing is what a child component compiles to: its accessor, read by
-// the element's children effect, which would otherwise track the whole
-// subtree here and rebuild it when a nested popup opened. The rule `<Show>`
-// reads its children by.
-const resolveChildren = (value: unknown, state: unknown) =>
-  typeof value === "function" && value.length > 0 ? value(state) : value
+const namespaces = {
+  svg: "http://www.w3.org/2000/svg",
+  mathml: "http://www.w3.org/1998/Math/MathML",
+}
+const skipRender = (key: string) => key === "render"
 
-// The `render` function with its props and state, or the default tag. Class names, styles and children that are
-// functions resolve against the part's state, and run again when the keys
-// they read change.
-function renderElement(
+// The part's element, made here rather than by `<Tag {...props} />`: Solid
+// reads the user's props, the part's attributes and its handlers as layers,
+// the later over the earlier, with no proxy between.
+function createElement(
   tag: string,
-  props: Record<string, any>,
+  user: Record<string, any>,
+  own: Record<string, unknown>,
+  attrs: () => Record<string, unknown>,
   state: unknown
 ) {
-  const resolved = merge(omit(props, "render"), {
-    get class() {
-      return resolve(props.class, state)
-    },
-    get style() {
-      return resolve(props.style, state)
-    },
-    get children() {
-      return resolveChildren(props.children, state)
-    },
-  })
-  const render = untrack(() => props.render)
-  // Lazy on the server for the same reason as a part's attributes: the render
-  // function reads them.
-  if (typeof render === "function") {
-    return createMemo(() => render(resolved, state), {
-      lazy: isServer,
-    }) as unknown as JSX.Element
+  const el = SVGElements.has(tag)
+    ? document.createElementNS(namespaces.svg, tag)
+    : MathMLElements.has(tag)
+      ? document.createElementNS(namespaces.mathml, tag)
+      : document.createElement(tag)
+  const resolved = () => {
+    const { class: classes, style } = user
+    const hasClass = typeof classes === "function"
+    // `part` merges a user's style with the slot's own, so leave it to `part` there.
+    const hasStyle = typeof style === "function" && !("style" in attrs())
+    if (!hasClass && !hasStyle) {
+      return undefined
+    }
+    return hasClass && hasStyle
+      ? { class: classes(state), style: style(state) }
+      : hasClass
+        ? { class: classes(state) }
+        : { style: style(state) }
   }
-  const Tag = dynamic(() => tag)
-  return <Tag {...resolved} />
+  const part = () => {
+    const current = attrs()
+    const id = user.id
+    const style = "style" in current ? resolve(user.style, state) : undefined
+    if (id == null && style == null) {
+      return current
+    }
+    const merged = { ...current }
+    if (id != null) {
+      merged.id = id
+    }
+    if (style != null) {
+      merged.style = mergeStyles(style, current.style as Record<string, string>)
+    }
+    return merged
+  }
+  spread(el, [user, resolved, part, own], true, skipRender)
+  // Untracked, since asking reads a source that's a function, like a
+  // controlled value's, and the component's own scope would run again with it.
+  const content = untrack(() =>
+    isStatic(user, "children") ? user.children : () => user.children
+  )
+  if (typeof content === "function") {
+    insert(el, () => resolveChildren(user.children, state))
+  } else if (content != null) {
+    insert(el, content)
+  }
+  return el as unknown as JSX.Element
+}
+
+// The `render` function with its props and state, or the default tag.
+function renderElement(
+  tag: string,
+  user: Record<string, any>,
+  own: Record<string, unknown>,
+  attrs: () => Record<string, unknown>,
+  state: unknown
+) {
+  const make = (render: unknown) => {
+    // Lazy on the server for the same reason as a part's attributes: the
+    // render function reads them.
+    if (typeof render === "function") {
+      const props = slotProps(user, own, attrs, state)
+      return createMemo(() => render(props, state), {
+        lazy: isServer,
+      }) as unknown as JSX.Element
+    }
+    if (
+      isServer ||
+      isHydrating() ||
+      untrack(() => user.is ?? user.xmlns) != null
+    ) {
+      const Tag = elementOf(tag)
+      return <Tag {...slotProps(user, own, attrs, state)} />
+    }
+    return createElement(tag, user, own, attrs, state)
+  }
+  // A `render` that can't change needs nothing to follow it. Untracked for the
+  // same reason as the children above.
+  if (untrack(() => isStatic(user, "render"))) {
+    return make(untrack(() => user.render))
+  }
+  // The getter reads more than `render`, so the same function keeps its element.
+  const render = createMemo(() => user.render)
+  return createMemo(() => {
+    const current = render()
+    return untrack(() => make(current))
+  }) as unknown as JSX.Element
 }
 
 // A `render` for a part whose element follows its props, like a link or a
@@ -787,7 +1081,7 @@ function renderStatic<State extends object>(
   const state = new Proxy({} as State, {
     get: (_, key) => current().state[key as keyof State],
   })
-  return renderElement(tag, slotProps(user, new Set(), {}, attrs), state)
+  return renderElement(tag, user, {}, attrs, state)
 }
 
 /**
@@ -911,18 +1205,20 @@ function renderSlot(
   props: Record<string, any>,
   tag: string
 ) {
-  const state = slotState(owner.instance, slot, part)
+  const { instance } = owner
+  const element = () => {
+    const tracked = trackers.get(instance)!(slot, part)
+    const [own, attrs] = slotParts(instance, tracked, slot, part, props)
+    const state = slotState(instance, tracked, slot, part)
+    return renderElement(tag, props, own, attrs, state)
+  }
   const definition = (
     owner.primitive.slots as Record<string, { present?: unknown }> | undefined
   )?.[slot]
   if (definition && !definition.present) {
-    return renderElement(tag, owner.slot(slot, part, props), state)
+    return element()
   }
-  return (
-    <Show when={owner.present(slot, part)}>
-      {renderElement(tag, owner.slot(slot, part, props), state)}
-    </Show>
-  )
+  return <Show when={owner.present(slot, part)}>{element()}</Show>
 }
 
 /**
