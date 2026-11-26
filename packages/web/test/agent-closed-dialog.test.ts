@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 import { beforeAll, expect, test } from "vitest"
+import { observe } from "@ui-sdk/core/observe"
 import { createAgent } from "../src/agent"
 import { defineDialogElements } from "../src/dialog"
 import { defineInputElements } from "../src/input"
@@ -77,6 +78,7 @@ test("a closed dialog's fields stay listed with offPage and their state, like Re
 
 test("a closed dialog's fields keep the rows and values they had when it closed", async () => {
   const agent = createAgent()
+  const stop = observe(() => {})
   document.body.innerHTML = `
     <ui-dialog>
       <ui-dialog-trigger><button>Members</button></ui-dialog-trigger>
@@ -107,13 +109,22 @@ test("a closed dialog's fields keep the rows and values they had when it closed"
   dialog.open = true
   await wait(50)
   agent.snapshot()
+  const [ada, grace] = document.querySelectorAll(
+    "ui-switch"
+  ) as unknown as (HTMLElement & {
+    checked: boolean
+  })[]
+  grace.click()
+  expect(grace.checked).toBe(true)
+  await wait(50)
   dialog.open = false
   await wait(50)
   document.querySelector("input")!.value = "key_B"
+  ada.checked = false
   await wait(50)
   expect(fields()).toEqual([
     { label: "Admin", offPage: true, row: "Ada Lovelace", checked: true },
-    { label: "Admin", offPage: true, row: "Grace Hopper", checked: false },
+    { label: "Admin", offPage: true, row: "Grace Hopper", checked: true },
     { label: "API key", offPage: true, value: "key_A" },
   ])
   expect(await agent.query({ text: "Ada Lovelace" })).toMatchObject([
@@ -131,6 +142,7 @@ test("a closed dialog's fields keep the rows and values they had when it closed"
     fields().map(({ label, offPage, checked }) => [label, offPage, checked])
   ).toEqual([
     ["Admin", false, "[redacted]"],
-    ["Admin", false, false],
+    ["Admin", false, true],
   ])
+  stop()
 })

@@ -25,7 +25,6 @@ import {
   componentLabel,
   rowOf,
   entries,
-  guard,
   install,
   keepOffPage,
   leftFrom,
@@ -33,7 +32,7 @@ import {
   offPage,
   ownParts,
   placeOf,
-  remember,
+  refresh,
   retire,
   shownParts,
   stateKeys,
@@ -398,8 +397,6 @@ function valueFor(entry: Entry, action: string, value: unknown) {
 // A button's text, else its accessible name, like "Close" for an icon-only ×, but
 // not one read from inside `data-agent-hidden`, which never reaches the agent.
 const textOrName = (el: Element) => textOf(el) || nameOf(el)
-
-const closedPopup = '[data-slot$="-content"][hidden]'
 
 // What left the page in the order it was on the page, since adapters unbind
 // and number components in different orders.
@@ -898,7 +895,7 @@ function createAgent(
       instance: PrimitiveInstance
       parts: Bound[]
     }[] = []
-    // A copy, since `remember` can move an entry to the ref it had.
+    // A copy, since `refresh` can move an entry to the ref it had.
     for (const entry of [...entries.values()]) {
       const instance = entry.instance.deref()
       if (!instance) {
@@ -906,17 +903,7 @@ function createAgent(
         continue
       }
       const parts = bound(instance)
-      // A field in a closed popup keeps the name, row and state it had when it
-      // closed, like one React unmounts, and only its guards stay current.
-      const closed =
-        parts.length > 0 &&
-        entry.shown &&
-        parts.every((part) => part.el.closest(closedPopup))
-      if (closed) {
-        guard(entry, parts)
-      } else if (parts.length) {
-        remember(entry, parts)
-      }
+      const closed = refresh(entry, parts)
       if (entry.secret || entry.offLimits) {
         offPage.delete(entry.ref)
       }

@@ -277,6 +277,33 @@ function guard(entry: Entry, parts: Bound[]) {
     elements.every((el) => (el as HTMLInputElement).type === "hidden")
 }
 
+const closedPopup = '[data-slot$="-content"][hidden]'
+
+// A component in a closed web popup keeps the name, row and state it had when
+// it closed, like one React unmounts, and only its guards stay current.
+function refresh(entry: Entry, parts: Bound[]) {
+  const closed =
+    !!entry.shown &&
+    parts.length > 0 &&
+    parts.every((part) => part.el.closest(closedPopup))
+  if (closed) {
+    guard(entry, parts)
+  } else if (parts.length) {
+    remember(entry, parts)
+  }
+  return closed
+}
+
+// A change a person makes before a popup closes is part of the state its
+// fields close with, though an agent may not look in between.
+function keepSeen(entry: Entry) {
+  const instance = entry.instance.deref()
+  const parts = instance ? bound(instance) : []
+  if (!parts.every((part) => part.el.closest(closedPopup))) {
+    entry.seen = instance!.get()
+  }
+}
+
 // Keeps the component's key current, and the first time it's seen gives it
 // the ref it had before it left the page, when one with its key did.
 function remember(entry: Entry, parts: Bound[]) {
@@ -503,6 +530,9 @@ function report(
   if (!entry) {
     return
   }
+  if (entry.shown) {
+    keepSeen(entry)
+  }
   const { source } = details
   if (source === "agent" && entry.commits?.includes(key)) {
     const changed: Uncommitted = uncommitted.get(entry) ?? new Map()
@@ -600,9 +630,7 @@ function send(
     return
   }
   const parts = bound(instance)
-  if (parts.length) {
-    remember(entry, parts)
-  }
+  refresh(entry, parts)
   const change: ObservedChange = {
     ref: entry.ref,
     component: entry.component,
@@ -667,7 +695,6 @@ export {
   elementsOf,
   entries,
   type Entry,
-  guard,
   install,
   keepOffPage,
   leftFrom,
@@ -676,7 +703,7 @@ export {
   offPage,
   ownParts,
   placeOf,
-  remember,
+  refresh,
   retire,
   rowOf,
   setterOf,
