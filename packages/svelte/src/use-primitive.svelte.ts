@@ -69,24 +69,35 @@ const exits = new WeakMap<object, Promise<void>[]>()
 // Reads from such a cleanup get the options delivered last.
 let tearingDown = 0
 
-// Per popup container, the event types it goes on delegating. Svelte's root
-// listener resumes delegation from the part that ran it, but a part moved out
-// of the root, into its container, is past it: one there resumes instead.
-const resumed = new WeakMap<Node, Set<string>>()
+// Svelte's root listener resumes delegation from the element whose `on` ran
+// it, but a part moved out of the root, into its container, is past it: the
+// container resumes instead, for any type a part inside it may bind.
+const delegatedTypes = [
+  "beforeinput",
+  "click",
+  "change",
+  "dblclick",
+  "contextmenu",
+  "focusin",
+  "focusout",
+  "input",
+  "keydown",
+  "keyup",
+  "mousedown",
+  "mousemove",
+  "mouseout",
+  "mouseover",
+  "mouseup",
+]
+const resumed = new WeakSet<Node>()
 
-function resumeDelegation(container: Node | null, types: string[]) {
-  if (!container) {
+function resumeDelegation(container: Node | null) {
+  if (!container || resumed.has(container)) {
     return
   }
-  let known = resumed.get(container)
-  if (!known) {
-    resumed.set(container, (known = new Set()))
-  }
-  for (const type of types) {
-    if (!known.has(type)) {
-      known.add(type)
-      delegated(container as Element, type, () => {})
-    }
+  resumed.add(container)
+  for (const type of delegatedTypes) {
+    delegated(container as Element, type, () => {})
   }
 }
 
@@ -351,10 +362,7 @@ function useHandlePart<P extends Primitive, S extends SlotName<P>>(
       if (present && restored && restored === bound) {
         back = portal?.(restored)
         if (back) {
-          resumeDelegation(
-            restored.parentNode,
-            Object.keys(partHandlers(current))
-          )
+          resumeDelegation(restored.parentNode)
         }
       }
       if (present) {
@@ -418,7 +426,7 @@ function useHandlePart<P extends Primitive, S extends SlotName<P>>(
     // wheel stay native: through it, a slider unmounted mid-drag leaked.
     const handlers = partHandlers(current)
     if (back) {
-      resumeDelegation(el.parentNode, Object.keys(handlers))
+      resumeDelegation(el.parentNode)
     }
     // Chrome fires `focusout` as Svelte removes a focused element, inside the
     // effect removing it, where a write throws. The core hears it after, if
