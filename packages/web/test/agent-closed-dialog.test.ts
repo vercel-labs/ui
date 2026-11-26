@@ -116,9 +116,9 @@ test("a closed dialog's fields keep the rows and values they had when it closed"
     { label: "Admin", offPage: true, row: "Grace Hopper", checked: false },
     { label: "API key", offPage: true, value: "key_A" },
   ])
-  expect(
-    (await agent.query({ text: "Ada Lovelace" })).map(({ label }) => label)
-  ).toEqual(["Admin"])
+  expect(await agent.query({ text: "Ada Lovelace" })).toMatchObject([
+    { label: "Admin", row: "Ada Lovelace" },
+  ])
   document.querySelector("#key")!.setAttribute("data-agent-hidden", "")
   await wait(50)
   expect(fields().map(({ label }) => label)).toEqual(["Admin", "Admin"])
