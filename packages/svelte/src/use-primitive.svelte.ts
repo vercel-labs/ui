@@ -16,6 +16,7 @@ import {
   followed,
   handlers as partHandlers,
   noteEarlyText,
+  on as listen,
   partState,
   present as isPresent,
   ref as partRef,
@@ -30,7 +31,7 @@ import {
 } from "@ui-sdk/core/renderer"
 import { onDestroy, untrack, type Snippet } from "svelte"
 import { createAttachmentKey, type Attachment } from "svelte/attachments"
-import { on } from "svelte/events"
+import { on as delegated } from "svelte/events"
 import type { SvelteHTMLElements } from "svelte/elements"
 import { trackBindable } from "./bindable.svelte"
 
@@ -67,6 +68,27 @@ const exits = new WeakMap<object, Promise<void>[]>()
 // where reading `current` runs it again and it stops following the props.
 // Reads from such a cleanup get the options delivered last.
 let tearingDown = 0
+
+// Per popup container, the event types it goes on delegating. Svelte's root
+// listener resumes delegation from the part that ran it, but a part moved out
+// of the root, into its container, is past it: one there resumes instead.
+const resumed = new WeakMap<Node, Set<string>>()
+
+function resumeDelegation(container: Node | null, types: string[]) {
+  if (!container) {
+    return
+  }
+  let known = resumed.get(container)
+  if (!known) {
+    resumed.set(container, (known = new Set()))
+  }
+  for (const type of types) {
+    if (!known.has(type)) {
+      known.add(type)
+      delegated(container as Element, type, () => {})
+    }
+  }
+}
 
 const memo = <Value>(compute: () => Value) => {
   const value = $derived.by(compute)
@@ -328,6 +350,12 @@ function useHandlePart<P extends Primitive, S extends SlotName<P>>(
       // content as its viewport binds again: it goes back where it renders.
       if (present && restored && restored === bound) {
         back = portal?.(restored)
+        if (back) {
+          resumeDelegation(
+            restored.parentNode,
+            Object.keys(partHandlers(current))
+          )
+        }
       }
       if (present) {
         restored = undefined
@@ -385,20 +413,41 @@ function useHandlePart<P extends Primitive, S extends SlotName<P>>(
     if (typeof styleShown === "string") {
       applyAttrs(el, { style: styleShown }, "svelte-style")
     }
-    // Svelte's `on` runs the delegated handlers inside the part first, so
-    // their `stopPropagation()` keeps the event from the part, as in React.
-    const cleanups = Object.entries(partHandlers(current)).map(
-      ([type, handler]) =>
-        on(el, type, (event) => {
+    // Svelte's `on` runs the delegated handlers inside the part first, so their
+    // `stopPropagation()` keeps the event from the part. Pointer, touch and
+    // wheel stay native: through it, a slider unmounted mid-drag leaked.
+    const handlers = partHandlers(current)
+    if (back) {
+      resumeDelegation(el.parentNode, Object.keys(handlers))
+    }
+    // Chrome fires `focusout` as Svelte removes a focused element, inside the
+    // effect removing it, where a write throws. The core hears it after, if
+    // the element stays. Svelte's `on` runs outside the effect: noted first.
+    const removing = new WeakSet<Event>()
+    const noteRemoval = (event: Event) =>
+      $effect.tracking() && removing.add(event)
+    el.addEventListener("focusout", noteRemoval, true)
+    const cleanups = Object.entries(handlers).map(([type, handler]) =>
+      (/^(pointer|touch|wheel)/.test(type) ? listen : delegated)(
+        el,
+        type as keyof HTMLElementEventMap,
+        (event: Event) => {
           const own = user[`on${type}`]
           if (typeof own === "function") {
             own(event)
           }
-          if (!event.defaultPrevented) {
+          if (event.defaultPrevented) {
+            return
+          }
+          if (removing.has(event) || $effect.tracking()) {
+            queueMicrotask(() => el.isConnected && handler!(event))
+          } else {
             handler!(event)
           }
-        })
+        }
+      )
     )
+    cleanups.push(() => el.removeEventListener("focusout", noteRemoval, true))
     return () => {
       cleanups.forEach((cleanup) => cleanup())
       bound = undefined
