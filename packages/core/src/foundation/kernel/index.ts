@@ -32,7 +32,7 @@ export {
 export { settleDraft } from "./draft"
 export { takeEarlyText } from "./early-text"
 export { elements } from "./elements"
-export { isComposing, on, selectEvent } from "./events"
+export { isComposing, isEditing, on, selectEvent } from "./events"
 export { createUndoStack, type UndoStackOptions } from "./undo-stack"
 export { css } from "./inline-style"
 export { isDestroying, keep, release, unwatched, whenKept } from "./keep"

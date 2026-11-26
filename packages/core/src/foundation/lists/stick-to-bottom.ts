@@ -4,6 +4,8 @@
 // they are; scrolling back down, or `scrollToBottom`, follows again. Older
 // content loaded above keeps what's in view still, in every browser.
 
+import { isEditing } from "../kernel/events"
+
 /**
  * Where a log stands.
  * @experimental
@@ -250,7 +252,9 @@ function createStickToBottom(options: StickToBottomOptions = {}) {
         }
       }
       observeRows()
-      // A wheel or touch going up stops following at once, before any frame lands.
+      // A wheel, touch or key going up stops following at once, before any
+      // frame lands. A key a field or a widget inside uses scrolls nothing,
+      // and if it does after all, the scroll lets go.
       const intent = (event: WheelEvent | TouchEvent | KeyboardEvent) => {
         const up =
           event.type === "wheel"
@@ -258,7 +262,9 @@ function createStickToBottom(options: StickToBottomOptions = {}) {
             : event.type === "keydown"
               ? ["ArrowUp", "PageUp", "Home"].includes(
                   (event as KeyboardEvent).key
-                )
+                ) &&
+                !event.defaultPrevented &&
+                !isEditing(event.target)
               : true
         if (up && el.scrollHeight > el.clientHeight) {
           ours = null

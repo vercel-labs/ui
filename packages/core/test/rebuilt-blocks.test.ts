@@ -507,6 +507,25 @@ describe("createStickToBottom", () => {
     expect(el.scrollTop).toBe(400)
   })
 
+  test("a key a field or a widget inside uses keeps following, and one for the scroller lets go", () => {
+    const el = scroller(100, () => 500)
+    const field = el.appendChild(document.createElement("input"))
+    const widget = el.appendChild(document.createElement("div"))
+    widget.addEventListener("keydown", (event) => event.preventDefault())
+    const log = createStickToBottom()
+    cleanups.push(log.connect(el))
+    const press = (target: Element, key: string) =>
+      target.dispatchEvent(
+        new KeyboardEvent("keydown", { key, bubbles: true, cancelable: true })
+      )
+    press(field, "ArrowUp")
+    press(field, "Home")
+    press(widget, "PageUp")
+    expect(log.get().following).toBe(true)
+    press(el, "PageUp")
+    expect(log.get().following).toBe(false)
+  })
+
   test("content that pushes the end out of view while not following is unseen", async () => {
     let content = 500
     const el = scroller(100, () => content)
