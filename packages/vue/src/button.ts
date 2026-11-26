@@ -14,6 +14,10 @@ import {
 
 type Click = (event: MouseEvent, details: ButtonActionDetails) => unknown
 
+// A lone Promise goes back as it is, so a popup's `open()` keeps the button idle.
+const isThenable = (value: unknown): value is PromiseLike<unknown> =>
+  typeof (value as PromiseLike<unknown> | null)?.then === "function"
+
 /**
  * A button, or a link or any element that acts as one through the `render` slot.
  * @stable
@@ -51,7 +55,18 @@ const Button = withElement(
               fn(event as MouseEvent, details)
             }
           }
-          return results.length > 1 ? Promise.all(results) : results[0]
+          const waits = results.filter(isThenable)
+          if (waits.length < 2) {
+            return waits[0] ?? results[0]
+          }
+          // Pending until every wait settles, then failed with the first error.
+          return Promise.allSettled(waits).then((settled) => {
+            for (const result of settled) {
+              if (result.status === "rejected") {
+                throw result.reason
+              }
+            }
+          })
         },
       }))
       return usePart(button, "root", undefined, undefined, "button")

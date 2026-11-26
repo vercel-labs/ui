@@ -48,3 +48,35 @@ test("its own click can cancel the trigger's", async () => {
   await nextTick()
   expect(button.getAttribute("aria-expanded")).toBe("false")
 })
+
+const mountHandlers = (onClick: (() => unknown)[]) => {
+  const root = document.body.appendChild(document.createElement("div"))
+  app = createApp(() => h(Button, { onClick }, () => "Save"))
+  app.mount(root)
+  return root.querySelector("button")!
+}
+
+test("a Button whose own handlers return nothing never goes pending", async () => {
+  const button = mountHandlers([() => {}, () => {}])
+  const seen: (string | null)[] = []
+  new MutationObserver(() =>
+    seen.push(button.getAttribute("data-pending"))
+  ).observe(button, { attributeFilter: ["data-pending"] })
+  button.click()
+  await new Promise((resolve) => setTimeout(resolve))
+  expect(seen).toEqual([])
+})
+
+test("a Button with several waits stays pending until the last settles", async () => {
+  let finish = () => {}
+  const button = mountHandlers([
+    () => Promise.reject(new Error("Offline")),
+    () => new Promise<void>((resolve) => (finish = resolve)),
+  ])
+  button.click()
+  await new Promise((resolve) => setTimeout(resolve))
+  expect(button.hasAttribute("data-pending")).toBe(true)
+  finish()
+  await new Promise((resolve) => setTimeout(resolve))
+  expect(button.hasAttribute("data-pending")).toBe(false)
+})
