@@ -462,11 +462,14 @@ function buttonsOf(parts: Bound[]) {
       "button, [role=button], [role^=menuitem]"
     ),
   ])
+  // A web popup's root holds its trigger, which `setOpen` covers.
+  const triggers = parts.filter((part) => part.slot === "trigger")
   return [...new Set([...toastButtons(parts), ...inside])]
     .filter(
       (el) =>
         el.checkVisibility?.(visible) !== false &&
-        !el.closest("[inert], [data-agent-hidden]")
+        !el.closest("[inert], [data-agent-hidden]") &&
+        !triggers.some((part) => part.el.contains(el))
     )
     .sort(documentOrder)
 }
