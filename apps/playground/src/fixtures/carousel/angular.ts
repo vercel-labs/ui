@@ -1,4 +1,4 @@
-import { Component } from "@angular/core"
+import { afterNextRender, Component, DestroyRef, inject } from "@angular/core"
 import {
   Carousel,
   CarouselContent,
@@ -50,6 +50,7 @@ import { mountAngular, state } from "../../angular-mount"
         [drag]="options.drag"
         [skipSnaps]="options.skipSnaps"
         [dragFree]="options.dragFree"
+        [disabled]="disabled()"
         (beforePageChange)="onPageChange($event)"
         (pageChangeComplete)="rested.set('' + $event)"
       >
@@ -131,9 +132,21 @@ class Fixture {
     dragFree?: boolean
   } = this.#options.options
   readonly page = state(1)
+  readonly disabled = state(false)
   readonly action = state("")
   readonly reason = state("")
   readonly rested = state("")
+
+  constructor() {
+    const media = this.#options.disabledMedia
+    const destroyed = inject(DestroyRef)
+    afterNextRender(() => {
+      const change = () => this.disabled.set(!!media?.matches)
+      change()
+      media?.addEventListener("change", change)
+      destroyed.onDestroy(() => media?.removeEventListener("change", change))
+    })
+  }
 
   onPageChange(change: CarouselPageChange) {
     if (change.value === this.#options.cancel) {

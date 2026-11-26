@@ -110,6 +110,8 @@ class Carousel {
   readonly dragFree = input(undefined, { transform: optionalBoolean })
   /** Whether swiping, dragging and scrolling move the slides. */
   readonly drag = input(undefined, { transform: optionalBoolean })
+  /** Whether it stops being a carousel for now, like at a breakpoint where the slides lay out as a grid. The parts drop their roles, inline styles and listeners, and the controls hide. */
+  readonly disabled = input(undefined, { transform: optionalBoolean })
   /** Pages the carousel from anywhere, and connects parts outside it. Create one with `createCarouselController()`. */
   readonly controller: InputSignal<CarouselOptions["controller"]> = input()
 
@@ -130,6 +132,7 @@ class Carousel {
     skipSnaps: this.skipSnaps(),
     dragFree: this.dragFree(),
     drag: this.drag(),
+    disabled: this.disabled(),
     controller: this.controller(),
   }))
   /** The carousel's state, as a signal. */
