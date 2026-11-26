@@ -765,6 +765,8 @@ function createPopupLayer<
     options.onOpenChange?.(false, closed)
     bound?.config.onClose?.()
     const order = layerCount()
+    // Read before the exit, which unbinds content with nothing to animate at once.
+    const setting = options.finalFocus?.() ?? "trigger"
     const exiting = [el, ...(shown?.backdrop ? [shown.backdrop] : [])]
     // The framework renders `data-closed` after this, too late for exit
     // keyframes keyed on it, so it's written here first.
@@ -790,7 +792,7 @@ function createPopupLayer<
       return
     }
     if (mode === true) {
-      returnFocus(el, from, false, range)
+      returnFocus(el, from, false, range, setting)
       // What focus went back to can leave as the framework renders the close,
       // like the row a confirm dialog's action removes. The chain goes on then.
       const target = activeElement()
@@ -801,7 +803,7 @@ function createPopupLayer<
           focusIsLost() &&
           !openedSince(order)
         ) {
-          returnFocus(el, from)
+          returnFocus(el, from, false, undefined, setting)
         }
       })
       return
@@ -812,7 +814,7 @@ function createPopupLayer<
         const moved =
           !!now && now !== el.ownerDocument.body && !composedContains(el, now)
         if (!moved && !openedSince(order)) {
-          returnFocus(el, from, false, range)
+          returnFocus(el, from, false, range, setting)
         }
       })
       return
@@ -823,7 +825,7 @@ function createPopupLayer<
       setTimeout(() => {
         const active = activeElement()
         if (!active || active === el.ownerDocument.body) {
-          returnFocus(el, from, false, range)
+          returnFocus(el, from, false, range, setting)
         }
       })
     }

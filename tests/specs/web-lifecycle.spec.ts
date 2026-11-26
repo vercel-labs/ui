@@ -146,6 +146,24 @@ test("radios in card labels around fields with descriptions are each named by th
   }
 })
 
+for (const kind of ["dialog", "popover"]) {
+  test(`a ${kind} with no exit animation sends focus to its \`final-focus\` as it closes`, async ({
+    page,
+  }) => {
+    await page.evaluate((kind) => {
+      document.querySelector("#stage")!.innerHTML =
+        `<ui-${kind}><ui-${kind}-trigger><button>Open</button></ui-${kind}-trigger><ui-${kind}-content final-focus="#next"><input aria-label="Name" /><ui-${kind}-close><button>Done</button></ui-${kind}-close></ui-${kind}-content></ui-${kind}><button id="next">Next step</button>`
+    }, kind)
+    await page.getByRole("button", { name: "Open" }).click()
+    await page.getByRole("button", { name: "Done" }).click()
+    await expect(page.getByRole("button", { name: "Next step" })).toBeFocused()
+    await page.getByRole("button", { name: "Open" }).click()
+    await expect(page.getByRole("textbox", { name: "Name" })).toBeFocused()
+    await page.keyboard.press("Escape")
+    await expect(page.getByRole("button", { name: "Next step" })).toBeFocused()
+  })
+}
+
 test("a button moved out of its tab is a plain button again", async ({
   page,
 }) => {
