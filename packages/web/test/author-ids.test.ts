@@ -47,7 +47,7 @@ test("a tab's button keeps its id, and its panel is labelled by it", async () =>
   expect(second.getAttribute("aria-labelledby")).toBe(password.id)
 })
 
-test("tabs put back on the page take the new instance's ids", async () => {
+test("tabs put back on the page keep their ids, and their references", async () => {
   defineTabsElements()
   document.body.innerHTML = `<div><ui-tabs value="a"><ui-tabs-list aria-label="Settings"><ui-tabs-tab value="a"><button>Account</button></ui-tabs-tab></ui-tabs-list><ui-tabs-panel value="a">A</ui-tabs-panel></ui-tabs></div>`
   await wait()
@@ -59,7 +59,7 @@ test("tabs put back on the page take the new instance's ids", async () => {
   await wait()
   document.querySelector("div")!.append(tabs)
   await wait()
-  expect(tab.id).not.toBe(before)
+  expect(tab.id).toBe(before)
   expect(panel.getAttribute("aria-labelledby")).toBe(tab.id)
   expect(tab.getAttribute("aria-controls")).toBe(panel.id)
 })
