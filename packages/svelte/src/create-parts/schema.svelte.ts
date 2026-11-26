@@ -86,7 +86,7 @@ function slotPropsOf(
     ? (useHandle(primitive).api as ListApi).internal.keyOf
     : undefined
   const own = () => {
-    const result: Record<string, unknown> = { id: props.id }
+    const result: Record<string, unknown> = {}
     for (const name in schema) {
       const spec = schema[name]
       let value = props[name]
