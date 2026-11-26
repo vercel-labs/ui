@@ -16,6 +16,7 @@ import {
   navigationMenuLayout,
   navigationMenuOptions,
 } from "../../../../../tests/fixtures/navigation-menu"
+import { indicatorOptions } from "../../../../../tests/fixtures/page"
 import { mountAngular, state } from "../../angular-mount"
 
 @Component({
@@ -107,7 +108,11 @@ import { mountAngular, state } from "../../angular-mount"
             >
           </li>
         </ul>
-        <div uiNavigationMenuIndicator class="nav-indicator"></div>
+        <div
+          uiNavigationMenuIndicator
+          class="nav-indicator"
+          [followHover]="indicator.followHover"
+        ></div>
         @if (layout.viewport) {
           <div
             *uiNavigationMenuViewport="layout.placement"
@@ -132,6 +137,7 @@ class Fixture {
     container?: HTMLElement | null
   } = navigationMenuOptions()
   readonly layout = navigationMenuLayout()
+  readonly indicator = indicatorOptions()
   readonly content = {
     keepMounted: this.layout.keepMounted,
     hiddenUntilFound: this.layout.hiddenUntilFound,

@@ -104,8 +104,13 @@ class TabsTabIcon {
  */
 @Directive({ selector: "[uiTabsIndicator]", exportAs: "uiTabsIndicator" })
 class TabsIndicator {
+  /** Whether it follows the tab under the pointer, and goes back to the selected one when the pointer leaves the list. */
+  readonly followHover = input(undefined, { transform: optionalBoolean })
+
   /** The indicator's state, as a signal. */
-  readonly state = usePart(inject(Tabs).handle, "indicator").state
+  readonly state = usePart(inject(Tabs).handle, "indicator", () => ({
+    followHover: this.followHover(),
+  })).state
 }
 
 /**
@@ -137,6 +142,7 @@ export type {
   TabsChangeOptions,
   TabsController,
   TabsDirection,
+  TabsIndicatorProps,
   TabsIndicatorState,
   TabsListState,
   TabsOptions,

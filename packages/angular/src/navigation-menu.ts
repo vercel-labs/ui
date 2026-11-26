@@ -356,8 +356,13 @@ class NavigationMenuViewport {
   exportAs: "uiNavigationMenuIndicator",
 })
 class NavigationMenuIndicator {
+  /** Whether it follows the top-level trigger or link under the pointer, and goes back to the open or current one when the pointer leaves the list. */
+  readonly followHover = input(undefined, { transform: optionalBoolean })
+
   /** The part's state, as a signal. */
-  readonly state = usePart(inject(NavigationMenu).handle, "indicator").state
+  readonly state = usePart(inject(NavigationMenu).handle, "indicator", () => ({
+    followHover: this.followHover(),
+  })).state
 }
 
 export { createNavigationMenuController } from "@ui-sdk/core/navigation-menu"
@@ -367,6 +372,7 @@ export type {
   NavigationMenuContentProps,
   NavigationMenuContentState,
   NavigationMenuController,
+  NavigationMenuIndicatorProps,
   NavigationMenuIndicatorState,
   NavigationMenuItemProps,
   NavigationMenuItemState,

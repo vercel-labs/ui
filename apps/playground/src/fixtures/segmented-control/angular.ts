@@ -6,7 +6,10 @@ import {
   SegmentedControlItem,
   type SegmentedControlValueChange,
 } from "@ui-sdk/angular/segmented-control"
-import { segmentedControlOptions } from "../../../../../tests/fixtures/page"
+import {
+  indicatorOptions,
+  segmentedControlOptions,
+} from "../../../../../tests/fixtures/page"
 import { segmentedControlFixture } from "../../../../../tests/fixtures/segmented-control"
 import { mountAngular, state } from "../../angular-mount"
 
@@ -25,7 +28,10 @@ import { mountAngular, state } from "../../angular-mount"
         [controller]="controller"
         (beforeValueChange)="onValueChange($event)"
       >
-        <span uiSegmentedControlIndicator></span>
+        <span
+          uiSegmentedControlIndicator
+          [followHover]="indicator.followHover"
+        ></span>
         @for (item of fixture.items; track item.value) {
           <button
             uiSegmentedControlItem
@@ -50,6 +56,7 @@ import { mountAngular, state } from "../../angular-mount"
 class Fixture {
   readonly controller = createSegmentedControlController()
   readonly options = segmentedControlOptions()
+  readonly indicator = indicatorOptions()
   readonly fixture = segmentedControlFixture
   readonly action = state("")
   readonly submitted = state("")

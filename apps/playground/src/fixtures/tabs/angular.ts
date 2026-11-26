@@ -9,7 +9,10 @@ import {
   type TabsValueChange,
 } from "@ui-sdk/angular/tabs"
 import { createTabsController } from "@ui-sdk/core/tabs"
-import { tabsOptions } from "../../../../../tests/fixtures/page"
+import {
+  indicatorOptions,
+  tabsOptions,
+} from "../../../../../tests/fixtures/page"
 import { tabsFixture } from "../../../../../tests/fixtures/tabs"
 import { mountAngular, state } from "../../angular-mount"
 
@@ -44,7 +47,11 @@ import { mountAngular, state } from "../../angular-mount"
               [textContent]="tab.label"
             ></button>
           }
-          <span uiTabsIndicator class="indicator"></span>
+          <span
+            uiTabsIndicator
+            class="indicator"
+            [followHover]="indicator.followHover"
+          ></span>
         </div>
         @for (tab of tabsFixture.tabs; track tab.value) {
           @if (options.keepMounted) {
@@ -85,6 +92,7 @@ class Fixture {
     activation?: "automatic" | "manual"
     orientation?: "horizontal" | "vertical"
   } = tabsOptions()
+  readonly indicator = indicatorOptions()
   readonly action = state("")
 
   onValueChange(change: TabsValueChange) {

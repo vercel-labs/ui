@@ -121,8 +121,15 @@ class SegmentedControlItem {
   exportAs: "uiSegmentedControlIndicator",
 })
 class SegmentedControlIndicator {
+  /** Whether it follows the item under the pointer, and goes back to the checked one when the pointer leaves the control. */
+  readonly followHover = input(undefined, { transform: optionalBoolean })
+
   /** The part's state, as a signal. */
-  readonly state = usePart(inject(SegmentedControl).handle, "indicator").state
+  readonly state = usePart(
+    inject(SegmentedControl).handle,
+    "indicator",
+    () => ({ followHover: this.followHover() })
+  ).state
 }
 
 export { createSegmentedControlController } from "@ui-sdk/core/segmented-control"
@@ -131,6 +138,7 @@ export type {
   SegmentedControlChangeOptions,
   SegmentedControlController,
   SegmentedControlDirection,
+  SegmentedControlIndicatorProps,
   SegmentedControlIndicatorState,
   SegmentedControlItemProps,
   SegmentedControlItemState,

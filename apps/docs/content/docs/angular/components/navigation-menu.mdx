@@ -97,6 +97,20 @@ Put `uiNavigationMenuLink` on the router's link, like `<a uiNavigationMenuLink r
 
 Routers call `preventDefault()` on a link's click to navigate without a page load. The menu listens on the link element itself, so it still closes after a client-side route change. A press with a modifier key or the middle button opens the link elsewhere and leaves the menu open. Set `closeOnSelect` to false to keep it open on every press, see [Close on Select](#close-on-select).
 
+## Link and Panel
+
+A top-level item can link to its section's page and open a panel too. Put the link and a small trigger next to each other in the item. The link goes to the page, and the trigger opens the panel on hover, from the keyboard and on touch. Tab and the arrow keys reach both. Give the trigger a name of its own, since it may show only an arrow.
+
+```angular-html
+<li uiNavigationMenuItem value="products">
+  <a uiNavigationMenuLink href="/products">Products</a>
+  <button uiNavigationMenuTrigger aria-label="More in Products">▾</button>
+  <div *uiNavigationMenuContent>
+    <a uiNavigationMenuLink href="/products/analytics">Analytics</a>
+  </div>
+</li>
+```
+
 ## Icons
 
 Put a link's icon in a `uiNavigationMenuLinkIcon`, before its text, like the With Icon panel in the menu at the top of the page. Screen readers skip it, so an SVG's `<title>`, an icon font's glyph or an emoji never joins the link's name.
@@ -187,6 +201,8 @@ The menu waits for whatever animations run, and only those. Turn them off for pe
   opacity: 1;
 }
 ```
+
+Give it `followHover` and it follows the top-level trigger or link under the pointer, then goes back to the open trigger or the current link when the pointer leaves the list.
 
 ## Viewport Placement
 
@@ -499,7 +515,10 @@ Each option below is an input on the directive, and each callback an output. A c
 
 ### NavigationMenuIndicator
 
-The indicator takes no inputs of its own.
+<TypeTable
+  path="../../packages/core/src/components/navigation-menu/navigation-menu.ts"
+  name="NavigationMenuIndicatorProps"
+/>
 
 ### State
 
