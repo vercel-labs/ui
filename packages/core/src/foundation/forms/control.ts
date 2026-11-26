@@ -67,4 +67,29 @@ function activateControl(control: HTMLElement, event?: Event) {
   event?.preventDefault()
 }
 
-export { activateControl, findControl }
+// A native label's control that takes no focus itself, like a color picker's
+// group: the browser activates it and focuses nothing, so the label does.
+function unfocusableControl(label: HTMLElement) {
+  const control = label instanceof HTMLLabelElement ? label.control : null
+  return control instanceof HTMLElement &&
+    control.tabIndex < 0 &&
+    !control.hasAttribute("tabindex")
+    ? control
+    : undefined
+}
+
+/** Whether a press on the label `el` lands on its control or on something interactive inside it, like a link. */
+function pressesInside(
+  event: Event,
+  el: HTMLElement,
+  control: HTMLElement | undefined
+) {
+  const target = event.target as Element
+  if (control?.contains(target)) {
+    return true
+  }
+  const inner = target.closest?.("a[href], button, input, select, textarea")
+  return !!inner && inner !== el && el.contains(inner)
+}
+
+export { activateControl, findControl, pressesInside, unfocusableControl }

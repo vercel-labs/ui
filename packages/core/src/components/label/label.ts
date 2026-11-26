@@ -1,4 +1,9 @@
-import { activateControl, findControl } from "../../foundation/forms/control"
+import {
+  activateControl,
+  findControl,
+  pressesInside,
+  unfocusableControl,
+} from "../../foundation/forms/control"
 import { isDisabledElement } from "../../foundation/forms/form"
 import { documentOrder } from "../../foundation/kernel/order"
 import { definePrimitive } from "../../foundation/kernel/primitive"
@@ -33,15 +38,6 @@ function ownControl(el: HTMLElement) {
     return
   }
   return control
-}
-
-// A native label's control that takes no focus itself, like a color picker's
-// group: the browser activates it and focuses nothing, so the label does.
-function unfocusableControl(el: HTMLElement) {
-  const control = el instanceof HTMLLabelElement ? el.control : null
-  return control instanceof HTMLElement && control.tabIndex < 0
-    ? control
-    : undefined
 }
 
 const labelsByControl = new WeakMap<HTMLElement, HTMLElement[]>()
@@ -179,19 +175,6 @@ function bindLabel(el: HTMLElement) {
 
 // A press on the control, or on a link or a control inside the label, is
 // theirs, as on a native label.
-function pressesInside(
-  event: Event,
-  el: HTMLElement,
-  control: HTMLElement | undefined
-) {
-  const target = event.target as Element
-  if (control?.contains(target)) {
-    return true
-  }
-  const inner = target.closest?.("a[href], button, input, select, textarea")
-  return !!inner && inner !== el && el.contains(inner)
-}
-
 const labelPrimitive = /* @__PURE__ */ definePrimitive({
   name: "label",
   state: (_options: LabelOptions) => ({}),
