@@ -65,3 +65,18 @@ test("emptying the browser's message shows it again", async () => {
   await wait()
   expect(error.textContent).toBe(input.validationMessage)
 })
+
+test("a rewrite of the browser's message, like a translation, keeps it live", async () => {
+  const { error } = await mount()
+  const input = document.querySelector("input")!
+  input.value = ""
+  input.dispatchEvent(new Event("input", { bubbles: true }))
+  input.dispatchEvent(new Event("invalid", { cancelable: true }))
+  await wait()
+  error.textContent = "Completa este campo."
+  input.setCustomValidity("Too short.")
+  input.value = "a"
+  input.dispatchEvent(new Event("input", { bubbles: true }))
+  await wait()
+  expect(error.textContent).toBe("Too short.")
+})

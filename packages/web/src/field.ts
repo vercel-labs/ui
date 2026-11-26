@@ -102,9 +102,11 @@ function defineFieldElements() {
             if (!("message" in error.dataset) && error.childNodes.length) {
               continue
             }
-            // Text the page wrote over ours, like a server's message, is its own
-            // until the page empties the error again.
+            // Text the page wrote over ours while it marks the field invalid, like
+            // a server's message, is its own until it empties the error. Otherwise
+            // it's a rewrite of ours, like a page translator's, so ours stays live.
             if (
+              (el as HTMLElement & { invalid?: boolean }).invalid === true &&
               "message" in error.dataset &&
               written.has(error) &&
               error.textContent &&
