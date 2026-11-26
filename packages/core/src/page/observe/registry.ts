@@ -68,6 +68,8 @@ type Entry = {
   // Whether an agent has had it on the page. One hidden all along, like a
   // field in a dialog nobody opened, isn't kept once it leaves.
   shown?: boolean
+  // Its state when an agent last had it on the page.
+  seen?: object
   // A password, card or one-time code, or a field inside `data-agent-secret`,
   // whose value is redacted and isn't kept once it leaves the page.
   secret?: boolean
@@ -174,13 +176,18 @@ function retire(entry: Entry) {
 
 // Lists a component that left the page, or hid in a closed popup's content
 // the web keeps in the page, with the state it had.
-function keepOffPage(entry: Entry) {
-  if (!entry.key || !entry.shown || entry.secret || entry.offLimits) {
+function keepOffPage(entry: Entry, seen = entry.instance.deref()?.get()) {
+  if (
+    !entry.key ||
+    !entry.shown ||
+    entry.secret ||
+    entry.offLimits ||
+    offPage.has(entry.ref)
+  ) {
     return
   }
   // Values and checks are worth keeping. A closed menu's `open: false` isn't.
-  const state = entry.instance.deref()?.get() as
-    Record<string, unknown> | undefined
+  const state = seen as Record<string, unknown> | undefined
   const keys = stateKeys(entry, state ?? {}).filter((key) => key !== "open")
   if (!state || !keys.length) {
     return
@@ -257,14 +264,8 @@ const stateKeys = (entry: Entry, state: Record<string, unknown>) =>
 // The api method that sets a state key, like `setOpen` for `open`.
 const setterOf = (key: string) => `set${key[0].toUpperCase()}${key.slice(1)}`
 
-// Keeps the component's key current, and the first time it's seen gives it
-// the ref it had before it left the page, when one with its key did.
-function remember(entry: Entry, parts: Bound[]) {
-  const first = !entry.key
+function guard(entry: Entry, parts: Bound[]) {
   const elements = parts.map((part) => part.el)
-  checkMarks(elements)
-  entry.label = componentLabel(parts)
-  entry.row = rowOf(parts)
   entry.secret ||=
     isSecret(elements) ||
     parts.some(({ el }) => secretControl(el)) ||
@@ -274,6 +275,17 @@ function remember(entry: Entry, parts: Bound[]) {
   entry.offLimits =
     isOffLimits(elements) ||
     elements.every((el) => (el as HTMLInputElement).type === "hidden")
+}
+
+// Keeps the component's key current, and the first time it's seen gives it
+// the ref it had before it left the page, when one with its key did.
+function remember(entry: Entry, parts: Bound[]) {
+  const first = !entry.key
+  const elements = parts.map((part) => part.el)
+  checkMarks(elements)
+  entry.label = componentLabel(parts)
+  entry.row = rowOf(parts)
+  guard(entry, parts)
   entry.sections = sectionsOf(parts)
   entry.key = `${entry.component}|${entry.label}|${entry.row}|${entry.sections.join(">")}`
   if (!first) {
@@ -655,6 +667,7 @@ export {
   elementsOf,
   entries,
   type Entry,
+  guard,
   install,
   keepOffPage,
   leftFrom,

@@ -25,6 +25,7 @@ import {
   componentLabel,
   rowOf,
   entries,
+  guard,
   install,
   keepOffPage,
   leftFrom,
@@ -905,8 +906,19 @@ function createAgent(
         continue
       }
       const parts = bound(instance)
-      if (parts.length) {
+      // A field in a closed popup keeps the name, row and state it had when it
+      // closed, like one React unmounts, and only its guards stay current.
+      const closed =
+        parts.length > 0 &&
+        entry.shown &&
+        parts.every((part) => part.el.closest(closedPopup))
+      if (closed) {
+        guard(entry, parts)
+      } else if (parts.length) {
         remember(entry, parts)
+      }
+      if (entry.secret || entry.offLimits) {
+        offPage.delete(entry.ref)
       }
       // Some show only now and then, like a field while it has errors: its control carries its label.
       // One whose every element is hidden, like a field in a closed dialog, isn't on the page yet.
@@ -918,14 +930,12 @@ function createAgent(
       ) {
         found.push({ entry, instance, parts })
         entry.shown = true
+        entry.seen = instance.get()
         shownInCall.add(entry.ref)
         offPage.delete(entry.ref)
-      } else if (
-        parts.length &&
-        parts.every((part) => part.el.closest(closedPopup))
-      ) {
+      } else if (closed) {
         // React unmounts a closed popup's content, so its fields leave the page there too.
-        keepOffPage(entry)
+        keepOffPage(entry, entry.seen)
       }
     }
     inDocumentOrder(

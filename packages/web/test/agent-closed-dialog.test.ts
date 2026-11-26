@@ -74,3 +74,58 @@ test("a closed dialog's fields stay listed with offPage and their state, like Re
     ["Send invite", false],
   ])
 })
+
+test("a closed dialog's fields keep the rows and values they had when it closed", async () => {
+  const agent = createAgent()
+  document.body.innerHTML = `
+    <ui-dialog>
+      <ui-dialog-trigger><button>Members</button></ui-dialog-trigger>
+      <ui-dialog-content>
+        <ui-dialog-title>Members</ui-dialog-title>
+        <ul>
+          <li>Ada Lovelace <ui-switch aria-label="Admin" default-checked></ui-switch></li>
+          <li>Grace Hopper <ui-switch aria-label="Admin"></ui-switch></li>
+        </ul>
+        <div id="key"><ui-input><input aria-label="API key" value="key_A" /></ui-input></div>
+      </ui-dialog-content>
+    </ui-dialog>`
+  await wait()
+  const dialog = document.querySelector("ui-dialog") as HTMLElement & {
+    open: boolean
+  }
+  const fields = () =>
+    agent
+      .snapshot()
+      .filter(({ label }) => label === "Admin" || label === "API key")
+      .map(({ label, row, offPage, value, checked }) => ({
+        label,
+        offPage: !!offPage,
+        ...(row !== undefined && { row }),
+        ...(value !== undefined && { value }),
+        ...(checked !== undefined && { checked }),
+      }))
+  dialog.open = true
+  await wait(50)
+  agent.snapshot()
+  dialog.open = false
+  await wait(50)
+  document.querySelector("input")!.value = "key_B"
+  await wait(50)
+  expect(fields()).toEqual([
+    { label: "Admin", offPage: true, row: "Ada Lovelace", checked: true },
+    { label: "Admin", offPage: true, row: "Grace Hopper", checked: false },
+    { label: "API key", offPage: true, value: "key_A" },
+  ])
+  expect(
+    (await agent.query({ text: "Ada Lovelace" })).map(({ label }) => label)
+  ).toEqual(["Admin"])
+  document.querySelector("#key")!.setAttribute("data-agent-hidden", "")
+  await wait(50)
+  expect(fields().map(({ label }) => label)).toEqual(["Admin", "Admin"])
+  dialog.open = true
+  await wait(50)
+  expect(fields().map(({ label, offPage }) => [label, offPage])).toEqual([
+    ["Admin", false],
+    ["Admin", false],
+  ])
+})
