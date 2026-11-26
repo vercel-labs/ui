@@ -15,6 +15,7 @@ import {
   type PositionProps,
 } from "../platform/position"
 import { type Side } from "../platform/sides"
+import { rovingStopOf } from "../focus/roving-focus"
 import { composedTabbables } from "../focus/tabbable"
 import { accessibleName } from "../text/accessible-name"
 import type { PopupCore, PopupState } from "./create-popup"
@@ -154,7 +155,10 @@ function pressOpening(core: PopupCore) {
         return content
       }
       if (setting === "auto") {
-        return preferred?.() ?? composedTabbables(content)[0] ?? content
+        const first = composedTabbables(content)[0]
+        return (
+          preferred?.() ?? (first && rovingStopOf(first)) ?? first ?? content
+        )
       }
       if (typeof setting === "function") {
         return setting() ?? content

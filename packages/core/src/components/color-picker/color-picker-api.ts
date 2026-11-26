@@ -289,9 +289,6 @@ function colorPickerApiBody(
     remember: false,
     disabled: () => isLocked(store.get()),
     preferred: (item) => isSelected(item.props?.value),
-    // The selected preset holds the stop from the first render, so a popup
-    // that opens on the presets focuses it, not the first one.
-    claims: (_state, item) => isSelected(item.props?.value),
     move(event, { from, items, rtl }) {
       if (event.shiftKey) {
         return

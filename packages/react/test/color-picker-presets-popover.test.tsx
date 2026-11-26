@@ -33,11 +33,11 @@ afterEach(async () => {
 
 const presets = ["#DC2626", "#EA580C", "#7C3AED", "#64748B"]
 
-test("a popover that opens on the presets focuses the selected one", async () => {
+async function open(value: string) {
   root = createRoot(document.body.appendChild(document.createElement("div")))
   await React.act(async () =>
     root!.render(
-      <ColorPicker aria-label="Design color" defaultValue="#7C3AED">
+      <ColorPicker aria-label="Design color" defaultValue={value}>
         <Popover>
           <PopoverTrigger>Recolor</PopoverTrigger>
           <PopoverContent aria-label="Recolor">
@@ -56,7 +56,16 @@ test("a popover that opens on the presets focuses the selected one", async () =>
     trigger.click()
     await new Promise((resolve) => setTimeout(resolve, 20))
   })
-  const focused = document.activeElement as HTMLElement
+  return document.activeElement as HTMLElement
+}
+
+test("a popover that opens on the presets focuses the selected one", async () => {
+  const focused = await open("#7C3AED")
   expect(focused.getAttribute("role")).toBe("option")
   expect(focused.getAttribute("aria-selected")).toBe("true")
+})
+
+test("with no preset selected, it focuses the first", async () => {
+  const focused = await open("#123456")
+  expect(focused).toBe(document.querySelector("[role=option]"))
 })
