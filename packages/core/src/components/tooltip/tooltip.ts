@@ -408,7 +408,12 @@ function tooltipApiBody(
 
   // A press toggles a toggleable tooltip. Any other closes it, unless `closeOnPress` is false,
   // and it stays closed until the pointer leaves.
-  function press(key: string, payload: unknown, event?: Event) {
+  function press(
+    key: string,
+    payload: unknown,
+    event?: Event,
+    el?: HTMLElement
+  ) {
     const by = openerOf(event)
     if (options().toggleable) {
       if (store.get().open && popup.internal.popup.opener() !== "hover") {
@@ -427,7 +432,11 @@ function tooltipApiBody(
       })
       return
     }
-    if (options().closeOnPress === false) {
+    // An aria-disabled trigger keeps the tooltip that says why it's unavailable.
+    if (
+      options().closeOnPress === false ||
+      el?.getAttribute("aria-disabled") === "true"
+    ) {
       return
     }
     hover?.clear()
@@ -521,10 +530,8 @@ const tooltipPrimitive = /* @__PURE__ */ definePrimitive({
             api.internal.enter(event, key, props.payload),
           pointerleave: (event, { api }) => api.internal.leave(event),
         },
-        // An aria-disabled trigger keeps its tooltip, which says why it's unavailable.
         press: ({ api, key, props, el }, event) =>
-          el?.getAttribute("aria-disabled") !== "true" &&
-          api.internal.tooltipPress(key, props.payload, event),
+          api.internal.tooltipPress(key, props.payload, event, el),
         // Asleep too, since the trigger is named or described before it's hovered or focused.
         bind: undefined,
         asleep(el, { key, store, id }) {
