@@ -16,7 +16,6 @@ import {
   followed,
   handlers as partHandlers,
   noteEarlyText,
-  on,
   partState,
   present as isPresent,
   ref as partRef,
@@ -31,6 +30,7 @@ import {
 } from "@ui-sdk/core/renderer"
 import { onDestroy, untrack, type Snippet } from "svelte"
 import { createAttachmentKey, type Attachment } from "svelte/attachments"
+import { on } from "svelte/events"
 import type { SvelteHTMLElements } from "svelte/elements"
 import { trackBindable } from "./bindable.svelte"
 
@@ -385,21 +385,16 @@ function useHandlePart<P extends Primitive, S extends SlotName<P>>(
     if (typeof styleShown === "string") {
       applyAttrs(el, { style: styleShown }, "svelte-style")
     }
+    // Svelte's `on` runs the delegated handlers inside the part first, so
+    // their `stopPropagation()` keeps the event from the part, as in React.
     const cleanups = Object.entries(partHandlers(current)).map(
       ([type, handler]) =>
-        on(el, type as keyof HTMLElementEventMap, (event) => {
+        on(el, type, (event) => {
           const own = user[`on${type}`]
           if (typeof own === "function") {
             own(event)
           }
-          if (event.defaultPrevented) {
-            return
-          }
-          // Chrome fires `focusout` as Svelte removes a focused element, inside
-          // the effect removing it, where a write throws. The core hears it after.
-          if ($effect.tracking()) {
-            queueMicrotask(() => el.isConnected && handler!(event))
-          } else {
+          if (!event.defaultPrevented) {
             handler!(event)
           }
         })
