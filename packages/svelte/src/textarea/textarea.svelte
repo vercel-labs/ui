@@ -97,17 +97,17 @@ text. Its text is its content, so it takes no children.
   // goes back to undefined whenever the parent's props change, which would
   // empty the field. A form reset returns to the element's default, which
   // nothing else writes, so an uncontrolled textarea sets it here.
-  let placed = false
   const setDefault: Attachment<HTMLTextAreaElement> = (el) => {
     if (!controlled) {
       el.defaultValue = defaultValue ?? ""
     }
-    // Writing `value` leaves the caret at the end, where a default leaves it at
-    // the start, so a Tab into a long text would land at the bottom.
-    if (!placed && el.ownerDocument.activeElement !== el) {
+  }
+  // Writing `value` leaves the caret at the end, where a default leaves it at
+  // the start, so a Tab into a long text would land at the bottom.
+  const toStart: Attachment<HTMLTextAreaElement> = (el) => {
+    if (el.ownerDocument.activeElement !== el) {
       el.setSelectionRange(0, 0)
     }
-    placed = true
   }
 </script>
 
@@ -121,7 +121,7 @@ text. Its text is its content, so it takes no children.
   />
 {:else}
   <!-- A static element, so the compiler renders the text as a textarea's content, without hydration markers. -->
-  <textarea {...bound.slot(element())} {@attach setDefault}
+  <textarea {...bound.slot(element())} {@attach setDefault} {@attach toStart}
     >{controlled ? value : defaultValue}</textarea
   >
 {/if}
