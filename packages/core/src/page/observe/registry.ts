@@ -63,6 +63,8 @@ type Entry = {
   row?: string
   // The labelled regions around it, outermost first, like a tab's panel and an accordion's section in it.
   sections?: string[]
+  // Its place among the components on the page when an agent last listed them.
+  listed?: number
   // Whether an agent has had it on the page. One hidden all along, like a
   // field in a dialog nobody opened, isn't kept once it leaves.
   shown?: boolean
@@ -103,6 +105,7 @@ const retiredLimit = 500
 const offPage = new Map<string, AgentComponent>()
 // The regions each of those was in, for telling look-alikes apart.
 const placeOf = new WeakMap<AgentComponent, string[]>()
+const leftFrom = new WeakMap<AgentComponent, number>()
 const partsOf = new WeakMap<PrimitiveInstance, ReadonlyMap<string, Part>>()
 const optionsOf = new WeakMap<PrimitiveInstance, () => object>()
 // What an agent's step changed on a key its component commits, like a
@@ -192,6 +195,9 @@ function retire(entry: Entry) {
   }
   if (entry.sections) {
     placeOf.set(last, entry.sections)
+  }
+  if (entry.listed !== undefined) {
+    leftFrom.set(last, entry.listed)
   }
   offPage.delete(entry.ref)
   offPage.set(entry.ref, last)
@@ -599,6 +605,7 @@ export {
   entries,
   type Entry,
   install,
+  leftFrom,
   listen,
   type ObservedChange,
   offPage,

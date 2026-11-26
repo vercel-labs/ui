@@ -26,6 +26,7 @@ import {
   rowOf,
   entries,
   install,
+  leftFrom,
   listen,
   offPage,
   ownParts,
@@ -395,11 +396,13 @@ function valueFor(entry: Entry, action: string, value: unknown) {
 // not one read from inside `data-agent-hidden`, which never reaches the agent.
 const textOrName = (el: Element) => textOf(el) || nameOf(el)
 
-// What left the page in the order its components were made, as the page's are
-// listed, since adapters unbind in different orders.
+// What left the page in the order it was on the page, since adapters unbind
+// and number components in different orders.
 const leftPage = () =>
   [...offPage.values()].sort(
-    (a, b) => Number(a.ref.slice(1)) - Number(b.ref.slice(1))
+    (a, b) =>
+      (leftFrom.get(a) ?? Infinity) - (leftFrom.get(b) ?? Infinity) ||
+      Number(a.ref.slice(1)) - Number(b.ref.slice(1))
   )
 
 // The items on the page, named by their trigger when they have one, like an
@@ -909,6 +912,12 @@ function createAgent(
         shownInCall.add(entry.ref)
       }
     }
+    inDocumentOrder(
+      found.map(({ entry, parts }) => ({
+        entry,
+        el: parts.find((part) => isShown(part.el))!.el,
+      }))
+    ).forEach(({ entry }, index) => (entry.listed = index))
     return found
   }
   // The components on the page for `act` and `query`, read once until the

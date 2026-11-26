@@ -94,3 +94,33 @@ test("an open collapsible lists its trigger before its panel's buttons", async (
   await nextTick()
   expect(entry("collapsible").buttons).toEqual(["Details", "Inside"])
 })
+
+test("components inside one another leave the page in its order", async () => {
+  const shown = ref(true)
+  const { Switch } = await import("../src/switch")
+  mount(() =>
+    h("div", [
+      shown.value
+        ? h(Tabs, { defaultValue: "a" }, () => [
+            h(TabsList, { "aria-label": "Outer" }, () => [
+              h(TabsTab, { value: "a" }, () => "A"),
+            ]),
+            h(TabsPanel, { value: "a" }, () =>
+              h(Switch, { "aria-label": "Inner", defaultChecked: true })
+            ),
+          ])
+        : null,
+    ])
+  )
+  await nextTick()
+  const agent = createAgent()
+  agent.snapshot()
+  shown.value = false
+  await nextTick()
+  expect(
+    agent
+      .snapshot()
+      .filter((item) => item.offPage && /Outer|Inner/.test(item.label ?? ""))
+      .map((item) => item.label)
+  ).toEqual(["Outer", "Inner"])
+})
