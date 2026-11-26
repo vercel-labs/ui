@@ -26,7 +26,12 @@ import {
 } from "./date-input-model"
 import { matchesDate, type DateMatchers } from "../calendar/calendar-model"
 import { parseDate } from "../../foundation/date/parse"
-import { isDisabled, watchFieldsets } from "../../foundation/forms/form"
+import {
+  dispatchChange,
+  formInternals,
+  isDisabled,
+  watchFieldsets,
+} from "../../foundation/forms/form"
 import { isRTL } from "../../foundation/platform/env"
 import { bindPageLocale, localeOf } from "../../foundation/text/locale"
 import { elements } from "../../foundation/kernel/elements"
@@ -274,6 +279,10 @@ function dateInputApiBody(
       )
   const segmentElement = (type: string) =>
     segmentElements().find((item) => item.type === type)?.el
+  const formElement = () => {
+    const root = element("root")
+    return formInternals(root) ? root : element("hidden-input")
+  }
   // The segment focus moved to once the last one was done, so the separator
   // typed next, as in 12/25, doesn't skip it.
   let advancedTo: HTMLElement | null = null
@@ -292,10 +301,11 @@ function dateInputApiBody(
       return store.set({ fields, buffer, fieldsFor: keyOf(current) })
     }
     const next = valueOf(fields, format())
-    if (next !== current) {
-      change("value", next, { reason, event })
-    }
+    const changed = next !== current && change("value", next, { reason, event })
     store.set({ fields, buffer, fieldsFor: keyOf(next) })
+    if (changed) {
+      dispatchChange(formElement())
+    }
   }
 
   function finish(event?: Event) {
@@ -318,9 +328,12 @@ function dateInputApiBody(
     if (value !== null && next === null) {
       return false
     }
-    const changed =
-      next === store.get().value || change("value", next, { reason, event })
+    const same = next === store.get().value
+    const changed = same || change("value", next, { reason, event })
     store.set({ fields: emptyFields(), fieldsFor: "", buffer: null })
+    if (!same && changed && reason !== "reset" && reason !== "restore") {
+      dispatchChange(formElement())
+    }
     return changed
   }
 
