@@ -48,6 +48,15 @@ function createFocus(config: {
     }
   }
 
+  // A content bound: focus moves in if an arrow key opened its item.
+  function contentBound(key: string, el: HTMLElement) {
+    if (pending !== key || config.value() !== key) {
+      return
+    }
+    pending = null
+    queueMicrotask(() => tabbables(el)[0]?.focus())
+  }
+
   // Top-level triggers and links in this menu's list, in document order:
   // inside the list, and not inside a content in it. Contents kept closed in
   // place hold links too, and a nested menu's list holds its own.
@@ -171,13 +180,14 @@ function createFocus(config: {
       last.focus()
     },
 
-    // A content bound: focus moves in if an arrow key opened its item.
-    contentBound(key: string, el: HTMLElement) {
-      if (pending !== key || config.value() !== key) {
-        return
+    contentBound,
+
+    // With `value` controlled, the content can bind before the menu has the value.
+    valueChanged() {
+      const content = pending === null ? undefined : config.content(pending)
+      if (content) {
+        contentBound(pending!, content)
       }
-      pending = null
-      queueMicrotask(() => tabbables(el)[0]?.focus())
     },
   }
 }

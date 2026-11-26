@@ -526,6 +526,7 @@ function navigationMenuApiBody(
       open(key, { reason: "trigger-press", event, by: "keyboard" }),
   })
   const topLevel = keys.topLevel
+  store.subscribe(keys.valueChanged)
 
   // A link was pressed: the menu closes, and so does every menu it's nested in.
   function linkPress(event: Event, closeOnSelect: boolean | undefined) {
