@@ -392,6 +392,7 @@ type MenuNode = {
     trackPointer: (event: PointerEvent) => void
     layer: () => Layer | undefined
     barArrow: (by: 1 | -1, event: KeyboardEvent) => boolean
+    subscribe: (listener: () => void) => () => void
   }
 }
 
@@ -823,6 +824,7 @@ function menuApiBody(
       entryOf,
       children,
       safeArea,
+      subscribe: store.subscribe,
       register(el: HTMLElement, item: Omit<Entry, "el">) {
         const entry = { ...item, el }
         const remove = entries.add(entry)

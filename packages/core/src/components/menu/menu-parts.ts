@@ -858,6 +858,7 @@ const menuItemIcons = /* @__PURE__ */ (() => ({
         component: "menu",
         item: itemSelector,
         list: '[role="menu"], [role="menubar"]',
+        subscribe: (api) => api.parentMenu()?.internal.subscribe,
       }),
       selects: selects({ values: [] }),
     }),

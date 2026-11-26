@@ -141,6 +141,9 @@ function itemIconPart<State extends object, Api>(
       el: HTMLElement,
       context: { api: Api; props: IconProps }
     ) => () => void
+    // Another store whose changes can put the list in place, like the parent
+    // menu's for an icon on a submenu's trigger.
+    subscribe?: (api: Api) => ((listener: () => void) => () => void) | undefined
   }
 ) {
   return {
@@ -169,7 +172,12 @@ function itemIconPart<State extends object, Api>(
             })
           }
         })
-      const unplace = placeIcon(el, placement, store.subscribe, found)
+      const other = placement.subscribe?.(api)
+      const subscribe = (listener: () => void) => {
+        const offs = [store.subscribe(listener), other?.(listener)]
+        return () => offs.forEach((off) => off?.())
+      }
+      const unplace = placeIcon(el, placement, subscribe, found)
       const unregister = placement.register?.(el, { api, props })
       return () => {
         unplace()
