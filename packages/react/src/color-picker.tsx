@@ -144,10 +144,12 @@ const ColorPickerSliderThumb = parts.SliderThumb
  * @experimental
  */
 function ColorPickerInput({ render, ...props }: InputProps<ColorPickerState>) {
+  // Its own key, so each input of a picker binds and follows the value.
+  const id = React.useId()
   return usePart(
     colorPicker,
     "input",
-    {},
+    { id },
     { ...props, render: startsAt(render) },
     "input"
   )
