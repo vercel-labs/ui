@@ -10,6 +10,10 @@ function isIOS() {
   )
 }
 
+function isAndroid() {
+  return isBrowser && /Android/i.test(navigator.userAgent)
+}
+
 /**
  * Whether `el` lays out right to left, from its computed direction. False on the server.
  * @stable
@@ -18,4 +22,4 @@ function isRTL(el: Element | null | undefined) {
   return !!el && isBrowser && getComputedStyle(el).direction === "rtl"
 }
 
-export { isBrowser, isIOS, isRTL }
+export { isAndroid, isBrowser, isIOS, isRTL }

@@ -1,6 +1,7 @@
 import { log } from "../kernel/change"
 import { createDetails } from "../kernel/details"
 import { isComposing } from "../kernel/events"
+import { isAndroid } from "../platform/env"
 import { changeSource } from "../kernel/input-source"
 import { callbackName } from "../kernel/option-names"
 import type { PrimitiveContext } from "../kernel/primitive-types"
@@ -9,14 +10,21 @@ import { watchers } from "../kernel/watchers"
 
 type ComposingState = { composingFrom: string | null }
 
-// Text an input method is still composing, like a half-typed とうk, follows the
+const hangul = /[\u1100-\u11ff\u3130-\u318f\uac00-\ud7af]/
+
+// Text an input method is still converting, like a half-typed とうk, follows the
 // input, so a controlled value keeps it, but the list filters by the text from before.
+// Android keyboards compose every word and Hangul every syllable, so that's typing.
 function composingInput(
   store: Store<ComposingState>,
   event: Event | undefined,
   filterText: () => string
 ) {
-  const composing = !!event && isComposing(event as InputEvent)
+  const composing =
+    !!event &&
+    isComposing(event as InputEvent) &&
+    !isAndroid() &&
+    !hangul.test((event as InputEvent).data ?? "")
   const held = store.get().composingFrom !== null
   if (composing && !held) {
     store.set({ composingFrom: filterText() })

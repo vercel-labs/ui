@@ -62,3 +62,19 @@ test("a command with its text and value controlled asks for a highlight only for
     expect.objectContaining({ reason: "input-change", event: end })
   )
 })
+
+test("a select with emptyItems keeps them while composing from an empty search", async () => {
+  const view = mount(
+    select,
+    { items: ["Alpha", "Beta", "Gamma"], emptyItems: ["Recent"] },
+    `<root><trigger aria-label="Letter"><value /></trigger><content><input aria-label="Search" /><list></list></content></root>`
+  )
+  await view.click(view.part("trigger")!)
+  const input = view.part("input") as HTMLInputElement
+  const listed = () => view.api.internal.listbox.entries().map((e) => e.label)
+  expect(listed()).toEqual(["Recent"])
+  input.value = "が"
+  input.dispatchEvent(composingInput("が"))
+  expect(listed()).toEqual(["Recent"])
+  view.unmount()
+})

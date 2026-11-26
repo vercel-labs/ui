@@ -189,7 +189,7 @@ type ChangeDetails<Reason extends string = string> = Reason extends unknown
  */
 type TextChangeDetails<Reason extends string = string> =
   ChangeDetails<Reason> & {
-    /** Whether an input method is still composing the text, like a half-typed `とうk` on its way to `東京`. Search once it's `false`: when a composition ends, its text is reported again with `false`. */
+    /** Whether an input method is still converting the text, like a half-typed `とうk` on its way to `東京`. Search once it's `false`: when a conversion ends, its text is reported again with `false`. Android keyboards and Hangul compose plain typing, so it stays `false` for them. */
     composing: boolean
   }
 

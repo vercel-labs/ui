@@ -6,7 +6,7 @@ import {
   type PointerSample,
 } from "../../foundation/drag-and-drop/pointer"
 import { bindRepeatPresses } from "../../foundation/direct-manipulation/repeat"
-import { isBrowser, isIOS } from "../../foundation/platform/env"
+import { isAndroid, isIOS } from "../../foundation/platform/env"
 import {
   dispatchChange,
   formInternals,
@@ -164,10 +164,6 @@ function stepSize(event: { shiftKey: boolean; altKey: boolean }) {
 }
 
 type Pending = { reason: NumberInputValueChangeReason; event?: Event }
-
-function isAndroid() {
-  return isBrowser && /Android/i.test(navigator.userAgent)
-}
 
 function numberInputApiBody(
   context: PrimitiveContext<NumberInputOptions, State, string>

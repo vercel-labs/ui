@@ -234,7 +234,7 @@ function selectApiBody(
     showEmpty: () =>
       store.get().searchable &&
       store.get().mounted &&
-      !store.get().query.trim(),
+      !(store.get().composingFrom ?? store.get().query).trim(),
     toKey,
     filter: () =>
       store.get().searchable ? (options().filter ?? "contains") : undefined,

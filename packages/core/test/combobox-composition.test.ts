@@ -1,9 +1,12 @@
 // @vitest-environment jsdom
-import { afterEach, expect, test } from "vitest"
+import { afterEach, expect, test, vi } from "vitest"
 import { combobox } from "../src/components/combobox/combobox"
 import { mount } from "../src/testing"
 
-afterEach(() => document.body.replaceChildren())
+afterEach(() => {
+  vi.restoreAllMocks()
+  document.body.replaceChildren()
+})
 
 const markup = `<input aria-label="City"></input><content><list></list></content>`
 
@@ -95,5 +98,54 @@ test("composing over a selected value's label keeps the items, not the empty lis
   expect(listed()).toEqual(["東京", "大阪"])
   compose(input, "東京お")
   expect(listed()).toEqual(["東京", "大阪"])
+  view.unmount()
+})
+
+test("an Android keyboard composing each word filters as it's typed", () => {
+  vi.spyOn(navigator, "userAgent", "get").mockReturnValue(
+    "Mozilla/5.0 (Linux; Android 15; Pixel 9) Chrome/131.0 Mobile"
+  )
+  const heard: string[] = []
+  const view = mount(
+    combobox,
+    {
+      items: ["Belgium", "Brazil", "France"],
+      onQueryChange: (query, details) =>
+        heard.push(details.composing ? `(${query})` : query),
+    },
+    markup
+  )
+  const input = view.part("input") as HTMLInputElement
+  input.focus()
+  for (const text of ["b", "br", "bra"]) {
+    compose(input, text)
+  }
+  expect(view.api.internal.listbox.entries().map((e) => e.label)).toEqual([
+    "Brazil",
+  ])
+  expect(heard).toEqual(["b", "br", "bra"])
+  view.unmount()
+})
+
+test("Hangul composing each syllable filters as it's typed", () => {
+  const heard: string[] = []
+  const view = mount(
+    combobox,
+    {
+      items: ["한국", "하노이", "東京"],
+      onQueryChange: (query, details) =>
+        heard.push(details.composing ? `(${query})` : query),
+    },
+    markup
+  )
+  const input = view.part("input") as HTMLInputElement
+  input.focus()
+  for (const text of ["ㅎ", "하", "한"]) {
+    compose(input, text)
+  }
+  expect(view.api.internal.listbox.entries().map((e) => e.label)).toEqual([
+    "한국",
+  ])
+  expect(heard).toEqual(["ㅎ", "하", "한"])
   view.unmount()
 })
