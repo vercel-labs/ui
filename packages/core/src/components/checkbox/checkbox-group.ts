@@ -1,5 +1,6 @@
 import { dev, warn } from "#dev"
 import { inOrder } from "../../foundation/focus/collection"
+import { deriveState } from "../../foundation/kernel/derive"
 import { documentOrder } from "../../foundation/kernel/order"
 import {
   bindHiddenInput,
@@ -167,6 +168,12 @@ function checkboxGroupApiBody(
 
   const disabled = () => isDisabled(store.get())
   const all = () => store.get().allValues ?? store.get().children
+
+  // The checkboxes' order, like the form's, also for a value given out of order.
+  deriveState(context, ["value"], ({ value, allValues, children }) => {
+    const ordered = inOrder(value, allValues ?? children)
+    return same(ordered, value) ? undefined : { value: ordered }
+  })
 
   // In document order, not the order they joined, since one can mount before the others later.
   function firstEnabled() {
