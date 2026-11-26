@@ -132,6 +132,20 @@ test("a ui-label names the select trigger its `for` points at", async ({
   await expect(page.getByRole("combobox", { name: "Country" })).toBeVisible()
 })
 
+test("radios in card labels around fields with descriptions are each named by their card", async ({
+  page,
+}) => {
+  await page.evaluate(() => {
+    const card = (value: string, text: string) =>
+      `<label><ui-field><ui-radio value="${value}"></ui-radio><span>${text}</span><ui-field-description>More</ui-field-description></ui-field></label>`
+    document.querySelector("#stage")!.innerHTML =
+      `<ui-radio-group aria-label="Plan" default-value="team">${card("starter", "Starter")}${card("team", "Team")}${card("business", "Business")}</ui-radio-group>`
+  })
+  for (const name of ["Starter More", "Team More", "Business More"]) {
+    await expect(page.getByRole("radio", { name })).toBeVisible()
+  }
+})
+
 test("a button moved out of its tab is a plain button again", async ({
   page,
 }) => {

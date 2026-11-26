@@ -554,7 +554,8 @@ const comboboxCreate = /* @__PURE__ */ (() => ({
     create: comboboxSlot<CreateProps, ComboboxCreateState>({
       // `onCreate`'s Promise makes the option pending. `text` is internal: passed by renderers.
       props: { onCreate: "action", minLength: "number", text: "boolean" },
-      present: (state, { api }) => api.internal.createShown(state),
+      present: (state, { api, props }) =>
+        api.internal.createShown(state, props),
       role: "option",
       focus: "active-descendant",
       state: (state) => ({
