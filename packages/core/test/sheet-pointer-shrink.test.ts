@@ -26,6 +26,7 @@ function setup() {
     size: 400,
     rests: [] as (string | null)[],
     snaps: [] as string[],
+    frames: [] as number[],
   }
   const none = () => {}
   driver = createPointerDriver({
@@ -53,7 +54,7 @@ function setup() {
     onDismissAttempt: none,
     onDragChange: none,
     isInteractive: () => false,
-    onFrame: none,
+    onFrame: (extent) => seen.frames.push(extent),
     onMotion: none,
     onMotionStart: none,
   })
@@ -67,6 +68,7 @@ test("a resting sheet whose content shrinks stays on the edge it's attached to",
   driver!.relayout(false)
   expect(animations).toEqual([])
   expect(sheet.style.translate).toBe("0 0px")
+  expect(seen.frames.at(-1)).toBe(200)
 })
 
 test("a resting sheet whose content grows still slides to its new size", () => {

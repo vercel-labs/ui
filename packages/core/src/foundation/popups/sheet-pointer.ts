@@ -656,6 +656,8 @@ function createPointerDriver(options: SheetDriverOptions) {
           state = initialState(extent, index)
           writeTranslate(extent)
           if (!immediate && id === targetId) {
+            // Effects follow the new extent too, like a dim that ends below it.
+            options.onFrame(extent)
             return
           }
           if (id !== targetId) {
