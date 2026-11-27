@@ -274,7 +274,7 @@ function release(instance: object, slot: string, holder: string) {
   }
 }
 
-const SAFE_URL = /^(?!javascript:)(?:[a-z\d+.-]+:|[^:/?#]*(?:[/?#]|$))/i
+const SAFE_URL = /^(?!javascript:)(?:[a-z\d+.-]+:|[^&:/?#]*(?:[/?#]|$))/i
 
 // Core writes an `href` itself, so it gets the check Angular gives an `[href]`
 // binding: `javascript:` and a malformed scheme get `unsafe:` in front. An
