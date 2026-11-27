@@ -85,6 +85,8 @@ Escape reaches the elements inside a popup first. One that handles the key and c
 
 Menu, Select, Combobox, Autocomplete, Popover, and Dialog support `presentation="auto"` to become a sheet on small touch screens. Use `presentation="sheet"` to always show a sheet.
 
+A sheet sets `--available-height` on its content to the room it has above the on-screen keyboard, the way a popover sets it to the room beside its trigger. So one `max-height: var(--available-height)` fits the content in either presentation.
+
 ## Focus
 
 Dialogs, alert dialogs, drawers, and popovers move focus into their content when they open. Where it lands depends on how they opened:

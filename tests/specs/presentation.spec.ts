@@ -204,6 +204,24 @@ for (const sheet of sheets) {
       await expect(sheet.popup(page)).toBeVisible()
     })
 
+    test("the content's --available-height is the room the sheet has, so a popover's max-height fits it", async ({
+      page,
+    }) => {
+      await openWithKeyboard(page, sheet)
+      await waitForStill(sheet.popup(page))
+      const popup = sheet.popup(page)
+      const room = await popup.evaluate((el) =>
+        parseFloat(getComputedStyle(el).getPropertyValue("--available-height"))
+      )
+      expect(room).toBe(page.viewportSize()!.height)
+      await popup.evaluate((el) => {
+        el.style.height = "2000px"
+        el.style.maxHeight = "var(--available-height)"
+      })
+      await waitForStill(popup)
+      expect(Math.round((await popup.boundingBox())!.height)).toBe(room)
+    })
+
     test("Escape closes it and returns focus to the trigger", async ({
       page,
     }) => {

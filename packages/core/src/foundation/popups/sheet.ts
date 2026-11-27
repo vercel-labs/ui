@@ -290,9 +290,12 @@ function attachSheet(el: HTMLElement, input: SheetOptions) {
       restoreStyles[0] = styleHost(host, side, atEnd)
     }
     // The scroll-snap host reaches below the screen, under Safari's toolbar.
-    const container =
-      (isVertical(side) ? host.clientHeight : host.clientWidth) -
-      (scrollSnap ? toolbarBleed : 0)
+    const height = host.clientHeight - (scrollSnap ? toolbarBleed : 0)
+    const width = host.clientWidth
+    const container = isVertical(side) ? height : width
+    // The room a popover's content gets, so one max-height fits both presentations.
+    el.style.setProperty("--available-height", `${height}px`)
+    el.style.setProperty("--available-width", `${width}px`)
     viewportHeight ??= view.visualViewport?.height
     size = sizeAlong(el, side)
     const rootFontSize =
@@ -618,6 +621,8 @@ function attachSheet(el: HTMLElement, input: SheetOptions) {
       restoreBackdrop?.()
       theme?.restore()
       restoreStyles.forEach((restore) => restore())
+      el.style.removeProperty("--available-height")
+      el.style.removeProperty("--available-width")
       el.removeAttribute("data-driver")
       sheets.delete(el)
     },
