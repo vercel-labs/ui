@@ -97,7 +97,15 @@ const ColorPickerSliderThumb = parts.SliderThumb
  * @experimental
  */
 function ColorPickerInput(props: InputProps) {
-  return usePart(colorPicker, "input", undefined, startingText(props), "input")
+  // Its own key, so each input of a picker binds and follows the value.
+  const id = createUniqueId()
+  return usePart(
+    colorPicker,
+    "input",
+    () => ({ id }),
+    startingText(props),
+    "input"
+  )
 }
 
 /**

@@ -395,12 +395,7 @@ To open a conversation at its current position instead of jumping to the end, us
 const stick = createStickToBottom({ initial: false, threshold: 48 })
 ```
 
-`threshold` is the distance in pixels that still counts as being at the bottom. Before adding older messages above the current ones, call `prepend()` to preserve the reader's position:
-
-```ts
-stick.prepend()
-addOlderMessages()
-```
+`threshold` is the distance in pixels that still counts as being at the bottom. Older messages added above the current ones keep the reader's place on their own, with nothing to call.
 
 <ComponentExample
   name="behaviors/stick-chat"

@@ -1448,6 +1448,7 @@ interface UiImageCropperElement
     UiElement<ImageCropperEvents>,
     AttributeProperties<typeof imageCropper, "api" | "controller" | "crop"> {
   crop: Required<ImageCrop> | null
+  defaultCrop?: ImageCrop
   api: ImageCropperController
   controller?: ImageCropperController
 }
@@ -2192,7 +2193,8 @@ declare global {
     "ui-combobox-item": UiPartElement<
       typeof combobox,
       "item",
-      "label" | "keywords" | "disabled" | "index" | "value"
+      "label" | "keywords" | "disabled" | "index",
+      "value"
     >
     "ui-combobox-item-indicator": UiPartElement<
       typeof combobox,
@@ -2387,7 +2389,8 @@ declare global {
     "ui-listbox-item": UiPartElement<
       typeof listbox,
       "item",
-      "value" | "label" | "disabled" | "index"
+      "label" | "disabled" | "index",
+      "value"
     >
     "ui-listbox-item-indicator": UiPartElement<
       typeof listbox,

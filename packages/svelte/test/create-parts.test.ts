@@ -1,5 +1,5 @@
 import { flushSync, mount, unmount } from "svelte"
-import { afterEach, describe, expect, test } from "vitest"
+import { afterEach, describe, expect, test, vi } from "vitest"
 import App from "./apps/picker-app.svelte"
 import ControlledApp from "./apps/picker-controlled-app.svelte"
 import ListboxApp from "./apps/listbox-parts-app.svelte"
@@ -101,6 +101,20 @@ describe("parts from createParts", () => {
     expect(document.querySelector("div")!.namespaceURI).toBe(
       "http://www.w3.org/1999/xhtml"
     )
+    unmount(app)
+  })
+
+  test("an SVG part without focus handlers gets no focus listener", () => {
+    // Chrome makes an SVG element with a focus listener a Tab stop.
+    const listen = vi.spyOn(EventTarget.prototype, "addEventListener")
+    const app = mount(SvgApp, { target: document.body })
+    flushSync()
+    const circle = document.querySelector("circle")!
+    const types = listen.mock.calls
+      .filter((_, index) => listen.mock.contexts[index] === circle)
+      .map(([type]) => type)
+    listen.mockRestore()
+    expect(types.filter((type) => /^(focus|blur)/.test(type))).toEqual([])
     unmount(app)
   })
 

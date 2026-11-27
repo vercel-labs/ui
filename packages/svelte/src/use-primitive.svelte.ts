@@ -16,7 +16,7 @@ import {
   followed,
   handlers as partHandlers,
   noteEarlyText,
-  on,
+  on as listen,
   partState,
   present as isPresent,
   ref as partRef,
@@ -31,6 +31,7 @@ import {
 } from "@ui-sdk/core/renderer"
 import { onDestroy, untrack, type Snippet } from "svelte"
 import { createAttachmentKey, type Attachment } from "svelte/attachments"
+import { on as delegated } from "svelte/events"
 import type { SvelteHTMLElements } from "svelte/elements"
 import { trackBindable } from "./bindable.svelte"
 
@@ -68,10 +69,45 @@ const exits = new WeakMap<object, Promise<void>[]>()
 // Reads from such a cleanup get the options delivered last.
 let tearingDown = 0
 
+// Svelte's root listener resumes delegation from the element whose `on` ran
+// it, but a part moved out of the root, into its container, is past it: the
+// container resumes instead, for any type a part inside it may bind.
+const delegatedTypes = [
+  "beforeinput",
+  "click",
+  "change",
+  "dblclick",
+  "contextmenu",
+  "focusin",
+  "focusout",
+  "input",
+  "keydown",
+  "keyup",
+  "mousedown",
+  "mousemove",
+  "mouseout",
+  "mouseover",
+  "mouseup",
+]
+const resumed = new WeakSet<Node>()
+
+function resumeDelegation(container: Node | null) {
+  if (!container || resumed.has(container)) {
+    return
+  }
+  resumed.add(container)
+  for (const type of delegatedTypes) {
+    delegated(container as Element, type, () => {})
+  }
+}
+
 const memo = <Value>(compute: () => Value) => {
   const value = $derived.by(compute)
   return () => value
 }
+
+// The primitive each instance was made from, for a part given only its handle.
+const primitives = new WeakMap<object, Primitive>()
 
 /**
  * Creates the instance for a component's life. `options` is a getter, so
@@ -92,6 +128,7 @@ function usePrimitive<P extends Primitive>(
   const prefixed = `ui-sdk-${first.id}`
   noteEarlyText()
   const instance = primitive({ ...first, id: prefixed }) as ReturnType<P>
+  primitives.set(instance, primitive)
   const bindable = trackBindable(primitive, instance.get(), first, options)
   const removals: Promise<void>[] = []
   if ("onOpenChangeComplete" in schemaOf(primitive).options) {
@@ -328,6 +365,9 @@ function useHandlePart<P extends Primitive, S extends SlotName<P>>(
       // content as its viewport binds again: it goes back where it renders.
       if (present && restored && restored === bound) {
         back = portal?.(restored)
+        if (back) {
+          resumeDelegation(restored.parentNode)
+        }
       }
       if (present) {
         restored = undefined
@@ -379,15 +419,37 @@ function useHandlePart<P extends Primitive, S extends SlotName<P>>(
     back = portal?.(el)
     const current = untrack(() => instance.part(name, props()))
     const ref = partRef(current, { by: "framework", attaches: "all" })
-    ref(el)
+    // A slot's `bind` runs in here, and what it reads, like app state behind
+    // a function option, would bind the element again each time it changes.
+    untrack(() => ref(el))
     bound = el
     // The declarations the spread wrote are recorded, so a later change can drop them.
     if (typeof styleShown === "string") {
       applyAttrs(el, { style: styleShown }, "svelte-style")
     }
-    const cleanups = Object.entries(partHandlers(current)).map(
-      ([type, handler]) =>
-        on(el, type as keyof HTMLElementEventMap, (event) => {
+    // Svelte's `on` runs the delegated handlers inside the part first, so their
+    // `stopPropagation()` keeps the event from the part. Pointer, touch and
+    // wheel stay native: through it, a slider unmounted mid-drag leaked.
+    const handlers = partHandlers(current)
+    if (back) {
+      resumeDelegation(el.parentNode)
+    }
+    // Chrome fires `focusout` as Svelte removes a focused element, inside the
+    // effect removing it, where a write throws. The core hears it after, if
+    // the element stays. Svelte's `on` runs outside the effect: noted first.
+    const removing = new WeakSet<Event>()
+    const noteRemoval = (event: Event) =>
+      $effect.tracking() && removing.add(event)
+    // Only for a part that handles it: Chrome makes an SVG element with a
+    // focus listener a Tab stop.
+    if (handlers.focusout) {
+      el.addEventListener("focusout", noteRemoval, true)
+    }
+    const cleanups = Object.entries(handlers).map(([type, handler]) =>
+      (/^(pointer|touch|wheel)/.test(type) ? listen : delegated)(
+        el,
+        type as keyof HTMLElementEventMap,
+        (event: Event) => {
           const own = user[`on${type}`]
           if (typeof own === "function") {
             own(event)
@@ -395,15 +457,15 @@ function useHandlePart<P extends Primitive, S extends SlotName<P>>(
           if (event.defaultPrevented) {
             return
           }
-          // Chrome fires `focusout` as Svelte removes a focused element, inside
-          // the effect removing it, where a write throws. The core hears it after.
-          if ($effect.tracking()) {
+          if (removing.has(event) || $effect.tracking()) {
             queueMicrotask(() => el.isConnected && handler!(event))
           } else {
             handler!(event)
           }
-        })
+        }
+      )
     )
+    cleanups.push(() => el.removeEventListener("focusout", noteRemoval, true))
     return () => {
       cleanups.forEach((cleanup) => cleanup())
       bound = undefined
@@ -623,6 +685,7 @@ export {
   plainPart,
   type PopupContainer,
   type Portal,
+  primitives,
   type PrimitiveHandle,
   type SlotAttributes,
   useHandlePart,

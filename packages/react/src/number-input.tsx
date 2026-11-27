@@ -141,7 +141,10 @@ function NumberInputControl({
   "value" | "defaultValue" | "children" | "readOnly"
 >) {
   const numberInput = useNumberInput("NumberInputControl")
-  // The core writes the text as it changes, so React only renders where it starts.
+  // The core writes the text as it changes, so React only renders where it
+  // starts. A later default would change the text behind React's back, and
+  // React would then miss the edit that clears it.
+  const [text] = React.useState(() => numberInput.state.text)
   const control = (input: Record<string, any>, state: NumberInputState) => {
     const { field } = numberInput
     const [own, element] = field
@@ -152,7 +155,7 @@ function NumberInputControl({
       : own
     return renderElement(
       "input",
-      { ...rest, defaultValue: value },
+      { ...rest, defaultValue: text },
       element,
       state
     )

@@ -4,6 +4,8 @@
 // they are; scrolling back down, or `scrollToBottom`, follows again. Older
 // content loaded above keeps what's in view still, in every browser.
 
+import { isEditing } from "../kernel/events"
+
 /**
  * Where a log stands.
  * @experimental
@@ -40,8 +42,6 @@ type StickToBottomOptions = {
  * const disconnect = log.connect(scroller)
  * // A "Jump to latest" button while !log.get().following:
  * button.onclick = () => log.scrollToBottom({ behavior: "smooth" })
- * // Before adding older messages above:
- * log.prepend()
  * ```
  * @experimental
  */
@@ -250,7 +250,9 @@ function createStickToBottom(options: StickToBottomOptions = {}) {
         }
       }
       observeRows()
-      // A wheel or touch going up stops following at once, before any frame lands.
+      // A wheel, touch or key going up stops following at once, before any
+      // frame lands. A key a field or a widget inside uses scrolls nothing,
+      // and if it does after all, the scroll lets go.
       const intent = (event: WheelEvent | TouchEvent | KeyboardEvent) => {
         const up =
           event.type === "wheel"
@@ -258,7 +260,9 @@ function createStickToBottom(options: StickToBottomOptions = {}) {
             : event.type === "keydown"
               ? ["ArrowUp", "PageUp", "Home"].includes(
                   (event as KeyboardEvent).key
-                )
+                ) &&
+                !event.defaultPrevented &&
+                !isEditing(event.target)
               : true
         if (up && el.scrollHeight > el.clientHeight) {
           ours = null
@@ -304,13 +308,15 @@ function createStickToBottom(options: StickToBottomOptions = {}) {
       }
     },
     /**
-     * Call right before adding content above, like older messages: the next
-     * growth keeps what's in view where it is instead of pushing it down.
+     * Keeps the distance from the end through the next growth. Rows added
+     * above keep their place without it; call it right before adding content
+     * whose rows it can't track, like one block that grows at its top.
      */
     prepend() {
+      // The height as of the last resize, so a call made just after the content
+      // changed, or while a change is still unmeasured, keeps the same place.
       if (scroller) {
-        anchor =
-          scroller.scrollHeight - scroller.clientHeight - scroller.scrollTop
+        anchor = lastHeight - scroller.clientHeight - scroller.scrollTop
       }
     },
   }

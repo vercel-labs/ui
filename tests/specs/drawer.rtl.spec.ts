@@ -33,6 +33,23 @@ test(
   }
 )
 
+for (const side of ["right", "left"] as const) {
+  test(
+    `side="${side}" stays on the ${side} in a right-to-left layout`,
+    { tag: "@enhancement" },
+    async ({ page, open }) => {
+      await open("drawer", { dir: "rtl", side })
+      await openDrawer(page)
+      const rect = await sheetRect(page)
+      if (side === "right") {
+        expect(rect.right).toBe(page.viewportSize()!.width)
+      } else {
+        expect(rect.left).toBe(0)
+      }
+    }
+  )
+}
+
 test(
   "a drag toward the start edge closes it in a right-to-left layout",
   { tag: "@enhancement" },

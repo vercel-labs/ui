@@ -1,5 +1,14 @@
 # @ui-sdk/solid
 
+## 0.1.0-beta.18
+
+### Patch Changes
+
+- 0dbff31: A Checkbox in a Field of its own inside a CheckboxGroup takes that field from the server's HTML on: its label names it and the field's `disabled` disables it, like a checkbox outside a group.
+- 60e18e1: Parts take less work to render, bind and update, most of all in Solid, and a closed Menu waits for its first use to set itself up.
+- 7cf20f0: A part follows its `render` when it changes after mount, so a Button whose `render` stops returning a link renders a button again.
+- Updated @ui-sdk/core to 0.1.0-beta.18
+
 ## 0.1.0-beta.17
 
 ### Patch Changes

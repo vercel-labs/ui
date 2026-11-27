@@ -3,8 +3,10 @@
 // uses the nearest one. Its own module, so a component that passes its
 // handle around never bundles Svelte's context code for it.
 import type { Primitive, PropsOf, SlotName } from "@ui-sdk/core"
+import { schemaOf } from "@ui-sdk/core/renderer"
 import { getContext, setContext } from "svelte"
 import {
+  primitives,
   useHandlePart,
   type Portal,
   type PrimitiveHandle,
@@ -43,12 +45,45 @@ function usePart<P extends Primitive, S extends SlotName<P>>(
   slotProps?: () => PropsOf<P, S>,
   portal?: Portal
 ) {
-  return useHandlePart(
-    typeof owner === "function" ? useHandle(owner) : owner,
-    slot,
-    slotProps,
-    portal
-  )
+  const handle = typeof owner === "function" ? useHandle(owner) : owner
+  const primitive =
+    typeof owner === "function" ? owner : primitives.get(handle.instance)
+  if (primitive) {
+    provideProps(primitive, slot, slotProps)
+  }
+  return useHandlePart(handle, slot, slotProps, portal)
+}
+
+// The slots whose props a nested part takes `from` them, by primitive.
+const providers = new WeakMap<Primitive, Set<string>>()
+
+// Like a generated part, one written by hand provides its props to the parts
+// inside it that take them `from` its slot.
+function provideProps(
+  primitive: Primitive,
+  slot: string,
+  slotProps?: () => Record<string, unknown>
+) {
+  const schema = schemaOf(primitive)
+  let slots = providers.get(primitive)
+  if (!slots) {
+    slots = new Set(
+      Object.values(schema.slots).flatMap((props) =>
+        Object.values(props).flatMap((spec) =>
+          typeof spec === "object" ? [spec.from.split(".")[0]] : []
+        )
+      )
+    )
+    providers.set(primitive, slots)
+  }
+  if (slots.has(slot)) {
+    type Around = Record<string, () => Record<string, unknown>>
+    const around = slot === "root" ? {} : getContext<Around>(schema)
+    setContext<Around>(schema, {
+      ...around,
+      [slot]: () => slotProps?.() ?? {},
+    })
+  }
 }
 
 export { provideInstance, useHandle, usePart }

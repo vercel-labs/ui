@@ -26,7 +26,9 @@ function defineRatingElements() {
         return () => observer.disconnect()
       },
     },
-    item: "ui-rating-item",
+    // A star isn't a choice, its radios are: like core, it's keyed by nothing,
+    // so an agent doesn't offer the stars as items.
+    item: { tag: "ui-rating-item", context: () => ({ id: "" }) },
     radio: "ui-rating-radio",
   })
 }

@@ -179,6 +179,39 @@ test.describe("catching it", { tag: "@enhancement" }, () => {
     expect(await drawerLog(page)).toContain("drawer:false:swipe")
   })
 
+  test("a swipe up on a scroll-snap drawer that's closing doesn't bring it back", async ({
+    page,
+    open,
+    context,
+  }) => {
+    await open("drawer", { driver: "scroll-snap" })
+    await openDrawer(page)
+    const opened = await sheetRect(page)
+    const cdp = await context.newCDPSession(page)
+    await page.keyboard.press("Escape")
+    await page.waitForTimeout(100)
+    const x = 200
+    const y = opened.top + opened.height - 40
+    await cdp.send("Input.dispatchTouchEvent", {
+      type: "touchStart",
+      touchPoints: [{ x, y }],
+    })
+    for (let step = 1; step <= 8; step++) {
+      await cdp.send("Input.dispatchTouchEvent", {
+        type: "touchMove",
+        touchPoints: [{ x, y: y - step * 30 }],
+      })
+    }
+    await cdp.send("Input.dispatchTouchEvent", {
+      type: "touchEnd",
+      touchPoints: [],
+    })
+    if (await drawerDialog(page).isVisible()) {
+      expect((await sheetRect(page)).top).toBeGreaterThan(opened.top + 50)
+    }
+    await expect(drawerDialog(page)).toBeHidden()
+  })
+
   test("without preventEdgeSwipe nothing on the page can cancel a touch, so scrolling never waits for script", async ({
     page,
     open,

@@ -3,7 +3,7 @@ import { prefersReducedMotion } from "../../foundation/platform/platform"
 import { ahead, registerUninherited } from "../../foundation/platform/style"
 import { bindTabStop } from "../../foundation/focus/tabbable"
 import { createScrollbarInput } from "./scroll-area-pointer"
-import { on } from "../../foundation/kernel/events"
+import { isEditing, on } from "../../foundation/kernel/events"
 import type { Store } from "../../foundation/kernel/store"
 import {
   edgesOf,
@@ -769,15 +769,6 @@ function createScrollView(store: Store<ScrollAreaModel>) {
       refreshVisibility()
     },
   }
-}
-
-function isEditing(target: EventTarget | null) {
-  if (!(target instanceof HTMLElement)) {
-    return false
-  }
-  return (
-    target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName)
-  )
 }
 
 // Whether a scroller between `target` and the viewport can still scroll

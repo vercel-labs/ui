@@ -252,7 +252,8 @@ function attachSheet(el: HTMLElement, input: SheetOptions) {
 
   const scrollSnap = side === "bottom" && usesScrollSnap(view, options)
   sheets.add(el)
-  const restoreStyles = [styleHost(host, side, el), styleSheet(el)]
+  let atEnd = endOf(host, side, el)
+  const restoreStyles = [styleHost(host, side, atEnd), styleSheet(el)]
 
   let ancestors: HTMLElement[] = []
   const effects = createSheetEffects({
@@ -279,11 +280,14 @@ function attachSheet(el: HTMLElement, input: SheetOptions) {
   let measured = false
   function measure() {
     measured = true
+    // A host that wasn't in the page yet, like a Vue one, read no direction.
     const nextSide = resolveSide(options.side(), el)
-    if (nextSide !== side) {
+    const nextAtEnd = endOf(host, nextSide, el)
+    if (nextSide !== side || nextAtEnd !== atEnd) {
       side = nextSide
+      atEnd = nextAtEnd
       restoreStyles[0]()
-      restoreStyles[0] = styleHost(host, side, el)
+      restoreStyles[0] = styleHost(host, side, atEnd)
     }
     // The scroll-snap host reaches below the screen, under Safari's toolbar.
     const container =
@@ -621,14 +625,16 @@ function attachSheet(el: HTMLElement, input: SheetOptions) {
   return sheet
 }
 
-function styleHost(host: HTMLElement, side: PhysicalSide, sheet: HTMLElement) {
-  const vertical = isVertical(side)
-  // Read only when it matters: the read styles the sheet before its own writes restyle it.
-  const atEnd = vertical
+// Read only when it matters: the read styles the sheet before its own writes restyle it.
+const endOf = (host: HTMLElement, side: PhysicalSide, sheet: HTMLElement) =>
+  isVertical(side)
     ? side === "bottom"
     : (side === "right") !==
       (sheet.ownerDocument.defaultView?.getComputedStyle(host).direction ===
         "rtl")
+
+function styleHost(host: HTMLElement, side: PhysicalSide, atEnd: boolean) {
+  const vertical = isVertical(side)
   return setStyles(host, {
     position: "fixed",
     inset: "0 0 var(--keyboard-inset, 0px) 0",

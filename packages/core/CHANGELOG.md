@@ -1,5 +1,80 @@
 # @ui-sdk/core
 
+## 0.1.0-beta.18
+
+### Patch Changes
+
+- dacbb42: Aborting an `act` call that waits behind another one, like a call waiting on a confirm the person hasn't answered, now settles it at once with its step cancelled. It used to wait until the call ahead of it finished. The cancelled call never runs, and the call ahead of it keeps waiting for its answer.
+- f34088c: The agent lists the components in a closed web popup, like the fields of a dialog that was open, with `offPage: true` and the state they had, as it does in React. Private fields stay out, as they do when they leave the page.
+- d01d785: The agent names a closed web popup by its trigger and leaves out its hidden title and description, as it does in React.
+- 89e15f7: The agent names a web field without a label by its control, like `aria-label` on its input, as it does in React.
+- 433d08b: A Field around a password, card or one-time-code control reads its error text as `"[redacted]"` to an agent in web components too, like it does in React.
+- 1b357fa: Input: `setValue` with text on an `<input type="file">` now returns `false` and changes nothing, where it threw the browser's error and kept the text as the value. An agent's `setValue` step on one fails with the value the field holds, and its `values` and the next snapshot no longer report text the input never took. `clear` still empties it.
+- 898012f: The agent bridge reads an item's label with a space between its blocks, as it reads on the page. An item that holds a name and a price in two elements was listed as `Starter$12`, which an agent had to send back to choose it. It now reads `Starter $12`. A component's label, title, description and button text read the same way.
+- 9a7bdc0: Before an agent's `setValue`, the bridge now opens only a component with an `open` state to look for its items, and once per step. It stops waiting when the list stays closed, like one the app keeps shut until the text has an "@". A component whose api has a `setOpen` for something else is no longer opened, and such a `setValue` no longer waits about 4 seconds.
+- 4ebaab3: An agent's `setValue` that names an item of a Select, Combobox or Listbox by its `itemToValue` key now sets the item's own value. Before, a list whose values are objects stored the key as text and answered `ok: true`. A list whose data holds object values lists each item by that key in the snapshot, where it read `[object Object]`.
+- 9fa3dd1: The agent doesn't list an open web popup's own trigger among its buttons, so an open select or combobox offers the same actions as a closed one.
+- 38efb10: An agent's snapshot lists a component's `items` and `buttons` in the page's order, and what left the page in the order it was listed, the same in every framework.
+- 3930e19: The agent bridge redacts only what a private field holds. Password Input's `visible` read `"[redacted]"` in the snapshot and in a step's changes, so an agent offered `setVisible` couldn't tell what it would do. It now reads `true` or `false`, and so does `open` on a list inside `data-agent-secret`. The value stays redacted.
+- a250f6e: Agent: a `set` step whose component unmounts while it runs, like a to-do that moves to a Done list once it's checked, no longer fails with "didn't take". The step ends as done, since the component it changed is gone and can't be read again.
+- ea48fe1: `agent.subscribe` reports changes to the components `snapshot` lists. A change to a component that's hidden when it changes isn't reported, apart from it opening or closing. `observe` still reports every change.
+- d5c6249: An agent's step that changes a value its component commits, like a Slider's or a Number Input's, now calls `onValueCommit` once, when the step has taken, with `source: "agent"`. It never fired for an agent, so an app that saves on commit missed an agent's change. Only the component the step names commits. A change that didn't take commits nothing, and neither does a value set from code or one a callback sets on another component, as before.
+- 8250b4d: The agent's snapshot names a web component Slider by its Field's label, as it does in the other frameworks.
+- 3f1cde1: Carousel takes `disabled`, which turns it off for now, like at a breakpoint where the slides lay out as a grid. The parts drop their roles, slide labels and inline styles, slides stay reachable, the viewport stops paging, and the controls hide. Turned back on, it measures again and shows its page.
+- 25a3d2a: A Carousel's content reads `--carousel-display` for its layout, flex by default. Set `--carousel-display: grid` to lay the slides out in a grid. The style stays inline, so server-rendered carousels lay out before they hydrate.
+- cbd887e: Carousel: each slide gets `--carousel-item-progress`, from -1 a page behind to 1 a page ahead and 0 at rest, on every frame of a scroll or spring.
+- d0d1b07: In development, a Carousel with `loop` says in the console when it can't go round seamlessly and scrolls back to the first page instead, with why: too few slides for a page to either side of the current one, or content that doesn't lay its slides out by CSS `order`.
+- 25766c0: A looping Carousel no longer scrolls back when Next or Previous is pressed again before the last step lands. A step the slides can't rotate for yet waits while the slides keep moving, then goes on the same way.
+- d445dc1: Carousel: a press on a slide peeking in at the edge pages to it, with the reason `item-press`. The slide is inert while it's out of view, so the press used to do nothing.
+- 1f54804: An agent's `setAll` on a checkbox group checks or unchecks every enabled checkbox instead of failing the step.
+- c81d202: A checkbox group given its value out of order now reads it in its checkboxes' order from the start.
+- bfa4470: Combobox, Command, Select's search field and Autocomplete keep their list's filter while an input method composes text, like `とうk` on its way to `東京` or a dead key's accent, and filter once it's committed. Their query change callbacks (Autocomplete's `onValueChange`) get `details.composing`, typed as `TextChangeDetails`, and report the committed text again with `composing: false`. Android keyboards and Hangul, which compose ordinary typing, filter as before. Async options' `setQuery` skips text that's still composing.
+- 7e93fda: A Combobox create option with a minimum length stays hidden for shorter text, instead of freezing the page in web components.
+- 1b06029: In Vue, a Combobox with its input in the popup keeps the trigger in the tab order while the list is open.
+- 01e2e3d: A native `<label>` for a web Date Input or Time Input focuses the first segment wherever it's pressed, not the segment nearest the press.
+- 60e18e1: Parts take less work to render, bind and update, most of all in Solid, and a closed Menu waits for its first use to set itself up.
+- f57c90a: A Field whose control already has focus when it mounts, like one with `autoFocus`, shows `data-focused` right away. One that lost focus while hidden, like inside a hidden `<Activity>`, no longer shows it when it's back.
+- 7e93fda: A field without a label keeps the name a native label around its control gives it, so every radio in a row of choice cards is named.
+- 3280bf1: Tabs and Segmented Control indicators get `data-visible` once they have a position, like the Navigation Menu indicator. Before then, like on a server-rendered page before its script runs, their variables are unset, so a marker can stay hidden with `:not([data-visible])`.
+- 045ee98: Tabs, Segmented Control and Navigation Menu indicators take `followHover`: the indicator follows the item under the pointer, and goes back to the selected, checked or open one when the pointer leaves.
+- dea5a58: Tabs, Segmented Control and Navigation Menu indicators: the right and bottom offsets, like `--active-tab-right` and `--active-tab-bottom`, stay exact when the list has a fractional size. They used to be off by up to half a pixel.
+- c78056f: A Tabs or Segmented Control indicator keeps its last box while an ancestor hides the list. It wrote an empty box there, so showing the list again animated the indicator from nothing to the selected item.
+- 56f180f: Escape in a filled Input that has a Clear part clears it, like pressing Clear, and stops there, so a dialog around it closes only once the input is empty.
+- 7e93fda: A label that names a control by `for` names it once the control drops its own label reference, like a Select trigger without a SelectLabel.
+- 6d6d236: A label built on a native `<label>` names and focuses the control inside a slider or number input it points at, and a press on any label for a checkbox group focuses the group's first checkbox.
+- c4d98a8: A press on a label that names a checkbox, switch or radio moves focus to it as it checks it, as a native label does.
+- cabebb5: A menu's groups, labels, separators, radio groups, item indicators, content and viewport no longer update on store changes they don't show, like a highlight moving.
+- f52f049: The arrow keys, Home, End and typeahead in a Menu skip items the page hides with `hidden`, `display: none` or `inert`. Focus used to land on the hidden item and stay out of sight.
+- 7b835b0: A menu whose only icons are on submenu triggers gets `data-has-icons` when it opens, not only when it starts open.
+- 0da01a3: Pressing a Menubar trigger whose menu opened when the pointer rested on it keeps focus in the menu, as a press that opens the menu does. The press used to leave focus on the trigger with the menu open, so letters searched the triggers and Enter closed the menu.
+- 7e93fda: A native label that names a control gets an id of its own, so it never shares one with a `<ui-label>` and names the wrong control.
+- ef2d737: A Navigation Menu switches to another trigger at once when the pointer moves along the bar to it. A wide panel's safe area used to cover that move too, so the switch waited for the pointer to rest. Crossing a trigger on the way down to the panel still keeps the panel.
+- b930273: ArrowDown on a navigation menu trigger now moves focus into the panel it opens when `value` is controlled, as it already did uncontrolled. In React, focus used to stay on the trigger.
+- 48bb644: Popovers, menus, selects, comboboxes, autocompletes, date pickers, tooltips and hover cards close with reason `anchor-hidden` when the element they sit beside stops rendering while they're open, like a trigger a breakpoint hides. They used to stay open with nothing showing them, so the next Escape or outside press went to a popup nobody could see, and they came back open with the trigger. Cancel the change in `onOpenChange` to keep one open.
+- 114d8c9: A dialog or popover with no exit animation sends focus to its `finalFocus` as it closes, as one with an animation does.
+- d6d48c9: A Menu or Popover with several triggers gives the trigger id to the first one rendered in the server's HTML too, instead of to every trigger. When that trigger leaves while the popover is closed, the next one takes the id.
+- 08e1538: An `initialFocus` you set on a Dialog, Alert Dialog, Drawer or Popover now applies when touch opens it too, like a search dialog that focuses its field. With the default `"auto"`, a touch open still focuses the content, so no on-screen keyboard appears.
+- fda6df7: A popup's content and backdrop keep `data-ending-style` until both exits finish and the popup hides. Content with a shorter exit, or none, lost it early and ran back to the open look while the backdrop still faded.
+- 359cbf3: A non-modal popup closes when Tab takes focus out of the page, like from its last control when nothing after its trigger can take focus. Before, focus landed on the body and the popup stayed open.
+- a71389a: With `items` on the root, an item disabled by its own `disabled` prop can't be chosen, highlighted or found by typeahead, as without data.
+- b1dcc33: A Select's highlight no longer moves to the item that scrolls under a resting pointer after a key like End, which WebKit reports as a pointermove without movement.
+- f884ac5: A Select with `items` on its root shows its value's icon in the trigger from the start, not only after the list has opened once.
+- a937036: A Drawer with `side="right"` or `side="left"` stays on that side in a right-to-left page in Vue. Its viewport read the page's direction before it was in the page, so the sheet opened on the opposite edge.
+- 7b35172: A resting Drawer whose content shrinks stays on the edge of the viewport it's attached to. It used to start the resize lifted by the height it lost, leaving a gap below it, and then slide back down.
+- bd7d0c7: A swipe on a scroll-snap sheet that's closing no longer scrolls it back onto the screen before it's removed.
+- 8250b4d: A Slider's thumb input no longer sets `pointer-events: none`, so browser automation tools that only target elements that take pointer events can find it and fill it. Presses still land on the thumb, since the input stays clipped.
+- 3ec94a9: Tabs: with `activation="manual"`, Tab and Shift+Tab from a focused tab now leave the tab list, where they could stop on the selected tab first. The tab stop stays on the focused tab while focus is in the list, and goes back to the selected tab once focus leaves, so entering the list still lands on the selected tab.
+- bb2b57f: Tabs that add a tab and select it in the same update now give it the direction the selection moved and scroll it into view, in every framework.
+- 8636bcf: The arrow keys, Home and End in Tabs skip tabs the page hides with `hidden`, `display: none` or `inert`. They used to select the hidden tab while focus stayed where it was.
+- 8c1d281: A trigger menu inside a token input now marks the editor with `aria-autocomplete` and `aria-haspopup` as soon as the editor is in the page. In Svelte and Solid, and in React with the menu written before the editor, they used to appear only after the first keystroke or focus.
+- d6174a5: A ToolbarButton that renders a Toggle is one item in the toolbar: it keeps the tab stop, and the arrow keys move past it.
+- 3f14aca: A press on an `aria-disabled` tooltip trigger leaves its tooltip open, so the tooltip that says why the control is unavailable stays while someone tries it.
+- d438ee3: A tooltip whose content hides a part reads its blocks with a space between them, so its trigger is described as "Olivia Martin Admin", not "Olivia MartinAdmin".
+- 6c1ea68: A Tree item keeps its depth when a render yields between its branch and the item, like a React hydration that pauses inside an expanded branch. The item rendered one level too shallow there, and React reported a hydration mismatch on `aria-level`, `data-level` and `--tree-level`.
+- 54187a7: A trigger menu connected through `editor` is named in `agent.snapshot()` by its field, like one with a `TriggerMenuInput`.
+- a56b595: A trigger menu with `open` controlled no longer announces its unfiltered suggestion count as it closes.
+- edab573: A `<ui-switch>`, `<ui-checkbox>` or other form control that starts `disabled` works once `disabled` is set back to `false` in jsdom. It kept `aria-disabled` and `data-disabled` and ignored presses, since its own `disabled` counted as a fieldset's, which only `formDisabledCallback` cleared and jsdom never calls it.
+
 ## 0.1.0-beta.17
 
 ### Minor Changes

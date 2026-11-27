@@ -343,11 +343,20 @@ function createListboxEngine(
   // Counts items mounting and leaving, so the listing knows when to look again.
   let mountsVersion = 0
 
+  // A data item is disabled by its data, or by its rendered item's own prop.
+  const flatten = (items: ListData<unknown>) =>
+    flattenData(items, config.toKey).map((entry) => ({
+      ...entry,
+      get disabled() {
+        return entry.disabled || !!registry.get(entry.key)?.meta().disabled
+      },
+    }))
+
   const memoOf = (items: ListData<unknown>, memo: DataMemo | undefined) => {
     if (memo?.data === items) {
       return memo
     }
-    const flat = flattenData(items, config.toKey)
+    const flat = flatten(items)
     return {
       data: items,
       flat,
@@ -404,7 +413,7 @@ function createListboxEngine(
         filter,
         rank,
         list,
-        flat: flattenData(list, config.toKey),
+        flat: flatten(list),
       }
     }
     return visibleMemo

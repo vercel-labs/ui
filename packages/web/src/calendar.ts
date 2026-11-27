@@ -18,6 +18,7 @@ import {
   definePart,
   createParts,
   findOwner,
+  inDragPreview,
   instanceOf,
   ownButton,
   parseAttribute,
@@ -215,6 +216,9 @@ function defineWeeksElement() {
     "ui-calendar-weeks",
     class extends HTMLElement {
       connectedCallback() {
+        if (inDragPreview(this)) {
+          return
+        }
         this.setAttribute("role", "rowgroup")
         scheduleRefresh(this)
       }

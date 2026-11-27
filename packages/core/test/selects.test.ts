@@ -147,18 +147,16 @@ describe("menu items select on the highlighted item and on their checked entry",
     expect(heard["toggle the item that mounted"]).toBe(1)
     // The group, and the items and indicators of the two values.
     expect(heard["choose a radio item"]).toBe(5)
-    // Items select on the highlight, so moving it between two of them reaches
-    // those two and the parts that don't select on it.
-    const items = parts.filter((part) =>
-      ["item", "checkbox-item", "radio-item"].includes(part.slot)
+    // Moving the highlight between two items reaches those two and the parts
+    // that hear every change. The rest select on the little they show.
+    const loud = parts.filter((part) =>
+      ["trigger", "shortcut", "item-icon"].includes(part.slot)
     )
-    expect(heard["highlight another item"]).toBe(
-      parts.length - items.length + 2
-    )
-    // Items show nothing of the popup, so opening it reaches none of them,
-    // and closing it only the one that loses the highlight.
-    expect(heard["open"]).toBe(parts.length - items.length)
-    expect(heard["close"]).toBe(parts.length - items.length + 1)
+    expect(heard["highlight another item"]).toBe(loud.length + 2)
+    // Opening reaches those and the content, and closing also the item that
+    // loses the highlight.
+    expect(heard["open"]).toBe(loud.length + 1)
+    expect(heard["close"]).toBe(loud.length + 2)
   })
 })
 

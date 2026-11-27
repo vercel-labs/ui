@@ -12,7 +12,9 @@ goes back to the value. The core writes its text.
 
   let props: TextPartProps<"input", ColorPickerState> = $props()
 
-  const input = usePart(colorPicker, "input")
+  // Its own key, so each input of a picker binds and follows the value.
+  const id = $props.id()
+  const input = usePart(colorPicker, "input", () => ({ id }))
 </script>
 
 <Part tag="input" part={input} {props} />

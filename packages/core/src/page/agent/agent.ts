@@ -10,6 +10,7 @@ import { withSource } from "../../foundation/kernel/details"
 import { documentOrder, inDocumentOrder } from "../../foundation/kernel/order"
 import { partState } from "../../foundation/kernel/part"
 import type { PrimitiveInstance } from "../../foundation/kernel/primitive-types"
+import { withoutFocus } from "../../foundation/popups/popup"
 import { foldText } from "../../foundation/text/match"
 import {
   confirmOf,
@@ -801,8 +802,21 @@ function describe(entry: Entry, instance: PrimitiveInstance, parts: Bound[]) {
   // they're few, and through `query` when they may be many.
   const opens = typeof api.setOpen === "function"
   if (typeof api.setValue === "function" || entry.agent?.items) {
-    const rendered = opens ? [] : unnamed(entry, renderedItems(parts))
-    const data = rendered.length ? undefined : dataOf(entry, instance)
+    const listed = dataOf(entry, instance)
+    // An item on the page goes by its data's label, the one `act` takes. Data
+    // of bare values, like an accordion's, names nothing the page doesn't.
+    const labels = new Map(
+      listed
+        ?.filter((item) => item.label !== item.value)
+        .map((item) => [item.value, item.label])
+    )
+    const rendered = opens
+      ? []
+      : unnamed(entry, renderedItems(parts)).map((item) => ({
+          ...item,
+          label: labels.get(item.value) || item.label,
+        }))
+    const data = rendered.length ? undefined : listed
     const items = data ? (data.length <= 10 ? data : []) : rendered
     if (items.length) {
       out.items = items
@@ -1715,6 +1729,11 @@ function createAgent(
   // What each closed place a call looked behind holds, by its path, like
   // "Notifications > Email", whether a look ran and whether it may have missed some.
   const held = new Map<string, string[]>()
+  // What each list a step opened showed, so later reads in the step don't open it again.
+  const looked = new Map<
+    PrimitiveInstance,
+    { value: string; label: string }[]
+  >()
   let surveyed = false
   let partial = false
   // The component the step running now is on, and whether it's private.
@@ -2682,30 +2701,43 @@ function createAgent(
           !bound(instance).some((part) => part.key === item)
       )
     // An `agent` key's items are all it has, so opening it shows no more.
+    // Only a list with an open state, once a step, like one its app keeps closed.
     if (
       ((!data && !items.length) || unseen()) &&
       !entry.agent?.items &&
       beforeOpen &&
       api.setOpen &&
-      !state.open
+      state.open === false
     ) {
+      const seen = looked.get(instance)
+      if (seen) {
+        return data ?? seen
+      }
       await beforeOpen()
-      asAgent(() => api.setOpen!(true))
-      let shown = renderedItems(bound(instance))
-      // Items that load can take a while. Ones the data already lists mount with the list.
-      for (
-        let tries = 0;
-        tries < (data ? 4 : 60) && (!shown.length || unseen());
-        tries++
-      ) {
-        await frames()
-        shown = renderedItems(bound(instance))
-      }
-      if (shown.length) {
-        whileOpen?.(disabledItems(entry, instance), bound(instance))
-      }
-      items = data ?? shown
-      asAgent(() => api.setOpen!(false))
+      const elements = bound(instance).map((part) => part.el)
+      await withoutFocus(elements, async () => {
+        asAgent(() => api.setOpen!(true))
+        let shown = renderedItems(bound(instance))
+        const open = () => (instance.get() as { open?: boolean }).open
+        // Items that load can take a while. Ones the data already lists mount
+        // with the list, and a list that didn't open shows none.
+        for (
+          let tries = 0;
+          tries < (data ? 4 : 60) &&
+          (!shown.length || unseen()) &&
+          (tries < 4 || open());
+          tries++
+        ) {
+          await frames()
+          shown = renderedItems(bound(instance))
+        }
+        if (shown.length) {
+          whileOpen?.(disabledItems(entry, instance), bound(instance))
+        }
+        items = data ?? shown
+        looked.set(instance, shown)
+        asAgent(() => api.setOpen!(false))
+      })
       await frames()
     }
     return items
@@ -2737,6 +2769,7 @@ function createAgent(
       }
       // What an earlier step's look found is stale once the page has moved on.
       held.clear()
+      looked.clear()
       surveyed = false
       partial = false
       stepped = undefined

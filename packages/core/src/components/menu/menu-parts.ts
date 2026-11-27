@@ -101,6 +101,35 @@ const unreadByItems = {
   shortcutItems: [],
 } as const
 
+// Every key of the menu's state, so a part that shows little of it hears only
+// what it reads: a group isn't woken by each highlight.
+const menuKeys = Object.keys({
+  nested: 0,
+  barred: 0,
+  open: 0,
+  mounted: 0,
+  highlighted: 0,
+  values: 0,
+  presentation: 0,
+  openChild: 0,
+  apple: 0,
+  trigger: 0,
+  payload: 0,
+  barStop: 0,
+  barDisabled: 0,
+  groupLabels: 0,
+  triggers: 0,
+  triggerElements: 0,
+  shortcutItems: 0,
+  pending: 0,
+  error: 0,
+} satisfies Record<keyof MenuState, 0>) as (keyof MenuState)[]
+
+const unreadBesides = (...read: (keyof MenuState)[]) =>
+  Object.fromEntries(
+    menuKeys.filter((key) => !read.includes(key)).map((key) => [key, []])
+  ) as { [Key in keyof MenuState]?: [] }
+
 // The menu's slots, which its features' slots join.
 const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
   trigger: slot<TriggerProps, MenuTriggerState>({
@@ -428,7 +457,17 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
       finalFocus: "string",
       keepMounted: "boolean",
     },
-    selects: selects({ values: [] }),
+    selects: selects(
+      unreadBesides(
+        "open",
+        "mounted",
+        "nested",
+        "presentation",
+        "payload",
+        "trigger",
+        "triggers"
+      )
+    ),
     connect: registerPopupElement,
     role: "menu",
     keys: [
@@ -536,7 +575,7 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
   // The full-screen element a root menu presented as a sheet sits in. The
   // adapters render it around the content, which they render only while present.
   viewport: slot({
-    selects: selects({ values: [] }),
+    selects: selects(unreadBesides("presentation", "nested")),
     present: (state) => state.presentation === "sheet" && !state.nested,
   }),
 
@@ -606,7 +645,7 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
 
   group: slot({
     props: { id: "id" },
-    selects: selects({ values: [] }),
+    selects: selects(unreadBesides("groupLabels")),
     role: "group",
     attrs: (state, { id, key }) => ({
       "aria-labelledby": menuGroupLabelledBy(state, id, key),
@@ -617,7 +656,7 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
   "group-label": slot<{ group: string }>({
     // Internal: passed by renderers, the group's `id` or the radio group's `name`.
     props: { group: "string" },
-    selects: selects({ values: [] }),
+    selects: selects(unreadBesides()),
     attrs: (state, { id, props }) => ({
       id: `${id}-label-${idPart(props.group ?? "")}`,
     }),
@@ -626,7 +665,7 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
   }),
 
   separator: slot({
-    selects: selects({ values: [] }),
+    selects: selects(unreadBesides()),
     role: "separator",
     attrs: () => ({ "aria-orientation": "horizontal" }),
   }),
@@ -778,7 +817,10 @@ const menuCheckable = /* @__PURE__ */ (() => ({
         defaultValue: "string",
         onValueChange: "callback",
       },
-      selects: selects({ values: ({ props }) => [`radio:${props.name}`] }),
+      selects: selects({
+        ...unreadBesides("groupLabels"),
+        values: ({ props }) => [`radio:${props.name}`],
+      }),
       role: "group",
       state: (state, { props, api }) => ({ value: api.radioValue(props.name) }),
       attrs: (state, { id, props }) => ({
@@ -852,6 +894,7 @@ const menuCheckable = /* @__PURE__ */ (() => ({
         keepMounted: "boolean",
       },
       selects: selects({
+        ...unreadBesides(),
         values: ({ props, api }) => [indicatorEntry(api, props)],
       }),
       present: (state, { props, api }) =>

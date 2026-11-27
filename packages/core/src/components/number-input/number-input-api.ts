@@ -544,13 +544,19 @@ function numberInputApiBody(
         el.select()
       },
       reset() {
-        if (keepsValueOnReset(options().value, options().defaultValue)) {
-          return
+        if (!keepsValueOnReset(options().value, options().defaultValue)) {
+          edited = false
+          pending = undefined
+          change("value", store.get().initial, { reason: "reset" })
+          showValue()
         }
-        edited = false
-        pending = undefined
-        change("value", store.get().initial, { reason: "reset" })
-        showValue()
+        // The form put back the control's default text, which React leaves at
+        // its first render. Writing it even when it matches keeps React's own
+        // record of the text, which the reset skipped, in step.
+        const el = input()
+        if (el) {
+          el.value = store.get().text
+        }
       },
       restore(saved: string) {
         const value = saved === "" ? null : Number(saved)

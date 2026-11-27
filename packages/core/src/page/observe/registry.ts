@@ -310,10 +310,18 @@ function remember(entry: Entry, parts: Bound[]) {
   const first = !entry.key
   const elements = parts.map((part) => part.el)
   checkMarks(elements)
-  entry.label = componentLabel(parts, entry)
+  // A name given through one keyed part, like a resizable's handle, can't be
+  // read while every part is hidden, as in a closed tab: the last one stays.
+  const hidden = parts.every((part) => part.el.closest("[hidden]"))
+  entry.label =
+    componentLabel(parts, entry) ?? (hidden ? entry.label : undefined)
   entry.row = rowOf(parts)
   guard(entry, parts)
   entry.sections = sectionsOf(parts)
+  // A fresh one can't be named yet, so it claims a ref once it shows.
+  if (first && hidden && entry.label === undefined) {
+    return
+  }
   entry.key = `${entry.component}|${entry.label}|${entry.row}|${entry.sections.join(">")}`
   if (!first) {
     return
@@ -357,12 +365,24 @@ function ownParts<Each extends Pick<Bound, "key" | "slot" | "props">>(
 }
 
 // A web field's control binds its own component's parts, not the field's,
-// so the field finds it.
+// so the field finds it. A trigger menu's editor isn't one of its parts either.
 function fieldInput(entry: Entry | undefined) {
-  const instance = entry?.component === "field" && entry.instance.deref()
-  const control = instance
-    ? (instance.api as { control?: () => HTMLElement | undefined }).control?.()
-    : undefined
+  const component = entry?.component
+  const api =
+    component === "field" || component === "trigger-menu"
+      ? (entry?.instance.deref()?.api as
+          | {
+              control?: () => HTMLElement | undefined
+              internal?: {
+                editor?: () => { element?: HTMLElement } | undefined
+              }
+            }
+          | undefined)
+      : undefined
+  const control =
+    component === "field"
+      ? api?.control?.()
+      : api?.internal?.editor?.()?.element
   return control?.matches("input, textarea") && !isOffLimits([control])
     ? control
     : undefined

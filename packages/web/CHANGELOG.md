@@ -1,5 +1,25 @@
 # @ui-sdk/web
 
+## 0.1.0-beta.18
+
+### Patch Changes
+
+- 94e1820: A popup content's `anchor` property takes an element or a point, as its docs and types say, besides a selector.
+- 8d64c80: `<ui-autocomplete>`'s `api` now has `highlight()` and `getHighlighted()`, as its type says. Calling them threw before, since the element left them out.
+- edab573: A `<ui-switch>`, `<ui-checkbox>` or other form control that starts `disabled` works once `disabled` is set back to `false` in jsdom. It kept `aria-disabled` and `data-disabled` and ignored presses, since its own `disabled` counted as a fieldset's, which only `formDisabledCallback` cleared and jsdom never calls it.
+- bacd0a4: An empty `<ui-field-error>` keeps a message the page writes into it, like a server's, instead of replacing it with the browser's. Emptying it again shows the browser's message.
+- a70d60f: An item text part written empty in the page, like `<ui-combobox-item-text>` beside an icon, shows its item's `label`, as it does for items given as data.
+- 6404deb: An element that makes its own id keeps it when it's taken off the page and put back, so the controls a label built on the label primitive names stay named.
+- 36df185: A `<ui-listbox-item>` or `<ui-combobox-item>` written in the page keeps a record set as its `value` property, keyed by the list's `itemToValue`, as a `<ui-select-item>` does. Each row used to register as "[object Object]", so every row shared one id and a press made the value that string. An empty item text part still shows its item's `label` when the item's value is a property, as Vue, React and Svelte set it.
+- 91b7d0a: A data combobox or listbox whose page writes its own rows, like a windowed list, shows those rows alone. A combobox finds them inside a box in its list and drops the rows it rendered once the page writes its rows again. A listbox that holds rows from the page when `items` is set renders none of `items` beside them.
+- 66afde4: `<ui-popover>`, `<ui-dialog>`, `<ui-alert-dialog>`, `<ui-drawer>`, `<ui-tooltip>`, `<ui-hover-card>` and `<ui-menu>` take `display: contents`, like `<ui-select>`, so the button in their trigger is laid out by the row or grid around them.
+- ef6d0e2: An agent sets a `<ui-rating>` by its score, and its stars are no longer listed as choices.
+- 2bbd848: `align` on `<ui-toast-region>` and `<ui-carousel>` now only places the toasts or the slides. In Chrome and Safari it used to right-align or center their text too, as popup contents with `align` already avoided.
+- 1dae48d: A button that two parts bind, like a `<ui-button>` or `<ui-toggle>` inside a popover or tooltip trigger, keeps the inner part's `data-slot` (`button` or `toggle`) whatever order they upgrade in.
+- dea32b4: A toast's close button with an `aria-label`, `aria-labelledby` or `title` and no content stays the author's close: it no longer hides, or shows and runs the toast's cancel.
+- 5a39f1f: A trigger's `payload` attribute gives the popup a string, so server-rendered triggers can carry one without a script. A `payload` property still wins, for rich values.
+- Updated @ui-sdk/core to 0.1.0-beta.18
+
 ## 0.1.0-beta.17
 
 ### Patch Changes

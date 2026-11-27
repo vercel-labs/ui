@@ -4069,6 +4069,44 @@ describe("a primitive's agent key", () => {
     expect(instance.get()).toMatchObject({ value: "profile" })
   })
 
+  test("an item on the page goes by the label its agent key gives, which act takes", async () => {
+    const tickets = [
+      { value: "t1", label: "Fix the login form" },
+      { value: "t2", label: "Update the docs" },
+    ]
+    const ticketList = definePrimitive({
+      name: "ticket-list",
+      state: () => ({ value: "" }),
+      api: ({ store }) => ({
+        setValue: (value: string) => store.set({ value }),
+      }),
+      slots: (slot) => ({
+        root: slot({ attrs: () => ({ "aria-label": "Tickets" }) }),
+        item: slot<{ value: string }>({ props: { value: "string" } }),
+      }),
+      agent: { actions: ["setValue"], closed: true, items: () => tickets },
+    })
+    const instance = ticketList({ id: "tickets" })
+    const root = document.createElement("div")
+    root.setAttribute("aria-label", "Tickets")
+    document.body.append(root)
+    cleanups.push(bind(instance.part("root"), root), () => instance.destroy())
+    tickets.forEach(({ value, label }, index) => {
+      const el = document.createElement("div")
+      el.innerHTML = `<span>T-${index + 1}</span> <p>${label}</p>`
+      root.append(el)
+      cleanups.push(bind(instance.part("item", { value }), el))
+    })
+    const agent = createAgent()
+    const [{ ref, items }] = agent.snapshot()
+    expect(items).toEqual(tickets)
+    const outcome = await agent.act({
+      steps: [{ ref, action: "setValue", args: [items![1].label] }],
+    })
+    expect(outcome.ok).toBe(true)
+    expect(instance.get()).toMatchObject({ value: "t2" })
+  })
+
   test("its actions are the only ones an agent sees and takes", async () => {
     const agent = createAgent()
     mount(sizes({ actions: ["setValue"] }))

@@ -167,8 +167,10 @@ const ColorPickerInput = withElement(
     inheritAttrs: false,
     slots: Object as PartSlots<typeof colorPicker, "input">,
     setup() {
+      // Its own key, so each input of a picker binds and follows the value.
+      const id = useId()
       // The core writes the text as it changes. Vue sets the same text, which the server renders.
-      return usePart(colorPicker, "input", undefined, undefined, {
+      return usePart(colorPicker, "input", () => ({ id }), undefined, {
         tag: "input",
       })
     },

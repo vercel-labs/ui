@@ -126,6 +126,18 @@ test("while a menu is open, pointing at another trigger opens its menu instead",
   await expectFocus(page, "Show bookmarks")
 })
 
+test("pressing the trigger whose menu pointing opened keeps focus in the menu", async ({
+  page,
+}) => {
+  await trigger(page, "File").click()
+  await trigger(page, "View").hover()
+  await expect(menuNamed(page, "View")).toBeVisible()
+  await page.mouse.down()
+  await page.mouse.up()
+  await expect(menuNamed(page, "View")).toBeVisible()
+  await expect(menuNamed(page, "View")).toBeFocused()
+})
+
 test("crossing another trigger on the way to the open menu keeps the menu", async ({
   page,
 }) => {

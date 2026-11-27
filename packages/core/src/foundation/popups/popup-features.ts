@@ -14,7 +14,9 @@ import {
   type Anchor,
   type PositionProps,
 } from "../platform/position"
+import { composedContains } from "../platform/platform"
 import { type Side } from "../platform/sides"
+import { rovingStopOf } from "../focus/roving-focus"
 import { composedTabbables } from "../focus/tabbable"
 import { accessibleName } from "../text/accessible-name"
 import type { PopupCore, PopupState } from "./create-popup"
@@ -154,7 +156,13 @@ function pressOpening(core: PopupCore) {
         return content
       }
       if (setting === "auto") {
-        return preferred?.() ?? composedTabbables(content)[0] ?? content
+        const first = composedTabbables(content)[0]
+        const stop = first && rovingStopOf(first)
+        return (
+          preferred?.() ??
+          (stop && composedContains(content, stop) ? stop : first) ??
+          content
+        )
       }
       if (typeof setting === "function") {
         return setting() ?? content

@@ -162,6 +162,20 @@ const openerBySource: Record<ChangeSource, PopupOpener> = {
 const openerOf = (event?: Event) =>
   event ? openerBySource[sourceOf(event)] : "imperative"
 
+// A popup opened from code while an agent looks into its component, like a
+// list it opens to read the items, isn't modal, takes no focus and gives none
+// back as it closes, so a person's focus stays where it was.
+const looking = new Set<Element>()
+async function withoutFocus<T>(elements: Element[], run: () => Promise<T>) {
+  const added = elements.filter((el) => !looking.has(el))
+  added.forEach((el) => looking.add(el))
+  try {
+    return await run()
+  } finally {
+    added.forEach((el) => looking.delete(el))
+  }
+}
+
 // Where focus goes on open, by opener. Hover and an open from the start move
 // no focus. Touch focuses the popup itself, so no on-screen keyboard appears.
 // Anything else asks the component.
@@ -631,6 +645,7 @@ function createPopupLayer<
   let openedOnPress = false
   let openedByKey = false
   let returnMode: ReturnMode = true
+  let quiet = false
   let before: HTMLElement | undefined
   let tabbing = false
   // The caret in a contenteditable it opened from, which focus alone puts back at the start.
@@ -703,7 +718,9 @@ function createPopupLayer<
           }
         }
       }
-      focusPending = true
+      const from = options.trigger()
+      quiet = opener === "imperative" && !!from && looking.has(from)
+      focusPending = !quiet
       enterPending = true
       returnMode = true
       const active = isBrowser ? activeElement() : null
@@ -737,7 +754,7 @@ function createPopupLayer<
       }
       return
     }
-    const mode = behavior.movesFocus && returnMode
+    const mode = behavior.movesFocus && !quiet && returnMode
     returnMode = true
     focusPending = false
     enterPending = false
@@ -1128,7 +1145,7 @@ function createPopupLayer<
     )
     trackInput()
 
-    let modal = options.modal()
+    let modal = quiet ? modalTriple(false) : options.modal()
     const blur = behavior.blur
     const persistent = options.persistent?.() ?? []
     // A press on the popup's ::backdrop targets the popup itself, outside its box.
@@ -1307,7 +1324,7 @@ function createPopupLayer<
       })
     }
     remodal = () => {
-      const next = options.modal()
+      const next = quiet ? modalTriple(false) : options.modal()
       own.modal = next.consumeOutsidePress
       own.blocking =
         typeof behavior.blocking === "function"
@@ -1648,6 +1665,7 @@ function createPopupLayer<
           const held =
             store.get().open &&
             behavior.movesFocus &&
+            !quiet &&
             (!active ||
               active === el.ownerDocument.body ||
               composedContains(el, active))
@@ -1790,4 +1808,5 @@ export {
   prepareReset,
   resetPopoverStyles,
   type ReturnMode,
+  withoutFocus,
 }

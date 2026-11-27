@@ -507,6 +507,25 @@ describe("createStickToBottom", () => {
     expect(el.scrollTop).toBe(400)
   })
 
+  test("a key a field or a widget inside uses keeps following, and one for the scroller lets go", () => {
+    const el = scroller(100, () => 500)
+    const field = el.appendChild(document.createElement("input"))
+    const widget = el.appendChild(document.createElement("div"))
+    widget.addEventListener("keydown", (event) => event.preventDefault())
+    const log = createStickToBottom()
+    cleanups.push(log.connect(el))
+    const press = (target: Element, key: string) =>
+      target.dispatchEvent(
+        new KeyboardEvent("keydown", { key, bubbles: true, cancelable: true })
+      )
+    press(field, "ArrowUp")
+    press(field, "Home")
+    press(widget, "PageUp")
+    expect(log.get().following).toBe(true)
+    press(el, "PageUp")
+    expect(log.get().following).toBe(false)
+  })
+
   test("content that pushes the end out of view while not following is unseen", async () => {
     let content = 500
     const el = scroller(100, () => content)
@@ -635,6 +654,33 @@ describe("createStickToBottom", () => {
     expect(first.getBoundingClientRect().top).toBe(-100)
   })
 
+  test("prepend called after older rows went in above leaves them where they are", async () => {
+    const el = scroller(100, () => el.children.length * 50)
+    el.getBoundingClientRect = () => new DOMRect(0, 0, 300, 100)
+    const row = () => {
+      const p = document.createElement("p")
+      p.getBoundingClientRect = () => {
+        const top = [...el.children].indexOf(p) * 50 - el.scrollTop
+        return new DOMRect(0, top, 300, 50)
+      }
+      p.getClientRects = () =>
+        [p.getBoundingClientRect()] as unknown as DOMRectList
+      return p
+    }
+    for (let i = 0; i < 10; i++) {
+      el.append(row())
+    }
+    const log = createStickToBottom({ initial: false })
+    cleanups.push(log.connect(el))
+    el.scrollTop = 200
+    el.dispatchEvent(new Event("scroll"))
+    const first = el.children[4]
+    el.prepend(row(), row(), row())
+    log.prepend()
+    await Promise.resolve()
+    expect(first.getBoundingClientRect().top).toBe(0)
+  })
+
   test("prepend keeps the distance from the end", () => {
     let content = 500
     const el = scroller(100, () => content)
@@ -648,6 +694,38 @@ describe("createStickToBottom", () => {
     el.append(document.createElement("p"))
     return Promise.resolve().then(() => {
       expect(el.scrollTop).toBe(400)
+    })
+  })
+
+  test("prepend while a change is still unmeasured keeps the distance it last measured", () => {
+    let content = 500
+    const el = scroller(100, () => content)
+    const log = createStickToBottom({ initial: false })
+    cleanups.push(log.connect(el))
+    el.scrollTop = 100
+    el.dispatchEvent(new Event("scroll"))
+    content = 520
+    log.prepend()
+    content = 820
+    el.append(document.createElement("p"))
+    return Promise.resolve().then(() => {
+      expect(el.scrollTop).toBe(420)
+    })
+  })
+
+  test("prepend right after a scroll, before its event, keeps the new position", () => {
+    let content = 500
+    const el = scroller(100, () => content)
+    const log = createStickToBottom({ initial: false })
+    cleanups.push(log.connect(el))
+    el.scrollTop = 100
+    el.dispatchEvent(new Event("scroll"))
+    el.scrollTop = 250
+    log.prepend()
+    content = 800
+    el.append(document.createElement("p"))
+    return Promise.resolve().then(() => {
+      expect(el.scrollTop).toBe(550)
     })
   })
 })

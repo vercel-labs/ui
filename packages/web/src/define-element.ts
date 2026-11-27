@@ -68,6 +68,10 @@ function autoId(el: Element) {
   return autoIds.get(el)!
 }
 
+// A drag preview's copy keeps the look it had when it was made, so the
+// elements cloned into it never start an instance of their own.
+const inDragPreview = (el: Element) => !!el.closest("[data-drag-preview]")
+
 /**
  * The button or link a wrapper part holds, like the <button> in <ui-tabs-tab>
  * or in a <ui-button> there, so the part binds to it and native button
@@ -1219,6 +1223,9 @@ function defineRootElement<P extends Primitive>(
       connectedCallback() {
         // Even a move within one task can take it into a shadow root or another document.
         adoptStyles(this)
+        if (inDragPreview(this)) {
+          return
+        }
         if (this.#connected) {
           for (const part of this.#parts) {
             elementMoved(part.el)
@@ -1880,6 +1887,9 @@ function definePartElement(tagName: string, config: SlotConfig) {
       #children?: MutationObserver
 
       connectedCallback() {
+        if (inDragPreview(this)) {
+          return
+        }
         upgradeProperties(this, [
           ...(config.properties ?? []),
           ...Object.keys(schema),
@@ -2396,6 +2406,7 @@ export {
   definePart,
   findContainer,
   findOwner,
+  inDragPreview,
   inheritedPortal,
   instanceOf,
   type Kinds,

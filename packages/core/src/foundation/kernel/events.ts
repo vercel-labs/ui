@@ -37,4 +37,14 @@ function isComposing(
   return key.isComposing === true || key.keyCode === 229
 }
 
-export { isComposing, on, selectEvent }
+// Whether a key lands in a field, which uses arrow, Home and paging keys to move its caret.
+function isEditing(target: EventTarget | null) {
+  if (!(target instanceof HTMLElement)) {
+    return false
+  }
+  return (
+    target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName)
+  )
+}
+
+export { isComposing, isEditing, on, selectEvent }

@@ -984,6 +984,15 @@ function menuApiBody(
       })
     } else if (!openedByHover) {
       hide({ reason: "trigger-press", event })
+    } else {
+      // The press then focuses the trigger, so focus goes back into the menu
+      // hover opened, as after a press that opens it.
+      requestAnimationFrame(() => {
+        const active = activeElement(trigger.ownerDocument)
+        if (store.get().open && active && composedContains(trigger, active)) {
+          highlight(store.get().highlighted)
+        }
+      })
     }
     openedByHover = false
     const start = { x: event.clientX, y: event.clientY }

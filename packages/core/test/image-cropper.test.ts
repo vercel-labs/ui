@@ -52,6 +52,14 @@ describe("image cropper", () => {
     })
   })
 
+  test("a default crop given after the instance is made still starts the first image's crop", () => {
+    const cropper = make()
+    const defaultCrop = { x: 10, y: 20, width: 100, height: 50 }
+    cropper.setOptions({ id: "c", src: "photo.png", defaultCrop })
+    load(cropper)
+    expect(cropper.api.getCrop()).toEqual({ ...defaultCrop, ...plain })
+  })
+
   test("a frame starts with the largest crop, and a box never below its minimum", () => {
     const frame = make({ mode: "frame", aspectRatio: 1 })
     load(frame)

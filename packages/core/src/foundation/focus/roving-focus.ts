@@ -86,6 +86,16 @@ type RovingFocusOptions<State extends object, Props = any> = {
   onItemsChange?: () => void
 }
 
+// Each bound item's way to find its group's stop. The stop can move before a
+// framework renders its new `tabindex`, so a popup that picks focus in between
+// asks the group's rules here instead of reading the page.
+const stops = new WeakMap<Element, () => HTMLElement | undefined>()
+
+/** The element with the stop in the roving group `el` is an item of, if it's bound. */
+function rovingStopOf(el: Element) {
+  return stops.get(el)?.()
+}
+
 // Whether an item rendering before any has bound, like on the server, holds
 // the tab stop: the first one its group calls eligible does, and keeps it
 // until the real stop is known, so the markup has exactly one.
@@ -324,6 +334,10 @@ function createRovingFocus<State extends object, Props = any>(
       }
       el.addEventListener("focus", focused)
       el.addEventListener("blur", blurred)
+      stops.set(el, () => {
+        const stop = stopFor() ?? store.get()[key]
+        return order.list().find((item) => item.part.key === stop)?.el
+      })
       // An item disabled, enabled or preferred after it joined, like a radio
       // a field around it disables, can move the stop. An item that joins with
       // its part hears each render; one joined with plain data never does.
@@ -345,6 +359,7 @@ function createRovingFocus<State extends object, Props = any>(
         unwatch()
         el.removeEventListener("focus", focused)
         el.removeEventListener("blur", blurred)
+        stops.delete(el)
         // An element removed with focus fires no blur, and focus drops to the body.
         const doc = el.ownerDocument
         const had =
@@ -486,6 +501,7 @@ type RovingFocus = ReturnType<typeof createRovingFocus>
 export {
   createClaim,
   createRovingFocus,
+  rovingStopOf,
   type RovingFocus,
   type RovingFocusItem,
   type RovingFocusMoveContext,

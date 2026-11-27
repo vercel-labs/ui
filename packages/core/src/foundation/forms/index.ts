@@ -13,7 +13,12 @@ export {
   setRelativePath,
   validateFiles,
 } from "./files"
-export { activateControl, findControl } from "./control"
+export {
+  activateControl,
+  findControl,
+  pressesInside,
+  unfocusableControl,
+} from "./control"
 export {
   associate,
   bindHiddenInput,

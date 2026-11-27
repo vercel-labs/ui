@@ -727,6 +727,7 @@ function triggerMenuApiBody(
       options,
       listbox,
       popup,
+      editor,
       choose: select.choose,
       onKeyDown,
       fieldAttrs,
