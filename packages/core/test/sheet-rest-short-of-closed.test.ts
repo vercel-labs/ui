@@ -22,7 +22,7 @@ afterEach(() => {
   vi.useRealTimers()
 })
 
-function setup() {
+function setup(dismissible = () => true) {
   const host = document.createElement("div")
   const sheet = document.createElement("div")
   host.append(sheet)
@@ -36,7 +36,7 @@ function setup() {
     config: () => ({
       snapPoints: [{ id: "full", extent: 400 }],
       dimension: 1000,
-      dismissible: true,
+      dismissible: dismissible(),
       expandOnScroll: true,
       physics: sheetPhysics.ios,
     }),
@@ -82,4 +82,15 @@ test("a swipe that comes to rest further up snaps back open", () => {
   swipeTo(host, 300)
   expect(seen.dismissed).toBe(0)
   expect(seen.rests.at(-1)).toBe("full")
+})
+
+test("a sheet opened without dismissal and made dismissible stays open at its detent", () => {
+  vi.useFakeTimers()
+  let dismissible = false
+  const { host, seen } = setup(() => dismissible)
+  driver!.open("full", false)
+  dismissible = true
+  swipeTo(host, 10)
+  swipeTo(host, 0)
+  expect(seen.dismissed).toBe(0)
 })

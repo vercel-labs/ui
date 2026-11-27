@@ -244,7 +244,7 @@ function createScrollSnapDriver(options: SheetDriverOptions) {
     if (
       config.dismissible &&
       targetId !== null &&
-      host.scrollTop <= closedSlack
+      host.scrollTop + extentAtTop <= closedSlack - toolbarBleed
     ) {
       return dismiss()
     }
