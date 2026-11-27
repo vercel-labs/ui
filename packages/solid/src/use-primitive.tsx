@@ -810,23 +810,24 @@ function usePrimitive<P extends Primitive>(
   // `open`, from here: a read sees it in the same flush as the app's own
   // signals, before the effect below hands it over.
   const delivered = instance.follow(() => untrack(current))
-  // Shared root created in the body so lazy projections and part scopes never
-  // take child hydration ids from the component itself.
   const lazyOwner = createRoot(() => getOwner())
   // Tracks delivered keys finely via a projection, but waits until a part
   // reads a delivered key so uncontrolled components track only key changes.
-  const syncedKeys = createMemo(() => {
-    current()
-    const synced = delivered()
-    if (!synced) {
-      return ""
-    }
-    let keys = ""
-    for (const key in synced) {
-      keys += `${key}\0`
-    }
-    return keys
-  })
+  const syncedKeys = createMemo(
+    () => {
+      current()
+      const synced = delivered()
+      if (!synced) {
+        return ""
+      }
+      let keys = ""
+      for (const key in synced) {
+        keys += `${key}\0`
+      }
+      return keys
+    },
+    { name: "synced keys" }
+  )
   let marks: Record<string, number> | undefined
   const getMarks = () => {
     if (marks) {

@@ -307,6 +307,8 @@ function useHandlePart<P extends Primitive, S extends SlotName<P>>(
   // Bumped when the attributes or presence changed, and when a read state key did.
   let tick = $state(0)
   let stateTick = $state(0)
+  let absentTick = $state(0)
+  let readAbsent = false
   // What the last render showed, which the listener compares against.
   let shown: { attrs: Attrs | undefined; present: boolean } | undefined
   let version = renderVersion(instance)
@@ -396,10 +398,13 @@ function useHandlePart<P extends Primitive, S extends SlotName<P>>(
         return
       }
       version = latest
-      if (
-        shown.attrs &&
-        !sameAttrs(partAttrs(current), shown.attrs, directNames(current))
-      ) {
+      if (!shown.attrs) {
+        if (readAbsent) {
+          absentTick++
+        }
+        return
+      }
+      if (!sameAttrs(partAttrs(current), shown.attrs, directNames(current))) {
         tick++
       }
     })
@@ -550,8 +555,14 @@ function useHandlePart<P extends Primitive, S extends SlotName<P>>(
       return { attrs, present }
     })
   })
-  const currentAttrs = () =>
-    rendered.attrs ?? untrack(() => partAttrs(instanceOf().part(name, props())))
+  const currentAttrs = () => {
+    if (rendered.attrs) {
+      return rendered.attrs
+    }
+    readAbsent = true
+    absentTick
+    return untrack(() => partAttrs(instanceOf().part(name, props())))
+  }
   // A boolean of its own: a part that reads another's presence, like content
   // whose portal depends on its viewport, then hears only when it flips, not
   // on every attribute change, which would bind its element again mid-exit.

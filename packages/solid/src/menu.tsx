@@ -73,10 +73,8 @@ const parts = createParts(menuPrimitive, { separator: "div", shortcut: "span" })
 
 type MenuContextValue = PrimitiveHandle<typeof menuPrimitive>
 
-// Per-menu extras kept beside the primitive handle, so <Menu> needs one
-// context provider instead of four.
 type MenuMeta = {
-  container: () => PopupContainer
+  container?: () => PopupContainer
   apple: () => boolean
   setOwnContent?: (present: boolean) => void
 }
@@ -356,7 +354,7 @@ function renderMenuContent<Payload = unknown>(
           return element()
         }
         const target = usePopupContainer(
-          () => props.container ?? meta?.container()
+          () => props.container ?? meta?.container?.()
         )
         return renderPopup(() => sheetViewport(menu, element), target)
       })()}
@@ -685,7 +683,6 @@ const MenuSub = /* @__PURE__ */ rootScope(function MenuSub(
     parent: parent.api,
   }))
   menuMeta.set(menu, {
-    container: () => undefined,
     apple: menuMeta.get(parent)?.apple ?? (() => false),
   })
   return providePrimitive(menu, () => props.children)
