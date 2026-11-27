@@ -228,7 +228,8 @@ const defaultOn = (
 function reflectAttributes(
   proto: HTMLElement,
   schema: Record<string, AttributeType>,
-  defaults: BooleanDefaults = {}
+  defaults: BooleanDefaults = {},
+  inherited: string[] = []
 ) {
   for (const [name, type] of Object.entries(schema)) {
     if (name in proto) {
@@ -245,9 +246,11 @@ function reflectAttributes(
         )
       },
       set(this: HTMLElement, value: unknown) {
+        // A missing attribute takes the value from around the part, so `false` stays written.
         const removes =
           value === false &&
           type === "boolean" &&
+          !inherited.includes(name) &&
           !defaultOn(this, defaults[name])
         if (value == null || removes) {
           this.removeAttribute(attribute)
@@ -1844,7 +1847,12 @@ function definePartElement(tagName: string, config: SlotConfig) {
             },
           })
         }
-        reflectAttributes(PartElement.prototype, schema, config.defaults)
+        reflectAttributes(
+          PartElement.prototype,
+          schema,
+          config.defaults,
+          Object.keys(config.from ?? {})
+        )
       }
 
       // What the element says itself, its attributes and properties, wins
@@ -2135,7 +2143,8 @@ const rootTags = new WeakMap<Primitive, string[]>()
 function elementProps(
   props: Record<string, PropSpec>,
   schema: PrimitiveSchema,
-  kinds: Kinds = {}
+  kinds: Kinds = {},
+  own = false
 ) {
   const attributes: Record<string, AttributeType> = {}
   const properties: string[] = []
@@ -2154,7 +2163,8 @@ function elementProps(
       // item icon's `item` in tabs, has nowhere to come from.
       if (slot in schema.slots) {
         from[name] = { slot, prop }
-      } else if (!(name in kinds)) {
+      }
+      if (!(own && slot in schema.slots) && !(name in kinds)) {
         continue
       }
     }
@@ -2203,7 +2213,8 @@ function partElement<P extends Primitive>(
   key: string,
   tagOrOptions: string | RootOptions<P> | PartOptions<P>,
   // The root defined with it, which its owners list first.
-  root?: string
+  root?: string,
+  own = false
 ) {
   const schema = schemaOf(primitive)
   if (key === "root") {
@@ -2258,7 +2269,7 @@ function partElement<P extends Primitive>(
   if (!slotSchema) {
     throw new Error(`<${tag}>: ${primitive.name} has no ${slot} slot.`)
   }
-  const { attributes, ...props } = elementProps(slotSchema, schema, kinds)
+  const { attributes, ...props } = elementProps(slotSchema, schema, kinds, own)
   const config: SlotConfig = {
     ...options,
     slot,
@@ -2293,15 +2304,19 @@ type PartTags<P extends Primitive> = { root: string | RootOptions<P> } & {
  * Every element `createParts` defines, as `partElement` describes each, the
  * root first, so its parts know their owner's tag.
  */
-function partElements<P extends Primitive>(primitive: P, tags: PartTags<P>) {
+function partElements<P extends Primitive>(
+  primitive: P,
+  tags: PartTags<P>,
+  own = false
+) {
   const { root, ...parts } = tags
-  const owner = partElement(primitive, "root", root)
+  const owner = partElement(primitive, "root", root, undefined, own)
   return [
     owner,
     ...Object.entries(
       parts as Record<string, string | PartOptions<P> | undefined>
     ).flatMap(([key, tag]) =>
-      tag ? [partElement(primitive, key, tag, owner.tagName)] : []
+      tag ? [partElement(primitive, key, tag, owner.tagName, own)] : []
     ),
   ]
 }
@@ -2334,6 +2349,24 @@ type Parts<Tags> = {
   [K in keyof Tags & string as Pascal<K>]: CustomElementConstructor | undefined
 }
 
+// Built-in parts keep the props they take from around them internal, so
+// only `own` gives those an attribute and property that win over it.
+function createParts<P extends Primitive, Tags extends PartTags<P>>(
+  primitive: P,
+  tags: Tags,
+  own = false
+) {
+  const parts: Record<string, CustomElementConstructor | undefined> = {}
+  for (const element of partElements(primitive, tags, own)) {
+    defineElement(primitive, element)
+    parts[pascal(element.key)] =
+      typeof customElements === "undefined"
+        ? undefined
+        : customElements.get(element.tagName)
+  }
+  return parts as Parts<Tags>
+}
+
 /**
  * Defines a custom element for each part of a primitive, typed from it.
  * `root` is the element that owns an instance: the primitive's options are
@@ -2347,7 +2380,8 @@ type Parts<Tags> = {
  * `display` too. Defines each tag once, and returns the element classes,
  * `Root` and one per part named in Pascal case, like `TabIcon` for
  * `tab-icon`. On the server it defines nothing and the classes are
- * `undefined`.
+ * `undefined`. A part's own attribute or property wins over a prop it takes
+ * from the part around it.
  *
  * @example
  * createParts(tabs, {
@@ -2359,19 +2393,11 @@ type Parts<Tags> = {
  * })
  * @stable
  */
-function createParts<P extends Primitive, Tags extends PartTags<P>>(
+function createAppParts<P extends Primitive, Tags extends PartTags<P>>(
   primitive: P,
   tags: Tags
 ) {
-  const parts: Record<string, CustomElementConstructor | undefined> = {}
-  for (const element of partElements(primitive, tags)) {
-    defineElement(primitive, element)
-    parts[pascal(element.key)] =
-      typeof customElements === "undefined"
-        ? undefined
-        : customElements.get(element.tagName)
-  }
-  return parts as Parts<Tags>
+  return createParts(primitive, tags, true)
 }
 
 /**
@@ -2399,6 +2425,7 @@ export {
   type AttributeType,
   autoId,
   claimTag,
+  createAppParts,
   createParts,
   definePart,
   findContainer,

@@ -1,7 +1,7 @@
 // Helpers and types, without side effects. Importing a component defines its
 // elements, like `import "@ui-sdk/web/accordion"`.
 export {
-  createParts,
+  createAppParts as createParts,
   wrappedButton,
   wrappedChild,
   type AttributeType,

@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { definePrimitive } from "@ui-sdk/core"
 import { beforeAll, expect, test } from "vitest"
-import { createParts } from "../src/define-element"
+import { createParts } from "../src"
 
 const wait = () => new Promise((resolve) => setTimeout(resolve, 10))
 
@@ -11,10 +11,18 @@ const grid = definePrimitive({
   api: () => ({}),
   slots: (slot) => ({
     root: slot({}),
-    row: slot<{ value?: string }>({ props: { value: "string" } }),
-    cell: slot<{ value?: string }>({
-      props: { value: { kind: "string", from: "row" } },
-      attrs: (_, { props }) => ({ "data-value": props.value ?? "none" }),
+    row: slot<{ value?: string; disabled?: boolean }>({
+      props: { value: "string", disabled: "boolean" },
+    }),
+    cell: slot<{ value?: string; rowDisabled?: boolean }>({
+      props: {
+        value: { kind: "string", from: "row" },
+        rowDisabled: { kind: "boolean", from: "row.disabled" },
+      },
+      attrs: (_, { props }) => ({
+        "data-value": props.value ?? "none",
+        "data-row-disabled": String(props.rowDisabled ?? false),
+      }),
     }),
   }),
   agent: { actions: [] },
@@ -51,4 +59,25 @@ test("a part's own attribute or property wins over the value around it", async (
   document.getElementById("attribute")!.removeAttribute("value")
   await wait()
   expect(value("attribute")).toBe("row-1")
+})
+
+test("a part's own false wins over a true around it", async () => {
+  document.body.innerHTML = `
+    <inherited-grid>
+      <inherited-row disabled>
+        <inherited-cell id="inherits"></inherited-cell>
+        <inherited-cell id="own"></inherited-cell>
+      </inherited-row>
+    </inherited-grid>`
+  const own = document.getElementById("own") as HTMLElement & {
+    rowDisabled: boolean | null
+  }
+  own.rowDisabled = false
+  await wait()
+  const disabled = (id: string) =>
+    document.getElementById(id)!.getAttribute("data-row-disabled")
+  expect([disabled("inherits"), disabled("own")]).toEqual(["true", "false"])
+  own.rowDisabled = null
+  await wait()
+  expect(disabled("own")).toBe("true")
 })
