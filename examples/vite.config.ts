@@ -35,6 +35,13 @@ const builds: Record<
   },
 }
 
+type Babel = {
+  transformAsync: (
+    code: string,
+    options: object
+  ) => Promise<{ code?: string | null } | null>
+}
+
 // The Angular examples and adapter run as Angular's compiler wrote them, which
 // `scripts/build.mjs` does first, into node_modules/.angular. Angular's own
 // packages and other libraries ship partly compiled, so its linker finishes them.
@@ -60,7 +67,8 @@ function compiledAngular(): Plugin {
         return
       }
       const [{ transformAsync }, { default: linker }] = await Promise.all([
-        import("@babel/core"),
+        // Babel comes with Angular's linker and ships no types.
+        import("@babel/core" as string) as Promise<Babel>,
         import("@angular/compiler-cli/linker/babel"),
       ])
       const result = await transformAsync(code, {
