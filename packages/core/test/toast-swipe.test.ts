@@ -103,3 +103,20 @@ test.each([
   await frame()
   expect(el.hasAttribute("data-swiping")).toBe(swipes)
 })
+
+const at = (event: PointerEvent, timeStamp: number) =>
+  Object.defineProperty(event, "timeStamp", { value: timeStamp })
+
+test("a quick short swipe held still before release snaps back, and one released at once dismisses", () => {
+  const swipe = (release: number) => {
+    const { el } = mountToast()
+    el.dispatchEvent(at(touch("pointerdown", 0), 0))
+    document.dispatchEvent(at(touch("pointermove", 7), 16))
+    document.dispatchEvent(at(touch("pointermove", 14), 32))
+    document.dispatchEvent(at(touch("pointermove", 21), 48))
+    document.dispatchEvent(at(touch("pointerup", 21), release))
+    return el.getAttribute("data-swipe-direction")
+  }
+  expect(swipe(1048)).toBe(null)
+  expect(swipe(56)).toBe("down")
+})

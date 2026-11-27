@@ -1,4 +1,5 @@
 import type { DragSession } from "../../foundation/drag-and-drop/pointer"
+import { createVelocityTracker } from "../../foundation/motion/velocity"
 
 /** A direction a swipe can dismiss toward. */
 type SwipeDirection = "up" | "down" | "left" | "right"
@@ -116,7 +117,10 @@ function trackSwipe(
   callbacks: SwipeCallbacks
 ) {
   const start = { x: down.clientX, y: down.clientY }
-  const samples = [{ x: start.x, y: start.y, time: down.timeStamp }]
+  const velocityX = createVelocityTracker()
+  const velocityY = createVelocityTracker()
+  velocityX.add(down.timeStamp, start.x)
+  velocityY.add(down.timeStamp, start.y)
   let axis: "x" | "y" = "x"
   drags.startOnMove(el, down, {
     pick(move) {
@@ -136,15 +140,11 @@ function trackSwipe(
       return true
     },
     onMove: ({ x, y, event }) => {
-      samples.push({ x, y, time: event.timeStamp })
-      if (samples.length > 2) {
-        samples.shift()
-      }
+      velocityX.add(event.timeStamp, x)
+      velocityY.add(event.timeStamp, y)
       callbacks.onMove(swipeOffset(x - start.x, y - start.y, axis, directions))
     },
     onEnd: (event, canceled) => {
-      const [from, to] = samples
-      const elapsed = to ? Math.max(1, to.time - from.time) : Infinity
       const x = event.clientX - start.x
       const y = event.clientY - start.y
       const direction = canceled
@@ -152,8 +152,8 @@ function trackSwipe(
         : swipeOutcome({
             x: axis === "x" ? x : 0,
             y: axis === "y" ? y : 0,
-            velocityX: to ? (to.x - from.x) / elapsed : 0,
-            velocityY: to ? (to.y - from.y) / elapsed : 0,
+            velocityX: velocityX.velocity(event.timeStamp),
+            velocityY: velocityY.velocity(event.timeStamp),
             directions,
           })
       callbacks.onEnd(direction, event)
