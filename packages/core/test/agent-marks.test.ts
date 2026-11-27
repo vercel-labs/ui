@@ -396,7 +396,7 @@ describe("data-agent-confirm", () => {
       steps: [{ ref: "Buy credits", action: "press" }],
     })
     expect(late.error?.message).toMatch(
-      /^No answer to press on c\d+ in 0 seconds\.$/
+      /^No answer to press on c\d+ in 50 ms, so it didn't run\. The page asks before an agent's step and nobody answered: tell the person what you could and couldn't do before trying again\.$/
     )
     expect(signal?.aborted).toBe(true)
   })

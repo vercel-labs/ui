@@ -233,6 +233,26 @@ describe("agent", () => {
     expect(outcome.ok).toBe(true)
   })
 
+  test("an empty field lists its placeholder, and a filled one doesn't", async () => {
+    const agent = createAgent()
+    const instance = input({ id: "invite" })
+    const el = document.createElement("input")
+    el.setAttribute("aria-label", "Invite")
+    el.setAttribute("placeholder", "Name or email")
+    document.body.append(el)
+    cleanups.push(bind(instance.part("root"), el), () => instance.destroy())
+    const field = () =>
+      agent.snapshot().find((component) => component.label === "Invite")
+    expect(field()).toMatchObject({ placeholder: "Name or email" })
+    await agent.act({
+      steps: [
+        { ref: "Invite", action: "setValue", args: ["jane@example.com"] },
+      ],
+    })
+    expect(field()).toMatchObject({ value: "jane@example.com" })
+    expect(field()).not.toHaveProperty("placeholder")
+  })
+
   test("a step on what an open modal covers is refused, with what is open", async () => {
     const agent = createAgent()
     const terms = mountCheckbox({ id: "terms" })
@@ -2701,6 +2721,40 @@ describe("agent rows", () => {
     ])
   })
 
+  test("a row's text is whole on its first component and brief on the next, and a press with the row's name and a button's text is on that button", async () => {
+    const agent = createAgent()
+    const row = document.createElement("li")
+    const about = `1042 Walnut standing desk, 160 by 80 cm, oiled finish, shipped from Leeds on 2026-12-04 by freight, assembly and removal of the old desk included, $912`
+    row.append(about)
+    document.body.append(row)
+    const pressed: string[] = []
+    for (const text of ["Notes (2)", "Refund 1042"]) {
+      const el = row.appendChild(document.createElement("button"))
+      el.textContent = text
+      el.addEventListener("click", () => pressed.push(text))
+      const instance = button({ id: text })
+      cleanups.push(bind(instance.part("root"), el), () => instance.destroy())
+    }
+    cleanups.push(() => row.remove())
+    const shown = agent.snapshot().filter((component) => !component.offPage)
+    expect(shown.map((component) => component.row)).toEqual([
+      `${about} Refund 1042`,
+      `${about} Notes (2)`.slice(0, 80),
+    ])
+    expect(
+      await agent.act({
+        steps: [{ ref: "1042", action: "press", args: ["Notes"] }],
+      })
+    ).toMatchObject({ ok: true })
+    expect(pressed).toEqual(["Notes (2)"])
+    const both = await agent.act({ steps: [{ ref: "1042", action: "press" }] })
+    expect(both.error?.message).toContain('"1042" names 2 components')
+    expect(
+      await agent.act({ steps: [{ ref: "Refund 1042", action: "press" }] })
+    ).toMatchObject({ ok: true })
+    expect(pressed).toEqual(["Notes (2)", "Refund 1042"])
+  })
+
   test("a table's header row adds no row text, so a header button is found by its label", async () => {
     const agent = createAgent()
     const table = document.createElement("table")
@@ -4315,7 +4369,13 @@ describe("agent act behind a closed tab or section", () => {
     disabledTab,
     multiple,
     held,
-  }: { disabledTab?: string; multiple?: boolean; held?: boolean } = {}) {
+    members = 0,
+  }: {
+    disabledTab?: string
+    multiple?: boolean
+    held?: boolean
+    members?: number
+  } = {}) {
     const saved: Record<string, boolean> = {}
     const moves: string[] = []
     // The attributes that name a panel after its tab or trigger, as an adapter renders them.
@@ -4394,7 +4454,18 @@ describe("agent act behind a closed tab or section", () => {
     }
     const pages: Record<string, (panel: HTMLElement) => () => void> = {
       general: (panel) => addSwitch(panel, "public", "Public project"),
-      members: (panel) => addSwitch(panel, "invite", "Invite only"),
+      members: (panel) => {
+        const offs = [addSwitch(panel, "invite", "Invite only")]
+        for (let index = 1; index <= members; index++) {
+          const row = panel.appendChild(document.createElement("li"))
+          row.append(`Member ${index} Admin`)
+          const el = row.appendChild(document.createElement("button"))
+          el.setAttribute("aria-label", "Select")
+          const instance = checkbox({ id: `member-${index}` })
+          offs.push(bind(instance.part("root"), el), () => instance.destroy())
+        }
+        return () => offs.forEach((off) => off())
+      },
       notifications: addChannels,
     }
     let leave: (() => void) | undefined
@@ -4494,6 +4565,57 @@ describe("agent act behind a closed tab or section", () => {
     expect(settings.get().value).toBe("notifications")
     expect(channels()?.get().value).toEqual(["email"])
     expect(saved).toEqual({ public: true, "email-digest": true })
+  })
+
+  test("a name with its tab or section in front and no > finds the component there", async () => {
+    const agent = createAgent()
+    const { settings, saved, moves, channels } = mountSettings()
+    expect(
+      await agent.act({ steps: [check("Members invite only")] })
+    ).toMatchObject({ ok: true })
+    expect(settings.get().value).toBe("members")
+    expect(
+      await agent.act({ steps: [check("Slack deploy failures")] })
+    ).toMatchObject({ ok: true })
+    expect(channels()?.get().value).toEqual(["slack"])
+    const looks = moves.length
+    expect(
+      await agent.act({ steps: [check("Slack Deploy failures", false)] })
+    ).toMatchObject({ ok: true })
+    expect(saved).toEqual({ invite: true, "slack-deploys": false })
+    expect(moves.slice(looks)).toEqual([])
+    const missing = await agent.act({
+      steps: [check("Billing deploy failures")],
+    })
+    expect(missing.error?.message).toContain(
+      'No component "Billing deploy failures" on the page.'
+    )
+  })
+
+  test("snapshot ends by naming the closed tabs and sections, which act reaches", async () => {
+    const agent = createAgent()
+    mountSettings()
+    expect(agent.snapshot().at(-1)).toMatchObject({
+      ref: "closed",
+      component: "closed",
+      closed: ["Members", "Notifications"],
+      actions: [],
+    })
+    await agent.act({ steps: [{ ref: "Notifications", action: "press" }] })
+    expect(agent.snapshot().at(-1)?.closed).toEqual([
+      "General",
+      "Members",
+      "Email",
+      "Slack",
+    ])
+  })
+
+  test("snapshot has no closed entry on a page with nothing closed", () => {
+    const agent = createAgent()
+    mountCheckbox({ id: "terms" })
+    expect(agent.snapshot().map((component) => component.ref)).not.toContain(
+      "closed"
+    )
   })
 
   test("a name two sections behind a tab share is refused, and the page goes back", async () => {
@@ -4644,6 +4766,85 @@ describe("agent act behind a closed tab or section", () => {
     expect(await labels(tools.get("query")?.execute({ closed: true }))).toEqual(
       ["Settings", "Public project"]
     )
+    remove()
+    Reflect.deleteProperty(document, "modelContext")
+  })
+
+  test("a closed query whose look nobody answers says so and leaves the page as it was", async () => {
+    const agent = createAgent({
+      timeout: 50,
+      allow: () => new Promise<boolean>(() => {}),
+    })
+    const { settings } = mountSettings()
+    expect(await agent.query({ closed: true })).toEqual({
+      error: expect.stringMatching(
+        /^No answer to setValue on c\d+ in 50 ms, so it didn't run\. The page asks before an agent's step and nobody answered: tell the person what you could and couldn't do before trying again\. What is closed wasn't read\.$/
+      ),
+    })
+    expect(settings.get().value).toBe("general")
+    // The next call isn't held up.
+    expect(await agent.query({ text: "Public project" })).toMatchObject([
+      { label: "Public project" },
+    ])
+  })
+
+  test("a wrong guess still fails as a step when the look for what is closed isn't answered", async () => {
+    const agent = createAgent({
+      timeout: 50,
+      allow: (step) =>
+        step.args[0] === "members" ? new Promise<boolean>(() => {}) : true,
+    })
+    const { settings } = mountSettings()
+    const outcome = await agent.act({
+      steps: [{ ref: "Settings", action: "setValue", args: ["Billing"] }],
+    })
+    expect(outcome.ok).toBe(false)
+    expect(outcome.error?.message).toMatch(
+      /^No item "Billing" in Settings \(c\d+\)\. Its items: General, Members, Notifications\./
+    )
+    expect(settings.get().value).toBe("general")
+  })
+
+  test("a browser agent's call that is cancelled or throws gets an error it can read", async () => {
+    const agent = createAgent()
+    const { settings } = mountSettings()
+    const tools = new Map<
+      string,
+      { execute: (input: object, context?: object) => unknown }
+    >()
+    Object.assign(document, {
+      modelContext: {
+        registerTool: async (tool: {
+          name: string
+          execute: (input: object) => unknown
+        }) => tools.set(tool.name, tool),
+      },
+    })
+    const remove = registerTools(agent, {
+      allow: (step) =>
+        step.args[0] === "members" ? new Promise<boolean>(() => {}) : true,
+    })
+    const stop = new AbortController()
+    const cancelled = tools
+      .get("query")!
+      .execute({ closed: true }, { signal: stop.signal })
+    await Promise.resolve()
+    stop.abort()
+    expect(await cancelled).toEqual({
+      error: expect.stringMatching(
+        /^setValue on c\d+ was cancelled\. What is closed wasn't read\.$/
+      ),
+    })
+    expect(settings.get().value).toBe("general")
+    // A value JSON can't hold makes the call itself throw.
+    expect(
+      await tools.get("act")!.execute({
+        steps: [{ ref: "Public project", action: "press", extra: 1n }],
+      })
+    ).toEqual({
+      ok: false,
+      error: { step: 0, message: expect.any(String) },
+    })
     remove()
     Reflect.deleteProperty(document, "modelContext")
   })
@@ -5278,6 +5479,64 @@ describe("agent act behind a closed tab or section", () => {
     expect(outcome.error?.message).not.toContain("Behind what is closed")
   })
 
+  test("a press that names a button and no component presses it in the popup that is open", async () => {
+    const agent = createAgent()
+    const { root } = await mountOrders()
+    const { popover } = await import("../src/components/popover/popover")
+    const confirm = popover({ id: "confirm", defaultOpen: true })
+    const content = Object.assign(document.createElement("div"), {
+      getAnimations: () => [],
+    })
+    content.setAttribute("aria-label", "Edit order")
+    const pressed: string[] = []
+    for (const text of ["Cancel", "Apply"]) {
+      const button = content.appendChild(document.createElement("button"))
+      button.textContent = text
+      button.addEventListener("click", () => pressed.push(text))
+    }
+    document.body.append(content)
+    cleanups.push(bind(confirm.part("content"), content), () =>
+      confirm.destroy()
+    )
+    root.setAttribute("inert", "")
+    const outcome = await agent.act({
+      steps: [{ ref: "Apply", action: "press" }],
+    })
+    expect(outcome).toMatchObject({
+      ok: true,
+      steps: [{ result: 'Pressed "Apply".' }],
+    })
+    expect(pressed).toEqual(["Apply"])
+    const missing = await agent.act({
+      steps: [{ ref: "Discard", action: "press" }],
+    })
+    expect(missing.error?.message).toContain('No component "Discard"')
+  })
+
+  test("an open popover says its own text beside its buttons, up to a limit", async () => {
+    const agent = createAgent()
+    const { popover } = await import("../src/components/popover/popover")
+    const details = popover({ id: "details", defaultOpen: true })
+    const content = Object.assign(document.createElement("div"), {
+      getAnimations: () => [],
+    })
+    content.setAttribute("aria-label", "Order details")
+    content.innerHTML =
+      "<p>Ships in two days.</p><ul><li>Gift wrap included</li></ul><button>Close</button>"
+    document.body.append(content)
+    cleanups.push(bind(details.part("content"), content), () =>
+      details.destroy()
+    )
+    const shown = () =>
+      agent.snapshot().find((component) => component.label === "Order details")
+    expect(shown()).toMatchObject({
+      text: ["Ships in two days. Gift wrap included"],
+      buttons: ["Close"],
+    })
+    content.querySelector("p")!.textContent = "word ".repeat(400)
+    expect(shown()?.text?.[0]).toHaveLength(1501)
+  })
+
   test("a name the page lacks under an open modal says what is open over it, with its buttons", async () => {
     const agent = createAgent()
     const { root } = await mountOrders()
@@ -5366,5 +5625,39 @@ describe("agent act behind a closed tab or section", () => {
     cleanups.push(bind(instance.part("root"), el), () => instance.destroy())
     const outcome = await agent.act({ steps: [check("Leaving")] })
     expect(outcome.error?.message).toMatch(/^No component "Leaving"/)
+  })
+
+  test("a listing of the whole page shows three rows of each closed place and counts the rest, and text finds them all", async () => {
+    const agent = createAgent()
+    mountSettings({ members: 5 })
+    const rows = (components: unknown) =>
+      (components as AgentComponent[]).flatMap(({ row, section }) =>
+        section === "Members" && row ? row : []
+      )
+    const listed = (await agent.query({ closed: true })) as AgentComponent[]
+    expect(rows(listed)).toEqual([
+      "Member 1 Admin",
+      "Member 2 Admin",
+      "Member 3 Admin",
+    ])
+    expect(listed.at(-1)).toMatchObject({ ref: "more", more: 2 })
+    expect(rows(await agent.query({ text: "Member", closed: true }))).toEqual([
+      "Member 1 Admin",
+      "Member 2 Admin",
+      "Member 3 Admin",
+      "Member 4 Admin",
+      "Member 5 Admin",
+    ])
+  })
+
+  test("a long list of what left the page stops at ten and counts the rest", async () => {
+    const agent = createAgent()
+    mountSettings({ members: 12 })
+    await agent.act({ steps: [{ ref: "Members", action: "press" }] })
+    const outcome = await agent.act({
+      steps: [{ ref: "General", action: "press" }],
+    })
+    expect(outcome.steps[0].gone).toHaveLength(11)
+    expect(outcome.steps[0].gone?.at(-1)).toBe("and 3 more")
   })
 })

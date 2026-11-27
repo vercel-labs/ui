@@ -518,16 +518,25 @@ function sectionsOf(parts: Bound[]) {
   return names
 }
 
-// Text in the component's row that isn't the component's own, its parts' or
-// its label's, like the name beside a member's menu, so an agent knows which
-// row it is.
-function rowOf(parts: Bound[]) {
+// The row a component is on, when it's on one that isn't a header's or its own.
+function rowElementOf(parts: Bound[]) {
   const el = (
     parts.find((part) => part.slot === "trigger" || part.slot === "root") ??
     parts[0]
   )?.el
   const row = el?.closest("li, tr, [role=row], [role=listitem]")
   if (!row || headerRow(row) || parts.some((part) => part.el.contains(row))) {
+    return
+  }
+  return row
+}
+
+// Text in the component's row that isn't the component's own, its parts' or
+// its label's, like the name beside a member's menu, so an agent knows which
+// row it is.
+function rowOf(parts: Bound[]) {
+  const row = rowElementOf(parts)
+  if (!row) {
     return
   }
   const own = parts.flatMap(({ el }) => [
@@ -546,7 +555,7 @@ function rowOf(parts: Bound[]) {
       words.push(node.textContent.trim())
     }
   }
-  return words.join(" ").slice(0, 80) || undefined
+  return words.join(" ").slice(0, 200) || undefined
 }
 
 type Details = { reason: string; source: ChangeSource }
@@ -741,6 +750,7 @@ export {
   placeOf,
   refresh,
   retire,
+  rowElementOf,
   rowOf,
   setterOf,
   shownParts,

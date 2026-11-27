@@ -32,7 +32,10 @@ async function stageChanges(
 ) {
   const onPage = (list: AgentComponent[] | { error: string }) =>
     Array.isArray(list)
-      ? list.filter((c) => !c.offPage && c.component !== "more")
+      ? list.filter(
+          (c) =>
+            !c.offPage && c.component !== "more" && c.component !== "closed"
+        )
       : []
   const components = onPage(agent.snapshot())
   // A long page's snapshot stops at its limit, so a control past it is looked up by ref, then name.
