@@ -162,16 +162,17 @@ const openerBySource: Record<ChangeSource, PopupOpener> = {
 const openerOf = (event?: Event) =>
   event ? openerBySource[sourceOf(event)] : "imperative"
 
-// A popup opened from code during `run`, like a list an agent opens to read
-// its items, isn't modal, takes no focus and gives none back as it closes, so
-// a person's focus stays where it was. One a person opens meanwhile is as ever.
-let unfocused = 0
-async function withoutFocus<T>(run: () => Promise<T>) {
-  unfocused++
+// A popup opened from code while an agent looks into its component, like a
+// list it opens to read the items, isn't modal, takes no focus and gives none
+// back as it closes, so a person's focus stays where it was.
+const looking = new Set<Element>()
+async function withoutFocus<T>(elements: Element[], run: () => Promise<T>) {
+  const added = elements.filter((el) => !looking.has(el))
+  added.forEach((el) => looking.add(el))
   try {
     return await run()
   } finally {
-    unfocused--
+    added.forEach((el) => looking.delete(el))
   }
 }
 
@@ -717,7 +718,8 @@ function createPopupLayer<
           }
         }
       }
-      quiet = unfocused > 0 && opener === "imperative"
+      const from = options.trigger()
+      quiet = opener === "imperative" && !!from && looking.has(from)
       focusPending = !quiet
       enterPending = true
       returnMode = true

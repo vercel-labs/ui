@@ -2714,7 +2714,8 @@ function createAgent(
         return data ?? seen
       }
       await beforeOpen()
-      await withoutFocus(async () => {
+      const elements = bound(instance).map((part) => part.el)
+      await withoutFocus(elements, async () => {
         asAgent(() => api.setOpen!(true))
         let shown = renderedItems(bound(instance))
         const open = () => (instance.get() as { open?: boolean }).open
