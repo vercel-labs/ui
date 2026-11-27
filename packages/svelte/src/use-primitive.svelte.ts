@@ -440,7 +440,11 @@ function useHandlePart<P extends Primitive, S extends SlotName<P>>(
     const removing = new WeakSet<Event>()
     const noteRemoval = (event: Event) =>
       $effect.tracking() && removing.add(event)
-    el.addEventListener("focusout", noteRemoval, true)
+    // Only for a part that handles it: Chrome makes an SVG element with a
+    // focus listener a Tab stop.
+    if (handlers.focusout) {
+      el.addEventListener("focusout", noteRemoval, true)
+    }
     const cleanups = Object.entries(handlers).map(([type, handler]) =>
       (/^(pointer|touch|wheel)/.test(type) ? listen : delegated)(
         el,
