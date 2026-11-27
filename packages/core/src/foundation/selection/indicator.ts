@@ -123,12 +123,14 @@ function bindIndicator(options: {
     typeof MutationObserver === "undefined"
       ? undefined
       : new MutationObserver(update)
+  // A list still in a template's inert document, before it's in the page,
+  // watches the page's document, where its `dir` will change.
   const list = options.list()
-  if (list) {
-    flips?.observe(list.ownerDocument.documentElement, {
-      attributeFilter: ["dir"],
-      subtree: true,
-    })
+  const root =
+    list &&
+    (list.ownerDocument.documentElement ?? globalThis.document?.documentElement)
+  if (root) {
+    flips?.observe(root, { attributeFilter: ["dir"], subtree: true })
   }
   // Items bind in the same commit. Measure once they have.
   queueMicrotask(remeasure)
