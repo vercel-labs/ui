@@ -59,6 +59,45 @@ describe("color picker", () => {
     expect(onValueChange.mock.lastCall![0]).toBe("#bf6000")
   })
 
+  test("a controlled value the parent keeps holds the thumbs and the color, as a slider does", () => {
+    const onValueChange = vi.fn()
+    const picker = make({ value: "#ff0000", onValueChange })
+    const hue = () =>
+      attrs(picker.part("slider-thumb", { channel: "hue" }))["aria-valuenow"]
+    picker.api.internal.sliderKeydown(key("PageUp"), "hue")
+    picker.api.internal.sliderKeydown(key("PageUp"), "hue")
+    expect(onValueChange.mock.calls.map(([value]) => value)).toEqual([
+      "#ff9900",
+      "#ff9900",
+    ])
+    expect(hue()).toBe("0")
+    expect(attrs(picker.part("root", {})).style).toBe(
+      "--color-picker-color:hsl(0 100% 50%)"
+    )
+    picker.setOptions({ id: "c", value: "#ff9900", onValueChange })
+    expect(hue()).toBe("36")
+  })
+
+  test("a controlled key step fits the gamut and commits its color before the owner renders", () => {
+    const onValueChange = vi.fn()
+    const onValueCommit = vi.fn()
+    const options = {
+      space: "oklch" as const,
+      value: "oklch(0.7 0.1 150)",
+      onValueChange,
+      onValueCommit,
+    }
+    const picker = make(options)
+    picker.api.internal.areaKeydown(key("End"))
+    const [value] = onValueChange.mock.lastCall!
+    const [committed, details] = onValueCommit.mock.lastCall!
+    expect(committed).toBe(value)
+    expect(isInGamut(details.color, "srgb")).toBe(true)
+    expect(details.color.coords[1]).toBeCloseTo(0.2104, 3)
+    picker.setOptions({ id: "c", ...options, value })
+    expect(isInGamut(picker.get().color, "srgb")).toBe(true)
+  })
+
   test("a controlled picker commits a key, a swatch and typed text before its owner renders", () => {
     const onValueCommit = vi.fn()
     const picker = make({ value: "#ff0000", onValueCommit })

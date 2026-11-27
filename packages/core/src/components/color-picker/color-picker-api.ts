@@ -156,6 +156,8 @@ function colorPickerApiBody(
   // The last value a change asked for. A controlled value only arrives with
   // the owner's next render, after a key or a swatch has already committed.
   let changed: string | undefined
+  // The color a change asked for while a controlled value hasn't taken it.
+  let moved: Color | undefined
 
   const begin = () => {
     start = store.get().value
@@ -178,6 +180,7 @@ function colorPickerApiBody(
     const state = store.get()
     const value = output(color, state)
     const before = state.color
+    moved = undefined
     store.set({ color })
     if (value === state.value) {
       return true
@@ -190,6 +193,11 @@ function colorPickerApiBody(
       store.set({ color: before })
     } else {
       changed = value
+      // Until the owner passes the value back, the parts stay on the one it holds.
+      if (store.get().value !== value) {
+        moved = color
+        store.set({ color: before })
+      }
       if (notify) {
         dispatchChange(formElement(), ["input"])
       }
@@ -203,8 +211,15 @@ function colorPickerApiBody(
     const from = start
     start = undefined
     const state = store.get()
-    if (state.gamut && !isInGamut(state.color, state.gamut)) {
-      store.set({ color: toGamut(state.color, state.gamut) })
+    const held = moved ?? state.color
+    const fitted =
+      state.gamut && !isInGamut(held, state.gamut)
+        ? toGamut(held, state.gamut)
+        : held
+    if (moved) {
+      moved = fitted
+    } else if (fitted !== held) {
+      store.set({ color: fitted })
     }
     const value = changed ?? store.get().value
     changed = undefined
@@ -213,7 +228,7 @@ function colorPickerApiBody(
     }
     commitValue("value", value, {
       ...details,
-      color: publicColor(store.get().color),
+      color: publicColor(moved ?? store.get().color),
     })
     dispatchChange(formElement(), ["change"])
   }
@@ -524,8 +539,8 @@ function colorPickerApiBody(
     },
   }
 
-  // A value that arrives as the color the parts hold would write keeps that
-  // color, with its hue. Any other reads anew, in the space that arrives.
+  // A value that arrives as the color the parts hold or asked for would write
+  // keeps that color, with its hue. Any other reads anew, in the space that arrives.
   deriveFromOptions(context, ["color"], (synced, state) => {
     const next = { ...state, ...synced }
     const kept =
@@ -537,6 +552,15 @@ function colorPickerApiBody(
     }
     if (next.value === output(kept, next)) {
       return { color: kept }
+    }
+    if (
+      moved &&
+      next.space === state.space &&
+      next.value === output(moved, next)
+    ) {
+      const color = moved
+      moved = undefined
+      return { color }
     }
     return { color: colorIn(next.value, next.space) ?? kept }
   })
