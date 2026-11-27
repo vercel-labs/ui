@@ -199,11 +199,10 @@ function touchOwner(start: {
   return "page"
 }
 
-// Contains overscroll inside a guarded modal, so a list never scrolls the page.
-// A scroll-snap sheet's lists chain a pull-down to its viewport, which contains
-// it instead. In the lowest cascade layer, so any style wins.
+// Contains overscroll inside a guarded modal, so reaching the end of a list
+// in it never scrolls the page. In the lowest cascade layer, so any style wins.
 const guardRule =
-  '@layer ui-sdk { [data-scroll-guard]:not([data-driver="scroll-snap"]), [data-scroll-guard]:not([data-driver="scroll-snap"]) * { overscroll-behavior: contain } }'
+  "@layer ui-sdk { [data-scroll-guard], [data-scroll-guard] * { overscroll-behavior: contain } }"
 
 // iOS ignores `overflow: hidden` while its toolbar is collapsed, and scrolls
 // the page behind a modal. Overscroll inside the modal is contained, and a

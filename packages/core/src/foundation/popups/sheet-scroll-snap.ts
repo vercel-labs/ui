@@ -76,6 +76,7 @@ function createScrollSnapDriver(options: SheetDriverOptions) {
   // Each scroll area with its own inline overflow-y, put back at the largest
   // snap point, since frameworks don't write a style again that didn't change.
   const scrollAreas = new Map<HTMLElement, [string, string]>()
+  const restoreChaining = new Map<HTMLElement, () => void>()
   // A snap marker where a finger caught a moving sheet, so mandatory snapping
   // doesn't pull it to a snap point before the finger moves it.
   let caught: HTMLElement | null = null
@@ -155,6 +156,7 @@ function createScrollSnapDriver(options: SheetDriverOptions) {
     for (const area of scrollAreas.keys()) {
       if (!sheet.contains(area)) {
         scrollAreas.delete(area)
+        restoreChaining.delete(area)
       }
     }
     for (const area of findScrollAreas(sheet)) {
@@ -163,6 +165,11 @@ function createScrollSnapDriver(options: SheetDriverOptions) {
           area.style.getPropertyValue("overflow-y"),
           area.style.getPropertyPriority("overflow-y"),
         ])
+      }
+      // A pull-down at the top of a list moves the sheet by chaining to the
+      // viewport, which contains overscroll. A popup's list inside it doesn't chain there.
+      if (!restoreChaining.has(area) && !inNestedLayer(area, sheet)) {
+        restoreChaining.set(area, setStyle(area, "overscroll-behavior", "auto"))
       }
     }
   }
@@ -533,6 +540,7 @@ function createScrollSnapDriver(options: SheetDriverOptions) {
       for (const [area, [value, priority]] of scrollAreas) {
         area.style.setProperty("overflow-y", value, priority)
       }
+      restoreChaining.forEach((restore) => restore())
       if (dragging) {
         options.onDragChange(false)
       }
@@ -542,6 +550,11 @@ function createScrollSnapDriver(options: SheetDriverOptions) {
       restoreHost()
     },
   } satisfies SheetDriver
+}
+
+function inNestedLayer(el: Element, sheet: Element) {
+  const layer = el.closest("[popover]")
+  return !!layer && layer !== sheet && sheet.contains(layer)
 }
 
 function findScrollAreas(sheet: HTMLElement) {
