@@ -32,6 +32,8 @@ test("a press on an aria-disabled trigger keeps a tooltip open, and still toggle
   await wait()
   expect(plain.open).toBe(true)
   toggle.querySelector("button")!.click()
-  await wait()
+  // Long enough for the open to complete, so its event never fires after the
+  // test's page is gone.
+  await wait(50)
   expect(toggle.open).toBe(true)
 })
