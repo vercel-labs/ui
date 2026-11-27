@@ -234,7 +234,8 @@ const parsed = [new Map<string, string[]>(), new Map<string, string[]>()]
 /**
  * Whether a key press matches a shortcut like `"mod+k"`. `mod` is Command on
  * Apple platforms and Control elsewhere, and letters match by physical key
- * when the layout types another character, like Option+N on a Mac.
+ * when the layout types another character, like Option+N on a Mac. A symbol
+ * matches whether or not the layout needs Shift to type it, like `"?"`.
  * @experimental
  */
 function matchesShortcut(
@@ -251,12 +252,20 @@ function matchesShortcut(
   if (!keys) {
     cache.set(shortcut, (keys = ariaKeyshortcuts(shortcut, apple).split("+")))
   }
+  const key = keys.at(-1)!
+  const shift = keys.includes("Shift")
+  // A symbol's Shift is how the layout types it, like "?" on Shift+/ in US.
+  const symbol =
+    !shift &&
+    key.length === 1 &&
+    !/\d/.test(key) &&
+    key.toLowerCase() === key.toUpperCase()
   return (
-    matchesKey(event, keys.at(-1)!) &&
+    matchesKey(event, key) &&
     event.metaKey === keys.includes("Meta") &&
     event.ctrlKey === keys.includes("Control") &&
     event.altKey === keys.includes("Alt") &&
-    event.shiftKey === keys.includes("Shift")
+    (symbol || event.shiftKey === shift)
   )
 }
 
