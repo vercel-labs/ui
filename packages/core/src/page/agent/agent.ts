@@ -407,6 +407,11 @@ const leftPage = () =>
       Number(a.ref.slice(1)) - Number(b.ref.slice(1))
   )
 
+// An item a person can't reach, like one in a folded column, is left out, but
+// not one in its list's closed content, which opening the list shows.
+const reachable = (el: HTMLElement) =>
+  isShown(el) || !!el.closest("[hidden]")?.matches('[data-slot$="-content"]')
+
 // The items on the page, named by their trigger when they have one, like an
 // accordion's sections, else by their text.
 function renderedItems(parts: Bound[]) {
@@ -416,7 +421,8 @@ function renderedItems(parts: Bound[]) {
         part.key &&
         (part.slot === "item" ||
           part.slot === "tab" ||
-          (part.slot === "root" && part.el.getAttribute("role") === "radio"))
+          (part.slot === "root" && part.el.getAttribute("role") === "radio")) &&
+        reachable(part.el)
     )
   )
   const nested = items.map((part) => part.el)
