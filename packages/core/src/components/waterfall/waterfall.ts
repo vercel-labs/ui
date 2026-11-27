@@ -533,10 +533,11 @@ const waterfallPrimitive = /* @__PURE__ */ definePrimitive({
         api.internal.pressIndicator(rowOf(props), event),
     }),
 
-    cell: slot<RowPartProps, WaterfallRowState>({
+    // A row can hold many cells, so each one is keyed by its own id.
+    cell: slot<RowPartProps & { id?: string }, WaterfallRowState>({
       role: "gridcell",
       focus: "roving",
-      props: { value: { kind: "string", from: "row" } },
+      props: { id: "id", value: { kind: "string", from: "row" } },
       selects: selects(rowPartReads),
       state: (state, { props, api }) => rowState(state, rowOf(props), api),
       attrs: (state, { props, api }) => ({
