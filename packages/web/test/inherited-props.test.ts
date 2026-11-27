@@ -10,10 +10,9 @@ const grid = definePrimitive({
   state: () => ({}),
   api: () => ({}),
   slots: (slot) => ({
-    root: slot({ role: "grid" }),
-    row: slot({ role: "row", props: { value: "string" } }),
-    cell: slot({
-      role: "gridcell",
+    root: slot({}),
+    row: slot<{ value?: string }>({ props: { value: "string" } }),
+    cell: slot<{ value?: string }>({
       props: { value: { kind: "string", from: "row" } },
       attrs: (_, { props }) => ({ "data-value": props.value ?? "none" }),
     }),
