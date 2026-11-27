@@ -201,7 +201,7 @@ import type {
   CommandOptions,
   CommandPagesChangeReason,
   CommandQueryChangeReason,
-  CommandValueChangeReason,
+  CommandValueChangeDetails,
 } from "@ui-sdk/core/command"
 import type {
   UndoStackOptions,
@@ -311,6 +311,7 @@ import type {
   Primitive,
   PropsOf,
   SlotName,
+  TextChangeDetails,
   TypesOf,
 } from "@ui-sdk/core"
 
@@ -1587,7 +1588,10 @@ type UiLoadMoreEvent = CustomEvent<{}>
  */
 type SelectEvents = OpenEvents<SelectOpenChangeReason> & {
   valuechange: UiChangeEvent<unknown, SelectValueChangeReason>
-  querychange: UiChangeEvent<string, SelectQueryChangeReason>
+  querychange: UiDetailedChangeEvent<
+    string,
+    TextChangeDetails<SelectQueryChangeReason>
+  >
   highlight: UiHighlightEvent
   loadmore: UiLoadMoreEvent
   dismissattempt: UiDismissAttemptEvent<SelectDismissReason>
@@ -1637,7 +1641,10 @@ interface UiSelectElement
  */
 type ComboboxEvents = OpenEvents<ComboboxOpenChangeReason> & {
   valuechange: UiChangeEvent<unknown, ComboboxValueChangeReason>
-  querychange: UiChangeEvent<string, ComboboxQueryChangeReason>
+  querychange: UiDetailedChangeEvent<
+    string,
+    TextChangeDetails<ComboboxQueryChangeReason>
+  >
   highlight: UiHighlightEvent
   loadmore: UiLoadMoreEvent
   /** The create part was chosen, with the text. Pass a Promise to `waitUntil()` to keep it pending until it settles. */
@@ -1731,8 +1738,11 @@ interface UiAutocompleteElement
  * @stable
  */
 type CommandEvents = {
-  valuechange: UiChangeEvent<string | null, CommandValueChangeReason>
-  querychange: UiChangeEvent<string, CommandQueryChangeReason>
+  valuechange: UiDetailedChangeEvent<string | null, CommandValueChangeDetails>
+  querychange: UiDetailedChangeEvent<
+    string,
+    TextChangeDetails<CommandQueryChangeReason>
+  >
   pageschange: UiChangeEvent<string[], CommandPagesChangeReason>
   loadmore: UiLoadMoreEvent
   /** A command ran, with its value. Pass a Promise to `waitUntil()` to keep it pending until it settles. */

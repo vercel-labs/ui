@@ -3,6 +3,7 @@ import type {
   ChangeDetails,
   DismissAttemptDetails,
   Side,
+  TextChangeDetails,
 } from "@ui-sdk/core"
 import type { AsyncOptionsStatus } from "@ui-sdk/core/async-options"
 import {
@@ -85,7 +86,7 @@ const ContainerKey: InjectionKey<() => PopupContainer> =
 
 type ValueDetails = ChangeDetails<SelectValueChangeReason>
 type OpenDetails = ChangeDetails<SelectOpenChangeReason>
-type QueryDetails = ChangeDetails<SelectQueryChangeReason>
+type QueryDetails = TextChangeDetails<SelectQueryChangeReason>
 
 const useSelect = () => useHandle(selectPrimitive)
 
