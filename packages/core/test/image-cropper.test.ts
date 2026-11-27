@@ -54,6 +54,26 @@ describe("image cropper", () => {
     })
   })
 
+  test("setCrop of the crop it has changes nothing, and a rounded crop stays inside the image", () => {
+    const onCropChange = vi.fn()
+    const cropper = make({ aspectRatio: 16 / 9, onCropChange })
+    load(cropper, 4032, 3024)
+    const crop = cropper.api.getCrop()
+    onCropChange.mockClear()
+    expect(cropper.api.setCrop(crop!)).toBe(false)
+    expect(onCropChange).not.toHaveBeenCalled()
+    const wide = make({ aspectRatio: 2 })
+    load(wide, 800, 600)
+    wide.api.setCrop({ x: 0, y: 600, width: 337, height: 200 })
+    const { y, height } = wide.api.getCrop()!
+    expect(y + height).toBeLessThanOrEqual(600)
+    const free = make({})
+    load(free, 800, 600)
+    free.api.setCrop({ x: 1000, y: 0, width: 200.5, height: 100 })
+    const { x, width } = free.api.getCrop()!
+    expect(x + width).toBeLessThanOrEqual(800)
+  })
+
   test("shows no crop until the image loads, then crops four fifths of the largest box at the ratio", () => {
     const onCropChange = vi.fn()
     const onCropCommit = vi.fn()

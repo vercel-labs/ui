@@ -275,23 +275,25 @@ function limitCrop(crop: Crop, natural: Size, limits: Limits) {
   const { aspect } = limits
   const min = smallest(shown, limits)
   const max = largest(shown, aspect)
-  const width = Math.min(
-    max.width,
-    Math.max(
-      min.width,
-      aspect ? Math.min(crop.width, crop.height * aspect) : crop.width
-    )
+  // The cropper's own crops are rounded to pixels, so one within a pixel of
+  // the ratio keeps its size and setting it back changes nothing.
+  const onRatio = !aspect || Math.abs(crop.width / aspect - crop.height) <= 1
+  const width = clamp(
+    onRatio ? crop.width : Math.min(crop.width, crop.height * aspect),
+    min.width,
+    max.width
   )
-  const height = aspect
-    ? width / aspect
-    : Math.min(max.height, Math.max(min.height, crop.height))
-  return round({
-    ...crop,
-    x: clamp(crop.x, 0, shown.width - width),
-    y: clamp(crop.y, 0, shown.height - height),
-    width,
-    height,
-  })
+  const height = !aspect
+    ? clamp(crop.height, min.height, max.height)
+    : onRatio && width === crop.width
+      ? crop.height
+      : width / aspect
+  const size = round({ ...crop, width, height })
+  return {
+    ...size,
+    x: clamp(size.x, 0, shown.width - size.width),
+    y: clamp(size.y, 0, shown.height - size.height),
+  }
 }
 
 /**
