@@ -1193,6 +1193,7 @@ function createPopupLayer<
       component: options.owner?.component,
       id: options.owner?.id,
       el,
+      covers: (target) => host.contains(target),
       contains: (target, event) =>
         (el.contains(target) && !pressedBackdrop(target, event)) ||
         persistent.some((node) => node.contains(target)) ||

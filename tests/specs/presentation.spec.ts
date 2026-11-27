@@ -915,3 +915,33 @@ test.describe("menu drill-in", () => {
     await expect(menuNamed(page, "File")).toBeHidden()
   })
 })
+
+test.describe("a select sheet in a dialog rendered into a container", () => {
+  test.beforeEach(({ framework }) => {
+    test.skip(
+      !hasFixture("dialog-nested-sheet", framework),
+      `No dialog-nested-sheet fixture for ${framework}.`
+    )
+  })
+
+  test("a tap on the dialog beside the select's sheet closes only the select", async ({
+    browser,
+    baseURL,
+    framework,
+  }) => {
+    const { context, page } = await phone(browser, baseURL)
+    await page.goto(`/?fixture=dialog-nested-sheet&framework=${framework}`)
+    await page.locator("body[data-mounted]").waitFor({ state: "attached" })
+    await page.getByRole("button", { name: "Open filters" }).tap()
+    const dialog = page.getByRole("dialog", { name: "Filters" })
+    await waitForStill(dialog)
+    await page.getByRole("combobox", { name: "Date range" }).tap()
+    const list = page.getByRole("listbox")
+    await waitForStill(list)
+    const box = (await dialog.boundingBox())!
+    await page.touchscreen.tap(box.x + 20, box.y + 10)
+    await expect(list).toBeHidden()
+    await expect(dialog).toBeVisible()
+    await context.close()
+  })
+})

@@ -10,6 +10,9 @@ type Layer = {
   // is the press being decided, when there is one.
   contains: (target: Node, event?: Event) => boolean
   parent?: Layer
+  // What the layer covers beyond what counts as inside it, like a sheet's
+  // viewport. A press there is outside it but inside the layer it opened from.
+  covers?: (target: Node) => boolean
   // False once the layer starts to close. Closed layers ignore dismissal.
   active: () => boolean
   // True while the layer animates out. It's inert then, so presses fall through
@@ -219,7 +222,10 @@ function insideTreeAt(layer: Layer, hops: Node[], event?: Event): boolean {
     return true
   }
   return active().some(
-    (other) => other.parent === layer && insideTreeAt(other, hops, event)
+    (other) =>
+      other.parent === layer &&
+      (hops.some((hop) => other.covers?.(hop)) ||
+        insideTreeAt(other, hops, event))
   )
 }
 
