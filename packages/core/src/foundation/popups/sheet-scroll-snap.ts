@@ -48,6 +48,8 @@ const restTimeout = 120
 // show a stretch before snapping back.
 const overscrollRoom = 24
 
+const closedSlack = 2
+
 function createScrollSnapDriver(options: SheetDriverOptions) {
   const { sheet, host } = options
   const doc = sheet.ownerDocument
@@ -237,6 +239,15 @@ function createScrollSnapDriver(options: SheetDriverOptions) {
       return
     }
     const config = options.config()
+    // iOS momentum can stop a swipe a pixel or two short of closed, where the
+    // sheet is below the screen but the visibility check still counts it as shown.
+    if (
+      config.dismissible &&
+      targetId !== null &&
+      host.scrollTop <= closedSlack
+    ) {
+      return dismiss()
+    }
     const result = next(state, { type: "rest", extent: scrollExtent() }, config)
     state = result.state
     for (const effect of result.effects) {
@@ -261,6 +272,10 @@ function createScrollSnapDriver(options: SheetDriverOptions) {
     ) {
       return
     }
+    dismiss()
+  }
+
+  function dismiss() {
     closing = "swipe"
     targetId = null
     options.onDismiss()
