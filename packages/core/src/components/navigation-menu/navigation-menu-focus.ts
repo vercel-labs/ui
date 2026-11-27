@@ -172,21 +172,7 @@ function createFocus(config: {
           after.focus()
           return
         }
-        // Nothing follows: the browser's Tab skips the panel's stops and leaves
-        // the page. Not `inert`, which a closing panel's exit animation owns.
-        const stops = tabbables(panel)
-        const kept = stops.map((el) => el.getAttribute("tabindex"))
-        stops.forEach((el) => (el.tabIndex = -1))
-        setTimeout(() =>
-          stops.forEach((el, index) => {
-            const value = kept[index]
-            if (value === null) {
-              el.removeAttribute("tabindex")
-            } else {
-              el.setAttribute("tabindex", value)
-            }
-          })
-        )
+        // Nothing follows: the menu closes, so the browser's Tab leaves the page.
         config.close(event)
         return
       }
