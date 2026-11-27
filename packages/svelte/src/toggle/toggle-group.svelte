@@ -3,7 +3,7 @@
 Toggles that share one value, with one tab stop and arrow keys between them.
 @stable
 -->
-<script lang="ts">
+<script lang="ts" generics="T extends string = string">
   import type { ChangeDetails } from "@ui-sdk/core"
   import {
     toggleGroup as toggleGroupPrimitive,
@@ -38,9 +38,9 @@ Toggles that share one value, with one tab stop and arrow keys between them.
     ...rest
   }: PartProps<"div", ToggleGroupState> & {
     /** The pressed toggles' values. Bind it with `bind:value` to control the group. */
-    value?: string[]
+    value?: T[]
     /** The toggles pressed at first, when uncontrolled. */
-    defaultValue?: string[]
+    defaultValue?: T[]
     /** Whether several toggles can be pressed at once. Otherwise pressing one unpresses the others. */
     multiple?: boolean
     /** Whether the pressed toggle can be unpressed when only one may be pressed. With `false`, one toggle stays pressed once any is. Ignored with `multiple`. */
@@ -52,11 +52,11 @@ Toggles that share one value, with one tab stop and arrow keys between them.
     /** Whether arrow keys wrap from the last toggle to the first. */
     loop?: boolean
     /** Presses toggles from anywhere. Create one with `createToggleGroupController()`. */
-    controller?: ToggleGroupController
+    controller?: ToggleGroupController<T>
     /** Logs every state change with its reason. */
     debug?: boolean
     /** Runs when a toggle wants to be pressed or unpressed. `details.reason` says why, and `details.cancel()` stops it. */
-    onValueChange?: (value: string[], details: Details) => void
+    onValueChange?: (value: T[], details: Details) => void
   } = $props()
 
   const id = $props.id()
@@ -73,13 +73,13 @@ Toggles that share one value, with one tab stop and arrow keys between them.
     disabled,
     orientation,
     loop,
-    controller,
+    controller: controller as ToggleGroupController | undefined,
     debug,
     onValueChange: (next: string[], details: Details) => {
       // The callback runs first, so canceling there also keeps a bound `value` as it was.
-      onValueChange?.(next, details)
+      onValueChange?.(next as T[], details)
       if (!details.canceled) {
-        value = next
+        value = next as T[]
       }
     },
   }))

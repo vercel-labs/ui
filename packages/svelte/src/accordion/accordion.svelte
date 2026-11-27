@@ -3,7 +3,7 @@
 A stack of items that each open a section of content. One item is open at a time unless `multiple` is set.
 @stable
 -->
-<script lang="ts">
+<script lang="ts" generics="T extends string = string">
   import type { ChangeDetails } from "@ui-sdk/core"
   import {
     accordion as accordionPrimitive,
@@ -35,9 +35,9 @@ A stack of items that each open a section of content. One item is open at a time
     ...rest
   }: PartProps<"div", AccordionState> & {
     /** The open items' values. Bind it with `bind:value` to control the accordion. */
-    value?: string[]
+    value?: T[]
     /** The items open at first, when uncontrolled. */
-    defaultValue?: string[]
+    defaultValue?: T[]
     /** Whether several items can be open at once. Otherwise opening one closes the others. */
     multiple?: boolean
     /** Whether the open item can close when only one may be open. With `false`, one item always stays open. */
@@ -49,11 +49,11 @@ A stack of items that each open a section of content. One item is open at a time
     /** Keeps closed panels in the page as `hidden="until-found"`, so find in page can open them. */
     hiddenUntilFound?: boolean
     /** Opens and closes items from anywhere. Create one with `createAccordionController()`. */
-    controller?: AccordionController
+    controller?: AccordionController<T>
     /** Logs every state change with its reason. */
     debug?: boolean
     /** Runs when items want to open or close. `details.reason` says why, and `details.cancel()` stops it. */
-    onValueChange?: (value: string[], details: Details) => void
+    onValueChange?: (value: T[], details: Details) => void
   } = $props()
 
   const id = $props.id()
@@ -68,13 +68,13 @@ A stack of items that each open a section of content. One item is open at a time
     disabled,
     keepMounted,
     hiddenUntilFound,
-    controller,
+    controller: controller as AccordionController | undefined,
     debug,
     onValueChange: (next: string[], details: Details) => {
       // The callback runs first, so canceling there also keeps a bound `value` as it was.
-      onValueChange?.(next, details)
+      onValueChange?.(next as T[], details)
       if (!details.canceled) {
-        value = next
+        value = next as T[]
       }
     },
   }))

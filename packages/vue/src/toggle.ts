@@ -4,7 +4,9 @@ import {
   toggleGroup as toggleGroupPrimitive,
   type ToggleController,
   type ToggleGroupController,
+  type ToggleGroupOptions,
   type ToggleGroupOrientation,
+  type ToggleGroupState,
   type ToggleGroupValueChangeReason,
   type TogglePressedChangeReason,
 } from "@ui-sdk/core/toggle"
@@ -16,7 +18,13 @@ import {
   type PropType,
 } from "vue"
 import { useToolbarScope } from "./toolbar-context"
-import { createParts, withElement } from "./create-parts"
+import {
+  createParts,
+  withElement,
+  type RenderableWith,
+  type RootInstanceOf,
+  type RootPropsOf,
+} from "./create-parts"
 import {
   optionalBoolean,
   orModel,
@@ -99,6 +107,15 @@ const Toggle = withElement(
  */
 const ToggleIcon = parts.Icon
 
+// Generic over the values, like React's `ToggleGroup<T>`: `v-model` and
+// `@value-change` share `T`.
+type ToggleGroupProps<T extends string> = ToggleGroupOptions<T>
+type ToggleGroupComponent = {
+  new <T extends string = string>(
+    props: RootPropsOf<ToggleGroupProps<T>, "div">
+  ): RootInstanceOf<ToggleGroupProps<T>, ToggleGroupState, "div">
+} & RenderableWith<ToggleGroupProps<string>, ToggleGroupState, "div">
+
 /**
  * Toggles that share one value, with one tab stop and arrow keys between them.
  * @stable
@@ -159,7 +176,7 @@ const ToggleGroup = /* @__PURE__ */ withElement(
       return usePart(group, "group", undefined, undefined, "div")
     },
   })
-)
+) as unknown as ToggleGroupComponent
 
 export {
   createToggleController,

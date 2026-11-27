@@ -4,7 +4,7 @@ Checkboxes that share a name and a list of checked values. The group, not
 each checkbox, sits in a field.
 @stable
 -->
-<script lang="ts">
+<script lang="ts" generics="T extends string = string">
   import type { ChangeDetails } from "@ui-sdk/core"
   import {
     checkboxGroup as checkboxGroupPrimitive,
@@ -40,11 +40,11 @@ each checkbox, sits in a field.
     ...rest
   }: PartProps<"div", CheckboxGroupState> & {
     /** The checked values. Bind it with `bind:value` to control the group. */
-    value?: string[]
+    value?: T[]
     /** The checked values at first, when uncontrolled. A form reset returns to them. */
-    defaultValue?: string[]
+    defaultValue?: T[]
     /** Every value in the group, for a parent checkbox to check them all. */
-    allValues?: string[]
+    allValues?: T[]
     /** Disables every checkbox in the group. */
     disabled?: boolean
     /** Makes every checkbox in the group read-only: focusable and submitted, but presses don't change it. */
@@ -56,11 +56,11 @@ each checkbox, sits in a field.
     /** The id of a form to belong to, when it isn't inside that form. */
     form?: string
     /** Drives the group from anywhere. Create one with `createCheckboxGroupController()`. */
-    controller?: CheckboxGroupController
+    controller?: CheckboxGroupController<T>
     /** Logs every state change with its reason. */
     debug?: boolean
     /** Runs when a checkbox or a form reset wants to change the values. `details.cancel()` stops it. */
-    onValueChange?: (value: string[], details: Details) => void
+    onValueChange?: (value: T[], details: Details) => void
   } = $props()
 
   const id = $props.id()
@@ -77,13 +77,13 @@ each checkbox, sits in a field.
     required,
     name: name ?? field?.name(),
     form,
-    controller,
+    controller: controller as CheckboxGroupController | undefined,
     debug,
     onValueChange: (next: string[], details: Details) => {
       // The callback runs first, so canceling there also keeps a bound `value` as it was.
-      onValueChange?.(next, details)
+      onValueChange?.(next as T[], details)
       if (!details.canceled) {
-        value = next
+        value = next as T[]
       }
     },
   }))

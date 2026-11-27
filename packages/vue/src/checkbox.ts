@@ -4,6 +4,8 @@ import {
   type CheckboxCheckedChangeReason,
   type CheckboxController,
   type CheckboxGroupController,
+  type CheckboxGroupOptions,
+  type CheckboxGroupState,
   type CheckboxGroupValueChangeReason,
   type CheckedState,
 } from "@ui-sdk/core/checkbox"
@@ -18,7 +20,13 @@ import {
 } from "vue"
 import { type FieldContext, FieldKey, useFieldControl } from "./field-context"
 import { toggleProps } from "./toggle-props"
-import { createParts, withElement } from "./create-parts"
+import {
+  createParts,
+  withElement,
+  type RenderableWith,
+  type RootInstanceOf,
+  type RootPropsOf,
+} from "./create-parts"
 import {
   optionalBoolean,
   orModel,
@@ -125,6 +133,15 @@ const Checkbox = withElement(
  */
 const CheckboxIndicator = parts.Indicator
 
+// Generic over the values, like React's `CheckboxGroup<T>`: `v-model` and
+// `@value-change` share `T`.
+type CheckboxGroupProps<T extends string> = CheckboxGroupOptions<T>
+type CheckboxGroupComponent = {
+  new <T extends string = string>(
+    props: RootPropsOf<CheckboxGroupProps<T>, "div">
+  ): RootInstanceOf<CheckboxGroupProps<T>, CheckboxGroupState, "div">
+} & RenderableWith<CheckboxGroupProps<string>, CheckboxGroupState, "div">
+
 /**
  * Checkboxes that share a name and a list of checked values. The group, not
  * each checkbox, sits in a field.
@@ -192,7 +209,7 @@ const CheckboxGroup = /* @__PURE__ */ withElement(
       return () => [root(), h("input", group.slot("group-input"))]
     },
   })
-)
+) as unknown as CheckboxGroupComponent
 
 export {
   createCheckboxController,
