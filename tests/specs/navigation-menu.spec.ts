@@ -354,7 +354,7 @@ test.describe("keyboard", () => {
     ).toBe(false)
   })
 
-  test("Tab from the last item past an open panel leaves the page when nothing follows the navigation", async ({
+  test("Tab from the last item past an open panel closes it without going back in when nothing follows the navigation", async ({
     page,
     tab,
   }) => {
@@ -377,11 +377,7 @@ test.describe("keyboard", () => {
     await link(page, "Pricing").focus()
     await tab()
     await expect(link(page, "Blog")).toBeHidden()
-    expect(
-      await page.evaluate(
-        () => !!document.activeElement?.closest("nav, ui-navigation-menu")
-      )
-    ).toBe(false)
+    await expect(viewport(page).locator(":focus")).toHaveCount(0)
   })
 
   test("Escape inside a panel closes it and returns focus to its trigger", async ({
