@@ -827,6 +827,10 @@ const menuCheckable = /* @__PURE__ */ (() => ({
       attrs: (state, { id, props }) => ({
         "aria-labelledby": menuGroupLabelledBy(state, id, props.name),
       }),
+      // After the group's items bind.
+      bind(el, { api, props }) {
+        queueMicrotask(() => api.forgetOtherPlace(props.name))
+      },
     }),
 
     "radio-item": menuSlot<RadioProps, MenuRadioItemState>({

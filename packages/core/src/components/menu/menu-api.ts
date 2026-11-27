@@ -712,6 +712,26 @@ function menuApiBody(
     return `radio@${place}`
   }
 
+  // A choice kept by place that none of the group's items has was made in a
+  // group that rendered there before, like one shown only some of the time.
+  function forgetOtherPlace(group: string) {
+    const place = placeKey(
+      group,
+      props("radio-group", group) as RadioGroupProps
+    )
+    const { values } = store.get()
+    const kept = place && values[place]
+    if (
+      place &&
+      kept !== undefined &&
+      values[`radio:${group}`] === undefined &&
+      !entries.get(`${group}:${kept}`)
+    ) {
+      const { [place]: _, ...rest } = values
+      store.set({ values: rest })
+    }
+  }
+
   function radioValue(group: string) {
     const groupProps = props("radio-group", group) as
       RadioGroupProps | undefined
@@ -812,6 +832,7 @@ function menuApiBody(
     focusTriggerItem,
     checkboxValue,
     radioValue,
+    forgetOtherPlace,
     setCheckbox,
     setRadio,
     root,
