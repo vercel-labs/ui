@@ -447,8 +447,11 @@ function createTracked(
     attrsTick,
     present(part, from) {
       presence()
-      const shown = isPresent(part, part.props)
-      answers.set(from, [part.props, shown])
+      // Every prop is read here, so a prop the answer reads only some of the
+      // time is still followed.
+      const props = { ...part.props }
+      const shown = isPresent(part, props)
+      answers.set(from, [props, shown])
       return shown
     },
     state: () => undefined,

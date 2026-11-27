@@ -1,6 +1,6 @@
 import { definePrimitive } from "@ui-sdk/core"
 import { render } from "@solidjs/web"
-import { createMemo, flush } from "solid-js"
+import { createMemo, createSignal, flush } from "solid-js"
 import { expect, test } from "vitest"
 import { usePrimitive } from "../src/use-primitive"
 
@@ -69,5 +69,34 @@ test("each reader of a part's presence hears it with its own props", () => {
   instance.api.setOpen(true)
   flush()
   expect(root.firstElementChild?.getAttribute("data-shown")).toBe("true true")
+  dispose()
+})
+
+test("a part's presence follows a prop its answer reads only some of the time", () => {
+  let instance!: ReturnType<typeof panel>
+  const [keep, setKeep] = createSignal(false)
+  const root = document.createElement("div")
+  const dispose = render(() => {
+    const handle = usePrimitive(panel, () => ({}))
+    instance = handle.instance
+    const shown = createMemo(() =>
+      handle.present("content", () => ({
+        get keep() {
+          return keep()
+        },
+      }))
+    )
+    return <div data-shown={String(shown())} />
+  }, root)
+  flush()
+  instance.api.setOpen(true)
+  flush()
+  setKeep(true)
+  flush()
+  instance.api.setOpen(false)
+  flush()
+  setKeep(false)
+  flush()
+  expect(root.firstElementChild?.getAttribute("data-shown")).toBe("false")
   dispose()
 })
