@@ -145,6 +145,20 @@ describe("selection", () => {
     expect([panel("a"), panel("b")]).toEqual([false, true])
   })
 
+  test("an agent going back to a kept panel in controlled tabs keeps the one a person was on", () => {
+    const instance = tabs({ id: "t", value: "a" })
+    const panel = (value: string) => present(instance.part("panel", { value }))
+    const move = (value: string, source?: "agent") => {
+      const select = () => instance.api.select(value)
+      source ? withSource(source, select) : select()
+      instance.setOptions({ id: "t", value })
+    }
+    move("b", "agent")
+    move("c")
+    move("a", "agent")
+    expect([panel("a"), panel("b"), panel("c")]).toEqual([true, false, true])
+  })
+
   test("selecting reports the value and a reason", () => {
     const onValueChange = vi.fn()
     const instance = tabs({ id: "t", defaultValue: "a", onValueChange })

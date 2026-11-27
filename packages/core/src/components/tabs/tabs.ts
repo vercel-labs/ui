@@ -568,10 +568,7 @@ function tabsApiBody(
     if (keeps) {
       store.set({ kept: [...kept, from] })
     }
-    agentOn =
-      agent && value !== null && !store.get().kept.includes(value)
-        ? value
-        : null
+    agentOn = agent ? value : null
     if (!change("value", value, { reason, event })) {
       agentOn = was
       if (keeps) {
