@@ -54,3 +54,11 @@ Every path ends the same way:
 2. **Write and run tests** (see testing.md). Every task gets tests, and every interface gets at least the agent test from agent-ready.md. If a test finds a bug in code you were asked only to test, mark it `test.fails` (or `it.fails`) with a one-line reason, report the bug, and leave the suite green.
 3. **Read every comment in your diff.** Delete it unless it names a browser quirk, an APG rule or a trade-off, and cut what's left to two lines. Turn JSDoc on app code into a plain comment or delete it. Never tell the reader to replace something.
 4. **Report** each command you ran with its exit code, anything you couldn't check, and anything the docs or types got wrong or left out.
+
+## When ui-sdk has a bug
+
+Sometimes the problem isn't in the app: a component does something its docs page says it won't, an error comes from inside `@ui-sdk/*`, or a type and its page disagree. Work around it so the task still finishes, then offer to report it:
+
+> This looks like a bug in ui-sdk: <one sentence>. Want me to report it? I'll show you the issue before I file it.
+
+Offer once for each bug. Never file an issue, or comment on one, without a yes from the user. [references/report-a-bug.md](references/report-a-bug.md) has the steps: check it's ours, look for an existing issue, write it, show it, then file it.

@@ -1,0 +1,38 @@
+name: Bug report
+description: Something in UI SDK doesn't work the way its docs say.
+body:
+  - type: input
+    id: package
+    attributes:
+      label: Package and version
+      description: The @ui-sdk packages involved, with the version you have installed.
+      placeholder: "@ui-sdk/react 0.1.0-beta.18"
+    validations:
+      required: true
+  - type: input
+    id: framework
+    attributes:
+      label: Framework
+      description: React, Vue, Svelte, Solid or web components, with its version.
+      placeholder: React 19.2
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: One failing test file is best. Otherwise the smallest code that shows it and the steps to take. A link to a repository or a sandbox works too.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected and actual
+      description: What should happen, and what happens instead. Include the full error text if there is one.
+    validations:
+      required: true
+  - type: textarea
+    id: checked
+    attributes:
+      label: Checked
+      description: What you tried, one line each, like the newest version, where it runs, other frameworks and whether it happens every time. Write "not tried" where that's true.

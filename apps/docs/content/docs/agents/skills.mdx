@@ -27,4 +27,8 @@ Use our existing styles and test the keyboard behavior.
 
 The skill guides the agent through reading the installed docs, choosing behaviors, defining a primitive, rendering it in your framework, and testing the result. It supports React, Vue, Svelte, Solid, and Web Components.
 
+## Report a Bug
+
+When the agent finds what looks like a bug in ui-sdk, it works around it and offers to report it. If you say yes, it searches the existing issues, writes a small test that shows the bug, with none of your app's code, and shows you the issue before it opens it on [GitHub](https://github.com/vercel-labs/ui/issues).
+
 [Build with an Agent](./build-with-an-agent) shows how to give the agent context, refine the component, and check its work. The [Core guides](../core/build-a-component) explain the code it builds.
