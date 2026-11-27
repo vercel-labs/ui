@@ -204,6 +204,9 @@ function touchOwner(start: {
 const guardRule =
   "@layer ui-sdk { [data-scroll-guard], [data-scroll-guard] * { overscroll-behavior: contain } }"
 
+// How far, in CSS pixels, a finger can move and still tap.
+const tapSlop = 8
+
 // iOS ignores `overflow: hidden` while its toolbar is collapsed, and scrolls
 // the page behind a modal. Overscroll inside the modal is contained, and a
 // drag that would move the page is stopped. Never `position: fixed` on the
@@ -218,11 +221,14 @@ function guardTouch(modal: HTMLElement) {
   }
 
   let owner: ReturnType<typeof touchOwner> = "browser"
+  let start = { x: 0, y: 0 }
   const offStart = on(
     doc,
     "touchstart",
     (event) => {
       const target = event.target instanceof Element ? event.target : null
+      const touch = event.touches[0]
+      start = { x: touch?.clientX ?? 0, y: touch?.clientY ?? 0 }
       owner = touchOwner({
         fingers: event.touches.length,
         zoomed: (view.visualViewport?.scale ?? 1) !== 1,
@@ -237,7 +243,13 @@ function guardTouch(modal: HTMLElement) {
     doc,
     "touchmove",
     (event) => {
-      if (owner === "page" && event.cancelable) {
+      // Safari drops the click of a tap whose move was stopped, so a finger
+      // that wobbles on a button is let through until it travels like a drag.
+      const touch = event.touches[0]
+      const moved = touch
+        ? Math.hypot(touch.clientX - start.x, touch.clientY - start.y)
+        : Infinity
+      if (owner === "page" && event.cancelable && moved > tapSlop) {
         event.preventDefault()
       }
     },
