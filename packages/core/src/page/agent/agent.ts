@@ -822,6 +822,11 @@ function describe(entry: Entry, instance: PrimitiveInstance, parts: Bound[]) {
   ) {
     out.value = redact(entry, state.value ?? null)
   }
+  // A checkbox or switch submits "on" unless the page names a value, which
+  // says nothing beside `checked`.
+  if ("checked" in out && out.value === "on") {
+    delete out.value
+  }
   // The rest only when they say something, like `required: true`. A secret
   // field's search text and errors can repeat its value.
   const root = rootState(parts)
