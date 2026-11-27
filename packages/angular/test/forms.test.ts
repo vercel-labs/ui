@@ -54,6 +54,9 @@ import { mount } from "./mount"
       <div uiField name="account">
         <input uiInput id="handle" [name]="'handle'" />
       </div>
+      <div uiField [name]="city()">
+        <input uiInput id="city" />
+      </div>
       <div uiField name="news" id="news-field">
         <label uiFieldLabel>Newsletter</label>
         <button type="button" uiSwitch id="news" [(checked)]="news">
@@ -91,6 +94,7 @@ import { mount } from "./mount"
 class Page {
   readonly email = signal("a@b.co")
   readonly invalid = signal<boolean | undefined>(undefined)
+  readonly city = signal<string | undefined>("city")
   readonly news = signal(false)
   readonly toppings = signal<string[]>(["ham"])
   readonly size = signal<string | null>("s")
@@ -151,6 +155,18 @@ describe("forms", () => {
     expect(input.name).toBe("plain")
     expect(el<HTMLInputElement>(host, "#bound").name).toBe("nickname")
     expect(el<HTMLInputElement>(host, "#handle").name).toBe("handle")
+  })
+
+  test("an input follows its field's name, and drops it with the field", async () => {
+    const { host, instance, settle } = await mount(Page)
+    const input = el<HTMLInputElement>(host, "#city")
+    expect(input.name).toBe("city")
+    instance.city.set("town")
+    await settle()
+    expect(input.name).toBe("town")
+    instance.city.set(undefined)
+    await settle()
+    expect(input.hasAttribute("name")).toBe(false)
   })
 
   test("a switch submits through its hidden input and takes its field's name", async () => {

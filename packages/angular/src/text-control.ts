@@ -81,10 +81,15 @@ function useTextControl(read: () => TextStates) {
     const current = el.getAttribute("name")
     // A name the author bound, like `[name]`, stays. The server's is ours.
     const bound = current !== null && current !== gave && current !== name
-    if (!named && !bound && name !== undefined) {
-      el.setAttribute("name", name)
-      gave = name
+    if (named || bound) {
+      return
     }
+    if (name !== undefined) {
+      el.setAttribute("name", name)
+    } else if (gave !== undefined) {
+      el.removeAttribute("name")
+    }
+    gave = name
   })
   useTextValue(read)
   return states
