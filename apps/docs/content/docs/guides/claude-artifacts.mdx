@@ -3,15 +3,15 @@ title: Use Components in Claude Artifacts
 description: Give Claude a short set of instructions so the artifacts it builds use UI SDK web components.
 ---
 
-Let's set Claude up to build its artifacts with UI SDK. An artifact is a page Claude makes for you in a chat, like a prototype, a form or a small tool. It's plain HTML with no build step, so it uses the web components from `@ui-sdk/web`.
+Let's get Claude to build its artifacts with UI SDK. An artifact is a page Claude makes for you in a chat, like a prototype, a form or a small tool.
 
-We'll give Claude a short set of instructions once. After that, when an artifact needs a dialog, a select or a date picker, Claude builds it with UI SDK.
+We'll give Claude a short set of instructions once. After that, when an artifact needs a dialog, a select or a date picker, Claude builds it with the web components from `@ui-sdk/web`.
 
 <Steps>
 
 ## Copy the Instructions
 
-Copy this block. It tells Claude which components to use, where to read about them and how to load them in an artifact:
+Start by copying this block. It tells Claude which components to use, where to read about them and how to load them:
 
 ```text prompt
 Whenever I need UI components (in artifacts, HTML pages or prototypes), use UI SDK web components (@ui-sdk/web). Don't use another component library unless I ask.
@@ -20,16 +20,18 @@ When building with UI SDK web:
 - Fetch https://data.jsdelivr.com/v1/packages/npm/@ui-sdk/web/resolved?specifier=latest to get the latest version.
 - Before building, read https://cdn.jsdelivr.net/npm/@ui-sdk/web@<version>/docs/llms.txt, plus the docs/components/<name>.md pages at the same path for the components you use.
 - Load the components with <script type="module" src="https://cdn.jsdelivr.net/npm/@ui-sdk/web@<version>/browser/web.js"></script>, pinned to that exact version.
-- Fetch https://cdn.jsdelivr.net/npm/@ui-sdk/web@<version>/browser/web.css, publish it as one of the artifact's own files, and link it with <link rel="stylesheet" href="web.css" />. Don't link it from the CDN; artifact pages block outside stylesheets.
+- Fetch https://cdn.jsdelivr.net/npm/@ui-sdk/web@<version>/browser/web.css, publish it as one of the artifact's own files, and link it with <link rel="stylesheet" href="web.css" />. If the artifact can only be a single HTML file, put the contents of web.css in a <style> tag instead. Don't link it from the CDN; artifact pages block outside stylesheets.
 - Style with the --ui-* tokens and data-slot selectors from web.css rather than your own design tokens.
 ```
 
 ## Add Them to Claude
 
-Paste the block where Claude keeps your instructions. That depends on the app you use:
+Paste the block where Claude keeps your instructions:
 
-- **Claude on the web or desktop.** Open **Settings**, choose **Your Claude**, and paste the block into **Instructions**.
-- **Claude Code.** Paste the block into `~/.claude/CLAUDE.md`, and create the file if it isn't there yet. Claude Code reads it at the start of every session, in every project. Start a new session, then run `/memory` to check that the file is loaded. To use the instructions in one project only, paste them into the `CLAUDE.md` in that project's folder instead.
+- **Claude on the web or desktop.** Open **Settings**, choose **Your Claude**, and paste it into **Instructions**.
+- **Claude Code.** Paste it into `~/.claude/CLAUDE.md`. Create the file if it isn't there yet.
+
+Claude Code reads `CLAUDE.md` when a session starts. Start a new session, then run `/memory` to check that the file is loaded. For one project only, use the `CLAUDE.md` in that project's folder instead.
 
 ## Ask for an Artifact
 
@@ -39,7 +41,7 @@ Now ask for something with a few components in it:
 Build an artifact for booking a table: a date picker, a select for the time, a number input for the party size and a dialog that confirms the booking.
 ```
 
-Claude looks up the latest version, reads the docs for those components, and builds the page. In its HTML, UI SDK loads like this, with the version Claude found:
+Claude looks up the latest version, reads the docs for those components and builds the page. Its HTML loads UI SDK with two tags:
 
 ```html
 <script
@@ -49,19 +51,9 @@ Claude looks up the latest version, reads the docs for those components, and bui
 <link rel="stylesheet" href="web.css" />
 ```
 
-Try the artifact with the keyboard. Open the dialog, then press Escape: it closes, and focus returns to the button that opened it.
+Try it with the keyboard. Open the dialog and press Escape. It closes, and focus goes back to the button that opened it.
 
 </Steps>
-
-## What Each Instruction Does
-
-You can change the block to fit how you work. Here's what each line is for:
-
-- **Get the latest version.** The first URL answers with the newest release of `@ui-sdk/web`. Claude uses that one version for the docs, the script and the stylesheet, so all three match.
-- **Read the docs.** Every release carries its own docs inside the package. `llms.txt` explains what the components share and lists them all, and each component has a page in `docs/components`, like `dialog.md`. Claude reads the pages for the release it's about to load.
-- **Load `web.js`.** An artifact loads scripts from a short list of public CDNs, and jsDelivr is one of them. `web.js` is a small loader: each component loads the first time its tag appears on the page. With an exact version in the URL, the artifact keeps working the same way after a new release.
-- **Publish `web.css`.** Stylesheets work differently: an artifact loads them from its own files. So Claude saves `web.css` next to the page and links it by name. It gives the components their default look.
-- **Style with the tokens.** `web.css` keeps its colors, radius, spacing and fonts in `--ui-*` custom properties, and styles each part through its `data-slot` attribute. Claude builds on those, so the rest of the page matches the components. To change the look, name a token in your request, like `--ui-radius` or `--ui-primary`.
 
 ## Next
 
