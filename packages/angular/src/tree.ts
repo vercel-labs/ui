@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   computed,
   DestroyRef,
@@ -345,6 +346,7 @@ class TreeGroup {
  * @experimental
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: "[uiTreeItems]",
   exportAs: "uiTreeItems",
   host: { style: "display: contents" },

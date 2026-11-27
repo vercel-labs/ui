@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   computed,
   Directive,
@@ -109,6 +110,7 @@ class Rating {
  * @experimental
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: "[uiRatingItem]",
   exportAs: "uiRatingItem",
   imports: [RatingRadio],

@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   Directive,
   inject,
@@ -59,6 +60,7 @@ class DateInputSegment {
  * @experimental
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: "[uiDateInput]",
   exportAs: "uiDateInput",
   imports: [DateInputSegment],

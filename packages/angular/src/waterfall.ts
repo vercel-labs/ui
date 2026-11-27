@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   computed,
   Directive,
@@ -193,6 +194,7 @@ class WaterfallBar {
  * @experimental
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: "[uiWaterfallAxis]",
   exportAs: "uiWaterfallAxis",
   imports: [WaterfallTick],
@@ -219,6 +221,7 @@ class WaterfallAxis {
  * @experimental
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: "[uiWaterfall]",
   exportAs: "uiWaterfall",
   imports: [WaterfallBar, WaterfallIndicator, WaterfallRow, WaterfallRowHeader],

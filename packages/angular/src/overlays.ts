@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   afterNextRender,
   Component,
   DestroyRef,
@@ -26,6 +27,7 @@ import {
  * @stable
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: "[uiOverlayHost]",
   exportAs: "uiOverlayHost",
   host: { style: "display: contents" },

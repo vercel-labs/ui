@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   computed,
   Directive,
@@ -288,6 +289,7 @@ const tokens = (ids: string | undefined) =>
  * @experimental
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: "[uiDatePicker]",
   exportAs: "uiDatePicker",
   imports: [

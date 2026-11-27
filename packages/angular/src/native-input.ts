@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   effect,
   ElementRef,
@@ -20,7 +21,11 @@ import {
 
 const NativeInputPart = new InjectionToken<() => void>("ui-sdk native input")
 
-@Component({ selector: "input", template: "" })
+@Component({
+  selector: "input",
+  template: "",
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
 class NativeInput {
   constructor() {
     inject(NativeInputPart)()
@@ -68,7 +73,11 @@ const FormInputPart = new InjectionToken<() => Signal<Attrs>>(
   "ui-sdk form input"
 )
 
-@Component({ selector: "textarea", template: "" })
+@Component({
+  selector: "textarea",
+  template: "",
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
 class FormTextarea {
   constructor() {
     const el = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement

@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   computed,
   Directive,
@@ -836,6 +837,7 @@ class ComboboxSelectAll {
  * @experimental
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: "[uiComboboxItems]",
   exportAs: "uiComboboxItems",
   host: { style: "display: contents" },

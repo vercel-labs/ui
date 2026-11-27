@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   Directive,
   Injectable,
@@ -734,6 +735,7 @@ class SelectSelectAll {
  * @experimental
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: "[uiSelectItems]",
   exportAs: "uiSelectItems",
   host: { style: "display: contents" },

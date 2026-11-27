@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   Directive,
   effect,
@@ -182,6 +183,7 @@ class ToastClose {
  * @experimental
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: "[uiToastRegion]",
   exportAs: "uiToastRegion",
   imports: [

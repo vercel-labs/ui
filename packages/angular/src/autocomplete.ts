@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   computed,
   Directive,
@@ -555,6 +556,7 @@ class AutocompleteArrow {
  * @experimental
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: "[uiAutocompleteItems]",
   exportAs: "uiAutocompleteItems",
   host: { style: "display: contents" },

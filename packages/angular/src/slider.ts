@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   computed,
   Directive,
@@ -180,6 +181,7 @@ class SliderIndicator {
  * @experimental
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: "[uiSliderThumb]",
   exportAs: "uiSliderThumb",
   imports: [SliderThumbInput],

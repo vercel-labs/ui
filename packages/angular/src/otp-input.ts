@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   computed,
   Directive,
@@ -52,6 +53,7 @@ const inputAttributes = [
  * @experimental
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: "[uiOTPInput]",
   exportAs: "uiOTPInput",
   imports: [OTPInputControl],

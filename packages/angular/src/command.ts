@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   computed,
   Directive,
@@ -437,6 +438,7 @@ class CommandShortcut {
  * @experimental
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: "[uiCommandItems]",
   exportAs: "uiCommandItems",
   host: { style: "display: contents" },

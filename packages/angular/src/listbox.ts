@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   computed,
   Directive,
@@ -265,6 +266,7 @@ class ListboxSeparator {
  * @experimental
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: "[uiListboxItems]",
   exportAs: "uiListboxItems",
   host: { style: "display: contents" },

@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   computed,
   Directive,
@@ -408,6 +409,7 @@ class TriggerMenuHint {
  * @experimental
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: "[uiTriggerMenuItems]",
   exportAs: "uiTriggerMenuItems",
   host: { style: "display: contents" },
@@ -473,6 +475,7 @@ class TriggerMenuItems {
  * @experimental
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: "[uiTriggerMenuList]",
   exportAs: "uiTriggerMenuList",
   imports: [TriggerMenuItems],

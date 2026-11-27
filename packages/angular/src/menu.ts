@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   afterNextRender,
   Component,
   computed,
@@ -783,6 +784,7 @@ const entryOf = (entry: MenuDataItem | string) =>
  * @experimental
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: "[uiMenuItems]",
   exportAs: "uiMenuItems",
   host: { style: "display: contents" },

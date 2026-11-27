@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   afterNextRender,
   Component,
   computed,
@@ -34,6 +35,7 @@ type OverlayHostToastProps = Pick<
 
 // The alert dialog the host renders for a `confirm()` question.
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: "ui-hosted-confirm",
   imports: [
     AlertDialog,
@@ -79,6 +81,7 @@ class HostedConfirm {
 
 // A toaster's region, unless the app placed one of its own.
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: "ui-hosted-toaster",
   imports: [ToastRegion],
   providers: [{ provide: HostedRegion, useValue: true }],

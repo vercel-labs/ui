@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   afterRenderEffect,
   Component,
   computed,
@@ -123,6 +124,7 @@ class CalendarNext {
  * @experimental
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: "[uiCalendarMonthSelect]",
   exportAs: "uiCalendarMonthSelect",
   template: `
@@ -149,6 +151,7 @@ class CalendarMonthSelect {
  * @experimental
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: "[uiCalendarYearSelect]",
   exportAs: "uiCalendarYearSelect",
   template: `
@@ -221,6 +224,7 @@ class CalendarDay {
  * @experimental
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: "[uiCalendarWeekdays]",
   exportAs: "uiCalendarWeekdays",
   imports: [CalendarCell, CalendarWeekday, CalendarWeekdaysRow],
@@ -246,6 +250,7 @@ class CalendarWeekdays {
  * @experimental
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: "[uiCalendarWeeks]",
   exportAs: "uiCalendarWeeks",
   imports: [CalendarCell, CalendarDay, CalendarWeek],
@@ -296,6 +301,7 @@ class CalendarWeeks {
  * @experimental
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: "[uiCalendarGrid]",
   exportAs: "uiCalendarGrid",
   imports: [CalendarWeekdays, CalendarWeeks],
@@ -328,6 +334,7 @@ class CalendarGrid {
  * @experimental
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: "[uiCalendar]",
   exportAs: "uiCalendar",
   imports: [CalendarGrid, CalendarHeading, CalendarNext, CalendarPrevious],
