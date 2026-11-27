@@ -71,14 +71,19 @@ function useTextControl(read: () => TextStates) {
       el.removeAttribute(name)
     }
   }
+  let gave: string | undefined
   effect(() => {
     const { disabled, readOnly, required } = states()
     flag("disabled", disabled)
     flag("readonly", readOnly)
     flag("required", required)
     const { name } = read()
-    if (!named && name !== undefined) {
+    const current = el.getAttribute("name")
+    // A name the author bound, like `[name]`, stays. The server's is ours.
+    const bound = current !== null && current !== gave && current !== name
+    if (!named && !bound && name !== undefined) {
       el.setAttribute("name", name)
+      gave = name
     }
   })
   useTextValue(read)
