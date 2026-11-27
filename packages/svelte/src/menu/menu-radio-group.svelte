@@ -40,6 +40,7 @@ Radio items that share one value.
   const part = useHandlePart(menu, "radio-group", () => ({
     id: group,
     name: group,
+    unnamed: group === generated,
     value,
     defaultValue,
     onValueChange: (next: string, details: ValueDetails) => {

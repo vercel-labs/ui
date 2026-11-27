@@ -462,6 +462,7 @@ const MenuRadioGroup = /* @__PURE__ */ withElement(
         defaultValue: props.defaultValue,
         id: name,
         name,
+        unnamed: name === generated,
         onValueChange: (
           value: string,
           details: ChangeDetails<MenuValueChangeReason>

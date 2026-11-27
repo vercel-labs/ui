@@ -85,7 +85,11 @@ function pressesInside(
   control: HTMLElement | undefined
 ) {
   const target = event.target as Element
-  if (control?.contains(target)) {
+  // A label inside its own control, like a slider's, is pressed itself.
+  if (
+    control?.contains(target) &&
+    !(control.contains(el) && el.contains(target))
+  ) {
     return true
   }
   const inner = target.closest?.("a[href], button, input, select, textarea")

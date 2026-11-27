@@ -113,3 +113,30 @@ test("a field around a plain input keeps its error text", async () => {
   const [field] = fields()
   expect(field.text).toEqual(["Enter your email."])
 })
+
+test("a nested field that keeps its element's own slot keeps a password's error text secret", async () => {
+  document.body.innerHTML = `
+    <form>
+      <ui-field>
+        <ui-field-label>Account</ui-field-label>
+        <ui-field as-child><div id="addon" data-slot="input-group-addon">
+          <ui-field-label>PIN</ui-field-label>
+          <ui-input><input type="password" required /></ui-input>
+          <ui-field-error match="valueMissing">Enter your PIN.</ui-field-error>
+        </div></ui-field>
+      </ui-field>
+    </form>`
+  const addon = document.getElementById("addon")!
+  new MutationObserver(() => {
+    if (addon.getAttribute("data-slot") !== "input-group-addon") {
+      addon.setAttribute("data-slot", "input-group-addon")
+    }
+  }).observe(addon, { attributeFilter: ["data-slot"] })
+  addon.setAttribute("data-slot", "input-group-addon")
+  await wait()
+  document.querySelector("input")!.checkValidity()
+  await wait()
+  expect(JSON.stringify(createAgent().snapshot())).not.toContain(
+    "Enter your PIN"
+  )
+})

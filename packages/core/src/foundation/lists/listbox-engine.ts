@@ -648,6 +648,9 @@ function createListboxEngine(
       const before = all
         .slice(0, skipped)
         .filter((entry) => !entry.disabled).length
+      if (!loop && before === (step > 0 ? list.length : 0)) {
+        return all[skipped].key
+      }
       return list[
         moveIndex(step > 0 ? before - 1 : before, step, list.length, loop)
       ].key

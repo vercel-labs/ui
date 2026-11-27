@@ -214,6 +214,40 @@ describe("navigation over data", () => {
     expect(store.get().highlighted).toBe("Éclair")
   })
 
+  test("with skipDisabled and no loop, a step past the end from a disabled item stays on it", () => {
+    const store = createStore({ highlighted: null as string | null }, [
+      "highlighted",
+    ])
+    const listbox = createFilteredListbox({
+      store,
+      focus: "virtual",
+      items: () => [
+        { value: "a", label: "A", disabled: true },
+        { value: "b", label: "B" },
+        { value: "c", label: "C" },
+        { value: "d", label: "D", disabled: true },
+      ],
+      toKey: (value) => itemKey(value),
+      filter: () => "contains",
+      query: () => "",
+      loop: () => false,
+      skipDisabled: true,
+      active: () => true,
+    })
+    store.set({ highlighted: "d" })
+    listbox.move(1)
+    expect(store.get().highlighted).toBe("d")
+    listbox.move(10)
+    expect(store.get().highlighted).toBe("d")
+    listbox.move(-1)
+    expect(store.get().highlighted).toBe("c")
+    store.set({ highlighted: "a" })
+    listbox.move(-1)
+    expect(store.get().highlighted).toBe("a")
+    listbox.move(-10)
+    expect(store.get().highlighted).toBe("a")
+  })
+
   test("with skipDisabled and nothing enabled, steps land nowhere", () => {
     const store = createStore({ highlighted: null as string | null }, [
       "highlighted",

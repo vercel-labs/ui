@@ -29,3 +29,17 @@ test("a held key runs only a shortcut that opts into repeat", () => {
   expect(held).toHaveBeenCalledTimes(2)
   set.destroy()
 })
+
+test("a held key doesn't fall through to an older shortcut that the newer one replaced", () => {
+  const set = createShortcuts()
+  const older = vi.fn()
+  const newer = vi.fn()
+  set.register("j", older, { repeat: true })
+  set.register("j", newer, { when: () => true })
+  press(false)
+  expect(press(true)).toBe(false)
+  press(true)
+  expect(newer).toHaveBeenCalledTimes(1)
+  expect(older).not.toHaveBeenCalled()
+  set.destroy()
+})

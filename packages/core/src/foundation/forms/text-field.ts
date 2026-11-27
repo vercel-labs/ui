@@ -210,14 +210,20 @@ function textFieldApi<Slot extends string>(
 }
 
 // A press on a field's surroundings, like its group's text and icons, focuses
-// the field the way a label would. Presses on anything interactive keep their own behavior.
+// the field the way a label would. Presses on anything interactive keep their
+// own behavior, even one that removed what was pressed, like a file's remove button.
 function focusFromSurroundings(
   event: Event | undefined,
   container: HTMLElement | undefined,
   field: TextControl | undefined
 ) {
   const target = event?.target
-  if (!(target instanceof Element) || !container || !field) {
+  if (
+    !(target instanceof Element) ||
+    !target.isConnected ||
+    !container ||
+    !field
+  ) {
     return
   }
   const interactive = target.closest(

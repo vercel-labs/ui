@@ -85,6 +85,53 @@ test.describe("trigger", () => {
     await expect(page.getByRole("menuitem", { name: "Delete" })).toBeFocused()
   })
 
+  for (const when of ["during", "after"]) {
+    test(`open written back ${when} openchange keeps focus on the last item`, async ({
+      page,
+      framework,
+    }) => {
+      test.skip(framework !== "web", "The web menu's open property")
+      await page.evaluate((later) => {
+        const menu = document.querySelector("ui-menu") as HTMLElement & {
+          open: boolean
+        }
+        menu.addEventListener("openchange", (event) => {
+          const write = () =>
+            (menu.open = (
+              event as CustomEvent<{ value: boolean }>
+            ).detail.value)
+          if (later) {
+            queueMicrotask(write)
+          } else {
+            write()
+          }
+        })
+      }, when === "after")
+      await page.getByRole("button", { name: "File" }).focus()
+      await page.keyboard.press("ArrowUp")
+      await expect(page.getByRole("menuitem", { name: "Delete" })).toBeFocused()
+    })
+  }
+
+  test("setOpen(true) on an open menu leaves focus where it is", async ({
+    page,
+    framework,
+  }) => {
+    test.skip(framework !== "web", "The web menu's api property")
+    await page.getByRole("button", { name: "File" }).focus()
+    await page.keyboard.press("ArrowUp")
+    await expect(page.getByRole("menuitem", { name: "Delete" })).toBeFocused()
+    const changed = await page.evaluate(() =>
+      (
+        document.querySelector("ui-menu") as HTMLElement & {
+          api: { setOpen: (open: boolean) => boolean }
+        }
+      ).api.setOpen(true)
+    )
+    expect(changed).toBe(false)
+    await expect(page.getByRole("menuitem", { name: "Delete" })).toBeFocused()
+  })
+
   test("a click on a trigger in a shadow root opens the menu, and it stays open", async ({
     page,
     framework,

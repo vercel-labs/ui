@@ -41,6 +41,23 @@ describe("matching shortcuts", () => {
     expect(matchesShortcut(autofill, "mod+k", false)).toBe(false)
   })
 
+  test("a symbol matches the character it types, whether or not the layout needs Shift for it", () => {
+    const typed = (init: Parameters<typeof key>[0], shortcut: string) =>
+      matchesShortcut(key(init), shortcut, false)
+    expect(typed({ key: "?", code: "Slash", shift: true }, "?")).toBe(true)
+    expect(typed({ key: "!", code: "Digit1", shift: true }, "!")).toBe(true)
+    expect(typed({ key: "!", code: "Slash" }, "!")).toBe(true)
+    expect(typed({ key: "?", code: "Slash", shift: true }, "shift+?")).toBe(
+      true
+    )
+    expect(typed({ key: "!", code: "Slash" }, "shift+!")).toBe(false)
+    expect(
+      typed({ key: "?", code: "Slash", shift: true, ctrl: true }, "?")
+    ).toBe(false)
+    expect(typed({ key: "A", code: "KeyA", shift: true }, "a")).toBe(false)
+    expect(typed({ key: "Ä", code: "Quote", shift: true }, "ä")).toBe(false)
+  })
+
   test("letters match the typed key, case-insensitively", () => {
     expect(
       matchesShortcut(

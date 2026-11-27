@@ -329,3 +329,21 @@ describe("number input", () => {
     expect(attrs(whole.part("control")).inputmode).toBe("numeric")
   })
 })
+
+test("a large or small step from an empty field moves by that step", () => {
+  const press = (init: Partial<KeyboardEvent>) => {
+    const instance = numberInput({ id: "n", defaultValue: null })
+    instance.api.internal.keydown({
+      preventDefault() {},
+      ...init,
+    } as KeyboardEvent)
+    return instance.get().value
+  }
+  expect(press({ key: "PageUp" })).toBe(10)
+  expect(press({ key: "ArrowUp", shiftKey: true })).toBe(10)
+  expect(press({ key: "ArrowUp", altKey: true })).toBe(0.1)
+  expect(press({ key: "ArrowDown" })).toBe(-1)
+  const instance = numberInput({ id: "n", defaultValue: null })
+  instance.api.increment({ large: true })
+  expect(instance.get().value).toBe(10)
+})

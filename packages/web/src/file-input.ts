@@ -80,8 +80,13 @@ function defineFileInputElements() {
         el.querySelector<HTMLElement>("button") ??
         (el.firstElementChild as HTMLElement | null),
     },
-    // `paste-target` is "document" or a CSS selector.
-    dropzone: { tag: "ui-file-input-dropzone", display: "block" },
+    // `paste-target` is "document" or a CSS selector. The property also takes
+    // an element or a function that returns one.
+    dropzone: {
+      tag: "ui-file-input-dropzone",
+      display: "block",
+      properties: ["pasteTarget"],
+    },
     list: { tag: "ui-file-input-list", display: "block" },
     item: {
       tag: "ui-file-input-item",

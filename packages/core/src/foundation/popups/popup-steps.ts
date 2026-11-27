@@ -151,6 +151,22 @@ function createOpenSteps<
     return pending.promise
   }
 
+  // The state a change is moving to while its listeners run, so a view that
+  // writes `open` back from them asks for the state it's already getting.
+  let changingTo: boolean | undefined
+  const change = (
+    open: boolean,
+    details: Parameters<typeof config.change>[1]
+  ) => {
+    const before = changingTo
+    changingTo = open
+    try {
+      return config.change(open, details)
+    } finally {
+      changingTo = before
+    }
+  }
+
   // `setOpen` and `toggle` pass their reason as `openReason`.
   function show(
     request: ShowRequest<PayloadReason, Extra> = {},
@@ -182,7 +198,7 @@ function createOpenSteps<
         }
       )
       popup.opening(by, event)
-      opened = config.change(true, { reason, event })
+      opened = change(true, { reason, event })
       if (!opened) {
         restorePayload?.()
       }
@@ -226,7 +242,7 @@ function createOpenSteps<
     const close = () => {
       requested = { reason, source: changeSource(reason, event), returnValue }
       popup.returnFocus(request.focus ?? config.returnFocus ?? true)
-      const changed = config.change(false, {
+      const changed = change(false, {
         reason,
         event,
         ...(returnValue !== undefined && { returnValue }),
@@ -278,10 +294,9 @@ function createOpenSteps<
     // The controller's methods. Components add `focus` and `getPayload` themselves, so lists don't expose a payload.
     api: {
       isOpen: () => store.get().open,
-      setOpen: (
-        open: boolean,
-        { reason, event }: ChangeOptions<Reason> = {}
-      ) => (open ? showFor(reason, event) : hide({ reason, event })),
+      setOpen: (open: boolean, { reason, event }: ChangeOptions<Reason> = {}) =>
+        open !== (changingTo ?? store.get().open) &&
+        (open ? showFor(reason, event) : hide({ reason, event })),
       // An app's event is no trigger's, so the reason stays "imperative" unless it names one.
       open: (
         options: PopupOpenOptions<unknown, PayloadReason> & Partial<Extra> = {}

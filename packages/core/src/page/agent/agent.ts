@@ -507,7 +507,9 @@ function triggersOf(parts: Bound[]) {
   const triggers = parts.filter(
     (part) => part.slot === "trigger" && isShown(part.el)
   )
-  return triggers.length > 1 ? triggers.map((part) => part.el) : []
+  return triggers.length > 1
+    ? triggers.map((part) => part.el).sort(documentOrder)
+    : []
 }
 
 // Any key on it is an adapter's, like a web component's generated id.

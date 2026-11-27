@@ -151,11 +151,7 @@ function createShortcuts() {
     const apple = isApple()
     for (const entry of entries) {
       const keys = keysOf(entry)
-      if (
-        !keys ||
-        (event.repeat && !entry.options.repeat) ||
-        !matchesShortcut(event, keys, apple)
-      ) {
+      if (!keys || !matchesShortcut(event, keys, apple)) {
         continue
       }
       context ??= {
@@ -182,7 +178,11 @@ function createShortcuts() {
         best = { entry, order }
       }
     }
-    if (!best || (event.key === "Escape" && escapesLayerAbove(best.order))) {
+    if (
+      !best ||
+      (event.repeat && !best.entry.options.repeat) ||
+      (event.key === "Escape" && escapesLayerAbove(best.order))
+    ) {
       return
     }
     event.preventDefault()

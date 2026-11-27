@@ -128,7 +128,8 @@ function createAsyncOptions<Item>(
     controller?.abort()
     const current = new AbortController()
     controller = current
-    page = next
+    // A page that fails or stops leaves `loadMore()` asking for it again.
+    page = next - 1
     set({ status: "loading", error: undefined })
     load(state.query, { signal: current.signal, page: next }).then(
       (result) => {
@@ -136,6 +137,7 @@ function createAsyncOptions<Item>(
           return
         }
         controller = undefined
+        page = next
         // The type rules it out, but a loader that resolves to nothing
         // shouldn't leave the list loading.
         const items = Array.isArray(result) ? result : (result?.items ?? [])

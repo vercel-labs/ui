@@ -332,8 +332,11 @@ function typeDigit(
  */
 function typePeriod(fields: Fields, letter: string, locale: string) {
   const lower = letter.toLowerCase()
-  const index = [...dayPeriodsOf(locale)].findIndex((name, at) =>
-    [name, at ? "pm" : "am"].some((candidate) =>
+  const names = [...dayPeriodsOf(locale)]
+  // Where both names start with it, like Malay's "PG" and "PTG", English decides.
+  const shared = names.every((name) => name.toLowerCase().startsWith(lower))
+  const index = names.findIndex((name, at) =>
+    [shared ? "" : name, at ? "pm" : "am"].some((candidate) =>
       candidate.toLowerCase().startsWith(lower)
     )
   )

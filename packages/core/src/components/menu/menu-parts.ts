@@ -813,6 +813,7 @@ const menuCheckable = /* @__PURE__ */ (() => ({
     "radio-group": menuSlot<RadioGroupProps, MenuRadioGroupState>({
       props: {
         name: "id",
+        unnamed: "boolean",
         value: "string",
         defaultValue: "string",
         onValueChange: "callback",
@@ -826,6 +827,10 @@ const menuCheckable = /* @__PURE__ */ (() => ({
       attrs: (state, { id, props }) => ({
         "aria-labelledby": menuGroupLabelledBy(state, id, props.name),
       }),
+      // After the group's items bind.
+      bind(el, { api, props }) {
+        queueMicrotask(() => api.forgetOtherPlace(props.name))
+      },
     }),
 
     "radio-item": menuSlot<RadioProps, MenuRadioItemState>({

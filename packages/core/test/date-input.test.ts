@@ -591,6 +591,27 @@ describe("time input", () => {
     ).toBe("14:30:15")
   })
 
+  test("P chooses PM and A chooses AM where both local names start with P", () => {
+    for (const locale of ["ms-MY", "lt-LT", "lv-LV"]) {
+      const am = mount(timeInput, {
+        defaultValue: "09:30",
+        hourCycle: 12,
+        locale,
+      })
+      am.segment("dayPeriod").focus()
+      am.type("p")
+      expect(am.instance.get().value).toBe("21:30")
+      const pm = mount(timeInput, {
+        defaultValue: "21:30",
+        hourCycle: 12,
+        locale,
+      })
+      pm.segment("dayPeriod").focus()
+      pm.type("a")
+      expect(pm.instance.get().value).toBe("09:30")
+    }
+  })
+
   test("typing a time on a 24 hour clock", () => {
     const { segment, type, instance } = mount(timeInput, { hourCycle: 24 })
     segment("hour").focus()

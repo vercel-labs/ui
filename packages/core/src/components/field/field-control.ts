@@ -1,3 +1,4 @@
+import { fieldOf } from "../../foundation/forms/field-root"
 import { formInternals } from "../../foundation/forms/form"
 
 // Reading a field's controls from the DOM: which elements take part in
@@ -66,7 +67,7 @@ function controlsIn(root: HTMLElement) {
     (el) =>
       validates(el) &&
       (el as HTMLInputElement).type !== "hidden" &&
-      el.closest('[data-slot="field"]') === root
+      fieldOf(el) === root
   ) as HTMLElement[]
 }
 

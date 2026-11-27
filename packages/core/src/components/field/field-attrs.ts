@@ -140,6 +140,8 @@ function bindFoundControl(
   // The name the field's label replaced, like a native <label>'s around the
   // control, which comes back when the field has no label of its own.
   let replaced: string | undefined
+  // What the control had before the field first wrote it, like its own `disabled`.
+  let had = new Map<string, string>()
   const write = () => {
     const control = current
     // A control moved out, maybe into another field, is no longer this one's to write.
@@ -183,6 +185,8 @@ function bindFoundControl(
           continue
         }
         replaced = current
+      } else if (current !== null && !written.has(name)) {
+        had.set(name, current)
       }
       next.set(name, value)
       if (current !== value) {
@@ -206,6 +210,42 @@ function bindFoundControl(
       named.removeAttribute("name")
     }
     gave = { el: named, name }
+  }
+  // A control a field nested later holds, or one the field no longer finds,
+  // gets back what the field wrote on it. What another field wrote since stays.
+  const release = (control: HTMLElement) => {
+    for (const [name, value] of written) {
+      const now = control.getAttribute(name)
+      if (name === "aria-describedby") {
+        const own = (now ?? "")
+          .split(/\s+/)
+          .filter((id) => id && !added.has(id))
+          .join(" ")
+        if (own) {
+          control.setAttribute(name, own)
+        } else {
+          control.removeAttribute(name)
+        }
+      } else if (now === value) {
+        const kept = name === "aria-labelledby" ? replaced : had.get(name)
+        if (kept != null) {
+          control.setAttribute(name, kept)
+        } else {
+          control.removeAttribute(name)
+        }
+      }
+    }
+    if (gave?.name && gave.el.getAttribute("name") === gave.name) {
+      gave.el.removeAttribute("name")
+    }
+    if (control.id === fieldControlId(api.id)) {
+      control.removeAttribute("id")
+    }
+    written = new Map()
+    added = new Set()
+    replaced = undefined
+    had = new Map()
+    gave = undefined
   }
   // Labels point at the control's id, or one the field gives it when it has none.
   const adopt = (control: HTMLElement) => {
@@ -235,12 +275,18 @@ function bindFoundControl(
       return
     }
     const next = api.control()
-    if (next === current || next === undefined) {
+    if (next === current) {
       return
     }
+    if (current) {
+      release(current)
+    }
     current = next
-    added = new Set()
-    replaced = undefined
+    if (!next) {
+      described?.disconnect()
+      store.set({ controlId: null, labelable: true, namedByContent: false })
+      return
+    }
     adopt(next)
     described?.disconnect()
     described?.observe(next, { attributeFilter: ["aria-describedby", "id"] })

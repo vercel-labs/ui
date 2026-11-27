@@ -25,6 +25,7 @@ import {
   type Validity,
   type ValidityKey,
 } from "./field-control"
+import { fieldOf, holdRoot } from "../../foundation/forms/field-root"
 import {
   bindFoundControl,
   controlAttrs,
@@ -130,7 +131,7 @@ type FieldErrorState = FieldState & {
 
 // A control inside a nested field belongs to that field.
 const ownControl = (root: HTMLElement) => (el: HTMLElement) =>
-  el.closest('[data-slot="field"]') === root
+  fieldOf(el) === root
 
 function fieldApiBody(
   context: PrimitiveContext<FieldOptions, FieldStore, string>
@@ -250,7 +251,12 @@ function fieldApiBody(
       descriptionId: (key: string) => descriptionId(parts(), id, key),
       bindRoot(el: HTMLElement) {
         root = el
-        return bindRoot(el)
+        const release = holdRoot(el)
+        const cleanup = bindRoot(el)
+        return () => {
+          release()
+          cleanup()
+        }
       },
       // A microtask after binding, since Vue binds mid-hydration. Each takes out
       // only its own entry, so two parts sharing an id don't drop each other.

@@ -359,6 +359,7 @@ function MenuRadioGroup<T extends string = string>({
   const part = {
     id: group,
     name: group,
+    unnamed: name === undefined,
     value,
     defaultValue,
     onValueChange: onValueChange as MenuRadioGroupProps["onValueChange"],
