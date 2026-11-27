@@ -66,6 +66,7 @@ import {
   withElement,
 } from "./create-parts"
 import {
+  copyProps,
   defaultSlot,
   optionalBoolean,
   orModel,
@@ -172,7 +173,7 @@ const Select = /* @__PURE__ */ renderless(
       const field = useFieldControl()
       provide(ContainerKey, () => props.container)
       const select = usePrimitive(selectPrimitive, () => ({
-        ...props,
+        ...copyProps(props),
         value: orModel(props.value, props.modelValue),
         container: undefined,
         name: props.name ?? field?.name(),

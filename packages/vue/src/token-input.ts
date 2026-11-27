@@ -30,6 +30,7 @@ import { withElement } from "./create-parts"
 import { EditorKey } from "./editor-context"
 import { useFieldControl } from "./field-context"
 import {
+  copyProps,
   optionalBoolean,
   orModel,
   useHandle,
@@ -107,7 +108,7 @@ const TokenInput = /* @__PURE__ */ renderless(
     setup(props, { slots, attrs, emit }) {
       const field = useFieldControl()
       const input = usePrimitive(tokenInputPrimitive, () => ({
-        ...props,
+        ...copyProps(props),
         value: given(orModel(props.value, props.modelValue)),
         defaultValue: props.defaultValue && toRaw(props.defaultValue),
         name: props.name ?? field?.name(),

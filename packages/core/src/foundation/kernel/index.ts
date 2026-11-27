@@ -63,9 +63,12 @@ export {
   firstAsleep,
   held,
   madeLabel,
+  nextAsleep,
   onProps,
+  partsOf,
   partState,
   present,
+  propsAsleep,
   subscribe,
 } from "./part"
 export { definePrimitive, schemaOf } from "./primitive"

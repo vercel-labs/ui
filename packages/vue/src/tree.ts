@@ -16,6 +16,7 @@ import { defineComponent, h, type PropType, type VNode } from "vue"
 import { hasChild, slotContent } from "./children"
 import { createParts, withElement } from "./create-parts"
 import {
+  copyProps,
   optionalBoolean,
   orModel,
   provideProps,
@@ -113,7 +114,7 @@ const Tree = withElement(
     slots: Object as PartSlots<typeof treePrimitive, "root">,
     setup(props, { slots, emit }) {
       const tree = usePrimitive(treePrimitive, () => ({
-        ...props,
+        ...copyProps(props),
         value: orModel(props.value, props.modelValue),
         onValueChange: (
           value: Value,

@@ -3,6 +3,7 @@
 // trigger instead, so the part is hidden from them.
 import { formatShortcut, isApple } from "../platform/platform"
 import { elements } from "../kernel/elements"
+import { partsOf } from "../kernel/part"
 import type { Part, SlotFactory } from "../kernel/primitive-types"
 import type { Store } from "../kernel/store"
 import {
@@ -37,7 +38,8 @@ function bindPartShortcut(
   keys: () => string | null | undefined,
   handler: ShortcutHandler,
   options: ShortcutOptions,
-  onProps: (listener: () => void) => () => void
+  onProps: (listener: () => void) => () => void,
+  store?: Store<{ apple: boolean }>
 ) {
   let current: string | undefined
   let off: (() => void) | undefined
@@ -48,7 +50,14 @@ function bindPartShortcut(
     }
     off?.()
     current = next
-    off = next ? shortcuts.register(next, handler, options) : undefined
+    if (next) {
+      if (store) {
+        adoptPlatform(store)
+      }
+      off = shortcuts.register(next, handler, options)
+    } else {
+      off = undefined
+    }
   }
   update()
   const unwatch = onProps(update)
@@ -62,12 +71,13 @@ function bindPartShortcut(
 // command a Shortcut part renders inside. With `beside`, a part in the
 // element's parent counts too, like a trigger next to its Shortcut part.
 function shortcutOf(
-  context: { parts(): Iterable<Part> },
+  context: { parts(): Iterable<Part> } | Part,
   slot: string,
   el: HTMLElement,
   { beside = false } = {}
 ) {
-  const owner = elements<{ shortcut?: string }>(context, slot).find(
+  const parts = "parts" in context ? context : { parts: () => partsOf(context) }
+  const owner = elements<{ shortcut?: string }>(parts, slot).find(
     (entry) =>
       entry.el.contains(el) ||
       (beside && !!el.parentElement?.contains(entry.el))
@@ -76,14 +86,14 @@ function shortcutOf(
 }
 
 // `inherited` names the keys a part without its own `shortcut` shows, like the
-// shortcut of the trigger it sits in. Renders call it without an element. It
-// takes the part, since reading the api wakes a sleeping component.
+// shortcut of the trigger it sits in. Renders call it without an element or
+// part, so it never wakes a sleeping instance.
 function shortcutSlot<State extends { apple: boolean }, Api>(
   slot: SlotFactory<State, Api>,
   inherited: (
     state: State,
-    part: { api: Api },
-    el?: HTMLElement
+    el?: HTMLElement,
+    part?: Part<any, Api>
   ) => string | undefined
 ) {
   return slot<
@@ -95,13 +105,10 @@ function shortcutSlot<State extends { apple: boolean }, Api>(
   >({
     props: { shortcut: "string" },
     state: (state, part) => ({
-      text: shortcutText(
-        part.props.shortcut ?? inherited(state, part),
-        state.apple
-      ),
+      text: shortcutText(part.props.shortcut ?? inherited(state), state.apple),
     }),
     attrs: () => ({ "aria-hidden": "true", translate: "no" }),
-    bind(el, part) {
+    asleep(el, part) {
       const { store, props } = part
       // A popup opened only through a controller has no trigger to learn the platform from.
       adoptPlatform(store)
@@ -112,7 +119,7 @@ function shortcutSlot<State extends { apple: boolean }, Api>(
       const write = () => {
         const state = store.get()
         el.textContent = shortcutText(
-          props.shortcut ?? inherited(state, part, el),
+          props.shortcut ?? inherited(state, el, part),
           state.apple
         )
       }

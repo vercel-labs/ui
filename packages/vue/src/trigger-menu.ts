@@ -41,6 +41,7 @@ import {
 import { ListItems, type ListParts } from "./list-items"
 import { createParts, withElement } from "./create-parts"
 import {
+  copyProps,
   defaultSlot,
   optionalBoolean,
   orModel,
@@ -120,7 +121,7 @@ const TriggerMenu = /* @__PURE__ */ renderless(
       const inherited = inject(EditorKey, () => undefined)
       provide(ContainerKey, () => props.container)
       const menu = usePrimitive(triggerMenuPrimitive, () => ({
-        ...props,
+        ...copyProps(props),
         open: orModel(props.open, props.modelValue),
         container: undefined,
         editor: props.editor ?? inherited(),

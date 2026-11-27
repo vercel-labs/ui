@@ -1637,9 +1637,13 @@ function defineRootElement<P extends Primitive>(
           }
           // The rule that keeps hidden parts hidden over an author's display
           // classes matches `data-slot`, which a part never shown has no other way to get.
-          const slot = partAttrs(record)["data-slot"]
-          if (slot && !part.el.hasAttribute("data-slot")) {
-            part.el.setAttribute("data-slot", slot)
+          if (!part.el.hasAttribute("data-slot")) {
+            part.el.setAttribute(
+              "data-slot",
+              part.slot === "root"
+                ? instance.name
+                : `${instance.name}-${part.slot}`
+            )
           }
           this.#restore(part)
         }

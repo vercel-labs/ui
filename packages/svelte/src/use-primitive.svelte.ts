@@ -186,9 +186,11 @@ function usePrimitive<P extends Primitive>(
   })
   deliveries.set(instance, (part) => {
     marks
-    return followed(part, untrack(delivered), part.props)
-      .map((name) => counts[name] ?? 0)
-      .join()
+    const names = followed(part, untrack(delivered), part.props)
+    if (names.length === 1) {
+      return String(counts[names[0]] ?? 0)
+    }
+    return names.map((name) => counts[name] ?? 0).join()
   })
   // Hands the options to the instance before the DOM updates. What they change
   // is counted first, against the state before them, so parts hear a key
@@ -306,7 +308,7 @@ function useHandlePart<P extends Primitive, S extends SlotName<P>>(
   let tick = $state(0)
   let stateTick = $state(0)
   // What the last render showed, which the listener compares against.
-  let shown: { attrs: Attrs; present: boolean } | undefined
+  let shown: { attrs: Attrs | undefined; present: boolean } | undefined
   let version = renderVersion(instance)
   // The state keys snippets read, and the snapshot they read them from.
   const read = new Set<string>()
@@ -394,7 +396,10 @@ function useHandlePart<P extends Primitive, S extends SlotName<P>>(
         return
       }
       version = latest
-      if (!sameAttrs(partAttrs(current), shown.attrs, directNames(current))) {
+      if (
+        shown.attrs &&
+        !sameAttrs(partAttrs(current), shown.attrs, directNames(current))
+      ) {
         tick++
       }
     })
@@ -538,13 +543,15 @@ function useHandlePart<P extends Primitive, S extends SlotName<P>>(
     const owned = instanceOf()
     const current = owned.part(name, props())
     return untrack(() => {
-      const attrs = partAttrs(current)
       const present = isPresent(current)
+      const attrs = present ? partAttrs(current) : undefined
       version = renderVersion(owned)
       shown = { attrs, present }
       return { attrs, present }
     })
   })
+  const currentAttrs = () =>
+    rendered.attrs ?? untrack(() => partAttrs(instanceOf().part(name, props())))
   // A boolean of its own: a part that reads another's presence, like content
   // whose portal depends on its viewport, then hears only when it flips, not
   // on every attribute change, which would bind its element again mid-exit.
@@ -556,7 +563,7 @@ function useHandlePart<P extends Primitive, S extends SlotName<P>>(
       return present
     },
     get attrs() {
-      return rendered.attrs
+      return currentAttrs()
     },
     state: new Proxy({} as StateOf<P, S>, {
       get(_, property) {
@@ -593,19 +600,15 @@ function useHandlePart<P extends Primitive, S extends SlotName<P>>(
       // Attributes left undefined are absent, so they never replace a value merged
       // in, like a field's on its control. An `id` the user gives, and what
       // `yieldToAuthor` leaves to the user, stay the user's.
-      const own = yieldToAuthor(
-        rendered.attrs,
-        (key) => attributes[key] != null
-      )
+      const resolved = currentAttrs()
+      const own = yieldToAuthor(resolved, (key) => attributes[key] != null)
       for (const [key, value] of Object.entries(own)) {
         if (value !== undefined && !(key === "id" && attributes.id != null)) {
           result[key] = value
         }
       }
-      if ("style" in rendered.attrs) {
-        result.style = styleFor(
-          mergeStyles(attributes.style, rendered.attrs.style)
-        )
+      if ("style" in resolved) {
+        result.style = styleFor(mergeStyles(attributes.style, resolved.style))
       }
       result[attach] = attachment
       return result

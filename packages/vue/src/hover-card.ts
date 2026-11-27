@@ -26,6 +26,7 @@ import {
 } from "./popup"
 import { createParts, withElement } from "./create-parts"
 import {
+  copyProps,
   optionalBoolean,
   orModel,
   useHandle,
@@ -73,7 +74,7 @@ const HoverCard = /* @__PURE__ */ renderless(
     setup(props, { slots, emit }) {
       provide(ContainerKey, () => props.container)
       const hoverCard = usePrimitive(hoverCardPrimitive, () => ({
-        ...props,
+        ...copyProps(props),
         open: orModel(props.open, props.modelValue),
         container: undefined,
         onOpenChange: (open: boolean, details: OpenDetails) => {

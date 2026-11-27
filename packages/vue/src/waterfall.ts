@@ -14,6 +14,7 @@ import { computed, defineComponent, h, type PropType } from "vue"
 import { slotContent } from "./children"
 import { createParts, withElement } from "./create-parts"
 import {
+  copyProps,
   optionalBoolean,
   orModel,
   usePart,
@@ -87,7 +88,7 @@ const Waterfall = withElement(
     slots: Object as PartSlots<typeof waterfallPrimitive, "root">,
     setup(props, { slots, emit }) {
       const waterfall = usePrimitive(waterfallPrimitive, () => ({
-        ...props,
+        ...copyProps(props),
         value: orModel(props.value, props.modelValue),
         onValueChange: (
           value: Value,

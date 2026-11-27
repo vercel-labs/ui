@@ -735,6 +735,13 @@ test.describe("modal", () => {
     await open("dialog", { layout: "tall" })
     await trigger(page).click()
     await expect(dialog(page)).toBeVisible()
+    await expect
+      .poll(() =>
+        outside(page, "After").evaluate(
+          (el) => !!el.closest('[inert], [aria-hidden="true"]')
+        )
+      )
+      .toBe(true)
     await page.mouse.move(5, 300)
     await page.mouse.wheel(0, 400)
     await page.waitForTimeout(200)
@@ -759,7 +766,7 @@ test.describe("modal", () => {
       )
     await trigger(page).click()
     await expect(dialog(page)).toBeVisible()
-    expect(await hidden()).toBe(true)
+    await expect.poll(hidden).toBe(true)
     await page.keyboard.press("Escape")
     await expect(dialog(page)).toBeHidden()
     await expect.poll(hidden).toBe(false)

@@ -19,6 +19,7 @@ import {
   type RootPropsOf,
 } from "./create-parts"
 import {
+  copyProps,
   optionalBoolean,
   orModel,
   useHandle,
@@ -110,7 +111,7 @@ const Listbox = defineComponent({
   setup(props, { slots, emit, attrs }) {
     const field = useFieldControl(attrs)
     const listbox = usePrimitive(listboxPrimitive, () => ({
-      ...props,
+      ...copyProps(props),
       value: orModel(props.value, props.modelValue),
       name: props.name ?? field?.name(),
       disabled: props.disabled || field?.disabled(),

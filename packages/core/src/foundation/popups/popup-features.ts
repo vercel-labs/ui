@@ -506,6 +506,16 @@ function warmGroup(core: PopupCore) {
 // prepared once however many instances there are.
 const resetSelectors = new Map<string, string[]>()
 
+function selectorsFor(name: string, contentSlot: string) {
+  const key = `${name}-${contentSlot}`
+  let known = resetSelectors.get(key)
+  if (!known) {
+    known = [`[data-slot="${key}"]`, `[data-slot="${name}-backdrop"]`]
+    resetSelectors.set(key, known)
+  }
+  return known
+}
+
 // Undoes the browser's own popover styles, including `overflow: auto`, which
 // turns content with an arrow sticking out into a scroller Tab stops on.
 const styleReset = {
@@ -513,13 +523,11 @@ const styleReset = {
   // a server, from the names the parts' `data-slot` has unless the primitive
   // has a `label`. Binding writes each part's own anyway.
   prepare(name: string, contentSlot: string) {
-    const key = `${name}-${contentSlot}`
-    const known = resetSelectors.get(key) ?? [
-      `[data-slot="${key}"]`,
-      `[data-slot="${name}-backdrop"]`,
-    ]
-    resetSelectors.set(key, known)
+    const known = selectorsFor(name, contentSlot)
     whenKept(() => prepareReset(known))
+  },
+  prepareClient(name: string, contentSlot: string) {
+    prepareReset(selectorsFor(name, contentSlot))
   },
   bind(el: HTMLElement) {
     resetPopoverStyles(el.ownerDocument, [

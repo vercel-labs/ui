@@ -70,6 +70,8 @@ function defineDialog<
       apple: initialApple(),
       presentation: "dialog",
     }),
+    asleep: (options) =>
+      options.open === undefined && !options.defaultOpen && !options.controller,
     sync: (options) => ({
       ...(options.open !== undefined && { open: options.open }),
       // An alert dialog is always modal.
@@ -83,7 +85,7 @@ function defineDialog<
       ),
     // Without an extension there are no extra parts, and spreading undefined adds none.
     slots: (slot) => ({
-      ...dialogSlots(slot, { name }),
+      ...dialogSlots(slot, { name, alert }),
       ...(extension?.slots(slot) as Extra),
     }),
     agent: { actions: ["setOpen"] },

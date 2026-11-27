@@ -1,15 +1,22 @@
 // The parts Dialog, Alert Dialog and Drawer share. Each primitive spreads
 // them into its own `slots`, and overrides the ones that differ.
 import { dev, warn } from "#dev"
+import { checkName } from "#name-check"
 import { trackKeyboard } from "../../foundation/platform/keyboard"
 import { ariaKeyshortcuts } from "../../foundation/platform/platform"
-import { popupContentAttrs } from "../../foundation/popups/popup"
+import {
+  disabledTriggerAttrs,
+  popupContentAttrs,
+  popupTriggerAttrs,
+} from "../../foundation/popups/popup"
+import { styleReset } from "../../foundation/popups/popup-features"
 import {
   ownsEvent,
   registerPopupElement,
 } from "../../foundation/popups/popup-elements"
 import {
   bindPopupContent,
+  bindTrigger,
   popupDescription,
   popupTitle,
   popupTrigger,
@@ -18,8 +25,8 @@ import { settleFlag } from "../../foundation/kernel/bound-keys"
 import { openAttrs } from "../../foundation/kernel/attrs"
 import type { SlotFactory } from "../../foundation/kernel/primitive-types"
 import {
-  adoptPlatform,
   bindPartShortcut,
+  shortcutOf,
   shortcutSlot,
 } from "../../foundation/shortcuts/shortcut-slot"
 import { ownContent, type DialogApi, type DialogState } from "./dialog-api"
@@ -32,7 +39,14 @@ import type {
   DialogTriggerProps,
   DialogTriggerState,
 } from "./dialog"
-import { onProps } from "../../foundation/kernel/part"
+import { trackInput } from "../../foundation/kernel/modality"
+import {
+  awake,
+  firstAsleep,
+  nextAsleep,
+  onProps,
+  propsAsleep,
+} from "../../foundation/kernel/part"
 
 type TriggerProps = Omit<DialogTriggerProps, "controller">
 type ContentProps = DialogContentProps
@@ -40,7 +54,7 @@ type CloseProps = DialogCloseProps
 
 function dialogSlots(
   slot: SlotFactory<DialogState, DialogApi>,
-  { name }: { name: string }
+  { name, alert = false }: { name: string; alert?: boolean }
 ) {
   const trigger = popupTrigger(slot)
   return {
@@ -58,7 +72,18 @@ function dialogSlots(
       },
       state: trigger.state,
       attrs: (state, part) => ({
-        ...trigger.attrs!(state, part),
+        ...popupTriggerAttrs(
+          state,
+          part.id,
+          "dialog",
+          part.key,
+          state.trigger === null
+            ? (firstAsleep(part, "trigger") ?? part.api.internal.firstTrigger())
+            : undefined
+        ),
+        "aria-haspopup": "dialog",
+        type: "button",
+        ...disabledTriggerAttrs(part.props),
         ...(state.modal === true && { "aria-expanded": undefined }),
         "aria-keyshortcuts": part.props.shortcut
           ? ariaKeyshortcuts(part.props.shortcut, state.apple)
@@ -66,20 +91,30 @@ function dialogSlots(
       }),
       on: trigger.on,
       press: trigger.press,
-      bind(el, part) {
-        const { key, store, api } = part
-        const unbind = trigger.bind!(el, part)
-        adoptPlatform(store)
+      asleep(el, part) {
+        const { key, id, store } = part
+        if (dev) {
+          checkName(el, "The trigger", { component: name, id })
+        }
+        styleReset.prepareClient(name, "content")
+        trackInput()
+        const unbind = bindTrigger(store, key, (leaving) =>
+          nextAsleep(part, "trigger", leaving)
+        )
+        if (store.get().trigger === key && !el.hasAttribute("id")) {
+          el.id = `${id}-trigger`
+        }
         // The trigger's own layer scopes it: on the page, a modal dialog pauses it.
         const offShortcut = bindPartShortcut(
           () => part.props.shortcut,
-          (event) => api.internal.shortcutPress(key, event),
+          (event) => awake(part).internal.shortcutPress(key, event),
           { layer: el },
-          (listener) => onProps(part, listener)
+          (listener) => onProps(part, listener),
+          store
         )
         return () => {
           offShortcut()
-          unbind?.()
+          unbind()
         }
       },
     }),
@@ -91,8 +126,12 @@ function dialogSlots(
         nestedOpen: state.stack > 0,
       }),
       // Kept mounted with the content, so both show together.
-      present: (state, { api }) =>
-        state.mounted || !!api.internal.contentProps().keepMounted,
+      present: (state, part) =>
+        state.mounted ||
+        !!(
+          propsAsleep<{ keepMounted?: boolean }>(part, "content") ??
+          part.api.internal.contentProps()
+        ).keepMounted,
       role: "presentation",
       attrs: (state) => ({
         hidden: state.mounted ? undefined : "",
@@ -115,8 +154,7 @@ function dialogSlots(
         inline: "boolean",
       },
       connect: registerPopupElement,
-      role: (state, { api }) => api.internal.role,
-      roles: ["dialog", "alertdialog"],
+      role: alert ? "alertdialog" : "dialog",
       state: (state) => ({
         open: state.open,
         modal: state.modal,
@@ -199,7 +237,8 @@ function dialogSlots(
     // Without keys of its own, it shows the shortcut of the trigger it sits in.
     shortcut: shortcutSlot(
       slot,
-      (_state, part, el) => el && part.api.internal.shortcutOf(el)
+      (_state, el, part) =>
+        el && part && shortcutOf(part, "trigger", el, { beside: true })
     ),
   }
 }

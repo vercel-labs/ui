@@ -67,6 +67,7 @@ import {
   withElement,
 } from "./create-parts"
 import {
+  copyProps,
   defaultSlot,
   optionalBoolean,
   orModel,
@@ -200,7 +201,7 @@ const Combobox = /* @__PURE__ */ renderless(
       const field = useFieldControl()
       provide(ContainerKey, () => props.container)
       const combobox = usePrimitive(comboboxPrimitive, () => ({
-        ...props,
+        ...copyProps(props),
         value: orModel(props.value, props.modelValue),
         container: undefined,
         name: props.name ?? field?.name(),

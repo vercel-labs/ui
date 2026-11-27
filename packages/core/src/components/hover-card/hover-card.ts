@@ -1,3 +1,8 @@
+import { dev } from "#dev"
+import { checkName } from "#name-check"
+import { openAttrs } from "../../foundation/kernel/attrs"
+import { trackInput } from "../../foundation/kernel/modality"
+import { nextAsleep } from "../../foundation/kernel/part"
 import { createPopupController } from "../../foundation/popups/popup"
 import {
   type PortalProps,
@@ -8,8 +13,11 @@ import {
   popupState,
   type PopupState,
 } from "../../foundation/popups/create-popup"
+import { preparePosition } from "../../foundation/platform/position"
+import { styleReset } from "../../foundation/popups/popup-features"
 import { hoverCardPreset } from "../../foundation/popups/popup-hover-presets"
 import {
+  bindTrigger,
   popupArrow,
   popupContent,
   popupTrigger,
@@ -233,6 +241,8 @@ const hoverCardPrimitive = /* @__PURE__ */ definePrimitive({
     controller: "value",
   },
   state: (options: HoverCardOptions) => popupState(options),
+  asleep: (options) =>
+    options.open === undefined && !options.defaultOpen && !options.controller,
   sync: (options) => (options.open === undefined ? {} : { open: options.open }),
   api: hoverCardApi,
   slots: (slot) => {
@@ -246,9 +256,33 @@ const hoverCardPrimitive = /* @__PURE__ */ definePrimitive({
         state: (state, { key }) => ({
           open: state.open && (state.trigger === null || state.trigger === key),
         }),
+        attrs: (state, { key }) =>
+          openAttrs(
+            state.open && (state.trigger === null || state.trigger === key)
+          ),
+        bind: undefined,
+        asleep(el, part) {
+          const { key, id, store } = part
+          if (dev) {
+            checkName(el, "The trigger", { component: "hover-card", id })
+          }
+          styleReset.prepareClient("hover-card", "content")
+          preparePosition()
+          // Focus that wakes it opens it only from the keyboard, which this tells from the start.
+          trackInput()
+          const unbind = bindTrigger(store, key, (leaving) =>
+            nextAsleep(part, "trigger", leaving)
+          )
+          if (store.get().trigger === key && !el.hasAttribute("id")) {
+            el.id = `${id}-trigger`
+          }
+          return unbind
+        },
       }),
       content: slot<ContentProps, HoverCardContentState>({
         ...content,
+        role: undefined,
+        present: (state, { props }) => state.mounted || !!props.keepMounted,
         props: {
           side: "string",
           align: "string",

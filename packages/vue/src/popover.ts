@@ -39,6 +39,7 @@ import {
 } from "./popup"
 import { createParts, withElement } from "./create-parts"
 import {
+  copyProps,
   optionalBoolean,
   orModel,
   type PrimitiveHandle,
@@ -108,7 +109,7 @@ const Popover = /* @__PURE__ */ renderless(
     setup(props, { slots, emit }) {
       provide(ContainerKey, () => props.container)
       const popover = usePrimitive(popoverPrimitive, () => ({
-        ...props,
+        ...copyProps(props),
         open: orModel(props.open, props.modelValue),
         container: undefined,
         onOpenChange: (open: boolean, details: OpenDetails) => {

@@ -532,6 +532,36 @@ function firstAsleep(view: object, slot: string) {
   return first
 }
 
+// The instance's parts in order, for work that runs while it sleeps.
+const partsOf = (part: Part) => ordered(ownerOf(part)).values()
+
+// The next bound, connected part of `slot` besides `except`, without waking `api`.
+function nextAsleep(part: Part, slot: string, except?: string) {
+  for (const other of ordered(ownerOf(part)).values()) {
+    if (other.slot === slot && other.key !== except && other.el?.isConnected) {
+      return other.key
+    }
+  }
+}
+
+// Props of `slot`'s bound or first registered part while asleep, or undefined once awake.
+function propsAsleep<Props extends object>(view: object, slot: string) {
+  const part = (view as { [viewed]?: PartRecord })[viewed]
+  if (!part) {
+    return undefined
+  }
+  let first: Props | undefined
+  for (const other of ordered(part.owner).values()) {
+    if (other.slot === slot) {
+      if (other.el?.isConnected) {
+        return other.props as Props
+      }
+      first ??= other.props as Props
+    }
+  }
+  return (first ?? {}) as Props
+}
+
 // Tells the part's `onProps` listeners it rendered with new props.
 function propsRendered(part: PartRecord) {
   part.propsListeners?.forEach((listener) => listener())
@@ -986,14 +1016,17 @@ export {
   held,
   liveAttrs,
   madeLabel,
+  nextAsleep,
   onProps,
   ordered,
   type PartOwner,
+  partsOf,
   provisional,
   type PartRecord,
   partState,
   present,
   press,
+  propsAsleep,
   propsRendered,
   ref,
   references,

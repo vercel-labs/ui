@@ -1,10 +1,13 @@
 import { dev, warn } from "#dev"
+import { checkName } from "#name-check"
 import {
   ariaKeyshortcuts,
   initialApple,
 } from "../../foundation/platform/platform"
 import {
   createPopupController,
+  disabledTriggerAttrs,
+  popupTriggerAttrs,
   type Modal,
   type PopupFocusTarget,
 } from "../../foundation/popups/popup"
@@ -19,8 +22,11 @@ import {
   popupState,
   type PopupState,
 } from "../../foundation/popups/create-popup"
+import { preparePosition } from "../../foundation/platform/position"
+import { styleReset } from "../../foundation/popups/popup-features"
 import { popoverPreset } from "../../foundation/popups/popup-presets"
 import {
+  bindTrigger,
   popupArrow,
   popupClose,
   popupContent,
@@ -40,12 +46,17 @@ import type {
   PrimitiveOptions,
 } from "../../foundation/kernel/primitive-types"
 import {
-  adoptPlatform,
   bindPartShortcut,
   shortcutOf,
   shortcutSlot,
 } from "../../foundation/shortcuts/shortcut-slot"
-import { onProps } from "../../foundation/kernel/part"
+import { trackInput } from "../../foundation/kernel/modality"
+import {
+  awake,
+  firstAsleep,
+  nextAsleep,
+  onProps,
+} from "../../foundation/kernel/part"
 import type { DismissOptions } from "../../foundation/popups/dismissal"
 
 /**
@@ -372,8 +383,11 @@ const popoverPrimitive = /* @__PURE__ */ definePrimitive({
   },
   state: (options: PopoverOptions): PopoverState => ({
     ...popupState(options),
+    modal: options.modal ?? false,
     apple: initialApple(),
   }),
+  asleep: (options) =>
+    options.open === undefined && !options.defaultOpen && !options.controller,
   sync: (options) => (options.open === undefined ? {} : { open: options.open }),
   api: popoverApi,
   slots: (slot) => {
@@ -391,23 +405,46 @@ const popoverPrimitive = /* @__PURE__ */ definePrimitive({
         },
         state: trigger.state,
         attrs: (state, part) => ({
-          ...trigger.attrs!(state, part),
+          ...popupTriggerAttrs(
+            state,
+            part.id,
+            "dialog",
+            part.key,
+            state.trigger === null
+              ? (firstAsleep(part, "trigger") ??
+                  part.api.internal.firstTrigger())
+              : undefined
+          ),
+          "aria-haspopup": "dialog",
+          type: "button",
+          ...disabledTriggerAttrs(part.props),
           "aria-keyshortcuts": part.props.shortcut
             ? ariaKeyshortcuts(part.props.shortcut, state.apple)
             : undefined,
         }),
         on: trigger.on,
         press: trigger.press,
-        bind(el, part) {
-          const { api, key } = part
-          const unbind = trigger.bind!(el, part)
-          adoptPlatform(part.store)
+        asleep(el, part) {
+          const { key, id, store } = part
+          if (dev) {
+            checkName(el, "The trigger", { component: "popover", id })
+          }
+          styleReset.prepareClient("popover", "content")
+          preparePosition()
+          trackInput()
+          const unbind = bindTrigger(store, key, (leaving) =>
+            nextAsleep(part, "trigger", leaving)
+          )
+          if (store.get().trigger === key && !el.hasAttribute("id")) {
+            el.id = `${id}-trigger`
+          }
           const offShortcut = bindPartShortcut(
             () => part.props.shortcut,
             (event) => {
               if (part.props.disabled) {
                 return
               }
+              const api = awake(part)
               if (api.isOpen()) {
                 api.internal.control.hide({ reason: "shortcut", event })
               } else {
@@ -421,11 +458,12 @@ const popoverPrimitive = /* @__PURE__ */ definePrimitive({
               }
             },
             { layer: el },
-            (listener) => onProps(part, listener)
+            (listener) => onProps(part, listener),
+            store
           )
           return () => {
             offShortcut()
-            unbind?.()
+            unbind()
           }
         },
       }),
@@ -433,6 +471,8 @@ const popoverPrimitive = /* @__PURE__ */ definePrimitive({
       // `"pointer"` modal, and presents as a popover or a sheet.
       content: slot<ContentProps, PopoverContentState>({
         ...content,
+        role: "dialog",
+        present: (state, { props }) => state.mounted || !!props.keepMounted,
         props: { ...content.props, inline: "boolean" },
         bind(el, part) {
           // Only a form inside nests. Other fields in a popover belong to the
@@ -465,7 +505,8 @@ const popoverPrimitive = /* @__PURE__ */ definePrimitive({
       // Without keys of its own, it shows the shortcut of the trigger it sits in.
       shortcut: shortcutSlot(
         slot,
-        (_state, part, el) => el && part.api.internal.shortcutOf(el)
+        (_state, el, part) =>
+          el && part && shortcutOf(part, "trigger", el, { beside: true })
       ),
     }
   },

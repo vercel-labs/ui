@@ -32,7 +32,7 @@ export {
   ownsEvent,
   registerPopupElement,
 } from "./popup-elements"
-export { contentAnchor, placementOptions } from "./popup-features"
+export { contentAnchor, placementOptions, styleReset } from "./popup-features"
 export { hoverCardPreset, tooltipPreset } from "./popup-hover-presets"
 export {
   alertDialogPreset,

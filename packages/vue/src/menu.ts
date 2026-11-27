@@ -58,6 +58,7 @@ import {
 } from "./popup"
 import { createParts, withElement } from "./create-parts"
 import {
+  copyProps,
   optionalBoolean,
   orModel,
   provideProps,
@@ -143,7 +144,7 @@ const Menu = /* @__PURE__ */ renderless(
       // A menu inside this one's content is no item of the menubar.
       provide(MenubarKey, null)
       const menu = usePrimitive(menuPrimitive, () => ({
-        ...props,
+        ...copyProps(props),
         open: orModel(props.open, props.modelValue),
         container: undefined,
         menubar: menubar ? () => menubar.api : undefined,
@@ -352,7 +353,7 @@ const MenuItem = withElement(
     setup(props, { slots }) {
       const menu = useMenu()
       const id = useId()
-      const item = () => ({ ...props, id })
+      const item = () => ({ ...copyProps(props), id })
       return usePart(menu, "item", item, undefined, {
         tag: "div",
         children: (state) => [
@@ -399,7 +400,7 @@ const MenuCheckboxItem = /* @__PURE__ */ withElement(
       menu.instance.use(menuCheckable)
       provide(ItemKey, () => ({ item: "checkbox-item", itemKey: props.value }))
       const item = () => ({
-        ...props,
+        ...copyProps(props),
         checked: orModel(props.checked, props.modelValue),
         onCheckedChange: (
           checked: boolean,
@@ -510,7 +511,7 @@ const MenuRadioItem = /* @__PURE__ */ withElement(
         itemKey: props.value,
         group,
       }))
-      const item = () => ({ ...props, group })
+      const item = () => ({ ...copyProps(props), group })
       return usePart(menu, "radio-item", item)
     },
   })
@@ -634,7 +635,7 @@ const MenuSub = /* @__PURE__ */ renderless(
       const parent = useMenu()
       // Its parts inside use this instance, the nearest.
       usePrimitive(menuPrimitive, () => ({
-        ...props,
+        ...copyProps(props),
         open: orModel(props.open, props.modelValue),
         parent: parent.api,
         onOpenChange: (open: boolean, details: OpenDetails) => {

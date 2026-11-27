@@ -501,7 +501,8 @@ function copyProps<T extends object>(props: T) {
 function trackedState(
   instance: PrimitiveInstance,
   name: string,
-  props: () => object
+  props: () => object,
+  component: ComponentInternalInstance | null = getCurrentInstance()
 ) {
   const tick = shallowRef(0)
   let last: Record<string, unknown> | undefined
@@ -540,7 +541,6 @@ function trackedState(
   // part, which costs a long list's opening more than its subscriptions do,
   // isn't needed. The part shares the subscription `slot()` makes for it, so
   // each part keeps one.
-  const component = getCurrentInstance()
   const shared = component && watchers.get(instance)
   let watch: PartWatch | undefined
   let subscribed: Part | undefined
@@ -564,7 +564,11 @@ function trackedState(
     unsubscribe?.()
     unsubscribe = subscribe(part, listener)
   }
-  onScopeDispose(() => unsubscribe?.())
+  if (component) {
+    onUnmounted(() => unsubscribe?.(), component)
+  } else {
+    onScopeDispose(() => unsubscribe?.())
+  }
   return new Proxy({} as Record<string, unknown>, {
     get(_, key) {
       tick.value
@@ -835,7 +839,14 @@ function usePart<P extends Primitive, S extends SlotName<P>>(
   const slots = useSlots()
   const user = props ?? (() => attrs)
   const options = typeof element === "string" ? { tag: element } : element
-  const state = trackedState(owner.instance, slot, slotProps) as StateOf<P, S>
+  let state: StateOf<P, S> | undefined
+  const getState = () =>
+    (state ??= trackedState(
+      owner.instance,
+      slot,
+      slotProps,
+      component
+    ) as StateOf<P, S>)
   const render = () => {
     const current = slotProps()
     // A part that shouldn't be in the page, like an unselected tab's panel, renders nothing.
@@ -846,11 +857,14 @@ function usePart<P extends Primitive, S extends SlotName<P>>(
     return renderElement(
       options.extend ? options.extend(merged) : merged,
       slots,
-      state,
+      getState(),
       options
     )
   }
-  return Object.assign(render, { state })
+  return Object.defineProperty(render, "state", {
+    get: getState,
+    enumerable: true,
+  }) as typeof render & { state: StateOf<P, S> }
 }
 
 // The listeners `slot()` hands a part's element, which a component that takes

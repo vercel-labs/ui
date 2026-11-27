@@ -66,6 +66,7 @@ import type {
   SlotDefinition,
 } from "../../foundation/kernel/primitive-types"
 import { live } from "../../foundation/kernel/live"
+import { propsAsleep } from "../../foundation/kernel/part"
 
 /**
  * Why a drawer opened or closed.
@@ -398,6 +399,11 @@ const drawerPrimitive = /* @__PURE__ */ definePrimitive({
   },
   live: ["dragging"],
   controlled: ["open", "snapPoint"],
+  asleep: (options) =>
+    options.open === undefined &&
+    !options.defaultOpen &&
+    !options.controller &&
+    options.snapPoint === undefined,
   sync: (options) => ({
     ...(options.open !== undefined && { open: options.open }),
     ...(options.snapPoint !== undefined && { snapPoint: options.snapPoint }),
@@ -420,8 +426,12 @@ const drawerPrimitive = /* @__PURE__ */ definePrimitive({
           nestedOpen: state.stack > 0,
           interactive: state.interactive,
         }),
-        present: (state, { api }) =>
-          state.mounted || !!api.internal.contentProps().keepMounted,
+        present: (state, part) =>
+          state.mounted ||
+          !!(
+            propsAsleep<{ keepMounted?: boolean }>(part, "content") ??
+            part.api.internal.contentProps()
+          ).keepMounted,
         role: "presentation",
         attrs: (state) => ({
           hidden: state.mounted ? undefined : "",
@@ -453,8 +463,12 @@ const drawerPrimitive = /* @__PURE__ */ definePrimitive({
       // around it. It's what goes into the top layer, and the scroller for
       // the scroll-snap driver.
       viewport: slot<{}, {}>({
-        present: (state, { api }) =>
-          state.mounted || !!api.internal.contentProps().keepMounted,
+        present: (state, part) =>
+          state.mounted ||
+          !!(
+            propsAsleep<{ keepMounted?: boolean }>(part, "content") ??
+            part.api.internal.contentProps()
+          ).keepMounted,
         attrs: (state) => ({
           hidden: state.mounted ? undefined : "",
           "data-side": state.side,

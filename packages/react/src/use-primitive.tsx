@@ -567,13 +567,15 @@ function elementProps(
 ) {
   takeOwnId(part, user.id)
   const handlers: Record<string, (event: React.SyntheticEvent) => void> = {}
-  for (const [type, handler] of Object.entries(partHandlers(part))) {
+  const partEvents = partHandlers(part)
+  for (const type in partEvents) {
     const prop = eventProps[type]
     if (!prop) {
       continue
     }
+    const handler = partEvents[type as keyof typeof partEvents]!
     handlers[prop] = (event) => {
-      handler!(event.nativeEvent)
+      handler(event.nativeEvent)
       // A handler that ran after ours, like a router link's own onClick, reads React's event.
       if (event.nativeEvent.defaultPrevented && !event.isDefaultPrevented()) {
         event.preventDefault()
@@ -643,6 +645,9 @@ function changesValues(
   return false
 }
 
+const emptySnapshot: Record<string, unknown> = {}
+const emptyAttrs: Attrs = {}
+
 /**
  * A part's state for `render` and state-based class names, and its
  * subscription to the instance. A part re-renders only when its attributes or
@@ -664,28 +669,34 @@ function usePartState<P extends Primitive, S extends SlotName<P>>(
   const part = instance.part(name, props, true)
   const rendered = readIn(
     handle,
-    (showing) => ({
-      handle,
-      around,
-      props,
-      snapshot: partState(part, props, showing) as StateOf<P, S> &
-        Record<string, unknown>,
-      // The keys this render read, filled in as it reads them.
-      read: new Set<string>(),
-      attrs: attrs(part, props, showing),
-      present: present(part, props, showing),
-      version: renderVersion(instance),
-    }),
+    (showing) => {
+      const shows = present(part, props, showing)
+      return {
+        handle,
+        around,
+        props,
+        snapshot: (shows
+          ? partState(part, props, showing)
+          : emptySnapshot) as StateOf<P, S> & Record<string, unknown>,
+        // The keys this render read, filled in as it reads them.
+        read: undefined as Set<string> | undefined,
+        attrs: shows ? attrs(part, props, showing) : emptyAttrs,
+        present: shows,
+        version: renderVersion(instance),
+      }
+    },
     around
   )
-  const state = new Proxy(rendered.snapshot, {
-    get(target, key) {
-      if (typeof key === "string") {
-        rendered.read.add(key)
-      }
-      return target[key as string]
-    },
-  })
+  const state = rendered.present
+    ? new Proxy(rendered.snapshot, {
+        get(target, key) {
+          if (typeof key === "string") {
+            ;(rendered.read ??= new Set()).add(key)
+          }
+          return target[key as string]
+        },
+      })
+    : (emptySnapshot as StateOf<P, S>)
 
   // What the last committed render showed. The listener compares it with
   // what that render's handle and the parts around it show now, so the part
@@ -707,7 +718,7 @@ function usePartState<P extends Primitive, S extends SlotName<P>>(
       const outdated = readIn(
         shown.handle,
         (now) => {
-          if (shown.read.size) {
+          if (shown.read?.size) {
             const next = partState(
               part,
               shown.props,

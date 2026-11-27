@@ -33,6 +33,7 @@ import { useControllerEntry } from "./controller-target"
 import { markSegments, slotText } from "./list-text"
 import { createParts, withElement } from "./create-parts"
 import {
+  copyProps,
   defaultSlot,
   optionalBoolean,
   orModel,
@@ -131,7 +132,7 @@ const Command = withElement(
     slots: Object as PartSlots<typeof commandPrimitive, "root">,
     setup(props, { slots, emit }) {
       const command = usePrimitive(commandPrimitive, () => ({
-        ...props,
+        ...copyProps(props),
         value: orModel(props.value, props.modelValue),
         onValueChange: (
           value: string | null,

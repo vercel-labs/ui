@@ -334,9 +334,6 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
     // A root trigger's own state and shortcuts are in place while its menu sleeps.
     asleep(el, part) {
       const { store, key, id } = part
-      // The client knows its platform now. Vue binds refs mid-hydration, so
-      // the switch waits a microtask, which still lands before paint.
-      adoptPlatform(store)
       checkName(el, "The trigger", { component: "menu", id })
       // A key press that wakes the menu opens it as the keyboard does, which this tells from the start.
       trackInput()
@@ -384,7 +381,8 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
             }
           },
           { layer: el },
-          (listener) => onProps(part, listener)
+          (listener) => onProps(part, listener),
+          store
         ),
         // Data menus run their items' shortcuts while closed.
         bindItemShortcuts(store, el, (value, event) =>
@@ -549,7 +547,8 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
       },
     },
     bind(el, part) {
-      const { api, key, props: initial } = part
+      const { api, key, props: initial, store } = part
+      adoptPlatform(store)
       const parentMenu = api.parentMenu()
       // Read on every check, so the popup follows prop changes while open.
       const props = () => api.itemProps<ContentProps>("content", key) ?? initial

@@ -127,13 +127,13 @@ const Menu = /* @__PURE__ */ rootScope(function Menu(props: MenuProps) {
     menubar ? () => ({ ...options, menubar: () => menubar.api }) : () => options
   )
   if (
-    !isStatic(props, "controller") ||
-    untrack(() => props.controller != null)
+    untrack(() => !isStatic(props, "controller") || props.controller != null)
   ) {
     useControllerEntry(() => props.controller, menu)
   }
-  const hasData =
-    !isStatic(props, "items") || untrack(() => props.items != null)
+  const hasData = untrack(
+    () => !isStatic(props, "items") || props.items != null
+  )
   const ownContent = hasData ? createChildFlag() : undefined
   menuMeta.set(menu, {
     container: () => props.container,
@@ -225,8 +225,7 @@ function MenuTrigger(
   })
   if (
     nearest &&
-    isStatic(props, "controller") &&
-    untrack(() => props.controller == null)
+    untrack(() => isStatic(props, "controller") && props.controller == null)
   ) {
     return triggerPart(nearest, "trigger", "button", trigger, rest)
   }
@@ -273,8 +272,7 @@ function MenuContextTrigger(
   })
   if (
     nearest &&
-    isStatic(props, "controller") &&
-    untrack(() => props.controller == null)
+    untrack(() => isStatic(props, "controller") && props.controller == null)
   ) {
     nearest.instance.use(menuContextTrigger)
     return triggerPart(nearest, "context-trigger", "div", trigger, rest)
@@ -405,7 +403,7 @@ function MenuItem(
     "destructive",
     "onSelect"
   )
-  if (isStatic(props, "shortcut") && !untrack(() => props.shortcut)) {
+  if (untrack(() => isStatic(props, "shortcut") && !props.shortcut)) {
     return usePart(menu, "item", item, rest, "div")
   }
   const apple = menuMeta.get(menu)?.apple ?? (() => false)
