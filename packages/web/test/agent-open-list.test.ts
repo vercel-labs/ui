@@ -63,7 +63,7 @@ test("a closed select's items are read without opening it", async () => {
   const select = document.querySelector("ui-select")!
   const opens: boolean[] = []
   select.addEventListener("openchange", (event) =>
-    opens.push((event as CustomEvent<{ open: boolean }>).detail.open)
+    opens.push(event.detail.value)
   )
   const [found] = (await agent.query({ within: "Plan" })) as {
     items: { value: string }[]
