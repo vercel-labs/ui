@@ -262,18 +262,16 @@ function numberInputApiBody(
       return false
     }
     const range = rangeOf(state)
-    const from = current()
+    const from = current() ?? 0
     const next =
-      from === null
-        ? stepValue(0, steps, range)
-        : size === "large"
-          ? snapToStep(
-              clamp(from + steps * state.largeStep, state.min, state.max),
-              range
-            )
-          : size === "small"
-            ? stepValue(from, steps, { ...range, step: state.smallStep })
-            : stepValue(from, steps, range)
+      size === "large"
+        ? snapToStep(
+            clamp(from + steps * state.largeStep, state.min, state.max),
+            range
+          )
+        : size === "small"
+          ? stepValue(from, steps, { ...range, step: state.smallStep })
+          : stepValue(from, steps, range)
     const done = setValue(next, reason, event)
     // The text follows a step, even one that lands on the same value.
     edited = false

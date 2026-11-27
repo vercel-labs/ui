@@ -372,3 +372,21 @@ test("Alt+ArrowUp keeps adding small steps in a percent or yen field, and shows 
   })
   expect(attrs(quarter.part("control")).value).toBe("0.25%")
 })
+
+test("a large or small step from an empty field moves by that step", () => {
+  const press = (init: Partial<KeyboardEvent>) => {
+    const instance = numberInput({ id: "n", defaultValue: null })
+    instance.api.internal.keydown({
+      preventDefault() {},
+      ...init,
+    } as KeyboardEvent)
+    return instance.get().value
+  }
+  expect(press({ key: "PageUp" })).toBe(10)
+  expect(press({ key: "ArrowUp", shiftKey: true })).toBe(10)
+  expect(press({ key: "ArrowUp", altKey: true })).toBe(0.1)
+  expect(press({ key: "ArrowDown" })).toBe(-1)
+  const instance = numberInput({ id: "n", defaultValue: null })
+  instance.api.increment({ large: true })
+  expect(instance.get().value).toBe(10)
+})
