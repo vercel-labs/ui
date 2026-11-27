@@ -207,6 +207,37 @@ function bindFoundControl(
     }
     gave = { el: named, name }
   }
+  // A control a field nested later holds, or one the field no longer finds,
+  // gets back what the field wrote on it. What another field wrote since stays.
+  const release = (control: HTMLElement) => {
+    for (const [name, value] of written) {
+      const now = control.getAttribute(name)
+      if (name === "aria-describedby") {
+        const own = (now ?? "")
+          .split(/\s+/)
+          .filter((id) => id && !added.has(id))
+          .join(" ")
+        if (own) {
+          control.setAttribute(name, own)
+        } else {
+          control.removeAttribute(name)
+        }
+      } else if (now === value) {
+        if (name === "aria-labelledby" && replaced) {
+          control.setAttribute(name, replaced)
+        } else {
+          control.removeAttribute(name)
+        }
+      }
+    }
+    if (gave?.name && gave.el.getAttribute("name") === gave.name) {
+      gave.el.removeAttribute("name")
+    }
+    written = new Map()
+    added = new Set()
+    replaced = undefined
+    gave = undefined
+  }
   // Labels point at the control's id, or one the field gives it when it has none.
   const adopt = (control: HTMLElement) => {
     if (!control.id) {
@@ -235,12 +266,18 @@ function bindFoundControl(
       return
     }
     const next = api.control()
-    if (next === current || next === undefined) {
+    if (next === current) {
       return
     }
+    if (current) {
+      release(current)
+    }
     current = next
-    added = new Set()
-    replaced = undefined
+    if (!next) {
+      described?.disconnect()
+      store.set({ controlId: null, labelable: true, namedByContent: false })
+      return
+    }
     adopt(next)
     described?.disconnect()
     described?.observe(next, { attributeFilter: ["aria-describedby", "id"] })
