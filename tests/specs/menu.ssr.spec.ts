@@ -18,6 +18,18 @@ test("a closed menu hydrates without mismatches", async ({ page, open }) => {
   expect(await hydrationErrors(page)).toEqual([])
 })
 
+test("a trigger whose render comes through a wrapper's merged props hydrates", async ({
+  page,
+  open,
+  framework,
+}) => {
+  test.skip(framework !== "solid-ssr", "Only Solid's fixture has the wrapper.")
+  await open("menu", { merged: "" })
+  await page.getByRole("button", { name: "File" }).click()
+  await expect(menuNamed(page, "File")).toBeVisible()
+  expect(await hydrationErrors(page)).toEqual([])
+})
+
 test("an open menu hydrates without mismatches, then shows the platform's shortcuts", async ({
   page,
   open,

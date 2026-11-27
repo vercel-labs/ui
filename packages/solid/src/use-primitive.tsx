@@ -1074,15 +1074,19 @@ function renderElement(
   }
   // A `render` that can't change needs nothing to follow it. Untracked for the
   // same reason as the children above.
-  if (untrack(() => isStatic(user, "render"))) {
+  if (isServer || untrack(() => isStatic(user, "render"))) {
     return make(untrack(() => user.render))
   }
   // The getter reads more than `render`, so the same function keeps its element.
-  const render = createMemo(() => user.render)
-  return createMemo(() => {
-    const current = render()
-    return untrack(() => make(current))
-  }) as unknown as JSX.Element
+  // Transparent, so these memos take no hydration ids the server didn't.
+  const render = createMemo(() => user.render, { transparent: true })
+  return createMemo(
+    () => {
+      const current = render()
+      return untrack(() => make(current))
+    },
+    { transparent: true }
+  ) as unknown as JSX.Element
 }
 
 // A `render` for a part whose element follows its props, like a link or a

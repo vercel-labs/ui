@@ -15,20 +15,35 @@ import {
   MenuTrigger,
 } from "@ui-sdk/solid/menu"
 import { render } from "@solidjs/web"
-import { createSignal } from "solid-js"
+import { type ComponentProps, createSignal, omit } from "solid-js"
 import { menuOptions } from "tests/fixtures/page.ts"
 
 const controller = createMenuController()
+
+function MergedTrigger(props: ComponentProps<typeof MenuTrigger>) {
+  return <MenuTrigger {...omit(props, "class")} class="wrapped" />
+}
 
 function Fixture() {
   const [action, setAction] = createSignal("")
   // Read here, not at module level, so the server reads each request's URL.
   const options = menuOptions()
+  const merged = new URLSearchParams(location.search).has("merged")
   return (
     <div class="fixture">
       <button>Before</button>
       <Menu onAction={setAction} controller={controller} {...options}>
-        <MenuTrigger>File</MenuTrigger>
+        {merged ? (
+          <MergedTrigger
+            render={(trigger) => (
+              <button {...trigger} type="button">
+                File
+              </button>
+            )}
+          />
+        ) : (
+          <MenuTrigger>File</MenuTrigger>
+        )}
         <MenuContent class="popup">
           <MenuItem class="item" value="new" shortcut="mod+n">
             New file
