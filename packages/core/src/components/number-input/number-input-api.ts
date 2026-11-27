@@ -112,13 +112,14 @@ const rangeOf = (state: { min: number; max: number; step: number }) => ({
 })
 
 // The text is read with the options it shows with, whose decimals can change
-// the plural of a unit or currency name, like "1,5 японской иены".
-const readFormat = (state: Pick<State, "format" | "step">) =>
-  displayOptions(state.format, state.step)
+// the plural of a unit or currency name, like "1,5 японской иены". It shows a
+// small step's decimals, so Alt+Arrow in a percent field shows "12.1%".
+const readFormat = (state: Pick<State, "format" | "step" | "smallStep">) =>
+  displayOptions(state.format, Math.min(state.step, state.smallStep))
 
 const display = (
   value: number | null,
-  state: Pick<State, "locale" | "pageLocale" | "format" | "step">
+  state: Pick<State, "locale" | "pageLocale" | "format" | "step" | "smallStep">
 ) => formatNumber(value, localeOf(state), readFormat(state))
 
 const isLocked = (state: State) => isDisabled(state) || state.readOnly
@@ -193,6 +194,9 @@ function numberInputApiBody(
     const state = store.get()
     if (state.text.trim() === "") {
       return null
+    }
+    if (!edited) {
+      return state.value
     }
     return (
       parseNumber(state.text, localeOf(state), readFormat(state)) ?? state.value
@@ -586,7 +590,7 @@ function numberInputApiBody(
   // user is typing. Formats compare by content, so a new object each render
   // changes nothing.
   const formatKey = (state: State) =>
-    JSON.stringify([state.format, localeOf(state), state.step])
+    JSON.stringify([state.format, localeOf(state), state.step, state.smallStep])
   // A value from options shows in the same pass, unless the text typed so far already reads as it.
   deriveFromOptions(context, ["text"], (synced, state) => {
     if (!("value" in synced) || sameValue(synced.value, state.value)) {
@@ -611,7 +615,8 @@ function numberInputApiBody(
     const settingsChanged =
       state.format !== shownState.format ||
       localeOf(state) !== localeOf(shownState) ||
-      state.step !== shownState.step
+      state.step !== shownState.step ||
+      state.smallStep !== shownState.smallStep
     shownState = state
     const format = settingsChanged ? formatKey(state) : shownFormat
     if (format !== shownFormat) {

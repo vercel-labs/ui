@@ -329,3 +329,37 @@ describe("number input", () => {
     expect(attrs(whole.part("control")).inputmode).toBe("numeric")
   })
 })
+
+test("Alt+ArrowUp keeps adding small steps in a percent or yen field, and shows them", () => {
+  const altUp = {
+    key: "ArrowUp",
+    altKey: true,
+    preventDefault() {},
+  } as KeyboardEvent
+  const press = (instance: ReturnType<typeof numberInput>, times: number) => {
+    for (let i = 0; i < times; i++) {
+      instance.api.internal.keydown(altUp)
+      instance.api.internal.keyup(altUp)
+    }
+  }
+  const percent = numberInput({
+    id: "n",
+    defaultValue: 0.12,
+    locale: "en-US",
+    format: { style: "percent" },
+  })
+  expect(attrs(percent.part("control")).value).toBe("12%")
+  press(percent, 2)
+  expect(percent.get().value).toBe(0.122)
+  expect(attrs(percent.part("control")).value).toBe("12.2%")
+  const yen = numberInput({
+    id: "n",
+    defaultValue: 100,
+    locale: "en-US",
+    format: { style: "currency", currency: "JPY" },
+  })
+  expect(attrs(yen.part("control")).value).toBe("¥100")
+  press(yen, 2)
+  expect(yen.get().value).toBe(100.2)
+  expect(attrs(yen.part("control")).value).toBe("¥100.2")
+})
