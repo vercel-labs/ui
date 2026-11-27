@@ -15,6 +15,8 @@ import { button } from "../src/components/button/button"
 import { checkbox } from "../src/components/checkbox/checkbox"
 import { collapsible } from "../src/components/collapsible/collapsible"
 import { combobox } from "../src/components/combobox/combobox"
+import { dateInput } from "../src/components/date-input/date-input"
+import type { DateInputState } from "../src/components/date-input/date-input-parts"
 import { datePicker } from "../src/components/date-picker/date-picker"
 import { dialog } from "../src/components/dialog/dialog"
 import { input, inputGroup, textarea } from "../src/components/input/input"
@@ -24,7 +26,7 @@ import { numberInput } from "../src/components/number-input/number-input"
 import { pagination } from "../src/components/pagination/pagination"
 import { passwordInput } from "../src/components/password-input/password-input"
 import { progress } from "../src/components/progress/progress"
-import { attrs, bind } from "../src/foundation/kernel/part"
+import { attrs, bind, partState } from "../src/foundation/kernel/part"
 import { definePrimitive } from "../src/foundation/kernel/primitive"
 import { select } from "../src/components/select/select"
 import { separator } from "../src/components/separator/separator"
@@ -251,6 +253,31 @@ describe("agent", () => {
     })
     expect(field()).toMatchObject({ value: "jane@example.com" })
     expect(field()).not.toHaveProperty("placeholder")
+  })
+
+  test("an empty date field's segment dashes aren't its placeholder", () => {
+    const agent = createAgent()
+    const instance = dateInput({ id: "due" })
+    const root = document.body.appendChild(document.createElement("div"))
+    root.setAttribute("aria-label", "Due")
+    const { segments } = partState(instance.part("root")) as DateInputState
+    cleanups.push(
+      bind(instance.part("root"), root),
+      ...segments
+        .filter((segment) => segment.editable)
+        .map((segment) => {
+          const part = instance.part("segment", { segment, id: segment.key })
+          const el = root.appendChild(document.createElement("input"))
+          el.placeholder = String(attrs(part).placeholder)
+          return bind(part, el)
+        }),
+      () => instance.destroy(),
+      () => root.remove()
+    )
+    const due = agent.snapshot().find((component) => component.label === "Due")
+    expect(root.querySelector("input")?.placeholder).toBe("––")
+    expect(due).toBeDefined()
+    expect(due).not.toHaveProperty("placeholder")
   })
 
   test("a step on what an open modal covers is refused, with what is open", async () => {
@@ -4370,11 +4397,13 @@ describe("agent act behind a closed tab or section", () => {
     multiple,
     held,
     members = 0,
+    removable,
   }: {
     disabledTab?: string
     multiple?: boolean
     held?: boolean
     members?: number
+    removable?: boolean
   } = {}) {
     const saved: Record<string, boolean> = {}
     const moves: string[] = []
@@ -4463,6 +4492,12 @@ describe("agent act behind a closed tab or section", () => {
           el.setAttribute("aria-label", "Select")
           const instance = checkbox({ id: `member-${index}` })
           offs.push(bind(instance.part("root"), el), () => instance.destroy())
+          if (removable) {
+            const remove = button({ id: `remove-${index}` })
+            const second = row.appendChild(document.createElement("button"))
+            second.textContent = "Remove"
+            offs.push(bind(remove.part("root"), second), () => remove.destroy())
+          }
         }
         return () => offs.forEach((off) => off())
       },
@@ -5537,6 +5572,33 @@ describe("agent act behind a closed tab or section", () => {
     expect(shown()?.text?.[0]).toHaveLength(1501)
   })
 
+  test("an open popover's text leaves out what a private field or region inside it says", async () => {
+    const agent = createAgent()
+    const { popover } = await import("../src/components/popover/popover")
+    const reset = popover({ id: "reset", defaultOpen: true })
+    const content = Object.assign(document.createElement("div"), {
+      getAnimations: () => [],
+    })
+    content.setAttribute("aria-label", "Reset password")
+    content.innerHTML = `<p>Choose a new password.</p>
+      <div data-agent-secret><p>Recovery code 4821</p></div>
+      <div><input aria-label="New password" /><p>hunter2 is too short</p></div>`
+    document.body.append(content)
+    const password = passwordInput({ id: "new-password" })
+    const root = content.lastElementChild!
+    cleanups.push(
+      bind(reset.part("content"), content),
+      bind(password.part("root"), root),
+      bind(password.part("control"), root.querySelector("input")!),
+      () => reset.destroy(),
+      () => password.destroy()
+    )
+    const shown = agent
+      .snapshot()
+      .find((component) => component.label === "Reset password")
+    expect(shown?.text).toEqual(["Choose a new password."])
+  })
+
   test("a name the page lacks under an open modal says what is open over it, with its buttons", async () => {
     const agent = createAgent()
     const { root } = await mountOrders()
@@ -5648,6 +5710,43 @@ describe("agent act behind a closed tab or section", () => {
       "Member 4 Admin",
       "Member 5 Admin",
     ])
+  })
+
+  test("a listing of one kind shows every row of a closed place", async () => {
+    const agent = createAgent()
+    mountSettings({ members: 5 })
+    const listed = (await agent.query({
+      kind: "checkbox",
+      closed: true,
+    })) as AgentComponent[]
+    const rows = listed.flatMap(({ section, row }) =>
+      section === "Members" && row ? row : []
+    )
+    expect(new Set(rows).size).toBe(5)
+    expect(listed.at(-1)).not.toMatchObject({ ref: "more" })
+  })
+
+  test("two controls on one row count as one of a closed place's three rows", async () => {
+    const agent = createAgent()
+    mountSettings({ members: 5, removable: true })
+    const listed = (await agent.query({ closed: true })) as AgentComponent[]
+    const rows = (label: string) =>
+      listed.flatMap((component) =>
+        component.label === label && component.row?.includes("Member")
+          ? component.row
+          : []
+      )
+    expect(rows("Remove")).toEqual([
+      "Member 1 Admin",
+      "Member 2 Admin",
+      "Member 3 Admin",
+    ])
+    expect(rows("Select").filter((row) => row.endsWith("Remove"))).toEqual([
+      "Member 1 Admin Remove",
+      "Member 2 Admin Remove",
+      "Member 3 Admin Remove",
+    ])
+    expect(listed.at(-1)).toMatchObject({ ref: "more", more: 2 })
   })
 
   test("a long list of what left the page stops at ten and counts the rest", async () => {

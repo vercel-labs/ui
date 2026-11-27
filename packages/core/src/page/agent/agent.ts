@@ -671,6 +671,16 @@ const redact = (entry: Entry, value: unknown, key = "value") =>
     ? "[redacted]"
     : value
 
+// A private component's elements inside another's, like a password field in
+// a dialog: what they say, like the field's error, isn't the dialog's to tell.
+const secretsIn = (el: Element) =>
+  [...entries.values()].flatMap((entry) => {
+    const instance = entry.secret ? entry.instance.deref() : undefined
+    return instance
+      ? bound(instance).flatMap((part) => (el.contains(part.el) ? part.el : []))
+      : []
+  })
+
 type SvelteStack = { file?: string; line?: number; parent?: SvelteStack | null }
 type SvelteElement = Element & {
   __svelte_meta?: SvelteStack & { loc?: SvelteStack }
@@ -867,9 +877,10 @@ function describe(entry: Entry, instance: PrimitiveInstance, parts: Bound[]) {
     (out.value === "" || out.value == null)
   ) {
     const asks = parts
-      .map((part) => part.el)
-      .find((el) => el.matches("input, textarea"))
-      ?.getAttribute("placeholder")
+      .find(
+        (part) => part.slot !== "segment" && part.el.matches("input, textarea")
+      )
+      ?.el.getAttribute("placeholder")
     if (asks) {
       out.placeholder = asks
     }
@@ -894,7 +905,8 @@ function describe(entry: Entry, instance: PrimitiveInstance, parts: Bound[]) {
       ...parts
         .filter((part) => /title|description|error|close/.test(part.slot))
         .map((part) => part.el),
-      ...content.querySelectorAll("button, [role=button]"),
+      ...content.querySelectorAll("button, [role=button], [data-agent-secret]"),
+      ...secretsIn(content),
     ])
     if (said) {
       text.push(said.length > reads ? `${said.slice(0, reads)}…` : said)
@@ -1846,13 +1858,20 @@ function createAgent(
             place,
           ])
           noted?.push(
-            ...brought.map(({ entry, instance, parts }) => ({
-              ...describe(entry, instance, parts),
-              offPage: true,
-              section: (entry.sections?.length ? entry.sections : path).join(
-                " > "
-              ),
-            }))
+            ...brought.map(({ entry, instance, parts }) => {
+              const component = {
+                ...describe(entry, instance, parts),
+                offPage: true,
+                section: (entry.sections?.length ? entry.sections : path).join(
+                  " > "
+                ),
+              }
+              const row = rowElementOf(parts)
+              if (row) {
+                rowAt.set(component, row)
+              }
+              return component
+            })
           )
           if (look()) {
             ways.push([place])
@@ -1888,6 +1907,7 @@ function createAgent(
   let stepped: { entry: Entry; secret: boolean } | undefined
   // The components behind what's closed, kept while a query reads them.
   let noted: AgentComponent[] | undefined
+  const rowAt = new WeakMap<AgentComponent, Element>()
 
   // The labels behind what's closed, for a step that guessed a name wrong: the
   // steps after it guessed too, and this is what they can name instead.
@@ -3196,8 +3216,8 @@ function createAgent(
     const read = new Set(behindClosed.map((component) => component.ref))
     // A listing of the whole page shows a closed place's first rows, enough
     // to see what its list holds: text finds the rest.
-    const rows = new Map<string, Set<string>>()
-    let left = 0
+    const rows = new Map<string, Set<Element>>()
+    const left = new Set<Element>()
     for (const component of [
       ...behindClosed,
       ...leftPage().filter((component) => !read.has(component.ref)),
@@ -3205,18 +3225,19 @@ function createAgent(
       if (!ofKind(component) || !named(component)) {
         continue
       }
-      if (!text && component.row) {
+      const row = !text && !kind && rowAt.get(component)
+      if (row) {
         const place = component.section ?? ""
         const seen = rows.get(place) ?? rows.set(place, new Set()).get(place)!
-        if (!seen.has(component.row) && seen.size === sampled) {
-          left++
+        if (!seen.has(row) && seen.size === sampled) {
+          left.add(row)
           continue
         }
-        seen.add(component.row)
+        seen.add(row)
       }
       found.push(component)
     }
-    return capped(apart(found), left)
+    return capped(apart(found), left.size)
   }
 
   // A closed tooltip on a listed component says what that component's label

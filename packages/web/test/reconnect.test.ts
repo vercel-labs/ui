@@ -32,6 +32,7 @@ test("tabs put back on the page keep their tab and reach the agent", async () =>
       value: "b",
       actions: ["setValue"],
     }),
+    expect.objectContaining({ component: "closed" }),
   ])
   const [{ ref }] = agent.snapshot()
   expect(

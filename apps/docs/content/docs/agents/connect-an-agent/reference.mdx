@@ -60,7 +60,7 @@ Each entry describes one registered component with bound elements, or a remember
 | `source`                                                                       | Where the app writes it, such as `"components/header.tsx:24"`. Development builds only; see below.                                               |
 | `actions`                                                                      | Action names available to request, such as `setValue`, `setChecked`, or `press`.                                                                 |
 
-A password, card, or one-time-code field's value, or one inside `data-agent-secret`, shows as `"[redacted]"` once it's filled, here, in `act`'s values and changes, and in `subscribe`. Password Input and OTP Input stay redacted while their text is shown. Only the value is private: `visible` and `open` read `true` or `false`.
+A password, card, or one-time-code field's value, or one inside `data-agent-secret`, shows as `"[redacted]"` once it's filled, here, in `act`'s values and changes, and in `subscribe`. Password Input and OTP Input stay redacted while their text is shown. Only the value is private: `visible` and `open` read `true` or `false`. The `text` of an open dialog or popover leaves out these fields and anything else inside `data-agent-secret`.
 
 In development, `source` comes from a `data-review-loc="file:line"` attribute on the component's element or the nearest element around it, or from Svelte's own element locations. Add the attribute at build time to let an agent go from a component to the code that renders it. Production builds leave `source` out.
 
