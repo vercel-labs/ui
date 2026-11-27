@@ -297,15 +297,14 @@ function numbered(entry: Entry, instance: PrimitiveInstance) {
   )
 }
 
-// The values of the items a person can't choose, like a disabled option, from the list's data and its elements.
+// The values of the items a person can't choose, like a disabled option, from the list's data
+// and its elements. A hidden item counts too, since its value can still be set.
 function disabledItems(entry: Entry, instance: PrimitiveInstance) {
   const disabled = new Set<string>()
   dataOf(entry, instance, disabled)
-  const parts = bound(instance)
-  const items = new Set(renderedItems(parts).map((item) => item.value))
-  for (const part of parts) {
+  for (const part of bound(instance)) {
     if (
-      items.has(part.key) &&
+      isItem(part) &&
       ((part.props as { disabled?: unknown } | undefined)?.disabled === true ||
         part.el.matches(":disabled") ||
         part.el.getAttribute("aria-disabled") === "true")
@@ -417,18 +416,17 @@ const reachable = (el: HTMLElement) =>
   (getComputedStyle(el).display === "contents" &&
     [...el.children].some((child) => isShown(child as HTMLElement)))
 
+const isItem = (part: Bound) =>
+  !!part.key &&
+  (part.slot === "item" ||
+    part.slot === "tab" ||
+    (part.slot === "root" && part.el.getAttribute("role") === "radio"))
+
 // The items on the page, named by their trigger when they have one, like an
 // accordion's sections, else by their text.
 function renderedItems(parts: Bound[]) {
   const items = inDocumentOrder(
-    parts.filter(
-      (part) =>
-        part.key &&
-        (part.slot === "item" ||
-          part.slot === "tab" ||
-          (part.slot === "root" && part.el.getAttribute("role") === "radio")) &&
-        reachable(part.el)
-    )
+    parts.filter((part) => isItem(part) && reachable(part.el))
   )
   const nested = items.map((part) => part.el)
   return items.map((part) => {
