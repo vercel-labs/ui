@@ -2190,6 +2190,8 @@ function elementProps(
   }
 }
 
+const popupTargets = ["anchor", "initialFocus", "finalFocus"]
+
 const tagOf = <T extends { tag: string }>(tagOrOptions: string | T) =>
   typeof tagOrOptions === "string" ? ({ tag: tagOrOptions } as T) : tagOrOptions
 
@@ -2270,13 +2272,13 @@ function partElement<P extends Primitive>(
     ),
     props: attributes,
     ...props,
-    // A popup content's `anchor` is a selector attribute, or an element or a
-    // point set as the property.
+    // A popup content's `anchor`, `initialFocus` and `finalFocus` are selector
+    // attributes, or an element (or a point, or a function) set as the property.
     properties: [
       ...new Set([
         ...props.properties,
         ...properties,
-        ...("anchor" in slotSchema ? ["anchor"] : []),
+        ...popupTargets.filter((name) => name in slotSchema),
       ]),
     ],
   }

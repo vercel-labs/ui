@@ -193,6 +193,43 @@ for (const kind of ["dialog", "popover"]) {
   })
 }
 
+for (const [name, target] of [
+  ["an element", "element"],
+  ["a function", "function"],
+] as const) {
+  test(`a popover content's \`initialFocus\` and \`finalFocus\` properties take ${name}`, async ({
+    page,
+  }) => {
+    const kept = await page.evaluate((target) => {
+      document.querySelector("#stage")!.innerHTML =
+        `<ui-popover><ui-popover-trigger><button>Open</button></ui-popover-trigger><ui-popover-content aria-label="Panel"><button>First</button><button id="second">Second</button></ui-popover-content></ui-popover><button id="next">Next step</button>`
+      const content = document.querySelector(
+        "ui-popover-content"
+      ) as HTMLElement & {
+        initialFocus: unknown
+        finalFocus: unknown
+      }
+      const second = document.getElementById("second")!
+      const next = document.getElementById("next")!
+      const initial = target === "element" ? second : () => second
+      const final = target === "element" ? next : () => next
+      content.initialFocus = initial
+      content.finalFocus = final
+      return (
+        content.initialFocus === initial &&
+        content.finalFocus === final &&
+        !content.hasAttribute("initial-focus") &&
+        !content.hasAttribute("final-focus")
+      )
+    }, target)
+    expect(kept).toBe(true)
+    await page.getByRole("button", { name: "Open" }).click()
+    await expect(page.getByRole("button", { name: "Second" })).toBeFocused()
+    await page.keyboard.press("Escape")
+    await expect(page.getByRole("button", { name: "Next step" })).toBeFocused()
+  })
+}
+
 test("a label built on a native label names and reaches the control inside a slider, number input or checkbox group", async ({
   page,
 }) => {

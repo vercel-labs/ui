@@ -2080,7 +2080,8 @@ declare global {
     "ui-alert-dialog-content": UiPartElement<
       typeof alertDialog,
       "content",
-      "container" | "initialFocus" | "finalFocus" | "keepMounted" | "inline"
+      "container" | "keepMounted" | "inline",
+      "initialFocus" | "finalFocus"
     >
     "ui-alert-dialog-title": UiPartElement<typeof alertDialog, "title">
     "ui-alert-dialog-description": UiPartElement<
@@ -2275,8 +2276,8 @@ declare global {
       | "arrowPadding"
       | "container"
       | "anchor"
-      | "finalFocus"
-      | "keepMounted"
+      | "keepMounted",
+      "finalFocus"
     >
     "ui-date-picker-hint": UiPartElement<typeof datePicker, "hint">
     "ui-date-picker-clear": UiPartElement<typeof datePicker, "clear">
@@ -2299,7 +2300,8 @@ declare global {
     "ui-dialog-content": UiPartElement<
       typeof dialog,
       "content",
-      "container" | "initialFocus" | "finalFocus" | "keepMounted" | "inline"
+      "container" | "keepMounted" | "inline",
+      "initialFocus" | "finalFocus"
     >
     "ui-dialog-title": UiPartElement<typeof dialog, "title">
     "ui-dialog-description": UiPartElement<typeof dialog, "description">
@@ -2322,7 +2324,8 @@ declare global {
     "ui-drawer-content": UiPartElement<
       typeof drawer,
       "content",
-      "container" | "initialFocus" | "finalFocus" | "keepMounted"
+      "container" | "keepMounted",
+      "initialFocus" | "finalFocus"
     >
     "ui-drawer-handle": UiPartElement<typeof drawer, "handle">
     "ui-drawer-outlet": UiPartElement<
@@ -2425,8 +2428,8 @@ declare global {
       | "arrowPadding"
       | "anchor"
       | "container"
-      | "finalFocus"
-      | "keepMounted"
+      | "keepMounted",
+      "finalFocus"
     >
     "ui-menu-sub-content": UiPartElement<
       typeof menu,
@@ -2610,10 +2613,9 @@ declare global {
       | "container"
       | "arrowPadding"
       | "anchor"
-      | "initialFocus"
-      | "finalFocus"
       | "keepMounted"
-      | "inline"
+      | "inline",
+      "initialFocus" | "finalFocus"
     >
     "ui-popover-title": UiPartElement<typeof popover, "title">
     "ui-popover-description": UiPartElement<typeof popover, "description">
