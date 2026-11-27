@@ -336,6 +336,15 @@ function createScrollSnapDriver(options: SheetDriverOptions) {
       flip = null
       onFinish()
       animation.cancel()
+      // iOS Safari keeps the cancelled translate in the host's scrollable
+      // overflow, which halves the resting dim its scroll timeline reads, until
+      // the sheet lays out again.
+      if (isIOS()) {
+        const { minHeight } = sheet.style
+        sheet.style.minHeight = `${sheet.offsetHeight + 1}px`
+        void host.scrollHeight
+        sheet.style.minHeight = minHeight
+      }
     }
   }
 

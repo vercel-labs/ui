@@ -233,41 +233,44 @@ function toggleApiBody(
   const scope = () => scopeOf(options())
   const key = () => options().value ?? id
 
+  function write(
+    pressed: boolean,
+    { reason = "imperative", event }: ToggleChangeOptions = {}
+  ) {
+    const owner = group()
+    if (!owner) {
+      return change("pressed", pressed, { reason, event })
+    }
+    if (!owner.internal.allows(key(), pressed)) {
+      return false
+    }
+    // The toggle hears first and can cancel. Then the group decides, and the
+    // toggle follows its value.
+    const details = createDetails(
+      { reason, event },
+      changeSource(reason, event)
+    )
+    options().onPressedChange?.(pressed, details)
+    if (details.canceled) {
+      return false
+    }
+    return owner.internal.press(key(), pressed, {
+      reason: reason === "press" ? "item-press" : reason,
+      event,
+    })
+  }
+
   const api = {
     isPressed: () => store.get().pressed,
-    setPressed(
-      pressed: boolean,
-      { reason = "imperative", event }: ToggleChangeOptions = {}
-    ) {
-      if (isDisabled(store.get())) {
-        return false
-      }
-      const owner = group()
-      if (!owner) {
-        return change("pressed", pressed, { reason, event })
-      }
-      if (!owner.internal.allows(key(), pressed)) {
-        return false
-      }
-      // The toggle hears first and can cancel. Then the group decides, and the
-      // toggle follows its value.
-      const details = createDetails(
-        { reason, event },
-        changeSource(reason, event)
-      )
-      options().onPressedChange?.(pressed, details)
-      if (details.canceled) {
-        return false
-      }
-      return owner.internal.press(key(), pressed, {
-        reason: reason === "press" ? "item-press" : reason,
-        event,
-      })
-    },
+    setPressed: (pressed: boolean, details?: ToggleChangeOptions) =>
+      !isDisabled(store.get()) && write(pressed, details),
     toggle: (details?: ToggleChangeOptions) =>
       api.setPressed(!store.get().pressed, details),
     focus: () => element("root")?.focus(),
     internal: {
+      // A page's own write, like the web element's `pressed` property. It
+      // isn't a press, so it applies while disabled, like a native input's `value`.
+      write: (pressed: boolean) => write(pressed),
       // Joins the group or the toolbar, and follows its value, tab stop and
       // settings from then on.
       join(el: HTMLElement) {

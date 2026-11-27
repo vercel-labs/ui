@@ -202,8 +202,15 @@ function toggleControl<
     if (isDisabled(state) || state.readOnly) {
       return false
     }
-    const done = write(checked, { reason, event })
-    if (done && reason !== "restore") {
+    return commit(checked, { reason, event })
+  }
+
+  function commit(
+    checked: CheckedState,
+    details: { reason: CheckboxCheckedChangeReason; event?: Event }
+  ) {
+    const done = write(checked, details)
+    if (done && details.reason !== "restore") {
       dispatchChange(formElement())
     }
     return done
@@ -222,6 +229,10 @@ function toggleControl<
     focus: () => element("root")?.focus(),
     form: formOwner,
     internal: {
+      // A page's own write, like the web element's `checked` property. It isn't
+      // a press, so it applies while disabled or read-only, like a native input's.
+      write: (checked: CheckedState) =>
+        commit(checked, { reason: "imperative" }),
       // The state a form restores after a reload, as `String(checked)` saved
       // it. The browser restores a disabled or read-only control too, as a native one.
       restore(saved: string) {

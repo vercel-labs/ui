@@ -45,7 +45,7 @@ function defineCheckboxElements() {
         checked: {
           get: (api: CheckboxApi) => api.getChecked(),
           set: (api: CheckboxApi, checked: CheckedState) =>
-            api.setChecked(checked),
+            api.internal.write(checked),
         },
       },
       api: toggleApi,
@@ -93,7 +93,8 @@ function defineSwitchElements() {
       state: {
         checked: {
           get: (api: SwitchApi) => api.getChecked(),
-          set: (api: SwitchApi, checked: boolean) => api.setChecked(!!checked),
+          set: (api: SwitchApi, checked: boolean) =>
+            api.internal.write(!!checked),
         },
       },
       api: toggleApi,
