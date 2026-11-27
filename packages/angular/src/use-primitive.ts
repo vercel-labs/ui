@@ -63,6 +63,7 @@ class Ids {
 class Renders {
   readonly #app = inject(ApplicationRef)
   readonly #errors = inject(ErrorHandler)
+  readonly #zone = inject(NgZone)
   #queued = false
 
   soon() {
@@ -78,12 +79,28 @@ class Renders {
       // `tick()` throws what a template threw, where Angular's own renders
       // hand it to the app's error handler.
       try {
-        this.#app.tick()
+        this.#zone.run(() => this.#app.tick())
       } catch (error) {
         this.#errors.handleError(error)
       }
     })
   }
+}
+
+const CALLBACK = /^(?:action$|on[A-Z])/
+
+// Core calls back from its own listeners, outside Angular's zone, and an app
+// with Zone.js renders after what runs inside it.
+function inZone<Props extends object>(zone: NgZone, props: Props) {
+  const given = props as Record<string, unknown>
+  let zoned = given
+  for (const [key, value] of Object.entries(given)) {
+    if (typeof value === "function" && CALLBACK.test(key)) {
+      zoned = zoned === given ? { ...given } : zoned
+      zoned[key] = (...args: unknown[]) => zone.run(() => value(...args))
+    }
+  }
+  return zoned as Props
 }
 
 // An id for a part that needs one and wasn't given a value, like an accordion's item.
@@ -112,6 +129,7 @@ function usePrimitive<P extends Primitive>(
 ) {
   const id = inject(Ids).next()
   const renders = inject(Renders)
+  const zone = inject(NgZone)
   let instance: ReturnType<P> | undefined
   const features = new Set<Feature>()
   // Inputs arrive after the constructor, so the instance waits for a reader.
@@ -121,7 +139,7 @@ function usePrimitive<P extends Primitive>(
   const whileAlive = (given: OptionsOf<P>) => {
     const next: Record<string, unknown> = { ...given, id }
     for (const [key, value] of Object.entries(next)) {
-      if (typeof value === "function" && /^on[A-Z]/.test(key)) {
+      if (typeof value === "function" && CALLBACK.test(key)) {
         // A parent writes a bound value as the change emits, and the input
         // here follows once Angular renders: a frame later without Zone.js.
         // Rendering in the same task hands it to core before the next event.
@@ -130,7 +148,7 @@ function usePrimitive<P extends Primitive>(
           if (destroyed) {
             return undefined
           }
-          const result = value(...args)
+          const result = zone.run(() => value(...args))
           if (changes && !NgZone.isInAngularZone()) {
             renders.soon()
           }
@@ -329,6 +347,7 @@ function bindPart<P extends Primitive, S extends SlotName<P>>(
   const container = template ? inject(ViewContainerRef) : undefined
   const own = inject(Ids).next()
   const renders = inject(Renders)
+  const zone = inject(NgZone)
   const sanitizer = inject(Sanitizer, { optional: true })
   const channel = `render:${own}`
   let claimed: { instance: object; lone: boolean } | undefined
@@ -351,7 +370,10 @@ function bindPart<P extends Primitive, S extends SlotName<P>>(
       if (!instance) {
         return undefined
       }
-      const given = props() as PropsOf<P, S> & { id?: string; value?: unknown }
+      const given = inZone(zone, props()) as PropsOf<P, S> & {
+        id?: string
+        value?: unknown
+      }
       if (given.value !== undefined || given.id !== undefined) {
         return instance.part(slot, given)
       }
