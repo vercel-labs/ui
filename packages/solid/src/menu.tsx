@@ -227,13 +227,12 @@ function MenuTrigger(
   ) {
     return triggerPart(nearest, "trigger", "button", trigger, rest)
   }
-  const menu = useControllerTarget(() => props.controller, nearest)
-  return (
-    <Show
-      when={menu()}
-      keyed
-      // Until the menu it names mounts, a trigger outside the menu is a plain button.
-      fallback={renderStatic(
+  return withTarget(
+    useControllerTarget(() => props.controller, nearest),
+    (menu) => triggerPart(menu, "trigger", "button", trigger, rest),
+    // Until the menu it names mounts, a trigger outside the menu is a plain button.
+    () =>
+      renderStatic(
         "button",
         () => ({
           attrs: {},
@@ -248,10 +247,7 @@ function MenuTrigger(
             return (props.disabled && props.focusableWhenDisabled) || undefined
           },
         })
-      )}
-    >
-      {(menu) => triggerPart(menu, "trigger", "button", trigger, rest)}
-    </Show>
+      )
   )
 }
 
@@ -275,26 +271,40 @@ function MenuContextTrigger(
     nearest.instance.use(menuContextTrigger)
     return triggerPart(nearest, "context-trigger", "div", trigger, rest)
   }
-  const menu = useControllerTarget(() => props.controller, nearest)
-  return (
-    <Show
-      when={menu()}
-      keyed
-      fallback={renderStatic(
+  return withTarget(
+    useControllerTarget(() => props.controller, nearest),
+    (menu) => (
+      menu.instance.use(menuContextTrigger),
+      triggerPart(menu, "context-trigger", "div", trigger, rest)
+    ),
+    () =>
+      renderStatic(
         "div",
         () => ({
           attrs: {},
           state: { open: false, disabled: !!props.disabled },
         }),
         rest
-      )}
-    >
-      {(menu) => (
-        menu.instance.use(menuContextTrigger),
-        triggerPart(menu, "context-trigger", "div", trigger, rest)
-      )}
-    </Show>
+      )
   )
+}
+
+// Transparent, so a trigger takes the same hydration ids as its direct path:
+// the server reads a `controller` missing from spread props as static, and
+// the client doesn't, so the two can take different paths.
+function withTarget(
+  target: () => MenuContextValue | undefined,
+  render: (menu: MenuContextValue) => JSX.Element,
+  fallback: () => JSX.Element
+) {
+  const menu = createMemo(target, { transparent: true })
+  return createMemo(
+    () => {
+      const current = menu()
+      return untrack(() => (current ? render(current) : fallback()))
+    },
+    { transparent: true }
+  ) as unknown as JSX.Element
 }
 
 // The bound part of a trigger or context area, once its menu is known.
