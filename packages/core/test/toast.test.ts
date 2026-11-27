@@ -172,6 +172,23 @@ describe("the queue", () => {
     })
   })
 
+  test("a function that throws before it returns a promise turns into an error", async () => {
+    const toast = quiet()
+    expect(() =>
+      toast.promise(
+        () => {
+          throw new Error("Name is required")
+        },
+        { loading: "Saving", error: (error) => (error as Error).message }
+      )
+    ).not.toThrow()
+    await Promise.resolve()
+    expect(toast.toasts()[0]).toMatchObject({
+      type: "error",
+      title: "Name is required",
+    })
+  })
+
   test("a promise toast dismissed while loading stays closed", async () => {
     const toast = quiet()
     let resolve!: () => void

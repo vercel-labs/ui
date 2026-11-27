@@ -361,7 +361,12 @@ function createToaster<Content = string>({
             : message
         update(id, { ...resolve(result), type })
       }
-      const running = typeof promise === "function" ? promise() : promise
+      let running: Promise<Value>
+      try {
+        running = typeof promise === "function" ? promise() : promise
+      } catch (error) {
+        running = Promise.reject(error)
+      }
       running.then(
         (value) => settle("success", messages.success, value),
         (error) => settle("error", messages.error, error)
