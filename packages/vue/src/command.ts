@@ -1,4 +1,4 @@
-import type { ChangeDetails } from "@ui-sdk/core"
+import type { ChangeDetails, TextChangeDetails } from "@ui-sdk/core"
 import type { AsyncOptionsStatus } from "@ui-sdk/core/async-options"
 import {
   command as commandPrimitive,
@@ -51,7 +51,7 @@ const PageKey: InjectionKey<string | null> = Symbol("command-page")
 // Provided while rendering data commands, whose shortcuts the root binds.
 const DataKey: InjectionKey<boolean> = Symbol("command-data")
 
-type QueryDetails = ChangeDetails<CommandQueryChangeReason>
+type QueryDetails = TextChangeDetails<CommandQueryChangeReason>
 type PagesDetails = ChangeDetails<CommandPagesChangeReason>
 
 const useCommand = () => useHandle(commandPrimitive)

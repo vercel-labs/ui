@@ -292,7 +292,13 @@ function otpInputApiBody(
   function syncElement() {
     const el = input()
     const { value, maxLength } = store.get()
-    if (!el || el.value === value || awaitingOwner) {
+    if (!el || awaitingOwner) {
+      return
+    }
+    // A framework may have written the owner's value itself, which the
+    // browser no longer flags as too short.
+    if (el.value === value) {
+      checkLength()
       return
     }
     writing = true

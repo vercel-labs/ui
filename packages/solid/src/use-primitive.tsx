@@ -115,6 +115,17 @@ function callHandler(handler: unknown, event: Event, ...extra: unknown[]) {
   }
 }
 
+// Boolean attributes core writes as "", which a render function's component
+// reads as options.
+const booleans = new Set([
+  "hidden",
+  "disabled",
+  "readonly",
+  "required",
+  "inert",
+  "multiple",
+])
+
 /**
  * Solid writes `checked` on an input as its live checkedness, again on every
  * spread, which would undo what core writes to a hidden input between
@@ -518,7 +529,8 @@ function slotProps(
   user: Record<string, any>,
   own: Record<string, unknown>,
   attrs: () => Record<string, unknown>,
-  state?: unknown
+  state?: unknown,
+  render = false
 ) {
   // With the part's state, the props of its element: functions resolve
   // against it, and `render` stays out.
@@ -537,7 +549,8 @@ function slotProps(
       return mergeStyles(user.style, attrs().style as Record<string, string>)
     }
     if (key in untrack(attrs)) {
-      return attrs()[key]
+      const value = attrs()[key]
+      return render && value === "" && booleans.has(key) ? true : value
     }
     // A key only the user passed never tracks the attributes.
     return key in user || key === "children" || key === "render"
@@ -1085,7 +1098,7 @@ function renderElement(
     // Lazy on the server for the same reason as a part's attributes: the
     // render function reads them.
     if (typeof render === "function") {
-      const props = slotProps(user, own, attrs, state)
+      const props = slotProps(user, own, attrs, state, true)
       return createMemo(() => render(props, state), {
         lazy: isServer,
       }) as unknown as JSX.Element

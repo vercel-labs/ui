@@ -870,7 +870,7 @@ async function composition(file: string) {
 
 // The entry an element is declared in: the one named like it, like `tabs`
 // for <ui-tabs-tab>, else the first that defines it.
-function home(doc: ElementDoc) {
+function homeEntry(doc: ElementDoc) {
   const named = doc.entries
     .filter(
       (entry) =>
@@ -894,7 +894,7 @@ function summary(doc: ElementDoc) {
   if (doc.parts.length) {
     lines.push(`Parts: ${doc.parts.map((tag) => `\`<${tag}>\``).join(", ")}.`)
   }
-  lines.push(`Defined by \`import "@ui-sdk/web/${home(doc)}"\`.`)
+  lines.push(`Defined by \`import "@ui-sdk/web/${homeEntry(doc)}"\`.`)
   if (doc.dataAttributes.length) {
     lines.push(
       `Styling hooks: ${doc.dataAttributes
@@ -930,7 +930,7 @@ function customElementsManifest(elements: ElementDoc[], entries: string[]) {
       kind: "javascript-module",
       path: modulePath(entry),
       declarations: elements
-        .filter((doc) => home(doc) === entry)
+        .filter((doc) => homeEntry(doc) === entry)
         .map((doc) => ({
           kind: "class",
           name: `${pascal(doc.tagName)}Element`,
@@ -980,7 +980,7 @@ function customElementsManifest(elements: ElementDoc[], entries: string[]) {
           name: doc.tagName,
           declaration: {
             name: `${pascal(doc.tagName)}Element`,
-            module: modulePath(home(doc)),
+            module: modulePath(homeEntry(doc)),
           },
         })),
     })),
@@ -1022,8 +1022,10 @@ function htmlCustomData(elements: ElementDoc[]) {
 }
 
 export {
+  composition,
   customElementsManifest,
   describeElements,
   type ElementDoc,
+  homeEntry,
   htmlCustomData,
 }

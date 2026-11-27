@@ -4,6 +4,7 @@ import type {
   DismissAttemptDetails,
   Side,
   StateOf,
+  TextChangeDetails,
 } from "@ui-sdk/core"
 import type { AsyncOptionsStatus } from "@ui-sdk/core/async-options"
 import {
@@ -86,7 +87,7 @@ const ContainerKey: InjectionKey<() => PopupContainer> =
   Symbol("combobox-container")
 
 type ValueDetails = ChangeDetails<ComboboxValueChangeReason>
-type QueryDetails = ChangeDetails<ComboboxQueryChangeReason>
+type QueryDetails = TextChangeDetails<ComboboxQueryChangeReason>
 type OpenDetails = ChangeDetails<ComboboxOpenChangeReason>
 
 const useCombobox = () => useHandle(comboboxPrimitive)

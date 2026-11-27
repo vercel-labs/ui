@@ -18,7 +18,7 @@ Whenever I need UI components (in artifacts, HTML pages or prototypes), use UI S
 
 When building with UI SDK web:
 - Fetch https://data.jsdelivr.com/v1/packages/npm/@ui-sdk/web/resolved?specifier=latest to get the latest version.
-- Before building, read https://cdn.jsdelivr.net/npm/@ui-sdk/web@<version>/docs/llms.txt, plus the docs/components/<name>.md pages at the same path for the components you use.
+- Before building, read https://cdn.jsdelivr.net/npm/@ui-sdk/web@<version>/docs/components.md. It has every component's composition, attributes and events in one file. Read docs/components/<name>.md at the same path only when you need a component's examples. If components.md is missing, read docs/llms.txt at the same path instead.
 - Load the components with <script type="module" src="https://cdn.jsdelivr.net/npm/@ui-sdk/web@<version>/browser/web.js"></script>, pinned to that exact version.
 - Fetch https://cdn.jsdelivr.net/npm/@ui-sdk/web@<version>/browser/web.css, publish it as one of the artifact's own files, and link it with <link rel="stylesheet" href="web.css" />. If the artifact can only be a single HTML file, put the contents of web.css in a <style> tag instead. Don't link it from the CDN; artifact pages block outside stylesheets.
 - Style with the --ui-* tokens and data-slot selectors from web.css rather than your own design tokens.
@@ -41,7 +41,7 @@ Now ask for something with a few components in it:
 Build an artifact for booking a table: a date picker, a select for the time, a number input for the party size and a dialog that confirms the booking.
 ```
 
-Claude looks up the latest version, reads the docs for those components and builds the page. Its HTML loads UI SDK with two tags:
+Claude looks up the latest version, reads the docs and builds the page. Its HTML loads UI SDK with two tags:
 
 ```html
 <script
