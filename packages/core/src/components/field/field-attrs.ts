@@ -140,6 +140,8 @@ function bindFoundControl(
   // The name the field's label replaced, like a native <label>'s around the
   // control, which comes back when the field has no label of its own.
   let replaced: string | undefined
+  // What the control had before the field first wrote it, like its own `disabled`.
+  let had = new Map<string, string>()
   const write = () => {
     const control = current
     // A control moved out, maybe into another field, is no longer this one's to write.
@@ -183,6 +185,8 @@ function bindFoundControl(
           continue
         }
         replaced = current
+      } else if (current !== null && !written.has(name)) {
+        had.set(name, current)
       }
       next.set(name, value)
       if (current !== value) {
@@ -223,8 +227,9 @@ function bindFoundControl(
           control.removeAttribute(name)
         }
       } else if (now === value) {
-        if (name === "aria-labelledby" && replaced) {
-          control.setAttribute(name, replaced)
+        const kept = name === "aria-labelledby" ? replaced : had.get(name)
+        if (kept != null) {
+          control.setAttribute(name, kept)
         } else {
           control.removeAttribute(name)
         }
@@ -239,6 +244,7 @@ function bindFoundControl(
     written = new Map()
     added = new Set()
     replaced = undefined
+    had = new Map()
     gave = undefined
   }
   // Labels point at the control's id, or one the field gives it when it has none.

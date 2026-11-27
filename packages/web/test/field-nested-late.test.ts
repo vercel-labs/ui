@@ -58,3 +58,18 @@ test("a nested field added later doesn't keep the id the outer field gave its co
   expect(inner.id).not.toBe(outer.id)
   expect(label.control).toBe(outer)
 })
+
+test("a control a nested field takes keeps its own disabled", async () => {
+  document.body.innerHTML = `
+    <ui-field id="outer" disabled>
+      <ui-field-label>Outer</ui-field-label>
+      <div id="slot"><input id="late" disabled /></div>
+    </ui-field>`
+  await wait()
+  const late = document.getElementById("late")!
+  const inner = document.createElement("ui-field")
+  document.getElementById("slot")!.append(inner)
+  inner.append(late)
+  await wait()
+  expect(late.hasAttribute("disabled")).toBe(true)
+})
