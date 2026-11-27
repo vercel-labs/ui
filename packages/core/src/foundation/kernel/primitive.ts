@@ -299,13 +299,16 @@ function definePrimitive<
     }
     // Asleep, parts render and run `asleep`, and the api and each `bind` wait
     // for the first event a part handles, or the first read of the api.
+    let waking = false
     function wake() {
       const { sleeping } = owner
-      if (!sleeping) {
+      if (!sleeping || waking) {
         return
       }
-      owner.sleeping = undefined
+      // Still asleep to a part that renders for state the api writes as it's built.
+      waking = true
       extendLifecycle(instance, build)
+      owner.sleeping = undefined
       for (const bind of [...sleeping.binds]) {
         bind()
       }

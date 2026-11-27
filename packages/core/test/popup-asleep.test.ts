@@ -11,6 +11,7 @@ import {
   partState,
   present,
 } from "../src/foundation/kernel/part"
+import type { Part } from "../src/foundation/kernel/primitive-types"
 
 Element.prototype.getAnimations ??= () => []
 
@@ -101,6 +102,56 @@ describe("closed popups stay asleep until used", () => {
     handlers(trigger).click!(new MouseEvent("click"))
     expect(asleep(trigger)).toBe(false)
     expect(instance.get().open).toBe(true)
+  })
+
+  test("a dialog or popover that may present as a sheet starts awake, as a sheet", () => {
+    const sheetDialog = dialog({ id: "sheet-dlg", presentation: "sheet" })
+    const sheetPopover = popover({ id: "sheet-pop", presentation: "sheet" })
+    expect(asleep(sheetDialog.part("trigger", { id: "t" }))).toBe(false)
+    expect(asleep(sheetPopover.part("trigger", { id: "t" }))).toBe(false)
+    expect(sheetDialog.get().presentation).toBe("sheet")
+    expect(sheetPopover.get().presentation).toBe("sheet")
+  })
+
+  test("parts render through a wake that changes state", () => {
+    const rendersOnChange = (
+      subscribe: (listener: () => void) => unknown,
+      parts: Part[]
+    ) => {
+      const shown: boolean[] = []
+      subscribe(() => {
+        for (const part of parts) {
+          shown.push(present(part))
+          if (shown.at(-1)) {
+            attrs(part)
+          }
+        }
+      })
+      return shown
+    }
+
+    const lateDialog = dialog({ id: "late-dlg" })
+    const dialogTrigger = lateDialog.part("trigger", { id: "t" })
+    const dialogShown = rendersOnChange(lateDialog.subscribe, [
+      dialogTrigger,
+      lateDialog.part("backdrop"),
+      lateDialog.part("content"),
+    ])
+    lateDialog.setOptions({ id: "late-dlg", presentation: "sheet" })
+    expect(lateDialog.get().presentation).toBe("sheet")
+    expect(dialogShown.length).toBeGreaterThan(0)
+    expect(asleep(dialogTrigger)).toBe(false)
+
+    const latePopover = popover({ id: "late-pop" })
+    const popoverTrigger = latePopover.part("trigger", { id: "t" })
+    const popoverShown = rendersOnChange(latePopover.subscribe, [
+      popoverTrigger,
+      latePopover.part("content"),
+    ])
+    latePopover.setOptions({ id: "late-pop", presentation: "sheet" })
+    expect(latePopover.get().presentation).toBe("sheet")
+    expect(popoverShown.length).toBeGreaterThan(0)
+    expect(asleep(popoverTrigger)).toBe(false)
   })
 
   test("a shortcut part inherits its trigger's shortcut while asleep", () => {

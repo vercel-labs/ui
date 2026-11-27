@@ -774,20 +774,21 @@ test.describe("sheet code preload", () => {
   })
 })
 
-// The sheet's code loads with `import()` the first time a popup presents as
-// one. A web component takes `presentation` after it's on the page, so the
-// code isn't loaded yet when it opens.
+// The sheet's code loads with `import()`. A web component takes `presentation`
+// after it's on the page, so each test routes the code's request first.
 test.describe("sheet code that loads late", () => {
-  test.beforeEach(async ({ framework, open, page }) => {
+  test.beforeEach(async ({ framework, open }) => {
     test.skip(
       framework !== "web",
       "Set after mount through the web component's attribute."
     )
     await open("popover")
-    await page
+  })
+
+  const asSheet = (page: Page) =>
+    page
       .locator(".fixture > ui-popover")
       .evaluate((el) => el.setAttribute("presentation", "sheet"))
-  })
 
   test("a popup that leaves the page before the code arrives never shows", async ({
     page,
@@ -799,6 +800,7 @@ test.describe("sheet code that loads late", () => {
       await route.continue()
     })
     const requested = page.waitForRequest("**/sheet-presentation*")
+    await asSheet(page)
     await page.getByRole("button", { name: "Profile" }).click()
     await requested
     await page.locator(".fixture > ui-popover").evaluate((el) => el.remove())
@@ -817,6 +819,7 @@ test.describe("sheet code that loads late", () => {
     page,
   }) => {
     await page.route("**/sheet-presentation*", (route) => route.abort())
+    await asSheet(page)
     await page.getByRole("button", { name: "Profile" }).click()
     await expect(
       page.getByRole("dialog", { name: "Edit profile" })

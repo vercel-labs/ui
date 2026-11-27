@@ -386,8 +386,12 @@ const popoverPrimitive = /* @__PURE__ */ definePrimitive({
     modal: options.modal ?? false,
     apple: initialApple(),
   }),
+  // A popover that may present as a sheet sets that up as it mounts.
   asleep: (options) =>
-    options.open === undefined && !options.defaultOpen && !options.controller,
+    options.open === undefined &&
+    !options.defaultOpen &&
+    !options.controller &&
+    !options.presentation,
   sync: (options) => (options.open === undefined ? {} : { open: options.open }),
   api: popoverApi,
   slots: (slot) => {
