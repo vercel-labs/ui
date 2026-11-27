@@ -1,10 +1,21 @@
-import { computed, effect, signal } from "@angular/core"
+import {
+  computed,
+  effect,
+  signal,
+  untracked,
+  type WritableSignal,
+} from "@angular/core"
 
-// The component each controller is attached to, read by parts outside it.
-// `version` changes with every registration, so a part that reads a
-// controller with no component yet binds once it registers.
-const controlled = new WeakMap<object, unknown>()
-const version = signal(0)
+// The component each controller is attached to, read by parts outside it. A
+// signal per controller, so a part that reads one with no component yet binds
+// once it registers, and no other controller's parts hear of it.
+const controlled = new WeakMap<object, WritableSignal<unknown>>()
+
+function targetOf(controller: object) {
+  const target = controlled.get(controller) ?? signal<unknown>(undefined)
+  controlled.set(controller, target)
+  return target
+}
 
 // The component a part connects to: the one its controller is attached to,
 // from anywhere on the page, or else `nearest`, the one it sits in.
@@ -14,11 +25,9 @@ function useControllerTarget<T>(
 ) {
   return computed(() => {
     const current = controller()
-    if (!current) {
-      return nearest
-    }
-    version()
-    return (controlled.get(current) as T | undefined) ?? nearest
+    return current
+      ? ((targetOf(current)() as T | undefined) ?? nearest)
+      : nearest
   })
 }
 
@@ -33,14 +42,12 @@ function useControllerEntry(
     if (!current) {
       return
     }
-    controlled.set(current, value)
-    version.update((count) => count + 1)
+    const target = targetOf(current)
+    target.set(value)
     onCleanup(() => {
-      if (controlled.get(current) !== value) {
-        return
+      if (untracked(target) === value) {
+        target.set(undefined)
       }
-      controlled.delete(current)
-      version.update((count) => count + 1)
     })
   })
 }
