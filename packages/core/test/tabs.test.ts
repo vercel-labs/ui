@@ -112,15 +112,37 @@ describe("selection", () => {
     ).toBe(true)
   })
 
-  test("a panel an agent's change leaves stays present until a person leaves its tab", () => {
+  test("the panel a person was on stays present when an agent's change leaves it, until a person leaves its tab", () => {
     const instance = tabs({ id: "t", defaultValue: "a" })
     const panel = (value: string) => present(instance.part("panel", { value }))
     withSource("agent", () => instance.api.select("b"))
     expect([panel("a"), panel("b")]).toEqual([true, true])
     expect(attrs(instance.part("panel", { value: "a" })).hidden).toBe("")
-    withSource("agent", () => instance.api.select("a"))
+    instance.api.select("a", { reason: "item-press" })
     instance.api.select("c", { reason: "item-press" })
-    expect([panel("a"), panel("b"), panel("c")]).toEqual([false, true, true])
+    expect([panel("a"), panel("b"), panel("c")]).toEqual([false, false, true])
+  })
+
+  test("a tab an agent opened itself isn't kept when the agent moves on", () => {
+    const instance = tabs({ id: "t", defaultValue: "a" })
+    const panel = (value: string) => present(instance.part("panel", { value }))
+    for (const value of ["b", "a", "c", "a"]) {
+      withSource("agent", () => instance.api.select(value))
+    }
+    expect([panel("a"), panel("b"), panel("c")]).toEqual([true, false, false])
+    withSource("agent", () => instance.api.select("b"))
+    expect([panel("a"), panel("b")]).toEqual([true, true])
+  })
+
+  test("a controlled value the app moves itself lets go of a kept panel", () => {
+    const instance = tabs({ id: "t", value: "a" })
+    const panel = (value: string) => present(instance.part("panel", { value }))
+    withSource("agent", () => instance.api.select("b"))
+    instance.setOptions({ id: "t", value: "b" })
+    expect([panel("a"), panel("b")]).toEqual([true, true])
+    instance.setOptions({ id: "t", value: "a" })
+    instance.setOptions({ id: "t", value: "b" })
+    expect([panel("a"), panel("b")]).toEqual([false, true])
   })
 
   test("selecting reports the value and a reason", () => {

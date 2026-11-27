@@ -185,7 +185,7 @@ When an open modal covers the rest of the page, nothing under it is looked throu
 
 A panel that loads what it holds after it opens, like a code-split tab, is still empty when the bridge looks. The error then lists the closed tabs and sections the component may be behind, so the agent can select that tab in one call and work there in the next.
 
-Each tab or section the bridge opens to look is an action of its own: `allow` is asked first, the component's change callback runs, and a no leaves it closed. A step opens 24 places at most. Disabled tabs and sections stay closed, and so does one inside `data-agent-confirm`: a step that names it opens it, and that step [needs the person](./permissions#mark-what-needs-a-person). A tab panel a step leaves stays mounted and hidden until a person selects that tab and leaves it, so what a person typed in the one they were on stays.
+Each tab or section the bridge opens to look is an action of its own: `allow` is asked first, the component's change callback runs, and a no leaves it closed. A step opens 24 places at most. Disabled tabs and sections stay closed, and so does one inside `data-agent-confirm`: a step that names it opens it, and that step [needs the person](./permissions#mark-what-needs-a-person). When a step selects another tab, the panel a person was on stays mounted and hidden, so what they typed there stays. It unmounts once a person selects that tab and leaves it. A tab the bridge opened itself unmounts as usual when the bridge moves on.
 
 ### Result
 

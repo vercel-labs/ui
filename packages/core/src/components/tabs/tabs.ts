@@ -312,6 +312,9 @@ function tabsApiBody(
   // first tab stands in until it does, unless someone picks another.
   let awaited = options().defaultValue ?? null
   let standIn: string | null = null
+  // The tab an agent's change asked for last. Nobody typed there before it
+  // came, so the agent leaving it keeps nothing.
+  let agentOn: string | null = null
   // Run after tabs come or go, which can move the selected tab without resizing it.
   const tabsChanged = new Set<() => void>()
 
@@ -497,14 +500,24 @@ function tabsApiBody(
   // the tab it selects.
   deriveFromOptions(
     context,
-    ["direction", "exiting", "stop"],
+    ["direction", "exiting", "kept", "stop"],
     (synced, state) => {
       if (!("value" in synced) || synced.value === state.value) {
         return
       }
       const value = synced.value ?? null
       const stop = roving.stopFor((tab) => tab.key === value)
-      return { ...selecting(state, value), ...(stop !== undefined && { stop }) }
+      // Any value but the one an agent asked for is the app's or a person's.
+      const left = value === agentOn ? null : state.value
+      agentOn = value === agentOn ? agentOn : null
+      return {
+        ...selecting(state, value),
+        ...(stop !== undefined && { stop }),
+        ...(left !== null &&
+          state.kept.includes(left) && {
+            kept: state.kept.filter((key) => key !== left),
+          }),
+      }
     }
   )
 
@@ -527,6 +540,13 @@ function tabsApiBody(
     reveal(state.value)
   })
 
+  const release = (key: string) => {
+    const { kept } = store.get()
+    if (kept.includes(key)) {
+      store.set({ kept: kept.filter((value) => value !== key) })
+    }
+  }
+
   // Selects a tab. Disabled tabs never select. Reads the props the tab last
   // rendered with, which it has before its element binds.
   function select(
@@ -540,14 +560,27 @@ function tabsApiBody(
       return false
     }
     const { value: from, kept } = store.get()
+    const leaves = from !== null && from !== value
     const agent = resolveSource(reason) === "agent"
+    const was = agentOn
+    // Kept before the change, so the panel is never absent in between.
+    const keeps = leaves && agent && from !== was && !kept.includes(from)
+    if (keeps) {
+      store.set({ kept: [...kept, from] })
+    }
+    agentOn =
+      agent && value !== null && !store.get().kept.includes(value)
+        ? value
+        : null
     if (!change("value", value, { reason, event })) {
+      agentOn = was
+      if (keeps) {
+        release(from)
+      }
       return false
     }
-    if (from !== null && agent !== kept.includes(from)) {
-      store.set({
-        kept: agent ? [...kept, from] : kept.filter((key) => key !== from),
-      })
+    if (leaves && !agent) {
+      release(from)
     }
     return true
   }
