@@ -146,6 +146,24 @@ const page = document
 const find = (id: string) => page.querySelector<HTMLElement>(`#${id}`)!
 const press = (id: string) => find(id).click()
 
+@Component({
+  selector: "test-root",
+  imports: [Menu, MenuContent, MenuRadioGroup, MenuRadioItem],
+  template: `
+    <ng-container uiMenu [(open)]="open">
+      <div *uiMenuContent>
+        <div uiMenuRadioGroup defaultValue="light">
+          <div uiMenuRadioItem value="light">Light</div>
+          <div uiMenuRadioItem id="dark" value="dark">Dark</div>
+        </div>
+      </div>
+    </ng-container>
+  `,
+})
+class Theme {
+  readonly open = signal(true)
+}
+
 describe("menu", () => {
   test("the trigger opens a menu of items, with groups named by their labels", async () => {
     const { settle } = await mount(Page)
@@ -213,6 +231,21 @@ describe("menu", () => {
     expect(instance.size()).toBe("large")
     expect(find("large").getAttribute("aria-checked")).toBe("true")
     expect(find("small").querySelector(".dot")).toBeNull()
+  })
+
+  test("an unnamed radio group keeps its choice after the menu closes", async () => {
+    const { instance, settle } = await mount(Theme)
+    press("dark")
+    await settle()
+    expect(find("dark").getAttribute("aria-checked")).toBe("true")
+    instance.open.set(false)
+    await settle()
+    await new Promise((resolve) => setTimeout(resolve, 20))
+    await settle()
+    expect(document.querySelector("#dark")).toBeNull()
+    instance.open.set(true)
+    await settle()
+    expect(find("dark").getAttribute("aria-checked")).toBe("true")
   })
 
   test("a submenu opens from its trigger, inside the menu's content", async () => {

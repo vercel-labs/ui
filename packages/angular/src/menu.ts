@@ -589,6 +589,7 @@ class MenuRadioGroup<Value extends string = string> {
   readonly state = usePart(this.#menu, "radio-group", () => ({
     id: this.group(),
     name: this.group(),
+    unnamed: this.name() === undefined,
     value: this.value(),
     defaultValue: this.defaultValue(),
     onValueChange: emitTypedChange(this.beforeValueChange, this.valueChange),
