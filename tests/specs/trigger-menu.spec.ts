@@ -185,6 +185,20 @@ test.describe("opening", () => {
     await page.keyboard.type("@zz")
     await expect(page.getByText("No matches")).toBeVisible()
   })
+
+  test("with an empty part, Control+Space reopens a dismissed query that matches nothing", async ({
+    page,
+    open,
+  }) => {
+    await open("trigger-menu", { empty: "" })
+    await field(page).focus()
+    await page.keyboard.type("@zz")
+    await expect(page.getByText("No matches")).toBeVisible()
+    await page.keyboard.press("Escape")
+    await expect(page.getByText("No matches")).toBeHidden()
+    await page.keyboard.press("Control+Space")
+    await expect(page.getByText("No matches")).toBeVisible()
+  })
 })
 
 test.describe("choosing", () => {

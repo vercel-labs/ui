@@ -406,13 +406,19 @@ function triggerMenuApiBody(
   // Counted when they bind, so an Empty that rebinds, or mounts as the last
   // row unmounts, never reads as gone within the commit.
   let empties = 0
+  // A closed content can unmount its Empty, which still counts to reopen the
+  // menu until the content mounts again.
+  let closedEmpty = false
 
   // The list for the current level shows while items match, while they
   // load, or while an empty part can say there are none.
   const visible = () =>
     !!levels.current() &&
     !isFreeText() &&
-    (hasEntries() || loadingStatus() === "loading" || empties > 0)
+    (hasEntries() ||
+      loadingStatus() === "loading" ||
+      empties > 0 ||
+      closedEmpty)
 
   function settle(reason: TriggerMenuOpenChangeReason, event?: Event) {
     if (visible()) {
@@ -733,7 +739,10 @@ function triggerMenuApiBody(
       fieldAttrs,
       itemCount: () => listbox.entries().length,
       announceState,
-      settle: () => settle("input-change"),
+      settle: () => {
+        closedEmpty = false
+        settle("input-change")
+      },
       // The list is named like the field: by its labels, or its own aria-label.
       // Not by the field itself, whose name as a reference would be its text.
       listLabel() {
@@ -785,6 +794,7 @@ function triggerMenuApiBody(
       // While an empty part is rendered, no matches keeps the menu open.
       countEmptyPart(delta: 1 | -1) {
         empties += delta
+        closedEmpty = !empties && delta < 0 && !store.get().open
         queueMicrotask(() => {
           const hasEmpty = empties > 0
           if (store.get().hasEmpty === hasEmpty) {
