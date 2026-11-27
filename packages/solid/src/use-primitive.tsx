@@ -664,7 +664,7 @@ function slotParts(
   const rebind = (part: Part) => {
     // Another element can share the entry for a flush while its own key
     // picks another part, like a new row taking the key a kept row leaves.
-    if (untrack(partOf) !== part) {
+    if (untrack(partOf).key !== part.key) {
       return
     }
     const next = ref(part, { by: "framework", attaches: "all" })
