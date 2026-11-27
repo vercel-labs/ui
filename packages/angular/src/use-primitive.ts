@@ -64,6 +64,8 @@ class Renders {
   readonly #app = inject(ApplicationRef)
   readonly #errors = inject(ErrorHandler)
   readonly #zone = inject(NgZone)
+  // Zone.js renders once what ran in Angular's zone is done, microtasks too.
+  readonly #zoned = this.#zone instanceof NgZone
   #queued = false
 
   soon() {
@@ -71,6 +73,10 @@ class Renders {
       return
     }
     this.#queued = true
+    if (this.#zoned) {
+      this.#zone.run(() => queueMicrotask(() => (this.#queued = false)))
+      return
+    }
     queueMicrotask(() => {
       this.#queued = false
       if (this.#app.destroyed) {
@@ -79,28 +85,53 @@ class Renders {
       // `tick()` throws what a template threw, where Angular's own renders
       // hand it to the app's error handler.
       try {
-        this.#zone.run(() => this.#app.tick())
+        this.#app.tick()
       } catch (error) {
         this.#errors.handleError(error)
       }
     })
   }
+
+  // Core calls back from its own listeners, outside Angular's zone. With
+  // Zone.js the callback runs inside it, and a microtask holds the render
+  // until core is done with the event.
+  call<Result>(callback: () => Result, changes: boolean) {
+    if (this.#zoned) {
+      return this.#zone.run(() => {
+        queueMicrotask(() => {})
+        return callback()
+      })
+    }
+    const result = callback()
+    // A parent writes a bound value as the change emits, and the input
+    // follows once Angular renders: in this task, before the next event.
+    if (changes) {
+      this.soon()
+    }
+    return result
+  }
 }
 
 const CALLBACK = /^(?:action$|on[A-Z])/
 
-// Core calls back from its own listeners, outside Angular's zone, and an app
-// with Zone.js renders after what runs inside it.
-function inZone<Props extends object>(zone: NgZone, props: Props) {
+// Tearing down can still report a change, like a highlight that's lost its
+// item, and by then the directive's outputs are destroyed too.
+function calling<Props extends object>(
+  renders: Renders,
+  props: Props,
+  gone: () => boolean
+) {
   const given = props as Record<string, unknown>
-  let zoned = given
+  let next = given
   for (const [key, value] of Object.entries(given)) {
     if (typeof value === "function" && CALLBACK.test(key)) {
-      zoned = zoned === given ? { ...given } : zoned
-      zoned[key] = (...args: unknown[]) => zone.run(() => value(...args))
+      next = next === given ? { ...given } : next
+      const changes = key.endsWith("Change")
+      next[key] = (...args: unknown[]) =>
+        gone() ? undefined : renders.call(() => value(...args), changes)
     }
   }
-  return zoned as Props
+  return next as Props
 }
 
 // An id for a part that needs one and wasn't given a value, like an accordion's item.
@@ -129,35 +160,12 @@ function usePrimitive<P extends Primitive>(
 ) {
   const id = inject(Ids).next()
   const renders = inject(Renders)
-  const zone = inject(NgZone)
   let instance: ReturnType<P> | undefined
   const features = new Set<Feature>()
   // Inputs arrive after the constructor, so the instance waits for a reader.
   let destroyed = false
-  // Tearing down can still report a change, like a highlight that's lost its
-  // item, and by then the directive's outputs are destroyed too.
-  const whileAlive = (given: OptionsOf<P>) => {
-    const next: Record<string, unknown> = { ...given, id }
-    for (const [key, value] of Object.entries(next)) {
-      if (typeof value === "function" && CALLBACK.test(key)) {
-        // A parent writes a bound value as the change emits, and the input
-        // here follows once Angular renders: a frame later without Zone.js.
-        // Rendering in the same task hands it to core before the next event.
-        const changes = key.endsWith("Change")
-        next[key] = (...args: unknown[]) => {
-          if (destroyed) {
-            return undefined
-          }
-          const result = zone.run(() => value(...args))
-          if (changes && !NgZone.isInAngularZone()) {
-            renders.soon()
-          }
-          return result
-        }
-      }
-    }
-    return next as OptionsOf<P>
-  }
+  const whileAlive = (given: OptionsOf<P>) =>
+    calling(renders, { ...given, id }, () => destroyed)
   // Angular evaluates a class binding on the root's own element before it
   // sets the inputs. A state read there makes the instance without a bound
   // default, which only the first options can set, so it's made again.
@@ -347,7 +355,6 @@ function bindPart<P extends Primitive, S extends SlotName<P>>(
   const container = template ? inject(ViewContainerRef) : undefined
   const own = inject(Ids).next()
   const renders = inject(Renders)
-  const zone = inject(NgZone)
   const sanitizer = inject(Sanitizer, { optional: true })
   const channel = `render:${own}`
   let claimed: { instance: object; lone: boolean } | undefined
@@ -370,7 +377,10 @@ function bindPart<P extends Primitive, S extends SlotName<P>>(
       if (!instance) {
         return undefined
       }
-      const given = inZone(zone, props()) as PropsOf<P, S> & {
+      const given = calling(renders, props(), () => destroyed) as PropsOf<
+        P,
+        S
+      > & {
         id?: string
         value?: unknown
       }

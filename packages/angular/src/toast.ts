@@ -137,7 +137,8 @@ class ToastAction {
   readonly state = usePart(inject(ToastRegionContext), "action", () => ({
     id: this.#id,
     toast: this.#toast().id,
-    onAction: this.action.handler(),
+    // Given here, the toast's own action runs in Angular's zone too.
+    onAction: this.action.handler() ?? this.#toast().action?.onAction,
     dismiss: this.dismiss(),
   })).state
 

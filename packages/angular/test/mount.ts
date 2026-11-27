@@ -2,6 +2,7 @@ import "@angular/compiler"
 import {
   createComponent,
   provideZonelessChangeDetection,
+  type Provider,
   type Type,
 } from "@angular/core"
 import { createApplication } from "@angular/platform-browser"
@@ -12,11 +13,14 @@ Element.prototype.getAnimations ??= () => []
 // jsdom has no layout either, which a list asks for as it highlights an item.
 Element.prototype.scrollIntoView ??= () => {}
 
-async function mount<Component>(component: Type<Component>) {
+async function mount<Component>(
+  component: Type<Component>,
+  providers: Provider[] = []
+) {
   const host = document.createElement("div")
   document.body.append(host)
   const app = await createApplication({
-    providers: [provideZonelessChangeDetection()],
+    providers: [provideZonelessChangeDetection(), providers],
   })
   const ref = createComponent(component, {
     environmentInjector: app.injector,

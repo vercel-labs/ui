@@ -20,7 +20,7 @@ Last reviewed: 2026-11-24, the whole adapter with its examples, docs and fixture
 - **Value roots take `Value extends string = string`**: Tabs, Accordion, RadioGroup, CheckboxGroup, ToggleGroup, SegmentedControl and MenuRadioGroup, inferred from `[value]`, so `(valueChange)` emits the app's own union. Children aren't checked against it.
 - **A star part that has `state` types its `let`** with `ngTemplateContextGuard`.
 - **Core's `href` gets Angular's URL check** in `use-primitive.ts`, since Angular never sees an attribute core writes.
-- **Callbacks run inside Angular's zone.** Core calls back from its own listeners, outside the zone, so `usePrimitive` and `usePart` run every `on*` and `action` callback through `NgZone.run`, and `Renders` ticks inside it. An app with Zone.js renders after an output, and work a handler starts keeps the zone.
+- **Callbacks run inside Angular's zone.** Core calls back from its own listeners, outside the zone. With Zone.js, `Renders.call` runs every `on*` and `action` callback of a root or a part through `NgZone.run` and queues a microtask there, so Angular renders once, after core is done with the event. Without it, a `*Change` callback renders in the same task through `Renders.soon()`.
 - **A moved popup leaves the page with its view.** On destroy the element is removed where it sits, not sent back to where Angular rendered it.
 - **CSP nonce**: a page sets it with `<meta property="csp-nonce" nonce="…">`. A tag with no nonce switches injected styles to constructed sheets, and the page declares `@layer ui-sdk;` first.
 - **Popups flip to the opposite side only**, never to a perpendicular one.
@@ -37,7 +37,7 @@ Last reviewed: 2026-11-24, the whole adapter with its examples, docs and fixture
 - **`*uiAccordionPanel` and `*uiCollapsiblePanel` take no star object**, so `keepMounted` can't be set in the star form. The plain attribute form takes it.
 - **An output can't be written on a star part.** It lands on the element inside the template. The long form, `<ng-template uiComboboxCreate (create)="…">`, takes it.
 - **`uiOverlayHost` takes no template for its toasts.** A placed `uiToastRegion` with the same toaster renders your own (`toast.host.spec.ts` skips the fixture's class check).
-- **No test or fixture loads Zone.js.** They all mount without it, and `zone.test.ts` checks that outputs emit through `NgZone.run`. A browser fixture with Zone.js needs `zone.js` as a dev dependency.
+- **No test or fixture loads Zone.js.** They all mount without it, and `zone.test.ts` checks, with a stand-in `NgZone`, that outputs emit inside it. A browser fixture with Zone.js needs `zone.js` as a dev dependency.
 - **Angular's forms package isn't wired up.** No part is a `ControlValueAccessor`, so `formControlName` and `ngModel` don't reach a Checkbox, Select or Slider, and nothing was run against Reactive Forms or Signal Forms. `[(value)]` and a native `<form>` work. A `@ui-sdk/angular/forms` entry is a new entry and a new peer, so it waits on discussion.
 - **Outputs named `select` and `submit` also hear the DOM events of those names.** `uiTriggerMenu` names its output `(itemSelect)` for that reason, as web components name the event `itemselect`. `(submit)` on `uiAutocomplete`, `uiTextarea` or `uiTokenInput` gets a form's from inside it. Menu and command items have a `select` output too. Renaming them is a public API change.
 - **The class `Input` shares its name with `@angular/core`'s `Input` decorator**, so a file that imports both aliases one.
@@ -49,6 +49,7 @@ Last reviewed: 2026-11-24, the whole adapter with its examples, docs and fixture
 - **An empty `*uiTriggerMenuHint` shows nothing.** The star form is for your own content. The plain form, left empty, shows the hints.
 - **`withEventReplay()` wasn't run**: a press on a trigger before hydration may be dropped.
 - **`animate.leave` on a star part wasn't probed.**
+- **`animate.leave` on a popup that was moved is cut short** when a block removes the popup: the element leaves the page as its view is destroyed. A popup's own exit, with `data-ending-style`, plays in full.
 - **No Angular fixture for** the agent reach, cached page, virtual list, wrapped content, kitchen sink and performance specs.
 - **The packed `.d.ts` files import `./x.ts`**, which TypeScript allows in a declaration file. `pnpm check:packages` builds `scripts/package-consumers/angular` against them with Angular's compiler and strict templates.
 - **Payload types**: a popup content's payload type is asserted by the user, not tied to the controller's type. In a star part's `let`, it's `unknown`.
