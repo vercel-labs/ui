@@ -2,6 +2,8 @@
 // An agent reaches the items a person can: not one in a hidden part of the
 // page, like a folded column, though one in its list's closed content is.
 import { afterEach, expect, test } from "vitest"
+import { accordion } from "../src/components/accordion/accordion"
+import { navigationMenu } from "../src/components/navigation-menu/navigation-menu"
 import { select } from "../src/components/select/select"
 import { createAgent } from "../src/page/agent/agent"
 import { bind } from "../src/foundation/kernel/part"
@@ -105,4 +107,44 @@ test.each([
   })
   expect(outcome.ok).toBe(false)
   expect(instance.get().value).toBeNull()
+})
+
+// Sections with their triggers, "Billing" disabled through its trigger alone.
+function mountSections(instance: {
+  part: (slot: "item" | "trigger", props: object) => never
+  destroy: () => void
+}) {
+  for (const [value, text, disabled] of [
+    ["team", "Team", false],
+    ["billing", "Billing", true],
+  ] as const) {
+    const item = document.body.appendChild(document.createElement("div"))
+    const trigger = item.appendChild(document.createElement("button"))
+    trigger.textContent = text
+    cleanups.push(
+      bind(instance.part("item", { value }), item),
+      bind(instance.part("trigger", { value, disabled }), trigger)
+    )
+  }
+  cleanups.push(() => instance.destroy())
+}
+
+test("a step doesn't open a navigation menu item whose trigger is disabled", async () => {
+  const instance = navigationMenu({ id: "nav" })
+  mountSections(instance as never)
+  const outcome = await createAgent().act({
+    steps: [{ ref: "navigation-menu", action: "setValue", args: ["billing"] }],
+  })
+  expect(outcome.ok).toBe(false)
+  expect(instance.get().value).toBeNull()
+})
+
+test("a step doesn't open an accordion section whose trigger is disabled", async () => {
+  const instance = accordion({ id: "settings" })
+  mountSections(instance as never)
+  const outcome = await createAgent().act({
+    steps: [{ ref: "accordion", action: "open", args: ["billing"] }],
+  })
+  expect(outcome.ok).toBe(false)
+  expect(instance.get().value).toEqual([])
 })

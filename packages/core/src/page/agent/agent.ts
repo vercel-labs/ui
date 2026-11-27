@@ -298,13 +298,16 @@ function numbered(entry: Entry, instance: PrimitiveInstance) {
 }
 
 // The values of the items a person can't choose, like a disabled option, from the list's data
-// and its elements. A hidden item counts too, since its value can still be set.
+// and its elements. A hidden item counts too, since its value can still be set, and so does
+// any part with an item's key, like a disabled trigger.
 function disabledItems(entry: Entry, instance: PrimitiveInstance) {
   const disabled = new Set<string>()
   dataOf(entry, instance, disabled)
-  for (const part of bound(instance)) {
+  const parts = bound(instance)
+  const items = new Set(parts.filter(isItem).map((part) => part.key))
+  for (const part of parts) {
     if (
-      isItem(part) &&
+      items.has(part.key) &&
       ((part.props as { disabled?: unknown } | undefined)?.disabled === true ||
         part.el.matches(":disabled") ||
         part.el.getAttribute("aria-disabled") === "true")
