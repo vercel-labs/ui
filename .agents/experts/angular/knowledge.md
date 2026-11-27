@@ -42,6 +42,7 @@ Last checked: 2026-11-24, against `node_modules/@angular/core` 21.2.26 (exports 
 
 - Angular 21 runs without Zone.js unless the app adds `provideZoneChangeDetection()`. It renders after a signal a template read changes, a template listener runs or `markForCheck()` is called, a frame later. A native listener added outside a template renders nothing unless it writes a signal.
 - `ApplicationRef.tick()` renders now.
+- A component without `changeDetection: ChangeDetectionStrategy.OnPush` is checked on every pass in an app with Zone.js. With it, a signal its template reads still renders it.
 
 ### Server rendering and hydration
 

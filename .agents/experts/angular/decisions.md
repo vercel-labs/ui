@@ -16,6 +16,10 @@ Last reviewed: 2026-11-24, the whole adapter with its examples, docs and fixture
 - **Core writes a part's attributes and binds its element**, outside change detection, as it does for web components. Host bindings would render a frame late and couldn't be in a star part's element.
 - **Server references point at the part a component expects.** Until the root or trigger binds, an open Collapsible points at its panel, a Progress or Meter at its label and a Timeline item at its title, so server HTML names them. A part left out dangles until binding drops it; accname falls back to `aria-label` meanwhile (#517, #524, #506).
 - **Form component dropped.**
+- **Every component is `OnPush`.** Their templates read signals only, so an app with Zone.js checks them when something they read changes, not on every event.
+- **Value roots take `Value extends string = string`**: Tabs, Accordion, RadioGroup, CheckboxGroup, ToggleGroup, SegmentedControl and MenuRadioGroup, inferred from `[value]`, so `(valueChange)` emits the app's own union. Children aren't checked against it.
+- **A star part that has `state` types its `let`** with `ngTemplateContextGuard`.
+- **Core's `href` gets Angular's URL check** in `use-primitive.ts`, since Angular never sees an attribute core writes.
 - **CSP nonce**: a page sets it with `<meta property="csp-nonce" nonce="…">`. A tag with no nonce switches injected styles to constructed sheets, and the page declares `@layer ui-sdk;` first.
 - **Popups flip to the opposite side only**, never to a perpendicular one.
 - **`tests/specs/position.spec.ts` runs once per engine**, on `react` in Chromium and `web` elsewhere: the placement math is core's and doesn't depend on the framework.
@@ -31,7 +35,7 @@ Last reviewed: 2026-11-24, the whole adapter with its examples, docs and fixture
 - **`*uiAccordionPanel` and `*uiCollapsiblePanel` take no star object**, so `keepMounted` can't be set in the star form. The plain attribute form takes it.
 - **An output can't be written on a star part.** It lands on the element inside the template. The long form, `<ng-template uiComboboxCreate (create)="…">`, takes it.
 - **`uiOverlayHost` takes no template for its toasts.** A placed `uiToastRegion` with the same toaster renders your own (`toast.host.spec.ts` skips the fixture's class check).
-- **No test or fixture runs with Zone.js.** They all mount without it.
+- **No test or fixture runs with Zone.js.** They all mount without it. The unit suite passed by hand under `provideZoneChangeDetection()`; a suite in the repo needs `zone.js` as a dev dependency.
 - **Angular's forms package isn't wired up.** No part is a `ControlValueAccessor`, so `formControlName` and `ngModel` don't reach a Checkbox, Select or Slider, and nothing was run against Reactive Forms or Signal Forms. `[(value)]` and a native `<form>` work. A `@ui-sdk/angular/forms` entry is a new entry and a new peer, so it waits on discussion.
 - **Outputs named `select` and `submit` also hear the DOM events of those names.** `(select)` on `uiTriggerMenu` gets a native `select` event when text is selected in its field, and `(submit)` on `uiAutocomplete`, `uiTextarea` or `uiTokenInput` gets a form's from inside it. Menu and command items have a `select` output too. Renaming them is a public API change.
 - **The class `Input` shares its name with `@angular/core`'s `Input` decorator**, so a file that imports both aliases one.
@@ -44,7 +48,7 @@ Last reviewed: 2026-11-24, the whole adapter with its examples, docs and fixture
 - **`withEventReplay()` wasn't run**: a press on a trigger before hydration may be dropped.
 - **`animate.leave` on a star part wasn't probed.**
 - **No Angular fixture for** the agent reach, cached page, virtual list, wrapped content, kitchen sink and performance specs.
-- **The packed `.d.ts` files import `./x.ts`.** `pnpm check:packages` compiles a strict consumer against them.
+- **The packed `.d.ts` files import `./x.ts`**, which TypeScript allows in a declaration file. `pnpm check:packages` builds `scripts/package-consumers/angular` against them with Angular's compiler and strict templates.
 - **Payload types**: a popup content's payload type is asserted by the user, not tied to the controller's type. In a star part's `let`, it's `unknown`.
 - **A popup stays shown when its anchor is clipped by a scroll container.** A marker like `data-anchor-hidden` is a public API and waits on discussion.
 - **An anchor moved by the Web Animations API** is followed by positioning's 500ms slow check, not on the next frame.
