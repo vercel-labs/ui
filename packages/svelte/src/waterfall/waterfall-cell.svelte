@@ -17,7 +17,12 @@ A cell of your own, like a status or a size.
   let props: PartProps<"div", WaterfallRowState> & WaterfallRowPartProps =
     $props()
 
-  const part = usePart(waterfall, "cell", useRow().partProps)
+  const id = $props.id()
+  const row = useRow()
+  const part = usePart(waterfall, "cell", () => ({
+    ...row.partProps(),
+    id: props.id ?? id,
+  }))
 </script>
 
 <Part tag="div" {part} {props} />
