@@ -362,4 +362,13 @@ test("Alt+ArrowUp keeps adding small steps in a percent or yen field, and shows 
   press(yen, 2)
   expect(yen.get().value).toBe(100.2)
   expect(attrs(yen.part("control")).value).toBe("¥100.2")
+  const quarter = numberInput({
+    id: "n",
+    defaultValue: 0.0025,
+    step: 0.0025,
+    smallStep: 0.001,
+    locale: "en-US",
+    format: { style: "percent" },
+  })
+  expect(attrs(quarter.part("control")).value).toBe("0.25%")
 })

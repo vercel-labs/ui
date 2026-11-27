@@ -115,7 +115,12 @@ const rangeOf = (state: { min: number; max: number; step: number }) => ({
 // the plural of a unit or currency name, like "1,5 японской иены". It shows a
 // small step's decimals, so Alt+Arrow in a percent field shows "12.1%".
 const readFormat = (state: Pick<State, "format" | "step" | "smallStep">) =>
-  displayOptions(state.format, Math.min(state.step, state.smallStep))
+  displayOptions(
+    state.format,
+    decimalsOf(state.smallStep) > decimalsOf(state.step)
+      ? state.smallStep
+      : state.step
+  )
 
 const display = (
   value: number | null,
