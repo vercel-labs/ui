@@ -33,7 +33,7 @@ import { mount } from "./mount"
         [triggers]="triggers"
         [controller]="controller"
         [(open)]="open"
-        (select)="chosen.set($event)"
+        (itemSelect)="chosen.set($event)"
       >
         <textarea uiTriggerMenuInput></textarea>
         <div *uiTriggerMenuContent id="content">

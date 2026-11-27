@@ -105,7 +105,7 @@ import {
           { char: '@', type: 'file', items: files },
           { char: '/', boundary: 'start', type: 'skill', items: skills },
         ]"
-        (select)="$event.trigger === '@' && $event.waitUntil(loadFile())"
+        (itemSelect)="$event.trigger === '@' && $event.waitUntil(loadFile())"
       >
         <span uiTriggerMenuHint></span>
         <div *uiTriggerMenuContent>

@@ -41,7 +41,7 @@ let composers = 0
       [triggers]="triggers"
       [autoHighlight]="options.autoHighlight"
       (beforeOpenChange)="onOpenChange($event)"
-      (select)="onSelect($event)"
+      (itemSelect)="onSelect($event)"
     >
       <label class="label" [attr.for]="id">{{ name() }}</label>
       @if (options.input) {

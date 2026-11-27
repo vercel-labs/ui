@@ -70,7 +70,7 @@ type TriggerMenuQueryChange = Parameters<
 }
 
 /**
- * What `(select)` emits: the chosen item's value and what came with it. `preventDefault()` skips the default insertion, and `waitUntil(promise)` inserts the token as pending until the Promise settles.
+ * What `(itemSelect)` and an item's `(select)` emit: the chosen item's value and what came with it. `preventDefault()` skips the default insertion, and `waitUntil(promise)` inserts the token as pending until the Promise settles.
  * @experimental
  */
 type TriggerMenuSelect<T = any> = TriggerMenuSelectDetails<T> & {
@@ -89,7 +89,7 @@ class TriggerMenuScope extends PopupRoot<typeof triggerMenu> {}
   selector: "[uiTriggerMenu]",
   exportAs: "uiTriggerMenu",
   providers: [TriggerMenuScope],
-  outputs: ["select"],
+  outputs: ["itemSelect"],
 })
 class TriggerMenu {
   /** Logs every state change with its reason. */
@@ -113,9 +113,9 @@ class TriggerMenu {
   readonly queryChange = output<TriggerMenuQueryChange["value"]>()
   /** Runs when the text after the trigger changes. `$event.argument` names the argument being typed. */
   readonly beforeQueryChange = output<TriggerMenuQueryChange>()
-  /** Runs when an item, with every required argument, is chosen. The default insertion follows unless `$event.preventDefault()`. Pass a Promise to `$event.waitUntil()` and a pending token is inserted at once. */
-  readonly select = new ListenedEmitter<TriggerMenuSelect>()
-  /** What screen readers hear once a `(select)` Promise has been pending for a second. An empty string says nothing. */
+  /** Runs when an item, with every required argument, is chosen. Named apart from `select`, which the field fires for selected text. The default insertion follows unless `$event.preventDefault()`. Pass a Promise to `$event.waitUntil()` and a pending token is inserted at once. */
+  readonly itemSelect = new ListenedEmitter<TriggerMenuSelect>()
+  /** What screen readers hear once an `(itemSelect)` Promise has been pending for a second. An empty string says nothing. */
   readonly pendingAnnouncement: InputSignal<
     TriggerMenuOptions["pendingAnnouncement"]
   > = input()
@@ -139,7 +139,7 @@ class TriggerMenu {
 
   readonly #editor = inject(EditorContext, { optional: true })
   readonly #select = (value: any, details: TriggerMenuSelectDetails<any>) =>
-    this.select.emit(Object.assign(details, { value }))
+    this.itemSelect.emit(Object.assign(details, { value }))
   readonly handle = usePrimitive(triggerMenu, () => ({
     debug: this.debug(),
     triggers: this.triggers(),
@@ -148,7 +148,7 @@ class TriggerMenu {
     onOpenChange: emitChange(this.beforeOpenChange, this.openChange),
     onOpenChangeComplete: (value) => this.openChangeComplete.emit(value),
     onQueryChange: emitChange(this.beforeQueryChange, this.queryChange),
-    onSelect: this.select.listened() ? this.#select : undefined,
+    onSelect: this.itemSelect.listened() ? this.#select : undefined,
     pendingAnnouncement: this.pendingAnnouncement(),
     status: this.status(),
     autoHighlight: this.autoHighlight(),
@@ -257,7 +257,7 @@ class TriggerMenuContent {
   outputs: ["select"],
 })
 class TriggerMenuItem {
-  /** What `(select)` emits when the item is chosen. */
+  /** What `(itemSelect)` emits when the item is chosen. */
   readonly value = input.required<TriggerMenuItemProps<any>["value"]>()
   /** The text inserted and matched, when the content isn't plain text. */
   readonly label: InputSignal<TriggerMenuItemProps["label"]> = input()
@@ -265,7 +265,7 @@ class TriggerMenuItem {
   readonly keywords: InputSignal<TriggerMenuItemProps["keywords"]> = input()
   /** Keeps the item from being chosen. It can still be highlighted, as the listbox pattern asks. */
   readonly disabled = input(undefined, { transform: optionalBoolean })
-  /** Runs before the menu's `(select)`. `$event.preventDefault()` skips the default insertion. */
+  /** Runs before the menu's `(itemSelect)`. `$event.preventDefault()` skips the default insertion. */
   readonly select = new ListenedEmitter<TriggerMenuSelect>()
 
   readonly #menu = inject(TriggerMenuScope).handle

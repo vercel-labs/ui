@@ -28,7 +28,7 @@ import {
         [triggers]="[
           { char: '/', boundary: 'start', type: 'command', items: commands },
         ]"
-        (select)="onSelect($event)"
+        (itemSelect)="onSelect($event)"
       >
         <div uiField name="message">
           <label uiFieldLabel>Message</label>

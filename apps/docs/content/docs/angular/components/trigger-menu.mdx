@@ -402,16 +402,17 @@ Create one with `createTriggerMenuController()` and pass it as `controller`.
 
 A `before` output emits `{ value, reason, event, cancel() }` before the change, and its plain output follows with the value alone. A bound `open` only updates when `(beforeOpenChange)` wasn't canceled.
 
-| Binding                | On                                   | Receives                                                                                    |
-| ---------------------- | ------------------------------------ | ------------------------------------------------------------------------------------------- |
-| `[(open)]`             | `uiTriggerMenu`                      | Whether the menu is open                                                                    |
-| `(beforeOpenChange)`   | `uiTriggerMenu`                      | `{ value, reason, cancel() }`: the new state, the [reason](#reasons) and the `trigger`      |
-| `(openChangeComplete)` | `uiTriggerMenu`                      | `$event`, whether it's open, after the animation                                            |
-| `(beforeQueryChange)`  | `uiTriggerMenu`                      | `{ value, reason, cancel() }`: the text after the trigger, and the `argument` being typed   |
-| `(dismissAttempt)`     | `uiTriggerMenu`                      | `{ reason, event }`, when a dismissal was refused                                           |
-| `(select)`             | `uiTriggerMenu`, `uiTriggerMenuItem` | `{ value, reason, cancel() }`: the item, its `arguments`, `insert()` and `preventDefault()` |
+| Binding                | On                  | Receives                                                                                    |
+| ---------------------- | ------------------- | ------------------------------------------------------------------------------------------- |
+| `[(open)]`             | `uiTriggerMenu`     | Whether the menu is open                                                                    |
+| `(beforeOpenChange)`   | `uiTriggerMenu`     | `{ value, reason, cancel() }`: the new state, the [reason](#reasons) and the `trigger`      |
+| `(openChangeComplete)` | `uiTriggerMenu`     | `$event`, whether it's open, after the animation                                            |
+| `(beforeQueryChange)`  | `uiTriggerMenu`     | `{ value, reason, cancel() }`: the text after the trigger, and the `argument` being typed   |
+| `(dismissAttempt)`     | `uiTriggerMenu`     | `{ reason, event }`, when a dismissal was refused                                           |
+| `(itemSelect)`         | `uiTriggerMenu`     | `{ value, reason, cancel() }`: the item, its `arguments`, `insert()` and `preventDefault()` |
+| `(select)`             | `uiTriggerMenuItem` | The same, for one item, before the menu's `(itemSelect)`                                    |
 
-When `(select)` passes a Promise to `$event.waitUntil()` and the editor takes tokens, the token is inserted at once with `data-pending`, updated with what the Promise resolves to, and removed if it rejects. The menu closes either way, so people keep typing.
+Choosing an item emits `(itemSelect)` on the menu, not `(select)`, which the field fires for selected text. When `(itemSelect)` passes a Promise to `$event.waitUntil()` and the editor takes tokens, the token is inserted at once with `data-pending`, updated with what the Promise resolves to, and removed if it rejects. The menu closes either way, so people keep typing.
 
 ## Accessibility
 

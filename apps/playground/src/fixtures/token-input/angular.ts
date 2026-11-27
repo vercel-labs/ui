@@ -79,7 +79,7 @@ import { mountAngular, state } from "../../angular-mount"
           <ng-container
             uiTriggerMenu
             [triggers]="triggers"
-            (select)="onSelect($event)"
+            (itemSelect)="onSelect($event)"
           >
             <span *uiTriggerMenuHint class="hint"></span>
             <div *uiTriggerMenuContent class="popup list-popup">
