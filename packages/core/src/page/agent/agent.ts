@@ -10,6 +10,7 @@ import { withSource } from "../../foundation/kernel/details"
 import { documentOrder, inDocumentOrder } from "../../foundation/kernel/order"
 import { partState } from "../../foundation/kernel/part"
 import type { PrimitiveInstance } from "../../foundation/kernel/primitive-types"
+import { withoutFocus } from "../../foundation/popups/popup"
 import { foldText } from "../../foundation/text/match"
 import {
   confirmOf,
@@ -2713,27 +2714,29 @@ function createAgent(
         return data ?? seen
       }
       await beforeOpen()
-      asAgent(() => api.setOpen!(true))
-      let shown = renderedItems(bound(instance))
-      const open = () => (instance.get() as { open?: boolean }).open
-      // Items that load can take a while. Ones the data already lists mount
-      // with the list, and a list that didn't open shows none.
-      for (
-        let tries = 0;
-        tries < (data ? 4 : 60) &&
-        (!shown.length || unseen()) &&
-        (tries < 4 || open());
-        tries++
-      ) {
-        await frames()
-        shown = renderedItems(bound(instance))
-      }
-      if (shown.length) {
-        whileOpen?.(disabledItems(entry, instance), bound(instance))
-      }
-      items = data ?? shown
-      looked.set(instance, shown)
-      asAgent(() => api.setOpen!(false))
+      await withoutFocus(async () => {
+        asAgent(() => api.setOpen!(true))
+        let shown = renderedItems(bound(instance))
+        const open = () => (instance.get() as { open?: boolean }).open
+        // Items that load can take a while. Ones the data already lists mount
+        // with the list, and a list that didn't open shows none.
+        for (
+          let tries = 0;
+          tries < (data ? 4 : 60) &&
+          (!shown.length || unseen()) &&
+          (tries < 4 || open());
+          tries++
+        ) {
+          await frames()
+          shown = renderedItems(bound(instance))
+        }
+        if (shown.length) {
+          whileOpen?.(disabledItems(entry, instance), bound(instance))
+        }
+        items = data ?? shown
+        looked.set(instance, shown)
+        asAgent(() => api.setOpen!(false))
+      })
       await frames()
     }
     return items

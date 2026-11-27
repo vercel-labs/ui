@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 // An agent's setValue opens only a list whose items show while it's open: not
 // a component without an open state, and it doesn't wait on one kept closed.
-import { afterEach, expect, test } from "vitest"
+import { afterEach, expect, test, vi } from "vitest"
 import { select } from "../src/components/select/select"
 import { createAgent } from "../src/page/agent/agent"
 import { createChange } from "../src/foundation/kernel/input-source"
@@ -95,4 +95,81 @@ test("a multiple select whose items show only while open takes them by label", a
   })
   expect(outcome.error).toBeUndefined()
   expect(instance.get().value).toEqual(["Bug", "Docs"])
+})
+
+function mountSelect(modal = false) {
+  Element.prototype.getAnimations ??= () => []
+  const content = document.createElement("div")
+  const unbinds: (() => void)[] = []
+  const regions = ["Europe", "North America", "Asia"]
+  const instance: ReturnType<typeof select> = select({
+    id: "region",
+    items: regions,
+    defaultValue: "Europe",
+    modal,
+    onOpenChange: (open) => {
+      unbinds.splice(0).forEach((unbind) => unbind())
+      content.replaceChildren()
+      content.remove()
+      if (!open) {
+        return
+      }
+      // A framework renders the open list after the change.
+      queueMicrotask(() => {
+        document.body.appendChild(content)
+        unbinds.push(bind(instance.part("content"), content))
+        for (const value of regions) {
+          const item = content.appendChild(document.createElement("div"))
+          item.textContent = value
+          item.tabIndex = -1
+          unbinds.push(bind(instance.part("item", { value }), item))
+        }
+      })
+    },
+  })
+  const trigger = document.body.appendChild(document.createElement("button"))
+  trigger.setAttribute("aria-label", "Region")
+  cleanups.push(bind(instance.part("trigger"), trigger), () => {
+    unbinds.forEach((unbind) => unbind())
+    instance.destroy()
+  })
+  return instance
+}
+
+for (const modal of [false, true]) {
+  test(`looking at a closed list's items moves no focus${modal ? ", modal" : ""}`, async () => {
+    const instance = mountSelect(modal)
+    const field = document.body.appendChild(document.createElement("input"))
+    field.focus()
+    const focus = vi.spyOn(HTMLElement.prototype, "focus")
+    const inert: Element[] = []
+    const watcher = new MutationObserver((records) =>
+      inert.push(...records.map((record) => record.target as Element))
+    )
+    watcher.observe(document.body, {
+      attributeFilter: ["inert"],
+      subtree: true,
+    })
+    const outcome = await createAgent().act({
+      steps: [{ ref: "Region", action: "setValue", args: ["North America"] }],
+    })
+    watcher.disconnect()
+    const focused = focus.mock.contexts
+    focus.mockRestore()
+    expect(outcome.error).toBeUndefined()
+    expect(instance.get().value).toBe("North America")
+    expect(focused).toEqual([])
+    expect(inert).toEqual([])
+    expect(document.activeElement).toBe(field)
+  })
+}
+
+test("looking at a closed list's items leaves focus on the page", async () => {
+  const instance = mountSelect()
+  const outcome = await createAgent().act({
+    steps: [{ ref: "Region", action: "setValue", args: ["North America"] }],
+  })
+  expect(outcome.error).toBeUndefined()
+  expect(instance.get().value).toBe("North America")
+  expect(document.activeElement).toBe(document.body)
 })

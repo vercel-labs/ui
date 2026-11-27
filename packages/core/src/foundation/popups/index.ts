@@ -24,6 +24,7 @@ export {
   popupTriggerAttrs,
   prepareReset,
   resetPopoverStyles,
+  withoutFocus,
 } from "./popup"
 export { createOpenSteps, createSteppedPopup, unopened } from "./popup-steps"
 export {
