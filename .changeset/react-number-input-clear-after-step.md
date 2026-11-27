@@ -1,4 +1,5 @@
 ---
+"@ui-sdk/core": patch
 "@ui-sdk/react": patch
 ---
 
