@@ -267,6 +267,34 @@ function fitCrop(crop: Crop, natural: Size, limits: Limits) {
 }
 
 /**
+ * A crop set from code, as a key or a drag would leave it: at the ratio,
+ * between the smallest and the whole image, and inside the image.
+ */
+function limitCrop(crop: Crop, natural: Size, limits: Limits) {
+  const shown = shownSize(natural, crop.rotation)
+  const { aspect } = limits
+  const min = smallest(shown, limits)
+  const max = largest(shown, aspect)
+  const width = Math.min(
+    max.width,
+    Math.max(
+      min.width,
+      aspect ? Math.min(crop.width, crop.height * aspect) : crop.width
+    )
+  )
+  const height = aspect
+    ? width / aspect
+    : Math.min(max.height, Math.max(min.height, crop.height))
+  return round({
+    ...crop,
+    x: clamp(crop.x, 0, shown.width - width),
+    y: clamp(crop.y, 0, shown.height - height),
+    width,
+    height,
+  })
+}
+
+/**
  * Where the image and the selection sit in the viewport's content box, in CSS
  * pixels, and how many of them one image pixel takes. A box shows the whole
  * image and the crop on it; a frame shows the crop as large as it fits, with
@@ -325,6 +353,7 @@ export {
   initialCrop,
   type Layout,
   layoutOf,
+  limitCrop,
   type Limits,
   type Rect,
   resizeCrop,

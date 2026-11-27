@@ -27,9 +27,9 @@ import {
   flipCrop,
   initialCrop,
   layoutOf,
+  limitCrop,
   resizeCrop,
   rotateCrop,
-  round,
   sameCrop,
   zoomCrop,
   zoomOf,
@@ -235,7 +235,11 @@ function imageCropperApiBody(
       crop: ImageCrop,
       { reason = "imperative", event }: ImageCropperChangeOptions = {}
     ) {
-      return step(() => round(complete(crop)), { reason, event })
+      return step(
+        (_, natural) =>
+          limitCrop(complete(crop), natural, limitsOf(store.get())),
+        { reason, event }
+      )
     },
     /** Turns the image a quarter clockwise, or counterclockwise with `-1`. */
     rotate(

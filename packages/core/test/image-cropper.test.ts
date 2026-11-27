@@ -22,6 +22,38 @@ const key = (key: string, shiftKey = false) =>
 const plain = { rotation: 0, flipX: false, flipY: false } as const
 
 describe("image cropper", () => {
+  test("setCrop keeps the crop inside the image, at the ratio and above the minimum", () => {
+    const onCropCommit = vi.fn()
+    const cropper = make({
+      aspectRatio: 1,
+      minWidth: 100,
+      minHeight: 100,
+      onCropCommit,
+    })
+    load(cropper, 800, 600)
+    cropper.api.setCrop({ x: 700, y: -50, width: 400, height: 20 })
+    expect(cropper.api.getCrop()).toEqual({
+      x: 700,
+      y: 0,
+      width: 100,
+      height: 100,
+      ...plain,
+    })
+    expect(onCropCommit).toHaveBeenLastCalledWith(
+      cropper.api.getCrop(),
+      expect.anything()
+    )
+    cropper.api.setCrop({ x: 0, y: 0, width: 400, height: 200 })
+    expect(cropper.api.getCrop()).toMatchObject({ width: 200, height: 200 })
+    cropper.api.setCrop({ x: 100, y: 100, width: 200, height: 200 })
+    expect(cropper.api.getCrop()).toMatchObject({
+      x: 100,
+      y: 100,
+      width: 200,
+      height: 200,
+    })
+  })
+
   test("shows no crop until the image loads, then crops four fifths of the largest box at the ratio", () => {
     const onCropChange = vi.fn()
     const onCropCommit = vi.fn()
