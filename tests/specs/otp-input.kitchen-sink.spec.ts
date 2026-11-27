@@ -134,3 +134,22 @@ test("a controlled OTP input keeps the caret where a character was deleted or ty
   await expect(input).toHaveValue("4879")
   await expect.poll(caret).toEqual([3, 4])
 })
+
+test("a partial code the owner rewrites, like into capitals, is still invalid", async ({
+  page,
+  framework,
+}) => {
+  test.skip(
+    !["react", "vue", "web"].includes(framework),
+    "Composition frameworks only."
+  )
+  await page.goto(`/?fixture=otp-input-kitchen-sink&framework=${framework}`)
+  await page.locator("body[data-mounted]").waitFor({ state: "attached" })
+  const input = page.locator('[data-variant="controlled-uppercase"] input')
+  await input.focus()
+  await page.keyboard.type("a7c")
+  await expect(input).toHaveValue("A7C")
+  await expect
+    .poll(() => input.evaluate((el: HTMLInputElement) => el.validity.valid))
+    .toBe(false)
+})
