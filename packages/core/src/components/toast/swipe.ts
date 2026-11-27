@@ -135,6 +135,8 @@ function trackSwipe(
       if (picked === null) {
         return false
       }
+      velocityX.add(move.timeStamp, move.clientX)
+      velocityY.add(move.timeStamp, move.clientY)
       axis = picked
       callbacks.onStart(axis)
       return true

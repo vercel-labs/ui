@@ -120,3 +120,13 @@ test("a quick short swipe held still before release snaps back, and one released
   expect(swipe(1048)).toBe(null)
   expect(swipe(56)).toBe("down")
 })
+
+test("a flick after a short rest dismisses, counting the move that starts the swipe", () => {
+  const { el } = mountToast()
+  el.dispatchEvent(at(touch("pointerdown", 0), 0))
+  document.dispatchEvent(at(touch("pointermove", 4), 60))
+  document.dispatchEvent(at(touch("pointermove", 16), 76))
+  document.dispatchEvent(at(touch("pointermove", 32), 92))
+  document.dispatchEvent(at(touch("pointerup", 32), 96))
+  expect(el.getAttribute("data-swipe-direction")).toBe("down")
+})
