@@ -511,7 +511,8 @@ function treeApiBody(
   }
 
   // Bound items by their parent's value, or "" at the top, for their places among their siblings.
-  const byParent = new Map<string, Set<string>>()
+  // A count per key: a row written again binds its new element before the old one lets go.
+  const byParent = new Map<string, Map<string, number>>()
   const boundParent = new WeakMap<Element, string>()
   const orders = new Map<
     string,
@@ -538,7 +539,7 @@ function treeApiBody(
     if (known && known.revision === revision) {
       return known
     }
-    const entries = [...(byParent.get(parent) ?? [])].flatMap((key) => {
+    const entries = [...(byParent.get(parent)?.keys() ?? [])].flatMap((key) => {
       const el = itemElement(key)
       return el?.isConnected ? [{ key, el }] : []
     })
@@ -1164,9 +1165,9 @@ function treeApiBody(
         const parent = part.props.parent ?? ""
         let siblings = byParent.get(parent)
         if (!siblings) {
-          byParent.set(parent, (siblings = new Set()))
+          byParent.set(parent, (siblings = new Map()))
         }
-        siblings.add(part.key)
+        siblings.set(part.key, (siblings.get(part.key) ?? 0) + 1)
         boundParent.set(el, parent)
         bumpSiblings(parent)
         bump()
@@ -1175,7 +1176,12 @@ function treeApiBody(
         }
         return () => {
           cleanups.forEach((cleanup) => cleanup())
-          siblings.delete(part.key)
+          const count = siblings.get(part.key)! - 1
+          if (count) {
+            siblings.set(part.key, count)
+          } else {
+            siblings.delete(part.key)
+          }
           boundParent.delete(el)
           bumpSiblings(parent)
           bump()
