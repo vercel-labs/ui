@@ -62,9 +62,13 @@ function keepControlled(
   return (next: string, details: ChangeDetails<InputValueChangeReason>) => {
     onValueChange?.(next, details)
     const event = details.event as InputEvent | undefined
-    const el = event?.target as HTMLInputElement | null | undefined
+    const el = event?.target
     // Mid-composition the IME owns the text, and its last change comes after.
-    if (details.canceled || !el || event?.isComposing) {
+    if (
+      details.canceled ||
+      !(el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) ||
+      event?.isComposing
+    ) {
       return
     }
     queueMicrotask(() => {
