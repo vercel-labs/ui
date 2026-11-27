@@ -233,6 +233,9 @@ function bindFoundControl(
     if (gave?.name && gave.el.getAttribute("name") === gave.name) {
       gave.el.removeAttribute("name")
     }
+    if (control.id === fieldControlId(api.id)) {
+      control.removeAttribute("id")
+    }
     written = new Map()
     added = new Set()
     replaced = undefined

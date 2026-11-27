@@ -37,3 +37,24 @@ test("a field nested in another and added later keeps its own control", async ()
     "search"
   )
 })
+
+test("a nested field added later doesn't keep the id the outer field gave its control", async () => {
+  document.body.innerHTML = `
+    <ui-field id="outer">
+      <ui-field-label as-child><label id="outer-label">Outer</label></ui-field-label>
+      <div id="slot"></div>
+    </ui-field>`
+  await wait()
+  document.getElementById("slot")!.innerHTML = `
+    <ui-field>
+      <ui-field-label>Inner</ui-field-label>
+      <input class="inner" />
+    </ui-field>
+    <input class="outer" />`
+  await wait()
+  const label = document.getElementById("outer-label") as HTMLLabelElement
+  const inner = document.querySelector<HTMLInputElement>("input.inner")!
+  const outer = document.querySelector<HTMLInputElement>("input.outer")!
+  expect(inner.id).not.toBe(outer.id)
+  expect(label.control).toBe(outer)
+})
