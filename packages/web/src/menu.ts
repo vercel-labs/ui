@@ -150,8 +150,9 @@ function defineMenuElements() {
     // A `value` of null, as a property, controls the group with nothing
     // selected. No attribute can say that.
     properties: ["value"],
-    // Its `name` attribute keys it, or a generated one.
-    kinds: { name: null },
+    // Its `name` attribute keys it, or a generated one that lasts as long as
+    // the element, which stays in the page while the menu is closed.
+    kinds: { name: null, unnamed: null },
     context: (el) => ({ id: groupName(el), name: groupName(el) }),
   })
   definePart(menu, "radio-item", {
