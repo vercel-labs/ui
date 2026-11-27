@@ -5,6 +5,7 @@ import { idPart } from "../src/foundation/kernel/attrs"
 import { renderVersion } from "../src/foundation/kernel/primitive"
 import { tabs } from "../src/components/tabs/tabs"
 import { attrs, partState, present } from "../src/foundation/kernel/part"
+import { withSource } from "../src/foundation/kernel/details"
 import { kept } from "./kept"
 
 describe("keys", () => {
@@ -109,6 +110,17 @@ describe("selection", () => {
     expect(
       present(instance.part("panel", { value: "b", keepMounted: true }))
     ).toBe(true)
+  })
+
+  test("a panel an agent's change leaves stays present until a person leaves its tab", () => {
+    const instance = tabs({ id: "t", defaultValue: "a" })
+    const panel = (value: string) => present(instance.part("panel", { value }))
+    withSource("agent", () => instance.api.select("b"))
+    expect([panel("a"), panel("b")]).toEqual([true, true])
+    expect(attrs(instance.part("panel", { value: "a" })).hidden).toBe("")
+    withSource("agent", () => instance.api.select("a"))
+    instance.api.select("c", { reason: "item-press" })
+    expect([panel("a"), panel("b"), panel("c")]).toEqual([false, true, true])
   })
 
   test("selecting reports the value and a reason", () => {

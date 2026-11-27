@@ -187,7 +187,7 @@ Give it `followHover` and it follows the tab under the pointer instead, then goe
 
 ## Keep Mounted
 
-Panels normally unmount when another tab is selected. Add `keepMounted` to a panel to keep its content hidden in the page, preserving local state such as a draft.
+Panels normally unmount when another tab is selected. Add `keepMounted` to a panel to keep its content hidden in the page, preserving local state such as a draft. When an agent selects another tab, the panel it leaves stays mounted and hidden as well, so a draft a person typed there isn't lost. It unmounts once a person selects that tab and leaves it.
 
 <ComponentExample
   name="tabs/keep-mounted"

@@ -31,9 +31,10 @@ import { bindTabStop } from "../../foundation/focus/tabbable"
 import { idPart } from "../../foundation/kernel/attrs"
 import { createController } from "../../foundation/kernel/controller"
 import { deriveFromOptions } from "../../foundation/kernel/derive"
-import type {
-  ChangeDetails,
-  ChangeOptions,
+import {
+  type ChangeDetails,
+  type ChangeOptions,
+  resolveSource,
 } from "../../foundation/kernel/details"
 import { definePrimitive } from "../../foundation/kernel/primitive"
 import type {
@@ -254,6 +255,9 @@ type TabsStore = {
   direction: TabsDirection
   // Panels animating out. They stay present until their animation ends.
   exiting: string[]
+  // Panels an agent's change left. They stay present, so what a person typed
+  // there stays, until a person leaves that tab themselves.
+  kept: string[]
   // The tab that takes focus from Tab: the selected one, or the first enabled
   // one when the selected one is missing or disabled. Null until tabs bind.
   stop: string | null
@@ -535,7 +539,17 @@ function tabsApiBody(
     ) {
       return false
     }
-    return change("value", value, { reason, event })
+    const { value: from, kept } = store.get()
+    const agent = resolveSource(reason) === "agent"
+    if (!change("value", value, { reason, event })) {
+      return false
+    }
+    if (from !== null && agent !== kept.includes(from)) {
+      store.set({
+        kept: agent ? [...kept, from] : kept.filter((key) => key !== from),
+      })
+    }
+    return true
   }
 
   const api = {
@@ -678,6 +692,7 @@ const tabsPrimitive = /* @__PURE__ */ definePrimitive({
     hiddenUntilFound: options.hiddenUntilFound ?? false,
     direction: "none",
     exiting: [],
+    kept: [],
     stop: null,
     panels: [],
     elements: {},
@@ -737,6 +752,7 @@ const tabsPrimitive = /* @__PURE__ */ definePrimitive({
         value: ({ key }) => [key, null],
         stop: ({ key }) => [key, null],
         exiting: [],
+        kept: [],
         panels: ({ key }) => [key],
         elements: ({ key }) => [key],
       }),
@@ -859,6 +875,7 @@ const tabsPrimitive = /* @__PURE__ */ definePrimitive({
         value: ({ key }) => [key, null],
         stop: [],
         exiting: ({ key }) => [key],
+        kept: ({ key }) => [key],
         panels: [],
         elements: [],
       }),
@@ -866,7 +883,8 @@ const tabsPrimitive = /* @__PURE__ */ definePrimitive({
         !!props.keepMounted ||
         findable(state, props) ||
         api.internal.shows(state, key) ||
-        state.exiting.includes(key),
+        state.exiting.includes(key) ||
+        state.kept.includes(key),
       state: (state, { key, api }) => ({
         selected: api.internal.shows(state, key),
       }),
