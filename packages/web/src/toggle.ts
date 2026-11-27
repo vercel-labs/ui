@@ -41,7 +41,8 @@ function defineToggleElements() {
       state: {
         pressed: {
           get: (api: ToggleApi) => api.isPressed(),
-          set: (api: ToggleApi, pressed: boolean) => api.setPressed(!!pressed),
+          set: (api: ToggleApi, pressed: boolean) =>
+            api.internal.write(!!pressed),
         },
       },
       api: ["isPressed", "setPressed", "toggle", "focus"],
