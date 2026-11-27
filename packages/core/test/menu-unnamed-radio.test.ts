@@ -32,12 +32,13 @@ test("an unnamed group shown only some of the time doesn't take the next group's
       unnamed: true,
       defaultValue: values[0],
     })
-    for (const value of values) {
+    const items = values.map((value) => {
       const item = instance.part("radio-item", { group: name, value })
       bind(item, document.body.appendChild(document.createElement("div")))
-    }
+      return item
+    })
     bind(part, document.body.appendChild(document.createElement("div")))
-    return part
+    return { part, items }
   }
   instance.api.open()
   group("sort", ["name", "date"])
@@ -46,5 +47,25 @@ test("an unnamed group shown only some of the time doesn't take the next group's
   instance.api.open()
   const density = group("density", ["compact", "comfortable"])
   await Promise.resolve()
-  expect(partState(density).value).toBe("compact")
+  expect(partState(density.part).value).toBe("compact")
+  expect(density.items.map((item) => partState(item).checked)).toEqual([
+    true,
+    false,
+  ])
+})
+
+test("an unnamed group whose value is controlled keeps its place", () => {
+  const instance = menu({ id: "layout" })
+  const group = (name: string, props: object) =>
+    instance.part("radio-group", { id: name, name, unnamed: true, ...props })
+  const valueOf = (name: string, props: object) =>
+    partState(group(name, props)).value
+  instance.api.open()
+  valueOf("sort", { defaultValue: "name" })
+  valueOf("density", { defaultValue: "compact" })
+  instance.api.setRadio("sort", "date")
+  instance.api.close()
+  instance.api.open()
+  expect(valueOf("sort-again", { value: "date" })).toBe("date")
+  expect(valueOf("density-again", { defaultValue: "compact" })).toBe("compact")
 })

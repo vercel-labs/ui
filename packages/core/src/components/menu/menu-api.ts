@@ -735,11 +735,11 @@ function menuApiBody(
   function radioValue(group: string) {
     const groupProps = props("radio-group", group) as
       RadioGroupProps | undefined
+    const place = placeKey(group, groupProps)
     if (groupProps?.value !== undefined) {
       return groupProps.value
     }
     const { values } = store.get()
-    const place = placeKey(group, groupProps)
     const own = (values[`radio:${group}`] ?? (place && values[place])) as
       string | undefined
     return own ?? groupProps?.defaultValue ?? null
