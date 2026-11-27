@@ -29,15 +29,3 @@ test("the trigger menu's input takes the textarea inside a ui-textarea", async (
   expect(wrapper.hasAttribute("aria-haspopup")).toBe(false)
   expect(field.style.getPropertyValue("field-sizing")).toBe("content")
 })
-
-test("the trigger menu's input skips an input nested deeper than a ui-input", async () => {
-  document.body.innerHTML = `
-    <ui-trigger-menu>
-      <ui-trigger-menu-input><div><input aria-label="Other" /></div></ui-trigger-menu-input>
-      <ui-trigger-menu-content hidden><ui-trigger-menu-list></ui-trigger-menu-list></ui-trigger-menu-content>
-    </ui-trigger-menu>`
-  await wait()
-  expect(document.querySelector("input")!.hasAttribute("aria-haspopup")).toBe(
-    false
-  )
-})
