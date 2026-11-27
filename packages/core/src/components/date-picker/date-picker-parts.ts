@@ -16,6 +16,7 @@ import {
   setComponentValidity,
   takeTypedText,
 } from "../../foundation/forms/form"
+import { afterReset } from "../../foundation/forms/value"
 import { pageLocale } from "../../foundation/text/locale"
 import {
   openerOf,
@@ -211,9 +212,23 @@ const datePickerSlots = (slot: SlotFactory<State, DatePickerApi>) => ({
           }
         }
       )
+      // A form reset puts back the default text, which React leaves at its
+      // first render. Writing it even when it matches keeps React's own record
+      // of the text in step. It waits a task more, for the state's own reset.
+      const onReset = (event: Event) => {
+        if (event.target === input.form) {
+          afterReset(event, () =>
+            setTimeout(() => {
+              input.value = textOf(store.get(), indexOf(props))
+            })
+          )
+        }
+      }
+      input.ownerDocument.addEventListener("reset", onReset, true)
       write()
       const unsubscribe = store.subscribe(write)
       return () => {
+        input.ownerDocument.removeEventListener("reset", onReset, true)
         unsubscribe()
         // React's hidden <Activity> keeps the input and its text in the page,
         // so the text still blocks its form.
