@@ -209,7 +209,12 @@ function checkboxApiBody(
           return () => {}
         }
         const follow = () => {
-          const { name, disabled, readOnly, form } = fromGroup(options())!
+          // A checkbox taken out of its group still hears it until it unbinds.
+          const joined = fromGroup(options())
+          if (!joined) {
+            return
+          }
+          const { name, disabled, readOnly, form } = joined
           store.set({
             checked: isParent()
               ? owner.parentChecked()

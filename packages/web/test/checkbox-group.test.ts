@@ -88,3 +88,15 @@ test("a checkbox disabled by its author is still disabled after it's put back on
     boxes[0].getAttribute("aria-disabled"),
   ]).toEqual(["", "true"])
 })
+
+test("a checkbox taken out of its group doesn't throw when the group's value changes in the same task", async () => {
+  const { group, boxes } = await mount(
+    `<ui-checkbox-group aria-label="Toppings"><ui-checkbox value="cheese" aria-label="Cheese"></ui-checkbox><ui-checkbox value="olives" aria-label="Olives"></ui-checkbox></ui-checkbox-group>`
+  )
+  boxes[0].remove()
+  expect(() => {
+    ;(group as unknown as { value: string[] }).value = ["olives"]
+  }).not.toThrow()
+  await wait()
+  expect(boxes[1].getAttribute("aria-checked")).toBe("true")
+})
