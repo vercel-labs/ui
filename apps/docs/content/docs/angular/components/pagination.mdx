@@ -124,7 +124,7 @@ With only a few pages, the range has no gaps, so you can write the links out and
 
 ## Links
 
-Pass `getHref` to map each page to a URL, and put page links and steps on `<a>` elements. Each gets its page's `href`. Without `getHref`, put them on `<button>` elements.
+Pass `getHref` to map each page to a URL, and put page links and steps on `<a>` elements. Each gets its page's `href`, with the check Angular gives an `[href]` binding. Without `getHref`, put them on `<button>` elements.
 
 ```ts
 import { Component } from "@angular/core"

@@ -49,6 +49,24 @@ class Page {
   readonly page = signal(1)
 }
 
+@Component({
+  selector: "test-root",
+  imports: [Pagination, PaginationList, PaginationItem, PaginationLink],
+  template: `
+    <nav uiPagination [pageCount]="3" [getHref]="getHref" aria-label="Pages">
+      <ul uiPaginationList>
+        @for (page of [1, 2, 3]; track page) {
+          <li uiPaginationItem><a uiPaginationLink [page]="page"></a></li>
+        }
+      </ul>
+    </nav>
+  `,
+})
+class Links {
+  readonly getHref = (page: number) =>
+    ["/posts?page=1", "javascript:alert(1)", " JavaScript:alert(1)"][page - 1]!
+}
+
 const pages = (host: HTMLElement) =>
   [...host.querySelectorAll(".page")].map((el) => el.textContent?.trim())
 const current = (host: HTMLElement) =>
@@ -81,5 +99,16 @@ describe("pagination", () => {
     await settle()
     expect(current(host)).toBe("10")
     expect(pages(host)).toEqual(["1", "9", "10", "11", "20"])
+  })
+
+  test("a link's URL gets the check an [href] binding gets", async () => {
+    const { host } = await mount(Links)
+    expect(
+      [...host.querySelectorAll("a")].map((el) => el.getAttribute("href"))
+    ).toEqual([
+      "/posts?page=1",
+      "unsafe:javascript:alert(1)",
+      "unsafe: JavaScript:alert(1)",
+    ])
   })
 })

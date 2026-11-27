@@ -10,6 +10,8 @@ import {
   inject,
   Injectable,
   NgZone,
+  Sanitizer,
+  SecurityContext,
   signal,
   TemplateRef,
   untracked,
@@ -254,6 +256,24 @@ function release(instance: object, slot: string, holder: string) {
   }
 }
 
+const SAFE_URL = /^(?!javascript:)(?:[a-z\d+.-]+:|[^:/?#]*(?:[/?#]|$))/i
+
+// Core writes an `href` itself, so it gets the check Angular gives an `[href]`
+// binding: `javascript:` and a malformed scheme get `unsafe:` in front. An
+// app's own `Sanitizer` decides instead, when it provides one.
+function checked(attrs: Attrs, sanitizer: Sanitizer | null) {
+  const href = attrs["href"]
+  if (href === undefined) {
+    return attrs
+  }
+  const safe = sanitizer
+    ? (sanitizer.sanitize(SecurityContext.URL, href) ?? "")
+    : SAFE_URL.test(href)
+      ? href
+      : `unsafe:${href}`
+  return safe === href ? attrs : { ...attrs, href: safe }
+}
+
 // A second part on the same element, like a field's control part on a
 // switch: its attributes merge into the element's own part and it binds too.
 type Joined = {
@@ -309,6 +329,7 @@ function bindPart<P extends Primitive, S extends SlotName<P>>(
   const container = template ? inject(ViewContainerRef) : undefined
   const own = inject(Ids).next()
   const renders = inject(Renders)
+  const sanitizer = inject(Sanitizer, { optional: true })
   const channel = `render:${own}`
   let claimed: { instance: object; lone: boolean } | undefined
   // Angular evaluates a class binding on the part's own element before it sets
@@ -491,9 +512,12 @@ function bindPart<P extends Primitive, S extends SlotName<P>>(
     }
     const present = isPresent(current)
     const other = joined && untracked(joined.part)
-    const attrs = other
-      ? joined.merge(partAttrs(current), partAttrs(other))
-      : partAttrs(current)
+    const attrs = checked(
+      other
+        ? joined.merge(partAttrs(current), partAttrs(other))
+        : partAttrs(current),
+      sanitizer
+    )
     if (present) {
       if (
         attrs["hidden"] === undefined &&
