@@ -78,6 +78,32 @@ describe("color picker", () => {
     expect(hue()).toBe("36")
   })
 
+  test("a controlled value previewed before it arrives keeps the hue the parts moved to", () => {
+    const onValueChange = vi.fn()
+    const picker = make({ value: "#bf8040", onValueChange })
+    picker.api.internal.areaKeydown(key("Home"))
+    const [gray] = onValueChange.mock.lastCall!
+    picker.preview({ id: "c", value: gray, onValueChange })
+    picker.setOptions({ id: "c", value: gray, onValueChange })
+    picker.api.internal.areaKeydown(key("End"))
+    expect(onValueChange.mock.lastCall![0]).toBe("#bf6000")
+  })
+
+  test("an owner that passes back another value at once shows that value", () => {
+    const picker = make({ value: "#ff0000" })
+    picker.setOptions({
+      id: "c",
+      value: "#ff0000",
+      onValueChange: () =>
+        picker.setOptions({ id: "c", value: "#0000ff", onValueChange() {} }),
+    })
+    picker.api.internal.sliderKeydown(key("PageUp"), "hue")
+    expect(picker.api.getValue()).toBe("#0000ff")
+    expect(
+      attrs(picker.part("slider-thumb", { channel: "hue" }))["aria-valuenow"]
+    ).toBe("240")
+  })
+
   test("a controlled key step fits the gamut and commits its color before the owner renders", () => {
     const onValueChange = vi.fn()
     const onValueCommit = vi.fn()

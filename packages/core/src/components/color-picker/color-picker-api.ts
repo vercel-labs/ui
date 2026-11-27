@@ -194,7 +194,7 @@ function colorPickerApiBody(
     } else {
       changed = value
       // Until the owner passes the value back, the parts stay on the one it holds.
-      if (store.get().value !== value) {
+      if (store.get().value === state.value) {
         moved = color
         store.set({ color: before })
       }
@@ -558,9 +558,7 @@ function colorPickerApiBody(
       next.space === state.space &&
       next.value === output(moved, next)
     ) {
-      const color = moved
-      moved = undefined
-      return { color }
+      return { color: moved }
     }
     return { color: colorIn(next.value, next.space) ?? kept }
   })
