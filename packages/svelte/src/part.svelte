@@ -8,6 +8,8 @@ with the part's attributes, so most parts need no more than
 @stable
 -->
 <script module lang="ts">
+  import type { SlotAttributes } from "./use-primitive.svelte"
+
   // Names only SVG uses. `a`, `title`, `style` and `script` are HTML too, so
   // they stay HTML, as a tag outside an `<svg>` of the same component does.
   const svgTags = new Set(
@@ -15,11 +17,33 @@ with the part's attributes, so most parts need no more than
       " "
     )
   )
+
+  // Boolean attributes core writes as "", which a render snippet's component
+  // reads as options.
+  const booleans = [
+    "hidden",
+    "disabled",
+    "readonly",
+    "required",
+    "inert",
+    "multiple",
+  ]
+
+  function renderProps(attributes: SlotAttributes) {
+    let result: SlotAttributes | undefined
+    for (const name of booleans) {
+      if (attributes[name] === "") {
+        result ??= { ...attributes }
+        result[name] = true
+      }
+    }
+    return result ?? attributes
+  }
 </script>
 
 <script lang="ts" generics="State">
   import type { Snippet } from "svelte"
-  import type { PartBinding, SlotAttributes } from "./use-primitive.svelte"
+  import type { PartBinding } from "./use-primitive.svelte"
 
   let {
     tag,
@@ -45,7 +69,7 @@ with the part's attributes, so most parts need no more than
 
 {#if props.render}
   {@render props.render({
-    props: attributes,
+    props: renderProps(attributes),
     state: part.state,
     children: props.children,
   })}
