@@ -687,7 +687,9 @@ for (const sheet of [sheets[0], sheets[4]]) {
     }) => {
       await open(sheet.fixture, { presentation: "sheet" })
       await openWithKeyboard(page, sheet)
-      expect(await pageBlocked(page)).toEqual({ inert: true, locked: true })
+      await expect
+        .poll(() => pageBlocked(page))
+        .toEqual({ inert: true, locked: true })
     })
 
     test("modal={false} keeps the page usable", async ({ page, open }) => {

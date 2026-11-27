@@ -213,6 +213,14 @@ test.describe("focus", () => {
         `<label><input type="radio" name="speed"> Standard</label><label><input type="radio" name="speed"> Express</label>`
       )
     )
+    // The group's checked radio is outside, so Tab reaches these once the page freezes.
+    await expect
+      .poll(() =>
+        page
+          .locator('input[aria-label="Page speed"]')
+          .evaluate((el) => !!el.closest("[inert]"))
+      )
+      .toBe(true)
     await page.getByRole("button", { name: "Close" }).focus()
     await tab()
     await expect(page.getByRole("radio", { name: "Standard" })).toBeFocused()
@@ -759,7 +767,7 @@ test.describe("modal", () => {
       )
     await trigger(page).click()
     await expect(dialog(page)).toBeVisible()
-    expect(await hidden()).toBe(true)
+    await expect.poll(hidden).toBe(true)
     await page.keyboard.press("Escape")
     await expect(dialog(page)).toBeHidden()
     await expect.poll(hidden).toBe(false)

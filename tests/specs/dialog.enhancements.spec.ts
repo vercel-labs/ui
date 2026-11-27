@@ -167,7 +167,7 @@ test.describe(
         outside(page, "Before").evaluate((el) => !!el.closest("[inert]"))
       await trigger(page).click()
       await expect(dialog(page)).toBeVisible()
-      expect(await inert()).toBe(true)
+      await expect.poll(inert).toBe(true)
       // The trigger is inert too: nothing outside a modal dialog may be used.
       expect(
         await outside(page, "Edit profile").evaluate(

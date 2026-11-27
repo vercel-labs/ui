@@ -94,11 +94,13 @@ for (const { name, policy, meta, layers } of policies) {
       await page.getByRole("button", { name: "Edit profile" }).click()
       const dialog = page.getByRole("dialog", { name: "Profile settings" })
       await expect(dialog).toBeVisible()
-      expect(
-        await page.evaluate(
-          () => getComputedStyle(document.scrollingElement!).overflow
+      await expect
+        .poll(() =>
+          page.evaluate(
+            () => getComputedStyle(document.scrollingElement!).overflow
+          )
         )
-      ).toBe("hidden")
+        .toBe("hidden")
       expect(
         await dialog.evaluate((el) => getComputedStyle(el).overscrollBehaviorY)
       ).toBe("contain")

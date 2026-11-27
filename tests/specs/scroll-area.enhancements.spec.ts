@@ -105,9 +105,10 @@ test.describe("native scrollbars", { tag: "@enhancement" }, () => {
   }) => {
     await open("scroll-area")
     const injected = await page.evaluate(() =>
-      Array.from(document.querySelectorAll("style")).some((style) =>
-        style.textContent?.includes("scrollbar-width")
-      )
+      // Vite's dev server injects the page's own stylesheets as style elements.
+      Array.from(
+        document.querySelectorAll("style:not([data-vite-dev-id])")
+      ).some((style) => style.textContent?.includes("scrollbar-width"))
     )
     expect(injected).toBe(false)
   })
