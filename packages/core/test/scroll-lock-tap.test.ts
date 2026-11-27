@@ -23,7 +23,7 @@ afterEach(() => {
   vi.restoreAllMocks()
 })
 
-function touch(type: string, y: number) {
+function touch(type: string, y: number, target: Element = button) {
   const point = { clientX: 10, clientY: y }
   const event = Object.assign(
     new Event(type, { bubbles: true, cancelable: true }),
@@ -31,7 +31,7 @@ function touch(type: string, y: number) {
       ? { touches: [], changedTouches: [point] }
       : { touches: [point], changedTouches: [point] }
   )
-  button.dispatchEvent(event)
+  target.dispatchEvent(event)
   return event.defaultPrevented
 }
 
@@ -54,4 +54,22 @@ test("on iOS, a tap that doesn't move is left to the browser", () => {
   touch("touchstart", 10)
   expect(touch("touchend", 10)).toBe(false)
   expect(clicks).toBe(0)
+})
+
+test("on iOS, a wobbling tap clicks once with two modals open", () => {
+  const releaseInner = lockScroll(document, button.parentElement!)
+  touch("touchstart", 10)
+  touch("touchmove", 12)
+  expect(touch("touchend", 12)).toBe(true)
+  expect(clicks).toBe(1)
+  releaseInner()
+})
+
+test("on iOS, a wobbling tap on an icon in a modal's button still clicks", () => {
+  const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg")
+  button.append(icon)
+  touch("touchstart", 10, icon)
+  touch("touchmove", 12, icon)
+  expect(touch("touchend", 12, icon)).toBe(true)
+  expect(clicks).toBe(1)
 })

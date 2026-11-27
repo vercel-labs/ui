@@ -270,10 +270,11 @@ function guardTouch(modal: HTMLElement) {
     (event) => {
       const target = event.target
       if (
+        event.defaultPrevented ||
         !stopped ||
         !tap ||
         !event.cancelable ||
-        !(target instanceof view.HTMLElement)
+        !(target instanceof view.Element)
       ) {
         return
       }
@@ -281,7 +282,17 @@ function guardTouch(modal: HTMLElement) {
       target
         .closest<HTMLElement>("input, textarea, select, [contenteditable]")
         ?.focus()
-      target.click()
+      if (target instanceof view.HTMLElement) {
+        target.click()
+      } else {
+        target.dispatchEvent(
+          new view.MouseEvent("click", {
+            bubbles: true,
+            cancelable: true,
+            composed: true,
+          })
+        )
+      }
     },
     { passive: false }
   )
