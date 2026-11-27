@@ -824,7 +824,10 @@ function describe(entry: Entry, instance: PrimitiveInstance, parts: Bound[]) {
   }
   // A checkbox or switch submits "on" unless the page names a value, which
   // says nothing beside `checked`.
-  if ("checked" in out && out.value === "on") {
+  if (
+    (entry.component === "checkbox" || entry.component === "switch") &&
+    out.value === "on"
+  ) {
     delete out.value
   }
   // The rest only when they say something, like `required: true`. A secret
