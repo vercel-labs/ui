@@ -745,6 +745,37 @@ function handOver(part: Part) {
 // A part its owner let go of when it left the page registers again once the owner is back.
 const registered = new WeakSet<Part>()
 
+// Roots that registered parts in one task flush together, and every part gets
+// its attributes before any binds. A bind that reads a style otherwise makes
+// a later root's unbound look the start of its transitions.
+const flushes: (() => void)[] = []
+let binds: (() => void)[] | undefined
+
+// One root's error never stops the others, as when each flushed on its own.
+function runEach(runs: (() => void)[]) {
+  for (const run of runs) {
+    try {
+      run()
+    } catch (error) {
+      queueMicrotask(() => {
+        throw error
+      })
+    }
+  }
+}
+
+function queueFlush(flush: () => void) {
+  if (!flushes.length) {
+    queueMicrotask(() => {
+      const waiting: (() => void)[] = (binds = [])
+      runEach(flushes.splice(0))
+      binds = undefined
+      runEach(waiting)
+    })
+  }
+  flushes.push(flush)
+}
+
 // Looks for the part element's owner again, for an owner that connects after
 // a part whose `for` names it, like a native label's control.
 const findOwnerAgain = new WeakMap<Element, () => void>()
@@ -1477,7 +1508,7 @@ function defineRootElement<P extends Primitive>(
         registered.add(part)
         part.sync = () => this.#pending.has(part) || this.#sync(part)
         if (!this.#pending.size) {
-          queueMicrotask(() => this.#flush())
+          queueFlush(() => this.#flush())
         }
         this.#pending.add(part)
       }
@@ -1627,7 +1658,13 @@ function defineRootElement<P extends Primitive>(
             part.el.removeAttribute("hidden")
           }
           this.#apply(part, attrs)
-          if (!part.unbind) {
+          if (binds) {
+            binds.push(() => {
+              if (!part.unbind && part.shown && this.#parts.has(part)) {
+                this.#bind(part, this.#instance!.part(part.slot, part.props))
+              }
+            })
+          } else if (!part.unbind) {
             this.#bind(part, record)
           }
         } else {
