@@ -6,6 +6,7 @@ import { expect, test } from "vitest"
 import { Checkbox } from "../src/checkbox"
 import { Field, FieldLabel } from "../src/field"
 import { Input } from "../src/input"
+import { PasswordInput, PasswordInputControl } from "../src/password-input"
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -117,6 +118,58 @@ test.each([
     unmount()
   }
 )
+
+test("a controlled PasswordInput keeps a value the parent doesn't update, as in React", async () => {
+  const short = ref("abc")
+  const { el, unmount } = mount(() =>
+    h(
+      PasswordInput,
+      {
+        modelValue: short.value,
+        "onUpdate:modelValue": (next: string) => {
+          if (next.length <= 3) {
+            short.value = next
+          }
+        },
+      },
+      () => h(PasswordInputControl, { "aria-label": "Password" })
+    )
+  )
+  const field = el.querySelector("input")!
+  const type = async (text: string) => {
+    field.value = text
+    field.dispatchEvent(new Event("input", { bubbles: true }))
+    await new Promise((resolve) => setTimeout(resolve))
+  }
+  await type("abcd")
+  expect(field.value).toBe("abc")
+  await type("ab")
+  expect(short.value).toBe("ab")
+  expect(field.value).toBe("ab")
+  unmount()
+})
+
+test("v-model.trim on a PasswordInput keeps the spaces being typed", async () => {
+  const text = ref("abc")
+  const { el, unmount } = mount(() =>
+    h(
+      PasswordInput,
+      {
+        modelValue: text.value,
+        modelModifiers: { trim: true },
+        "onUpdate:modelValue": (next: string) => (text.value = next),
+      },
+      () => h(PasswordInputControl, { "aria-label": "Password" })
+    )
+  )
+  const field = el.querySelector("input")!
+  field.value = "abc "
+  field.dispatchEvent(new Event("input", { bubbles: true }))
+  await new Promise((resolve) => setTimeout(resolve))
+  expect(text.value).toBe("abc")
+  expect(field.value).toBe("abc ")
+  unmount()
+})
 
 test("v-model.trim keeps the spaces being typed", async () => {
   const text = ref("hello")

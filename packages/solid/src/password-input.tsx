@@ -5,7 +5,7 @@ import {
 } from "@ui-sdk/core/password-input"
 import { createContext, merge, omit, useContext } from "solid-js"
 import { joinField, useFieldControl, useFieldControlId } from "./field-context"
-import { valueProps } from "./text-control"
+import { keepControlled, valueProps } from "./text-control"
 import {
   createParts,
   rootScope,
@@ -51,7 +51,7 @@ const PasswordInput = /* @__PURE__ */ rootScope(function PasswordInput(
   const passwordInput = usePrimitive(passwordInputPrimitive, () => ({
     value: props.value,
     defaultValue: props.defaultValue,
-    onValueChange: props.onValueChange,
+    onValueChange: keepControlled(() => props.value, props.onValueChange),
     visible: props.visible,
     defaultVisible: props.defaultVisible,
     onVisibleChange: props.onVisibleChange,

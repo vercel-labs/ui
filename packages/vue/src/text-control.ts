@@ -96,6 +96,29 @@ function textOptions(props: TextProps, emit: Emit) {
   })
 }
 
+// A control that's a part of its own renders apart from its root, so a
+// controlled value the parent kept goes back to the element, as in React.
+function keepTyped(props: { value?: string; modelValue?: string }) {
+  const component = getCurrentInstance()
+  return (value: string, details: ChangeDetails<InputValueChangeReason>) => {
+    const event = details.event as InputEvent | undefined
+    const el = event?.target
+    // Mid-composition the IME owns the text, and its last change comes after.
+    if (!(el instanceof HTMLInputElement) || event?.isComposing) {
+      return
+    }
+    nextTick(() => {
+      const kept = orModel(props.value, props.modelValue)
+      const key =
+        props.value === undefined ? "modelModifiers" : "valueModifiers"
+      const modifiers = component?.vnode.props?.[key]
+      if (kept !== undefined && kept !== received(value, modifiers)) {
+        el.value = kept
+      }
+    })
+  }
+}
+
 // Whether a control is read-only: the `read-only` prop, or else a native
 // `readonly` attribute, which Vue keeps in `attrs`.
 const readOnlyOf = (
@@ -132,4 +155,11 @@ function elementProps(
   }
 }
 
-export { elementProps, readOnlyOf, textEmits, textOptions, textProps }
+export {
+  elementProps,
+  keepTyped,
+  readOnlyOf,
+  textEmits,
+  textOptions,
+  textProps,
+}

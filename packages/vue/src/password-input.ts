@@ -22,7 +22,7 @@ import {
   usePrimitive,
   type PartSlots,
 } from "./use-primitive"
-import { readOnlyOf } from "./text-control"
+import { keepTyped, readOnlyOf } from "./text-control"
 
 // What the control takes from its root: the field it joins, and the value it shows.
 type ControlContext = {
@@ -78,6 +78,7 @@ const PasswordInput = withElement(
     setup(props, { attrs, emit }) {
       const field = useFieldControl()
       const controlId = useFieldControlId()
+      const keep = keepTyped(props)
       const passwordInput = usePrimitive(passwordInputPrimitive, () => ({
         value: orModel(props.value, props.modelValue),
         defaultValue: props.defaultValue,
@@ -103,6 +104,7 @@ const PasswordInput = withElement(
           }
           emit("update:value", value)
           emit("update:modelValue", value)
+          keep(value, details)
         },
         onVisibleChange: (
           visible: boolean,
