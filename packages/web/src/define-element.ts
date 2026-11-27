@@ -378,7 +378,9 @@ function withEvents<T extends object>(
         value: unknown,
         details?: { cancel?: () => void; canceled?: boolean }
       ) => {
-        if (quietNow(el)) {
+        // A write from script fires no change event, but still reports when
+        // it finishes, whether or not it animates.
+        if (quietNow(el) && !key.endsWith("ChangeComplete")) {
           return
         }
         const only = detailsOnly(value, details)
