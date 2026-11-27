@@ -5585,7 +5585,7 @@ describe("agent act behind a closed tab or section", () => {
       <div><input aria-label="New password" /><p>hunter2 is too short</p></div>`
     document.body.append(content)
     const password = passwordInput({ id: "new-password" })
-    const root = content.lastElementChild!
+    const root = content.lastElementChild as HTMLElement
     cleanups.push(
       bind(reset.part("content"), content),
       bind(password.part("root"), root),
