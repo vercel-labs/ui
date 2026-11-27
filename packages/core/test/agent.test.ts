@@ -2172,6 +2172,29 @@ describe("agent", () => {
     ).toBe("Fruit")
   })
 
+  test("a dialog without a title is named by its content's label, not by a button inside it", () => {
+    const agent = createAgent()
+    const instance = dialog({ id: "booking", defaultOpen: true })
+    const content = document.body.appendChild(
+      Object.assign(document.createElement("div"), { getAnimations: () => [] })
+    )
+    content.setAttribute("aria-label", "Review booking")
+    const close = content.appendChild(document.createElement("button"))
+    close.setAttribute("aria-label", "Close")
+    // The close binds first, as in a web dialog that opens after it mounts.
+    cleanups.push(
+      bind(instance.part("close"), close),
+      bind(instance.part("content"), content),
+      () => instance.destroy()
+    )
+    const label = () =>
+      agent.snapshot().find((component) => component.component === "dialog")
+        ?.label
+    expect(label()).toBe("Review booking")
+    content.removeAttribute("aria-label")
+    expect(label()).toBeUndefined()
+  })
+
   test("item labels read as text: spaces collapsed, and without a nested item's text", () => {
     const agent = createAgent()
     const views = tabs({ id: "views" })

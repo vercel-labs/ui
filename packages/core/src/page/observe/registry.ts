@@ -480,6 +480,10 @@ function labelOf(parts: Bound[], entry?: Entry) {
     ...sole,
     ...keyed,
   ]) {
+    // A part inside the popup, like a dialog's Close, has a name of its own.
+    if (popup !== part.el && popup?.contains(part.el)) {
+      continue
+    }
     const name = nameOf(part.el)
     if (name) {
       return name
