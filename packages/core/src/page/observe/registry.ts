@@ -3,7 +3,7 @@
 // row text read from its elements, and every change that goes through, settled
 // or step by step, once either entry installs it on the kernel's `watchers`.
 import type { AgentComponent } from "../agent/agent"
-import { fieldOf } from "../../components/field/field-control"
+import { fieldOf } from "../../foundation/forms/field-root"
 import { commitFrom } from "../../foundation/kernel/change"
 import type { ChangeSource } from "../../foundation/kernel/details"
 import type {

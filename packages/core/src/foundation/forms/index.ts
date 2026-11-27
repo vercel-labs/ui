@@ -19,6 +19,7 @@ export {
   pressesInside,
   unfocusableControl,
 } from "./control"
+export { fieldOf, holdRoot } from "./field-root"
 export {
   associate,
   bindHiddenInput,

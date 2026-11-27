@@ -18,8 +18,6 @@ import {
 } from "../../foundation/forms/control"
 import {
   controlsIn,
-  fieldOf,
-  holdRoot,
   isRequired,
   valid,
   validityKeys,
@@ -27,6 +25,7 @@ import {
   type Validity,
   type ValidityKey,
 } from "./field-control"
+import { fieldOf, holdRoot } from "../../foundation/forms/field-root"
 import {
   bindFoundControl,
   controlAttrs,
