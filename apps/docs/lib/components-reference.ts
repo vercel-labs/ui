@@ -55,6 +55,23 @@ function elementLine(doc: ElementDoc) {
   return said.length ? `- \`<${doc.tagName}>\`: ${said.join(". ")}.` : ""
 }
 
+// An example's markup without its script elements, which import what
+// `web.js` already defines. They start a line in the docs' examples.
+function withoutScripts(html: string) {
+  const kept: string[] = []
+  let inScript = false
+  for (const line of html.split("\n")) {
+    inScript ||= line.trimStart().startsWith("<script")
+    if (!inScript) {
+      kept.push(line)
+    }
+    if (line.includes("</script>")) {
+      inScript = false
+    }
+  }
+  return kept.join("\n").trim()
+}
+
 // A page with no composition, like Button's, shows its markup under Usage.
 async function usageMarkup(file: string) {
   const markdown = await pageMarkdown(file, "web-components", () => null)
@@ -62,16 +79,16 @@ async function usageMarkup(file: string) {
     markdown
       .match(/\n## Usage\n([\s\S]*?)(?=\n## )/)?.[1]
       .match(/```html[^\n]*\n([\s\S]*?)\n```/) ?? []
-  return (
-    html &&
-    `\`\`\`html\n${html.replace(/<script\b[\s\S]*?<\/script>\n*/g, "").trim()}\n\`\`\``
-  )
+  return html && `\`\`\`html\n${withoutScripts(html)}\n\`\`\``
 }
 
 async function componentSection(page: DocPage, elements: ElementDoc[]) {
   const slug = page.slugs[2]
+  // A link to one of the page's own headings goes to the page.
   const markup =
-    (await composition(page.file))?.replace(/^[^\n]*:\n\n(?=```)/, "") ??
+    (await composition(page.file))
+      ?.replace(/^[^\n]*:\n\n(?=```)/, "")
+      .replaceAll("](#", `](./components/${slug}.md#`) ??
     (await usageMarkup(page.file))
   return [
     `### [${page.title}](./components/${slug}.md)`,
