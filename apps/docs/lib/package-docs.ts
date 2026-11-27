@@ -1,5 +1,6 @@
 import { mkdir, rm, writeFile } from "node:fs/promises"
 import path from "node:path"
+import { componentsReference } from "./components-reference"
 import {
   customElementsManifest,
   describeElements,
@@ -104,8 +105,12 @@ const frameworkFiles = (framework: Framework) => [
 function index(name: string, framework: Framework | undefined) {
   const core = docPage(["core"])!
   const agents = docPage(["agents"])!
+  const reference =
+    framework === "web-components"
+      ? ` [components.md](./components.md) has every component's composition, attributes and events in one file.`
+      : ""
   const llms = framework
-    ? `Start with [llms.txt](./llms.txt): how the components fit together, then an index of every component, in one file for an agent's context. Each page below has the rest.\n\n`
+    ? `Start with [llms.txt](./llms.txt): how the components fit together, then an index of every component, in one file for an agent's context.${reference} Each page below has the rest.\n\n`
     : `[llms.txt](./llms.txt) is the Core docs, the same as core.md, under the name agents look for.\n\n`
   const shared = `## Core and Agents
 
@@ -191,13 +196,20 @@ async function writePackageDocs(names = Object.keys(packageFrameworks)) {
         )
       }
     }
+    const described = name === "web" ? await describeElements() : undefined
+    if (described) {
+      files["components.md"] = await componentsReference(described.elements)
+    }
     for (const [file, text] of Object.entries(files)) {
       await mkdir(path.dirname(path.join(dir, file)), { recursive: true })
       await writeFile(path.join(dir, file), text)
     }
     console.log(`packages/${name}/docs: ${Object.keys(files).length} files`)
-    if (name === "web") {
-      await writeElementsManifest(path.join(repoRoot, "packages", name))
+    if (described) {
+      await writeElementsManifest(
+        path.join(repoRoot, "packages", name),
+        described
+      )
     }
   }
 }
@@ -207,8 +219,11 @@ async function writePackageDocs(names = Object.keys(packageFrameworks)) {
  * `customElements` points to, and `html-custom-data.json` for VS Code into
  * `dir`, and lists what has no description yet.
  */
-async function writeElementsManifest(dir: string) {
-  const { entries, elements, missing } = await describeElements()
+async function writeElementsManifest(
+  dir: string,
+  described?: Awaited<ReturnType<typeof describeElements>>
+) {
+  const { entries, elements, missing } = described ?? (await describeElements())
   await writeFile(
     path.join(dir, "custom-elements.json"),
     `${JSON.stringify(customElementsManifest(elements, entries), null, 2)}\n`

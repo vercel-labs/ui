@@ -33,7 +33,8 @@
 // `@ui-sdk/core` beside it. A package that needs another `@ui-sdk` package
 // takes it as a peer, never a dependency, so an app ends up with one copy.
 // Every package ships `docs/llms.txt`, which the setup prompts and the skill
-// point agents at, from `pnpm docs:packages`.
+// point agents at, and the web package `docs/components.md`, which the Claude
+// Artifacts guide does, from `pnpm docs:packages`.
 //
 // The release workflow and CI run it.
 import { execFileSync, spawnSync } from "node:child_process"
@@ -288,14 +289,13 @@ function listEntries(manifest) {
 }
 
 function findMissingDocs(name, manifest) {
-  if (
-    existsSync(path.join(app, "node_modules", manifest.name, "docs/llms.txt"))
-  ) {
-    return []
-  }
-  return [
-    `packages/${name} packs no docs/llms.txt. Run \`pnpm docs:packages\`.`,
-  ]
+  return ["docs/llms.txt", ...(name === "web" ? ["docs/components.md"] : [])]
+    .filter(
+      (file) => !existsSync(path.join(app, "node_modules", manifest.name, file))
+    )
+    .map(
+      (file) => `packages/${name} packs no ${file}. Run \`pnpm docs:packages\`.`
+    )
 }
 
 // Each `@ui-sdk` package the packed manifest lists as a dependency, which
