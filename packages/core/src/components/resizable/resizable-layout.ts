@@ -352,9 +352,14 @@ function fitLayout(
     next[index] += change
     left -= change
   }
-  // Constraints that can't all hold: the last panel takes the rest, so it still fills the group.
+  // Constraints that can't all hold: the last open panel takes the rest, so it
+  // still fills the group, and a collapsed one stays collapsed.
   if (Math.abs(left) > epsilon && next.length) {
-    next[next.length - 1] += left
+    let open = next.length - 1
+    while (open >= 0 && isCollapsed(panels[open], next[open])) {
+      open--
+    }
+    next[open >= 0 ? open : next.length - 1] += left
   }
   return next
 }
