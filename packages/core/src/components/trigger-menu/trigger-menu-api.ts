@@ -406,8 +406,8 @@ function triggerMenuApiBody(
   // Counted when they bind, so an Empty that rebinds, or mounts as the last
   // row unmounts, never reads as gone within the commit.
   let empties = 0
-  // A closed content can unmount its Empty, which still counts to reopen the
-  // menu until the content mounts again.
+  // An Empty that unmounts with its content on close still counts to reopen
+  // the menu, until the content mounts again.
   let closedEmpty = false
 
   // The list for the current level shows while items match, while they
@@ -794,8 +794,14 @@ function triggerMenuApiBody(
       // While an empty part is rendered, no matches keeps the menu open.
       countEmptyPart(delta: 1 | -1) {
         empties += delta
-        closedEmpty = !empties && delta < 0 && !store.get().open
+        if (delta > 0) {
+          closedEmpty = false
+        }
         queueMicrotask(() => {
+          const { open, settled } = store.get()
+          if (delta < 0 && !empties && !open && !settled) {
+            closedEmpty = true
+          }
           const hasEmpty = empties > 0
           if (store.get().hasEmpty === hasEmpty) {
             return
