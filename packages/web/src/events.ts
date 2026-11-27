@@ -2341,7 +2341,8 @@ declare global {
     "ui-file-input-dropzone": UiPartElement<
       typeof fileInput,
       "dropzone",
-      "target" | "pasteTarget"
+      "target",
+      "pasteTarget"
     >
     "ui-file-input-list": UiPartElement<typeof fileInput, "list">
     "ui-file-input-item": UiPartElement<typeof fileInput, "item", never, "file">

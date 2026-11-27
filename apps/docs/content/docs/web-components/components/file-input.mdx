@@ -184,7 +184,7 @@ new MutationObserver((records) => {
 
 ## Attachments
 
-Put a textarea inside a drop zone to attach files to a message. `paste-target` takes file pastes from the textarea too, through a CSS selector; text pastes keep their normal behavior. It can also be `"document"`.
+Put a textarea inside a drop zone to attach files to a message. `paste-target` takes file pastes from the textarea too, through a CSS selector; text pastes keep their normal behavior. It can also be `"document"`. From a script, set the `pasteTarget` property to the element itself, or to a function that returns it.
 
 ```html
 <ui-file-input multiple>

@@ -31,9 +31,7 @@ for (const [name, target] of [
       <textarea id="prompt"></textarea>`
     await wait()
     const prompt = document.getElementById("prompt")!
-    const zone = document.getElementById("zone") as HTMLElement & {
-      pasteTarget: unknown
-    }
+    const zone = document.querySelector("ui-file-input-dropzone")!
     const value = target(prompt)
     zone.pasteTarget = value
     await wait()
