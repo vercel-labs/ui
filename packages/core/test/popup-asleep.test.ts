@@ -4,6 +4,7 @@ import { alertDialog, dialog } from "../src/components/dialog/dialog"
 import { drawer } from "../src/components/drawer/drawer"
 import { hoverCard } from "../src/components/hover-card/hover-card"
 import { popover } from "../src/components/popover/popover"
+import { tooltip } from "../src/components/tooltip/tooltip"
 import {
   attrs,
   bind,
@@ -12,10 +13,14 @@ import {
   present,
 } from "../src/foundation/kernel/part"
 import type { Part } from "../src/foundation/kernel/primitive-types"
+import { setPlatform } from "../src/foundation/platform/platform"
 
 Element.prototype.getAnimations ??= () => []
 
-afterEach(() => document.body.replaceChildren())
+afterEach(() => {
+  document.body.replaceChildren()
+  setPlatform("other")
+})
 
 const asleep = (part: unknown) => (part as { api?: unknown }).api === undefined
 
@@ -152,6 +157,22 @@ describe("closed popups stay asleep until used", () => {
     expect(latePopover.get().presentation).toBe("sheet")
     expect(popoverShown.length).toBeGreaterThan(0)
     expect(asleep(popoverTrigger)).toBe(false)
+  })
+
+  test("a tooltip's shortcut that arrives after its trigger binds takes the platform's names", async () => {
+    const instance = tooltip({ id: "tip" })
+    setPlatform("apple")
+    const el = document.body.appendChild(document.createElement("button"))
+    el.textContent = "Save"
+    const trigger = instance.part("trigger", { id: "t" })
+    bind(trigger, el)
+    await Promise.resolve()
+    expect(instance.get().apple).toBe(false)
+
+    instance.setOptions({ id: "tip", shortcut: "mod+s" })
+    await Promise.resolve()
+    expect(attrs(trigger)["aria-keyshortcuts"]).toBe("Meta+S")
+    expect(asleep(trigger)).toBe(true)
   })
 
   test("a shortcut part inherits its trigger's shortcut while asleep", () => {

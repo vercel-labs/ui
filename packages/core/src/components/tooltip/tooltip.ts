@@ -37,7 +37,10 @@ import type {
   PrimitiveContext,
   PrimitiveOptions,
 } from "../../foundation/kernel/primitive-types"
-import { shortcutSlot } from "../../foundation/shortcuts/shortcut-slot"
+import {
+  adoptPlatform,
+  shortcutSlot,
+} from "../../foundation/shortcuts/shortcut-slot"
 
 /**
  * Why a tooltip opened or closed.
@@ -533,6 +536,8 @@ const tooltipPrimitive = /* @__PURE__ */ definePrimitive({
           const unbind = bindTrigger(store, key)
           // Focus that wakes it opens it only from the keyboard, which this tells from the start.
           trackInput()
+          let bound = true
+          let unwatch: (() => void) | undefined
           // The client knows the trigger's name now. A microtask lets hydration finish first.
           queueMicrotask(() => {
             const state = store.get()
@@ -540,8 +545,18 @@ const tooltipPrimitive = /* @__PURE__ */ definePrimitive({
             if (state.trigger === key) {
               change.unnamed = !hasOwnName(el, `${id}-content`)
             }
-            if (state.shortcut && state.apple !== isApple()) {
-              change.apple = isApple()
+            if (state.apple !== isApple()) {
+              if (state.shortcut) {
+                change.apple = isApple()
+              } else if (bound) {
+                // A shortcut that arrives later takes the platform's names then.
+                unwatch = store.subscribe(() => {
+                  if (store.get().shortcut) {
+                    unwatch!()
+                    adoptPlatform(store)
+                  }
+                })
+              }
             }
             if (change.unnamed !== undefined || change.apple !== undefined) {
               store.set(change)
@@ -561,6 +576,8 @@ const tooltipPrimitive = /* @__PURE__ */ definePrimitive({
             )
           }
           return () => {
+            bound = false
+            unwatch?.()
             unname?.()
             unbind()
           }
