@@ -119,7 +119,7 @@ function selectAction(value: unknown, args: Record<string, string>) {
 }
 
 // Options a spec can set through the URL: ?input renders an <input>, ?textarea
-// renders the SDK's Textarea (React and Vue), ?empty
+// renders the SDK's Textarea, ?empty
 // renders the empty part, ?auto=false turns off autoHighlight, ?twice renders
 // a second menu after the first.
 function triggerMenuOptions() {

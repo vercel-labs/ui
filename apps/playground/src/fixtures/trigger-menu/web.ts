@@ -8,11 +8,17 @@ import {
 function composer(
   name: string,
   id: string,
-  { input, empty }: { input: boolean; empty: boolean }
+  {
+    input,
+    textarea,
+    empty,
+  }: { input: boolean; textarea: boolean; empty: boolean }
 ) {
   const field = input
     ? `<input id="${id}" name="message" class="input" />`
-    : `<textarea id="${id}" name="message" class="input"></textarea>`
+    : textarea
+      ? `<ui-textarea auto-resize><textarea id="${id}" name="message" class="input"></textarea></ui-textarea>`
+      : `<textarea id="${id}" name="message" class="input"></textarea>`
   return `
     <ui-trigger-menu>
       <label class="label" for="${id}">${name}</label>
@@ -31,6 +37,7 @@ function composer(
 
 async function mount(root: HTMLElement) {
   await import("@ui-sdk/web/trigger-menu")
+  await import("@ui-sdk/web/textarea")
   const options = triggerMenuOptions()
   root.innerHTML = `
     <div class="fixture">
