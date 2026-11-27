@@ -253,7 +253,10 @@ function attachSheet(el: HTMLElement, input: SheetOptions) {
   const scrollSnap = side === "bottom" && usesScrollSnap(view, options)
   sheets.add(el)
   let atEnd = endOf(host, side, el)
-  const restoreStyles = [styleHost(host, side, atEnd), styleSheet(el)]
+  const restoreStyles = [
+    styleHost(host, side, atEnd),
+    styleSheet(el, scrollSnap),
+  ]
 
   let ancestors: HTMLElement[] = []
   const effects = createSheetEffects({
@@ -660,10 +663,12 @@ function styleHost(host: HTMLElement, side: PhysicalSide, atEnd: boolean) {
   })
 }
 
-function styleSheet(sheet: HTMLElement) {
+function styleSheet(sheet: HTMLElement, scrollSnap: boolean) {
   return setStyles(sheet, {
     "pointer-events": "auto",
-    "overscroll-behavior": "contain",
+    // A scroll-snap sheet moves by scroll chaining, so a pull-down at the top of
+    // its content must reach the viewport, which contains overscroll instead.
+    "overscroll-behavior": scrollSnap ? "auto" : "contain",
     "will-change": "translate",
   })
 }
