@@ -613,7 +613,12 @@ function imageCropperApiBody(
       },
       zoomInput(event: Event, el: HTMLInputElement) {
         const state = store.get()
-        if (isLocked(state)) {
+        // React runs onChange again on a range's `change` when the input
+        // reads back the zoom we wrote at its own precision, 15 digits.
+        if (
+          isLocked(state) ||
+          Math.abs(el.valueAsNumber - zoomText(state)) < 1e-9
+        ) {
           return
         }
         if (start === undefined) {
