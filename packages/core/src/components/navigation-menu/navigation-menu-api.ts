@@ -524,6 +524,7 @@ function navigationMenuApiBody(
     panel: () => surface().element(),
     open: (key, event) =>
       open(key, { reason: "trigger-press", event, by: "keyboard" }),
+    close: (event) => close({ reason: "focus-out", event, focus: false }),
   })
   const topLevel = keys.topLevel
   store.subscribe(keys.valueChanged)

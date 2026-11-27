@@ -27,6 +27,7 @@ function mountPanel(html: string) {
     content: () => panel,
     panel: () => panel,
     open: () => {},
+    close: () => {},
   })
   panel.addEventListener("keydown", (event) => focus.panelKeydown(event, panel))
   return panel

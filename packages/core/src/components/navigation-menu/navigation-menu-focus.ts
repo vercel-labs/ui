@@ -33,6 +33,7 @@ function createFocus(config: {
   panel: () => HTMLElement | undefined
   // Opens an item from the keyboard.
   open: (key: string, event: KeyboardEvent) => void
+  close: (event: KeyboardEvent) => void
 }) {
   // An arrow key opened this item, and focus moves into its panel once it binds.
   let pending: string | null = null
@@ -162,11 +163,20 @@ function createFocus(config: {
       }
       if (!event.shiftKey) {
         const next = nextTabbable(target)
+        if (!next || !panel.contains(next) || !isAfter(trigger, target)) {
+          return
+        }
         const after = nextTabbable(panel, panel)
-        if (next && panel.contains(next) && isAfter(trigger, target) && after) {
+        if (after) {
           event.preventDefault()
           after.focus()
+          return
         }
+        // Nothing follows: the browser's Tab skips the panel and leaves the page.
+        const wasInert = panel.inert
+        panel.inert = true
+        setTimeout(() => (panel.inert = wasInert))
+        config.close(event)
         return
       }
       // Already between the trigger and here, the browser gets there on its own.

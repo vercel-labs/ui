@@ -354,6 +354,36 @@ test.describe("keyboard", () => {
     ).toBe(false)
   })
 
+  test("Tab from the last item past an open panel leaves the page when nothing follows the navigation", async ({
+    page,
+    tab,
+  }) => {
+    await trigger(page, "Resources").evaluate((button) => {
+      const nav = button.closest("nav, ui-navigation-menu")!
+      for (const el of document.querySelectorAll<HTMLElement>(
+        "a[href], button, input, select, textarea, [tabindex]"
+      )) {
+        if (
+          !nav.contains(el) &&
+          nav.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_FOLLOWING
+        ) {
+          el.tabIndex = -1
+        }
+      }
+    })
+    await trigger(page, "Resources").focus()
+    await page.keyboard.press("Enter")
+    await expect(link(page, "Blog")).toBeVisible()
+    await link(page, "Pricing").focus()
+    await tab()
+    await expect(link(page, "Blog")).toBeHidden()
+    expect(
+      await page.evaluate(
+        () => !!document.activeElement?.closest("nav, ui-navigation-menu")
+      )
+    ).toBe(false)
+  })
+
   test("Escape inside a panel closes it and returns focus to its trigger", async ({
     page,
     tab,

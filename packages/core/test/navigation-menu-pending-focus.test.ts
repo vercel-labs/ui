@@ -34,6 +34,7 @@ function setup() {
     content: () => content,
     panel: () => content,
     open: () => {},
+    close: () => {},
   })
   list.addEventListener("keydown", (event) => focus.listKeydown(event, list))
   trigger.focus()
