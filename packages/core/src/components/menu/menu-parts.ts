@@ -943,7 +943,8 @@ const menuItemIcons = /* @__PURE__ */ (() => ({
       ...itemIconPart<MenuState, MenuApi>({
         component: "menu",
         item: itemSelector,
-        list: '[role="menu"], [role="menubar"]',
+        // A closed menu's content can be in the page without its role yet.
+        list: '[role="menu"], [data-slot="menu-content"], [role="menubar"]',
         subscribe: (api) => api.parentMenu()?.internal.subscribe,
       }),
       selects: selects({ values: [] }),
