@@ -144,6 +144,7 @@ function textFieldApi<Slot extends string>(
     }: ChangeOptions<InputValueChangeReason> = {}) => write("", reason, event),
     focus: () => control()?.focus(),
     internal: {
+      control,
       clearPress: (event?: Event) => write("", "clear-press", event),
       bind(el: TextControl) {
         textFields.set(el, api)

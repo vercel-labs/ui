@@ -2,7 +2,7 @@ import { render } from "@solidjs/web"
 import { createSignal, flush } from "solid-js"
 import { expect, test } from "vitest"
 import { Field, FieldLabel } from "../src/field"
-import { Input } from "../src/input"
+import { createInputController, Input } from "../src/input"
 import {
   createPasswordInputController,
   PasswordInput,
@@ -77,6 +77,40 @@ test("clearing a controlled password input from a button leaves the button's val
   controller.clear({ event: click })
   await settle()
   expect(button.value).toBe("go")
+  dispose()
+})
+
+test("clearing a controlled field from another input writes its value only to the field", async () => {
+  const password = createPasswordInputController()
+  const input = createInputController()
+  const { root, dispose } = mount(() => (
+    <>
+      <PasswordInput value="abc" controller={password}>
+        <PasswordInputControl aria-label="Password" />
+      </PasswordInput>
+      <Input
+        aria-label="Token"
+        type="password"
+        value="abc"
+        controller={input}
+      />
+      <input type="button" value="Clear" />
+      <input aria-label="Name" value="Ada" />
+    </>
+  ))
+  const [first, second, button, name] = root.querySelectorAll("input")
+  for (const controller of [password, input]) {
+    for (const el of [button, name]) {
+      const click = new MouseEvent("click", { bubbles: true })
+      el.dispatchEvent(click)
+      controller.clear({ event: click })
+      await settle()
+    }
+  }
+  expect(button.value).toBe("Clear")
+  expect(name.value).toBe("Ada")
+  expect(first.value).toBe("abc")
+  expect(second.value).toBe("abc")
   dispose()
 })
 

@@ -48,10 +48,15 @@ const PasswordInput = /* @__PURE__ */ rootScope(function PasswordInput(
 ) {
   const field = useFieldControl()
   const controlId = useFieldControlId()
+  const keep = keepControlled(
+    () => props.value,
+    () => passwordInput.api.internal.control(),
+    () => props.onValueChange
+  )
   const passwordInput = usePrimitive(passwordInputPrimitive, () => ({
     value: props.value,
     defaultValue: props.defaultValue,
-    onValueChange: keepControlled(() => props.value, props.onValueChange),
+    onValueChange: keep,
     visible: props.visible,
     defaultVisible: props.defaultVisible,
     onVisibleChange: props.onVisibleChange,

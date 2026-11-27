@@ -21,10 +21,15 @@ const Textarea = /* @__PURE__ */ rootScope(function Textarea(
   props: TextareaOptions & Omit<Native<"textarea", TextareaState>, "onSubmit">
 ) {
   const field = useFieldControl()
+  const keep = keepControlled(
+    () => props.value,
+    () => textarea.api.internal.control(),
+    () => props.onValueChange
+  )
   const textarea = usePrimitive(textareaPrimitive, () => ({
     value: props.value,
     defaultValue: props.defaultValue,
-    onValueChange: keepControlled(() => props.value, props.onValueChange),
+    onValueChange: keep,
     controller: props.controller,
     debug: props.debug,
     autoResize: props.autoResize,

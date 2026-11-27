@@ -78,7 +78,7 @@ const PasswordInput = withElement(
     setup(props, { attrs, emit }) {
       const field = useFieldControl()
       const controlId = useFieldControlId()
-      const keep = keepTyped(props)
+      const keep = keepTyped(props, () => passwordInput.api.internal.control())
       const passwordInput = usePrimitive(passwordInputPrimitive, () => ({
         value: orModel(props.value, props.modelValue),
         defaultValue: props.defaultValue,

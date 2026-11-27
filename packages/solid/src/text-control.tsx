@@ -51,29 +51,28 @@ function valueProps(
 }
 
 // Solid writes `value` only when it changes, so a controlled value the parent
-// kept goes back once the change settles, as in React.
+// kept goes back once the change settles, as in React. It goes to the field,
+// never to the change's event target, which can be a button that cleared it.
 function keepControlled(
   value: () => string | undefined,
-  onValueChange?: (
-    value: string,
-    details: ChangeDetails<InputValueChangeReason>
-  ) => void
+  control: () => HTMLInputElement | HTMLTextAreaElement | undefined,
+  onValueChange: () =>
+    | ((value: string, details: ChangeDetails<InputValueChangeReason>) => void)
+    | undefined
 ) {
   return (next: string, details: ChangeDetails<InputValueChangeReason>) => {
-    onValueChange?.(next, details)
-    const event = details.event as InputEvent | undefined
-    const el = event?.target
+    onValueChange()?.(next, details)
     // Mid-composition the IME owns the text, and its last change comes after.
     if (
       details.canceled ||
-      !(el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) ||
-      event?.isComposing
+      (details.event as InputEvent | undefined)?.isComposing
     ) {
       return
     }
     queueMicrotask(() => {
+      const el = control()
       const kept = untrack(value)
-      if (kept !== undefined && el.value !== kept) {
+      if (el && kept !== undefined && el.value !== kept) {
         el.value = kept
       }
     })

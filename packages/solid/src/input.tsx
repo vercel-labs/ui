@@ -32,10 +32,15 @@ const Input = /* @__PURE__ */ rootScope(function Input(
   props: InputOptions & Native<"input", InputState>
 ) {
   const field = useFieldControl()
+  const keep = keepControlled(
+    () => props.value,
+    () => input.api.internal.control(),
+    () => props.onValueChange
+  )
   const input = usePrimitive(inputPrimitive, () => ({
     value: props.value,
     defaultValue: props.defaultValue,
-    onValueChange: keepControlled(() => props.value, props.onValueChange),
+    onValueChange: keep,
     controller: props.controller,
     debug: props.debug,
   }))

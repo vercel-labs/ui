@@ -6,7 +6,11 @@ import { expect, test } from "vitest"
 import { Checkbox } from "../src/checkbox"
 import { Field, FieldLabel } from "../src/field"
 import { Input } from "../src/input"
-import { PasswordInput, PasswordInputControl } from "../src/password-input"
+import {
+  createPasswordInputController,
+  PasswordInput,
+  PasswordInputControl,
+} from "../src/password-input"
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -146,6 +150,28 @@ test("a controlled PasswordInput keeps a value the parent doesn't update, as in 
   await type("ab")
   expect(short.value).toBe("ab")
   expect(field.value).toBe("ab")
+  unmount()
+})
+
+test("clearing a controlled PasswordInput from another input writes its value only to the field", async () => {
+  const controller = createPasswordInputController()
+  const { el, unmount } = mount(() => [
+    h(PasswordInput, { modelValue: "abc", controller }, () =>
+      h(PasswordInputControl, { "aria-label": "Password" })
+    ),
+    h("input", { type: "button", value: "Clear" }),
+    h("input", { "aria-label": "Name", value: "Ada" }),
+  ])
+  const [field, button, name] = el.querySelectorAll("input")
+  for (const other of [button, name]) {
+    const click = new MouseEvent("click", { bubbles: true })
+    other.dispatchEvent(click)
+    controller.clear({ event: click })
+    await new Promise((resolve) => setTimeout(resolve))
+  }
+  expect(button.value).toBe("Clear")
+  expect(name.value).toBe("Ada")
+  expect(field.value).toBe("abc")
   unmount()
 })
 
