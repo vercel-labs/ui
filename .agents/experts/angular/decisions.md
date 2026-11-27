@@ -20,6 +20,7 @@ Last reviewed: 2026-11-24, the whole adapter with its examples, docs and fixture
 - **Value roots take `Value extends string = string`**: Tabs, Accordion, RadioGroup, CheckboxGroup, ToggleGroup, SegmentedControl and MenuRadioGroup, inferred from `[value]`, so `(valueChange)` emits the app's own union. Children aren't checked against it.
 - **A star part that has `state` types its `let`** with `ngTemplateContextGuard`.
 - **Core's `href` gets Angular's URL check** in `use-primitive.ts`, since Angular never sees an attribute core writes.
+- **A moved popup leaves the page with its view.** On destroy the element is removed where it sits, not sent back to where Angular rendered it.
 - **CSP nonce**: a page sets it with `<meta property="csp-nonce" nonce="…">`. A tag with no nonce switches injected styles to constructed sheets, and the page declares `@layer ui-sdk;` first.
 - **Popups flip to the opposite side only**, never to a perpendicular one.
 - **`tests/specs/position.spec.ts` runs once per engine**, on `react` in Chromium and `web` elsewhere: the placement math is core's and doesn't depend on the framework.

@@ -77,6 +77,42 @@ class Page {
 const page = document
 const press = (id: string) => page.querySelector<HTMLElement>(`#${id}`)!.click()
 
+@Component({
+  selector: "test-shown",
+  imports: [Dialog, DialogContent, DialogTitle],
+  template: `
+    <section>
+      @if (shown()) {
+        <ng-container uiDialog [defaultOpen]="true">
+          <div *uiDialogContent id="content">
+            <h2 uiDialogTitle>Profile</h2>
+          </div>
+        </ng-container>
+      }
+    </section>
+  `,
+})
+class Shown {
+  readonly shown = signal(true)
+}
+
+@Component({
+  selector: "test-shown-content",
+  imports: [Dialog, DialogContent, DialogTitle],
+  template: `
+    <ng-container uiDialog [defaultOpen]="true">
+      <section>
+        @if (shown()) {
+          <div uiDialogContent id="content"><h2 uiDialogTitle>Profile</h2></div>
+        }
+      </section>
+    </ng-container>
+  `,
+})
+class ShownContent {
+  readonly shown = signal(true)
+}
+
 describe("dialog", () => {
   test("the trigger opens it, named by its title and described by its description", async () => {
     const { instance, settle } = await mount(Page)
@@ -152,4 +188,18 @@ describe("dialog", () => {
     expect(instance.open()).toBe(false)
     expect(instance.changes).toEqual(["action:false:save"])
   })
+  for (const [name, type] of [
+    ["an open dialog", Shown],
+    ["an open dialog's content", ShownContent],
+  ] as const) {
+    test(`${name} leaves the page when a block removes it`, async () => {
+      const { instance, settle } = await mount(type)
+      expect(document.querySelector("#content")?.parentElement).toBe(
+        document.body
+      )
+      instance.shown.set(false)
+      await settle()
+      expect(document.querySelector("#content")).toBeNull()
+    })
+  }
 })

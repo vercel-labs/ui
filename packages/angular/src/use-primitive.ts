@@ -418,13 +418,13 @@ function bindPart<P extends Primitive, S extends SlotName<P>>(
     }
   }
 
-  const goHome = () => {
+  const goHome = (back = true) => {
     const current = moved
     moved = undefined
     if (!current) {
       return
     }
-    if (current.home.isConnected) {
+    if (back && current.home.isConnected) {
       current.home.before(current.el)
     } else {
       current.el.remove()
@@ -703,7 +703,8 @@ function bindPart<P extends Primitive, S extends SlotName<P>>(
     destroyed = true
     unbind()
     head(undefined)
-    goHome()
+    // Angular has taken the element out, and going home would put it back.
+    goHome(false)
     if (claimed?.lone) {
       release(claimed.instance, slot, own)
     }
