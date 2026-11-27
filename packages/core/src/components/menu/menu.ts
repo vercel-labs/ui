@@ -315,7 +315,7 @@ type MenuCheckboxItemProps = CheckboxProps
  */
 type MenuRadioGroupProps<T extends string = string> = Omit<
   RadioGroupProps<T>,
-  "name"
+  "name" | "unnamed"
 > & {
   /** Identifies the group in the menu's `onValueChange`. Defaults to a generated id. */
   name?: string

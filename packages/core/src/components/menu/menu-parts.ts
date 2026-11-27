@@ -813,6 +813,7 @@ const menuCheckable = /* @__PURE__ */ (() => ({
     "radio-group": menuSlot<RadioGroupProps, MenuRadioGroupState>({
       props: {
         name: "id",
+        unnamed: "boolean",
         value: "string",
         defaultValue: "string",
         onValueChange: "callback",

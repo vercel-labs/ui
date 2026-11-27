@@ -457,6 +457,7 @@ function MenuRadioGroup<T extends string = string>(
   const part = () => ({
     id: group(),
     name: group(),
+    unnamed: props.name === undefined,
     value: props.value,
     defaultValue: props.defaultValue,
     onValueChange: props.onValueChange as MenuRadioGroupProps["onValueChange"],
