@@ -2129,13 +2129,9 @@ type RootOptions<P extends Primitive> = {
 // The root tags defined for each primitive, so the parts defined after them find their owner.
 const rootTags = new WeakMap<Primitive, string[]>()
 
-// A schema's props as an element reads them: string, number, boolean and
-// list kinds and parsers from attributes, value kinds from properties, id
-// kinds made for each element when left out, and props taken from a part
-// around it, which only `kinds` makes attributes too. Callbacks need
-// nothing, since every `on*` prop fires an event, and action callbacks hand
-// their listeners `waitUntil()`. `id` is the element's own attribute, so
-// it's never a prop's unless `kinds` says so.
+// A schema's props as an element reads them. Callbacks need no attribute,
+// since every `on*` prop fires an event. `id` is the element's own attribute,
+// so it's never a prop's unless `kinds` says so.
 function elementProps(
   props: Record<string, PropSpec>,
   schema: PrimitiveSchema,
@@ -2158,8 +2154,7 @@ function elementProps(
       // item icon's `item` in tabs, has nowhere to come from.
       if (slot in schema.slots) {
         from[name] = { slot, prop }
-      }
-      if (!(name in kinds)) {
+      } else if (!(name in kinds)) {
         continue
       }
     }

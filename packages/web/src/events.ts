@@ -2047,16 +2047,16 @@ declare global {
       "item",
       "value" | "disabled"
     >
-    "ui-accordion-header": UiPartElement<typeof accordion, "header">
+    "ui-accordion-header": UiPartElement<typeof accordion, "header", "value">
     "ui-accordion-trigger": UiPartElement<
       typeof accordion,
       "trigger",
-      "disabled"
+      "disabled" | "value"
     >
     "ui-accordion-panel": UiPartElement<
       typeof accordion,
       "panel",
-      "keepMounted" | "hiddenUntilFound"
+      "keepMounted" | "hiddenUntilFound" | "value"
     >
     "ui-alert-dialog-trigger": UiPartElement<
       typeof alertDialog,
@@ -2113,18 +2113,19 @@ declare global {
     "ui-autocomplete-item": UiPartElement<
       typeof autocomplete,
       "item",
-      "value" | "label" | "keywords" | "disabled" | "index"
+      "value" | "label" | "keywords" | "disabled" | "index" | "group"
     >
     "ui-autocomplete-item-text": UiPartElement<typeof autocomplete, "item-text">
     "ui-autocomplete-item-icon": UiPartElement<
       typeof autocomplete,
       "item-icon",
-      "mirror"
+      "mirror" | "item"
     >
     "ui-autocomplete-group": UiPartElement<typeof autocomplete, "group">
     "ui-autocomplete-group-label": UiPartElement<
       typeof autocomplete,
-      "group-label"
+      "group-label",
+      "group"
     >
     "ui-autocomplete-separator": UiPartElement<typeof autocomplete, "separator">
     "ui-autocomplete-empty": UiPartElement<typeof autocomplete, "empty">
@@ -2140,7 +2141,7 @@ declare global {
     "ui-calendar-weekdays": UiPartElement<typeof calendar, "weekdays">
     "ui-calendar-weekday": UiPartElement<typeof calendar, "weekday", "index">
     "ui-calendar-week": UiPartElement<typeof calendar, "week">
-    "ui-calendar-day": UiPartElement<typeof calendar, "day", "value">
+    "ui-calendar-day": UiPartElement<typeof calendar, "day", "value" | "offset">
     "ui-carousel-viewport": UiPartElement<typeof carousel, "viewport">
     "ui-carousel-content": UiPartElement<typeof carousel, "content">
     "ui-carousel-item": UiPartElement<typeof carousel, "item">
@@ -2162,11 +2163,31 @@ declare global {
       "item",
       "value" | "status"
     >
-    "ui-timeline-marker": UiPartElement<typeof timeline, "marker">
-    "ui-timeline-connector": UiPartElement<typeof timeline, "connector">
-    "ui-timeline-time": UiPartElement<typeof timeline, "time">
-    "ui-timeline-title": UiPartElement<typeof timeline, "title">
-    "ui-timeline-description": UiPartElement<typeof timeline, "description">
+    "ui-timeline-marker": UiPartElement<
+      typeof timeline,
+      "marker",
+      "value" | "status"
+    >
+    "ui-timeline-connector": UiPartElement<
+      typeof timeline,
+      "connector",
+      "value" | "status"
+    >
+    "ui-timeline-time": UiPartElement<
+      typeof timeline,
+      "time",
+      "value" | "status"
+    >
+    "ui-timeline-title": UiPartElement<
+      typeof timeline,
+      "title",
+      "value" | "status"
+    >
+    "ui-timeline-description": UiPartElement<
+      typeof timeline,
+      "description",
+      "value" | "status"
+    >
     "ui-collapsible-trigger": UiPartElement<typeof collapsible, "trigger">
     "ui-collapsible-panel": UiPartElement<
       typeof collapsible,
@@ -2194,22 +2215,26 @@ declare global {
     "ui-combobox-item": UiPartElement<
       typeof combobox,
       "item",
-      "label" | "keywords" | "disabled" | "index",
+      "label" | "keywords" | "disabled" | "index" | "group",
       "value"
     >
     "ui-combobox-item-indicator": UiPartElement<
       typeof combobox,
       "item-indicator",
-      "keepMounted"
+      "keepMounted" | "item"
     >
     "ui-combobox-item-icon": UiPartElement<
       typeof combobox,
       "item-icon",
-      "mirror"
+      "mirror" | "item"
     >
     "ui-combobox-value-icon": UiPartElement<typeof combobox, "value-icon">
     "ui-combobox-group": UiPartElement<typeof combobox, "group">
-    "ui-combobox-group-label": UiPartElement<typeof combobox, "group-label">
+    "ui-combobox-group-label": UiPartElement<
+      typeof combobox,
+      "group-label",
+      "group"
+    >
     "ui-combobox-separator": UiPartElement<typeof combobox, "separator">
     // Its `create` event fires on the combobox.
     "ui-combobox-create": UiPartElement<
@@ -2247,9 +2272,17 @@ declare global {
     >
     "ui-command-shortcut": UiPartElement<typeof command, "shortcut", "shortcut">
     "ui-command-page": UiPartElement<typeof command, "page", "value">
-    "ui-command-item-icon": UiPartElement<typeof command, "item-icon", "mirror">
+    "ui-command-item-icon": UiPartElement<
+      typeof command,
+      "item-icon",
+      "mirror" | "item"
+    >
     "ui-command-group": UiPartElement<typeof command, "group">
-    "ui-command-group-label": UiPartElement<typeof command, "group-label">
+    "ui-command-group-label": UiPartElement<
+      typeof command,
+      "group-label",
+      "group"
+    >
     "ui-command-separator": UiPartElement<typeof command, "separator">
     "ui-command-empty": UiPartElement<typeof command, "empty">
     "ui-command-status": UiPartElement<typeof command, "status">
@@ -2349,7 +2382,12 @@ declare global {
     >
     "ui-file-input-list": UiPartElement<typeof fileInput, "list">
     "ui-file-input-item": UiPartElement<typeof fileInput, "item", never, "file">
-    "ui-file-input-item-remove": UiPartElement<typeof fileInput, "item-remove">
+    "ui-file-input-item-remove": UiPartElement<
+      typeof fileInput,
+      "item-remove",
+      "value",
+      "file"
+    >
     "ui-hover-card-trigger": UiPartElement<
       typeof hoverCard,
       "trigger",
@@ -2393,17 +2431,25 @@ declare global {
     "ui-listbox-item": UiPartElement<
       typeof listbox,
       "item",
-      "label" | "disabled" | "index",
+      "label" | "disabled" | "index" | "group",
       "value"
     >
     "ui-listbox-item-indicator": UiPartElement<
       typeof listbox,
       "item-indicator",
-      "keepMounted"
+      "keepMounted" | "item"
     >
-    "ui-listbox-item-icon": UiPartElement<typeof listbox, "item-icon", "mirror">
+    "ui-listbox-item-icon": UiPartElement<
+      typeof listbox,
+      "item-icon",
+      "mirror" | "item"
+    >
     "ui-listbox-group": UiPartElement<typeof listbox, "group">
-    "ui-listbox-group-label": UiPartElement<typeof listbox, "group-label">
+    "ui-listbox-group-label": UiPartElement<
+      typeof listbox,
+      "group-label",
+      "group"
+    >
     "ui-listbox-separator": UiPartElement<typeof listbox, "separator">
     "ui-menu-trigger": UiPartElement<
       typeof menu,
@@ -2488,7 +2534,11 @@ declare global {
     "ui-menu-group-label": UiPartElement<typeof menu, "group-label">
     "ui-menu-separator": UiPartElement<typeof menu, "separator">
     "ui-menu-shortcut": UiPartElement<typeof menu, "shortcut">
-    "ui-menu-item-icon": UiPartElement<typeof menu, "item-icon", "mirror">
+    "ui-menu-item-icon": UiPartElement<
+      typeof menu,
+      "item-icon",
+      "mirror" | "item"
+    >
     "ui-meter-track": UiPartElement<typeof meter, "track">
     "ui-meter-indicator": UiPartElement<typeof meter, "indicator">
     "ui-meter-label": UiPartElement<typeof meter, "label">
@@ -2502,7 +2552,7 @@ declare global {
     "ui-navigation-menu-trigger": UiPartElement<
       typeof navigationMenu,
       "trigger",
-      "disabled"
+      "disabled" | "value"
     >
     "ui-navigation-menu-content": UiPartElement<
       typeof navigationMenu,
@@ -2525,7 +2575,7 @@ declare global {
     "ui-navigation-menu-link-icon": UiPartElement<
       typeof navigationMenu,
       "link-icon",
-      "mirror"
+      "mirror" | "item"
     >
     "ui-navigation-menu-viewport": UiPartElement<
       typeof navigationMenu,
@@ -2574,14 +2624,14 @@ declare global {
     "ui-toast-action": UiPartElement<
       typeof toastRegion,
       "action",
-      "dismiss",
+      "dismiss" | "toast",
       never,
       ActionEvents
     >
     "ui-toast-close": UiPartElement<
       typeof toastRegion,
       "close",
-      never,
+      "toast",
       never,
       ActionEvents
     >
@@ -2627,7 +2677,7 @@ declare global {
     "ui-radio-indicator": UiPartElement<
       typeof radioGroup,
       "indicator",
-      "keepMounted"
+      "keepMounted" | "value"
     >
     "ui-rating-item": UiPartElement<typeof rating, "item", "index">
     "ui-rating-radio": UiPartElement<
@@ -2648,7 +2698,11 @@ declare global {
       "scrollbar",
       "orientation"
     >
-    "ui-scroll-area-thumb": UiPartElement<typeof scrollArea, "thumb">
+    "ui-scroll-area-thumb": UiPartElement<
+      typeof scrollArea,
+      "thumb",
+      "orientation"
+    >
     "ui-scroll-area-corner": UiPartElement<typeof scrollArea, "corner">
     "ui-scroll-area-scroll-to-end": UiPartElement<
       typeof scrollArea,
@@ -2686,28 +2740,38 @@ declare global {
     "ui-select-item": UiPartElement<
       typeof select,
       "item",
-      "label" | "disabled" | "index",
+      "label" | "disabled" | "index" | "group",
       "value"
     >
     "ui-select-item-indicator": UiPartElement<
       typeof select,
       "item-indicator",
-      "keepMounted"
+      "keepMounted" | "item"
     >
-    "ui-select-item-icon": UiPartElement<typeof select, "item-icon", "mirror">
+    "ui-select-item-icon": UiPartElement<
+      typeof select,
+      "item-icon",
+      "mirror" | "item"
+    >
     "ui-select-value-icon": UiPartElement<typeof select, "value-icon">
     "ui-select-group": UiPartElement<typeof select, "group">
-    "ui-select-group-label": UiPartElement<typeof select, "group-label">
+    "ui-select-group-label": UiPartElement<
+      typeof select,
+      "group-label",
+      "group"
+    >
     "ui-select-separator": UiPartElement<typeof select, "separator">
     "ui-select-arrow": UiPartElement<typeof select, "arrow">
     "ui-color-picker-area": UiPartElement<typeof colorPicker, "area", "x" | "y">
     "ui-color-picker-area-thumb": UiPartElement<
       typeof colorPicker,
-      "area-thumb"
+      "area-thumb",
+      "x" | "y"
     >
     "ui-color-picker-area-canvas": UiPartElement<
       typeof colorPicker,
-      "area-canvas"
+      "area-canvas",
+      "x" | "y"
     >
     "ui-color-picker-slider": UiPartElement<
       typeof colorPicker,
@@ -2716,7 +2780,8 @@ declare global {
     >
     "ui-color-picker-slider-thumb": UiPartElement<
       typeof colorPicker,
-      "slider-thumb"
+      "slider-thumb",
+      "channel" | "orientation"
     >
     "ui-color-picker-input": UiPartElement<typeof colorPicker, "input">
     "ui-color-picker-channel-input": UiPartElement<
@@ -2739,7 +2804,11 @@ declare global {
     "ui-slider-track": UiPartElement<typeof slider, "track">
     "ui-slider-indicator": UiPartElement<typeof slider, "indicator">
     "ui-slider-thumb": UiPartElement<typeof slider, "thumb", "index">
-    "ui-slider-thumb-input": UiPartElement<typeof slider, "thumb-input">
+    "ui-slider-thumb-input": UiPartElement<
+      typeof slider,
+      "thumb-input",
+      "index"
+    >
     "ui-slider-value": UiPartElement<typeof slider, "value">
     "ui-switch-thumb": UiPartElement<typeof switchPrimitive, "thumb">
     "ui-segmented-control-indicator": UiPartElement<
@@ -2771,14 +2840,14 @@ declare global {
     "ui-toolbar-button": UiPartElement<
       typeof toolbar,
       "button",
-      "disabled" | "focusableWhenDisabled"
+      "disabled" | "focusableWhenDisabled" | "groupDisabled"
     >
     "ui-toolbar-input": UiPartElement<
       typeof toolbar,
       "input",
-      "disabled" | "focusableWhenDisabled"
+      "disabled" | "focusableWhenDisabled" | "groupDisabled"
     >
-    "ui-toolbar-link": UiPartElement<typeof toolbar, "link">
+    "ui-toolbar-link": UiPartElement<typeof toolbar, "link", "groupDisabled">
     "ui-toolbar-group": UiPartElement<typeof toolbar, "group", "disabled">
     "ui-toolbar-separator": UiPartElement<typeof toolbar, "separator">
     "ui-tooltip-trigger": UiPartElement<
@@ -2804,15 +2873,15 @@ declare global {
     "ui-tree-item": UiPartElement<
       typeof tree,
       "item",
-      "value" | "branch" | "disabled" | "label"
+      "value" | "branch" | "disabled" | "label" | "parent"
     >
-    "ui-tree-item-label": UiPartElement<typeof tree, "label">
-    "ui-tree-item-indicator": UiPartElement<typeof tree, "indicator">
-    "ui-tree-item-checkbox": UiPartElement<typeof tree, "checkbox">
+    "ui-tree-item-label": UiPartElement<typeof tree, "label", "value">
+    "ui-tree-item-indicator": UiPartElement<typeof tree, "indicator", "value">
+    "ui-tree-item-checkbox": UiPartElement<typeof tree, "checkbox", "value">
     "ui-tree-group": UiPartElement<
       typeof tree,
       "group",
-      "keepMounted" | "hiddenUntilFound"
+      "keepMounted" | "hiddenUntilFound" | "value"
     >
     "ui-waterfall-header-row": UiPartElement<typeof waterfall, "header-row">
     "ui-waterfall-column-header": UiPartElement<
@@ -2823,10 +2892,18 @@ declare global {
     "ui-waterfall-tick": UiPartElement<typeof waterfall, "tick", "time">
     "ui-waterfall-mark": UiPartElement<typeof waterfall, "mark", "time">
     "ui-waterfall-row": UiPartElement<typeof waterfall, "row", "value">
-    "ui-waterfall-row-header": UiPartElement<typeof waterfall, "row-header">
-    "ui-waterfall-indicator": UiPartElement<typeof waterfall, "indicator">
-    "ui-waterfall-cell": UiPartElement<typeof waterfall, "cell">
-    "ui-waterfall-bar": UiPartElement<typeof waterfall, "bar">
+    "ui-waterfall-row-header": UiPartElement<
+      typeof waterfall,
+      "row-header",
+      "value"
+    >
+    "ui-waterfall-indicator": UiPartElement<
+      typeof waterfall,
+      "indicator",
+      "value"
+    >
+    "ui-waterfall-cell": UiPartElement<typeof waterfall, "cell", "value">
+    "ui-waterfall-bar": UiPartElement<typeof waterfall, "bar", "value">
     "ui-trigger-menu-input": UiPartElement<typeof triggerMenu, "input">
     "ui-trigger-menu-content": UiPartElement<
       typeof triggerMenu,
@@ -2846,19 +2923,20 @@ declare global {
     "ui-trigger-menu-item": UiPartElement<
       typeof triggerMenu,
       "item",
-      "value" | "label" | "keywords" | "disabled",
+      "value" | "label" | "keywords" | "disabled" | "group",
       never,
       {}
     >
     "ui-trigger-menu-item-icon": UiPartElement<
       typeof triggerMenu,
       "item-icon",
-      "mirror"
+      "mirror" | "item"
     >
     "ui-trigger-menu-group": UiPartElement<typeof triggerMenu, "group">
     "ui-trigger-menu-group-label": UiPartElement<
       typeof triggerMenu,
-      "group-label"
+      "group-label",
+      "group"
     >
     "ui-trigger-menu-separator": UiPartElement<typeof triggerMenu, "separator">
     "ui-trigger-menu-empty": UiPartElement<typeof triggerMenu, "empty">
