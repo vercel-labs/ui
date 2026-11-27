@@ -566,7 +566,6 @@ function elementProps(
   state: object
 ) {
   takeOwnId(part, user.id)
-  renderedProps.set(part, props as Part["props"])
   const handlers: Record<string, (event: React.SyntheticEvent) => void> = {}
   for (const [type, handler] of Object.entries(partHandlers(part))) {
     const prop = eventProps[type]
@@ -963,6 +962,10 @@ function usePart<
   const part = owner.instance.part(slot, slotProps, true)
   // Removed with its component, a part lets go in this commit, not a microtask later.
   React.useLayoutEffect(() => () => ref(part, host)(null), [part])
+  // Before refs attach, and only for a render React commits.
+  React.useInsertionEffect(() => {
+    renderedProps.set(part, slotProps as Part["props"])
+  })
   const merged = readIn(
     owner,
     (showing) => {
