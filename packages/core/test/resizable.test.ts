@@ -293,6 +293,15 @@ describe("fitting a layout", () => {
     ).toEqual([100, 0])
   })
 
+  test("the rest opens a collapsed panel when it fits there", () => {
+    expect(
+      fitLayout(
+        [100, 0],
+        [panel({ max: 66.7 }), panel({ min: 20, collapsible: true })]
+      )
+    ).toEqual([66.7, 33.3])
+  })
+
   test("panels without a default share what's left evenly", () => {
     expect(initialLayout([panel({ initial: 40 }), panel(), panel()])).toEqual([
       40, 30, 30,
