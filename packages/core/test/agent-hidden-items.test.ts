@@ -21,7 +21,7 @@ function mount(moved: string[]) {
     api: () => ({ move: (value: string) => moved.push(value) }),
     slots: (slot) => ({
       root: slot({ attrs: () => ({ role: "group", "aria-label": "Board" }) }),
-      item: slot({}),
+      item: slot<{ value: string }>({ props: { value: "string" } }),
     }),
     agent: { actions: ["move"] },
   })

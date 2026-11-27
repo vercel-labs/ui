@@ -408,9 +408,13 @@ const leftPage = () =>
   )
 
 // An item a person can't reach, like one in a folded column, is left out, but
-// not one in its list's closed content, which opening the list shows.
+// not one in its list's closed content, which opening the list shows. An item
+// with `display: contents` has no box of its own, so its children say.
 const reachable = (el: HTMLElement) =>
-  isShown(el) || !!el.closest("[hidden]")?.matches('[data-slot$="-content"]')
+  isShown(el) ||
+  !!el.closest("[hidden]")?.matches('[data-slot$="-content"]') ||
+  (getComputedStyle(el).display === "contents" &&
+    [...el.children].some((child) => isShown(child as HTMLElement)))
 
 // The items on the page, named by their trigger when they have one, like an
 // accordion's sections, else by their text.
