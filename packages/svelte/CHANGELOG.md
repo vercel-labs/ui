@@ -1,5 +1,19 @@
 # @ui-sdk/svelte
 
+## 0.1.0-beta.19
+
+### Patch Changes
+
+- 287cab6: A closed Popover, Hover Card, Dialog, Alert Dialog and Drawer waits for its first use to set itself up, like Menu and Tooltip, unless it has `open`, `defaultOpen`, a `controller` or a `presentation`. Parts that aren't shown take less work to mount in every framework.
+- f49311f: Each `ColorPickerInput` in a color picker is its own part, so every one shows the picker's value and takes a typed color, like a field beside the trigger and another in a popover.
+- a19503d: CheckboxGroup and ToggleGroup in Svelte and Vue, and Accordion in Svelte, type their value from `value`, `defaultValue` or the change handler, as the docs say, so a handler typed with your own union of values type-checks.
+- f8f3301: A Menu radio group without a `name` keeps the person's choice after the menu closes and its content unmounts. It's kept by the group's place among the menu's unnamed radio groups, so give a group that's shown only some of the time a `name`.
+- 798e7c1: A part rendered through `render` as a component, like UI SDK's own Button, gets `disabled`, `hidden`, `readonly`, `required`, `inert` and `multiple` as `true`, as React's and Vue's adapters give them. A disabled Popover trigger, File Input trigger or Image Cropper button rendered as a Button is now disabled.
+- 518ca7d: A part binds once per element, even when its `bind` reads app state through a function option, like a format function: that state changing no longer unbinds and binds it again.
+- 537f315: A part written by hand with `usePart` gives its props to the parts inside it that take them `from` its slot, as a generated part does. An item inside a hand-written group now reads the group's `value`.
+- a3b6cd5: An SVG part no longer takes a Tab stop in Chrome. Only a part that handles `focusout` gets the listener that notes a focused element Svelte removes.
+- Updated @ui-sdk/core to 0.1.0-beta.19
+
 ## 0.1.0-beta.18
 
 ### Patch Changes

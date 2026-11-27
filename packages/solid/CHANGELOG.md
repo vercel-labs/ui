@@ -1,5 +1,21 @@
 # @ui-sdk/solid
 
+## 0.1.0-beta.19
+
+### Patch Changes
+
+- 287cab6: A closed Popover, Hover Card, Dialog, Alert Dialog and Drawer waits for its first use to set itself up, like Menu and Tooltip, unless it has `open`, `defaultOpen`, a `controller` or a `presentation`. Parts that aren't shown take less work to mount in every framework.
+- f49311f: Each `ColorPickerInput` in a color picker is its own part, so every one shows the picker's value and takes a typed color, like a field beside the trigger and another in a popover.
+- f8f3301: A Menu radio group without a `name` keeps the person's choice after the menu closes and its content unmounts. It's kept by the group's place among the menu's unnamed radio groups, so give a group that's shown only some of the time a `name`.
+- b33fc55: A controlled `PasswordInput` now keeps showing its value when the parent doesn't take a change, as `Input` does.
+- 798e7c1: A part rendered through `render` as a component, like UI SDK's own Button, gets `disabled`, `hidden`, `readonly`, `required`, `inert` and `multiple` as `true`, as React's and Vue's adapters give them. A disabled Popover trigger, File Input trigger or Image Cropper button rendered as a Button is now disabled.
+- b80945c: A controlled `Input`, `Textarea` or `PasswordInput` puts a value its parent kept back in its own field after any change, like one a controller makes from a button's click.
+- 9da5590: A Menu trigger whose props come through a wrapper's spread, with a function `render`, hydrates again without a mismatch.
+- 2fd1edb: A server-rendered part whose `render` comes through a wrapper's merged props hydrates again, instead of making a new element.
+- c12c3ea: A Solid part's `Show` condition, like a Menu content's, runs again only when the part's presence changes, not on every change the part hears.
+- 025d6d7: A Solid part whose key moves to another element in the same update, like a Calendar week row that the next month shows too, keeps each element on its own part, so no "two parts share the key" warning shows.
+- Updated @ui-sdk/core to 0.1.0-beta.19
+
 ## 0.1.0-beta.18
 
 ### Patch Changes

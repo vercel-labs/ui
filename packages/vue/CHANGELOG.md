@@ -1,5 +1,17 @@
 # @ui-sdk/vue
 
+## 0.1.0-beta.19
+
+### Patch Changes
+
+- 287cab6: A closed Popover, Hover Card, Dialog, Alert Dialog and Drawer waits for its first use to set itself up, like Menu and Tooltip, unless it has `open`, `defaultOpen`, a `controller` or a `presentation`. Parts that aren't shown take less work to mount in every framework.
+- f49311f: Each `ColorPickerInput` in a color picker is its own part, so every one shows the picker's value and takes a typed color, like a field beside the trigger and another in a popover.
+- a19503d: CheckboxGroup and ToggleGroup in Svelte and Vue, and Accordion in Svelte, type their value from `value`, `defaultValue` or the change handler, as the docs say, so a handler typed with your own union of values type-checks.
+- f8f3301: A Menu radio group without a `name` keeps the person's choice after the menu closes and its content unmounts. It's kept by the group's place among the menu's unnamed radio groups, so give a group that's shown only some of the time a `name`.
+- b33fc55: A controlled `PasswordInput` now keeps showing its value when the parent doesn't take a change, as `Input` does.
+- fe4d8ad: The types of `<ui-command>`'s `valuechange` now include `detail.index`, and the types of `querychange` on `<ui-select>`, `<ui-combobox>` and `<ui-command>` include `detail.composing`. Vue's Command, Combobox and Select type `queryChange`'s details with `composing` too.
+- Updated @ui-sdk/core to 0.1.0-beta.19
+
 ## 0.1.0-beta.18
 
 ### Patch Changes

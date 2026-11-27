@@ -1,5 +1,20 @@
 # @ui-sdk/web
 
+## 0.1.0-beta.19
+
+### Patch Changes
+
+- 287cab6: A closed Popover, Hover Card, Dialog, Alert Dialog and Drawer waits for its first use to set itself up, like Menu and Tooltip, unless it has `open`, `defaultOpen`, a `controller` or a `presentation`. Parts that aren't shown take less work to mount in every framework.
+- e3d2015: A disabled `<ui-toggle>`, `<ui-checkbox>` or `<ui-switch>` takes a `pressed` or `checked` written from script, by property or attribute, like a native input's `value`. Presses, the `api` and agents still can't change it while it's disabled. Inside a toggle group or a disabled checkbox group, the group still decides.
+- 3c9f2ae: An image cropper starts its first image's crop at `defaultCrop` even when the default arrives after the cropper is made, like the web property set on a `<ui-image-cropper>` already in the page. `defaultCrop` is now on the element's type.
+- fe4d8ad: The types of `<ui-command>`'s `valuechange` now include `detail.index`, and the types of `querychange` on `<ui-select>`, `<ui-combobox>` and `<ui-command>` include `detail.composing`. Vue's Command, Combobox and Select type `queryChange`'s details with `composing` too.
+- 25d0606: The package's docs now include `docs/components.md`: every component's composition, attributes and events in one file, for an agent building a page with no build step.
+- 3cc1b67: A drag preview's copy of web components stays as it was made: the elements cloned into it no longer connect and start their own instance, so a checked box in the copy stays checked and its parts keep their ids and slots.
+- 3028fe8: In parts made with `createParts`, a part's own attribute or property now wins over a prop it takes from the part around it, like a cell's `value` inside a row. Setting a boolean one to `false` keeps it off even when the part around it is on.
+- 3073909: A `<ui-file-input-dropzone>`'s `pasteTarget` property keeps an element or a function as it is, so pastes into that target add their files. The `paste-target` attribute still takes `"document"` or a CSS selector.
+- cd8bf5a: A popup content's `initialFocus` and `finalFocus` properties keep an element or a function that returns one, as their types say. Before, the property wrote it to the attribute as a string, so opening or closing the popup threw and focus was lost. The `initial-focus` and `final-focus` attributes still take a selector.
+- Updated @ui-sdk/core to 0.1.0-beta.19
+
 ## 0.1.0-beta.18
 
 ### Patch Changes

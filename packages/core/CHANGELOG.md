@@ -1,5 +1,59 @@
 # @ui-sdk/core
 
+## 0.1.0-beta.19
+
+### Patch Changes
+
+- 3bf9eef: A component an agent reads while it's hidden, like one in a closed tab panel, keeps the name it had when one of its parts named it. Replaced while hidden, the fresh one takes back its ref and leaves no nameless copy off the page.
+- 3c7c0df: The agent leaves out a component's items that a person can't reach, like ones in a `hidden` ancestor or under `display: none`, the way it leaves out such a component. `snapshot`, `query` and a step by an item's text no longer offer them. Items in a list's own closed content are still read, since opening the list shows them.
+- 3c6a682: When an agent opens a closed list for a moment to read its items, like a Select it sets by label, focus stays where the person has it. The list no longer takes focus as it opens, sends it to the trigger as it closes, or makes the page inert while it's open.
+- d985a1d: The agent no longer names an open Dialog, Alert Dialog, Drawer or Popover by a button inside it, like Close. With no title or trigger to name it, its content's `aria-label` or `aria-labelledby` does.
+- 145f4ed: An agent reaches and reads more of the page in one call. A `press` finds a button by its exact text in the open component that holds it, or by a row's name and the button's text. A name can carry its tab or section in front without `>`, like `"Email deploy failures"`. The snapshot ends with a `closed` entry naming the closed tabs and sections. An open dialog or popover lists its own text, an empty field lists its placeholder, and a row's text runs to 200 characters on its first component. `query` with `closed: true` alone shows the first 3 rows of each closed place and counts the rest, and `gone` stops at ten. When `allow` isn't answered in time, the error says the step didn't run and to tell the person.
+- 357fa1c: An agent's snapshot names a list's items on the page by the labels its data gives, like an `items` function's, so a label copied from the snapshot is one `act` takes.
+- 145f4ed: `query` with `closed: true` returns `{ error }` when `allow` isn't answered in time or the call is cancelled, and `act` keeps a wrong guess as a failed step when that happens. The tools `registerTools` registers return an error as their result when a call throws.
+- 0d77e53: The agent lists a closed popup's triggers in page order, the same in every framework.
+- 11fa2b8: `loadMore()` after a page failed or was cancelled now asks for that page again, instead of skipping it.
+- 287cab6: A closed Popover, Hover Card, Dialog, Alert Dialog and Drawer waits for its first use to set itself up, like Menu and Tooltip, unless it has `open`, `defaultOpen`, a `controller` or a `presentation`. Parts that aren't shown take less work to mount in every framework.
+- e39ddd3: A controlled color picker whose value the owner keeps now keeps its thumbs and color on that value, instead of moving with the user.
+- db8f09f: A popup whose first focusable element is in a roving group, like a color picker's presets, focuses the item that holds the group's tab stop: the selected preset, or the first when none is selected. It used to take the first item while a framework was still rendering the stop's new place.
+- 266ee64: A key on an Image Cropper's zoom input in React no longer changes the crop again after `onCropCommit`, a pixel from the crop it committed.
+- 13a20b7: A Date Input or Time Input that a user changes, by typing, stepping or pasting, fires native `input` and `change` events on its form, like Select and Number Input do. A form reset fires none.
+- e3d2015: A disabled `<ui-toggle>`, `<ui-checkbox>` or `<ui-switch>` takes a `pressed` or `checked` written from script, by property or attribute, like a native input's `value`. Presses, the `api` and agents still can't change it while it's disabled. Inside a toggle group or a disabled checkbox group, the group still decides.
+- 85e9e8c: A field around a plain control lets go of a control that a field nested later takes, and takes back the label, description and name it wrote on it. In WebKit, the two fields no longer write the control's description back and forth without end.
+- 85b8ff8: A field nested in another keeps its label, description, control and `required` when its element keeps a `data-slot` of its own, like an element it takes with `as-child`. The outer field no longer takes the nested field's control.
+- 3c9f2ae: An image cropper starts its first image's crop at `defaultCrop` even when the default arrives after the cropper is made, like the web property set on a `<ui-image-cropper>` already in the page. `defaultCrop` is now on the element's type.
+- a064071: An image cropper's `setCrop`, from a controller, an agent or the web element's `crop` property, keeps the crop inside the image, at `aspectRatio`, and no smaller than `minWidth`, `minHeight` and `maxZoom` allow, as a key or a drag does. A crop saved under other limits is enlarged to fit the current ones.
+- ac5d54f: Tabs and Segmented Control indicators no longer throw when their list binds before it's in the page, like inside a template a framework clones from.
+- 7d85ff4: A press on a button inside an input group that removes the button, like a file's remove button, no longer moves focus to the group's field.
+- b6cc642: A sheet in iOS Safari keeps its full backdrop dim once it comes to rest, instead of dropping to about half.
+- 097df87: A press on a native label written inside a range slider, like a Field's label with `as-child`, focuses the first thumb.
+- 2d5c7c3: An arrow key or Page Up and Page Down on a disabled option at the end of a listbox that doesn't loop now stays on it, instead of moving to and selecting the option before it.
+- f8f3301: A Menu radio group without a `name` keeps the person's choice after the menu closes and its content unmounts. It's kept by the group's place among the menu's unnamed radio groups, so give a group that's shown only some of the time a `name`.
+- bcba6a2: Item icons in a menu inside a menubar put `data-has-icons` on the menu's content, as they do outside a menubar, and no longer on the bar, which web components marked while the menu was closed.
+- cc6d49e: A press on a native `<label>` for a control that takes no focus itself, like a web color picker, focuses into it the way a field's own label does: its input, or its area's thumb.
+- c11c03d: Tab from a navigation menu's last item past an open panel in a viewport leaves the page when nothing focusable follows the menu, and the panel closes. Before, focus went back into the open panel and never left.
+- 6474fcb: A tap beside a sheet opened from inside a popup rendered into a `container`, like a Select sheet in a Dialog, now closes only that sheet, as it does without a container.
+- b8b25ff: Page Up, Page Down, and Shift or Alt with an arrow key on an empty number input now step by the large or small step, as they do from 0.
+- 88e304f: Alt with an arrow key in a percent or whole-currency number input now keeps adding small steps, and the text shows them, like "12.1%". A value off its step shows its decimals too, like "$3.015".
+- c4f14ac: An OTP Input whose app rewrites the typed code, like into capitals, no longer lets a partial code pass validation in Svelte and Vue: the input's `pattern` asks for the whole code again once the rewritten value is in place.
+- a07c1cc: A popup's `setOpen(open)` does nothing when the popup already is, or is changing to, that state, as its docs say. A view that writes `open` back from `openchange`, like a web component's `open` property, no longer reopens the popup and moves focus. So `setOpen(true)` on a popup that opened on hover no longer keeps it open once the pointer leaves; `open()` still does.
+- a404878: A React Date Picker input whose date the app set reports `null` when it's cleared. Its text no longer changes behind React's back, and every Date Picker input writes its text again after a form reset.
+- bceabfe: A Number Input that starts empty reports `null` when it's cleared after a step, instead of keeping the stepped value while the field shows nothing.
+- 3cce759: A collapsed resizable panel stays collapsed when the panel next to it reaches its `maxSize` and can't take the rest, instead of reopening below its `minSize`.
+- 8b19d98: A sheet sets `--available-height` and `--available-width` on its content, the room it has above the on-screen keyboard, so a `max-height: var(--available-height)` written for the popover fits a sheet too.
+- 7df40cb: A sheet swiped down on iOS closes when the swipe's momentum stops a pixel or two short of closed, instead of snapping back open.
+- 655c279: On iOS, a sheet moved by the browser's scrolling (`data-driver="scroll-snap"`) can be dragged down from content or a list scrolled to its top, instead of the content rubber-banding in place. Its viewport contains overscroll, so the page behind still doesn't scroll.
+- fc57235: Holding a key no longer runs an older `repeat: true` shortcut that a newer one on the same keys replaced.
+- ac251ff: A shortcut for a symbol, like `"?"`, now runs when the layout needs Shift to type it, like Shift+/ on a US keyboard.
+- 10724dd: The `ui-sdk` skill offers to report a bug it finds in ui-sdk. With the user's yes, it searches the existing issues, writes a failing test as the reproduction and shows the issue before filing it.
+- 4d5171e: `createStickToBottom` keeps following when a field or a widget inside the scroller uses an arrow, Home or Page Up key, like the caret moving up in an input. A key that scrolls the scroller still lets go.
+- ce26b93: `createStickToBottom`'s `prepend()` keeps the view in place when it's called right after older rows went in above, instead of jumping it by their height. Rows added above keep their place without it, and the docs no longer ask for it.
+- c74cb9d: Tabs keep the panel a person was on when an agent's change selects another tab. The panel stays mounted and hidden, so what they typed there isn't lost, until a person selects that tab and leaves it. Before, the panel unmounted the way it does when a person switches tabs.
+- e028570: Typing P in a time's AM/PM segment now chooses PM in locales whose AM name also starts with P, like Malay, Lithuanian and Latvian.
+- 0b280f6: A toast swiped a short way and held still before release snaps back instead of dismissing, as a slow swipe does. A quick flick released at once still dismisses.
+- 7d58400: `toast.promise()` with a function that throws before it returns a promise shows the error toast, as a rejected promise does, instead of leaving the loading toast up and throwing to the caller.
+- 0df3568: A tree's rows written again as new elements under the values they had keep `aria-posinset` and `aria-setsize`. Before, the old elements letting go took the values out of their parent's order, so the rows lost their places.
+
 ## 0.1.0-beta.18
 
 ### Patch Changes
