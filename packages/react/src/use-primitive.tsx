@@ -519,6 +519,8 @@ function carried(
 }
 
 const heldRefs = new WeakMap<Part, (el: HTMLElement | null) => void>()
+const renderedProps = new WeakMap<Part, Part["props"]>()
+const propsBeforeBind = new WeakMap<Part, Part["props"]>()
 
 // React detaches and attaches an element again when its ref changes, like an
 // inline callback ref the app passes, so a part lets go of its element a
@@ -533,6 +535,15 @@ function heldRef(part: Part) {
   held = (el) => {
     releasing = !el
     if (el) {
+      // React binds an element before the part's layout effect commits its
+      // props, and a part that took over another's key still holds that one's.
+      const props = renderedProps.get(part)
+      if (props !== undefined && props !== part.props) {
+        if (!propsBeforeBind.has(part)) {
+          propsBeforeBind.set(part, part.props)
+        }
+        commit(part, props)
+      }
       return bindTo(el)
     }
     queueMicrotask(() => {
@@ -555,6 +566,7 @@ function elementProps(
   state: object
 ) {
   takeOwnId(part, user.id)
+  renderedProps.set(part, props as Part["props"])
   const handlers: Record<string, (event: React.SyntheticEvent) => void> = {}
   for (const [type, handler] of Object.entries(partHandlers(part))) {
     const prop = eventProps[type]
@@ -741,7 +753,11 @@ function usePartState<P extends Primitive, S extends SlotName<P>>(
   )
 
   React.useLayoutEffect(() => {
-    const changed = part.props !== props && changesValues(part.props, props)
+    const before = propsBeforeBind.has(part)
+      ? propsBeforeBind.get(part)
+      : part.props
+    propsBeforeBind.delete(part)
+    const changed = before !== props && changesValues(before, props)
     commit(part, props)
     preview?.pending.delete(last)
     if (part.el && !inPage(instance)) {
