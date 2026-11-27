@@ -222,6 +222,8 @@ function guardTouch(modal: HTMLElement) {
 
   let owner: ReturnType<typeof touchOwner> = "browser"
   let start = { x: 0, y: 0 }
+  let stopped = false
+  let tap = true
   const offStart = on(
     doc,
     "touchstart",
@@ -229,6 +231,8 @@ function guardTouch(modal: HTMLElement) {
       const target = event.target instanceof Element ? event.target : null
       const touch = event.touches[0]
       start = { x: touch?.clientX ?? 0, y: touch?.clientY ?? 0 }
+      stopped = false
+      tap = true
       owner = touchOwner({
         fingers: event.touches.length,
         zoomed: (view.visualViewport?.scale ?? 1) !== 1,
@@ -243,21 +247,48 @@ function guardTouch(modal: HTMLElement) {
     doc,
     "touchmove",
     (event) => {
-      // Safari drops the click of a tap whose move was stopped, so a finger
-      // that wobbles on a button is let through until it travels like a drag.
       const touch = event.touches[0]
-      const moved = touch
-        ? Math.hypot(touch.clientX - start.x, touch.clientY - start.y)
-        : Infinity
-      if (owner === "page" && event.cancelable && moved > tapSlop) {
-        event.preventDefault()
+      if (
+        !touch ||
+        Math.hypot(touch.clientX - start.x, touch.clientY - start.y) > tapSlop
+      ) {
+        tap = false
       }
+      if (owner === "page" && event.cancelable) {
+        event.preventDefault()
+        stopped = true
+      }
+    },
+    { passive: false }
+  )
+  // Safari drops the click of a tap whose move was stopped, so a finger that
+  // wobbles on a button gets its click here, and Safari's own is held back.
+  // Its first move has to be stopped, since that decides whether the page pans.
+  const offEnd = on(
+    doc,
+    "touchend",
+    (event) => {
+      const target = event.target
+      if (
+        !stopped ||
+        !tap ||
+        !event.cancelable ||
+        !(target instanceof view.HTMLElement)
+      ) {
+        return
+      }
+      event.preventDefault()
+      target
+        .closest<HTMLElement>("input, textarea, select, [contenteditable]")
+        ?.focus()
+      target.click()
     },
     { passive: false }
   )
   return () => {
     offStart()
     offMove()
+    offEnd()
     if (marked) {
       modal.removeAttribute("data-scroll-guard")
     }
