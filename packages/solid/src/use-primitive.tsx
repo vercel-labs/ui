@@ -182,6 +182,7 @@ type Tracked = {
   owner: () => Owner | null
   tick: () => number
   attrsTick: () => number
+  present: (part: Part, from: () => unknown) => boolean
   state: (key: string) => unknown
   follow: (part: Part, from: () => unknown) => void
   rebinds: Set<(part: Part) => void>
@@ -339,11 +340,26 @@ function createTracked(
     ownedWrite: true,
     name: `${name} attrs tick`,
   })
+  // Bumps only when the part's presence changes, so a `Show` around it stays
+  // still while the part hears other changes. Each reader's props can answer
+  // differently.
+  const [presence, setPresence] = createSignal(0, {
+    ownedWrite: true,
+    name: `${name} presence`,
+  })
+  const answers = new Map<() => unknown, [props: object, shown: boolean]>()
   // Keys the props deliver reach the part through Solid (`usePrimitive`),
   // not from the effect that hands them to the instance.
   const notify = (liveOnly: boolean, delivered: boolean) => {
     if (delivered) {
       return
+    }
+    for (const [props, shown] of answers.values()) {
+      if (isPresent(subscribed, props) !== shown) {
+        answers.clear()
+        setPresence((count) => count + 1)
+        break
+      }
     }
     setTick((count) => count + 1)
     if (!liveOnly) {
@@ -429,6 +445,15 @@ function createTracked(
     owner: scopeOwner,
     tick,
     attrsTick,
+    present(part, from) {
+      presence()
+      // Every prop is read here, so a prop the answer reads only some of the
+      // time is still followed.
+      const props = { ...part.props }
+      const shown = isPresent(part, props)
+      answers.set(from, [props, shown])
+      return shown
+    },
     state: () => undefined,
     follow,
     rebinds,
@@ -843,12 +868,10 @@ function usePrimitive<P extends Primitive>(
     },
     present(name, props = noProps as never) {
       const tracked = track(name, props)
-      // Presence may read live state, so every change counts.
-      tracked.tick()
       const part = instance.part(name, props())
       tracked.follow(part, props)
       return readPart(instance, part, "present", () =>
-        isPresent(part, part.props)
+        tracked.present(part, props)
       )
     },
     slot(name, props = noProps as never, user = {}) {
@@ -1289,6 +1312,16 @@ function usePart<
   )
 }
 
+// Tracks every change a part hears, for a component that reads more than
+// the part's presence and state, like where it renders.
+function hears<P extends Primitive>(
+  handle: PrimitiveHandle<P>,
+  name: SlotName<P>,
+  props: () => unknown
+) {
+  trackers.get(handle.instance)!(name, props).tick()
+}
+
 // The props of the part of `slot` around the one rendering, as a getter, like
 // an option's inside its group. An item's `value` is its key.
 function useAround<P extends Primitive>(primitive: P, slot: SlotName<P>) {
@@ -1629,6 +1662,7 @@ export {
   createChildFlag,
   createParts,
   type GenericPartComponent,
+  hears,
   ownChildren,
   type PartComponent,
   type PartProps,

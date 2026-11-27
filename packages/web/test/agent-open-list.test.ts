@@ -47,3 +47,31 @@ test("an open select or combobox doesn't list its own trigger as a button", asyn
     expect(entry).not.toHaveProperty("buttons")
   }
 })
+
+test("a closed select's items are read without opening it", async () => {
+  const agent = createAgent()
+  document.body.innerHTML = `
+    <ui-select default-value="free">
+      <ui-select-label>Plan</ui-select-label>
+      <ui-select-trigger><button><ui-select-value></ui-select-value></button></ui-select-trigger>
+      <ui-select-content>
+        <ui-select-item value="free">Free</ui-select-item>
+        <ui-select-item value="pro">Pro</ui-select-item>
+      </ui-select-content>
+    </ui-select>`
+  await wait()
+  const select = document.querySelector("ui-select")!
+  const opens: boolean[] = []
+  select.addEventListener("openchange", (event) =>
+    opens.push(event.detail.value)
+  )
+  const [found] = (await agent.query({ within: "Plan" })) as {
+    items: { value: string }[]
+  }[]
+  expect(found.items.map((item) => item.value)).toEqual(["free", "pro"])
+  const outcome = await agent.act({
+    steps: [{ ref: "Plan", action: "setValue", args: ["Pro"] }],
+  })
+  expect(outcome.ok).toBe(true)
+  expect(opens).toEqual([])
+})

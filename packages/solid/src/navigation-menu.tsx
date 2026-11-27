@@ -23,6 +23,7 @@ import {
 import { renderPopup, usePopupContainer, type PopupContainer } from "./popup"
 import {
   createParts,
+  hears,
   renderAs,
   useHandle,
   useNearest,
@@ -165,8 +166,9 @@ function NavigationMenuContent(
   )
   // Where the content renders, or nothing while it isn't present. The
   // viewport binding and the item opening change both, and the part hears
-  // them through `present`. A move remounts the content, so it binds for where it is.
+  // them. A move remounts the content, so it binds for where it is.
   const placement = createMemo(() => {
+    hears(menu, "content", content)
     if (!menu.present("content", content)) {
       return null
     }

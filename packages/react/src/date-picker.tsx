@@ -213,7 +213,10 @@ function DatePickerInput({
 > &
   DatePickerInputProps) {
   const picker = useDatePicker("DatePickerInput")
-  // Field names the first input. The core writes the text as it changes, so React only renders where it starts.
+  // Field names the first input. The core writes the text as it changes, so
+  // React only renders where it starts. A later default would change the text
+  // behind React's back, and React would then miss the edit that clears it.
+  const start = React.useRef<{ text: unknown }>(undefined)
   const input = (merged: Record<string, any>, state: DatePickerInputState) => {
     const field = picker.field && !end ? picker.field : undefined
     const [own, element] = field
@@ -222,9 +225,10 @@ function DatePickerInput({
     const { value, ...rest }: Record<string, any> = field
       ? field.props(own)
       : own
+    start.current ??= { text: value }
     return renderElement(
       "input",
-      { ...rest, defaultValue: value },
+      { ...rest, defaultValue: start.current.text },
       element,
       state
     )
