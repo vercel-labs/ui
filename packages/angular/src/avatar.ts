@@ -76,6 +76,13 @@ class AvatarFallback {
   readonly state = usePart(inject(Avatar).handle, "fallback", () =>
     withStar(this.uiAvatarFallback(), { delay: this.delay() })
   ).state
+
+  static ngTemplateContextGuard(
+    _directive: AvatarFallback,
+    context: unknown
+  ): context is { $implicit: ReturnType<AvatarFallback["state"]> } {
+    return true
+  }
 }
 
 export type {

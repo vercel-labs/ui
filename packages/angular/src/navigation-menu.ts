@@ -345,6 +345,13 @@ class NavigationMenuViewport {
         this.#around?.container(),
     }
   ).state
+
+  static ngTemplateContextGuard(
+    _directive: NavigationMenuViewport,
+    context: unknown
+  ): context is { $implicit: ReturnType<NavigationMenuViewport["state"]> } {
+    return true
+  }
 }
 
 /**

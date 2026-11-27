@@ -115,6 +115,13 @@ class DialogTrigger {
 class DialogBackdrop {
   /** The backdrop's state, as a signal. */
   readonly state = usePopupLayer(inject(DialogScope), "backdrop").state
+
+  static ngTemplateContextGuard(
+    _directive: DialogBackdrop,
+    context: unknown
+  ): context is { $implicit: ReturnType<DialogBackdrop["state"]> } {
+    return true
+  }
 }
 
 /**

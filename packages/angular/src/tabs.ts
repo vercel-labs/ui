@@ -5,7 +5,7 @@ import {
   type TabsValueChangeReason,
 } from "@ui-sdk/core/tabs"
 import { optionalBoolean } from "./inputs.ts"
-import { emitChange, type Change } from "./outputs.ts"
+import { emitTypedChange, type Change } from "./outputs.ts"
 import { useId, usePart, usePrimitive } from "./use-primitive.ts"
 
 /**
@@ -13,18 +13,21 @@ import { useId, usePart, usePrimitive } from "./use-primitive.ts"
  * and `cancel()` to keep the current one.
  * @experimental
  */
-type TabsValueChange = Change<string | null, TabsValueChangeReason>
+type TabsValueChange<Value extends string = string> = Change<
+  Value | null,
+  TabsValueChangeReason
+>
 
 /**
  * Layered sections of content, one shown at a time.
  * @experimental
  */
 @Directive({ selector: "[uiTabs]", exportAs: "uiTabs" })
-class Tabs {
+class Tabs<Value extends string = string> {
   /** The selected tab's value. Bind it with `[(value)]` to control the tabs. `null` selects nothing. */
-  readonly value = input<string | null>()
+  readonly value = input<Value | null>()
   /** The tab selected at first, when uncontrolled. Defaults to the first enabled tab. */
-  readonly defaultValue = input<string | null>()
+  readonly defaultValue = input<Value | null>()
   /** Which arrow keys move between tabs: left and right, or up and down. */
   readonly orientation = input<"horizontal" | "vertical">()
   /** Whether focusing a tab selects it, or only Enter and Space do. */
@@ -36,9 +39,9 @@ class Tabs {
   /** Drives the tabs from outside, made with `createTabsController()`. */
   readonly controller = input<TabsController>()
   /** The new value, after a change that wasn't canceled. */
-  readonly valueChange = output<string | null>()
+  readonly valueChange = output<Value | null>()
   /** Runs before the value changes, with the reason and `cancel()`. */
-  readonly beforeValueChange = output<TabsValueChange>()
+  readonly beforeValueChange = output<TabsValueChange<Value>>()
 
   readonly handle = usePrimitive(tabs, () => ({
     value: this.value(),
@@ -48,7 +51,7 @@ class Tabs {
     loop: this.loop(),
     hiddenUntilFound: this.hiddenUntilFound(),
     controller: this.controller(),
-    onValueChange: emitChange(this.beforeValueChange, this.valueChange),
+    onValueChange: emitTypedChange(this.beforeValueChange, this.valueChange),
   }))
   /** The tabs' state, as a signal. */
   readonly state = usePart(this.handle, "root").state
@@ -134,6 +137,13 @@ class TabsPanel {
     keepMounted: this.keepMounted(),
     hiddenUntilFound: this.hiddenUntilFound(),
   })).state
+
+  static ngTemplateContextGuard(
+    _directive: TabsPanel,
+    context: unknown
+  ): context is { $implicit: ReturnType<TabsPanel["state"]> } {
+    return true
+  }
 }
 
 export { createTabsController } from "@ui-sdk/core/tabs"

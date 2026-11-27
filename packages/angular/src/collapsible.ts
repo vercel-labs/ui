@@ -77,6 +77,13 @@ class CollapsiblePanel {
     keepMounted: this.keepMounted(),
     hiddenUntilFound: this.hiddenUntilFound(),
   })).state
+
+  static ngTemplateContextGuard(
+    _directive: CollapsiblePanel,
+    context: unknown
+  ): context is { $implicit: ReturnType<CollapsiblePanel["state"]> } {
+    return true
+  }
 }
 
 export { createCollapsibleController } from "@ui-sdk/core/collapsible"

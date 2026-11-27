@@ -13,7 +13,7 @@ import {
   type CheckboxOptions,
 } from "@ui-sdk/core/checkbox"
 import { optionalBoolean } from "./inputs.ts"
-import { emitChange } from "./outputs.ts"
+import { emitChange, emitTypedChange } from "./outputs.ts"
 import {
   FieldContext,
   type FieldScope,
@@ -37,11 +37,13 @@ type CheckboxCheckedChange = Parameters<
  * What `(beforeValueChange)` emits: the value about to be set, why, and `cancel()` to keep the current one.
  * @experimental
  */
-type CheckboxGroupValueChange = Parameters<
-  NonNullable<CheckboxGroupOptions["onValueChange"]>
+type CheckboxGroupValueChange<Value extends string = string> = Parameters<
+  NonNullable<CheckboxGroupOptions<Value>["onValueChange"]>
 >[1] & {
   /** The value the change would set. */
-  value: Parameters<NonNullable<CheckboxGroupOptions["onValueChange"]>>[0]
+  value: Parameters<
+    NonNullable<CheckboxGroupOptions<Value>["onValueChange"]>
+  >[0]
 }
 
 const checkedState = (value: unknown) =>
@@ -148,19 +150,20 @@ class CheckboxIndicator {
  * @experimental
  */
 @Directive({ selector: "[uiCheckboxGroup]", exportAs: "uiCheckboxGroup" })
-class CheckboxGroup {
+class CheckboxGroup<Value extends string = string> {
   readonly #field = useFieldControl()
   /** Logs every state change with its reason to the console, in development builds. */
   readonly debug = input(undefined, { transform: optionalBoolean })
   /** The checked checkboxes' values. Bind it with `[(value)]` to control the group. */
-  readonly value: InputSignal<CheckboxGroupOptions["value"]> = input()
+  readonly value: InputSignal<CheckboxGroupOptions<Value>["value"]> = input()
   /** The values checked at first, when uncontrolled. A form reset returns to them. */
-  readonly defaultValue: InputSignal<CheckboxGroupOptions["defaultValue"]> =
-    input()
+  readonly defaultValue: InputSignal<
+    CheckboxGroupOptions<Value>["defaultValue"]
+  > = input()
   /** The new value, after a change that wasn't canceled. */
-  readonly valueChange = output<CheckboxGroupValueChange["value"]>()
+  readonly valueChange = output<CheckboxGroupValueChange<Value>["value"]>()
   /** Runs when a user or a form reset wants to change the value. `$event.reason` says why, and `$event.cancel()` stops it. */
-  readonly beforeValueChange = output<CheckboxGroupValueChange>()
+  readonly beforeValueChange = output<CheckboxGroupValueChange<Value>>()
   /** Every value a parent checkbox checks. Without it, the parent checks the checkboxes in the group. Pass it to render the parent right on the server. */
   readonly allValues: InputSignal<CheckboxGroupOptions["allValues"]> = input()
   /** Disables every checkbox in the group, and leaves them out of the form. */
@@ -180,7 +183,7 @@ class CheckboxGroup {
     debug: this.debug(),
     value: this.value(),
     defaultValue: this.defaultValue(),
-    onValueChange: emitChange(this.beforeValueChange, this.valueChange),
+    onValueChange: emitTypedChange(this.beforeValueChange, this.valueChange),
     allValues: this.allValues(),
     disabled: this.disabled() || this.#field?.disabled(),
     readOnly: this.readOnly(),

@@ -11,7 +11,7 @@ import {
   type SegmentedControlOptions,
 } from "@ui-sdk/core/segmented-control"
 import { optionalBoolean } from "./inputs.ts"
-import { emitChange } from "./outputs.ts"
+import { emitTypedChange } from "./outputs.ts"
 import { useFieldControl } from "./field-context.ts"
 import { useNativeInput } from "./native-input.ts"
 import { usePart, usePrimitive } from "./use-primitive.ts"
@@ -20,11 +20,13 @@ import { usePart, usePrimitive } from "./use-primitive.ts"
  * What `(beforeValueChange)` emits: the value about to be set, why, and `cancel()` to keep the current one.
  * @experimental
  */
-type SegmentedControlValueChange = Parameters<
-  NonNullable<SegmentedControlOptions["onValueChange"]>
+type SegmentedControlValueChange<Value extends string = string> = Parameters<
+  NonNullable<SegmentedControlOptions<Value>["onValueChange"]>
 >[1] & {
   /** The value the change would set. */
-  value: Parameters<NonNullable<SegmentedControlOptions["onValueChange"]>>[0]
+  value: Parameters<
+    NonNullable<SegmentedControlOptions<Value>["onValueChange"]>
+  >[0]
 }
 
 /**
@@ -32,19 +34,20 @@ type SegmentedControlValueChange = Parameters<
  * @experimental
  */
 @Directive({ selector: "[uiSegmentedControl]", exportAs: "uiSegmentedControl" })
-class SegmentedControl {
+class SegmentedControl<Value extends string = string> {
   readonly #field = useFieldControl()
   /** Logs every state change with its reason to the console, in development builds. */
   readonly debug = input(undefined, { transform: optionalBoolean })
   /** The checked item's value. Bind it with `[(value)]` to control the segmented control. `null` checks nothing. */
-  readonly value: InputSignal<SegmentedControlOptions["value"]> = input()
+  readonly value: InputSignal<SegmentedControlOptions<Value>["value"]> = input()
   /** The item checked at first, when uncontrolled. A form reset returns to it. */
-  readonly defaultValue: InputSignal<SegmentedControlOptions["defaultValue"]> =
-    input()
+  readonly defaultValue: InputSignal<
+    SegmentedControlOptions<Value>["defaultValue"]
+  > = input()
   /** The new value, after a change that wasn't canceled. */
-  readonly valueChange = output<SegmentedControlValueChange["value"]>()
+  readonly valueChange = output<SegmentedControlValueChange<Value>["value"]>()
   /** Runs when a user or a form reset wants to change the value. `$event.reason` says why, and `$event.cancel()` stops it. */
-  readonly beforeValueChange = output<SegmentedControlValueChange>()
+  readonly beforeValueChange = output<SegmentedControlValueChange<Value>>()
   /** Disables every item: they can't be focused or changed, and the value isn't submitted. */
   readonly disabled = input(undefined, { transform: optionalBoolean })
   /** Keeps the items focusable and the value submitted, but stops changes. */
@@ -68,7 +71,7 @@ class SegmentedControl {
     debug: this.debug(),
     value: this.value(),
     defaultValue: this.defaultValue(),
-    onValueChange: emitChange(this.beforeValueChange, this.valueChange),
+    onValueChange: emitTypedChange(this.beforeValueChange, this.valueChange),
     disabled: this.disabled() || this.#field?.disabled(),
     readOnly: this.readOnly(),
     required: this.required(),

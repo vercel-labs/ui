@@ -318,6 +318,13 @@ class DrawerShortcut {
 class DrawerBackdrop {
   /** The part's state, as a signal. */
   readonly state = usePopupLayer(inject(DrawerScope), "backdrop").state
+
+  static ngTemplateContextGuard(
+    _directive: DrawerBackdrop,
+    context: unknown
+  ): context is { $implicit: ReturnType<DrawerBackdrop["state"]> } {
+    return true
+  }
 }
 
 /**

@@ -12,7 +12,7 @@ import {
   type ToggleOptions,
 } from "@ui-sdk/core/toggle"
 import { optionalBoolean } from "./inputs.ts"
-import { emitChange } from "./outputs.ts"
+import { emitChange, emitTypedChange } from "./outputs.ts"
 import { useToolbarScope } from "./toolbar-context.ts"
 import { usePart, usePrimitive } from "./use-primitive.ts"
 
@@ -31,11 +31,11 @@ type TogglePressedChange = Parameters<
  * What `(beforeValueChange)` emits: the value about to be set, why, and `cancel()` to keep the current one.
  * @experimental
  */
-type ToggleGroupValueChange = Parameters<
-  NonNullable<ToggleGroupOptions["onValueChange"]>
+type ToggleGroupValueChange<Value extends string = string> = Parameters<
+  NonNullable<ToggleGroupOptions<Value>["onValueChange"]>
 >[1] & {
   /** The value the change would set. */
-  value: Parameters<NonNullable<ToggleGroupOptions["onValueChange"]>>[0]
+  value: Parameters<NonNullable<ToggleGroupOptions<Value>["onValueChange"]>>[0]
 }
 
 /**
@@ -103,18 +103,19 @@ class ToggleIcon {
  * @experimental
  */
 @Directive({ selector: "[uiToggleGroup]", exportAs: "uiToggleGroup" })
-class ToggleGroup {
+class ToggleGroup<Value extends string = string> {
   /** Logs every state change with its reason to the console, in development builds. */
   readonly debug = input(undefined, { transform: optionalBoolean })
   /** The pressed toggles' values. Bind it with `[(value)]` to control the group. */
-  readonly value: InputSignal<ToggleGroupOptions["value"]> = input()
+  readonly value: InputSignal<ToggleGroupOptions<Value>["value"]> = input()
   /** The toggles pressed at first, when uncontrolled. */
-  readonly defaultValue: InputSignal<ToggleGroupOptions["defaultValue"]> =
-    input()
+  readonly defaultValue: InputSignal<
+    ToggleGroupOptions<Value>["defaultValue"]
+  > = input()
   /** The new value, after a change that wasn't canceled. */
-  readonly valueChange = output<ToggleGroupValueChange["value"]>()
+  readonly valueChange = output<ToggleGroupValueChange<Value>["value"]>()
   /** Runs when a toggle wants to be pressed or unpressed. `$event.reason` says why, and `$event.cancel()` stops it. */
-  readonly beforeValueChange = output<ToggleGroupValueChange>()
+  readonly beforeValueChange = output<ToggleGroupValueChange<Value>>()
   /** Whether several toggles can be pressed at once. Otherwise pressing one unpresses the others. */
   readonly multiple = input(undefined, { transform: optionalBoolean })
   /** Whether the pressed toggle can be unpressed when only one may be pressed. With `false`, one toggle stays pressed once any is. Ignored with `multiple`. */
@@ -133,7 +134,7 @@ class ToggleGroup {
     debug: this.debug(),
     value: this.value(),
     defaultValue: this.defaultValue(),
-    onValueChange: emitChange(this.beforeValueChange, this.valueChange),
+    onValueChange: emitTypedChange(this.beforeValueChange, this.valueChange),
     multiple: this.multiple(),
     deselectable: this.deselectable(),
     disabled: this.disabled(),

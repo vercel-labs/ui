@@ -22,6 +22,19 @@ const emitChange =
     }
   }
 
+// The same for a root typed by its own values, like `Tabs<"a" | "b">`. Core
+// holds them as plain strings, and they are the ones the root was given.
+const emitTypedChange = <
+  Emitted extends ChangeDetails<string> & { value: unknown },
+>(
+  before: OutputEmitterRef<Emitted>,
+  changed?: OutputEmitterRef<Emitted["value"]>
+) =>
+  emitChange(before, changed) as (
+    value: unknown,
+    details: ChangeDetails<string>
+  ) => void
+
 // What an `(action)` output emits: the press, how it was made, and `waitUntil()`.
 type Action = ActionDetails & {
   /** The press that ran the action. An agent's press has none. */
@@ -102,6 +115,7 @@ export {
   ActionEmitter,
   type Change,
   emitChange,
+  emitTypedChange,
   emitWaiting,
   EventActionEmitter,
   ListenedEmitter,

@@ -5,7 +5,7 @@ import {
   type AccordionValueChangeReason,
 } from "@ui-sdk/core/accordion"
 import { optionalBoolean } from "./inputs.ts"
-import { emitChange, type Change } from "./outputs.ts"
+import { emitChange, emitTypedChange, type Change } from "./outputs.ts"
 import { useId, usePart, usePrimitive } from "./use-primitive.ts"
 
 /**
@@ -13,7 +13,10 @@ import { useId, usePart, usePrimitive } from "./use-primitive.ts"
  * `cancel()` to leave them as they are.
  * @experimental
  */
-type AccordionValueChange = Change<string[], AccordionValueChangeReason>
+type AccordionValueChange<Value extends string = string> = Change<
+  Value[],
+  AccordionValueChangeReason
+>
 
 /**
  * What an item's `(beforeOpenChange)` emits: whether it is about to open,
@@ -27,11 +30,11 @@ type AccordionItemOpenChange = Change<boolean, AccordionValueChangeReason>
  * @experimental
  */
 @Directive({ selector: "[uiAccordion]", exportAs: "uiAccordion" })
-class Accordion {
+class Accordion<Value extends string = string> {
   /** The open items' values. Bind it with `[(value)]` to control the accordion. */
-  readonly value = input<string[]>()
+  readonly value = input<Value[]>()
   /** The items open at first, when uncontrolled. */
-  readonly defaultValue = input<string[]>()
+  readonly defaultValue = input<Value[]>()
   /** Whether several items can be open at once. Otherwise opening one closes the others. */
   readonly multiple = input(undefined, { transform: optionalBoolean })
   /** Whether the open item can close when only one may be open. */
@@ -45,9 +48,9 @@ class Accordion {
   /** Opens and closes items from anywhere. Create one with `createAccordionController()`. */
   readonly controller = input<AccordionController>()
   /** The open items' values, after a change that wasn't canceled. */
-  readonly valueChange = output<string[]>()
+  readonly valueChange = output<Value[]>()
   /** Runs before items open or close, with the reason and `cancel()`. */
-  readonly beforeValueChange = output<AccordionValueChange>()
+  readonly beforeValueChange = output<AccordionValueChange<Value>>()
 
   readonly handle = usePrimitive(accordion, () => ({
     value: this.value(),
@@ -58,7 +61,7 @@ class Accordion {
     keepMounted: this.keepMounted(),
     hiddenUntilFound: this.hiddenUntilFound(),
     controller: this.controller(),
-    onValueChange: emitChange(this.beforeValueChange, this.valueChange),
+    onValueChange: emitTypedChange(this.beforeValueChange, this.valueChange),
   }))
   /** The accordion's state, as a signal. */
   readonly state = usePart(this.handle, "root").state
@@ -139,6 +142,13 @@ class AccordionPanel {
     keepMounted: this.keepMounted(),
     hiddenUntilFound: this.hiddenUntilFound(),
   })).state
+
+  static ngTemplateContextGuard(
+    _directive: AccordionPanel,
+    context: unknown
+  ): context is { $implicit: ReturnType<AccordionPanel["state"]> } {
+    return true
+  }
 }
 
 export { createAccordionController } from "@ui-sdk/core/accordion"

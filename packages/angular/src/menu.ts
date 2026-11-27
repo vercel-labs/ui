@@ -48,6 +48,7 @@ import {
 import { MenubarContext } from "./menubar-context.ts"
 import {
   emitChange,
+  emitTypedChange,
   EventActionEmitter,
   ValueActionEmitter,
   type Change,
@@ -136,7 +137,10 @@ type MenuCheckboxItemCheckedChange = Change<boolean, MenuCheckedChangeReason>
  * selected, why, and `cancel()` to keep the current one.
  * @experimental
  */
-type MenuRadioGroupValueChange = Change<string, MenuValueChangeReason>
+type MenuRadioGroupValueChange<Value extends string = string> = Change<
+  Value,
+  MenuValueChangeReason
+>
 
 // What a menu or a submenu hands its parts. A submenu renders inside its
 // parent's popup and moves with it.
@@ -564,17 +568,17 @@ class MenuCheckboxItem {
  * @experimental
  */
 @Directive({ selector: "[uiMenuRadioGroup]", exportAs: "uiMenuRadioGroup" })
-class MenuRadioGroup {
+class MenuRadioGroup<Value extends string = string> {
   /** Identifies the group in the menu's `(valueChange)`. Defaults to a generated id. */
   readonly name = input<string>()
   /** The selected value. Bind it with `[(value)]` to control the group. `null` selects nothing. */
-  readonly value = input<string | null>()
+  readonly value = input<Value | null>()
   /** The value selected at first, when uncontrolled. */
-  readonly defaultValue = input<string | null>()
+  readonly defaultValue = input<Value | null>()
   /** The selected value, after a change that wasn't canceled. */
-  readonly valueChange = output<string>()
+  readonly valueChange = output<Value>()
   /** Runs when the selection wants to change. `$event.reason` says why, and `$event.cancel()` stops it. */
-  readonly beforeValueChange = output<MenuRadioGroupValueChange>()
+  readonly beforeValueChange = output<MenuRadioGroupValueChange<Value>>()
 
   readonly #menu = inject(MenuScope).handle
   readonly #generated = useId()
@@ -586,7 +590,7 @@ class MenuRadioGroup {
     name: this.group(),
     value: this.value(),
     defaultValue: this.defaultValue(),
-    onValueChange: emitChange(this.beforeValueChange, this.valueChange),
+    onValueChange: emitTypedChange(this.beforeValueChange, this.valueChange),
   })).state
 
   constructor() {
@@ -673,6 +677,13 @@ class MenuItemIndicator {
 
   constructor() {
     useFeature(this.#menu, menuCheckable)
+  }
+
+  static ngTemplateContextGuard(
+    _directive: MenuItemIndicator,
+    context: unknown
+  ): context is { $implicit: ReturnType<MenuItemIndicator["state"]> } {
+    return true
   }
 }
 

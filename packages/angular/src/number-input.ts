@@ -242,6 +242,13 @@ class NumberInputScrubAreaCursor {
   /** The part's state, as a signal. */
   readonly state = usePart(inject(NumberInput).handle, "scrub-area-cursor")
     .state
+
+  static ngTemplateContextGuard(
+    _directive: NumberInputScrubAreaCursor,
+    context: unknown
+  ): context is { $implicit: ReturnType<NumberInputScrubAreaCursor["state"]> } {
+    return true
+  }
 }
 
 export { createNumberInputController } from "@ui-sdk/core/number-input"
