@@ -619,6 +619,12 @@ function createPointerDriver(options: SheetDriverOptions) {
       }
       closing = null
       dispatch({ type: "snap-to", time: performance.now(), id, reason })
+      // Settling back to where it rests reports no snap, as when a release's
+      // snap is refused, so the target follows the settle here.
+      if (state.phase === "settling") {
+        targetId =
+          options.config().snapPoints[state.targetIndex]?.id ?? targetId
+      }
     },
     nudge() {
       if (!closing && !options.reducedMotion()) {
