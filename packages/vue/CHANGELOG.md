@@ -1,5 +1,11 @@
 # @ui-sdk/vue
 
+## 0.1.0-beta.20
+
+### Patch Changes
+
+- Updated @ui-sdk/core to 0.1.0-beta.20
+
 ## 0.1.0-beta.19
 
 ### Patch Changes
