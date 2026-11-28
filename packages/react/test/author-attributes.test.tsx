@@ -92,3 +92,22 @@ test("a popover's content takes the label it's given over its trigger's name", a
   expect(content.getAttribute("aria-label")).toBe("Add a deliverable")
   expect(content.hasAttribute("aria-labelledby")).toBe(false)
 })
+
+test("a popover's content goes back to its trigger's name when its label is taken away", async () => {
+  const view = (label?: string) => (
+    <Popover defaultOpen>
+      <PopoverTrigger>Add deliverable</PopoverTrigger>
+      <PopoverContent aria-label={label}>
+        <input aria-label="Name" />
+      </PopoverContent>
+    </Popover>
+  )
+  await render(view("Add a deliverable"))
+  const content = document.querySelector('[data-slot="popover-content"]')!
+  await React.act(async () => root!.render(view()))
+  await React.act(async () => new Promise((resolve) => setTimeout(resolve, 20)))
+  expect(content.hasAttribute("aria-label")).toBe(false)
+  expect(content.getAttribute("aria-labelledby")).toBe(
+    document.querySelector('[data-slot="popover-trigger"]')!.id
+  )
+})

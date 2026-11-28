@@ -339,13 +339,22 @@ function popupContent<State extends PopupState, Api extends PopupApi>(
     },
     bind(el, part) {
       settleFlag(part.store, "titled")
-      const named = el.hasAttribute("aria-label")
-      if (named !== !!part.store.get().named) {
-        later(part.store, (draft) => {
-          draft.named = named
-        })
+      const name = () => {
+        const named = el.hasAttribute("aria-label")
+        if (named !== !!part.store.get().named) {
+          later(part.store, (draft) => {
+            draft.named = named
+          })
+        }
       }
-      return bindPopupContent(el, part.api.internal, part.key, part)
+      name()
+      const observer = new MutationObserver(name)
+      observer.observe(el, { attributeFilter: ["aria-label"] })
+      const unbind = bindPopupContent(el, part.api.internal, part.key, part)
+      return () => {
+        observer.disconnect()
+        unbind?.()
+      }
     },
   })
 }
