@@ -483,6 +483,8 @@ function labelOf(parts: Bound[], entry?: Entry) {
   )
   for (const part of [
     ...parts.filter((part) => !part.key),
+    // A popup's content names it while hidden too, as React's keyless one does.
+    ...parts.filter((part) => part.key && part.el === popup),
     ...sole,
     ...keyed,
   ]) {
