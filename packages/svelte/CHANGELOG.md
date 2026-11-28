@@ -1,5 +1,13 @@
 # @ui-sdk/svelte
 
+## 0.1.0-beta.20
+
+### Patch Changes
+
+- 2c85022: Svelte components no longer render a space beside their hidden native input or textarea, so nothing but the control and the input lands in your layout, as in React.
+- e3322b2: A waterfall row with more than one cell no longer warns that its cells share a key.
+- Updated @ui-sdk/core to 0.1.0-beta.20
+
 ## 0.1.0-beta.19
 
 ### Patch Changes

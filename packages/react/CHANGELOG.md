@@ -1,5 +1,12 @@
 # @ui-sdk/react
 
+## 0.1.0-beta.20
+
+### Patch Changes
+
+- 32e8817: A Button rendered through a part's `render`, like a tooltip trigger, shows its pending state again: a merged event handler returns what the element's own handler returns.
+- Updated @ui-sdk/core to 0.1.0-beta.20
+
 ## 0.1.0-beta.19
 
 ### Patch Changes

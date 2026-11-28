@@ -1,5 +1,25 @@
 # @ui-sdk/core
 
+## 0.1.0-beta.20
+
+### Patch Changes
+
+- 76b19dd: The agent names a closed web popup that several triggers share by its content's `aria-label`, as it does in React.
+- 8c5d8cf: An autocomplete or combobox open as a sheet keeps its field's name in the agent snapshot.
+- cdc84c2: The agent snapshot leaves out a checkbox's or switch's value when it's the default "on".
+- ff7a63a: Popup content with an `aria-label` of its own, like `<PopoverContent aria-label="Add a deliverable">`, is now named by it instead of its trigger.
+- 091efbe: A checkbox taken out of its group no longer throws when the group's value changes before the checkbox unbinds, as a web component does a microtask after removal.
+- 39d9924: A controlled drawer dragged to another snap point settles there once `snapPoint` follows `onSnapPointChange`, instead of staying where the drag started.
+- 4577f9a: An item highlighted as its list mounts, like a Command's `defaultValue`, now scrolls into view, as it does when you move the highlight.
+- cb87d50: Listbox, Select and the other lists scroll an option fully into view while an ancestor is scaled, like a popup that scales in as it opens.
+- 7d2667b: On iPad and iPhone, a tap on a modal's button whose finger moves a little now clicks. A drag that would scroll the page behind the modal is still stopped.
+- 0049e24: On iOS Safari, a tap on a Slider's track or a Color Picker's area or channel slider no longer also clicks a button just beside it.
+- fac67bf: A submenu opened with a click or a key and closed with Escape before the hover delay ends stays closed, instead of opening again while the pointer rests on its trigger.
+- 786e6e0: Canceling a typed change in a date, time, email or number input puts the value back without throwing.
+- 1b184b4: Text matching no longer throws on its first call when a global `window` has no `addEventListener`, as in React Native.
+- e157932: A trigger menu with an empty part reopens with Control+Space on a query that matches nothing, after its content unmounted on close.
+- e3322b2: A waterfall row with more than one cell no longer warns that its cells share a key.
+
 ## 0.1.0-beta.19
 
 ### Patch Changes

@@ -1,5 +1,14 @@
 # @ui-sdk/web
 
+## 0.1.0-beta.20
+
+### Patch Changes
+
+- 1d7fb2d: A collapsible opened or closed from script now fires its completion event, even without an animation.
+- 1b49088: `<ui-trigger-menu-input>` now takes the field inside a `<ui-textarea>` or `<ui-input>`, so the SDK's Textarea works as a trigger menu's field.
+- 93e1afb: Parts written to the page together get their attributes before any of them binds, so a part's transitions no longer run as the page opens when a component before it reads a style.
+- Updated @ui-sdk/core to 0.1.0-beta.20
+
 ## 0.1.0-beta.19
 
 ### Patch Changes
