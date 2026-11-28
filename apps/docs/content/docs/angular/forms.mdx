@@ -1,0 +1,139 @@
+---
+title: Forms
+description: Submit component values, label controls, and show validation errors.
+---
+
+Give a control a `name` to include its value in a form. This works for Select and Combobox as well as inputs and checkboxes. Each control submits through a native form field the browser reads, so a plain `<form>` works without Angular's forms package.
+
+## Submit a Value
+
+```ts
+import { Component } from "@angular/core"
+import { Checkbox } from "@ui-sdk/angular/checkbox"
+
+@Component({
+  selector: "app-preferences",
+  imports: [Checkbox],
+  template: `
+    <form action="/preferences" method="post">
+      <label>
+        <button uiCheckbox name="updates" value="yes" defaultChecked></button>
+        Email me updates
+      </label>
+      <button type="submit">Save</button>
+      <button type="reset">Reset</button>
+    </form>
+  `,
+})
+export class Preferences {}
+```
+
+The checkbox submits `updates=yes` when checked. Reset restores its default value.
+
+## Reset a Controlled Value
+
+A reset also goes through `(beforeCheckedChange)` and `[(checked)]`. Keep the binding in place so your signal follows the reset:
+
+```ts
+import { Component, signal } from "@angular/core"
+import { Checkbox, type CheckedState } from "@ui-sdk/angular/checkbox"
+
+@Component({
+  selector: "app-preferences",
+  imports: [Checkbox],
+  template: `
+    <form>
+      <label>
+        <button
+          uiCheckbox
+          [(checked)]="checked"
+          name="updates"
+          defaultChecked
+          (beforeCheckedChange)="reason.set($event.reason)"
+        ></button>
+        Email me updates
+      </label>
+      <button type="reset">Reset</button>
+      <output>{{ reason() }}</output>
+    </form>
+  `,
+})
+export class Preferences {
+  readonly checked = signal<CheckedState>(true)
+  readonly reason = signal("No change yet")
+}
+```
+
+Uncheck the box, then press Reset. `defaultChecked` supplies the reset value. `(beforeCheckedChange)` receives `true` with reason `"reset"`, and the binding updates `checked`. It runs when reset requests a different value; it does not run if the checkbox is already at its default. Without `defaultChecked`, a reset leaves a controlled checkbox as it is, so your signal stays the only source of its value.
+
+## Label and Validate a Field
+
+`uiField` connects a control to its label, description, and error message:
+
+```ts
+import { Component } from "@angular/core"
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "@ui-sdk/angular/field"
+import { Input } from "@ui-sdk/angular/input"
+
+@Component({
+  selector: "app-email-field",
+  imports: [Field, FieldDescription, FieldError, FieldLabel, Input],
+  template: `
+    <div uiField name="email">
+      <label uiFieldLabel>Email</label>
+      <input uiInput type="email" required />
+      <p uiFieldDescription>We'll only use it for receipts.</p>
+      <p uiFieldError></p>
+    </div>
+  `,
+})
+export class EmailField {}
+```
+
+You can use a Textarea, Checkbox, Switch, Radio Group, or Select in place of the Input. [Field](./components/field) shows how they connect. The error left empty shows the browser's message for the current problem.
+
+On controls that support them, `required`, `disabled`, `readOnly`, and `form` follow native conventions. Disabled fields are left out of submission; read-only fields remain focusable and submitted.
+
+## Handle a Submission
+
+On a normal submit, the browser checks constraints such as `required` and `type="email"` before running your handler.
+
+Your server may still reject a valid-looking value. Pass `invalid` to the field and show the server's message. When the user edits the field, clear the message and return `invalid` to `undefined` so the field uses native validation again. This example expects a `/api/preferences` endpoint:
+
+```ts
+import { Component, signal } from "@angular/core"
+import { Field, FieldError, FieldLabel } from "@ui-sdk/angular/field"
+import { Input } from "@ui-sdk/angular/input"
+
+@Component({
+  selector: "app-email-form",
+  imports: [Field, FieldError, FieldLabel, Input],
+  template: `
+    <form (submit)="save($event)">
+      <div uiField name="email" [invalid]="error() ? true : undefined">
+        <label uiFieldLabel>Email</label>
+        <input uiInput type="email" required (valueChange)="error.set('')" />
+        <p *uiFieldError="let state">{{ error() || state.message }}</p>
+      </div>
+      <button type="submit">Save</button>
+    </form>
+  `,
+})
+export class EmailForm {
+  readonly error = signal("")
+
+  async save(event: SubmitEvent) {
+    event.preventDefault()
+    const body = new FormData(event.currentTarget as HTMLFormElement)
+    const response = await fetch("/api/preferences", { method: "POST", body })
+    this.error.set(response.ok ? "" : "That email is already taken.")
+  }
+}
+```
+
+Without a handler, the form submits through its `action` URL.

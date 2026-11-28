@@ -1,0 +1,302 @@
+---
+title: Collapsible
+description: Show and hide a panel, preserve its contents, and animate its height.
+---
+
+Use a collapsible to show and hide one panel of content. For a set of panels, use an [accordion](./accordion).
+
+<ComponentExample
+  name="collapsible/basic"
+  caption="Press Order #4189, or focus it and press Enter or Space, to show the items."
+/>
+
+## Installation
+
+```bash
+npm install @ui-sdk/angular @ui-sdk/core
+```
+
+## Composition
+
+Use the following composition to build Collapsible:
+
+```text
+uiCollapsible
+├── uiCollapsibleTrigger
+└── uiCollapsiblePanel
+```
+
+The root and panel render divs, and the trigger renders a native button. Put other content around them, like a heading or a summary that always shows.
+
+## Usage
+
+Import the parts and put them together:
+
+```ts
+import { Component } from "@angular/core"
+import {
+  Collapsible,
+  CollapsiblePanel,
+  CollapsibleTrigger,
+} from "@ui-sdk/angular/collapsible"
+
+@Component({
+  selector: "app-example",
+  imports: [Collapsible, CollapsiblePanel, CollapsibleTrigger],
+  template: `
+    <div uiCollapsible>
+      <button uiCollapsibleTrigger>Order details</button>
+      <div uiCollapsiblePanel>2 × Linen shirt</div>
+    </div>
+  `,
+})
+class Example {}
+
+export { Example }
+```
+
+## Build Your Own
+
+`@ui-sdk/angular/collapsible` comes with a ready-made Collapsible. If you'd like to build your own, with your own names, start from the `collapsible` primitive in `@ui-sdk/core`:
+
+```ts title="spoiler.ts"
+import { Directive, inject } from "@angular/core"
+import { collapsible } from "@ui-sdk/core/collapsible"
+import { usePart, usePrimitive } from "@ui-sdk/angular/primitive"
+
+@Directive({ selector: "[appSpoiler]" })
+class Spoiler {
+  readonly handle = usePrimitive(collapsible, () => ({}))
+  readonly state = usePart(this.handle, "root").state
+}
+
+@Directive({ selector: "[appSpoilerToggle]" })
+class SpoilerToggle {
+  readonly state = usePart(inject(Spoiler).handle, "trigger").state
+}
+
+@Directive({ selector: "[appSpoilerContent]" })
+class SpoilerContent {
+  readonly state = usePart(inject(Spoiler).handle, "panel").state
+}
+
+export { Spoiler, SpoilerContent, SpoilerToggle }
+```
+
+```ts
+import { Component } from "@angular/core"
+import { Spoiler, SpoilerContent, SpoilerToggle } from "./spoiler"
+
+@Component({
+  selector: "app-spoiler-example",
+  imports: [Spoiler, SpoilerContent, SpoilerToggle],
+  template: `
+    <div appSpoiler>
+      <button appSpoilerToggle>Show the ending</button>
+      <div *appSpoilerContent>The butler did it.</div>
+    </div>
+  `,
+})
+export class SpoilerExample {}
+```
+
+Connect the other slots the same way, each with `usePart`. Each part keeps the behavior, state and data attributes of its ready-made counterpart. See [Rendering Primitives](../rendering) and [Custom Parts](../custom-parts) for more.
+
+## Disabled
+
+Set `disabled` on the root to stop its trigger from opening or closing the panel. The trigger stays in the tab order and reports `aria-disabled="true"`. A disabled `<fieldset>` around the collapsible disables it too.
+
+```angular-html
+<div uiCollapsible disabled>
+  <button uiCollapsibleTrigger>Gift options</button>
+  <div uiCollapsiblePanel>Add a gift message and wrapping.</div>
+</div>
+```
+
+## Keep Mounted
+
+Panels unmount when they close, so Tab skips their contents. Set `keepMounted` on the panel to keep it mounted and hidden, so a field keeps what you typed into it.
+
+<ComponentExample
+  name="collapsible/keep-mounted"
+  caption="Open Add a delivery note, type a note, then close and reopen the panel. Your note is still there."
+/>
+
+## Find in Page
+
+Set `hiddenUntilFound` on the panel to keep it in the DOM as `hidden="until-found"`. Browser Find and links to content inside the panel can reveal it. The panel opens without an animation so the match is visible immediately.
+
+Server rendering keeps `hidden="until-found"` on the server, so the closed panel is findable before hydration.
+
+<ComponentExample
+  name="collapsible/find-in-page"
+  caption="Leave Ingredients closed. Open your browser's Find command and search for cardamom to reveal the panel."
+/>
+
+## Controlled
+
+Bind `open` with `[(open)]`. `(beforeOpenChange)` also gets the change details: call `$event.cancel()` in it to cancel the change.
+
+For a button elsewhere on the page, create a [controller](#controller) with `createCollapsibleController()` and pass it as `controller`. Create one controller per mounted collapsible.
+
+<ComponentExample
+  name="collapsible/controlled"
+  caption="Open Recovery codes with Toggle or its trigger, then press Done. The console logs each change and its reason, and Done returns focus to the trigger."
+/>
+
+## Animation
+
+Animate the measured `--collapsible-panel-height` between zero and the content's height. `data-starting-style` marks the opening frame, and `data-ending-style` stays on while it closes. The panel stays mounted until its closing animation finishes, and a panel open on its first paint doesn't animate.
+
+<StyleTabs>
+
+```css
+[data-slot="collapsible-panel"] {
+  height: var(--collapsible-panel-height);
+  overflow: hidden;
+  transition: height 0.2s ease-out;
+
+  &:is([data-starting-style], [data-ending-style]) {
+    height: 0;
+  }
+}
+```
+
+```angular-html
+<div
+  uiCollapsiblePanel
+  class="h-(--collapsible-panel-height) overflow-hidden transition-[height] duration-200 ease-out data-starting-style:h-0 data-ending-style:h-0"
+></div>
+```
+
+</StyleTabs>
+
+`(openChangeComplete)` reports when opening or closing has finished.
+
+<ComponentExample
+  name="collapsible/animation"
+  caption="Open and close Release notes. The console logs when each animation finishes."
+/>
+
+## Custom Rendering
+
+Each directive goes on an element you write, so you choose the element and read its state from a template reference, like `#parcel="uiCollapsible"` and then `parcel.state().open`. The trigger below sits inside a heading, and the panel is an ordered list.
+
+<ComponentExample
+  name="collapsible/render"
+  caption="Press Track parcel to open the ordered list. The summary changes from Arrives Thursday to 3 updates."
+/>
+
+## Styling
+
+Use `data-open`, `data-closed` and `data-disabled` to style each state. The examples turn their chevron from the trigger's `data-open`.
+
+Each part has a `data-slot`, such as `collapsible-panel`, and its state attributes are listed under [Data Attributes](#data-attributes).
+
+### CollapsiblePanel [#styling-collapsiblepanel]
+
+<CssVariables component="collapsible" part="panel" />
+
+## Data Attributes
+
+### Collapsible [#data-attributes-collapsible]
+
+<DataAttributes component="collapsible" part="root" />
+
+### CollapsibleTrigger [#data-attributes-collapsibletrigger]
+
+<DataAttributes component="collapsible" part="trigger" />
+
+### CollapsiblePanel [#data-attributes-collapsiblepanel]
+
+<DataAttributes component="collapsible" part="panel" />
+
+## API Reference
+
+Each option below is an input on the directive, and each callback an output. A change callback is two outputs: `(beforeOpenChange)`, with the details and `cancel()`, then `(openChange)` with the new value alone. Bind `open` with `[(open)]`.
+
+### Collapsible
+
+<TypeTable
+  path="../../packages/core/src/components/collapsible/collapsible.ts"
+  name="CollapsibleOptions"
+/>
+
+### CollapsibleTrigger
+
+The trigger takes no inputs of its own. Everything else stays on your element.
+
+### CollapsiblePanel
+
+<TypeTable
+  path="../../packages/core/src/components/collapsible/collapsible.ts"
+  name="CollapsiblePanelProps"
+/>
+
+### State
+
+What each part's `state()` signal holds. The trigger and the panel receive the same state as the
+collapsible.
+
+<StateTable
+  path="../../packages/core/src/components/collapsible/collapsible.ts"
+  name="CollapsibleState"
+/>
+
+### Reasons
+
+`$event.reason` says why the panel opened or closed.
+
+<ReasonTable
+  path="../../packages/core/src/components/collapsible/collapsible.ts"
+  name="CollapsibleOpenChangeReason"
+/>
+
+### Controller
+
+Create one with `createCollapsibleController()` and pass it as `controller`.
+
+Every write method takes an optional `{ reason, event }`, and returns `false` when the change was canceled or changed nothing.
+
+<ControllerTable
+  path="../../packages/core/src/components/collapsible/collapsible.ts"
+  name="CollapsibleController"
+/>
+
+### Events
+
+A `before` output emits `{ value, reason, event, cancel() }` before the change, and its plain output follows with the value alone. A bound `open` only updates when `(beforeOpenChange)` wasn't canceled.
+
+| Binding                | On              | Receives                                                                 |
+| ---------------------- | --------------- | ------------------------------------------------------------------------ |
+| `[(open)]`             | `uiCollapsible` | Whether the panel is open                                                |
+| `(beforeOpenChange)`   | `uiCollapsible` | `{ value, reason, cancel() }`: the new state, and the [reason](#reasons) |
+| `(openChangeComplete)` | `uiCollapsible` | `$event`, whether it's open, after the panel's animation                 |
+
+## Accessibility
+
+The collapsible follows the [WAI-ARIA disclosure pattern](https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/). The trigger says whether the panel is open with `aria-expanded`, and points to the panel with `aria-controls` while it's mounted. Every line below is an automated test.
+
+### Keyboard
+
+| Key          | Does                                                   |
+| ------------ | ------------------------------------------------------ |
+| Enter, Space | Opens or closes the panel. Focus stays on the trigger. |
+| Tab          | Moves from the trigger into an open panel              |
+
+Closing a panel while focus is inside it moves focus back to the trigger.
+
+### Tested Behavior
+
+<SpecList
+  spec="collapsible"
+  only={["opening and closing", "keyboard", "mounting"]}
+/>
+
+Beyond the pattern's baseline:
+
+<SpecList spec="collapsible.enhancements" />
+
+Screen readers hear the same thing in each tested framework, recorded by a virtual screen reader:
+
+<SpecList spec="collapsible.sr" />

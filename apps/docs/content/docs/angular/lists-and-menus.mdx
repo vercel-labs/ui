@@ -1,0 +1,150 @@
+---
+title: Lists and Menus
+description: Supply options as data, load them from a server, and define menu actions.
+---
+
+Select, Combobox, Autocomplete, Listbox, and Trigger Menu accept items as data. Use this when your choices already come from an array. You can also compose their item parts yourself.
+
+## Start with Strings
+
+Pass the items to the root, and put `uiSelectItems` where they should render:
+
+```ts
+import { Component } from "@angular/core"
+import {
+  Select,
+  SelectContent,
+  SelectItems,
+  SelectTrigger,
+  SelectValue,
+} from "@ui-sdk/angular/select"
+
+@Component({
+  selector: "app-fruit-select",
+  imports: [Select, SelectContent, SelectItems, SelectTrigger, SelectValue],
+  template: `
+    <ng-container uiSelect [items]="['Apple', 'Banana', 'Pear']">
+      <button uiSelectTrigger aria-label="Fruit">
+        <span uiSelectValue placeholder="Choose a fruit"></span>
+      </button>
+      <div *uiSelectContent>
+        <div uiSelectItems></div>
+      </div>
+    </ng-container>
+  `,
+})
+export class FruitSelect {}
+```
+
+Each string is both the value and its label. Use objects when those need to differ:
+
+```ts
+const items = [
+  { value: "apple", label: "Apple" },
+  { value: "banana", label: "Banana", disabled: true },
+]
+```
+
+Items can have `keywords` for searching. Group them with `{ type: "group", label, items }`, or separate them with `{ type: "separator" }`.
+
+For object values, provide `itemToValue` for the submitted string and `itemToLabel` for the displayed text. [Select](./components/select) and [Combobox](./components/combobox) show complete examples.
+
+## Style the Items
+
+`uiSelectItems` renders bare parts, each with just its label. To style them, render the parts yourself from your array, with your classes right on them. Type the array with `ListData`, so a mistake in it shows up where you write it:
+
+```ts
+import { Component } from "@angular/core"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  type ListData,
+} from "@ui-sdk/angular/select"
+
+@Component({
+  selector: "app-fruit-select",
+  imports: [Select, SelectContent, SelectItem, SelectTrigger, SelectValue],
+  template: `
+    <ng-container uiSelect [items]="fruits">
+      <button uiSelectTrigger aria-label="Fruit" class="…">
+        <span uiSelectValue placeholder="Choose a fruit"></span>
+      </button>
+      <div *uiSelectContent class="…">
+        @for (fruit of fruits; track fruit.value) {
+          <div uiSelectItem [value]="fruit.value" class="…">
+            {{ fruit.label }}
+          </div>
+        }
+      </div>
+    </ng-container>
+  `,
+})
+export class FruitSelect {
+  readonly fruits = [
+    { value: "apple", label: "Apple" },
+    { value: "banana", label: "Banana" },
+  ] satisfies ListData
+}
+```
+
+A list that searches still filters the items you render, and hides the ones that don't match. When the items come from state, like results from a server, read the ones to show from the list part's state: put `#list="uiSelectList"` on a `uiSelectList`, then loop over `list.state().items`.
+
+## Search and Load Items
+
+Searchable components accept a `filter` to change how typing narrows their items. [Async Options](./utilities/async-options) handles server results, debouncing, and stale requests.
+
+For a large list, pass every option through `items` and render only the visible rows. [Select](./components/select#virtualized) and [Combobox](./components/combobox#virtualized) show how.
+
+## Describe a Menu
+
+A `MenuData` array describes actions, separators, groups, and submenus. A plain string is an action whose value and label are the string. Put `uiMenuItems` in the content to render them:
+
+```ts
+import { Component } from "@angular/core"
+import {
+  Menu,
+  MenuContent,
+  MenuItems,
+  MenuTrigger,
+  type MenuData,
+} from "@ui-sdk/angular/menu"
+
+@Component({
+  selector: "app-file-menu",
+  imports: [Menu, MenuContent, MenuItems, MenuTrigger],
+  template: `
+    <ng-container uiMenu [items]="actions" (action)="run($event.value)">
+      <button uiMenuTrigger>File</button>
+      <div *uiMenuContent>
+        <div uiMenuItems></div>
+      </div>
+    </ng-container>
+  `,
+})
+export class FileMenu {
+  readonly actions: MenuData = [
+    { value: "open", label: "Open", shortcut: "mod+o" },
+    { type: "separator" },
+    {
+      type: "submenu",
+      label: "Share",
+      items: [{ value: "email", label: "Email" }],
+    },
+  ]
+
+  run(value: string) {
+    console.log(value)
+  }
+}
+```
+
+`uiMenuItems` renders bare parts too. To style them, render the items in the content yourself, as [Menu](./components/menu#menus-as-data) shows. That page also covers checkbox items, radio groups, and nested menus.
+
+## Keys and Shortcuts
+
+`loop` controls whether arrow keys wrap around a list. Components that support `orientation` use it to choose the navigation axis.
+
+A trigger's `shortcut="mod+k"` opens it from elsewhere on the page. A data menu runs item shortcuts while closed; the `shortcut` of an item you render yourself only displays the keys. [Shortcuts](./utilities/shortcuts) covers registering your own.

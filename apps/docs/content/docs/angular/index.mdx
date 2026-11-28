@@ -1,0 +1,41 @@
+---
+title: Introduction
+description: Use unstyled Angular components with keyboard, focus, and screen reader support built in.
+---
+
+<Callout>
+
+These docs cover ui-sdk in Angular. Using another framework? See [React](/docs/react), [Vue](/docs/vue), [Svelte](/docs/svelte), [Solid](/docs/solid) or [Web Components](/docs/web-components). To build your own components from behaviors, see [Core](/docs/core).
+
+</Callout>
+
+`@ui-sdk/angular` gives you components such as Select, Dialog, and Tabs, built on ui-sdk's behaviors. They handle interactions, focus, and ARIA attributes. You choose their markup and styles.
+
+Each part is a directive you put on your own elements. Import the parts you need, add them to your component's `imports`, and style them with your own CSS.
+
+## Quick Start
+
+Copy this prompt into your agent:
+
+<include>../../shared/setup-prompt/angular.mdx</include>
+
+It installs ui-sdk and points your `AGENTS.md` at the docs that ship with the packages.
+
+## Set It Up Yourself
+
+<Cards>
+  <Card
+    title="Installation"
+    href="./installation"
+    description="Install the packages in your Angular app."
+  />
+  <Card
+    title="First Component"
+    href="./first-component"
+    description="Add and style your first component."
+  />
+</Cards>
+
+## Explore the Components
+
+The [Using Components guides](./parts-and-composition) cover patterns the components share, such as composing parts, handling state, and styling.

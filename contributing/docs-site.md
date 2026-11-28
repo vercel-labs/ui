@@ -10,7 +10,7 @@
 
 ## Layout
 
-- `apps/docs/content/docs/` has one folder per section: `core` and `agents`, which are shared across frameworks, and `react`, `vue`, `svelte`, `solid` and `web-components`, one full copy of the docs per framework.
+- `apps/docs/content/docs/` has one folder per section: `core` and `agents`, which are shared across frameworks, and `react`, `vue`, `svelte`, `solid`, `web-components` and `angular`, one full copy of the docs per framework.
 - A framework's name alone, like `/react`, redirects to its docs at `/docs/react`.
 - A framework's docs have no `<Framework only>` blocks. A page differs per framework in its own copy, so an edit that holds for every framework is made in each copy. A component a framework doesn't have gets no page there.
 - Core and Agents link to a framework's pages without naming one, like `/docs/components/field`, which redirects to the framework the reader last read (a cookie its pages set), else React. Switching framework keeps the page: a framework's page goes to its copy in the other, and Get Started, Core, Agents and Guides stay put and fetch the page built for the new one (`FollowFramework` in `site-preferences.tsx`). On phones the switch is a select at the top of the menu.
@@ -35,6 +35,7 @@
   examples/components/<name>/svelte/<example>.svelte
   examples/components/<name>/solid/<example>.tsx     exports Example
   examples/components/<name>/web/<example>.ts        exports mount(root)
+  examples/components/<name>/angular/<example>.ts    exports Example
   ```
 
 - Next never compiles the examples. `examples/vite.config.ts` builds each framework's, with the SDK bundled, to `apps/docs/public/examples/<framework>` (`pnpm --filter examples build`, or `node examples/scripts/build.mjs react vue` for some). Every file name carries a hash, so the site serves them as immutable static files.

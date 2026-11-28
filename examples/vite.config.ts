@@ -1,7 +1,7 @@
 import solid from "@solidjs/vite-plugin"
 import { svelte } from "@sveltejs/vite-plugin-svelte"
 import vue from "@vitejs/plugin-vue"
-import { globSync } from "node:fs"
+import { existsSync, globSync, readFileSync } from "node:fs"
 import { createRequire } from "node:module"
 import path from "node:path"
 import { defineConfig, type Plugin, type UserConfig } from "vite"
@@ -26,6 +26,61 @@ const builds: Record<
     config: (ssr) => ({ plugins: [solid({ include: solidFiles, ssr })] }),
   },
   web: { ext: "ts" },
+  angular: {
+    ext: "ts",
+    config: () => ({
+      plugins: [compiledAngular()],
+      define: { ngDevMode: "false", ngJitMode: "false" },
+    }),
+  },
+}
+
+type Babel = {
+  transformAsync: (
+    code: string,
+    options: object
+  ) => Promise<{ code?: string | null } | null>
+}
+
+// The Angular examples and adapter run as Angular's compiler wrote them, which
+// `scripts/build.mjs` does first, into node_modules/.angular. Angular's own
+// packages and other libraries ship partly compiled, so its linker finishes them.
+function compiledAngular(): Plugin {
+  const repo = path.resolve(import.meta.dirname, "..")
+  const out = path.join(import.meta.dirname, "node_modules/.angular")
+  return {
+    name: "compiled-angular",
+    enforce: "pre",
+    load(id) {
+      const file = path
+        .join(out, path.relative(repo, id))
+        .replace(/\.ts$/, ".js")
+      if (id.startsWith(repo) && existsSync(file)) {
+        return readFileSync(file, "utf8")
+      }
+    },
+    async transform(code, id) {
+      if (
+        !id.includes("/node_modules/") ||
+        !code.includes("\u0275\u0275ngDeclare")
+      ) {
+        return
+      }
+      const [{ transformAsync }, { default: linker }] = await Promise.all([
+        // Babel comes with Angular's linker and ships no types.
+        import("@babel/core" as string) as Promise<Babel>,
+        import("@angular/compiler-cli/linker/babel"),
+      ])
+      const result = await transformAsync(code, {
+        filename: id,
+        plugins: [linker],
+        babelrc: false,
+        configFile: false,
+        compact: false,
+      })
+      return result?.code
+    },
+  }
 }
 
 // The docs hand the React examples their own React, Next's copy, so a page runs

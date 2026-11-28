@@ -28,6 +28,13 @@ const frameworks = {
     ext: "tsx",
     lang: "tsx",
   },
+  angular: {
+    label: "Angular",
+    short: "Angular",
+    example: "angular",
+    ext: "ts",
+    lang: "angular-ts",
+  },
 } as const
 
 type Framework = keyof typeof frameworks
@@ -43,7 +50,7 @@ const isCallback = (name: string) => /^on[A-Z]/.test(name)
 
 /**
  * A callback's name as a framework writes it: `onOpenChange` in React, Svelte
- * and Solid, `@open-change` in Vue, and the `openchange` event on web components. Names that aren't callbacks come back as they are.
+ * and Solid, `@open-change` in Vue, the `openchange` event on web components and `(beforeOpenChange)` in Angular. Names that aren't callbacks come back as they are.
  */
 function callbackIn(name: string, framework: Framework) {
   if (!isCallback(name)) {
@@ -55,6 +62,12 @@ function callbackIn(name: string, framework: Framework) {
   }
   if (framework === "web-components") {
     return words.toLowerCase()
+  }
+  // A change's details and `cancel()` come with the `before` output, like
+  // `(beforeValueChange)`; `(valueChange)` carries the value alone.
+  if (framework === "angular") {
+    const output = words.endsWith("Change") ? `before${words}` : words
+    return `(${output[0].toLowerCase()}${output.slice(1)})`
   }
   return name
 }

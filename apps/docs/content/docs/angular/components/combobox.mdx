@@ -1,0 +1,1000 @@
+---
+title: Combobox
+description: Search a list of options and choose one or several values.
+---
+
+Use a Combobox when people need to find a choice by typing. Start with an input and a list, then add chips, server results, or the option to create something new as you need them.
+
+<ComponentExample
+  name="combobox/demo"
+  caption="Type “sv” to find SvelteKit. Press Down Arrow to highlight it, then Enter to choose it."
+/>
+
+## Installation
+
+```bash
+npm install @ui-sdk/angular @ui-sdk/core
+```
+
+## Composition
+
+Use the following composition to build Combobox:
+
+```text
+uiCombobox
+├── uiComboboxLabel
+├── uiComboboxInput
+└── uiComboboxContent
+    └── uiComboboxList
+        ├── uiComboboxItem
+        └── uiComboboxItem
+```
+
+Name the input, give each option a unique value, and put the options in a list inside the popup. The label names the input; choosing an option puts its label in the input.
+
+## Usage
+
+Import the parts and put them together:
+
+```ts
+import { Component } from "@angular/core"
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxLabel,
+  ComboboxList,
+} from "@ui-sdk/angular/combobox"
+
+@Component({
+  selector: "app-example",
+  imports: [
+    Combobox,
+    ComboboxContent,
+    ComboboxInput,
+    ComboboxItem,
+    ComboboxLabel,
+    ComboboxList,
+  ],
+  template: `
+    <ng-container uiCombobox>
+      <label uiComboboxLabel>Fruit</label>
+      <input uiComboboxInput placeholder="Search fruits…" />
+      <div *uiComboboxContent>
+        <div uiComboboxList>
+          <div uiComboboxItem value="apple">Apple</div>
+          <div uiComboboxItem value="banana">Banana</div>
+        </div>
+      </div>
+    </ng-container>
+  `,
+})
+class Example {}
+
+export { Example }
+```
+
+## Autocomplete vs Combobox
+
+Both filter a list as you type. They differ in what the value is.
+
+- **Combobox**: the value is an option from the list, or several with `multiple`. The text is only a query; closing without choosing restores the selected label, and a form submits the value, not the text. Use it for a country, an assignee or a set of labels.
+- **[Autocomplete](./autocomplete)**: the value is the text. Suggestions help fill it in, and anything typed is valid. Use it for a search box, an address or a free-form field.
+
+`allowCustomValue` lets a combobox accept text that matches no option, like a datalist. Reach for it when choosing from the list is the main path; use an autocomplete when free text is.
+
+## Build Your Own
+
+`@ui-sdk/angular/combobox` comes with a ready-made Combobox. If you'd like to build your own, with your own names, start from the `combobox` primitive in `@ui-sdk/core`:
+
+```ts title="country-picker.ts"
+import { Directive, inject, input, type InputSignal } from "@angular/core"
+import { combobox, type ComboboxItemProps } from "@ui-sdk/core/combobox"
+import { usePart, usePrimitive } from "@ui-sdk/angular/primitive"
+
+@Directive({ selector: "[appCountryPicker]" })
+class CountryPicker {
+  readonly handle = usePrimitive(combobox, () => ({}))
+}
+
+@Directive({ selector: "[appCountryLabel]" })
+class CountryLabel {
+  readonly state = usePart(inject(CountryPicker).handle, "label").state
+}
+
+@Directive({ selector: "[appCountryInput]" })
+class CountryInput {
+  readonly state = usePart(inject(CountryPicker).handle, "input").state
+}
+
+@Directive({ selector: "[appCountryPopup]" })
+class CountryPopup {
+  readonly state = usePart(inject(CountryPicker).handle, "content").state
+}
+
+@Directive({ selector: "[appCountryList]" })
+class CountryList {
+  readonly state = usePart(inject(CountryPicker).handle, "list").state
+}
+
+@Directive({ selector: "[appCountryOption]" })
+class CountryOption {
+  readonly label: InputSignal<ComboboxItemProps<any>["label"]> = input()
+  readonly value = input.required<ComboboxItemProps<any>["value"]>()
+  readonly state = usePart(inject(CountryPicker).handle, "item", () => ({
+    label: this.label(),
+    value: this.value(),
+  })).state
+}
+
+@Directive({ selector: "[appCountryEmpty]" })
+class CountryEmpty {
+  readonly state = usePart(inject(CountryPicker).handle, "empty").state
+}
+
+export {
+  CountryEmpty,
+  CountryInput,
+  CountryLabel,
+  CountryList,
+  CountryOption,
+  CountryPicker,
+  CountryPopup,
+}
+```
+
+```ts
+import { Component } from "@angular/core"
+import {
+  CountryEmpty,
+  CountryInput,
+  CountryLabel,
+  CountryList,
+  CountryOption,
+  CountryPicker,
+  CountryPopup,
+} from "./country-picker"
+
+@Component({
+  selector: "app-country-picker-example",
+  imports: [
+    CountryEmpty,
+    CountryInput,
+    CountryLabel,
+    CountryList,
+    CountryOption,
+    CountryPicker,
+    CountryPopup,
+  ],
+  template: `
+    <ng-container appCountryPicker>
+      <label appCountryLabel>Country</label>
+      <input appCountryInput />
+      <div appCountryPopup>
+        <div appCountryEmpty>No countries found.</div>
+        <div appCountryList>
+          <div appCountryOption value="fr" label="France">France</div>
+          <div appCountryOption value="jp" label="Japan">Japan</div>
+        </div>
+      </div>
+    </ng-container>
+  `,
+})
+export class CountryPickerExample {}
+```
+
+Connect the other slots the same way, each with `usePart`. Each part keeps the behavior, state and data attributes of its ready-made counterpart: typing filters the options, arrow keys move the highlight and the popup opens in the top layer. See [Rendering Primitives](../rendering) and [Custom Parts](../custom-parts) for more.
+
+## Disabled
+
+A disabled combobox cannot be focused or changed and submits nothing. A read-only one remains focusable and submits its value, but does not open or accept changes. Keyboard navigation skips a disabled option, and it cannot be chosen.
+
+<ComponentExample
+  name="combobox/disabled"
+  caption="Billing country is disabled and Shipping from is read-only. Open Shipping to: arrow keys skip Denmark, which can't be chosen."
+/>
+
+## Clear and Trigger
+
+`uiComboboxClear` clears both the selection and the query, then keeps focus in the input. It appears while either has a value. When someone deletes all the text, a single selection clears right away instead of when the list closes. Escape brings the selection back while the list is still open; closing it any other way leaves it cleared.
+
+<ComponentExample
+  name="combobox/clear"
+  caption="Choose a framework, then press the clear button. The selection and text clear, focus stays in the input, and the console logs each change."
+/>
+
+## Auto Highlight
+
+Add `autoHighlight` to highlight the first match while typing, so Enter can choose it immediately. With `autoHighlight="always"`, opening the list also highlights the selected item, or the first, so the arrow keys move from there. `autoHighlight="selected"` highlights only the selected item when the list opens, and nothing when none is. A highlight it placed follows the list as items arrive, and one the user moved stays while its item is there.
+
+<ComponentExample
+  name="combobox/auto-highlight"
+  caption="Type “sw” and press Enter. The first matching country is already highlighted."
+/>
+
+## Highlight Matches
+
+`uiComboboxItemText` marks the matching text. Matching ignores case and accents using the current locale, while the label keeps its original spelling. Its state also exposes segments if you want to render the marks yourself.
+
+<ComponentExample
+  name="combobox/highlight"
+  caption="Type “an”. Matching letters are marked while each country keeps its original spelling."
+/>
+
+## Filter and Keywords
+
+`filter` accepts `"contains"` (the default), `"startsWith"`, a function of the item and query, or `false` for results already filtered by a server. A function can return a score instead of `true` or `false`, and items you pass as `items` then sort by it, best first. `fuzzyScore` from `@ui-sdk/core/text-match` scores an exact match above a prefix, and a prefix above a match inside the label.
+
+Use `keywords` for text that should match without appearing in the label, such as a username or a country’s local name.
+
+<ComponentExample
+  name="combobox/filter"
+  caption="Type “an” and switch Filter between Contains and Starts with. Choose Fuzzy and type “swd” for Sweden, or type “deutschland” to find Germany through a keyword."
+/>
+
+## Groups
+
+Use `uiComboboxGroup` and `uiComboboxGroupLabel` to name groups. Filtering hides empty groups and separators as their items disappear.
+
+<ComponentExample
+  name="combobox/groups"
+  caption="Type “chic”. Chicago remains in Americas; groups with no matches disappear."
+/>
+
+## Icons
+
+`uiComboboxItemIcon` keeps decorative icons out of accessible names, filtering, and match marks. `uiComboboxValueIcon` projects the selected item’s icon next to the input; you leave it empty, and it is only for a single selection.
+
+Wrap the input and icon together, then use that wrapper as the popup’s `anchor`. Add `mirror` for directional icons. An icon-only option still needs an `aria-label`.
+
+<ComponentExample
+  name="combobox/icons"
+  caption="Choose Done. Its icon appears next to the input as well as in the list."
+/>
+
+## Custom Items
+
+Show useful context beside a label, such as a username or role. Set `label` explicitly so filtering and the input use the intended text, and put extra search terms in `keywords`.
+
+<ComponentExample
+  name="combobox/custom-items"
+  caption="Search for a person’s name or username. Choose a result to put that person’s name in the input."
+/>
+
+## Items as Data
+
+Pass `items` when the combobox needs the whole collection, such as recent items, server results, or virtualization. `uiComboboxItems` inside the list renders bare parts for you, or you can render the parts yourself from the list's `state().items`. Each item's `label` supplies the text for filtering and the input; `keywords` and `disabled` work the same as with items you render yourself. [Lists and Menus](../lists-and-menus) covers the `ListData` format.
+
+```ts
+import { Component } from "@angular/core"
+import { Combobox, ComboboxInput } from "@ui-sdk/angular/combobox"
+
+@Component({
+  selector: "app-example",
+  imports: [Combobox, ComboboxInput],
+  template: `
+    <ng-container uiCombobox [items]="fruits">
+      <input uiComboboxInput aria-label="Fruit" />
+    </ng-container>
+  `,
+})
+class Example {
+  readonly fruits = [
+    { value: "apple", label: "Apple" },
+    { value: "cherry", label: "Cherry", keywords: ["red"] },
+    {
+      type: "group",
+      label: "Citrus",
+      items: [{ value: "lemon", label: "Lemon" }],
+    },
+  ]
+}
+
+export { Example }
+```
+
+Items can change while the list is open. Selection and highlight stay on their items; removing the highlighted item clears the highlight.
+
+## Recent Items
+
+`emptyItems` supplies suggestions while the query is empty. Pair it with `items` for the full searchable collection. Render the list from its `state().items` so it follows the active collection.
+
+<ComponentExample
+  name="combobox/recent"
+  caption="Open the empty input to see Recent. Start typing to search all countries; clear the text to return to Recent."
+/>
+
+## Object Values
+
+Use `itemToValue` for an object’s string identity and form value, `itemToLabel` for its displayed text, and `isItemEqualToValue` when two different objects can represent the same option.
+
+```ts
+import { Component } from "@angular/core"
+import { Combobox } from "@ui-sdk/angular/combobox"
+
+type Person = { id: number; name: string }
+
+@Component({
+  selector: "app-example",
+  imports: [Combobox],
+  template: `
+    <ng-container
+      uiCombobox
+      name="reviewer"
+      [itemToValue]="itemToValue"
+      [itemToLabel]="itemToLabel"
+      [isItemEqualToValue]="isItemEqualToValue"
+    ></ng-container>
+  `,
+})
+class Example {
+  readonly itemToValue = (person: Person) => String(person.id)
+
+  readonly itemToLabel = (person: Person) => person.name
+
+  readonly isItemEqualToValue = (person: Person, value: Person) =>
+    person.id === value.id
+}
+
+export { Example }
+```
+
+## Multiple
+
+Add `multiple` to make the value an array. Choosing an option toggles it, keeps the list open, and clears the query. Put `uiComboboxValue` and the input inside `uiComboboxChips`, then render each value as a chip with a removal button.
+
+Backspace in an empty input removes the last chip in one press. Unlike [Token Input](./token-input#deleting-tokens), there is no `tokenDeletion` option to select it first. Arrow keys move between chips. Supply `itemToLabel` when starting with values whose labels are not yet known from rendered items.
+
+Add `keepQuery` to choose several matches without retyping the query.
+
+<ComponentExample
+  name="combobox/multiple"
+  caption="Choose several frameworks. Remove one with its chip button, or press Backspace in the empty input to remove the last chip."
+/>
+
+## Select All
+
+`uiComboboxSelectAll` toggles every matching, enabled option. Inside a group, it affects only that group. It joins keyboard navigation and reports a mixed state while some of its options are selected.
+
+<ComponentExample
+  name="combobox/select-all"
+  caption="Open the list and choose a group’s select-all option. Type to narrow the matches, then use the main select-all option on those results."
+/>
+
+## Chips That Collapse
+
+Add `uiComboboxChipsOverflow` to keep chips on one line. It measures which chips fit, hides the rest, and exposes their count and labels. Separately, `uiComboboxValue` can use `max` to show a short text summary of the selection.
+
+<ComponentExample
+  name="combobox/chips-overflow"
+  caption="Add or remove countries. Chips that no longer fit are replaced by an overflow count; the summary below lists the first two."
+/>
+
+## Max Selected
+
+`maxSelected` limits a multiple selection. Once the limit is reached, other options become disabled; their `maxReached` state explains why.
+
+<ComponentExample
+  name="combobox/max-selected"
+  caption="Choose a third label. Other unselected labels become unavailable until you remove one."
+/>
+
+## Create Option
+
+`uiComboboxCreate` offers the query when no label matches it exactly and it meets `minLength`. Use `(create)` to save it, and pass a promise to `$event.waitUntil()` for asynchronous work. Creation does not change the selection itself: add the new item and select it after saving.
+
+While saving, the option reports `data-pending`, `aria-busy` and `aria-disabled`. A rejected promise is available through its error state.
+
+<ComponentExample
+  name="combobox/create"
+  caption="Type a new label and choose Create. It becomes a selected chip after saving; a label longer than 20 characters shows an error."
+/>
+
+## Custom Value
+
+Use `allowCustomValue` when suggestions are optional, like a datalist. Unmatched text becomes the value on Enter with nothing highlighted, or when the list closes. This does not create a new item in the collection.
+
+<ComponentExample
+  name="combobox/custom-value"
+  caption="Type a job title that isn't suggested, then press Enter without a highlighted option or leave the field. The text becomes the value, and the console logs it."
+/>
+
+## Input in the Popup
+
+The input can live inside the popup, opened by a button showing the current value. The button then stays in the tab order. Anchor the content to it, clear the query when opening, and return focus to it after closing, as this example does.
+
+<ComponentExample
+  name="combobox/popup"
+  caption="Press Country to open the search field inside the popup. Choose a country; closing the popup returns focus to the button."
+/>
+
+## Async Search
+
+Use [useAsyncOptions](../utilities/async-options) to debounce a search and discard stale results. Pass its `items` and `status` to the combobox, set `filter` to `false`, and send query changes to the loader.
+
+`uiComboboxStatus` and `uiComboboxEmpty` provide loading, error, and empty messages. Without a custom status, the combobox announces the result count once typing pauses.
+
+<ComponentExample
+  name="combobox/async"
+  caption="Replace “the” with another movie title. The status shows the pending search, then the latest results."
+/>
+
+## Load More
+
+`(loadMore)` runs when scrolling or highlighting reaches the last option, once per page and not while a page loads. Connect it to the async loader’s `loadMore()`; return `{ items, hasMore }` from each page.
+
+<ComponentExample
+  name="combobox/infinite"
+  caption="Open the movies and scroll or arrow to the last result. Another page loads while the existing results stay available."
+/>
+
+## Virtualized
+
+Supply `items` so filtering and keyboard navigation know about every option, even when only a few rows render. The list’s `state().items` contains matches, `(highlight)` reports the row to reveal, and each rendered item’s `index` gives its position in the full list to screen readers.
+
+This example windows 10,000 items. Keep the actual row height aligned with your virtualizer’s measurement, and use the scroller’s visible height when revealing a row.
+
+<ComponentExample
+  name="combobox/virtualized"
+  caption="Search 10,000 items or move through them with the arrow keys. Only the nearby rows render."
+/>
+
+## Controlled
+
+The selection, text, and popup have separate values:
+
+| Value   | Change notification   | Meaning                                        |
+| ------- | --------------------- | ---------------------------------------------- |
+| `value` | `(beforeValueChange)` | One value or `null`; an array with `multiple`. |
+| `query` | `(beforeQueryChange)` | The input’s text.                              |
+| `open`  | `(beforeOpenChange)`  | Whether the popup is open.                     |
+
+Control only the values you need; `value`, `query` and `open` can also be bound with `[(…)]`. The `before` outputs include a reason and `$event.cancel()` to reject the request. Choosing an item writes its label into the input, and a canceled choice keeps the current one. Closing without choosing restores the value’s label unless custom values are allowed. [State and Events](../state-and-events) covers the binding pattern.
+
+While an input method composes text, like a Japanese conversion or a dead key's accent, the list keeps its filter and `(beforeQueryChange)` gets `$event.composing: true`. Search a server once it's `false`; async options wait for that on their own.
+
+Focus leaving the input closes the popup with the reason `focus-out`, even when code moves it, like a notice that takes focus. To keep the popup open, cancel that close in `(beforeOpenChange)`.
+
+<ComponentExample
+  name="combobox/controlled"
+  caption="Type, choose, or use the buttons. The console logs each value, query and open change with its reason."
+/>
+
+## Controller
+
+Pass a controller from `createComboboxController()`. It can read or set the value and query, open or close the list, and focus the input. `open()` resolves when the list closes with its reason and source, including `unmount`; pass an abort signal to close it on cancellation. [Controllers](../controllers) covers lifetime and setup.
+
+<ComponentExample
+  name="combobox/controller"
+  caption="Use the buttons to drive the combobox from outside. Open and Wait logs how the list closed and what was chosen."
+/>
+
+## Positioning
+
+`side` and `align` place the popup around the input or chips. `anchor` can use a different element, and `uiComboboxArrow` follows the side chosen after collision handling. [Popups](../popups#place-the-content) covers offsets and available space.
+
+The page stays usable by default. `modal="pointer"` makes an outside press only dismiss the list; `modal` also locks scrolling and makes the rest of the page inert. The popup uses the top layer and renders in place; use `container` when its DOM belongs elsewhere, such as a shadow root.
+
+<ComponentExample
+  name="combobox/positioning"
+  caption="Pick a side and an alignment, then open the list. Check Anchor to the Box to place it against the box instead of the input."
+/>
+
+## Animation
+
+The content has `data-starting-style` while it opens and `data-ending-style` while it closes. Transition from those states, and the popup stays mounted until the exit finishes. `(openChangeComplete)` runs after opening or closing finishes, and `keepMounted` on an item indicator keeps it in the page for a selection animation.
+
+<StyleTabs>
+
+```css
+[data-slot="combobox-content"] {
+  transition:
+    opacity 0.15s,
+    translate 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+
+  &:is([data-starting-style], [data-ending-style]) {
+    opacity: 0;
+    translate: 0 -6px;
+  }
+}
+```
+
+```angular-html
+<div
+  *uiComboboxContent
+  class="transition-[opacity,translate] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] data-starting-style:-translate-y-1.5 data-starting-style:opacity-0 data-ending-style:-translate-y-1.5 data-ending-style:opacity-0"
+></div>
+```
+
+</StyleTabs>
+
+<ComponentExample
+  name="combobox/animation"
+  caption="Open and close the list. The console logs when each animation finishes."
+/>
+
+## Presentation
+
+Use `presentation="sheet"` for a sheet, or `"auto"` to choose a sheet on small touch screens each time the list opens. The input moves into the sheet’s header; there is still one input and one query.
+
+A touch opening leaves the keyboard closed. Tapping the header input opens the keyboard and grows the sheet; closing the keyboard keeps the query. Choosing an item closes the sheet unless `multiple` is set. Swiping down closes it with the reason `swipe`.
+
+Keep the options inside `uiComboboxList` so the header stays outside the listbox. Give sheet content a height, style it with `data-presentation`, and leave its `translate` for the sheet behavior. `--sheet-backdrop` controls the backdrop. The sheet is modal unless you set `modal` to false; mouse and keyboard openings keep input focus as it moves.
+
+<ComponentExample
+  name="combobox/presentation"
+  caption="Open the field to see a sheet. On touch, tap the search field in its header to bring up the keyboard, or swipe down to close it."
+/>
+
+## Forms
+
+A combobox submits the selected value under `name`, rather than the query text. Multiple values submit as separate entries. `required` prevents empty submissions, reset restores the default selection and its label, and `form` joins a form from elsewhere on the page.
+
+The server HTML includes the hidden inputs for the selection, so their values can submit before hydration. [Forms](../forms) covers the shared integration.
+
+In a [Field](./field), the field supplies the input's accessible name, description and error. Submitting a required field without a selection sets `aria-invalid` and `data-invalid`.
+
+<ComponentExample
+  name="combobox/form"
+  caption="Submit without a country to see the inline error. Choose one and submit; the console logs the values, and Reset restores the defaults."
+/>
+
+## Custom Rendering
+
+Each directive goes on an element you write. Read a part's state from a template reference, like `#trigger="uiComboboxTrigger"` and then `trigger.state().open`, and the content's from `*uiComboboxContent="let content"`. Each part's state is listed [below](#state).
+
+<ComponentExample
+  name="combobox/custom-rendering"
+  caption="Open the list and move through it. The chevron flips while it's open, the highlighted person shows Enter, and the chosen one shows a check."
+/>
+
+## Styling
+
+Each part has a `data-slot`, such as `combobox-content`, and shows its state through the attributes listed under [Data Attributes](#data-attributes).
+
+Use `data-highlighted` for the active option and `data-selected` for chosen values. Because the keyboard highlight usually moves without focus leaving the input, use the content's `data-modality="keyboard"` to style it. Real focus can move into the list for touch screen readers or into the sheet.
+
+`--anchor-width` follows the input or chips. `--available-height` doesn't inherit: when a nested scroller needs it, copy it to a custom property on the content, such as `--list-height: var(--available-height)`, then use that property on the scroller.
+
+### ComboboxContent [#styling-comboboxcontent]
+
+<CssVariables component="combobox" part="content" />
+
+### Viewport [#styling-viewport]
+
+<CssVariables component="combobox" part="viewport" />
+
+## Data Attributes
+
+### ComboboxLabel [#data-attributes-comboboxlabel]
+
+<DataAttributes component="combobox" part="label" />
+
+### ComboboxInput [#data-attributes-comboboxinput]
+
+<DataAttributes component="combobox" part="input" />
+
+### ComboboxTrigger [#data-attributes-comboboxtrigger]
+
+<DataAttributes component="combobox" part="trigger" />
+
+### ComboboxClear [#data-attributes-comboboxclear]
+
+<DataAttributes component="combobox" part="clear" />
+
+### ComboboxChips [#data-attributes-comboboxchips]
+
+<DataAttributes component="combobox" part="chips" />
+
+### ComboboxContent [#data-attributes-comboboxcontent]
+
+<DataAttributes component="combobox" part="content" />
+
+### ComboboxItem [#data-attributes-comboboxitem]
+
+<DataAttributes component="combobox" part="item" />
+
+### ComboboxItemText [#data-attributes-comboboxitemtext]
+
+<DataAttributes component="combobox" part="item-text" />
+
+### ComboboxItemIndicator [#data-attributes-comboboxitemindicator]
+
+<DataAttributes component="combobox" part="item-indicator" />
+
+### ComboboxEmpty [#data-attributes-comboboxempty]
+
+<DataAttributes component="combobox" part="empty" />
+
+### ComboboxStatus [#data-attributes-comboboxstatus]
+
+<DataAttributes component="combobox" part="status" />
+
+### ComboboxArrow [#data-attributes-comboboxarrow]
+
+<DataAttributes component="combobox" part="arrow" />
+
+### ComboboxItemIcon [#data-attributes-comboboxitemicon]
+
+<DataAttributes component="combobox" part="item-icon" />
+
+### ComboboxChip [#data-attributes-comboboxchip]
+
+<DataAttributes component="combobox" part="chip" />
+
+### ComboboxChipRemove [#data-attributes-comboboxchipremove]
+
+<DataAttributes component="combobox" part="chip-remove" />
+
+### ComboboxSelectAll [#data-attributes-comboboxselectall]
+
+<DataAttributes component="combobox" part="select-all" />
+
+### ComboboxCreate [#data-attributes-comboboxcreate]
+
+<DataAttributes component="combobox" part="create" />
+
+## API Reference
+
+Each option below is an input on the directive, and each callback an output. A change callback is two outputs: `(beforeValueChange)`, with the details and `cancel()`, then `(valueChange)` with the new value alone. `value`, `query` and `open` can be bound with `[(…)]`.
+
+### Combobox
+
+<TypeTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxOptions"
+/>
+
+`announcement` receives `{ type: "results", count, query, loading }` or `{ type: "removed", label }` and returns the words, or `null` for silence. The default is English: "3 results", "No results", "Loading" or "France removed".
+
+### ComboboxLabel
+
+The input's visible label. Goes on a `label`.
+
+### ComboboxInput
+
+The text field that filters the list and shows the chosen label. Goes on a `input`.
+
+### ComboboxTrigger
+
+Opens and closes the list. Renders a `button`, kept out of the tab order while the input sits beside it.
+
+### ComboboxClear
+
+<TypeTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxClearProps"
+/>
+
+### ComboboxChips
+
+Holds the chips and the input for a multiple selection. Goes on a `div`.
+
+### ComboboxValue
+
+<TypeTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxValueProps"
+/>
+
+### ComboboxChip
+
+<TypeTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxChipProps"
+/>
+
+### ComboboxChipRemove
+
+Removes its chip's value. Goes on a `button`. Takes the same inputs as `uiComboboxChip`.
+
+### ComboboxChipsOverflow
+
+Turns collapsing on for the chips around it, and shows how many are hidden. Goes on a `span`.
+
+### ComboboxValueIcon
+
+Shows the selected item's icon beside the input. It takes no inputs of its own, and you leave it empty.
+
+### ComboboxContent
+
+<TypeTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxContentProps"
+/>
+
+### ComboboxArrow
+
+Points from the popup to its anchor, following the side chosen after collision handling. Goes on a `div`.
+
+### ComboboxStatus
+
+Announces loading, errors and result counts. Gets the status role.
+
+### ComboboxEmpty
+
+Shows while no option matches. Goes on a `div`.
+
+### ComboboxList
+
+Holds the options. Gets the listbox role.
+
+### ComboboxSelectAll
+
+Toggles every matching, enabled option in its group, or outside a group. Gets the option role.
+
+### ComboboxGroup
+
+Groups options under a label. Gets the group role.
+
+### ComboboxGroupLabel
+
+Names its group. Goes on a `div`.
+
+### ComboboxItem
+
+<TypeTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxItemProps"
+/>
+
+### ComboboxItemIcon
+
+<TypeTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxItemIconProps"
+/>
+
+### ComboboxItemText
+
+Shows its item's label, and marks what matched the query. Goes on a `span`.
+
+### ComboboxItemIndicator
+
+<TypeTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxItemIndicatorProps"
+/>
+
+### ComboboxSeparator
+
+Separates options or groups. Gets the separator role.
+
+### ComboboxCreate
+
+<TypeTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxCreateProps"
+/>
+
+### Items as Data
+
+Each item in `items`. Groups are `{ type: "group", label, items }` and separators `{ type: "separator" }`.
+
+<TypeTable
+  path="../../packages/core/src/foundation/lists/listbox.ts"
+  name="ListItem"
+/>
+
+### Async Options
+
+[Async Options](../utilities/async-options) covers loading, paging, and retries.
+
+### State
+
+What each part's `state()` signal holds, per part.
+
+`uiComboboxInput`:
+
+<StateTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxInputState"
+/>
+
+`uiComboboxTrigger`:
+
+<StateTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxTriggerState"
+/>
+
+`uiComboboxContent` and `uiComboboxList`:
+
+<StateTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxContentState"
+/>
+
+`uiComboboxItem`:
+
+<StateTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxItemState"
+/>
+
+`uiComboboxItemIndicator`:
+
+<StateTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxItemIndicatorState"
+/>
+
+`uiComboboxItemIcon`:
+
+<StateTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxItemIconState"
+/>
+
+`uiComboboxCreate`:
+
+<StateTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxCreateState"
+/>
+
+`uiComboboxEmpty`:
+
+<StateTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxEmptyState"
+/>
+
+`uiComboboxStatus`:
+
+<StateTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxStatusState"
+/>
+
+`uiComboboxValue`:
+
+<StateTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxValueState"
+/>
+
+`uiComboboxChip`:
+
+<StateTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxChipState"
+/>
+
+`uiComboboxClear` and `uiComboboxChipRemove`:
+
+<StateTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxClearState"
+/>
+
+`uiComboboxArrow`:
+
+<StateTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxArrowState"
+/>
+
+`uiComboboxItemText`:
+
+<StateTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxItemTextState"
+/>
+
+`uiComboboxSelectAll`:
+
+<StateTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxSelectAllState"
+/>
+
+`uiComboboxChipsOverflow`:
+
+<StateTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxChipsOverflowState"
+/>
+
+### Reasons
+
+`$event.reason` says why the value changed:
+
+<ReasonTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxValueChangeReason"
+/>
+
+Why the text changed:
+
+<ReasonTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxQueryChangeReason"
+/>
+
+And why the list opened or closed:
+
+<ReasonTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxOpenChangeReason"
+/>
+
+With `dismissible` false, the refused dismissals `(dismissAttempt)` reports:
+
+<ReasonTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxDismissReason"
+/>
+
+### Controller
+
+Create one with `createComboboxController<Value, Multiple>()` and pass it as `controller`.
+
+Every write method takes an optional `{ reason, event }`, passed to the change outputs.
+
+<ControllerTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxController"
+/>
+
+### Events
+
+A `before` output emits `{ value, reason, event, cancel() }` before the change, and its plain output follows with the value alone. A bound value only updates when the change isn't canceled.
+
+| Binding                | On                 | Receives                                                                                               |
+| ---------------------- | ------------------ | ------------------------------------------------------------------------------------------------------ |
+| `[(value)]`            | `uiCombobox`       | The selected value                                                                                     |
+| `[(query)]`            | `uiCombobox`       | The input's text                                                                                       |
+| `[(open)]`             | `uiCombobox`       | Whether the list is open                                                                               |
+| `(beforeValueChange)`  | `uiCombobox`       | `{ value, reason, cancel() }`: the new value, and the [reason](#reasons)                               |
+| `(beforeQueryChange)`  | `uiCombobox`       | `{ value, reason, cancel() }`: the new text, the [reason](#reasons) and whether it's still `composing` |
+| `(beforeOpenChange)`   | `uiCombobox`       | `{ value, reason, cancel() }`: the new state, and the [reason](#reasons)                               |
+| `(openChangeComplete)` | `uiCombobox`       | `$event`, whether it's open, after the animation                                                       |
+| `(highlight)`          | `uiCombobox`       | `{ value, index, event }`: the highlighted item and its row                                            |
+| `(loadMore)`           | `uiCombobox`       | `()`, when the last item is reached                                                                    |
+| `(dismissAttempt)`     | `uiCombobox`       | `{ reason, event }`, when a dismissal was refused                                                      |
+| `(create)`             | `uiComboboxCreate` | `{ query, waitUntil() }`: the text. `waitUntil(promise)` marks it pending                              |
+
+## Accessibility
+
+The combobox follows the [WAI-ARIA combobox pattern with list autocomplete](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/examples/combobox-autocomplete-list/). Focus usually stays in the input while `aria-activedescendant` identifies the highlighted option. A touch screen-reader trigger can move real focus into the list, and a sheet has its own [focus behavior](#presentation). Every line below is an automated test.
+
+### Keyboard
+
+| Key                   | Does                                                                    |
+| --------------------- | ----------------------------------------------------------------------- |
+| Typing                | Filters the options and opens the list                                  |
+| ArrowDown, ArrowUp    | Opens the list, then moves the highlight. Wraps unless `[loop]="false"` |
+| Enter                 | Chooses the highlighted option                                          |
+| Escape                | Closes the list, then restores the selection's label                    |
+| Backspace             | In an empty input with chips, removes the last chip                     |
+| ArrowLeft, ArrowRight | Moves between chips, reversed in right-to-left text                     |
+
+### Tested Behavior
+
+<SpecList spec="combobox" />
+
+Long lists stay fast and announce their size:
+
+<SpecList spec="combobox.virtual" />
+
+Also tested:
+
+<SpecList spec="combobox.enhancements" />
+
+Rows people rebuild, here and in Select:
+
+<SpecList spec="list.rows" />
+
+Match highlighting, here and in Autocomplete and Command:
+
+<SpecList spec="list.highlight" />
+
+Touch screen readers and announcements:
+
+<SpecList spec="list.touch" />
+
+Screen readers hear the same thing in each tested framework, recorded by a virtual screen reader:
+
+<SpecList spec="combobox.sr" />

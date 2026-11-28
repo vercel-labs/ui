@@ -247,6 +247,72 @@ if (button && icon && label) {
 The adapter reads `muted="false"` as the boolean `false`. Each event updates the value, icon and label together.
 
 </FrameworkContent>
+<FrameworkContent value="angular">
+
+Give the directive a `muted` input and a `mutedChange` output, and pass them to the primitive:
+
+```ts title="components/ui/mute-button.ts"
+import { Directive, input, output } from "@angular/core"
+import { usePart, usePrimitive } from "@ui-sdk/angular/primitive"
+import { muteButton } from "@/lib/mute-button"
+
+@Directive({ selector: "[appMuteButton]" })
+export class MuteButton {
+  readonly muted = input<boolean>()
+  readonly mutedChange = output<boolean>()
+
+  readonly handle = usePrimitive(muteButton, () => ({
+    muted: this.muted(),
+    onMutedChange: (muted: boolean) => this.mutedChange.emit(muted),
+  }))
+
+  constructor() {
+    usePart(this.handle, "root")
+  }
+}
+```
+
+```ts title="pages/home.ts"
+import { Component, signal } from "@angular/core"
+import { MuteButton } from "@/components/ui/mute-button"
+
+@Component({
+  selector: "app-home",
+  imports: [MuteButton],
+  template: `
+    <button appMuteButton [(muted)]="muted">
+      <svg
+        aria-hidden="true"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="m11 5-6 4H2v6h3l6 4z" />
+        <path
+          [attr.d]="
+            muted()
+              ? 'm16 9 6 6m0-6-6 6'
+              : 'M16 9a5 5 0 0 1 0 6m3-9a9 9 0 0 1 0 12'
+          "
+        />
+      </svg>
+      {{ muted() ? "Unmute" : "Mute" }}
+    </button>
+  `,
+})
+export class Home {
+  readonly muted = signal(false)
+}
+```
+
+`[(muted)]` keeps the button and the parent component's state in sync.
+
+</FrameworkContent>
 
 <ComponentExample
   name="core/mute-button-controlled"

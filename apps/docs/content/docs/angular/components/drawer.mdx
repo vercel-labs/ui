@@ -1,0 +1,653 @@
+---
+title: Drawer
+description: A sheet you can open, drag, and resize from an edge of the screen.
+---
+
+A drawer gives a task its own sheet without leaving the page. It shares [Dialog’s](./dialog) focus and dismissal behavior, then adds dragging, snap points, and a handle you can use with the keyboard.
+
+<ComponentExample
+  name="drawer/basic"
+  caption="Open the drawer, adjust the daily goal, then Submit or Cancel. You can also press Escape, press outside, or drag the sheet toward its edge to close it."
+/>
+
+## Installation
+
+```bash
+npm install @ui-sdk/angular @ui-sdk/core
+```
+
+## Composition
+
+Use the following composition to build Drawer:
+
+```text
+uiDrawer
+├── uiDrawerTrigger
+├── uiDrawerBackdrop
+└── uiDrawerContent
+    ├── uiDrawerTitle
+    ├── uiDrawerDescription
+    └── uiDrawerClose
+```
+
+The content is the sheet. The drawer positions it inside a full-screen viewport and moves it with `translate`. Give it a size, a surface, and corners; leave positioning and translation to the drawer. Give the backdrop a color, such as `bg-black/30`; the drawer manages its opacity.
+
+## Usage
+
+Import the parts and put them together:
+
+```ts
+import { Component } from "@angular/core"
+import {
+  Drawer,
+  DrawerBackdrop,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@ui-sdk/angular/drawer"
+
+@Component({
+  selector: "app-example",
+  imports: [
+    Drawer,
+    DrawerBackdrop,
+    DrawerClose,
+    DrawerContent,
+    DrawerDescription,
+    DrawerTitle,
+    DrawerTrigger,
+  ],
+  template: `
+    <ng-container uiDrawer>
+      <button uiDrawerTrigger>Filters</button>
+      <div *uiDrawerBackdrop></div>
+      <div *uiDrawerContent>
+        <h2 uiDrawerTitle>Filters</h2>
+        <p uiDrawerDescription>Narrow down the results.</p>
+        <button uiDrawerClose>Done</button>
+      </div>
+    </ng-container>
+  `,
+})
+class Example {}
+
+export { Example }
+```
+
+## Scrollable Content
+
+Put long content in an inner `min-h-0 flex-1 overflow-y-auto` area. A downward drag scrolls that area first; when it reaches the top, the same gesture can move the drawer. `initialFocus="content"` starts focus on the sheet itself.
+
+<ComponentExample
+  name="drawer/scrollable"
+  caption="Open the long sheet and scroll its text. At the top, drag downward to move the sheet; on a keyboard, Tab reaches the controls and Escape closes it."
+/>
+
+Fields, sliders and color areas inside the sheet keep their own drags. For a drag surface of your own, like a canvas or a map, add `data-drawer-no-drag` to it, and a drag that starts there won't move the drawer.
+
+## Sides
+
+`side` chooses bottom, top, left, or right. Logical `start` and `end` follow text direction. The content’s `data-side` tells you which physical edge to style.
+
+Side drawers can opt into `preventEdgeSwipe` to keep an edge gesture from starting iOS Safari’s back or forward navigation. It also prevents clicks right at those edges, so use it only when you need that tradeoff.
+
+<ComponentExample
+  name="drawer/sides"
+  caption="Open a sheet from each edge. Drag it back toward that edge, press outside, or press Escape to close it."
+/>
+
+## Snap Points
+
+`snapPoints` are the places the drawer can rest. It opens at the first, or at `defaultSnapPoint`, and settles at another after a drag. A fast fling can skip intermediate points.
+
+| Value              | Size                                       |
+| ------------------ | ------------------------------------------ |
+| `0.5`              | Half the viewport along the drawer’s axis. |
+| `320` or `"320px"` | Pixels; numbers above 1 are pixel values.  |
+| `"20rem"`          | A multiple of the root font size.          |
+| `"50%"`            | A percentage of the viewport.              |
+| `"content"`        | The sheet’s own size, the default.         |
+
+The sheet’s CSS size is the limit: `1` cannot make a short sheet fill the screen. Use a height such as `h-[calc(100dvh-3rem)]` when the largest point should nearly fill it. The drawer measures again when content or available space changes; a moved resting point reports `content-resize`.
+
+A Handle is a button with an accessible name. Pressing it moves to the next larger snap point, then wraps to the smallest. Arrow keys along the drawer’s axis move one point without wrapping; Home and End move to the ends. `canExpand` and `canCollapse` let the example show which moves remain.
+
+For a sheet with one snap point, use a decorative bar instead of an inactive button.
+
+<ComponentExample
+  name="drawer/snap-points"
+  caption="Open the sheet at its middle snap point. Drag it, press the handle, or Tab to the handle and use Up, Down, Home and End to try the other resting points."
+/>
+
+## Controlled
+
+Use `[(open)]`, or `[(snapPoint)]`, to keep the drawer's state in your component. You can control opening and snap points independently. Cancel a proposed change with `$event.cancel()` in `(beforeOpenChange)` or `(beforeSnapPointChange)`; a canceled swipe springs back. `(openChangeComplete)` runs after the sheet settles.
+
+```ts
+import { Component, signal } from "@angular/core"
+import { Drawer, type SnapPoint } from "@ui-sdk/angular/drawer"
+
+@Component({
+  selector: "app-example",
+  imports: [Drawer],
+  template: `
+    <ng-container
+      uiDrawer
+      [(open)]="open"
+      [snapPoints]="[0.25, 0.5, 1]"
+      [(snapPoint)]="snapPoint"
+    >
+      <!-- … -->
+    </ng-container>
+  `,
+})
+class Example {
+  readonly open = signal(false)
+
+  readonly snapPoint = signal<SnapPoint>(0.5)
+}
+
+export { Example }
+```
+
+## Not Dismissible
+
+With `dismissible` false, Escape, outside presses, back gestures, and swipes leave the drawer open. `(dismissAttempt)` tells you what was tried, so you can offer a way to discard unsaved work. Close parts, triggers, and controllers can still close it deliberately.
+
+```angular-html
+<ng-container
+  uiDrawer
+  [dismissible]="false"
+  (dismissAttempt)="attempt = $event.reason"
+>
+  <button uiDrawerTrigger>Write a Post</button>
+  <div *uiDrawerBackdrop></div>
+  <div *uiDrawerContent>
+    @if (attempt) {
+      <button uiDrawerClose>Discard</button>
+    }
+    <button uiDrawerClose value="post">Post</button>
+  </div>
+</ng-container>
+```
+
+## Modal
+
+Set `modalAbove` when the page should stay usable beside a small sheet. At or below that point there is no dim, inert page, scroll lock, or `aria-modal`. Above it, `modal` applies. The switch happens when the drawer settles and does not move focus; `data-interactive` exposes the usable-page state.
+
+`modal` has the same choices as [Dialog](./dialog#modal): `true` blocks the page, `"trap-focus"` keeps Tab inside while leaving the page usable, and `false` allows focus to leave. A click on the page also closes a `"trap-focus"` drawer, while a non-modal drawer closes on an outside press only when `closeOnOutsidePress` is enabled.
+
+<ComponentExample
+  name="drawer/non-modal"
+  caption="Open directions at the small snap point and choose another place behind the sheet. Expand it to make the sheet modal, then collapse it to use the page again."
+/>
+
+## Nested Drawers
+
+A drawer opened inside another joins its stack. Escape and outside presses affect the topmost one; closing a parent closes its children. `--drawer-stack` follows the sheets above it as they open and drag, so a parent can scale back with `[scale:calc(1-var(--drawer-stack)*0.04)]`.
+
+<ComponentExample
+  name="drawer/nested"
+  caption="Open Account, then Change Password. The parent steps back as the child opens; Escape closes one sheet at a time."
+/>
+
+## Forms
+
+A Close part’s `(action)` can wait on a Promise with `$event.waitUntil()`. The sheet stays open while it runs, including through Escape or a swipe. A rejection leaves the action’s error state available for a retry. See [Alert Dialog’s async action](./alert-dialog#async-action) for the shared pending and error contract.
+
+`keepMounted` preserves unfinished fields, and `finalFocus` returns focus to the updated profile.
+
+```angular-html
+<div *uiDrawerContent="{ keepMounted: true, finalFocus: summary }">
+  <form #form><!-- fields --></form>
+  <button
+    uiDrawerClose
+    #close="uiDrawerClose"
+    (action)="$event.waitUntil(save(form))"
+  >
+    {{
+      close.state().pending
+        ? "Saving…"
+        : close.state().error
+          ? "Try Again"
+          : "Save Changes"
+    }}
+  </button>
+</div>
+```
+
+## Outlets
+
+An Outlet makes another element follow the sheet’s progress. Its `keyframes` run from collapsed to fully expanded; this example scales and rounds the inbox behind a compose sheet. An outlet outside the drawer connects through its controller.
+
+<ComponentExample
+  name="drawer/outlet"
+  caption="Open Compose, then drag the sheet slowly. The inbox behind it scales and rounds with the sheet’s progress."
+/>
+
+## Opening from Anywhere
+
+Connect external triggers and the drawer to one `createDrawerController<Payload, Result>()`. Each trigger passes a `payload`; the content reads it from its state, `*uiDrawerContent="let content"`, as `content.payload`. In a template the payload is `unknown`, so give it its type in a method, like the example's `payloadOf()`. This lets one sheet serve every row, including disabled triggers for unavailable actions.
+
+Calling `open({ payload })` on the controller returns a Promise with the closing `reason` and `returnValue`. `getSnapPoint()` and `setSnapPoint()` also let code read or move the sheet. The [controller guide](../controllers) covers the shared result and payload flow.
+
+```ts
+import { Component } from "@angular/core"
+import {
+  createDrawerController,
+  Drawer,
+  DrawerBackdrop,
+  DrawerContent,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@ui-sdk/angular/drawer"
+
+type SharedFile = { name: string; uploading: boolean }
+
+@Component({
+  selector: "app-example",
+  imports: [Drawer, DrawerBackdrop, DrawerContent, DrawerTitle, DrawerTrigger],
+  template: `
+    <button
+      uiDrawerTrigger
+      [controller]="share"
+      [payload]="file"
+      [disabled]="file.uploading"
+    >
+      Share
+    </button>
+
+    <ng-container uiDrawer [controller]="share">
+      <div *uiDrawerBackdrop></div>
+      <div *uiDrawerContent="let content">
+        <h2 uiDrawerTitle>Share {{ payloadOf(content)?.name }}</h2>
+      </div>
+    </ng-container>
+  `,
+})
+class Example {
+  readonly file: SharedFile = { name: "Roadmap.pdf", uploading: false }
+  readonly share = createDrawerController<SharedFile, "copy" | "email">()
+
+  async shareFile() {
+    const { reason, returnValue } = await this.share.open({
+      payload: this.file,
+    })
+  }
+
+  payloadOf(state: { payload?: unknown }) {
+    return state.payload as SharedFile | undefined
+  }
+}
+
+export { Example }
+```
+
+## Action Sheet
+
+A sheet can offer choices instead of a form. Give each Close part a `value`; the open Promise returns the chosen action. Escape, an outside press, or a swipe returns no value, which this example treats as Cancel.
+
+Put the least risky action first because a keyboard or code open starts there. Use an [Alert Dialog](./alert-dialog) when a choice needs confirmation.
+
+<ComponentExample
+  name="drawer/action-sheet"
+  caption="Open Photo Options and choose an action. The console logs the returned value; dismissing the sheet counts as Cancel."
+/>
+
+## Responsive
+
+This recipe uses a media query to choose a Drawer on a narrow screen and a Dialog on a wide screen. It replaces the component tree at the breakpoint, so an open sheet closes and local field edits reset. Lift the open and field values above that branch if they must survive the switch.
+
+```ts
+import { Component, afterNextRender, signal } from "@angular/core"
+import {
+  Dialog,
+  DialogBackdrop,
+  DialogContent,
+  DialogTrigger,
+} from "@ui-sdk/angular/dialog"
+import {
+  Drawer,
+  DrawerBackdrop,
+  DrawerContent,
+  DrawerTrigger,
+} from "@ui-sdk/angular/drawer"
+import { ProfileForm } from "./profile-form"
+
+@Component({
+  selector: "app-edit-profile",
+  imports: [
+    Dialog,
+    DialogBackdrop,
+    DialogContent,
+    DialogTrigger,
+    Drawer,
+    DrawerBackdrop,
+    DrawerContent,
+    DrawerTrigger,
+    ProfileForm,
+  ],
+  template: `
+    @if (isDesktop()) {
+      <ng-container uiDialog>
+        <button uiDialogTrigger>Edit Profile</button>
+        <div *uiDialogBackdrop></div>
+        <div *uiDialogContent>
+          <app-profile-form />
+        </div>
+      </ng-container>
+    } @else {
+      <ng-container uiDrawer>
+        <button uiDrawerTrigger>Edit Profile</button>
+        <div *uiDrawerBackdrop></div>
+        <div *uiDrawerContent>
+          <app-profile-form />
+        </div>
+      </ng-container>
+    }
+  `,
+})
+class EditProfile {
+  readonly isDesktop = signal(false)
+
+  constructor() {
+    afterNextRender(() => {
+      const query = matchMedia("(min-width: 768px)")
+      this.isDesktop.set(query.matches)
+      query.addEventListener("change", () => this.isDesktop.set(query.matches))
+    })
+  }
+}
+
+export { EditProfile }
+```
+
+## Driver and Physics
+
+`driver` picks how the sheet moves. `"scroll-snap"` uses native scrolling and CSS snap points for a bottom sheet; `"pointer"` uses pointer dragging and spring motion on every side. The default `"auto"` chooses native scrolling for a bottom sheet on a touch screen, and pointer dragging for mouse and pen, other sides, `modalAbove`, or `expandOnScroll` false. `data-driver` reports the active choice.
+
+Override part of `sheetPhysics.ios` with `physics` to tune the pointer driver: `response` changes spring timing, `dampingRatio` changes settling, `momentumDampingRatio` affects flings, and `rubberBand` changes resistance past the largest point.
+
+```angular-html
+<ng-container
+  uiDrawer
+  driver="pointer"
+  [physics]="{ response: 0.3, dampingRatio: 0.9 }"
+></ng-container>
+```
+
+## Page Integration
+
+`themeColor` dims an existing `<meta name="theme-color">` with the backdrop, so the browser's toolbars can follow it; pages without that tag are left alone. `persistentElements` keeps selected elements usable while the drawer is modal: an array of elements or selectors, or a function returning elements. Something that must stay above the backdrop also needs its own top-layer surface.
+
+Drawers render in place and use the top layer. `container` moves the backdrop and viewport elsewhere, for example into a shadow root or out of a surrounding form. See the shared [popup guide](../popups#mounting-and-containers).
+
+```angular-html
+<ng-container uiDrawer themeColor [persistentElements]="['#chat-launcher']">
+  <div *uiDrawerContent="{ container: shadowRoot }"></div>
+</ng-container>
+```
+
+## Custom Rendering
+
+Each directive goes on an element you write. Read a part's state from a template reference, like `#trigger="uiDrawerTrigger"` and then `trigger.state().open`, and the content's from `*uiDrawerContent="let content"`.
+
+```angular-html
+<button uiDrawerTrigger #drawerTrigger="uiDrawerTrigger" shortcut="mod+j">
+  {{ drawerTrigger.state().open ? "Viewing" : "View Details" }}
+</button>
+<div *uiDrawerContent="let content">
+  <h3 uiDrawerTitle>Quarterly report</h3>
+  <p uiDrawerDescription>
+    {{ content.expanded ? "Showing all of it." : "Drag up to see more." }}
+  </p>
+  <a uiDrawerClose href="/reports/q3">Open the Full Page</a>
+</div>
+```
+
+## Styling
+
+Each part has a `data-slot`, such as `drawer-content`, and shows its state through the attributes listed under [Data Attributes](#data-attributes).
+
+Leave the content's `translate` and the backdrop's opacity to the drawer. You can style scale, corners, colors, and the inner scroll area. A bottom sheet can use an `after` element below its edge to cover the gap during overscroll, as the examples do. The drawer respects reduced motion, fading instead of sliding.
+
+### DrawerContent [#styling-drawercontent]
+
+<CssVariables component="drawer" part="content" />
+
+### Viewport [#styling-viewport]
+
+<CssVariables component="drawer" part="viewport" />
+
+### DrawerOutlet [#styling-draweroutlet]
+
+<CssVariables component="drawer" part="outlet" />
+
+## Data Attributes
+
+### DrawerTrigger [#data-attributes-drawertrigger]
+
+<DataAttributes component="drawer" part="trigger" />
+
+### DrawerBackdrop [#data-attributes-drawerbackdrop]
+
+<DataAttributes component="drawer" part="backdrop" />
+
+### Viewport [#data-attributes-viewport]
+
+<DataAttributes component="drawer" part="viewport" />
+
+### DrawerContent [#data-attributes-drawercontent]
+
+<DataAttributes component="drawer" part="content" />
+
+### DrawerHandle [#data-attributes-drawerhandle]
+
+<DataAttributes component="drawer" part="handle" />
+
+### DrawerClose [#data-attributes-drawerclose]
+
+<DataAttributes component="drawer" part="close" />
+
+### DrawerOutlet [#data-attributes-draweroutlet]
+
+<DataAttributes component="drawer" part="outlet" />
+
+## API Reference
+
+Each option below is an input on the directive, and each callback an output. A change callback is two outputs: `(beforeOpenChange)`, with the details and `cancel()`, then `(openChange)` with the new value alone. `open` and `snapPoint` can be bound with `[(open)]` and `[(snapPoint)]`.
+
+### Drawer
+
+<TypeTable
+  path="../../packages/core/src/components/drawer/drawer.ts"
+  name="DrawerOptions"
+/>
+
+### DrawerTrigger
+
+A trigger outside the drawer also takes `controller`.
+
+<TypeTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="DialogTriggerProps"
+/>
+
+### DrawerBackdrop
+
+Dims the page behind a modal drawer, which manages its opacity. Goes on a `div`.
+
+### DrawerContent
+
+<TypeTable
+  path="../../packages/core/src/components/drawer/drawer.ts"
+  name="DrawerContentProps"
+/>
+
+### DrawerHandle
+
+Resizes the sheet: a press moves to the next snap point, and arrow keys, Home and End choose one. Goes on a `button`.
+
+### DrawerTitle
+
+Names the drawer. Goes on a `h2`.
+
+### DrawerDescription
+
+Describes the drawer while it's rendered. Goes on a `p`.
+
+### DrawerClose
+
+<TypeTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="DialogCloseProps"
+/>
+
+### DrawerShortcut
+
+<TypeTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="DialogShortcutProps"
+/>
+
+### DrawerOutlet
+
+An outlet outside the drawer also takes `controller`.
+
+<TypeTable
+  path="../../packages/core/src/components/drawer/drawer.ts"
+  name="DrawerOutletProps"
+/>
+
+### State
+
+What each part's `state()` signal holds, per part.
+
+`uiDrawerTrigger`:
+
+<StateTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="DialogTriggerState"
+/>
+
+`uiDrawerBackdrop`:
+
+<StateTable
+  path="../../packages/core/src/components/drawer/drawer.ts"
+  name="DrawerBackdropState"
+/>
+
+`uiDrawerContent`:
+
+<StateTable
+  path="../../packages/core/src/components/drawer/drawer.ts"
+  name="DrawerContentState"
+/>
+
+`uiDrawerHandle`:
+
+<StateTable
+  path="../../packages/core/src/components/drawer/drawer.ts"
+  name="DrawerHandleState"
+/>
+
+`uiDrawerClose`:
+
+<StateTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="DialogCloseState"
+/>
+
+`uiDrawerOutlet`:
+
+<StateTable
+  path="../../packages/core/src/components/drawer/drawer.ts"
+  name="DrawerOutletState"
+/>
+
+### Reasons
+
+`$event.reason` says why the drawer opened or closed.
+
+<ReasonTable
+  path="../../packages/core/src/components/drawer/drawer.ts"
+  name="DrawerOpenChangeReason"
+/>
+
+For a payload change, it says what opened the drawer or took it over.
+
+<ReasonTable
+  path="../../packages/core/src/components/drawer/drawer.ts"
+  name="DrawerPayloadChangeReason"
+/>
+
+Why it moved to another snap point:
+
+<ReasonTable
+  path="../../packages/core/src/components/drawer/drawer.ts"
+  name="DrawerSnapPointChangeReason"
+/>
+
+The dismissals `dismissible` can refuse:
+
+<ReasonTable
+  path="../../packages/core/src/components/drawer/drawer.ts"
+  name="DrawerDismissReason"
+/>
+
+### Controller
+
+Create one with `createDrawerController<Payload, Result>()` and pass it to `[controller]`, on the drawer and on any triggers and outlets outside it.
+
+Every write method takes an optional `{ reason, event }`, passed to the outputs. Closing with a controller always works, even when the drawer isn't dismissible or an action is running.
+
+<ControllerTable
+  path="../../packages/core/src/components/drawer/drawer.ts"
+  name="DrawerController"
+/>
+
+### Events
+
+A `before` output emits `{ value, reason, event, cancel() }` before the change, and its plain output follows with the value alone. A bound `open` or `snapPoint` only updates when its change isn't canceled.
+
+| Binding                   | On         | Receives                                                                                   |
+| ------------------------- | ---------- | ------------------------------------------------------------------------------------------ |
+| `[(open)]`                | `uiDrawer` | Whether the drawer is open                                                                 |
+| `[(snapPoint)]`           | `uiDrawer` | The snap point it rests on                                                                 |
+| `(beforeOpenChange)`      | `uiDrawer` | `{ value, reason, cancel() }`: the new state, the [reason](#reasons) and any `returnValue` |
+| `(openChangeComplete)`    | `uiDrawer` | `$event`, whether it's open, once it has settled                                           |
+| `(beforePayloadChange)`   | `uiDrawer` | `{ value, reason, cancel() }`: the content's new payload, and the [reason](#reasons)       |
+| `(beforeSnapPointChange)` | `uiDrawer` | `{ value, reason, cancel() }`: the new snap point and the [reason](#reasons)               |
+| `(dismissAttempt)`        | `uiDrawer` | `{ reason, event }`, when a dismissal was refused                                          |
+
+## Accessibility
+
+The trigger is a button that opens a dialog, and the drawer follows the [WAI-ARIA modal dialog pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/) while it's modal: `aria-modal`, focus trapped inside, the page inert, labelled by its title and described by its description. Escape closes it. The handle is a button that controls the drawer: a press moves to the next snap point, arrow keys along the drawer's axis step, and Home and End go to the ends. Every line below is an automated test.
+
+### Keyboard
+
+| Key                       | Does                                                                          |
+| ------------------------- | ----------------------------------------------------------------------------- |
+| Enter, Space              | On the trigger, opens the drawer; on the handle, moves to the next snap point |
+| Arrow keys along the axis | On the handle, moves one snap point without wrapping                          |
+| Home, End                 | On the handle, moves to the smallest or largest snap point                    |
+| Tab, Shift+Tab            | Moves through the sheet's controls, staying inside while it's modal           |
+| Escape                    | Closes the topmost drawer when it's dismissible                               |
+
+It shares [Dialog’s focus behavior](./dialog#focus): focus moves inside on open and returns when it closes. A touch open focuses the content so a field does not summon the keyboard immediately, unless you set `initialFocus`. When the on-screen keyboard opens, the viewport shrinks and the focused field can scroll into view inside the sheet.
+
+### Tested Behavior
+
+<SpecList spec="drawer" />
+
+Screen readers and layouts the drawer is tested against:
+
+<SpecList spec="drawer.a11y" />
+
+<SpecList spec="drawer.rtl" />
+
+Also tested:
+
+<SpecList spec="drawer.enhancements" />

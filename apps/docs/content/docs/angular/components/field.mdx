@@ -1,0 +1,378 @@
+---
+title: Field
+description: Connect a form control to its label, description, and validation errors.
+---
+
+A field connects a form control to its label, its description and the errors it shows, and wires up `id`, `for` and `aria-describedby` for you.
+
+<ComponentExample
+  name="field/input"
+  caption="Press Username to focus the input, then type a name."
+/>
+
+## Installation
+
+```bash
+npm install @ui-sdk/angular @ui-sdk/core
+```
+
+## Composition
+
+Use the following composition to build Field:
+
+```text
+uiField
+├── uiFieldLabel
+├── uiInput
+├── uiFieldDescription
+└── uiFieldError
+```
+
+## Usage
+
+```ts
+import { Component } from "@angular/core"
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "@ui-sdk/angular/field"
+import { Input } from "@ui-sdk/angular/input"
+
+@Component({
+  selector: "app-example",
+  imports: [Field, FieldDescription, FieldError, FieldLabel, Input],
+  template: `
+    <div uiField name="username">
+      <label uiFieldLabel>Username</label>
+      <input uiInput autocomplete="username" required />
+      <p uiFieldDescription>This is your public name.</p>
+      <div *uiFieldError></div>
+    </div>
+  `,
+})
+class Example {}
+
+export { Example }
+```
+
+The control is one of ours, like an [Input](./input), a [Textarea](./textarea), a [Select](./select) or a [Checkbox](./checkbox), and it wires itself to the field.
+
+The label names the control, and the description and any error that shows describe it.
+
+Group related fields in a [field set](#field-sets):
+
+```angular-html
+<fieldset uiFieldSet>
+  <legend uiFieldLegend></legend>
+  <p uiFieldDescription></p>
+  <div uiFieldGroup>
+    <div uiField></div>
+    <div uiField></div>
+  </div>
+</fieldset>
+```
+
+## Controls
+
+Use an [Input](./input) for a line of text and a [Textarea](./textarea) for more:
+
+```angular-html
+<div uiField>
+  <label uiFieldLabel>Feedback</label>
+  <textarea uiTextarea name="feedback"></textarea>
+</div>
+```
+
+For a control we don't ship, like a native `<select>`, use `uiFieldControl`. Put it on the native element, and it connects it to the field the same way. An [agent](/docs/agents) sees only our components, so it can't fill a `uiFieldControl`: use ours where there is one.
+
+```angular-html
+<div uiField>
+  <label uiFieldLabel>Department</label>
+  <select uiFieldControl name="department">
+    <option value="design">Design</option>
+    <option value="engineering">Engineering</option>
+  </select>
+</div>
+```
+
+A [Checkbox](./checkbox), [Switch](./switch) or [Radio Group](./radio) inside a field uses the field's label and description. Pressing the label toggles a checkbox or switch. A radio group takes the field's label as its name, and each radio keeps a label of its own:
+
+```angular-html
+<div uiField>
+  <button uiSwitch name="mfa"></button>
+  <label uiFieldLabel>Two-factor authentication</label>
+  <p uiFieldDescription>Ask for a code when you sign in.</p>
+</div>
+
+<div uiField>
+  <label uiFieldLabel>Plan</label>
+  <div uiRadioGroup name="plan" defaultValue="monthly">
+    <label>
+      <button uiRadio value="monthly"></button>
+      Monthly
+    </label>
+    <label>
+      <button uiRadio value="yearly"></button>
+      Yearly
+    </label>
+  </div>
+</div>
+```
+
+## Validation
+
+Use native constraints such as `required`, `type="email"`, and `pattern`. Errors appear after a submit attempt and update as the value changes. The first invalid control takes focus.
+
+Leave an error empty to show the browser's message, or use `match="valueMissing"` and `match="typeMismatch"` for your own messages. Adding an error part replaces the browser's validation bubble with that message in the page.
+
+<ComponentExample
+  name="field/validation"
+  caption="Press Subscribe with an empty or invalid email, then correct it to clear the error."
+/>
+
+## Errors from Your Code
+
+Pass `invalid` when your server or form library supplies an error. `true` shows it immediately. Clear the value to return to the browser's validation.
+
+Give this error its own text and set `match` to `true`. Named matches such as `valueMissing` still refer to native validation. `[invalid]="false"` hides the field's invalid state, but does not make an invalid native control pass validation.
+
+```angular-html
+<div uiField name="email" [invalid]="serverError ? true : undefined">
+  <label uiFieldLabel>Email</label>
+  <input uiInput type="email" required (valueChange)="serverError = null" />
+  <div *uiFieldError="'valueMissing'">Enter your email address.</div>
+  @if (serverError) {
+    <div *uiFieldError="true">{{ serverError }}</div>
+  }
+</div>
+```
+
+## Required and Disabled
+
+A required control marks every part with `data-required`, and the parts' state has `required`, so a label can show a mark with CSS alone.
+
+A disabled field disables its control and marks every part with `data-disabled`, the way a [disabled field set](#disabled-field-sets) does for every field inside it.
+
+## Character Count
+
+Keep the text in state and show its length in the description. Set `maxlength` on the control to enforce the limit.
+
+```angular-html
+<div uiField>
+  <label uiFieldLabel>Bio</label>
+  <textarea uiTextarea [(value)]="bio" maxlength="280"></textarea>
+  <p uiFieldDescription>{{ bio().length }} / 280</p>
+</div>
+```
+
+## Forms
+
+The control submits its value under its own `name`, or the field's name if it has none. Reset restores the control's default and hides validation errors. Disabled controls are left out of the submitted values. See [Forms](../forms) for the shared form behavior.
+
+## Field Sets
+
+A field set groups related fields under a legend, and disables them together.
+
+<ComponentExample
+  name="field/field-set"
+  caption="Move through the address fields. Their legend and description name the group."
+/>
+
+`uiFieldSet` is a native `<fieldset>` and `uiFieldLegend` a native `<legend>`, so the set is named, and disabled, before scripts run. Keep the legend the first child. A `uiFieldLegend` on another element, like a `<div>`, still names the set through `aria-labelledby`.
+
+A `uiFieldDescription` right inside the set, outside any `uiField`, describes the set, so screen readers read it as focus enters. `uiFieldGroup` is a `<div>` that stacks the fields, with no role and no state: the field set is what names and disables a group.
+
+## Disabled Field Sets
+
+Disabling the set disables its controls and nested field sets. The form leaves their values out of submissions.
+
+```angular-html
+<fieldset uiFieldSet [disabled]="sameAsShipping">
+  <legend uiFieldLegend>Billing address</legend>
+  <div uiField name="billing-street">
+    <label uiFieldLabel>Street address</label>
+    <input uiInput autocomplete="billing street-address" />
+  </div>
+</fieldset>
+```
+
+## Groups in a Field Set
+
+The legend names a [checkbox group](./checkbox#group) or a [radio group](./radio) inside the set, so the group needs no label of its own.
+
+```angular-html
+<fieldset uiFieldSet>
+  <legend uiFieldLegend>Notifications</legend>
+  <div uiCheckboxGroup name="notify" [defaultValue]="['mentions']">
+    <label>
+      <button uiCheckbox value="mentions"></button>
+      Mentions
+    </label>
+    <label>
+      <button uiCheckbox value="follows"></button>
+      New followers
+    </label>
+  </div>
+</fieldset>
+```
+
+## Custom Rendering
+
+Each directive goes on an element you write, like `uiFieldControl` on a `<select>`. Read the field's state from a template reference:
+
+```angular-html
+<div uiField #username="uiField">
+  <label uiFieldLabel>Username</label>
+  <input uiInput pattern="[a-z0-9]+" />
+  <p uiFieldDescription>
+    {{
+      username.state().invalid
+        ? "Use letters and numbers only."
+        : "Letters and numbers."
+    }}
+  </p>
+</div>
+```
+
+`uiFieldError`'s state also has the `message` for the current problem. Each state is a signal, so the template updates only where it reads a value that changed. Each part's state is listed under [State](#state).
+
+## Custom Controls
+
+A control of your own joins the field around it, the way ours do, when it puts `FieldControl` on its element as a host directive. The field then gives it the `id`, `aria-labelledby`, `aria-describedby` after your own, `aria-invalid`, `disabled` and its data attributes. `useFieldControl()` returns the field's `name()` and `disabled()`, or `undefined` outside a field:
+
+```ts title="phone-input.ts"
+import { Directive } from "@angular/core"
+import { FieldControl, useFieldControl } from "@ui-sdk/angular/field"
+
+@Directive({
+  selector: "input[appPhoneInput]",
+  hostDirectives: [FieldControl],
+  host: { type: "tel", autocomplete: "tel", "[attr.name]": "field?.name()" },
+})
+export class PhoneInput {
+  readonly field = useFieldControl()
+}
+```
+
+```angular-html
+<div uiField name="phone">
+  <label uiFieldLabel>Phone</label>
+  <input appPhoneInput required />
+  <div uiFieldError></div>
+</div>
+```
+
+The field reads validity from the native inputs, selects and textareas inside it, so `required` and `pattern` work on the input above. A control that isn't a native input, like a row of buttons, takes part through a native input of its own: ours render one, visually hidden, beside the control.
+
+To build a control from scratch on the primitives ours use, see [Primitives](../../core/kernel/define-a-primitive).
+
+## Styling
+
+Use `data-invalid` and `data-valid` for validation, and `data-focused`, `data-required` and `data-disabled` for the rest. Every part of a field gets the same attributes, so a label can turn red with its control.
+
+Each part has a `data-slot`, such as `field-label`, and its state attributes are listed under [Data Attributes](#data-attributes).
+
+## Data Attributes
+
+### Field [#data-attributes-field]
+
+<DataAttributes component="field" part="root" />
+
+### FieldLabel [#data-attributes-fieldlabel]
+
+<DataAttributes component="field" part="label" />
+
+### FieldControl [#data-attributes-fieldcontrol]
+
+<DataAttributes component="field" part="control" />
+
+### FieldDescription [#data-attributes-fielddescription]
+
+<DataAttributes component="field" part="description" />
+
+### FieldError [#data-attributes-fielderror]
+
+<DataAttributes component="field" part="error" />
+
+### FieldSet [#data-attributes-fieldset]
+
+`uiFieldGroup` has `data-slot="field-group"` and no state attributes.
+
+<DataAttributes component="field-set" part="set" />
+
+### FieldLegend [#data-attributes-fieldlegend]
+
+<DataAttributes component="field-set" part="legend" />
+
+### FieldDescription in a FieldSet [#data-attributes-fieldset-description]
+
+<DataAttributes component="field-set" part="description" />
+
+## API Reference
+
+Each option below is an input on the directive.
+
+A field has no change events. Read its state from the parts' data attributes, or from a part's `state()`. Set `debug` to log every state change and its reason.
+
+### Field
+
+<TypeTable
+  path="../../packages/core/src/components/field/field.ts"
+  name="FieldOptions"
+/>
+
+### FieldError
+
+<TypeTable
+  path="../../packages/core/src/components/field/field.ts"
+  name="FieldErrorProps"
+/>
+
+### FieldSet
+
+<TypeTable
+  path="../../packages/core/src/components/field/field-set.ts"
+  name="FieldSetOptions"
+/>
+
+### State
+
+<StateTable
+  path="../../packages/core/src/components/field/field.ts"
+  name="FieldState"
+/>
+
+<StateTable
+  path="../../packages/core/src/components/field/field.ts"
+  name="FieldErrorState"
+/>
+
+A `uiFieldDescription` receives the field's state, or only `disabled` when it describes a field set.
+
+<StateTable
+  path="../../packages/core/src/components/field/field.ts"
+  name="FieldDescriptionState"
+/>
+
+Every part of a field set receives the same state.
+
+<StateTable
+  path="../../packages/core/src/components/field/field-set.ts"
+  name="FieldSetState"
+/>
+
+## Accessibility
+
+The label names the control with `aria-labelledby`, beside a native `<label for>` where the control can take one. The description and any error that shows describe it with `aria-describedby`, and an invalid control has `aria-invalid`. The tests below cover these connections and keyboard behavior.
+
+<SpecList spec="field" />
+
+In a field set:
+
+<SpecList spec="field.set" />
+
+In a form:
+
+<SpecList spec="forms.form" />

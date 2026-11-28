@@ -61,7 +61,7 @@ const engineWeight = 2
 const shardMinutes = 6
 const maxShards = 12
 
-const frameworks = ["react", "vue", "web", "solid", "svelte"]
+const frameworks = ["react", "vue", "web", "solid", "svelte", "angular"]
 // `BROWSERS` drops an engine's projects from the Playwright config, so it does here too.
 const engineProjects = ["webkit", "firefox"]
   .filter(
@@ -91,6 +91,7 @@ const sharedPaths = [
   "apps/playground/vite.config.ts",
   "apps/playground/ssr-plugin.ts",
   "apps/playground/solid-ssr.ts",
+  "apps/playground/angular-plugin.ts",
 ]
 
 const { values: flags } = parseArgs({
@@ -148,6 +149,9 @@ function frameworksOf(file) {
   }
   if (file === "apps/playground/solid-ssr.ts") {
     return ["solid"]
+  }
+  if (file === "apps/playground/angular-plugin.ts") {
+    return ["angular"]
   }
   return frameworks
 }

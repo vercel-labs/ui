@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "include": ["src/fixtures/*/angular*.ts", "src/ssr/angular*.ts"],
+  "compilerOptions": {
+    "noEmit": false,
+    "rewriteRelativeImportExtensions": true,
+    "noUnusedLocals": false,
+    "rootDir": "../..",
+    "outDir": "node_modules/.angular",
+    "types": ["vite/client"],
+    "paths": {
+      "@ui-sdk/angular": ["../../packages/angular/src/index.ts"],
+      "@ui-sdk/angular/*": ["../../packages/angular/src/*"]
+    }
+  },
+  "angularCompilerOptions": { "strictTemplates": true }
+}

@@ -1,0 +1,74 @@
+---
+title: Installation
+description: Install UI SDK in your Angular app.
+---
+
+Start with an app using Angular 21 or newer. It works with or without Zone.js.
+
+## Install the Packages
+
+```bash
+npm install @ui-sdk/angular @ui-sdk/core
+```
+
+`@ui-sdk/angular` provides the Angular directives. `@ui-sdk/core` provides their behavior and is a peer dependency. Install both so the components and any helpers you use share one copy of the core.
+
+## Import a Component
+
+Import each component from its own entry, and add it to your component's `imports`:
+
+```ts
+import { Component } from "@angular/core"
+import { Button } from "@ui-sdk/angular/button"
+import { Toggle } from "@ui-sdk/angular/toggle"
+
+@Component({
+  selector: "app-toolbar",
+  imports: [Button, Toggle],
+  template: `
+    <button uiButton>Save</button>
+    <button uiToggle>Bold</button>
+  `,
+})
+export class Toolbar {}
+```
+
+Each part is an attribute directive, so it goes on an element you write. A Dialog has separate parts for its trigger, content, and title. Import those parts from the same entry:
+
+```ts
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "@ui-sdk/angular/dialog"
+```
+
+Each [component page](./components) lists the parts you can use.
+
+## Add Your Styles
+
+Components are unstyled, so you style them with your app's CSS or with Tailwind CSS. [Styling and Animation](./styling-and-animation) covers both.
+
+For a default look to start from, import `@ui-sdk/core/web.css` once, at the top of your global stylesheet, `src/styles.css`:
+
+```css title="src/styles.css"
+@import "@ui-sdk/core/web.css";
+```
+
+With Tailwind CSS, import it after Tailwind instead. `layer(components)` puts it above Tailwind's base styles, so they don't reset it, and below its utilities, so a class still wins. Declare [the ui-sdk layer](./styling-and-animation#the-ui-sdk-layer) above both:
+
+```css title="src/styles.css"
+@layer ui-sdk;
+
+@import "tailwindcss";
+@import "@ui-sdk/core/web.css" layer(components);
+```
+
+You can render your first component without setting up a provider or adding a portal root. Angular can render the initial HTML on the server; [Server Rendering](./server-rendering) explains how to keep it consistent when the page hydrates.
+
+## Right to Left
+
+Set `dir="rtl"` on the page or a container. Arrow keys and popup placement follow that direction without a provider. Use logical CSS properties, such as `padding-inline-start`, for your styles.
+
+Continue with [First Component](./first-component) to add a working toggle to your app.

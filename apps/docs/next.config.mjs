@@ -9,7 +9,14 @@ import {
 
 const withMDX = createMDX()
 
-const frameworks = ["react", "vue", "svelte", "web-components", "solid"]
+const frameworks = [
+  "react",
+  "vue",
+  "svelte",
+  "web-components",
+  "solid",
+  "angular",
+]
 
 const publicDir = path.join(import.meta.dirname, "public")
 const newest = (versions) =>

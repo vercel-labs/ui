@@ -32,10 +32,16 @@ const rendered = () => {
 const test = base.extend({
   page: async ({ page }, use) => {
     await page.addInitScript(rendered)
-    // Vercel serves the analytics scripts only on its own hosting.
-    await page.route("**/_vercel/**", (route) =>
-      route.fulfill({ contentType: "text/javascript", body: "" })
-    )
+    // Vercel serves the analytics scripts only on its own hosting, and the dev
+    // server loads them from its CDN, which a machine offline can't reach.
+    for (const scripts of [
+      "**/_vercel/**",
+      "https://va.vercel-scripts.com/**",
+    ]) {
+      await page.route(scripts, (route) =>
+        route.fulfill({ contentType: "text/javascript", body: "" })
+      )
+    }
     // Next prefetches a Core or Agents page's segments by the URL a link names,
     // but serves that page through a rewrite, so the prefetch 404s. Following
     // the link still renders the page, so a missed prefetch isn't an error.

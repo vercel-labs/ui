@@ -3,8 +3,15 @@ import { test } from "./docs-test"
 import { existsSync, readdirSync } from "node:fs"
 import path from "node:path"
 
-const frameworks = ["react", "vue", "web-components", "svelte", "solid"]
-const folders = ["react", "vue", "web", "svelte", "solid"]
+const frameworks = [
+  "react",
+  "vue",
+  "web-components",
+  "svelte",
+  "solid",
+  "angular",
+]
+const folders = ["react", "vue", "web", "svelte", "solid", "angular"]
 
 // The folder a framework's docs keep a section in: React's utilities are hooks.
 const docsFolder = (framework: string, section: string) =>

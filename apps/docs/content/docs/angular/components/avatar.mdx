@@ -1,0 +1,285 @@
+---
+title: Avatar
+description: Show an image with a fallback while it loads or if it fails.
+---
+
+Use an Avatar for a person or a team, like in a comment, a member list or an account menu. It shows initials or an icon until the image loads, and keeps showing them if the image fails.
+
+<ComponentExample
+  name="avatar/basic"
+  caption="The image replaces the initials once it loads. A screen reader can read the person's name in either state."
+/>
+
+## Installation
+
+```bash
+npm install @ui-sdk/angular @ui-sdk/core
+```
+
+## Composition
+
+Use the following composition to build Avatar:
+
+```text
+uiAvatar
+├── uiAvatarImage
+└── uiAvatarFallback
+```
+
+- `uiAvatar` shares the image's loading state with its parts.
+- `uiAvatarImage` renders the image.
+- `uiAvatarFallback` shows when no image is loaded.
+
+The image is a real `img`, including in server markup. The browser can start fetching it before hydration. The fallback stays visible until the image loads; if loading fails, the fallback remains.
+
+## Usage
+
+Import the parts and put them together:
+
+```ts
+import { Component } from "@angular/core"
+import { Avatar, AvatarFallback, AvatarImage } from "@ui-sdk/angular/avatar"
+
+@Component({
+  selector: "app-example",
+  imports: [Avatar, AvatarFallback, AvatarImage],
+  template: `
+    <span uiAvatar>
+      <img uiAvatarImage src="/ada.png" alt="Ada Lovelace" />
+      <span *uiAvatarFallback>AL</span>
+    </span>
+  `,
+})
+class Example {}
+
+export { Example }
+```
+
+## Build Your Own
+
+`@ui-sdk/angular/avatar` comes with a ready-made Avatar. If you'd like to build your own, with your own names, start from the `avatar` primitive in `@ui-sdk/core`:
+
+```ts title="user-photo.ts"
+import { Directive, inject } from "@angular/core"
+import { avatar } from "@ui-sdk/core/avatar"
+import { usePart, usePrimitive } from "@ui-sdk/angular/primitive"
+
+@Directive({ selector: "[appUserPhoto]" })
+class UserPhoto {
+  readonly handle = usePrimitive(avatar, () => ({}))
+  readonly state = usePart(this.handle, "root").state
+}
+
+@Directive({ selector: "[appUserPhotoImage]" })
+class UserPhotoImage {
+  readonly state = usePart(inject(UserPhoto).handle, "image").state
+}
+
+@Directive({ selector: "[appUserPhotoInitials]" })
+class UserPhotoInitials {
+  readonly state = usePart(inject(UserPhoto).handle, "fallback").state
+}
+
+export { UserPhoto, UserPhotoImage, UserPhotoInitials }
+```
+
+```ts
+import { Component } from "@angular/core"
+import { UserPhoto, UserPhotoImage, UserPhotoInitials } from "./user-photo"
+
+@Component({
+  selector: "app-user-photo-example",
+  imports: [UserPhoto, UserPhotoImage, UserPhotoInitials],
+  template: `
+    <span appUserPhoto>
+      <img appUserPhotoImage src="https://github.com/shadcn.png" alt="shadcn" />
+      <span appUserPhotoInitials>CN</span>
+    </span>
+  `,
+})
+export class UserPhotoExample {}
+```
+
+These are the same parts the ready-made Avatar is made of, with your names. See [Rendering Primitives](../rendering) and [Custom Rendering](#custom-rendering) for more.
+
+## Fallback Delay
+
+<span id="behavior-and-options" />
+
+Set `delay` on the fallback to wait before showing it. This avoids flashing initials when an image loads quickly. Without a delay, the fallback appears immediately, including on the server.
+
+```angular-html
+<span uiAvatar>
+  <img uiAvatarImage src="https://github.com/shadcn.png" alt="shadcn" />
+  <span *uiAvatarFallback="{ delay: 600 }">CN</span>
+</span>
+```
+
+## Image Attributes
+
+Pass image attributes such as `srcset`, `crossorigin`, and `referrerpolicy` to the image. They work on the same `img` the browser loads. For avatars farther down a page, use `loading="lazy"`.
+
+```angular-html
+<span uiAvatar>
+  <img
+    uiAvatarImage
+    src="https://github.com/shadcn.png"
+    srcset="
+      https://github.com/shadcn.png?size=80  1x,
+      https://github.com/shadcn.png?size=160 2x
+    "
+    alt="shadcn"
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+    loading="lazy"
+  />
+  <span *uiAvatarFallback>CN</span>
+</span>
+```
+
+<span id="render-functions" />
+
+## Interactive Avatar
+
+Use a button when clicking an avatar performs an action. Give it an accessible name that stays available while the image loads.
+
+```angular-html
+<button
+  uiAvatar
+  (click)="openProfile($event)"
+  type="button"
+  aria-label="shadcn"
+>
+  <img uiAvatarImage src="https://github.com/shadcn.png" alt="" />
+  <span *uiAvatarFallback aria-hidden="true">CN</span>
+</button>
+```
+
+Put `uiAvatar` on the `<button>` itself, as above.
+
+## Loading Status
+
+`(beforeLoadingStatusChange)` receives the new status and change details. The possible statuses are `loading`, `loaded`, `error`, and `idle`.
+
+```ts
+import { Component } from "@angular/core"
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+  type AvatarLoadingStatusChange,
+} from "@ui-sdk/angular/avatar"
+
+const reportBrokenImage = (reason: string) => console.warn(reason)
+
+@Component({
+  selector: "app-example",
+  imports: [Avatar, AvatarFallback, AvatarImage],
+  template: `
+    <span uiAvatar (beforeLoadingStatusChange)="onLoadingStatusChange($event)">
+      <img uiAvatarImage [src]="user.image" [alt]="user.name" />
+      <span *uiAvatarFallback>{{ user.initials }}</span>
+    </span>
+  `,
+})
+class Example {
+  readonly user = { image: "/ada.png", name: "Ada Lovelace", initials: "AL" }
+
+  onLoadingStatusChange(change: AvatarLoadingStatusChange) {
+    if (change.value === "error") reportBrokenImage(change.reason)
+  }
+}
+
+export { Example }
+```
+
+When you replace a loaded image, the browser keeps it visible while the next source loads. A failed replacement shows the fallback. The change details explain why the status changed; see [Reasons](#reasons).
+
+## Custom Rendering
+
+Read a part's state from a template reference, as [Parts and Composition](../parts-and-composition) shows. Every part's state has the loading status, so the fallback can say something different when the image fails:
+
+```angular-html
+<span uiAvatar #avatar="uiAvatar">
+  <img uiAvatarImage [src]="user.image" [alt]="user.name" />
+  <span *uiAvatarFallback>
+    {{ avatar.state().loadingStatus === "error" ? "?" : user.initials }}
+  </span>
+</span>
+```
+
+## Styling
+
+Set the root's size and let the image and fallback fill it. The image manages its own hidden styles until it loads; keep those styles intact when changing its element.
+
+Each part has a `data-slot`, such as `avatar-fallback`, and shows the loading status through the attributes listed under [Data Attributes](#data-attributes).
+
+## Data Attributes
+
+### Avatar [#data-attributes-avatar]
+
+<DataAttributes component="avatar" part="root" />
+
+### AvatarImage [#data-attributes-avatarimage]
+
+<DataAttributes component="avatar" part="image" />
+
+### AvatarFallback [#data-attributes-avatarfallback]
+
+<DataAttributes component="avatar" part="fallback" />
+
+## API Reference
+
+Each option below is an input on the directive, and each callback an output. `(beforeLoadingStatusChange)` emits the new status with its details, then `(loadingStatusChange)` emits the status alone.
+
+### Avatar
+
+<TypeTable
+  path="../../packages/core/src/components/avatar/avatar.ts"
+  name="AvatarOptions"
+/>
+
+### AvatarImage
+
+The image. Renders a real `img`, so the browser can fetch it before hydration, and accepts its attributes, such as `srcset`, `crossorigin` and `referrerpolicy`.
+
+### AvatarFallback
+
+<TypeTable
+  path="../../packages/core/src/components/avatar/avatar.ts"
+  name="AvatarFallbackProps"
+/>
+
+### State
+
+What each part's `state()` signal holds. Every part gets the same state.
+
+<StateTable
+  path="../../packages/core/src/components/avatar/avatar.ts"
+  name="AvatarState"
+/>
+
+### Reasons
+
+`$event.reason` says why the status changed.
+
+<ReasonTable
+  path="../../packages/core/src/components/avatar/avatar.ts"
+  name="AvatarLoadingStatusChangeReason"
+/>
+
+### Events
+
+`(beforeLoadingStatusChange)` emits `{ value, reason, event }`, and `(loadingStatusChange)` follows with the status alone.
+
+| Binding                       | On         | Receives                                                              |
+| ----------------------------- | ---------- | --------------------------------------------------------------------- |
+| `(beforeLoadingStatusChange)` | `uiAvatar` | The image's new status in `value`, the [reason](#reasons) and `event` |
+
+## Accessibility
+
+Give the image meaningful `alt` text. Include the person's name in the fallback too, using visually hidden text if you only want to show initials.
+
+When a visible name beside the avatar already identifies the person, use an empty `alt` and hide decorative fallback content from screen readers.
+
+<SpecList spec="avatar" />

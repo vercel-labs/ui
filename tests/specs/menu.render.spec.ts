@@ -63,6 +63,10 @@ test.describe("custom rendering", () => {
       framework.startsWith("solid"),
       "Solid runs a render function once."
     )
+    test.skip(
+      framework.startsWith("angular"),
+      "Angular has no render functions. A binding updates on its own."
+    )
     await page.getByRole("button", { name: "File" }).focus()
     await page.keyboard.press("Enter")
     await expect(page.getByRole("menuitem", { name: "Docs" })).toBeFocused()

@@ -3,13 +3,18 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite --port ${PLAYGROUND_PORT:-5300} --strictPort",
-    "build": "NODE_ENV=development vite build && NODE_ENV=development vite build --ssr src/ssr.ts --outDir dist-ssr && NODE_ENV=development vite build --ssr src/ssr/vue.ts --outDir dist-ssr --emptyOutDir false && NODE_ENV=development vite build --ssr src/ssr/solid.ts --outDir dist-ssr --emptyOutDir false",
+    "dev": "ngc -p tsconfig.angular.json && vite --port ${PLAYGROUND_PORT:-5300} --strictPort",
+    "build": "ngc -p tsconfig.angular.json && NODE_ENV=development vite build && NODE_ENV=development vite build --ssr src/ssr.ts --outDir dist-ssr && NODE_ENV=development vite build --ssr src/ssr/vue.ts --outDir dist-ssr --emptyOutDir false && NODE_ENV=development vite build --ssr src/ssr/solid.ts --outDir dist-ssr --emptyOutDir false && NODE_ENV=development vite build --ssr src/ssr/angular.ts --outDir dist-ssr --emptyOutDir false",
     "preview": "vite preview --port ${PLAYGROUND_PORT:-5300} --strictPort",
-    "typecheck": "vue-tsc --noEmit && svelte-check --tsconfig ./tsconfig.svelte.json --fail-on-warnings && node ../../scripts/tsgo.mjs --noEmit -p tsconfig.solid.json"
+    "typecheck": "vue-tsc --noEmit && svelte-check --tsconfig ./tsconfig.svelte.json --fail-on-warnings && node ../../scripts/tsgo.mjs --noEmit -p tsconfig.solid.json && ngc -p tsconfig.angular.json --noEmit"
   },
   "dependencies": {
+    "@angular/common": "^21.2.26",
+    "@angular/core": "^21.2.26",
+    "@angular/platform-browser": "^21.2.26",
+    "@angular/platform-server": "^21.2.26",
     "@guidepup/virtual-screen-reader": "^0.33.0",
+    "@ui-sdk/angular": "workspace:*",
     "@ui-sdk/core": "workspace:*",
     "@ui-sdk/react": "workspace:*",
     "@ui-sdk/svelte": "workspace:*",
@@ -26,6 +31,8 @@
     "@solidjs/web": "catalog:"
   },
   "devDependencies": {
+    "@angular/compiler": "^21.2.26",
+    "@angular/compiler-cli": "^21.2.26",
     "@sveltejs/vite-plugin-svelte": "catalog:",
     "@tailwindcss/vite": "^4.3.3",
     "@types/react": "catalog:",

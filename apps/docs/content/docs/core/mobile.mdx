@@ -159,6 +159,23 @@ const { hover } = pointerKind.get()
 ```
 
 </FrameworkContent>
+<FrameworkContent value="angular">
+
+```ts
+import { Component } from "@angular/core"
+import { createPointerKind } from "@ui-sdk/core"
+import { usePreference } from "@ui-sdk/angular/preferences"
+
+const pointerKind = createPointerKind()
+
+@Component({ selector: "app-toolbar", template: `…` })
+export class Toolbar {
+  readonly pointer = usePreference(pointerKind)
+  // pointer().hover: "hover" with a mouse, "none" on a phone, "unknown" on the server
+}
+```
+
+</FrameworkContent>
 
 It's for behavior and content, like opening on tap where nothing can hover. Style with the media queries themselves, `@media (hover: hover)` or Tailwind's `pointer-coarse:`, which are right from the first paint.
 

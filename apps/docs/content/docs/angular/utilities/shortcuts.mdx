@@ -1,0 +1,109 @@
+---
+title: Shortcuts
+description: Register keyboard shortcuts and show the right keys for the user's platform.
+---
+
+`useShortcut` registers a shortcut while your component exists. For a component that already accepts `shortcut`, such as a dialog trigger, use that input directly.
+
+<ComponentExample
+  name="shortcuts/basic"
+  caption="Press N to create a note. Press Command+S on Mac or Control+S elsewhere to save. The buttons run the same actions."
+/>
+
+## Register a Shortcut
+
+Keys are joined with `+`. `mod` means Command on Apple platforms and Control elsewhere. This example also displays the keys using `useShortcutHint`:
+
+```ts
+import { Component, signal } from "@angular/core"
+import { useShortcut, useShortcutHint } from "@ui-sdk/angular/shortcuts"
+
+@Component({
+  selector: "app-new-note",
+  template: `
+    <button
+      (click)="addNote()"
+      [attr.aria-keyshortcuts]="hint.ariaKeyshortcuts()"
+    >
+      New note ({{ count() }}) <kbd aria-hidden="true">{{ hint.text() }}</kbd>
+    </button>
+  `,
+})
+export class NewNote {
+  readonly count = signal(0)
+  readonly hint = useShortcutHint("mod+enter")
+
+  constructor() {
+    useShortcut("mod+enter", () => this.addNote(), {
+      description: "New note",
+    })
+  }
+
+  addNote() {
+    this.count.update((count) => count + 1)
+  }
+}
+```
+
+Call the helper in a constructor or a field initializer. It unregisters when the component is destroyed. Keys and options can be signals or getters, and the shortcut registers again when what they read changes; return `null` for keys to leave the shortcut unregistered. Nothing registers on the server.
+
+## Show the Keys
+
+`useShortcutHint` supplies display text and `aria-keyshortcuts`, as signals. It keeps the server and the first render in the browser consistent, then updates for the user's platform once the page renders.
+
+Outside templates, use `formatShortcut` for display text or `ariaKeyshortcuts` for the ARIA value, from the same entry. The hint's text and `formatShortcut` both keep their left-to-right order on a right-to-left page, because two invisible characters wrap the text. Compare the original keys, not the formatted hint.
+
+## While Someone Is Typing
+
+Shortcuts with Command, Control, or Option can run in text fields. Plain letters and other keys stay available for typing. Set `allowInInput: true` when a shortcut should work there too, such as Escape to clear a search. A shortcut runs once per press. Set `repeat: true` to keep it running while the keys are held, like `j` moving down a list.
+
+## Limit a Shortcut to an Area
+
+Use a named `scope` for an editor or another area. Turn it on while that area has focus:
+
+```ts
+import { Component, DestroyRef, inject, signal } from "@angular/core"
+import { shortcuts, useShortcut } from "@ui-sdk/angular/shortcuts"
+
+@Component({
+  selector: "app-note",
+  template: `
+    <textarea
+      aria-label="Note"
+      [value]="text()"
+      (input)="text.set($any($event.target).value)"
+      (focus)="shortcuts.setScope('note', true)"
+      (blur)="shortcuts.setScope('note', false)"
+    ></textarea>
+  `,
+})
+export class Note {
+  readonly text = signal("")
+  readonly shortcuts = shortcuts
+
+  constructor() {
+    useShortcut("escape", () => this.text.set(""), {
+      scope: "note",
+      allowInInput: true,
+    })
+    inject(DestroyRef).onDestroy(() => shortcuts.setScope("note", false))
+  }
+}
+```
+
+Scope names are shared, so choose one for each area you want to enable together. A `when` function can add another condition, checked each time the keys are pressed.
+
+<ComponentExample
+  name="shortcuts/scope"
+  caption="Focus the note and type some text. Press Command+Enter on Mac or Control+Enter elsewhere to save, or Escape to clear it. Move focus outside the note to turn off its shortcuts."
+/>
+
+## Inside a Popup
+
+Page shortcuts pause while a modal is open. Pass `layer`, an element inside the popup or a getter that returns one, to make a shortcut belong to that popup. It runs only while that popup is open.
+
+When shortcuts share the same keys, the topmost open layer wins, then the most recently registered shortcut.
+
+## List Available Shortcuts
+
+Call `shortcuts.list()` when a help screen opens. It returns the shortcuts that can run now, including their `keys`, formatted `hint`, and `description`. Add descriptions when registering shortcuts so the help screen can explain each action.

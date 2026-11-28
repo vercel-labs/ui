@@ -100,6 +100,11 @@ for (const [items, options] of [
       framework.startsWith("solid") && items === "composed items",
       "Solid roots can't read their items' labels before they mount; `items` or `itemToLabel` give the server the label."
     )
+    // Angular makes the items when their content renders, which a closed popup's hasn't.
+    test.skip(
+      framework.startsWith("angular") && items === "composed items",
+      "Angular roots can't read their items' labels before they render; `items` or `itemToLabel` give the server the label."
+    )
     await open("select", { value: "banana", ...options })
     expect(await serverText(page, '[data-slot="select-value"]')).toBe("Banana")
     await expect(page.locator('[data-slot="select-value"]')).toHaveText(

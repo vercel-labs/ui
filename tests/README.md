@@ -20,6 +20,8 @@ PLAYGROUND_PORT=5310 ../scripts/test-slot.sh npx playwright test --project react
 
 A file filter is a regular expression matched against the path, so `specs/menu` runs `menu.a11y.spec.ts`, `menu.counts.spec.ts` and `menubar.spec.ts` too. Name the whole file, like `specs/menu.spec.ts`, for the base spec only. `pnpm test` from the root runs `playwright test` in `tests/` with every project, which is the whole matrix: pass `--project` to narrow it.
 
+Angular's fixtures (`apps/playground/src/fixtures/<name>/angular.ts`) run in the `angular`, `angular-data`, `angular-sheet` and `angular-ssr` projects. The playground's `dev` and `build` scripts compile them and the Angular adapter first, with Angular's compiler, into `apps/playground/node_modules/.angular`, and Vite serves that output. Restart the dev server after you change either.
+
 ## At a glance
 
 | Kind                                  | Files                                                             | Runs in                                                                              | CI tier   |
@@ -68,7 +70,7 @@ From `.github/workflows`:
 | `affected`         | Pull requests and pushes to `main`                | The specs the changes can affect, from `pnpm test:pr`, on 1 to 12 runners                      | Typecheck, perf docs, unit tests             |
 | `affected-engines` | Pushes to a pull request with the `engines` label | `affected`, plus `web-webkit` and `web-firefox` for the touched specs                          | Typecheck, perf docs, unit tests             |
 | `engines`          | Adding the `engines` label to a pull request      | `*-webkit`, `*-firefox`                                                                        | Docs tests                                   |
-| `main`             | Run workflow                                      | Every Chromium project: the 5 frameworks, `*-data`, `*-ssr`, `*-portal`, `*-sheet` (10 shards) | Typecheck, perf docs, unit tests             |
+| `main`             | Run workflow                                      | Every Chromium project: the 6 frameworks, `*-data`, `*-ssr`, `*-portal`, `*-sheet` (10 shards) | Typecheck, perf docs, unit tests             |
 | `nightly`          | 03:00 UTC Monday to Saturday, when main changed   | `*-webkit`, `*-firefox`                                                                        |                                              |
 | `full`             | Sundays from `weekly.yml`, and Run workflow       | Everything above                                                                               | Typecheck, perf docs, unit tests, docs tests |
 
@@ -157,7 +159,7 @@ cd tests && PLAYGROUND_PORT=5310 ../scripts/test-slot.sh npx playwright test spe
 
 ### Server rendering
 
-`<name>.ssr.spec.ts`. The `-ssr` fixtures render to a string, then hydrate, and record every hydration mismatch on `window.__hydrationErrors`. The Vue, Svelte and Solid ones get their string from the playground's `/__ssr` route, which renders them in Node. Vue checks text when it hydrates, so in `vue-ssr` text that Node's ICU writes differently from the browser's shows up as a mismatch. The specs check there are none, closed and open, and that the hydrated component behaves. `specsThatSkip` leaves them out of every project whose framework doesn't end in `-ssr`, so they run in `react-ssr`, `vue-ssr`, `svelte-ssr` and `solid-ssr` only, which CI runs from the `main` tier. Web components have no server rendering. `controller-shortcuts.ssr.spec.ts` covers controllers and shortcuts across components.
+`<name>.ssr.spec.ts`. The `-ssr` fixtures render to a string, then hydrate, and record every hydration mismatch on `window.__hydrationErrors`. The Vue, Svelte, Solid and Angular ones get their string from the playground's `/__ssr` route, which renders them in Node. Vue checks text when it hydrates, so in `vue-ssr` text that Node's ICU writes differently from the browser's shows up as a mismatch. The specs check there are none, closed and open, and that the hydrated component behaves. `specsThatSkip` leaves them out of every project whose framework doesn't end in `-ssr`, so they run in `react-ssr`, `vue-ssr`, `svelte-ssr`, `solid-ssr` and `angular-ssr` only, which CI runs from the `main` tier. Web components have no server rendering. `controller-shortcuts.ssr.spec.ts` covers controllers and shortcuts across components.
 
 ```bash
 cd tests && PLAYGROUND_PORT=5310 ../scripts/test-slot.sh npx playwright test specs/menu.ssr --project react-ssr --project vue-ssr
@@ -264,7 +266,7 @@ cd tests && DOCS_PORT=5410 ../scripts/test-slot.sh npx playwright test --config 
 
 ## Bundle size
 
-`pnpm size` (`scripts/size.mjs`) bundles every React, Vue, Svelte, Solid and web components entry from source the way an app's production build would: minified, core included, and `#dev` resolved without the `development` condition. React stays external. Svelte, Vue and Solid rows count the part of their runtime the entry adds to a bare app. Svelte rows compile components as `@sveltejs/vite-plugin-svelte` does, and Solid rows as `@solidjs/vite-plugin` does. A web components row imports the whole entry, since importing it defines its elements. A row is what a page loads up front: the entry's chunk and the chunks it imports statically. Code it loads with `import()`, like the sheet, gets its own `(lazy)` row and budget. An `import()` in code the build shakes out counts for nothing, as in Vite. The `(perf pages)` rows bundle every part the perf pages use in one entry, so shared code counts once, as in an app.
+`pnpm size` (`scripts/size.mjs`) bundles every React, Vue, Svelte, Solid, web components and Angular entry from source the way an app's production build would: minified, core included, and `#dev` resolved without the `development` condition. React and Angular stay external. Svelte, Vue and Solid rows count the part of their runtime the entry adds to a bare app. Svelte rows compile components as `@sveltejs/vite-plugin-svelte` does, and Solid rows as `@solidjs/vite-plugin` does. Angular rows bundle what Angular's compiler writes for an app (`packages/angular/tsconfig.size.json`). A web components row imports the whole entry, since importing it defines its elements. A row is what a page loads up front: the entry's chunk and the chunks it imports statically. Code it loads with `import()`, like the sheet, gets its own `(lazy)` row and budget. An `import()` in code the build shakes out counts for nothing, as in Vite. The `(perf pages)` rows bundle every part the perf pages use in one entry, so shared code counts once, as in an app.
 
 It compares each row's gzip size with `size-budget.json` and reports each row that grows more than 3% past its budget, or has none, in the CI job summary too. For now this is a report, not a failure; `pnpm size --strict` fails on it, and CI will run that again once sizes settle. It does fail, in every framework including web components, when production code contains strings only development code has, when an entry other than Field bundles Field code, and when an entry bundles a module it should never need, like a page with a component's basic parts bundling code for a part it doesn't render (`absent` and `minimalPages` in the script). The CI packages job runs it. After a change that shrinks or grows an entry on purpose, `pnpm size --update` writes the new budgets.
 
@@ -284,7 +286,7 @@ pnpm docs:perf --check
 
 ## Coverage
 
-`scripts/check-coverage.mjs`, part of `pnpm lint`, checks that every component in `packages/core/src/components` has a base, `a11y`, `rtl` and `ssr` spec, fixtures in all five frameworks, an entry in the leaks fixture, a core unit test, a docs page for every framework and a docs spec. A component without one lists it in `tests/coverage-exemptions.json` with a reason, or `todo` for coverage still to write. An exemption for something the component now has fails, so remove it in the same change that adds the coverage.
+`scripts/check-coverage.mjs`, part of `pnpm lint`, checks that every component in `packages/core/src/components` has a base, `a11y`, `rtl` and `ssr` spec, fixtures in all six frameworks, an entry in the leaks fixture, a core unit test, a docs page for every framework and a docs spec. A component without one lists it in `tests/coverage-exemptions.json` with a reason, or `todo` for coverage still to write. An exemption for something the component now has fails, so remove it in the same change that adds the coverage.
 
 ```bash
 node scripts/check-coverage.mjs          # Check.

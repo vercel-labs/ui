@@ -1,0 +1,485 @@
+---
+title: Pagination
+description: Navigate pages with buttons, links, or your router.
+---
+
+<ComponentExample
+  name="pagination/basic"
+  caption="Choose a page, or use Previous and Next. The console logs each page and its reason, and the step at either end stays focusable as a button."
+/>
+
+## Installation
+
+```bash
+npm install @ui-sdk/angular @ui-sdk/core
+```
+
+## Composition
+
+Use the following composition to build Pagination:
+
+```text
+uiPagination
+└── uiPaginationList
+    ├── uiPaginationItem
+    │   └── uiPaginationPrevious
+    ├── uiPaginationItem
+    │   └── uiPaginationLink
+    ├── uiPaginationItem
+    │   └── uiPaginationEllipsis
+    ├── uiPaginationItem
+    │   └── uiPaginationLink
+    └── uiPaginationItem
+        └── uiPaginationNext
+```
+
+Name the navigation with `aria-label`, then put the page links and steps in a list.
+
+Read the list's state from a template reference. Its `items` contains page numbers and the strings `"ellipsis-start"` and `"ellipsis-end"`. Render a link for each number and an ellipsis for each gap. Track entries by the item itself so a page link keeps its element as the range moves.
+
+`uiPaginationLink` shows its page number when you leave it empty. The current link gets `aria-current="page"` and `data-current`. `uiPaginationEllipsis` shows “…” and is hidden from screen readers.
+
+Give Previous, Next, First, and Last text or an `aria-label`. At an end, a step gets `aria-disabled="true"` and `data-disabled` and stops changing the page. As a button, it stays in the tab order. Set `disabled` on the root to do the same for every page and step, like while results load. A controller still changes the page.
+
+## Usage
+
+Import the parts and put them together:
+
+```ts
+import { Component } from "@angular/core"
+import {
+  Pagination,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationList,
+  PaginationNext,
+  PaginationPrevious,
+} from "@ui-sdk/angular/pagination"
+
+@Component({
+  selector: "app-example",
+  imports: [
+    Pagination,
+    PaginationEllipsis,
+    PaginationItem,
+    PaginationLink,
+    PaginationList,
+    PaginationNext,
+    PaginationPrevious,
+  ],
+  template: `
+    <nav uiPagination aria-label="Pagination" [pageCount]="10">
+      <ul uiPaginationList #list="uiPaginationList">
+        <li uiPaginationItem>
+          <button uiPaginationPrevious>Previous</button>
+        </li>
+        @for (item of list.state().items; track item) {
+          <li uiPaginationItem>
+            @if (typeof item === "number") {
+              <button uiPaginationLink [page]="item"></button>
+            } @else {
+              <span uiPaginationEllipsis></span>
+            }
+          </li>
+        }
+        <li uiPaginationItem>
+          <button uiPaginationNext>Next</button>
+        </li>
+      </ul>
+    </nav>
+  `,
+})
+class Example {}
+
+export { Example }
+```
+
+## Total and Page Size
+
+Instead of `pageCount`, pass `total`, how many items there are, and `pageSize`, how many fit on a page (10 by default). Pagination calculates the page count, with a minimum of one. This example resets to page 1 when the page size changes.
+
+A page past the end, like after the count shrinks, reads as the last page.
+
+<ComponentExample
+  name="pagination/total"
+  caption="Choose a page, then change Rows per page. The console logs each change, and a new size starts again at page 1."
+/>
+
+## Simple
+
+With only a few pages, the range has no gaps, so you can write the links out and leave the steps off.
+
+```angular-html
+<nav uiPagination aria-label="Pagination" [pageCount]="5">
+  <ul uiPaginationList>
+    @for (page of [1, 2, 3, 4, 5]; track page) {
+      <li uiPaginationItem>
+        <button uiPaginationLink [page]="page"></button>
+      </li>
+    }
+  </ul>
+</nav>
+```
+
+## Links
+
+Pass `getHref` to map each page to a URL, and put page links and steps on `<a>` elements. Each gets its page's `href`, with the check Angular gives an `[href]` binding. Without `getHref`, put them on `<button>` elements.
+
+```ts
+import { Component } from "@angular/core"
+import { Pagination } from "@ui-sdk/angular/pagination"
+
+@Component({
+  selector: "app-example",
+  imports: [Pagination],
+  template: `
+    <nav
+      uiPagination
+      aria-label="Pagination"
+      [pageCount]="10"
+      [getHref]="getHref"
+    >
+      ...
+    </nav>
+  `,
+})
+class Example {
+  readonly getHref = (page: number) => `/posts?page=${page}`
+}
+
+export { Example }
+```
+
+Server-rendered anchors work before JavaScript loads. A normal click changes the page and follows the URL. Modifier clicks and middle clicks leave pagination state alone so the browser can open the link elsewhere.
+
+A step at its end loses its `href` and leaves the tab order, but keeps focus if it already had it. During navigation, its original `href` stays in place so Next cannot accidentally follow the next page's URL.
+
+## Router Links
+
+Page on the client with the Angular router. With `getHref`, links and steps on `<a>` elements have real URLs. Cancel the change in `(beforePageChange)` and navigate yourself: a canceled change calls `preventDefault()` on the click, so the browser stays on the page.
+
+Read the page from the URL, like your router's search params, so the route [controls](#controlled) the pagination.
+
+```ts
+import { Component, inject } from "@angular/core"
+import { toSignal } from "@angular/core/rxjs-interop"
+import { ActivatedRoute, Router } from "@angular/router"
+import { map } from "rxjs"
+import {
+  Pagination,
+  type PaginationPageChange,
+} from "@ui-sdk/angular/pagination"
+
+@Component({
+  selector: "app-example",
+  imports: [Pagination],
+  template: `
+    <nav
+      uiPagination
+      aria-label="Pagination"
+      [pageCount]="10"
+      [page]="page()"
+      [getHref]="getHref"
+      (beforePageChange)="goTo($event)"
+    >
+      ...
+    </nav>
+  `,
+})
+class Example {
+  readonly #router = inject(Router)
+
+  readonly page = toSignal(
+    inject(ActivatedRoute).queryParamMap.pipe(
+      map((params) => Number(params.get("page") ?? 1))
+    ),
+    { initialValue: 1 }
+  )
+
+  readonly getHref = (page: number) => `?page=${page}`
+
+  goTo(change: PaginationPageChange) {
+    change.cancel()
+    this.#router.navigate([], { queryParams: { page: change.value } })
+  }
+}
+
+export { Example }
+```
+
+## Controlled
+
+Bind `page` with `[(page)]` to control the pagination, and use `(beforePageChange)` for the reason.
+
+```ts
+import { Component, signal } from "@angular/core"
+import { Pagination } from "@ui-sdk/angular/pagination"
+
+@Component({
+  selector: "app-example",
+  imports: [Pagination],
+  template: `
+    <nav uiPagination [(page)]="page" aria-label="Pagination" [pageCount]="10">
+      ...
+    </nav>
+  `,
+})
+class Example {
+  readonly page = signal(1)
+}
+
+export { Example }
+```
+
+Every change carries a [reason](#reasons): `item-press` for a page, `previous-press`, `next-press`, `first-press` or `last-press` for a step, and `imperative` from a [controller](#controller). Call `$event.cancel()` to keep the page, like while a form has unsaved changes. A canceled change also stops a link from navigating.
+
+## Default Page
+
+`defaultPage` is the page it starts on, when uncontrolled. It's 1 by default.
+
+```angular-html
+<nav uiPagination aria-label="Pagination" [pageCount]="10" [defaultPage]="5">
+  ...
+</nav>
+```
+
+## Siblings
+
+`siblings` is how many pages show on each side of the current one, 1 by default. Near an end, the window slides over instead of shrinking, keeping the range length stable. A gap of one page shows that page instead of an ellipsis.
+
+```angular-html
+<nav
+  uiPagination
+  aria-label="Pagination"
+  [pageCount]="20"
+  [defaultPage]="10"
+  [siblings]="2"
+>
+  ...
+</nav>
+```
+
+## Boundaries
+
+`boundaries` is how many pages always show at each end, 1 by default.
+
+```angular-html
+<nav
+  uiPagination
+  aria-label="Pagination"
+  [pageCount]="20"
+  [defaultPage]="10"
+  [boundaries]="2"
+>
+  ...
+</nav>
+```
+
+## Paging from Anywhere
+
+A [controller](#controller), from `createPaginationController()`, pages the pagination from anywhere, like buttons elsewhere on the page or a keyboard shortcut, without controlling it. Pass it as `controller`.
+
+```ts
+import { Component } from "@angular/core"
+import {
+  Pagination,
+  createPaginationController,
+} from "@ui-sdk/angular/pagination"
+
+@Component({
+  selector: "app-example",
+  imports: [Pagination],
+  template: `
+    <button (click)="pagination.next()">Next Page</button>
+    <nav
+      uiPagination
+      aria-label="Pagination"
+      [pageCount]="10"
+      [controller]="pagination"
+    >
+      ...
+    </nav>
+  `,
+})
+class Example {
+  readonly pagination = createPaginationController()
+}
+
+export { Example }
+```
+
+## Your Own Markup
+
+`paginationRange({ page, pageCount, siblings, boundaries })` is the range the parts use, as a pure function. It runs anywhere, like on the server, in an email or for a UI that isn't a list of pages. Import it from `@ui-sdk/core/pagination`. Here it keeps a strip of slide dots the same length however many slides there are.
+
+```ts
+import { Component, computed, signal } from "@angular/core"
+import { paginationRange } from "@ui-sdk/core/pagination"
+
+@Component({
+  selector: "app-example",
+  template: `
+    <div role="group" aria-label="Slides">
+      @for (item of items(); track item) {
+        @if (typeof item === "number") {
+          <button
+            [attr.aria-label]="'Slide ' + item"
+            [attr.aria-current]="item === slide() ? 'true' : null"
+            (click)="slide.set(item)"
+          ></button>
+        } @else {
+          <span aria-hidden="true"></span>
+        }
+      }
+    </div>
+  `,
+})
+class Example {
+  readonly slide = signal(1)
+
+  readonly items = computed(() =>
+    paginationRange({
+      page: this.slide(),
+      pageCount: 20,
+      siblings: 2,
+      boundaries: 1,
+    })
+  )
+}
+
+export { Example }
+```
+
+## Custom Rendering
+
+Each directive goes on an element you write. Read a part's state from a template reference: whether a link is `current`, and for a step, the `page` it goes to and whether it's `disabled`.
+
+<ComponentExample
+  name="pagination/render"
+  caption="Choose a page. The current page widens to say Page 3, and each arrow shows the page it goes to."
+/>
+
+## Styling
+
+Parts are unstyled. Style them through the attributes they render, which are the same in every framework: `aria-current="page"` or `data-current` on the current page's link, and `aria-disabled` or `data-disabled` on a step at its end.
+
+Each part has a `data-slot`, such as `pagination-link`, and its state attributes are listed under [Data Attributes](#data-attributes). The root, list, items and ellipsis have none.
+
+## Data Attributes
+
+### PaginationLink [#data-attributes-paginationlink]
+
+<DataAttributes component="pagination" part="link" />
+
+### PaginationPrevious [#data-attributes-paginationprevious]
+
+<DataAttributes component="pagination" part="previous" />
+
+### PaginationNext [#data-attributes-paginationnext]
+
+<DataAttributes component="pagination" part="next" />
+
+### PaginationFirst [#data-attributes-paginationfirst]
+
+<DataAttributes component="pagination" part="first" />
+
+### PaginationLast [#data-attributes-paginationlast]
+
+<DataAttributes component="pagination" part="last" />
+
+## API Reference
+
+Each option below is an input on the directive, and each callback an output. A change callback is two outputs: `(beforePageChange)`, with the details and `cancel()`, then `(pageChange)` with the new value alone. Bind `page` with `[(page)]`.
+
+### Pagination
+
+<TypeTable
+  path="../../packages/core/src/components/pagination/pagination.ts"
+  name="PaginationOptions"
+/>
+
+### PaginationLink
+
+<TypeTable
+  path="../../packages/core/src/components/pagination/pagination.ts"
+  name="PaginationLinkProps"
+/>
+
+`uiPaginationList`, `uiPaginationItem`, `uiPaginationPrevious`, `uiPaginationNext`, `uiPaginationFirst`, `uiPaginationLast` and `uiPaginationEllipsis` take no inputs of their own.
+
+### State
+
+What each part's `state()` signal holds, per part.
+
+`uiPagination` and `uiPaginationList`:
+
+<StateTable
+  path="../../packages/core/src/components/pagination/pagination.ts"
+  name="PaginationState"
+/>
+
+`uiPaginationLink`:
+
+<StateTable
+  path="../../packages/core/src/components/pagination/pagination.ts"
+  name="PaginationLinkState"
+/>
+
+`uiPaginationPrevious`, `uiPaginationNext`, `uiPaginationFirst` and `uiPaginationLast`:
+
+<StateTable
+  path="../../packages/core/src/components/pagination/pagination.ts"
+  name="PaginationStepState"
+/>
+
+### Reasons
+
+`$event.reason` says why the page changed.
+
+<ReasonTable
+  path="../../packages/core/src/components/pagination/pagination.ts"
+  name="PaginationPageChangeReason"
+/>
+
+### Controller
+
+Create one with `createPaginationController()` and pass it as `controller`.
+
+Every write method takes an optional `{ reason, event }`, passed to `(beforePageChange)`, and returns `false` when the change is canceled or there's nowhere to go.
+
+<ControllerTable
+  path="../../packages/core/src/components/pagination/pagination.ts"
+  name="PaginationController"
+/>
+
+### Events
+
+A `before` output emits `{ value, reason, event, cancel() }` before the change, and its plain output follows with the value alone. A bound `page` only updates when `(beforePageChange)` wasn't canceled.
+
+| Binding              | On             | Receives                                                                |
+| -------------------- | -------------- | ----------------------------------------------------------------------- |
+| `[(page)]`           | `uiPagination` | The current page                                                        |
+| `(beforePageChange)` | `uiPagination` | `{ value, reason, cancel() }`: the new page, and the [reason](#reasons) |
+
+## Accessibility
+
+There's no WAI-ARIA pattern for pagination. It follows the common practice: a `navigation` landmark named with `aria-label`, a list of links or buttons, and `aria-current="page"` on the current one. The list keeps the `list` role even when styled without bullets, which Safari would otherwise drop.
+
+### Focus
+
+Steps rendered as buttons stay focusable at the ends. A clicked page link keeps focus as the range moves; the primitive also tries to restore focus to that page or step if rendering replaces its element. Key range entries by their value rather than their index.
+
+### Tested Behavior
+
+Every line below is an automated test.
+
+<SpecList spec="pagination" />
+
+Beyond the baseline:
+
+<SpecList spec="pagination.enhancements" />
+
+Screen readers hear the same thing in each tested framework, recorded by a virtual screen reader:
+
+<SpecList spec="pagination.sr" />

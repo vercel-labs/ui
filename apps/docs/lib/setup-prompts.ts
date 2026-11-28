@@ -126,6 +126,20 @@ const stacks = [
     ],
   },
   {
+    id: "angular",
+    name: "Angular",
+    pkg: "angular",
+    needs: "It needs Angular 21 or newer.",
+    projects: [
+      {
+        id: "angular-cli",
+        name: "Angular CLI",
+        create:
+          "npx @angular/cli@latest new app --directory . --defaults --skip-git",
+      },
+    ],
+  },
+  {
     id: "artifacts",
     name: "Artifacts",
     note: "Copy and paste the following prompt in Claude Code or Cowork.",

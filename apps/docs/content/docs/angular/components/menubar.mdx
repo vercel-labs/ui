@@ -1,0 +1,270 @@
+---
+title: Menubar
+description: Move between an application’s menus with one tab stop.
+---
+
+Wrap a few [Menus](./menu) in a Menubar to connect their triggers. Tab enters the bar once; arrow keys move between menus, and pointing at another trigger switches an open menu.
+
+<ComponentExample
+  name="menubar/demo"
+  caption="Tab into the bar and use Left and Right to choose a menu, or point at another trigger once one is open. File has submenus, Edit has shortcuts, and View has checkboxes and an appearance choice. The console logs each one."
+/>
+
+## Installation
+
+```bash
+npm install @ui-sdk/angular @ui-sdk/core
+```
+
+## Composition
+
+Use the following composition to build Menubar:
+
+```text
+uiMenubar
+├── uiMenu
+│   ├── uiMenuTrigger
+│   └── uiMenuContent
+│       ├── uiMenuItem
+│       └── uiMenuItem
+└── uiMenu
+    ├── uiMenuTrigger
+    └── uiMenuContent
+        ├── uiMenuItem
+        └── uiMenuItem
+```
+
+Each Menu joins its surrounding Menubar automatically. There are no separate menubar trigger or item components. Name the bar with `aria-label` when people need to distinguish it from another one.
+
+## Usage
+
+Import the parts and put them together:
+
+```ts
+import { Component } from "@angular/core"
+import { Menu, MenuContent, MenuItem, MenuTrigger } from "@ui-sdk/angular/menu"
+import { Menubar } from "@ui-sdk/angular/menubar"
+
+@Component({
+  selector: "app-example",
+  imports: [Menu, MenuContent, MenuItem, MenuTrigger, Menubar],
+  template: `
+    <div uiMenubar aria-label="Application">
+      <ng-container uiMenu>
+        <button uiMenuTrigger>File</button>
+        <div *uiMenuContent>
+          <div uiMenuItem>New file</div>
+          <div uiMenuItem>Open file</div>
+        </div>
+      </ng-container>
+      <ng-container uiMenu>
+        <button uiMenuTrigger>Edit</button>
+        <div *uiMenuContent>
+          <div uiMenuItem>Undo</div>
+          <div uiMenuItem>Redo</div>
+        </div>
+      </ng-container>
+    </div>
+  `,
+})
+class Example {}
+
+export { Example }
+```
+
+## Submenu
+
+A submenu still uses Menu’s Sub, SubTrigger, and SubContent. The arrow toward it enters that level. On an ordinary item, the same arrow can move to the next top-level menu instead.
+
+<ComponentExample
+  name="menubar/submenu"
+  caption="Open File and enter Share with the arrow key. Go back to File, then move to Edit without leaving the menubar."
+/>
+
+## Vertical
+
+Set `orientation="vertical"` to move between triggers with Up and Down. The arrow toward the popup opens it; the arrow back closes it and returns to the trigger.
+
+<ComponentExample
+  name="menubar/vertical"
+  caption="Use Up and Down to choose Inbox, Drafts, or Archive. Right opens its menu in left-to-right text; Left returns to its trigger."
+/>
+
+## Menus as Data
+
+Each Menu can take `items` and register its shortcuts while closed. The [Menu data example](./menu#menus-as-data) explains the item shapes and outputs.
+
+```ts
+import { Component } from "@angular/core"
+import {
+  Menu,
+  MenuContent,
+  type MenuData,
+  MenuTrigger,
+} from "@ui-sdk/angular/menu"
+import { Menubar } from "@ui-sdk/angular/menubar"
+
+@Component({
+  selector: "app-example",
+  imports: [Menu, MenuContent, MenuTrigger, Menubar],
+  template: `
+    <div uiMenubar>
+      <ng-container uiMenu [items]="file" (action)="run($event.value)">
+        <button uiMenuTrigger>File</button>
+        <div *uiMenuContent></div>
+      </ng-container>
+    </div>
+  `,
+})
+class Example {
+  readonly file: MenuData = [
+    { value: "new", label: "New File", shortcut: "mod+alt+n" },
+    { value: "open", label: "Open…" },
+    { type: "separator" },
+    {
+      type: "submenu",
+      label: "Share",
+      items: [{ value: "email", label: "Email link" }],
+    },
+  ]
+
+  run(command: string) {
+    console.log(command)
+  }
+}
+
+export { Example }
+```
+
+## Disabled
+
+A disabled trigger stays focusable with `aria-disabled`, so people can discover it, but cannot open its menu. Set `disabled` on the bar to disable all its triggers while preserving the tab stop.
+
+```angular-html
+<div uiMenubar>
+  <ng-container uiMenu>
+    <button uiMenuTrigger disabled>Share</button>
+    <div *uiMenuContent></div>
+  </ng-container>
+</div>
+
+<div uiMenubar disabled></div>
+```
+
+## Modal
+
+The bar supplies `modal` to menus that do not set their own value. The default, `"pointer"`, consumes an outside press while closing. With `true`, the page also becomes inert and stops scrolling, but the menubar stays usable so you can switch menus.
+
+```angular-html
+<div uiMenubar modal></div>
+```
+
+## Loop
+
+Arrow keys wrap between triggers and open menus by default. Set `loop` false to stop at the ends.
+
+```angular-html
+<div uiMenubar [loop]="false"></div>
+```
+
+## Controller
+
+Create a `createMenubarController()` and pass it to the bar. `focus()` moves focus to it; `close()` closes its active menu. Each menu still owns its own open state and controller. Connect a shortcut like Alt+M to `focus()`, like an application command that moves focus into its menus.
+
+```ts
+import { Component } from "@angular/core"
+import { Menubar, createMenubarController } from "@ui-sdk/angular/menubar"
+import { useShortcut } from "@ui-sdk/angular/shortcuts"
+
+@Component({
+  selector: "app-example",
+  imports: [Menubar],
+  template: `
+    <div uiMenubar [controller]="menubar"></div>
+    <button (click)="menubar.focus()">Focus Menubar</button>
+  `,
+})
+class Example {
+  readonly menubar = createMenubarController()
+
+  constructor() {
+    useShortcut("alt+m", () => this.menubar.focus())
+  }
+}
+
+export { Example }
+```
+
+## Shared Menu Features
+
+[Checkboxes](./menu#checkboxes), [radio groups](./menu#radio-group), [icons](./menu#icons), [shortcuts](./menu#shortcuts), and [links](./menu#links-and-custom-rendering) work as they do in Menu. The first example combines settings and actions in one bar. Menus inside a menubar always use the popover presentation.
+
+## Styling
+
+The bar gets `data-open` while any menu is open; a trigger gets it only for its own menu. Use `data-orientation` for row or column layout. Style the popups and their items through the same [Menu attributes and CSS variables](./menu#styling).
+
+Each part has a `data-slot`, such as `menubar`, and its state attributes are listed under [Data Attributes](#data-attributes).
+
+## Data Attributes
+
+### Menubar [#data-attributes-menubar]
+
+<DataAttributes component="menubar" part="root" />
+
+## API Reference
+
+Each option below is an input on the directive, and each callback an output.
+
+### Menubar
+
+<TypeTable
+  path="../../packages/core/src/components/menubar/menubar.ts"
+  name="MenubarOptions"
+/>
+
+Menus, items and their icons take the inputs on the Menu page, like [`uiMenuItemIcon`](./menu#menuitemicon).
+
+### State
+
+<StateTable
+  path="../../packages/core/src/components/menubar/menubar.ts"
+  name="MenubarState"
+/>
+
+### Reasons
+
+A menu that another menu in the menubar takes over closes with `submenu-switch`, one opened by pointing at its trigger opens with `trigger-hover`, and one opened with an arrow key opens with `trigger-press`. See [Menu](./menu#reasons) for every reason.
+
+### Controller
+
+<ControllerTable
+  path="../../packages/core/src/components/menubar/menubar.ts"
+  name="MenubarController"
+/>
+
+## Accessibility
+
+The menubar follows the [WAI-ARIA menubar pattern](https://www.w3.org/WAI/ARIA/apg/patterns/menubar/).
+
+### Keyboard
+
+Tab first lands on the first trigger, then remembers the last one used. While a menu is open, moving the pointer onto another enabled trigger opens its menu, unless the pointer is only passing over it on the way into the open menu. Pressing that trigger keeps it open. Moving to a disabled trigger closes the current menu without opening another.
+
+| Key             | On a Trigger              | In an Open Menu                                  |
+| --------------- | ------------------------- | ------------------------------------------------ |
+| Left / Right    | Previous or next trigger. | Previous or next menu, or enter/leave a submenu. |
+| Down            | Open at the first item.   | Next item.                                       |
+| Up              | Open at the last item.    | Previous item.                                   |
+| Enter / Space   | Open at the first item.   | Choose the focused item.                         |
+| Home / End      | First or last trigger.    | First or last item.                              |
+| A letter        | Find a trigger by name.   | Find an item by name.                            |
+| Escape          | —                         | Close and return to the trigger.                 |
+| Tab / Shift+Tab | Leave the bar.            | Close and leave the bar.                         |
+
+These directions describe a horizontal bar in left-to-right text. Right-to-left text reverses the horizontal keys and submenu side; vertical bars use Up and Down between triggers.
+
+### Tested Behavior
+
+Every line below is an automated test.
+
+<SpecList spec="menubar" />

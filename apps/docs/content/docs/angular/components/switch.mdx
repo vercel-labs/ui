@@ -1,0 +1,231 @@
+---
+title: Switch
+description: Turn a setting on or off.
+---
+
+Use a switch for a setting that takes effect as soon as it changes, like Airplane mode or a notification preference. Keep its label the same in both states: the label says what the setting is, and the switch shows whether it's on.
+
+<ComponentExample
+  name="switch/basic"
+  caption="Click Airplane mode, or focus the switch and press Space, to turn it on and off."
+/>
+
+## Installation
+
+```bash
+npm install @ui-sdk/angular @ui-sdk/core
+```
+
+## Composition
+
+Use the following composition to build Switch:
+
+```text
+uiSwitch
+└── uiSwitchThumb
+```
+
+Wrap the switch and its text in a label. The thumb stays mounted and gets the switch's state, so CSS can slide it from one end to the other.
+
+## Usage
+
+Import the parts and put them together:
+
+```ts
+import { Component } from "@angular/core"
+import { Switch, SwitchThumb } from "@ui-sdk/angular/switch"
+
+@Component({
+  selector: "app-example",
+  imports: [Switch, SwitchThumb],
+  template: `
+    <label>
+      Airplane mode
+      <button uiSwitch>
+        <span uiSwitchThumb></span>
+      </button>
+    </label>
+  `,
+})
+class Example {}
+
+export { Example }
+```
+
+## Description
+
+Use `uiFieldLabel` and `uiFieldDescription` when a setting needs more explanation. The field connects both to the switch.
+
+<ComponentExample
+  name="switch/description"
+  caption="Click Weekly digest. The field connects the label and description to the switch."
+/>
+
+## Choice Card
+
+A setting can fill a whole card. Here the label's `::after` covers the card, so a click anywhere on it toggles the switch, and `:has([data-checked])` marks the cards that are on.
+
+<ComponentExample
+  name="switch/choice-card"
+  caption="Click anywhere on the Public profile card to turn it on. Each card's switch keeps its own value."
+/>
+
+## Disabled
+
+`disabled` prevents focus and changes, and leaves the switch out of form submissions. A disabled `fieldset` does the same.
+
+<ComponentExample
+  name="switch/disabled"
+  caption="Security alerts are always on, so that switch is disabled. Clicking it leaves it on, and Tab skips it."
+/>
+
+## Read-Only
+
+`readOnly` keeps the switch focusable and included in form submissions, while preventing the user from changing it. Use it for a setting managed somewhere else.
+
+<ComponentExample
+  name="switch/read-only"
+  caption="Tab to Encrypt backups. Space and clicks leave it on."
+/>
+
+## Controlled
+
+Bind `[(checked)]`, or pass `checked` and handle `(beforeCheckedChange)`, to own the value. A [controller](#controller) from `createSwitchController()` changes it from anywhere, like the Toggle button below. See [State and Events](../state-and-events) for the shared change callback.
+
+<ComponentExample
+  name="switch/controlled"
+  caption="Turn Wi-Fi off, or press Toggle. The console logs each change and its reason."
+/>
+
+## Form
+
+Set `name` to include the switch in a native form. A switch that's on submits its `value`, which defaults to `"on"`; a switch that's off submits nothing. Reset returns it to `defaultChecked`. Set `form` to a form's id to join it from elsewhere on the page.
+
+<ComponentExample
+  name="switch/form"
+  caption="Turn on Product updates and press Save. The console logs the submitted values, and Reset restores the defaults."
+/>
+
+## Validation
+
+`required` blocks submission until the switch is on. In a [Field](./field), `uiFieldError` shows the message under the switch and connects it to the switch. [Forms and Validation](../forms) covers the shared field behavior.
+
+<ComponentExample
+  name="switch/invalid"
+  caption="Press Continue with the switch off to see the error. Turn on Two-factor authentication and continue; the console logs the submitted value."
+/>
+
+## Saving on Toggle
+
+To save a change before it shows, call `$event.cancel()` in `(beforeCheckedChange)` to keep the current value while the save runs. When it finishes, call `controller.setChecked(next, { reason: "imperative" })`, and let that reason through in the callback so the saved value commits.
+
+The example ignores presses while a save is running, and shows a spinner in the thumb. `aria-busy` tells assistive technology the switch is busy; the callback is what blocks another change.
+
+<ComponentExample
+  name="switch/async"
+  caption="Turn on Automatic backups. The thumb shows a spinner while it saves, then the switch turns on."
+/>
+
+## Custom Rendering
+
+The switch and thumb go on elements you write. Read their state from a template reference: with `#darkMode="uiSwitch"`, `darkMode.state().checked` says whether it's on. See [Parts and Composition](../parts-and-composition) for more.
+
+<ComponentExample
+  name="switch/render"
+  caption="Turn on Dark mode. The thumb renders a sun or a moon from its state."
+/>
+
+## Styling
+
+Style the switch and its thumb with `data-checked` and `data-unchecked`, and use `data-disabled`, `data-readonly` and `data-required` for the rest. In an invalid field, the switch also gets `data-invalid` and `aria-invalid`; the thumb doesn't. Slide the thumb with `translate` on `data-checked`, and reverse it under `dir="rtl"`.
+
+Each part has a `data-slot`, such as `switch`, and its state attributes are listed under [Data Attributes](#data-attributes).
+
+## Data Attributes
+
+### Switch [#data-attributes-switch]
+
+<DataAttributes component="switch" part="root" />
+
+### SwitchThumb [#data-attributes-switchthumb]
+
+<DataAttributes component="switch" part="thumb" />
+
+## API Reference
+
+Each option below is an input on the directive, and each callback an output. A change callback is two outputs: `(beforeCheckedChange)`, with the details and `cancel()`, then `(checkedChange)` with the new value alone. Bind `checked` with `[(checked)]`.
+
+### Switch
+
+<TypeTable
+  path="../../packages/core/src/components/switch/switch.ts"
+  name="SwitchOptions"
+/>
+
+### State
+
+What each part's `state()` signal holds. The thumb's state, `SwitchThumbState`, is the same.
+
+<StateTable
+  path="../../packages/core/src/components/switch/switch.ts"
+  name="SwitchState"
+/>
+
+### Reasons
+
+`$event.reason` says why the switch turned on or off.
+
+<ReasonTable
+  path="../../packages/core/src/components/switch/switch.ts"
+  name="SwitchCheckedChangeReason"
+/>
+
+### Controller
+
+Create one with `createSwitchController()` and pass it as `controller`.
+
+Every write method takes an optional `{ reason, event }`, runs the change callback like a press, and returns `false` when the change is canceled.
+
+<ControllerTable
+  path="../../packages/core/src/components/switch/switch.ts"
+  name="SwitchController"
+/>
+
+### Events
+
+A `before` output emits `{ value, reason, event, cancel() }` before the change, and its plain output follows with the value alone. A bound `checked` only updates when `(beforeCheckedChange)` wasn't canceled.
+
+| Binding                 | On         | Receives                                                                 |
+| ----------------------- | ---------- | ------------------------------------------------------------------------ |
+| `[(checked)]`           | `uiSwitch` | Whether the switch is on                                                 |
+| `(beforeCheckedChange)` | `uiSwitch` | `{ value, reason, cancel() }`: the new state, and the [reason](#reasons) |
+
+## Accessibility
+
+The switch follows the [WAI-ARIA switch pattern](https://www.w3.org/WAI/ARIA/apg/patterns/switch/). `uiSwitch` renders a button with the `switch` role, and a hidden native checkbox that takes part in forms.
+
+### Keyboard
+
+| Key   | Does                                   |
+| ----- | -------------------------------------- |
+| Tab   | Moves to the next switch               |
+| Space | Turns it on or off                     |
+| Enter | Submits its form, and never toggles it |
+
+### Tested Behavior
+
+Every line below is an automated test.
+
+<SpecList spec="switch" />
+
+In forms:
+
+<SpecList spec="forms.form" />
+
+Beyond the pattern's baseline:
+
+<SpecList spec="forms.enhancements" />
+
+Screen readers hear the same thing in each tested framework, recorded by a virtual screen reader:
+
+<SpecList spec="forms.sr" />

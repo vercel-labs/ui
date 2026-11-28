@@ -23,10 +23,12 @@ const serverPicker = (page: import("@playwright/test").Page) =>
     )
     return {
       hue: hue?.getAttribute("aria-valuenow"),
-      background: template.content
-        .querySelector('[data-slot="color-picker-area"]')
-        ?.getAttribute("style")
-        ?.includes("--color-area-background:linear-gradient"),
+      // Angular's server writes a space after the colon.
+      background: /--color-area-background:\s*linear-gradient/.test(
+        template.content
+          .querySelector('[data-slot="color-picker-area"]')
+          ?.getAttribute("style") ?? ""
+      ),
     }
   })
 

@@ -1,6 +1,6 @@
 ---
 name: ui-sdk-write-code
-description: Writes and edits ui-sdk code (core, the React, Vue, Svelte, Solid and web component adapters, examples, specs and scripts) the way an expert in that framework would, then checks it with the linters, the framework expert's checklist and a cold read. Use whenever you write or change code in this repo, before you call the change done.
+description: Writes and edits ui-sdk code (core, the React, Vue, Svelte, Solid, web component and Angular adapters, examples, specs and scripts) the way an expert in that framework would, then checks it with the linters, the framework expert's checklist and a cold read. Use whenever you write or change code in this repo, before you call the change done.
 metadata:
   internal: true
 ---
@@ -20,6 +20,7 @@ Every piece of code here has a twin that already does it well. Open it before yo
 | A React, Vue or Solid part | The same component's file in `packages/<framework>/src/`, on `createParts`                                                         |
 | A Svelte part              | `packages/svelte/src/tabs/`                                                                                                        |
 | A web component            | `packages/web/src/tabs.ts`, on `createParts`                                                                                       |
+| An Angular part            | `packages/angular/src/tabs.ts`, on `usePrimitive` and `usePart`                                                                    |
 | An example                 | The same example in another framework: `examples/components/<name>/<framework>/`                                                   |
 | A spec                     | `tests/specs/tabs*.spec.ts`                                                                                                        |
 
@@ -36,6 +37,7 @@ Read the expert's knowledge file for every framework you touch: `.agents/experts
 - **Svelte 5**: runes only (`$state`, `$derived`, `$props`, `$bindable`), snippets, `onclick` attributes, attachments. No `$:`, `on:`, `<slot>` or `createEventDispatcher`. Props typed with an `interface Props`. Outside `packages/svelte`, declaration tags (`{const x = $derived(...)}`) instead of `{@const}`.
 - **Solid 2**: props read where they're used, never destructured; derive with memos, not effects; Solid 2 APIs only.
 - **Web components**: platform first. Options reflect as attributes the way built-ins do, public events are `composed` and don't bubble (listen with `{ capture: true }`), and the user's markup stays in light DOM.
+- **Angular 21**: standalone directives, signal `input()` and `output()`, `inject()` in field initializers, `computed` over `effect`, `@if` and `@for` in templates, DOM reads after render. No `@Input()`, `EventEmitter`, `NgModule` or `*ngIf`.
 
 ## 3. Write it
 

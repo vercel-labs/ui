@@ -44,6 +44,13 @@ npm add @ui-sdk/web
 ```
 
 </FrameworkContent>
+<FrameworkContent value="angular">
+
+```bash
+npm add @ui-sdk/angular
+```
+
+</FrameworkContent>
 
 ## Create the Parts
 
@@ -113,6 +120,31 @@ createParts(copyButton, {
 `createParts` registers a custom element for each slot you map. `wrappedButton` puts the root's behavior and attributes on a native button inside the element. Import this file from your app's browser entry point.
 
 </FrameworkContent>
+<FrameworkContent value="angular">
+
+In Angular, each part is a directive you put on your own element. `usePrimitive` creates the primitive's instance, and `usePart` connects the directive's element to a slot:
+
+```ts title="copy-button-parts.ts"
+import { Directive, input, output } from "@angular/core"
+import { usePart, usePrimitive } from "@ui-sdk/angular/primitive"
+import { copyButton } from "./copy-button"
+
+@Directive({ selector: "[appCopyButton]", exportAs: "appCopyButton" })
+export class CopyButton {
+  readonly text = input<string>()
+  readonly copied = output<string>()
+
+  readonly handle = usePrimitive(copyButton, () => ({
+    text: this.text(),
+    onCopy: (text: string) => this.copied.emit(text),
+  }))
+  readonly state = usePart(this.handle, "root").state
+}
+```
+
+The directive with `usePrimitive` is the root. Other parts reach it with `inject(CopyButton).handle`.
+
+</FrameworkContent>
 
 `Root` creates the primitive's instance and shares it with the parts inside. Every other slot you map becomes a part named in Pascal case, so a `star` slot becomes `Star`.
 
@@ -170,6 +202,17 @@ A callback option becomes an event, so `onCopy` is `@copy`.
 A `"string"` option reads from its attribute, and a callback option fires as an event on the element.
 
 </FrameworkContent>
+<FrameworkContent value="angular">
+
+```angular-html
+<button appCopyButton text="npm add @ui-sdk/core" (copied)="log($event)">
+  Copy
+</button>
+```
+
+Each option is an input on the directive, and each callback an output.
+
+</FrameworkContent>
 
 ## Read the State
 
@@ -214,6 +257,17 @@ The root's slot returns `copied` from its `state`, so the button's content can f
 <FrameworkContent value="web-components">
 
 On web components, the content is your own HTML. Show state through the attributes the part sets, as [Style a Component](./style-a-component) shows.
+
+</FrameworkContent>
+<FrameworkContent value="angular">
+
+```angular-html
+<button appCopyButton #copyButton="appCopyButton" text="npm add @ui-sdk/core">
+  {{ copyButton.state().copied ? "Copied" : "Copy" }}
+</button>
+```
+
+`usePart` returns the part's state as a signal, which a template reference reads.
 
 </FrameworkContent>
 

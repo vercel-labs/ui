@@ -14,7 +14,7 @@ import path from "node:path"
 import { parseArgs } from "node:util"
 
 const root = path.resolve(import.meta.dirname, "..")
-const frameworks = ["react", "vue", "svelte", "solid", "web"]
+const frameworks = ["react", "vue", "svelte", "solid", "web", "angular"]
 
 const { values: flags } = parseArgs({
   options: {

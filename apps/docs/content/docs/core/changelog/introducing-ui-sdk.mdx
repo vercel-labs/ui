@@ -135,6 +135,34 @@ createParts(share, {
 ```
 
 </FrameworkTab>
+<FrameworkTab value="angular">
+
+```ts title="components/ui/share.ts"
+import { Directive, inject } from "@angular/core"
+import { usePart, usePrimitive } from "@ui-sdk/angular/primitive"
+import { share } from "@/lib/share"
+
+@Directive({ selector: "[appShare]" })
+export class Share {
+  readonly handle = usePrimitive(share, () => ({}))
+}
+
+@Directive({ selector: "[appShareTrigger]" })
+export class ShareTrigger {
+  constructor() {
+    usePart(inject(Share).handle, "trigger")
+  }
+}
+
+@Directive({ selector: "[appShareContent]" })
+export class ShareContent {
+  constructor() {
+    usePart(inject(Share).handle, "content")
+  }
+}
+```
+
+</FrameworkTab>
 </FrameworkTabs>
 
 Then use it like any other component:
@@ -213,6 +241,26 @@ function Example() {
   <share-trigger><button>Share</button></share-trigger>
   <share-content>Anyone with the link can view.</share-content>
 </share-popover>
+```
+
+</FrameworkTab>
+<FrameworkTab value="angular">
+
+```ts title="pages/home.ts"
+import { Component } from "@angular/core"
+import { Share, ShareContent, ShareTrigger } from "@/components/ui/share"
+
+@Component({
+  selector: "app-home",
+  imports: [Share, ShareContent, ShareTrigger],
+  template: `
+    <ng-container appShare>
+      <button appShareTrigger>Share</button>
+      <div *appShareContent>Anyone with the link can view.</div>
+    </ng-container>
+  `,
+})
+export class Home {}
 ```
 
 </FrameworkTab>
@@ -358,6 +406,46 @@ function Example() {
     <ui-select-item value="editor">Editor</ui-select-item>
   </ui-select-content>
 </ui-select>
+```
+
+</FrameworkTab>
+<FrameworkTab value="angular">
+
+```ts
+import { Component } from "@angular/core"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@ui-sdk/angular/select"
+
+@Component({
+  selector: "app-role",
+  imports: [
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+  ],
+  template: `
+    <ng-container uiSelect placeholder="Select a role">
+      <div uiSelectLabel>Role</div>
+      <button uiSelectTrigger>
+        <span uiSelectValue></span>
+      </button>
+      <div *uiSelectContent>
+        <div uiSelectItem value="viewer">Viewer</div>
+        <div uiSelectItem value="editor">Editor</div>
+      </div>
+    </ng-container>
+  `,
+})
+export class Role {}
 ```
 
 </FrameworkTab>

@@ -1,0 +1,281 @@
+---
+title: Button
+description: Run an action, show that it's working, and keep it reachable when disabled.
+---
+
+Button goes on a native `button` and adds what it doesn't do on its own: it stays pending while an async action runs, so a form can't submit twice, announces slow actions to screen readers, can stay focusable while disabled, and keeps the same behavior on a link. For a plain `(click)` handler, a native `button` is enough.
+
+<ComponentExample
+  name="button/basic"
+  caption="Click Button, or focus it and press Enter or Space. The console logs each press."
+/>
+
+## Installation
+
+```bash
+npm install @ui-sdk/angular @ui-sdk/core
+```
+
+## Usage
+
+Put `uiButton` on a `<button>`, and listen to `(action)` to run an action. The button gets `type="button"` unless you set one.
+
+```ts
+import { Component } from "@angular/core"
+import { Button } from "@ui-sdk/angular/button"
+
+@Component({
+  selector: "app-save",
+  imports: [Button],
+  template: `<button uiButton (action)="save()">Save</button>`,
+})
+export class Save {
+  save() {}
+}
+```
+
+## Pending
+
+Pass a Promise to `$event.waitUntil()` to keep the button pending until it settles. The button keeps focus and ignores further presses while it waits.
+
+```angular-html
+<button
+  uiButton
+  (action)="$event.waitUntil(save())"
+  pendingAnnouncement="Saving"
+>
+  Save
+</button>
+```
+
+After one second, it announces "Loading" to screen readers. Set `pendingAnnouncement` to change that message, as above, or use an empty string to silence it.
+
+<ComponentExample
+  name="button/pending"
+  caption="Press Save, then press it again while it saves. Nothing happens until the first action finishes."
+/>
+
+## Pending Content
+
+To change what the button shows while it waits, mark content with `data-show="idle"` or `data-show="pending"` and hide it in the other state with one CSS rule each, or use Tailwind's `in-data-pending` variant:
+
+<StyleTabs>
+
+```css
+[data-slot="button"]:not([data-pending]) [data-show="pending"],
+[data-slot="button"][data-pending] [data-show="idle"] {
+  display: none;
+}
+```
+
+```angular-html
+<button uiButton (action)="$event.waitUntil(save())">
+  <svg lucideArrowDownToLine class="in-data-pending:hidden"></svg>
+  <svg lucideLoaderCircle class="not-in-data-pending:hidden"></svg>
+  Save
+</button>
+```
+
+</StyleTabs>
+
+<ComponentExample
+  name="button/pending-content"
+  caption="Press Save. Its arrow turns into a spinner while it saves."
+/>
+
+Keep the label and change only the visual, as above. If the text has to change too, swap it the same way, without an `aria-label`. [Pending Buttons](#pending-buttons) explains why:
+
+```angular-html
+<button uiButton (action)="$event.waitUntil(save())">
+  <span data-show="idle">Save</span>
+  <span data-show="pending">Saving…</span>
+</button>
+```
+
+## Handling Errors
+
+If the Promise passed to `waitUntil()` rejects, the button's `state().error` holds the error. Use it to show a message or a retry label. The next press clears the error and runs the handler again.
+
+The demo [reads the state](/docs/angular/parts-and-composition#read-the-state) through `#button="uiButton"` to change the label.
+
+<ComponentExample
+  name="button/render"
+  caption="Choose Save Changes. Saving always fails here: the console shows the error and the label changes to Try Again."
+/>
+
+## Changes After an Await
+
+`(action)` emits the press with its `source`, which says how the button was pressed. If the handler changes another ui-sdk component after an `await`, wrap that change in `withSource` to keep the original source. Otherwise, the later change is reported as `"programmatic"`.
+
+Here `save()` is your request and `status` is an Input's [controller](/docs/angular/controllers):
+
+```ts
+import { Component } from "@angular/core"
+import { Button, type ButtonAction } from "@ui-sdk/angular/button"
+import { createInputController } from "@ui-sdk/angular/input"
+import { withSource } from "@ui-sdk/angular/observe"
+
+const save = () => fetch("/api/save", { method: "POST" })
+
+@Component({
+  selector: "app-save",
+  imports: [Button],
+  template: `
+    <button uiButton (action)="$event.waitUntil(onSave($event))">Save</button>
+  `,
+})
+export class Save {
+  readonly status = createInputController()
+
+  async onSave({ source }: ButtonAction) {
+    await save()
+    withSource(source, () => this.status.setValue("Saved"))
+  }
+}
+```
+
+[Observe](/docs/core/observe#keep-the-source-after-an-await) explains source tracking. Preserving `"agent"` lets [`undoSource("agent")`](/docs/agents/connect-an-agent/history-and-undo#undo-the-agents-changes) include that later change.
+
+## Disabled
+
+Set `disabled` to prevent presses and remove the button from the tab order. A disabled `<fieldset>` around the button disables it too.
+
+```angular-html
+<button uiButton disabled>Disabled</button>
+```
+
+<ComponentExample
+  name="button/disabled"
+  caption="Try clicking the button. It does nothing, and Tab skips it."
+/>
+
+## Focusable When Disabled
+
+Add `focusableWhenDisabled` when people should still be able to focus a disabled button. It uses `aria-disabled` instead of the native `disabled` attribute. Presses still do nothing.
+
+Use `aria-describedby` to explain why the action is unavailable:
+
+```angular-html
+<button uiButton disabled focusableWhenDisabled aria-describedby="publish-hint">
+  Publish
+</button>
+<p id="publish-hint">Add a title to publish.</p>
+```
+
+<ComponentExample
+  name="button/focusable-when-disabled"
+  caption="Focus Title, then press Tab to reach Publish while it is disabled. Enter a title to enable it, then choose Publish. The console logs what was published."
+/>
+
+## Links
+
+Put `uiButton` on an `<a>`. It keeps its `href` and link semantics, including opening in a new tab. A disabled link cannot navigate and leaves the tab order.
+
+```angular-html
+<a uiButton href="/docs/angular">Get started</a>
+```
+
+<ComponentExample
+  name="button/link"
+  caption="Choose Get Started to jump to Installation on this page. Changelog is disabled and does not navigate."
+/>
+
+For your own components, see [Parts and Composition](/docs/angular/parts-and-composition).
+
+## Forms
+
+Set `type="submit"` to submit a form or `type="reset"` to restore its default values. The default, `type="button"`, does neither.
+
+```angular-html
+<button uiButton type="submit">Subscribe</button>
+<button uiButton type="reset">Reset</button>
+```
+
+<ComponentExample
+  name="button/form"
+  caption="Edit the email and choose Subscribe, or press Enter in the field. The console logs each submission, and Reset restores the original email."
+/>
+
+Button tracks the Promise passed to its own `waitUntil()`, not one from the form’s submit handler. For an async submit handler, keep your own pending flag and set `disabled` on the button while it runs, with [`focusableWhenDisabled`](#focusable-when-disabled) so the button keeps focus while it waits.
+
+## Styling
+
+Use `data-pending` to show a spinner or waiting cursor, and `data-disabled` to style an unavailable action. The button's `data-slot` is `button`, and its attributes are listed under [Data Attributes](#data-attributes).
+
+[Styling and Animation](/docs/angular/styling-and-animation) covers the styling patterns shared by all components.
+
+## Data Attributes
+
+### Button [#data-attributes-button]
+
+<DataAttributes component="button" part="root" />
+
+## API Reference
+
+Each option below is an input on `uiButton`. Everything else stays on your element. `#button="uiButton"` gives the template the button's `state()`; see [Parts and Composition](/docs/angular/parts-and-composition).
+
+### Button
+
+<TypeTable
+  path="../../packages/core/src/components/button/button.ts"
+  name="ButtonOptions"
+/>
+
+### State
+
+<StateTable
+  path="../../packages/core/src/components/button/button.ts"
+  name="ButtonState"
+/>
+
+### Events
+
+| Output     | Receives                                                                                                                      |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `(action)` | The press: its `event`, its `source`, and `waitUntil()`, which keeps the button pending until the Promise it's given settles. |
+
+## Accessibility
+
+Give the button a clear text label. If it contains only an icon, add an `aria-label`. Native buttons respond to Enter and Space; links respond to Enter.
+
+### Pending Buttons
+
+While its action runs, the button tells assistive technology it's busy, so you don't need to add anything:
+
+- It sets `aria-busy="true"` and `aria-disabled="true"`, and ignores presses until the action settles. It keeps focus the whole time.
+- After a second, it announces `pendingAnnouncement` ("Loading" by default) through a polite live region. Quick actions stay silent. This is a status message: people hear it without focus moving.
+
+To show progress, keep the label and change only the visual, like a spinner. Changing the text renames the button while it has focus: screen readers don't reliably announce a new name on the focused element, so the change mostly helps sighted users, and the button's width shifts as the text changes length. The announcement already tells everyone it's working.
+
+```angular-html
+<button
+  uiButton
+  (action)="$event.waitUntil(save())"
+  pendingAnnouncement="Saving"
+>
+  <svg lucideArrowDownToLine data-show="idle"></svg>
+  <svg lucideLoaderCircle data-show="pending"></svg>
+  Save
+</button>
+```
+
+```angular-html
+<button uiButton (click)="save()" aria-label="Save">
+  {{ saving() ? "Saving…" : "Save" }}
+  <span aria-live="polite">{{ saving() ? "Saving" : "" }}</span>
+</button>
+```
+
+The second button tracks `saving` itself, shows text its accessible name doesn't contain, and announces the same state twice. If the text has to change anyway, swap it with `data-show` and leave out `aria-label`, so the button's name always contains the text on screen. See [Pending Content](#pending-content) for the markup.
+
+References:
+
+- [WCAG 2.5.3 Label in Name](https://www.w3.org/WAI/WCAG22/Understanding/label-in-name.html)
+- [WCAG 4.1.3 Status Messages](https://www.w3.org/WAI/WCAG22/Understanding/status-messages.html)
+- [WAI-ARIA `aria-busy`](https://www.w3.org/TR/wai-aria-1.2/#aria-busy) and [`aria-disabled`](https://www.w3.org/TR/wai-aria-1.2/#aria-disabled)
+
+### Tested Behavior
+
+The following behaviors are covered by automated tests:
+
+<SpecList spec="button" />

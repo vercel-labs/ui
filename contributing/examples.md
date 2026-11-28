@@ -22,7 +22,7 @@ The result is that an example shows only what it teaches. Someone copying it, or
 - **No readouts that repeat the UI.** Don't add a status line or `output` that restates what the caption or the component already shows.
 - **No motion unless it's the demo.** Only an example about animation animates. Hover and press feedback is fine.
 - **Self-contained files.** An example imports only `@ui-sdk/*`, its framework, lucide icons and helpers from `examples/shared/<framework>/`. The Code tab shows a shared helper as a second file, imported from the same folder, so copying both files works. The data it needs, such as a list of fruits or people, sits in the file as a `const` at the top or inline in the markup. Copy the same data into each framework's file so they all show the same items.
-- **Icons come from lucide**, imported by name: `lucide-react` in React, `@lucide/vue` in Vue, `@lucide/svelte` in Svelte and `lucide` in web components, where `createElement(ChevronDown, { "aria-hidden": "true" }).outerHTML` puts an icon in a template. Pass `aria-hidden`, since `createElement` doesn't add it. Use the same icon in every framework. The stylesheet sizes icons.
+- **Icons come from lucide**, imported by name: `lucide-react` in React, `@lucide/vue` in Vue, `@lucide/svelte` in Svelte, `@lucide/angular` in Angular and `lucide` in web components, where `createElement(ChevronDown, { "aria-hidden": "true" }).outerHTML` puts an icon in a template. Pass `aria-hidden`, since `createElement` doesn't add it. Use the same icon in every framework. The stylesheet sizes icons.
 - **Keep what the example teaches.** Restyling never removes a prop or a behavior. Examples have no comments; the docs page around an example explains it.
 
 ## The Stylesheets
@@ -31,8 +31,8 @@ The result is that an example shows only what it teaches. Someone copying it, or
 examples/
   styles/tokens.css                 the tokens
   styles/base.css                   bare elements, layout slots, shared fields and controls
-  components/<name>/<name>.css      one component, shared by all five frameworks
-  components/<name>/{react,vue,svelte,solid,web}/
+  components/<name>/<name>.css      one component, shared by every framework
+  components/<name>/{react,vue,svelte,solid,web,angular}/
   behaviors/ core/ experiments/     demo groups for the Core pages
 ```
 

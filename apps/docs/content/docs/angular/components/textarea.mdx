@@ -1,0 +1,193 @@
+---
+title: Textarea
+description: Enter multiple lines of text, grow the field as you type, and connect it to a form.
+---
+
+A textarea is a native multi-line text field for messages, notes and descriptions. It works inside a field and a form, can grow with its text, and reports the same change reasons as Input.
+
+<ComponentExample
+  name="textarea/basic"
+  caption="Click Message to focus the textarea, then type. Press Enter to start a new line."
+/>
+
+## Installation
+
+```bash
+npm install @ui-sdk/angular @ui-sdk/core
+```
+
+## Usage
+
+`uiTextarea` goes on a native `<textarea>`. Pass `rows`, `placeholder`, `maxlength` and other native attributes directly.
+
+```ts
+import { Component } from "@angular/core"
+import { Textarea } from "@ui-sdk/angular/textarea"
+
+@Component({
+  selector: "app-example",
+  imports: [Textarea],
+  template: `
+    <textarea
+      uiTextarea
+      aria-label="Message"
+      placeholder="Type your message here…"
+    ></textarea>
+  `,
+})
+class Example {}
+
+export { Example }
+```
+
+## Field
+
+Wrap the textarea in a [Field](./field) to give it a visible label and a description. The field also supplies its `name` when the textarea has none.
+
+<ComponentExample
+  name="textarea/field"
+  caption="Click Feedback to focus the textarea. A screen reader reads the description with the field."
+/>
+
+## Auto Resize
+
+Set `autoResize` to grow and shrink the textarea with its text. CSS `min-height` and `max-height` set its limits; past the maximum, the text scrolls inside it.
+
+<ComponentExample
+  name="textarea/auto-resize"
+  caption="Type several lines in Notes. The textarea grows with each line until it reaches its maximum height, then scrolls. Delete the lines and it shrinks back."
+/>
+
+Browsers that support `field-sizing: content` size it natively. Elsewhere, the component measures it when the value changes, the form resets or its width changes.
+
+## Controlled
+
+Bind the value with `[(value)]`, or pass `value` and handle `(beforeValueChange)`. Here the character count is derived from that value, and the native `maxlength` caps the text.
+
+<ComponentExample
+  name="textarea/controlled"
+  caption="Edit Bio and watch the character count under it. The textarea stops accepting text at 160 characters."
+/>
+
+Textarea shares Input's [change reasons](#reasons) and cancellation behavior. See [State and Events](../state-and-events) for the shared conventions.
+
+## Form
+
+A textarea submits its value through a native form under its field's `name`. Pass a controller from `createInputController()` to change it from outside, here to empty it after sending. The native `required` constraint blocks an empty message.
+
+<ComponentExample
+  name="textarea/button"
+  caption="Type a message and press Send Message. The console logs it and the textarea clears. Pressing Send Message while it's empty is blocked."
+/>
+
+[Controllers](../controllers) covers creating and sharing a controller.
+
+## Disabled
+
+Set `disabled` on the textarea or its field to prevent editing and leave it out of the tab order and the submitted values.
+
+<ComponentExample
+  name="textarea/disabled"
+  caption="Try to edit Reply or reach it with Tab. The disabled textarea keeps its value but can't be changed."
+/>
+
+## Invalid
+
+Set `invalid` on the field for an error your app decides. The field shows its error, associates it with the textarea and sets `aria-invalid`. [Field](./field#validation) covers native constraints and error matches.
+
+<ComponentExample
+  name="textarea/invalid"
+  caption="Focus Review. The textarea is marked invalid, and the error below says how long the review should be."
+/>
+
+## Submit Shortcut
+
+Set `submitShortcut` to submit the textarea's form from the keyboard. With `"mod+enter"`, Enter still starts a new line and Command or Control+Enter submits. With `"enter"`, Enter submits and Shift+Enter starts a new line. Without it, Enter always starts a new line, and neither submits while an input method is composing.
+
+```ts
+import { Component } from "@angular/core"
+import { Textarea } from "@ui-sdk/angular/textarea"
+
+@Component({
+  selector: "app-example",
+  imports: [Textarea],
+  template: `
+    <form action="/messages" method="post">
+      <textarea
+        uiTextarea
+        name="message"
+        aria-label="Message"
+        required
+        submitShortcut="mod+enter"
+      ></textarea>
+      <button type="submit">Send</button>
+    </form>
+  `,
+})
+class Example {}
+
+export { Example }
+```
+
+The shortcut submits like the Send button, so `required` and the form's `(submit)` still apply. Listen to `(submit)` on the textarea to handle the shortcut yourself instead. `$event.value` holds the text, and the form doesn't submit.
+
+## Styling
+
+Style the native textarea directly, with `data-filled`, `data-disabled`, `data-readonly` and `data-required` for its states. Inside a field it also receives the field's validation attributes, such as `data-invalid`. For `autoResize`, set `min-height` and `max-height` to bound its growth. Use logical spacing so the text follows the surrounding direction.
+
+The textarea has a `data-slot` of `textarea`, and its state attributes are listed under [Data Attributes](#data-attributes).
+
+## Data Attributes
+
+### Textarea [#data-attributes-textarea]
+
+<DataAttributes component="textarea" part="root" />
+
+## API Reference
+
+Each option below is an input on the directive, and each callback an output, and every native textarea attribute stays on your element. A change callback is two outputs: `(beforeValueChange)`, with the details and `cancel()`, then `(valueChange)` with the new value alone. Bind `value` with `[(value)]`.
+
+### Textarea
+
+<TypeTable
+  path="../../packages/core/src/components/input/input.ts"
+  name="TextareaOptions"
+/>
+
+<TypeTable
+  path="../../packages/core/src/components/input/input.ts"
+  name="TextareaProps"
+/>
+
+### State
+
+<StateTable
+  path="../../packages/core/src/components/input/input.ts"
+  name="TextareaState"
+/>
+
+### Reasons
+
+<ReasonTable
+  path="../../packages/core/src/components/input/input.ts"
+  name="InputValueChangeReason"
+/>
+
+### Controller
+
+Create one with `createInputController()` and pass it as `controller`.
+
+<ControllerTable
+  path="../../packages/core/src/components/input/input.ts"
+  name="InputController"
+/>
+
+## Accessibility
+
+There's no WAI-ARIA pattern for a multi-line text field. The textarea stays a native `<textarea>`, with standard text editing, selection, spell checking and form behavior. Give it a visible field label or an `aria-label`, and keep descriptions and errors in their field parts so they're associated with it.
+
+### Tested Behavior
+
+Every line below is an automated test.
+
+<SpecList spec="textarea" />

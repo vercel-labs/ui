@@ -6,7 +6,7 @@ export const dynamic = "force-static"
 export function GET() {
   const text = `# ui-sdk
 
-> The layer underneath a UI library: how interfaces behave, written once in a framework-free TypeScript core and rendered in React, Vue, Svelte, Solid and web components.
+> The layer underneath a UI library: how interfaces behave, written once in a framework-free TypeScript core and rendered in React, Vue, Svelte, Solid, web components and Angular.
 
 To build something ui-sdk doesn't ship, read Core: build a component, compose behaviors, then explore the helpers you need. To render a primitive, or to use what we ship, read your framework's llms.txt: its Rendering page, then every component's parts, props, state and styling hooks. To operate a page, or hand it to the browser's agent, read Agents.
 

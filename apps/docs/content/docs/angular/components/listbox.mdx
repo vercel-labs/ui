@@ -1,0 +1,373 @@
+---
+title: Listbox
+description: Choose one or several options from an always-visible list.
+---
+
+Use a Listbox when the choices should stay in view. It works like a native select with several visible rows, with keyboard navigation, typeahead, and optional range selection.
+
+<ComponentExample
+  name="listbox/basic"
+  caption="Choose Comments, then hold Shift and choose New sign-ins to select the range. A click replaces the selection; Ctrl or ⌘ adds one option."
+/>
+
+## Installation
+
+```bash
+npm install @ui-sdk/angular @ui-sdk/core
+```
+
+## Composition
+
+Use the following composition to build Listbox:
+
+```text
+uiListbox
+├── uiListboxItem
+│   └── uiListboxItemIndicator
+└── uiListboxItem
+    └── uiListboxItemIndicator
+```
+
+Give the list an accessible name and each option a unique value. `uiListboxItemIndicator` shows its content when that option is selected.
+
+You can also name the list with a [Field label](./field) or `aria-labelledby`. Keep buttons, search fields, and empty messages outside the list: its contents should be options, groups, and separators.
+
+## Usage
+
+Import the parts and put them together:
+
+```ts
+import { Component } from "@angular/core"
+import {
+  Listbox,
+  ListboxItem,
+  ListboxItemIndicator,
+} from "@ui-sdk/angular/listbox"
+
+@Component({
+  selector: "app-example",
+  imports: [Listbox, ListboxItem, ListboxItemIndicator],
+  template: `
+    <div uiListbox aria-label="Toppings" defaultValue="basil">
+      <div uiListboxItem value="basil">
+        Basil
+        <span *uiListboxItemIndicator>✓</span>
+      </div>
+      <div uiListboxItem value="olive">
+        Olive
+        <span *uiListboxItemIndicator>✓</span>
+      </div>
+    </div>
+  `,
+})
+class Example {}
+
+export { Example }
+```
+
+## Multiple
+
+Add `multiple` to select several options. The value becomes an array; a single list uses one value or `null`. By default, arrow keys move focus without changing a multiple selection.
+
+| Action                             | Result                                                 |
+| ---------------------------------- | ------------------------------------------------------ |
+| Press an option or Space           | Toggle that option.                                    |
+| Shift + press, arrow key, or Space | Select a range from the last chosen option.            |
+| Ctrl/Cmd + Shift + Home or End     | Extend the range to the first or last option.          |
+| Ctrl/Cmd + A                       | Select every enabled option, then clear the selection. |
+
+Changing a Shift range preserves the options selected before that range began.
+
+<ComponentExample
+  name="listbox/multiple"
+  caption="Choose Basil, then hold Shift and choose Pepper to select a range. Use Ctrl+A or ⌘A to select every option, then again to clear. The console logs each change."
+/>
+
+## Selection That Follows Focus
+
+A single list selects as arrow keys, Page Up and Page Down, Home, End, or typing move focus. Page Up and Page Down move ten options, and stop at the ends. A multiple list can do the same with `activation="automatic"`, like a file list: a press or arrow replaces the selection, Ctrl or Cmd adds to it, and Ctrl or Cmd with an arrow moves focus without selecting.
+
+Taps and screen-reader presses toggle an option instead, since they do not have modifier keys.
+
+```angular-html
+<div uiListbox multiple activation="automatic" aria-label="Files"></div>
+```
+
+<ComponentExample
+  name="listbox/activation"
+  caption="Choose index.ts to replace the selection. Hold Ctrl or Cmd while choosing another file to add it; Shift selects a range."
+/>
+
+## Manual Activation
+
+Set `activation="manual"` on a single list to browse without selecting. Space, Enter, or a press chooses the focused option.
+
+<ComponentExample
+  name="listbox/manual"
+  caption="Move through the options with the arrow keys. Nothing is selected until you press Space or Enter, and the console logs the choice."
+/>
+
+## Focus on the List
+
+Set `virtualFocus` to keep focus on the list itself while arrow keys, Home, End, and typing move a highlight through the options. The list points at the highlighted option with `aria-activedescendant`, so screen readers still announce it. Style the highlight with `[data-highlighted]`, since the options don't take focus.
+
+<ComponentExample
+  name="listbox/virtual-focus"
+  caption="Tab into the list and move through it with the arrow keys. Focus stays on the list, and Space or Enter chooses the highlighted option."
+/>
+
+## Deselectable
+
+Add `deselectable` to let pressing the selected option clear a single selection. Without it, the selection stays as it is.
+
+<ComponentExample
+  name="listbox/deselectable"
+  caption="Press Astro again to clear the selection, or choose another framework. The console logs each change."
+/>
+
+## Groups
+
+Use `uiListboxGroup` and `uiListboxGroupLabel` to name a group. Arrow keys and ranges continue across groups. Separators stay out of the accessibility tree.
+
+<ComponentExample
+  name="listbox/groups"
+  caption="Move from Apple through the list with Down Arrow. Navigation continues into the Vegetables group."
+/>
+
+## Icons
+
+Wrap an icon in `uiListboxItemIcon` so screen readers and typeahead skip it. Add `mirror` to a directional icon to flip it in right-to-left text.
+
+<ComponentExample
+  name="listbox/icons"
+  caption="Choose Drafts. The icon stays out of the option’s accessible name and the text used for typeahead."
+/>
+
+## Horizontal
+
+Set `orientation="horizontal"` to move with Left and Right Arrow. Arrow keys normally wrap; set `[loop]="false"` to stop at the ends, as this example does. Shift ranges never wrap.
+
+The list reads `dir="rtl"` from the page or an ancestor, so Left Arrow moves to the next option in right-to-left text.
+
+<ComponentExample
+  name="listbox/horizontal"
+  caption="Focus M, then use Left and Right Arrow to choose a size. The list stops at its ends; XL cannot be selected."
+/>
+
+## Disabled
+
+A disabled option cannot be selected. Arrow keys, typeahead and ranges skip it. Disabling the whole list removes its tab stop, prevents changes, and excludes its value from the form.
+
+<ComponentExample
+  name="listbox/disabled"
+  caption="Try choosing Olive. Then press Disable the List to make every option unavailable until you enable it again."
+/>
+
+## Read-Only
+
+Use `readOnly` when people should be able to browse the list without changing its value. The list remains focusable and its value still submits.
+
+<ComponentExample
+  name="listbox/read-only"
+  caption="Move focus through the frameworks. Nuxt stays selected because the list is read-only."
+/>
+
+## Form
+
+Add `name` to submit the selection. Multiple selections submit one entry per value. Reset restores `defaultValue`, and `required` prevents submission when nothing is selected.
+
+The server HTML includes the hidden inputs for the current selection, so those values can submit before hydration.
+
+The list can live outside its form: set `form` to the form’s ID, as this example does. A disabled fieldset also disables the list. [Forms](../forms) covers the shared integration.
+
+<ComponentExample
+  name="listbox/form"
+  caption="Choose Basil and press Order: the console logs both toppings. Reset restores Extra cheese; clearing every option makes the required list block the order."
+/>
+
+## Object Values
+
+Pass objects as item values when the selection should carry more than an ID. `itemToValue` provides the string used for identity and form submission; `isItemEqualToValue` matches objects that represent the same option but are different instances.
+
+<ComponentExample
+  name="listbox/data"
+  caption="Choose Team. The console logs the price from the selected object, not from its string ID."
+/>
+
+`items` supplies the collection as data, and `uiListboxItems` inside the listbox renders the options for you. To keep markup and classes explicit, map the data into parts, as the example does. Use `ListData<T>` to type object-valued data. [Lists and Menus](../lists-and-menus) covers the shared data format.
+
+## Controller
+
+A controller can select all options, clear the selection, or focus the list from another control. Create one with `createListboxController()` and pass it as `controller`. [Controllers](../controllers) covers setup and lifetime.
+
+<ComponentExample
+  name="listbox/controller"
+  caption="Press Select All, Clear and Focus. Each button drives the same list through its controller, and the console logs the change."
+/>
+
+## Scrollable
+
+Give a long list a maximum height and `overflow-y: auto`. It starts scrolled to the selected option without taking focus. Keyboard navigation reveals the focused option without scrolling the page.
+
+<ComponentExample
+  name="listbox/scrollable"
+  caption="Focus the list and use the arrow keys. Options scroll into view, and the console logs the focused time zone."
+/>
+
+For a virtualized list, supply `items` so typeahead knows about unmounted options. `(highlight)` reports the focused value and index; each rendered item’s `index` places it in the full collection for screen readers. The [Select virtualization example](./select#virtualized) shows the same data and scrolling approach.
+
+Set `[keepInView]="false"` when something else scrolls the list, like a wheel that picks the option at its center with [`bindScrollPicker`](../../core/behaviors/lists#wheels-you-scroll-to-pick-from). The list then leaves its scroll position alone as keys move focus.
+
+## Custom Rendering
+
+Render an option as a link when choosing it should navigate. A press or Enter follows the link and selects the option. This example uses manual activation so arrow keys only browse.
+
+```angular-html
+<a uiListboxItem value="remix" href="#remix">Remix</a>
+```
+
+<ComponentExample
+  name="listbox/render"
+  caption="Focus Remix and press Enter, or choose it with the pointer. The option is selected and its link updates the URL hash."
+/>
+
+[Parts and Composition](../parts-and-composition) covers the shared rendering API. Each part’s state is listed [below](#state).
+
+## Styling
+
+Use `data-selected` for the selection and `data-highlighted` for focus. They can describe different options when selection does not follow focus. Disabled and read-only states have their own attributes.
+
+Each part has a `data-slot`, such as `listbox-item`, and its state attributes are listed under [Data Attributes](#data-attributes).
+
+## Data Attributes
+
+`uiListboxGroup`, `uiListboxGroupLabel` and `uiListboxSeparator` have no state attributes.
+
+### Listbox [#data-attributes-listbox]
+
+<DataAttributes component="listbox" part="root" />
+
+### ListboxItem [#data-attributes-listboxitem]
+
+<DataAttributes component="listbox" part="item" />
+
+### ListboxItemIndicator [#data-attributes-listboxitemindicator]
+
+<DataAttributes component="listbox" part="item-indicator" />
+
+### ListboxItemIcon [#data-attributes-listboxitemicon]
+
+<DataAttributes component="listbox" part="item-icon" />
+
+## API Reference
+
+Each option below is an input on the directive, and each callback an output. A change callback is two outputs: `(beforeValueChange)`, with the details and `cancel()`, then `(valueChange)` with the new value alone. Bind `value` with `[(value)]`.
+
+### Listbox
+
+<TypeTable
+  path="../../packages/core/src/components/listbox/listbox-root.ts"
+  name="ListboxOptions"
+/>
+
+### ListboxItem
+
+<TypeTable
+  path="../../packages/core/src/components/listbox/listbox-root.ts"
+  name="ListboxItemProps"
+/>
+
+### ListboxItemIndicator
+
+<TypeTable
+  path="../../packages/core/src/components/listbox/listbox-root.ts"
+  name="ListboxItemIndicatorProps"
+/>
+
+### ListboxItemIcon
+
+<TypeTable
+  path="../../packages/core/src/foundation/lists/item-icon.ts"
+  name="ItemIconProps"
+/>
+
+`uiListboxGroup`, `uiListboxGroupLabel` and `uiListboxSeparator` take no inputs of their own.
+
+### State
+
+What each part's `state()` signal holds, per part.
+
+`uiListbox`:
+
+<StateTable
+  path="../../packages/core/src/components/listbox/listbox-root.ts"
+  name="ListboxState"
+/>
+
+`uiListboxItem`:
+
+<StateTable
+  path="../../packages/core/src/components/listbox/listbox-root.ts"
+  name="ListboxItemState"
+/>
+
+`uiListboxItemIndicator`:
+
+<StateTable
+  path="../../packages/core/src/components/listbox/listbox-root.ts"
+  name="ListboxItemIndicatorState"
+/>
+
+### Reasons
+
+`$event.reason` says why the value changed: `item-press` for a press, Space or Enter, `list-navigation` for keys that select as they move, Shift ranges with arrows and Ctrl or ⌘ with A, `reset` and `restore` from the form, and `imperative` from a controller.
+
+<ReasonTable
+  path="../../packages/core/src/components/listbox/listbox-root.ts"
+  name="ListboxValueChangeReason"
+/>
+
+### Controller
+
+Create one with `createListboxController()` and pass it as `controller`.
+
+Every write method takes an optional `{ reason, event }`, passed to `(beforeValueChange)`.
+
+<ControllerTable
+  path="../../packages/core/src/components/listbox/listbox-root.ts"
+  name="ListboxController"
+/>
+
+### Events
+
+A `before` output emits `{ value, reason, event, cancel() }` before the change, and its plain output follows with the value alone. A bound `value` only updates when `(beforeValueChange)` wasn't canceled.
+
+| Binding               | On          | Receives                                                                 |
+| --------------------- | ----------- | ------------------------------------------------------------------------ |
+| `[(value)]`           | `uiListbox` | The selected value                                                       |
+| `(beforeValueChange)` | `uiListbox` | `{ value, reason, cancel() }`: the new value, and the [reason](#reasons) |
+| `(highlight)`         | `uiListbox` | `{ value, reason, cancel() }`: the focused option's value, and its index |
+
+## Accessibility
+
+Follows the [WAI-ARIA listbox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/listbox/), with both of its keyboard models for several options. Options take real focus with one roving tab stop. Every option says whether it's selected.
+
+### Focus
+
+The list is one tab stop. Tab returns to the last focused option, then falls back to the first selected or enabled option. Options receive real DOM focus, so `focus-visible` works directly. With `virtualFocus`, the list is the tab stop and keeps focus instead.
+
+The root forwards focus into the options, including when you press a Field label or the list’s padding. Escape stays available to an enclosing dialog.
+
+### Tested Behavior
+
+Every line below is an automated test.
+
+<SpecList spec="listbox" />
+
+Beyond the pattern:
+
+<SpecList spec="listbox.enhancements" />
+
+Screen readers hear the same thing in each tested framework, recorded by a virtual screen reader:
+
+<SpecList spec="listbox.sr" />

@@ -1,0 +1,542 @@
+---
+title: Command
+description: Search commands, run actions, and open pages of more choices.
+---
+
+Command puts a search field over a list of actions. The list stays open while someone searches. You can use it on its own, or put it in a dialog to build a command palette.
+
+<ComponentExample
+  name="command/demo"
+  caption="Type “bil” to find Billing. Arrow keys move the highlight; Escape clears the search."
+/>
+
+## Installation
+
+```bash
+npm install @ui-sdk/angular @ui-sdk/core
+```
+
+## Composition
+
+Use the following composition to build Command:
+
+```text
+uiCommand
+├── uiCommandInput
+├── uiCommandEmpty
+└── uiCommandList
+    ├── uiCommandItem
+    └── uiCommandItem
+```
+
+Give the input an accessible name and each command a unique value. Keep empty and status messages outside the list, which holds commands and groups. `(action)` reports the value of the command that ran; use it to perform the action.
+
+Use `uiCommandGroup` and `uiCommandGroupLabel` to name related commands, with a `uiCommandSeparator` between groups. Groups and separators disappear when filtering leaves them empty.
+
+## Usage
+
+Import the parts and put them together:
+
+```ts
+import { Component } from "@angular/core"
+import {
+  Command,
+  CommandEmpty,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@ui-sdk/angular/command"
+
+@Component({
+  selector: "app-example",
+  imports: [Command, CommandEmpty, CommandInput, CommandItem, CommandList],
+  template: `
+    <div uiCommand>
+      <input uiCommandInput aria-label="Search commands" />
+      <div uiCommandEmpty>No commands found.</div>
+      <div uiCommandList>
+        <div uiCommandItem value="new-file">New file</div>
+        <div uiCommandItem value="new-folder">New folder</div>
+      </div>
+    </div>
+  `,
+})
+class Example {}
+
+export { Example }
+```
+
+## Build Your Own
+
+`@ui-sdk/angular/command` comes with a ready-made Command. If you'd like to build your own, with your own names, start from the `command` primitive in `@ui-sdk/core`:
+
+```ts title="palette.ts"
+import { Directive, inject, input } from "@angular/core"
+import { command } from "@ui-sdk/core/command"
+import { usePart, usePrimitive } from "@ui-sdk/angular/primitive"
+
+@Directive({ selector: "[appPalette]" })
+class Palette {
+  readonly handle = usePrimitive(command, () => ({}))
+}
+
+@Directive({ selector: "[appPaletteSearch]" })
+class PaletteSearch {
+  readonly state = usePart(inject(Palette).handle, "input").state
+}
+
+@Directive({ selector: "[appPaletteEmpty]" })
+class PaletteEmpty {
+  readonly state = usePart(inject(Palette).handle, "empty").state
+}
+
+@Directive({ selector: "[appPaletteList]" })
+class PaletteList {
+  readonly state = usePart(inject(Palette).handle, "list").state
+}
+
+@Directive({ selector: "[appPaletteAction]" })
+class PaletteAction {
+  readonly value = input.required<string>()
+  readonly state = usePart(inject(Palette).handle, "item", () => ({
+    value: this.value(),
+  })).state
+}
+
+export { Palette, PaletteAction, PaletteEmpty, PaletteList, PaletteSearch }
+```
+
+```ts
+import { Component } from "@angular/core"
+import {
+  Palette,
+  PaletteAction,
+  PaletteEmpty,
+  PaletteList,
+  PaletteSearch,
+} from "./palette"
+
+@Component({
+  selector: "app-palette-example",
+  imports: [Palette, PaletteAction, PaletteEmpty, PaletteList, PaletteSearch],
+  template: `
+    <ng-container appPalette>
+      <input appPaletteSearch aria-label="Search actions" />
+      <div appPaletteEmpty>No actions found.</div>
+      <div appPaletteList>
+        <div appPaletteAction value="new-file">New file</div>
+        <div appPaletteAction value="new-folder">New folder</div>
+      </div>
+    </ng-container>
+  `,
+})
+export class PaletteExample {}
+```
+
+Connect the other slots the same way, each with `usePart`. Each part keeps the behavior, state and data attributes of its ready-made counterpart: typing filters the commands, arrow keys move the highlight and Enter runs it. See [Rendering Primitives](../rendering) and [Custom Parts](../custom-parts) for more.
+
+## Dialog
+
+Put Command inside a [Dialog](./dialog) for a command palette. Give the dialog a title, put `shortcut="mod+k"` on its trigger, and close it when a command runs. The dialog handles dismissal and returns focus to the trigger.
+
+<ComponentExample
+  name="command/dialog"
+  caption="Press Search or use Cmd+K / Ctrl+K. Choose a command to run it and close the palette; the console logs what ran."
+/>
+
+## Shortcuts
+
+An item’s `shortcut` can run it while the command list is mounted, even when the search or current page hides it. `uiCommandShortcut` displays the keys for the current platform, and the item gets `aria-keyshortcuts`. Shortcuts inside a dialog run while it is open.
+
+<ComponentExample
+  name="command/shortcuts"
+  caption="Press Cmd+P / Ctrl+P to run Profile, even when the search hides it. The console logs each command that runs."
+/>
+
+## Highlight Matches
+
+`uiCommandItemText` marks the matched text. The default fuzzy filter can match letters that are apart, so one command may have several marked segments.
+
+<ComponentExample
+  name="command/highlight"
+  caption="Type “prf” to find Profile. Matching letters are marked even when they are not next to each other."
+/>
+
+## Filter and Keywords
+
+`"fuzzy"` is the default: `nf` matches New file. `"contains"` and `"startsWith"` match the text itself. A custom function returns a boolean or a score; zero hides a command and higher scores rank first.
+
+Data commands are sorted by score. Commands written directly in markup keep their order, even though the best match can be highlighted.
+
+`keywords` adds search terms without changing the command's label. Use it for synonyms or names someone might type instead.
+
+<ComponentExample
+  name="command/filter"
+  caption="Type “nf” with Fuzzy to find New file. Choose Words and type “zo in” for Zoom in, or type “smiley” to find Search emoji through a keyword."
+/>
+
+## Pages
+
+Set an item’s `page` to the value of a `uiCommandPage` to open it. An unnamed page holds the first set of commands. The `pages` array records the stack of pages that have been opened.
+
+Backspace in an empty search goes back and restores the previous page’s query. Escape clears the query first, then goes back. A Go back command can call `pop()` on a controller.
+
+<ComponentExample
+  name="command/pages"
+  caption="Choose Change theme or Switch team. Use Go back, or press Backspace in an empty search field, to return."
+/>
+
+## Items as Data
+
+Pass `items` to provide commands, groups, separators, and pages as `CommandData`. A data command with its own `items` opens a page. Its shortcut still works when another page or filter hides it.
+
+`uiCommandItems` inside the list renders bare parts from the data. For styled commands, render from the list’s `state().items`, which follows the current page and ranked results. The example handles groups and separators as well as commands. [Lists and Menus](../lists-and-menus) covers the shared data format.
+
+Pass `emptyItems` alongside `items` to show suggested or recent commands while the first page's search is empty. Once someone types, the full collection is searched.
+
+```angular-html
+<div
+  uiCommand
+  [items]="commands"
+  [emptyItems]="[{ type: 'group', label: 'Suggested', items: recent }]"
+></div>
+```
+
+<ComponentExample
+  name="command/data"
+  caption="Choose Change theme to open its commands. Press Cmd+I / Ctrl+I to run Open inbox from any page; the console logs what ran."
+/>
+
+## Async Results
+
+Use [async options](../utilities/async-options) to wait for typing to pause and discard stale results. Send query changes to `setQuery()`, render the returned items, and pass `status`. Set `filter` to `false` to keep the server’s order.
+
+`uiCommandStatus` describes loading and failures, and the list gets `aria-busy` while loading. `(loadMore)` can request another page when scrolling or highlighting reaches the last command. Without a status part, `announcement` controls the result-count message after typing pauses.
+
+<ComponentExample
+  name="command/async"
+  caption="Type “login” and wait for matching issues. Replace the text to start a new search; only the latest results appear."
+/>
+
+## Pending Actions
+
+Pass a promise to `$event.waitUntil()` in `(action)` or an item’s `(select)`. The command gets `data-pending`, `aria-busy` and `aria-disabled` until it settles; further presses do not start another run. A rejection becomes the command’s `error` state, which clears when it runs again.
+
+An item’s `(select)` runs before `(action)`. Call `preventDefault()` on its event to stop the action.
+
+<ComponentExample
+  name="command/pending"
+  caption="Run Deploy to production and try it again while it's pending. Sync with server fails and can be retried; the console logs each outcome."
+/>
+
+## Virtualized
+
+Pass the full `items` collection so filtering and keyboard navigation include commands that are not mounted. Render only visible rows, giving each its index in the current results. `(beforeValueChange)` includes that index so you can scroll a newly highlighted row into view.
+
+<ComponentExample
+  name="command/virtualized"
+  caption="Search 10,000 commands or move through them with the arrow keys. Only the rows near the viewport render."
+/>
+
+## Controlled
+
+The highlighted command, search text, and page stack are separate:
+
+| Value   | Shape                               | Change Notification   |
+| ------- | ----------------------------------- | --------------------- |
+| `value` | A command’s string value or `null`. | `(beforeValueChange)` |
+| `query` | The search text.                    | `(beforeQueryChange)` |
+| `pages` | An array of page values.            | `(beforePagesChange)` |
+
+Bind them with `[(value)]`, `[(query)]` and `[(pages)]`, or use `defaultValue`, `defaultQuery`, and `defaultPages` for starting state. The `before` outputs receive the details; call `$event.cancel()` to reject a change. `value` is the highlighted command, not a chosen one, and it changes as the highlight moves. `(action)` reports activation, so moving the highlight alone does not run a command. [State and Events](../state-and-events) covers the shared binding pattern.
+
+<ComponentExample
+  name="command/controlled"
+  caption="Open Change theme, search and move the highlight. The console logs each highlight, query and page change with its reason."
+/>
+
+## Controller
+
+Create a `createCommandController()` for one instance and pass it as `controller`. It can read and set the highlight, query, and page stack. Use `push()` and `pop()` to navigate pages, `run()` to run the highlighted command or a named one, and `focus()` to focus the search. See [Controllers](../controllers) for setup and lifecycle.
+
+<ComponentExample
+  name="command/controller"
+  caption="Use the buttons to open pages, search, move the highlight and run it from outside. The console logs each command that runs."
+/>
+
+## Custom Rendering
+
+Render a command as an anchor when it should navigate. Enter follows the highlighted link; modified clicks keep their usual browser behavior.
+
+<ComponentExample
+  name="command/custom-rendering"
+  caption="Search for Installation and press Enter. The command follows the link to that section on this page."
+/>
+
+## Styling
+
+Each part has a `data-slot`, such as `command-item`, and shows its state through the attributes listed under [Data Attributes](#data-attributes).
+
+Use `data-highlighted` for the active command and `data-pending` for an action in progress. Give the list a height limit and `overflow-y: auto` for long lists; keyboard navigation scrolls the highlighted command into view. When mixing commands with and without icons, `data-has-icons` on the list and `data-has-icon` on each item let you reserve matching space with logical padding.
+
+## Data Attributes
+
+### Command [#data-attributes-command]
+
+<DataAttributes component="command" part="root" />
+
+### CommandInput [#data-attributes-commandinput]
+
+<DataAttributes component="command" part="input" />
+
+### CommandList [#data-attributes-commandlist]
+
+<DataAttributes component="command" part="list" />
+
+### CommandItem [#data-attributes-commanditem]
+
+<DataAttributes component="command" part="item" />
+
+### CommandItemText [#data-attributes-commanditemtext]
+
+<DataAttributes component="command" part="item-text" />
+
+### CommandItemIcon [#data-attributes-commanditemicon]
+
+<DataAttributes component="command" part="item-icon" />
+
+### CommandEmpty [#data-attributes-commandempty]
+
+<DataAttributes component="command" part="empty" />
+
+### CommandStatus [#data-attributes-commandstatus]
+
+<DataAttributes component="command" part="status" />
+
+## API Reference
+
+Each option below is an input on the directive, and each callback an output. A change callback is two outputs: `(beforeValueChange)`, with the details and `cancel()`, then `(valueChange)` with the new value alone.
+
+### Command
+
+<TypeTable
+  path="../../packages/core/src/components/command/command.ts"
+  name="CommandOptions"
+/>
+
+### CommandInput
+
+The search field. Gets the combobox role.
+
+### CommandStatus
+
+Describes loading and failures. Gets the status role.
+
+### CommandEmpty
+
+Shows while no command matches. Goes on a `div`.
+
+### CommandList
+
+Holds the commands. Renders a `div` with the listbox role, always shown.
+
+### CommandPage
+
+<TypeTable
+  path="../../packages/core/src/components/command/command.ts"
+  name="CommandPageProps"
+/>
+
+### CommandGroup
+
+Groups commands under a label. Gets the group role.
+
+### CommandGroupLabel
+
+Names its group. Goes on a `div`.
+
+### CommandItem
+
+<TypeTable
+  path="../../packages/core/src/components/command/command.ts"
+  name="CommandItemProps"
+/>
+
+### CommandItemIcon
+
+<TypeTable
+  path="../../packages/core/src/components/command/command.ts"
+  name="CommandItemIconProps"
+/>
+
+### CommandItemText
+
+Shows its command's label, and marks what matched the search. Goes on a `span`.
+
+### CommandShortcut
+
+<TypeTable
+  path="../../packages/core/src/components/command/command.ts"
+  name="CommandShortcutProps"
+/>
+
+### CommandSeparator
+
+Separates commands or groups. Gets the separator role.
+
+### Items as Data
+
+Each command in `items`. Groups are `{ type: "group", label, items }` and separators `{ type: "separator" }`.
+
+<TypeTable
+  path="../../packages/core/src/components/command/command.ts"
+  name="CommandDataItem"
+/>
+
+### State
+
+What each part's `state()` signal holds, per part.
+
+`uiCommand`:
+
+<StateTable
+  path="../../packages/core/src/components/command/command.ts"
+  name="CommandState"
+/>
+
+`uiCommandInput`:
+
+<StateTable
+  path="../../packages/core/src/components/command/command.ts"
+  name="CommandInputState"
+/>
+
+`uiCommandList`:
+
+<StateTable
+  path="../../packages/core/src/components/command/command.ts"
+  name="CommandListState"
+/>
+
+`uiCommandItem`:
+
+<StateTable
+  path="../../packages/core/src/components/command/command.ts"
+  name="CommandItemState"
+/>
+
+`uiCommandEmpty`:
+
+<StateTable
+  path="../../packages/core/src/components/command/command.ts"
+  name="CommandEmptyState"
+/>
+
+`uiCommandStatus`:
+
+<StateTable
+  path="../../packages/core/src/components/command/command.ts"
+  name="CommandStatusState"
+/>
+
+`uiCommandShortcut`:
+
+<StateTable
+  path="../../packages/core/src/components/command/command.ts"
+  name="CommandShortcutState"
+/>
+
+`uiCommandItemText`, which takes no inputs of its own:
+
+<StateTable
+  path="../../packages/core/src/components/command/command.ts"
+  name="CommandItemTextState"
+/>
+
+`uiCommandItemIcon`:
+
+<StateTable
+  path="../../packages/core/src/components/command/command.ts"
+  name="CommandItemIconState"
+/>
+
+### Reasons
+
+Why the highlighted command changed:
+
+<ReasonTable
+  path="../../packages/core/src/components/command/command.ts"
+  name="CommandValueChangeReason"
+/>
+
+Why the search text changed:
+
+<ReasonTable
+  path="../../packages/core/src/components/command/command.ts"
+  name="CommandQueryChangeReason"
+/>
+
+And why the stack of pages changed:
+
+<ReasonTable
+  path="../../packages/core/src/components/command/command.ts"
+  name="CommandPagesChangeReason"
+/>
+
+### Controller
+
+Create one with `createCommandController()` and pass it as `controller`.
+
+<ControllerTable
+  path="../../packages/core/src/components/command/command.ts"
+  name="CommandController"
+/>
+
+### Events
+
+A `before` output emits `{ value, reason, event, cancel() }` before the change, and its plain output follows with the value alone. A bound `value`, `query` or `pages` only updates when its change isn't canceled.
+
+| Binding               | On              | Receives                                                                                               |
+| --------------------- | --------------- | ------------------------------------------------------------------------------------------------------ |
+| `[(value)]`           | `uiCommand`     | The highlighted command                                                                                |
+| `[(query)]`           | `uiCommand`     | The search text                                                                                        |
+| `[(pages)]`           | `uiCommand`     | The stack of pages                                                                                     |
+| `(beforeValueChange)` | `uiCommand`     | `{ value, reason, cancel() }`: the highlighted command, the [reason](#reasons) and its `index`         |
+| `(beforeQueryChange)` | `uiCommand`     | `{ value, reason, cancel() }`: the new text, the [reason](#reasons) and whether it's still `composing` |
+| `(beforePagesChange)` | `uiCommand`     | `{ value, reason, cancel() }`: the new stack, and the [reason](#reasons)                               |
+| `(action)`            | `uiCommand`     | `{ value, event, waitUntil() }`: the command that ran. `waitUntil(promise)` marks it pending           |
+| `(loadMore)`          | `uiCommand`     | `()`, when the last command is reached                                                                 |
+| `(select)`            | `uiCommandItem` | `{ event, waitUntil() }`: before `(action)`. `$event.event.preventDefault()` skips it                  |
+
+## Accessibility
+
+The command list follows the [WAI-ARIA combobox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/) with a listbox that's always shown. Focus stays in the input, which points to the highlighted command with `aria-activedescendant`. Every line below is an automated test.
+
+### Keyboard
+
+| Key                | Does                                                                  |
+| ------------------ | --------------------------------------------------------------------- |
+| Typing             | Filters the commands and highlights the best match                    |
+| ArrowDown, ArrowUp | Moves the highlight. Wraps unless `[loop]="false"`                    |
+| Enter              | Runs the highlighted command, or follows it when it renders as a link |
+| Escape             | Clears the search, then goes back a page                              |
+| Backspace          | In an empty search, goes back a page and restores its query           |
+| An item's shortcut | Runs it while the list is mounted, even when hidden by the search     |
+
+The first available command is highlighted by default. Set `autoHighlight` to `false` to wait for an arrow key or pointer movement.
+
+### Tested Behavior
+
+<SpecList spec="command" />
+
+Long lists stay fast and announce their size:
+
+<SpecList spec="command.virtual" />
+
+Also tested:
+
+<SpecList spec="command.enhancements" />
+
+Screen readers hear the same thing in each tested framework, recorded by a virtual screen reader:
+
+<SpecList spec="command.sr" />

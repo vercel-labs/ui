@@ -1,0 +1,283 @@
+---
+title: Input
+description: Enter text, add a clear button, and connect the value to your form or state.
+---
+
+An input is a native text field for short values like a name, an email address or a search. It works inside a field and a form, and adds a clear button, text around the input, and change reasons.
+
+<ComponentExample
+  name="input/basic"
+  caption="Edit the website, then press Clear website. The text clears, focus returns to the input and the console logs the reason. Pressing https:// focuses the input too."
+/>
+
+## Installation
+
+```bash
+npm install @ui-sdk/angular @ui-sdk/core
+```
+
+## Composition
+
+Use the following composition to build an `uiInput` or an `uiInputGroup`:
+
+```text
+uiInput
+
+uiInputGroup
+├── uiInput
+└── uiInputClear
+```
+
+`uiInput` goes on a native `<input>`. Pass its type, placeholder, autocomplete and other native attributes directly. `uiInputGroup` holds text or buttons around it, and `uiInputClear` empties it.
+
+## Usage
+
+Import the parts and put them together:
+
+```ts
+import { Component } from "@angular/core"
+import { Input, InputClear, InputGroup } from "@ui-sdk/angular/input"
+
+@Component({
+  selector: "app-example",
+  imports: [Input, InputClear, InputGroup],
+  template: `
+    <div uiInputGroup>
+      <input uiInput type="search" aria-label="Search" />
+      <button *uiInputClear aria-label="Clear search"></button>
+    </div>
+  `,
+})
+class Example {}
+
+export { Example }
+```
+
+## Fields
+
+Wrap the input in a [Field](./field) to give it a visible label, a description and errors. The field also supplies its `name` when the input has none.
+
+```angular-html
+<div uiField name="username">
+  <label uiFieldLabel>Username</label>
+  <input uiInput autocomplete="username" />
+  <p uiFieldDescription>Choose a unique username for your account.</p>
+</div>
+```
+
+## Disabled and Read Only
+
+Set `disabled` on the input or its field to prevent editing and leave it out of the tab order and the submitted values. A `readOnly` input can still be focused, selected and submitted.
+
+```angular-html
+<div uiField disabled>
+  <label uiFieldLabel>Email</label>
+  <input uiInput type="email" defaultValue="hollis@example.com" />
+</div>
+
+<div uiField>
+  <label uiFieldLabel>Profile URL</label>
+  <input uiInput readonly value="example.com/hollis" />
+</div>
+```
+
+## Validation
+
+Use native constraints such as `required`, `type="email"` and `pattern`. The field shows its error after a submit attempt and updates it as the value changes. Set `invalid` on the field for an error your app decides; the input gets `aria-invalid`. [Field](./field#validation) covers the error parts and their matches.
+
+```angular-html
+<div uiField name="email" [invalid]="emailTaken ? true : undefined">
+  <label uiFieldLabel>Email</label>
+  <input uiInput type="email" required />
+  <div *uiFieldError="'valueMissing'">Enter your email address.</div>
+  <div *uiFieldError="true">That email is already in use.</div>
+</div>
+```
+
+## Input Group
+
+Place text or buttons around an input with `uiInputGroup`. Pressing the group's text focuses the input. The text is display content, not part of the submitted value.
+
+```angular-html
+<div uiInputGroup>
+  <span>https://</span>
+  <input uiInput aria-label="Website" placeholder="example" />
+  <span>.com</span>
+</div>
+```
+
+## Clear Button
+
+`uiInputClear` shows while the input has text it can clear. Pressing it empties the value, reports `clear-press` and returns focus to the input. Controlled state and native input listeners receive the change too. Escape in a filled input clears it the same way, so a dialog around it closes only once the input is empty.
+
+```angular-html
+<div uiInputGroup>
+  <input uiInput type="search" aria-label="Search people" />
+  <button *uiInputClear aria-label="Clear search">
+    <svg lucideX></svg>
+  </button>
+</div>
+```
+
+## Controlled
+
+Bind `value` with `[(value)]` to control the input. `(beforeValueChange)` also receives the change details, and native `(input)` still works.
+
+```ts
+import { Component, signal } from "@angular/core"
+import { Input } from "@ui-sdk/angular/input"
+
+@Component({
+  selector: "app-example",
+  imports: [Input],
+  template: ` <input uiInput [(value)]="name" /> `,
+})
+class Example {
+  readonly name = signal("Hollis Grant")
+}
+
+export { Example }
+```
+
+See [State and Events](../state-and-events) for the shared controlled-state conventions. Input's [reasons](#reasons) tell typing, clearing, resetting and controller changes apart.
+
+## Filtering What's Typed
+
+Call `$event.cancel()` in `(beforeValueChange)` to reject a change. The previous text and caret position are restored.
+
+```ts
+import { Component } from "@angular/core"
+import { Input, type InputValueChange } from "@ui-sdk/angular/input"
+
+@Component({
+  selector: "app-example",
+  imports: [Input],
+  template: `
+    <input
+      uiInput
+      inputmode="numeric"
+      maxlength="6"
+      (beforeValueChange)="onValueChange($event)"
+    />
+  `,
+})
+class Example {
+  onValueChange(change: InputValueChange) {
+    if (!/^\d*$/.test(change.value)) change.cancel()
+  }
+}
+
+export { Example }
+```
+
+## Controller
+
+Use `createInputController()` for actions outside the input. Its methods update the input through the same change callbacks as typing.
+
+```ts
+import { Component } from "@angular/core"
+import { Input, createInputController } from "@ui-sdk/angular/input"
+
+@Component({
+  selector: "app-example",
+  imports: [Input],
+  template: `
+    <input uiInput [controller]="message" aria-label="Message" />
+    <button (click)="message.setValue('On my way!')">Quick Reply</button>
+    <button (click)="message.clear()">Clear</button>
+    <button (click)="message.focus()">Focus</button>
+  `,
+})
+class Example {
+  readonly message = createInputController()
+}
+
+export { Example }
+```
+
+[Controllers](../controllers) covers creating and sharing a controller.
+
+## Passwords and Files
+
+Use [Password Input](./password-input) to show and hide a password. A native file input works with `type="file"`; use [File Input](./file-input) for dropping, previews and validation.
+
+## Styling
+
+Each part has a `data-slot`, such as `input-group`, and shows its state through the attributes listed under [Data Attributes](#data-attributes). Use `data-filled`, `data-disabled`, `data-readonly` and `data-required` on the input, and the field's validation and focus attributes inside a field. For a group's focus ring, style `:has(input:focus-visible)`, so a focused button inside it keeps its own ring.
+
+## Data Attributes
+
+### Input [#data-attributes-input]
+
+<DataAttributes component="input" part="root" />
+
+### InputGroup [#data-attributes-inputgroup]
+
+<DataAttributes component="input-group" part="group" />
+
+### InputClear [#data-attributes-inputclear]
+
+<DataAttributes component="input-group" part="clear" />
+
+## API Reference
+
+Each option below is an input on the directive, and each callback an output, and every native input attribute stays on your element. A change callback is two outputs: `(beforeValueChange)`, with the details and `cancel()`, then `(valueChange)` with the new value alone. Bind `value` with `[(value)]`.
+
+### Input
+
+<TypeTable
+  path="../../packages/core/src/components/input/input.ts"
+  name="InputOptions"
+/>
+
+<TypeTable
+  path="../../packages/core/src/components/input/input.ts"
+  name="InputProps"
+/>
+
+### InputGroup
+
+<TypeTable
+  path="../../packages/core/src/components/input/input.ts"
+  name="InputGroupOptions"
+/>
+
+### InputClear
+
+A `<button>` that empties the input in its group and focuses it. It renders only while there's text to clear.
+
+### State
+
+<StateTable
+  path="../../packages/core/src/components/input/input.ts"
+  name="InputState"
+/>
+
+`uiInputGroup` and `uiInputClear` receive the state of the input inside the group.
+
+<StateTable
+  path="../../packages/core/src/components/input/input.ts"
+  name="InputGroupState"
+/>
+
+### Reasons
+
+<ReasonTable
+  path="../../packages/core/src/components/input/input.ts"
+  name="InputValueChangeReason"
+/>
+
+### Controller
+
+Create one with `createInputController()` and pass it as `controller`.
+
+<ControllerTable
+  path="../../packages/core/src/components/input/input.ts"
+  name="InputController"
+/>
+
+## Accessibility
+
+Give the input a visible field label or an `aria-label`, and give the clear button an accessible name. The native input keeps standard text editing, selection, autocomplete and form behavior.
+
+<SpecList spec="input" />

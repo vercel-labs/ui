@@ -3,8 +3,15 @@ import { test } from "./docs-test"
 import { readdirSync } from "node:fs"
 import path from "node:path"
 
-const frameworks = ["react", "vue", "svelte", "web-components", "solid"]
-const folders = ["react", "vue", "svelte", "web", "solid"]
+const frameworks = [
+  "react",
+  "vue",
+  "svelte",
+  "web-components",
+  "solid",
+  "angular",
+]
+const folders = ["react", "vue", "svelte", "web", "solid", "angular"]
 const examplesIn = (folder: string) =>
   readdirSync(
     path.join(

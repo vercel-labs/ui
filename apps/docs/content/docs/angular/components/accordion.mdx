@@ -1,0 +1,509 @@
+---
+title: Accordion
+description: Show and hide sections of content from their headings.
+---
+
+Use an Accordion for content people can explore one section at a time, such as answers, settings, or a course outline. Each heading is a button that opens its panel.
+
+<ComponentExample
+  name="accordion/basic"
+  caption="Press “What is your return policy?”. Its answer opens and the shipping answer closes. Press the same heading again to close it."
+/>
+
+## Installation
+
+```bash
+npm install @ui-sdk/angular @ui-sdk/core
+```
+
+## Composition
+
+Use the following composition to build Accordion:
+
+```text
+uiAccordion
+├── uiAccordionItem
+│   ├── uiAccordionHeader
+│   │   └── uiAccordionTrigger
+│   └── uiAccordionPanel
+└── uiAccordionItem
+    ├── uiAccordionHeader
+    │   └── uiAccordionTrigger
+    └── uiAccordionPanel
+```
+
+Give every item a unique `value`. Put its trigger inside a heading, then add the panel it opens. The accordion's value is always an array of open item values, even when only one can be open.
+
+`uiAccordionHeader` renders an `h3` by default. Use a heading level that fits the surrounding document. Tab moves between triggers; Enter or Space opens and closes their panels. Arrow keys, Home and End do nothing here: the APG removed them from the pattern, and a screen reader’s heading navigation already reaches each trigger.
+
+## Usage
+
+Import the parts and put them together:
+
+```ts
+import { Component } from "@angular/core"
+import {
+  Accordion,
+  AccordionHeader,
+  AccordionItem,
+  AccordionPanel,
+  AccordionTrigger,
+} from "@ui-sdk/angular/accordion"
+
+@Component({
+  selector: "app-example",
+  imports: [
+    Accordion,
+    AccordionHeader,
+    AccordionItem,
+    AccordionPanel,
+    AccordionTrigger,
+  ],
+  template: `
+    <div uiAccordion>
+      <div uiAccordionItem value="shipping">
+        <h3 uiAccordionHeader>
+          <button uiAccordionTrigger>Shipping</button>
+        </h3>
+        <div uiAccordionPanel>Orders arrive in five to seven days.</div>
+      </div>
+    </div>
+  `,
+})
+class Example {}
+
+export { Example }
+```
+
+## Build Your Own
+
+`@ui-sdk/angular/accordion` comes with a ready-made Accordion. If you'd like to build your own, with your own names, start from the `accordion` primitive in `@ui-sdk/core`:
+
+```ts title="faq.ts"
+import { Directive, inject, input } from "@angular/core"
+import { accordion } from "@ui-sdk/core/accordion"
+import { usePart, usePrimitive } from "@ui-sdk/angular/primitive"
+
+@Directive({ selector: "[appFaqList]" })
+class FaqList {
+  readonly handle = usePrimitive(accordion, () => ({}))
+  readonly state = usePart(this.handle, "root").state
+}
+
+@Directive({ selector: "[appFaqItem]" })
+class FaqItem {
+  readonly value = input.required<string>()
+  readonly handle = inject(FaqList).handle
+  readonly state = usePart(this.handle, "item", () => ({ value: this.value() }))
+    .state
+}
+
+@Directive({ selector: "[appFaqHeading]" })
+class FaqHeading {
+  readonly #item = inject(FaqItem)
+  readonly state = usePart(this.#item.handle, "header", () => ({
+    value: this.#item.value(),
+  })).state
+}
+
+@Directive({ selector: "[appFaqQuestion]" })
+class FaqQuestion {
+  readonly #item = inject(FaqItem)
+  readonly state = usePart(this.#item.handle, "trigger", () => ({
+    value: this.#item.value(),
+  })).state
+}
+
+@Directive({ selector: "[appFaqAnswer]" })
+class FaqAnswer {
+  readonly #item = inject(FaqItem)
+  readonly state = usePart(this.#item.handle, "panel", () => ({
+    value: this.#item.value(),
+  })).state
+}
+
+export { FaqAnswer, FaqHeading, FaqItem, FaqList, FaqQuestion }
+```
+
+```ts
+import { Component } from "@angular/core"
+import { FaqAnswer, FaqHeading, FaqItem, FaqList, FaqQuestion } from "./faq"
+
+@Component({
+  selector: "app-faq-example",
+  imports: [FaqAnswer, FaqHeading, FaqItem, FaqList, FaqQuestion],
+  template: `
+    <div appFaqList>
+      <div appFaqItem value="shipping">
+        <h3 appFaqHeading>
+          <button appFaqQuestion>What are your shipping options?</button>
+        </h3>
+        <div appFaqAnswer>Standard, express and overnight.</div>
+      </div>
+    </div>
+  `,
+})
+export class FaqExample {}
+```
+
+Connect the other slots the same way, each with `usePart`. Each part keeps the behavior, state and data attributes of its ready-made counterpart. See [Rendering Primitives](../rendering) and [Custom Parts](../custom-parts) for more.
+
+## Multiple
+
+Add `multiple` to let several items stay open. Opening one then leaves the others as they are.
+
+<ComponentExample
+  name="accordion/multiple"
+  caption="Open Privacy and security. Notification settings stays open; close either section independently."
+/>
+
+## Disabled
+
+Set `disabled` on an item or on a single trigger to prevent changes, or on the accordion to disable every item. Disabled triggers stay in the tab order so people can still discover them. A disabled `<fieldset>` around the accordion disables it too.
+
+<ComponentExample
+  name="accordion/disabled"
+  caption="Tab to Premium feature information. It stays focusable, and pressing it leaves its panel closed. Try “How do I update my email address?” instead."
+/>
+
+<span id="behavior-and-options" />
+
+## Collapsible
+
+Set `[collapsible]="false"` when the open item should stay open until another item replaces it. Pair it with `defaultValue={["overview"]}` so a panel starts open.
+
+The open trigger reports `aria-disabled="true"` because pressing it leaves its panel open.
+
+```angular-html
+<div uiAccordion [collapsible]="false" [defaultValue]="['overview']"></div>
+```
+
+<ComponentExample
+  name="accordion/collapsible"
+  caption="Open Timeline, then press it again. It stays open until you choose another heading."
+/>
+
+## Controlled
+
+Use `[(value)]` to own the open items. [State and Events](../state-and-events) covers the shared pattern.
+
+An item can refuse a change: call `$event.cancel()` in its `(beforeOpenChange)` callback. Item callbacks run before the accordion's `(beforeValueChange)`, including the item that would close when another opens. Canceling any one of them cancels the whole change. `(beforeValueChange)` also gets the [reason](#reasons) for the change.
+
+<ComponentExample
+  name="accordion/controlled"
+  caption="Press Security to open it, then press it again. Cancel the confirmation and Security stays open; accept it and the section closes."
+/>
+
+## Keep Mounted
+
+A closed panel normally unmounts. Add `keepMounted` to one panel or the whole accordion to keep its content hidden in the page. This preserves local state, such as a draft in a field.
+
+<ComponentExample
+  name="accordion/keep-mounted"
+  caption="Write a message, switch to Formatting, then return to Reply to this thread. Your draft is still there."
+/>
+
+## Find in Page
+
+Add `hiddenUntilFound` to keep closed panels available to the browser's Find command. A match opens the item immediately, without an animation, with the [reason](#reasons) `find-in-page`.
+
+<ComponentExample
+  name="accordion/find-in-page"
+  caption="Use your browser’s Find command to search for “pineapple”. The closed “Which fruit do you stock?” panel opens to reveal the match."
+/>
+
+<span id="deep-links" />
+
+A link to an element inside a closed panel can reveal it too. Give the target an `id` and link to it with a hash, such as `href="#refund-timeline"`.
+
+<ComponentExample
+  name="accordion/deep-link"
+  caption="Press Jump to the refund timeline. The closed Refunds panel opens and the browser moves to the linked paragraph."
+/>
+
+With `hiddenUntilFound`, the server render writes `hidden="until-found"`, so closed panels are findable from the start. For an initial URL hash, [open the item explicitly](#url-hash).
+
+## Animation
+
+Each part has a `data-slot`, such as `accordion-panel`. The panel exposes its measured height as `--accordion-panel-height`. Animate that height to or from zero with `data-starting-style` and `data-ending-style`:
+
+<StyleTabs>
+
+```css
+[data-slot="accordion-panel"] {
+  height: var(--accordion-panel-height);
+  overflow: hidden;
+  transition: height 0.15s;
+
+  &:is([data-starting-style], [data-ending-style]) {
+    height: 0;
+  }
+}
+```
+
+```angular-html
+<div
+  uiAccordionPanel
+  class="h-(--accordion-panel-height) overflow-hidden transition-[height] data-starting-style:h-0 data-ending-style:h-0"
+></div>
+```
+
+</StyleTabs>
+
+The panel stays mounted until its exit animation finishes. An item's `(openChangeComplete)` runs afterward with the open state. A panel that starts open appears right away, with no animation and no completion callback.
+
+<ComponentExample
+  name="accordion/animation"
+  caption="Open or close an item. Its panel animates its height."
+/>
+
+## Expand All
+
+With `multiple`, a controller's `openAll()` opens every enabled item. `closeAll()` closes every item that may close. [Controllers](../controllers) explains how to connect one.
+
+<ComponentExample
+  name="accordion/expand-all"
+  caption="Press Expand all or Collapse all. Open an individual week near the bottom to scroll it into view after its panel opens."
+/>
+
+## Nested
+
+Put another accordion inside a panel when a section has its own expandable sections. Each accordion tracks its own items. Give the inner headings a lower level than the outer headings.
+
+<ComponentExample
+  name="accordion/nested"
+  caption="Open Billing, then Invoices inside it. The inner accordion changes without closing Billing."
+/>
+
+## FAQ Search
+
+<span id="faq-with-search" />
+
+Combine a search field with a controlled accordion: filter the questions and set `value` to the matching items. The example also highlights matches and leaves the triggers usable while the search is active.
+
+<ComponentExample
+  name="accordion/search"
+  caption="Search for “refund” to show and open matching answers. Try “zzz” for the empty result, then clear the search to restore all questions."
+/>
+
+## URL Hash
+
+<span id="open-the-item-in-the-url-hash" />
+
+A hash can name an item's `value` instead of an element inside its panel. Read it after mount and on `hashchange`, then open and focus the matching item through your controller:
+
+```ts
+const value = decodeURIComponent(location.hash.slice(1))
+if (items.some((item) => item.value === value)) {
+  accordion.open(value)
+  accordion.focus(value)
+}
+```
+
+Check the value against your items first. A controller can hold a value even when no item renders it. Remove the `hashchange` listener when the component unmounts.
+
+## Query String
+
+<span id="keep-open-items-in-the-query-string" />
+
+Use `open` query parameters when several items should be shareable. Read the initial values from your router on the server, then write accepted changes back to the URL:
+
+```ts
+function saveOpenItems(value: string[]) {
+  const url = new URL(location.href)
+  url.searchParams.delete("open")
+  for (const item of value) url.searchParams.append("open", item)
+  history.replaceState(null, "", url)
+}
+```
+
+Call this from `(beforeValueChange)` after updating your state. If your app already has a router, use its navigation API instead.
+
+## Scroll into View
+
+<span id="scroll-an-item-into-view" />
+
+Scroll after `(openChangeComplete)`, when the panel has its full height. Scrolling in `(beforeOpenChange)` would measure it before it opens. The [Expand All example](#expand-all) shows the full setup and scrolls only when someone opens a single item.
+
+## Custom Rendering
+
+<span id="render-functions" />
+
+Put `uiAccordionHeader` on the heading level you need, and read a trigger's state from a template reference, like whether it's `open`. [Parts and Composition](../parts-and-composition#choose-the-element) covers custom elements and part state. Accordion's states are listed under [State](#state).
+
+<ComponentExample
+  name="accordion/render"
+  caption="Each step is an h4 with its number and a Show or Hide hint that follows its open state. Open Import the parts to see it update."
+/>
+
+## Styling
+
+Style the parts with the attributes below. This turns the chevron as its panel opens, mirrors it in right to left with `:dir(rtl)`, and dims disabled triggers:
+
+<StyleTabs>
+
+```css
+[data-slot="accordion-trigger"] {
+  & > svg {
+    rotate: -90deg;
+
+    &:dir(rtl) {
+      rotate: 90deg;
+    }
+  }
+
+  &[data-open] > svg {
+    rotate: 0deg;
+  }
+
+  &[data-disabled] {
+    color: gray;
+  }
+}
+```
+
+```angular-html
+<button
+  uiAccordionTrigger
+  class="data-disabled:text-gray-500 [&>svg]:-rotate-90 rtl:[&>svg]:rotate-90 data-open:[&>svg]:rotate-0"
+></button>
+```
+
+</StyleTabs>
+
+### AccordionPanel [#styling-accordionpanel]
+
+<CssVariables component="accordion" part="panel" />
+
+## Data Attributes
+
+### Accordion [#data-attributes-accordion]
+
+<DataAttributes component="accordion" part="root" />
+
+### AccordionItem [#data-attributes-accordionitem]
+
+<DataAttributes component="accordion" part="item" />
+
+### AccordionHeader [#data-attributes-accordionheader]
+
+<DataAttributes component="accordion" part="header" />
+
+### AccordionTrigger [#data-attributes-accordiontrigger]
+
+<DataAttributes component="accordion" part="trigger" />
+
+### AccordionPanel [#data-attributes-accordionpanel]
+
+<DataAttributes component="accordion" part="panel" />
+
+## API Reference
+
+Each option below is an input on the directive, and each callback an output. A change callback is two outputs: `(beforeValueChange)`, with the details and `cancel()`, then `(valueChange)` with the new value alone. Bind `value` with `[(value)]`. Headers,
+triggers and panels take their item's value from the item.
+
+### Accordion
+
+<TypeTable
+  path="../../packages/core/src/components/accordion/accordion.ts"
+  name="AccordionOptions"
+/>
+
+### AccordionItem
+
+<TypeTable
+  path="../../packages/core/src/components/accordion/accordion.ts"
+  name="AccordionItemProps"
+/>
+
+### AccordionHeader
+
+The header takes no inputs of its own. Everything else stays on your element.
+
+### AccordionTrigger
+
+<TypeTable
+  path="../../packages/core/src/components/accordion/accordion.ts"
+  name="AccordionTriggerProps"
+/>
+
+### AccordionPanel
+
+<TypeTable
+  path="../../packages/core/src/components/accordion/accordion.ts"
+  name="AccordionPanelProps"
+/>
+### State
+
+What each part's `state()` signal holds, per part.
+
+`uiAccordion`:
+
+<StateTable
+  path="../../packages/core/src/components/accordion/accordion.ts"
+  name="AccordionState"
+/>
+
+`uiAccordionItem`, `uiAccordionHeader`, `uiAccordionTrigger` and `uiAccordionPanel`:
+
+<StateTable
+  path="../../packages/core/src/components/accordion/accordion.ts"
+  name="AccordionItemState"
+/>
+
+### Reasons
+
+`$event.reason` says why items opened or closed, for `(beforeValueChange)` and every item's `(beforeOpenChange)`.
+
+<ReasonTable
+  path="../../packages/core/src/components/accordion/accordion.ts"
+  name="AccordionValueChangeReason"
+/>
+
+### Controller
+
+Create one with `createAccordionController()` and pass it as `controller`.
+
+Every write method takes an optional `{ reason, event }`, runs the item and accordion callbacks like a press, and returns `false` when the change is canceled or does nothing.
+
+<ControllerTable
+  path="../../packages/core/src/components/accordion/accordion.ts"
+  name="AccordionController"
+/>
+
+### Events
+
+A `before` output emits `{ value, reason, event, cancel() }` before the change, and its plain output follows with the value alone. A bound `value` only updates when `(beforeValueChange)` wasn't canceled.
+
+| Binding                | On                | Receives                                                                  |
+| ---------------------- | ----------------- | ------------------------------------------------------------------------- |
+| `[(value)]`            | `uiAccordion`     | The open items                                                            |
+| `(beforeValueChange)`  | `uiAccordion`     | `{ value, reason, cancel() }`: the open items, and the [reason](#reasons) |
+| `(beforeOpenChange)`   | `uiAccordionItem` | `{ value, reason, cancel() }`, before `(beforeValueChange)`               |
+| `(openChangeComplete)` | `uiAccordionItem` | `$event`, whether it's open, after the panel's animation                  |
+
+## Accessibility
+
+The accordion follows the [WAI-ARIA accordion pattern](https://www.w3.org/WAI/ARIA/apg/patterns/accordion/). Every line below is an automated test.
+
+<SpecList
+  spec="accordion"
+  only={[
+    "expanding and collapsing",
+    "multiple",
+    "disabled",
+    "keyboard",
+    "structure",
+    "mounting",
+  ]}
+/>
+
+Beyond the pattern's baseline:
+
+<SpecList spec="accordion.enhancements" />
+
+Every panel is a region labelled by its trigger, so screen readers can list open panels as landmarks. With many panels open at once, such as `multiple` with Expand all, keep the number of items modest so that list stays short.
+
+Screen readers hear the same thing in each tested framework, recorded by a virtual screen reader:
+
+<SpecList spec="accordion.sr" />

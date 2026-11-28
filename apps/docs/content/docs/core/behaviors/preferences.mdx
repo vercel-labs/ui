@@ -217,6 +217,25 @@ customElements.define("app-sidebar", AppSidebar)
 ```
 
 </FrameworkContent>
+<FrameworkContent value="angular">
+
+```ts title="sidebar.ts"
+import { Component } from "@angular/core"
+import { usePreference } from "@ui-sdk/angular/preferences"
+import { sidebarPreference } from "./sidebar-preference"
+
+@Component({
+  selector: "app-sidebar",
+  template: `
+    <aside [hidden]="sidebar().value === 'closed'">Sidebar content</aside>
+  `,
+})
+export class Sidebar {
+  readonly sidebar = usePreference(sidebarPreference)
+}
+```
+
+</FrameworkContent>
 
 Call `sidebarPreference.set("closed")` from your toggle to close the sidebar, or `sidebarPreference.set("open")` to open it. The component updates when the preference changes, and the choice is saved for the next visit.
 
@@ -297,6 +316,29 @@ function App(props: { children: JSX.Element }) {
 
   document.querySelector("ui-preferences").preferences = [skinTone]
 </script>
+```
+
+</FrameworkContent>
+<FrameworkContent value="angular">
+
+```ts title="app.ts"
+import { Component } from "@angular/core"
+import { RouterOutlet } from "@angular/router"
+import { Preferences } from "@ui-sdk/angular/preferences"
+import { skinTone } from "./preferences"
+
+@Component({
+  selector: "app-root",
+  imports: [Preferences, RouterOutlet],
+  template: `
+    <div uiPreferences [preferences]="[skinTone]">
+      <router-outlet />
+    </div>
+  `,
+})
+export class App {
+  readonly skinTone = skinTone
+}
 ```
 
 </FrameworkContent>
@@ -383,6 +425,23 @@ function CurrentTone() {
 <FrameworkContent value="web-components">
 
 Use `get()` and `subscribe()` to read the value and keep your element current, as shown in [Follow Changes](#follow-changes).
+
+</FrameworkContent>
+<FrameworkContent value="angular">
+
+```ts
+import { Component } from "@angular/core"
+import { usePreference } from "@ui-sdk/angular/preferences"
+import { skinTone } from "./preferences"
+
+@Component({
+  selector: "app-selected-tone",
+  template: `<span>Selected tone: {{ tone().value }}</span>`,
+})
+export class SelectedTone {
+  readonly tone = usePreference(skinTone)
+}
+```
 
 </FrameworkContent>
 

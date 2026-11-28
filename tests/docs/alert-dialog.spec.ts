@@ -3,12 +3,19 @@ import { test } from "./docs-test"
 import { readdirSync } from "node:fs"
 import path from "node:path"
 
-const frameworks = ["react", "solid", "vue", "svelte", "web-components"]
+const frameworks = [
+  "react",
+  "solid",
+  "vue",
+  "svelte",
+  "web-components",
+  "angular",
+]
 const root = path.join(
   import.meta.dirname,
   "../../examples/components/alert-dialog"
 )
-const folders = ["react", "solid", "vue", "svelte", "web"]
+const folders = ["react", "solid", "vue", "svelte", "web", "angular"]
 const examplesIn = (folder: string) =>
   readdirSync(path.join(root, folder), { withFileTypes: true })
     .filter((entry) => entry.isFile())
@@ -136,13 +143,15 @@ for (const framework of frameworks) {
     await expect(alert).toContainText("Delete Globex?")
     await page.keyboard.press("Escape")
     await expect(alert).toHaveCount(0)
-    await expect(list.getByText(/^Globex/), "escape answers no").toHaveCount(1)
+    await expect(list.getByText(/^\s*Globex/), "escape answers no").toHaveCount(
+      1
+    )
 
     await deletes.nth(0).click()
     await expect(alert).toContainText("Delete Acme?")
     await alert.getByRole("button", { name: "Delete" }).click()
     await expect(alert).toHaveCount(0)
-    await expect(list.getByText(/^Acme/)).toHaveCount(0)
+    await expect(list.getByText(/^\s*Acme/)).toHaveCount(0)
     await expect(deletes).toHaveCount(2)
     // Focus moves on to the next row's button, not to the page, once the pressed one is gone.
     await expect(deletes.nth(0)).toBeFocused()

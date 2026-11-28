@@ -1,0 +1,428 @@
+---
+title: Alert Dialog
+description: Ask someone to confirm an action before you continue.
+---
+
+Use an alert dialog when someone needs to answer a question before an action continues, such as deleting a project.
+
+<ComponentExample
+  name="alert-dialog/basic"
+  caption="Open the dialog with Enter to start on Cancel. Tab stays inside, clicking outside leaves it open, and Escape closes it and returns focus to the trigger."
+/>
+
+## Installation
+
+```bash
+npm install @ui-sdk/angular @ui-sdk/core
+```
+
+## Composition
+
+Use the following composition to build AlertDialog:
+
+```text
+uiAlertDialog
+├── uiAlertDialogTrigger
+├── uiAlertDialogBackdrop
+└── uiAlertDialogContent
+    ├── uiAlertDialogTitle
+    ├── uiAlertDialogDescription
+    ├── uiAlertDialogClose
+    └── uiAlertDialogClose
+```
+
+Put the question in `uiAlertDialogTitle`, explain what happens in `uiAlertDialogDescription`, and use `uiAlertDialogClose` for each answer. Add `uiAlertDialogBackdrop` to dim the page.
+
+A Close part reports its `value` when it closes. `value="confirm"` is the agreeing answer that the [confirm helper](#confirm) recognizes.
+
+## Usage
+
+Import the parts and put them together:
+
+```ts
+import { Component } from "@angular/core"
+import {
+  AlertDialog,
+  AlertDialogClose,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@ui-sdk/angular/alert-dialog"
+
+@Component({
+  selector: "app-example",
+  imports: [
+    AlertDialog,
+    AlertDialogClose,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+  ],
+  template: `
+    <ng-container uiAlertDialog>
+      <button uiAlertDialogTrigger>Delete Project</button>
+      <div *uiAlertDialogContent>
+        <h2 uiAlertDialogTitle>Delete this project?</h2>
+        <p uiAlertDialogDescription>
+          The project and its files will be deleted for everyone.
+        </p>
+        <button uiAlertDialogClose>Cancel</button>
+        <button uiAlertDialogClose value="confirm">Delete</button>
+      </div>
+    </ng-container>
+  `,
+})
+class Example {}
+
+export { Example }
+```
+
+## Build Your Own
+
+`@ui-sdk/angular/alert-dialog` comes with a ready-made Alert Dialog. If you'd like to build your own, with your own names, start from the `alertDialog` primitive in `@ui-sdk/core`:
+
+```ts title="confirm.ts"
+import { Directive, inject } from "@angular/core"
+import { alertDialog } from "@ui-sdk/core/alert-dialog"
+import { usePart, usePrimitive } from "@ui-sdk/angular/primitive"
+
+@Directive({ selector: "[appConfirm]" })
+class Confirm {
+  readonly handle = usePrimitive(alertDialog, () => ({}))
+}
+
+@Directive({ selector: "[appConfirmTrigger]" })
+class ConfirmTrigger {
+  readonly state = usePart(inject(Confirm).handle, "trigger").state
+}
+
+@Directive({ selector: "[appConfirmBackdrop]" })
+class ConfirmBackdrop {
+  readonly state = usePart(inject(Confirm).handle, "backdrop").state
+}
+
+@Directive({ selector: "[appConfirmContent]" })
+class ConfirmContent {
+  readonly state = usePart(inject(Confirm).handle, "content").state
+}
+
+@Directive({ selector: "[appConfirmTitle]" })
+class ConfirmTitle {
+  readonly state = usePart(inject(Confirm).handle, "title").state
+}
+
+@Directive({ selector: "[appConfirmDescription]" })
+class ConfirmDescription {
+  readonly state = usePart(inject(Confirm).handle, "description").state
+}
+
+@Directive({ selector: "[appConfirmClose]" })
+class ConfirmClose {
+  readonly state = usePart(inject(Confirm).handle, "close").state
+}
+
+export {
+  Confirm,
+  ConfirmBackdrop,
+  ConfirmClose,
+  ConfirmContent,
+  ConfirmDescription,
+  ConfirmTitle,
+  ConfirmTrigger,
+}
+```
+
+```ts
+import { Component } from "@angular/core"
+import {
+  Confirm,
+  ConfirmBackdrop,
+  ConfirmClose,
+  ConfirmContent,
+  ConfirmDescription,
+  ConfirmTitle,
+  ConfirmTrigger,
+} from "./confirm"
+
+@Component({
+  selector: "app-confirm-example",
+  imports: [
+    Confirm,
+    ConfirmBackdrop,
+    ConfirmClose,
+    ConfirmContent,
+    ConfirmDescription,
+    ConfirmTitle,
+    ConfirmTrigger,
+  ],
+  template: `
+    <ng-container appConfirm>
+      <button appConfirmTrigger>Delete Project</button>
+      <div appConfirmBackdrop></div>
+      <div appConfirmContent>
+        <h2 appConfirmTitle>Delete this project?</h2>
+        <p appConfirmDescription>This permanently deletes the project.</p>
+        <button appConfirmClose>Cancel</button>
+        <button appConfirmClose value="confirm">Delete</button>
+      </div>
+    </ng-container>
+  `,
+})
+export class ConfirmExample {}
+```
+
+Connect the other slots the same way, each with `usePart`. Each part keeps the behavior, state and data attributes of its ready-made counterpart: the content opens in the top layer, traps focus and makes the page inert. See [Rendering Primitives](../rendering) and [Custom Parts](../custom-parts) for more.
+
+## Controlled
+
+Use `[(open)]` when your app needs to read or control whether the dialog is open. [State and Events](../state-and-events) explains controlled state and canceling a change.
+
+<ComponentExample
+  name="alert-dialog/controlled"
+  caption="Choose Review Changes, then Keep Editing or Discard."
+/>
+
+## Shortcut
+
+Give the trigger a `shortcut` to open the dialog from the keyboard, and put `uiAlertDialogShortcut` inside it to show the keys. [Dialog](./dialog#keyboard-shortcut) covers the shortcut syntax.
+
+<ComponentExample
+  name="alert-dialog/shortcut"
+  caption="Press Cmd+Shift+H (Ctrl+Shift+H on Windows and Linux) to open the dialog without clicking."
+/>
+
+## Animation
+
+The content has `data-starting-style` while it opens and `data-ending-style` while it closes. Transition from those states, and the dialog stays mounted until the exit finishes:
+
+<StyleTabs>
+
+```css
+[data-slot="alert-dialog-content"] {
+  transition:
+    opacity 0.2s,
+    translate 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    scale 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+
+  &:is([data-starting-style], [data-ending-style]) {
+    opacity: 0;
+    translate: 0 16px;
+    scale: 0.96;
+  }
+
+  &[data-ending-style] {
+    transition-duration: 0.15s;
+  }
+}
+```
+
+```angular-html
+<div
+  *uiAlertDialogContent
+  class="transition-[opacity,translate,scale] duration-250 ease-[cubic-bezier(0.22,1,0.36,1)] data-starting-style:translate-y-4 data-starting-style:scale-96 data-starting-style:opacity-0 data-ending-style:translate-y-4 data-ending-style:scale-96 data-ending-style:opacity-0 data-ending-style:duration-150"
+></div>
+```
+
+</StyleTabs>
+
+<ComponentExample
+  name="alert-dialog/animation"
+  caption="Open and close the dialog. It slides up and fades in, and slides down and fades out before it unmounts."
+/>
+
+## Nested
+
+An alert dialog opened inside another joins its stack, such as a second confirmation before something can't be undone. Escape closes the topmost one and returns focus to its trigger. The dialog underneath gets `data-nested-open`, so you can show which layer is active. To close both once the last question is answered, control the outer dialog with `[(open)]` and close it when the inner one's `(beforeOpenChange)` reports `returnValue` `"confirm"`.
+
+<ComponentExample
+  name="alert-dialog/nested"
+  caption="Choose Delete Workspace, then Delete. Press Escape to step back to the first question, or choose Delete Workspace to close both."
+/>
+
+## Async Action
+
+An `(action)` on a Close part runs before it closes the dialog. Pass a Promise to `$event.waitUntil()` to keep the dialog open until the work finishes. A resolved Promise closes it with the reason `action`; a rejection keeps it open and puts the error in that part's state.
+
+<ComponentExample
+  name="alert-dialog/async-action"
+  caption="Choose Delete Project, then Delete. The first attempt fails so you can try again. While Deleting… is shown, Cancel and Escape leave the dialog open. A successful retry closes it."
+/>
+
+While the action runs, its button stays focusable and gets `data-pending`, `aria-busy`, and `aria-disabled`. Other Close parts get `aria-disabled` and `data-disabled`, and neither they nor dismissals can close the dialog until it settles. `(dismissAttempt)` reports refused dismissals; a controller can still close it.
+
+The root's `pendingAnnouncement` sets what screen readers hear after a second of waiting. The error clears on the next attempt or when the dialog opens again. The action also receives `{ source }` after its event argument; [Changes After an Await](./button#changes-after-an-await) explains when to use it.
+
+## Confirm From Anywhere
+
+The shared `confirm()` asks a question without any dialog markup. Render `uiOverlayHost` from `@ui-sdk/angular/overlays` once near the root of your app, and it shows each question as an alert dialog. `confirm()` resolves `true` when someone agrees. [Confirm Options](#confirm-options) lists what you can pass.
+
+<ComponentExample
+  name="alert-dialog/confirm-anywhere"
+  caption="Choose Archive Project, then Archive or Cancel. The console shows the answer."
+/>
+
+## Confirm
+
+Use `createConfirm<Payload>()` to ask a question from an event handler and await the answer. Create it once, then pass its `controller` to your alert dialog. The content reads the question's data from its state, `*uiAlertDialogContent="let content"`, as `content.payload`. In a template the payload is `unknown`, so give it its type in a method, like the example's `payloadOf()`.
+
+`await confirm({ name })` resolves `true` when the Close part with `value="confirm"` closes the dialog. Cancel, Escape, and other answers resolve `false`. This lets several rows share one dialog:
+
+<ComponentExample
+  name="alert-dialog/confirm"
+  caption="Delete a project. Cancel or Escape keeps it; Delete removes it and focuses a neighboring row's button. Reset Projects brings the list back."
+/>
+
+When the action removes the button that opened the dialog, choose a useful place for focus to go. This example focuses a neighboring row, or Reset Projects when the list is empty.
+
+## Queued Questions
+
+Calls to the same confirm function wait their turn. You can ask two questions at once; the second appears only after the first has an answer.
+
+<ComponentExample
+  name="alert-dialog/queue"
+  caption="Choose Review Two Projects. Answer the Acme question, then the Globex question. The console shows both answers once the second one is in."
+/>
+
+## Styling
+
+Each part has a `data-slot`, such as `alert-dialog-content`, and shows its state through the attributes listed under [Data Attributes](#data-attributes). [Styling and Animation](../styling-and-animation) covers state attributes and entry and exit transitions.
+
+### AlertDialogContent [#styling-alertdialogcontent]
+
+<CssVariables component="alert-dialog" part="content" />
+
+## Data Attributes
+
+### AlertDialogTrigger [#data-attributes-alertdialogtrigger]
+
+<DataAttributes component="alert-dialog" part="trigger" />
+
+### AlertDialogBackdrop [#data-attributes-alertdialogbackdrop]
+
+<DataAttributes component="alert-dialog" part="backdrop" />
+
+### AlertDialogContent [#data-attributes-alertdialogcontent]
+
+<DataAttributes component="alert-dialog" part="content" />
+
+### AlertDialogClose [#data-attributes-alertdialogclose]
+
+<DataAttributes component="alert-dialog" part="close" />
+
+## API Reference
+
+Alert Dialog shares [Dialog's](./dialog) options, except `modal`, `closeOnOutsidePress`, and `presentation`. It is always modal, never closes on an outside press, and does not present as a sheet.
+
+### AlertDialog
+
+<TypeTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="AlertDialogOptions"
+/>
+
+### AlertDialogTrigger
+
+<TypeTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="AlertDialogTriggerProps"
+/>
+
+### AlertDialogBackdrop
+
+Dims the page behind the dialog. Goes on a `div`.
+
+### AlertDialogContent
+
+<TypeTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="AlertDialogContentProps"
+/>
+
+### AlertDialogTitle
+
+The question. Renders an `h2`, and the content uses it as its accessible name.
+
+### AlertDialogDescription
+
+What happens if you agree. Renders a `p`, and the content uses it as its accessible description.
+
+### AlertDialogClose
+
+<TypeTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="AlertDialogCloseProps"
+/>
+
+### AlertDialogShortcut
+
+<TypeTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="AlertDialogShortcutProps"
+/>
+
+### Confirm Options
+
+The shared `confirm()` function uses these options when an `uiOverlayHost` renders the question. See [Toasts and Confirms](../popups#toasts-and-confirms) for the host setup. With your own dialog, `createConfirm<Payload>()` accepts the payload you choose instead.
+
+<TypeTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="ConfirmOptions"
+/>
+
+### State
+
+`uiAlertDialogContent`:
+
+<StateTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="AlertDialogContentState"
+/>
+
+`uiAlertDialogClose`:
+
+<StateTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="AlertDialogCloseState"
+/>
+
+`uiAlertDialogShortcut`:
+
+<StateTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="AlertDialogShortcutState"
+/>
+
+### Reasons
+
+<ReasonTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="AlertDialogOpenChangeReason"
+/>
+
+`(beforePayloadChange)` runs before `(beforeOpenChange)` when the dialog opens with another payload. Calling `controller.open({ payload })` on an open dialog updates the payload with the reason `imperative`.
+
+<ReasonTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="AlertDialogPayloadChangeReason"
+/>
+
+### Controller
+
+Use `createAlertDialogController<Payload, Result>()` for direct control. `createConfirm<Payload>()` returns a confirm function with its own `controller`.
+
+<ControllerTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="AlertDialogController"
+/>
+
+## Accessibility
+
+Give the dialog a title and a description, and put the least destructive answer first. It follows the [WAI-ARIA alert dialog pattern](https://www.w3.org/WAI/ARIA/apg/patterns/alertdialog/).
+
+The dialog uses the `alertdialog` role and keeps the rest of the page inert while it's open. Screen readers announce its title and description. Opening it focuses the first Close part, so put Cancel first. A touch open focuses the content instead, so no on-screen keyboard appears, unless you set `initialFocus`. Escape closes the dialog, but pressing outside never does. [Dialog](./dialog#focus) covers other initial and final focus targets.
+
+These behaviors are covered by automated tests:
+
+<SpecList spec="dialog" only={["alert dialog"]} />

@@ -1,0 +1,82 @@
+---
+title: Rendering Primitives
+description: Turn a Core primitive into Angular directives with usePrimitive and usePart.
+---
+
+This page renders the rating from [Compose Behaviors](../core/compose-behaviors). Start with that guide's [complete `rating.ts`](../core/compose-behaviors#complete-primitive): it already handles selection, arrow keys, and focus. Here we'll connect its `root` and `star` slots to Angular.
+
+## Create the Parts
+
+Each slot becomes a directive. `usePrimitive` creates the instance in the root, and `usePart` connects a slot to the element the directive is on. Save this beside `rating.ts`:
+
+```ts title="rating-parts.ts"
+import { Directive, inject, input, output } from "@angular/core"
+import { usePart, usePrimitive } from "@ui-sdk/angular/primitive"
+import { rating } from "./rating"
+
+@Directive({ selector: "[appRating]", exportAs: "appRating" })
+export class Rating {
+  readonly value = input<number>()
+  readonly defaultValue = input<number>()
+  readonly valueChange = output<number>()
+
+  readonly handle = usePrimitive(rating, () => ({
+    value: this.value(),
+    defaultValue: this.defaultValue(),
+    onValueChange: (value) => this.valueChange.emit(value),
+  }))
+  readonly state = usePart(this.handle, "root").state
+}
+
+@Directive({ selector: "[appRatingStar]", exportAs: "appRatingStar" })
+export class RatingStar {
+  readonly value = input.required<string>()
+
+  readonly state = usePart(inject(Rating).handle, "star", () => ({
+    value: this.value(),
+  })).state
+}
+```
+
+- `usePrimitive` takes the options as a function, so they follow your inputs. It destroys the instance with the directive.
+- `usePart` writes the slot's attributes onto the element and binds its events, without change detection. Its own props, like a star's `value`, come from a function too.
+- `state` is a signal of the part's state, for your templates.
+
+A `value` input and a `valueChange` output let the rating take `[(value)]`. A part finds its root through `inject`, so `RatingStar` works anywhere inside an element with `appRating`.
+
+## Render the Rating
+
+Put the directives on your own elements. Each star receives its slot value and a name a screen reader can announce:
+
+```ts
+import { Component } from "@angular/core"
+import { Rating, RatingStar } from "./rating-parts"
+
+@Component({
+  selector: "app-review",
+  imports: [Rating, RatingStar],
+  template: `
+    <div appRating [defaultValue]="4" aria-label="Rating" class="flex gap-1">
+      @for (star of stars; track star) {
+        <button
+          appRatingStar
+          [value]="star.toString()"
+          [attr.aria-label]="star + (star === 1 ? ' star' : ' stars')"
+          class="opacity-40 data-filled:opacity-100"
+        >
+          ★
+        </button>
+      }
+    </div>
+  `,
+})
+export class Review {
+  readonly stars = [1, 2, 3, 4, 5]
+}
+```
+
+The primitive supplies `data-filled`; these classes make the filled stars easier to see. [Styling and Animation](./styling-and-animation) covers other ways to style parts.
+
+## Add Logic to a Part
+
+A part is a directive like any other, so it can have inputs, outputs and logic of its own. [Custom Parts](./custom-parts) uses the same rating to show the rest of what `usePart` can do.

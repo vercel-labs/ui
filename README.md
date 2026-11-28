@@ -2,7 +2,7 @@
 
 A library of behaviors for agents to build and drive the next generation of user interfaces.
 
-Keyboard navigation, focus, selection, dismissal, popups, drag and drop and the ARIA they need live in `@ui-sdk/core`, with adapters for React, Vue, Svelte, Solid and Web Components.
+Keyboard navigation, focus, selection, dismissal, popups, drag and drop and the ARIA they need live in `@ui-sdk/core`, with adapters for React, Vue, Svelte, Solid, Web Components and Angular.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./assets/behaviors-dark.svg">
@@ -19,7 +19,7 @@ UI SDK is in beta. Install core and the adapter for your framework:
 npm install @ui-sdk/react @ui-sdk/core
 ```
 
-For other frameworks, swap `@ui-sdk/react` for `@ui-sdk/vue`, `@ui-sdk/svelte`, `@ui-sdk/solid` or `@ui-sdk/web`.
+For other frameworks, swap `@ui-sdk/react` for `@ui-sdk/vue`, `@ui-sdk/svelte`, `@ui-sdk/solid`, `@ui-sdk/web` or `@ui-sdk/angular`.
 
 Then give your agent the UI SDK skill:
 
@@ -63,7 +63,7 @@ const searchField = definePrimitive({
 export { searchField }
 ```
 
-Then render it in your framework with `createParts`. The parts are the same in all five.
+Then render it in your framework with `createParts`. The parts are the same in every one.
 
 ### React
 
@@ -177,6 +177,44 @@ Then use them in your HTML:
   <search-field-input><input placeholder="Search" /></search-field-input>
   <search-field-clear><button>Clear</button></search-field-clear>
 </search-field>
+```
+
+### Angular
+
+Write a directive for each part:
+
+```ts
+import { Directive, inject } from "@angular/core"
+import { usePart, usePrimitive } from "@ui-sdk/angular/primitive"
+import { searchField } from "./search-field"
+
+@Directive({ selector: "[appSearchField]" })
+export class SearchField {
+  readonly handle = usePrimitive(searchField, () => ({}))
+}
+
+@Directive({ selector: "[appSearchFieldInput]" })
+export class SearchFieldInput {
+  constructor() {
+    usePart(inject(SearchField).handle, "input")
+  }
+}
+
+@Directive({ selector: "[appSearchFieldClear]" })
+export class SearchFieldClear {
+  constructor() {
+    usePart(inject(SearchField).handle, "clear")
+  }
+}
+```
+
+Then put them on your own elements:
+
+```html
+<ng-container appSearchField>
+  <input appSearchFieldInput placeholder="Search" />
+  <button *appSearchFieldClear>Clear</button>
+</ng-container>
 ```
 
 ## Contributing

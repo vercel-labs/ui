@@ -1,0 +1,664 @@
+---
+title: Select
+description: Choose one value or several from a popup list.
+---
+
+Use a Select when someone needs to choose from a set of options. It handles opening the list, keyboard navigation, selection, and the value submitted with a form. You provide the parts and styles.
+
+<ComponentExample
+  name="select/demo"
+  inspect
+  caption="Open Role and choose Editor. The list closes and the trigger shows your choice."
+/>
+
+## Installation
+
+```bash
+npm install @ui-sdk/angular @ui-sdk/core
+```
+
+## Composition
+
+Use the following composition to build Select:
+
+```text
+uiSelect
+├── uiSelectLabel
+├── uiSelectTrigger
+│   └── uiSelectValue
+└── uiSelectContent
+    ├── uiSelectItem
+    └── uiSelectItem
+```
+
+Start with a label, a trigger, and a list of items. `uiSelectValue` shows the selected item's label inside the trigger. `uiSelectLabel` names the trigger; inside a [Field](./field), use its `uiFieldLabel` instead, as the examples do.
+
+## Usage
+
+Import the parts and put them together:
+
+```ts
+import { Component } from "@angular/core"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@ui-sdk/angular/select"
+
+@Component({
+  selector: "app-example",
+  imports: [
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+  ],
+  template: `
+    <ng-container uiSelect placeholder="Select a role">
+      <div uiSelectLabel>Role</div>
+      <button uiSelectTrigger>
+        <span uiSelectValue></span>
+      </button>
+      <div *uiSelectContent>
+        <div uiSelectItem value="viewer">Viewer</div>
+        <div uiSelectItem value="editor">Editor</div>
+      </div>
+    </ng-container>
+  `,
+})
+class Example {}
+
+export { Example }
+```
+
+## Items as Data
+
+Pass an array to `items` when your options come from data. A string is both the value and the label. Use an object when they differ:
+
+```angular-html
+<ng-container uiSelect [items]="['Free', 'Pro']"></ng-container>
+<ng-container
+  uiSelect
+  [items]="[{ value: 'pro', label: 'Pro plan' }]"
+></ng-container>
+```
+
+These are option examples; add the label and trigger shown above. `items` can also include groups and separators, checked with `ListData`:
+
+```ts
+import type { ListData } from "@ui-sdk/angular/select"
+
+const plans: ListData = [
+  { value: "free", label: "Free" },
+  { type: "separator" },
+  { type: "group", label: "Contact sales", items: ["Enterprise"] },
+]
+```
+
+Put `uiSelectItems` inside the content and the select renders bare items from this data. To style them, keep `items` on `uiSelect` and render `uiSelectItem` parts inside `uiSelectContent`, as the example does. Keeping the data on the root also makes labels available before the list opens, including during server rendering.
+
+<ComponentExample
+  name="select/data"
+  caption="Open Plan to see the options, separator, and Contact sales group. Education is disabled; choose Enterprise to update the value."
+/>
+
+Items can change while the list is open. Navigation follows the new order, and selection and highlight stay with their values while those items remain. Removing the highlighted item clears the highlight. [Lists and Menus](../lists-and-menus) covers shared data shapes.
+
+## Groups
+
+Put related items inside `uiSelectGroup` and name each group with `uiSelectGroupLabel`. `uiSelectSeparator` adds a visual break without becoming an option.
+
+<ComponentExample
+  name="select/groups"
+  caption="Open Font and choose from Sans serif, Serif or Monospace. Each group has a label that screen readers announce."
+/>
+
+## Icons
+
+`uiSelectItemIcon` keeps an icon separate from the item's text, so it doesn't affect its accessible name, typeahead, or search. Add `uiSelectValueIcon` to the trigger to show the selected item's icon there too.
+
+```angular-html
+<button uiSelectTrigger>
+  <span uiSelectValueIcon></span>
+  <span uiSelectValue></span>
+</button>
+```
+
+The full example marks directional icons with `mirror`, so they flip in right-to-left layouts. Items containing only an icon still need an `aria-label`.
+
+<ComponentExample
+  name="select/icons"
+  caption="Choose Center or End. Both the label and the icon in the trigger update to match the selected item."
+/>
+
+## Typeahead
+
+With the trigger focused and closed, typing selects the next matching option without opening the list. With the list open, typing moves the highlight; Enter chooses the highlighted item.
+
+Set an item's `label` when its content includes extra text that shouldn't be matched. Here, country names match typing; calling codes don't.
+
+<ComponentExample
+  name="select/typeahead"
+  caption="Focus Country and type “sw” to select Sweden without opening the list. Open it and type “g” to highlight Germany, then press Enter."
+/>
+
+## Disabled
+
+A disabled select can't be focused or changed and doesn't submit a value. A read-only select stays focusable and submits its value, but can't change. Keyboard navigation skips disabled items, and they can't be chosen.
+
+<ComponentExample
+  name="select/disabled"
+  caption="Billing country is disabled and Shipping from is read-only. Open Shipping to and press the arrow keys: the highlight skips Denmark, which can't be chosen."
+/>
+
+## Clear Button
+
+`placeholder` appears while nothing is selected. Add `uiSelectClear` to return to that state. Clearing sets a single value to `null`, or multiple values to an empty array, and returns focus to the trigger.
+
+Keep the clear button beside the trigger: a button can't contain another button. `keepMounted` lets it stay in the DOM when there is nothing to clear.
+
+<ComponentExample
+  name="select/clearable"
+  caption="Press the clear button. The trigger shows Unassigned, focus returns to it, and the console logs null. Choose someone to bring the button back."
+/>
+
+## Multiple
+
+Set `multiple` to select more than one value. The value becomes an array, and choosing an item toggles it while keeping the list open.
+
+```angular-html
+<ng-container uiSelect multiple [defaultValue]="['en', 'ja']"></ng-container>
+```
+
+`uiSelectValue` holds the selected `labels` in its state. Read them from a template reference, `#selectValue="uiSelectValue"`, to summarize a long selection, as this example does.
+
+<ComponentExample
+  name="select/multiple"
+  caption="Choose several languages, then choose one again to remove it. The list stays open, and the console logs the array."
+/>
+
+## Select All
+
+Add `uiSelectSelectAll` to select or clear every enabled item. It shows a mixed state when only some are selected. Inside a `uiSelectGroup`, it applies to that group.
+
+`<span uiSelectValue [maxLabels]="2">` shows up to two labels and summarizes the remaining values. `getMoreLabel` lets you write that summary.
+
+<ComponentExample
+  name="select/select-all"
+  caption="Open Regions and press Select all. Press it again to clear the selection, then choose one region to see the mixed state."
+/>
+
+## Search with Groups
+
+Add `uiSelectInput` inside `uiSelectContent` to filter the options. Put the items in `uiSelectList`, so the search field stays outside the scrollable list. `uiSelectEmpty` shows when nothing matches.
+
+```angular-html
+<div *uiSelectContent>
+  <input uiSelectInput aria-label="Search countries" />
+  <div uiSelectEmpty>No countries found.</div>
+  <div uiSelectList><!-- Items go here. --></div>
+</div>
+```
+
+Groups with no matching items hide automatically. `uiSelectItemText` can highlight the matching text; this example reads its `state().segments` to bold the matches. Closing the popup clears the search.
+
+<ComponentExample
+  name="select/search-groups"
+  caption="Open Country and type “ja”. Only Asia Pacific and Japan remain. Try “zz” to see the empty message, then clear the search to show every country."
+/>
+
+Arrow keys move the highlight while focus stays in the search field. On a touch screen reader, focus moves into the items instead. To show recent choices before a search, pass `emptyItems` alongside `items`. [Lists and Menus](../lists-and-menus#search-and-load-items) covers filtering options.
+
+## Async Search
+
+Use `[filter]="false"` when the server already filters your options. Connect `query` and `(beforeQueryChange)` to your loader, and pass its items and status to `uiSelect`.
+
+This example uses [Async Options](../utilities/async-options) to replace stale requests and load another page through `(loadMore)`. `uiSelectStatus` shows loading and result counts. Without a status part, Select announces result counts through the page's live region.
+
+<ComponentExample
+  name="select/async-search"
+  caption="Open Country and type “an”. Results arrive after a short delay. Clear the search and move or scroll to the last result to load another page."
+/>
+
+## Object Values
+
+A value can be an object. Tell Select how to identify it, display it, and compare it with another copy:
+
+| Prop                 | What It Does                                                          |
+| -------------------- | --------------------------------------------------------------------- |
+| `itemToValue`        | Returns the string used to identify and submit the value.             |
+| `itemToLabel`        | Returns the text shown in the trigger.                                |
+| `isItemEqualToValue` | Matches an item with a selected value that may be a different object. |
+
+<ComponentExample
+  name="select/object-values"
+  caption="Inès starts selected even though the initial value is a copy of her item. Choose another assignee; the console logs the ID the form submits."
+/>
+
+## Virtualized
+
+For a large list, pass every option through `items` and render only the visible rows. `(highlight)` tells your virtualizer which row to bring into view. Give each rendered item its full-list `index` so the accessibility attributes describe its position correctly.
+
+The example includes its own small row-windowing helpers. You can use the same inputs with a virtualizer of your choice.
+
+<ComponentExample
+  name="select/virtualized"
+  caption="Open Item and press End to reach Item 10000, then Home to return to the beginning. Scroll through the list; only nearby rows render."
+/>
+
+## Align Item with Trigger
+
+Set `alignItemWithTrigger` on `uiSelectContent` to place the selected item over the trigger. It falls back to normal popup placement when opened by touch or when there isn't enough room.
+
+<ComponentExample
+  name="select/align-item"
+  caption="Open Priority: Medium sits over the trigger. Close it, uncheck Align item with trigger, and open it again to compare placement."
+/>
+
+## Scrollable
+
+Limit the content's height and allow vertical scrolling. `--available-height` tells you how much room the popup has; the highlighted item scrolls into view as you move with the keyboard.
+
+<ComponentExample
+  name="select/scrollable"
+  caption="Open Time zone and move down with the arrow keys. The list scrolls to keep the highlighted option visible."
+/>
+
+## Invalid
+
+Inside a [Field](./field), the field's label names the trigger, its description and errors describe it, and its `name` is used for submission. After invalid submission, the trigger gets `aria-invalid` and `data-invalid`.
+
+<ComponentExample
+  name="select/invalid"
+  caption="Press Continue without choosing a shipping method to show the error. Choose one and continue; the console logs the submitted value."
+/>
+
+## Forms
+
+Set `name` to include a select in form submission. `required` blocks submission until something is selected; resetting the form restores `defaultValue`. Multiple values submit as separate entries under the same name.
+
+The example also uses `autoComplete="country"` for autofill and `form="select-newsletter"` to associate the Frequency select with a form it sits outside.
+
+<ComponentExample
+  name="select/form"
+  caption="Choose a country and some topics, change Frequency, then press Save; the console logs all three fields. Reset restores the initial choices."
+/>
+
+## Presentation
+
+Use `presentation="sheet"` to open the options in a bottom sheet, or `"auto"` to use a sheet on small touch screens. Choosing an item still selects it and closes the single-select list.
+
+The content gets `data-presentation`, and its render state includes `presentation`. Use either to give sheet items more space. Keep the sheet's `translate` property free for its drag behavior, and include safe-area padding at the bottom.
+
+<ComponentExample
+  name="select/presentation"
+  caption="Open Status to show the bottom sheet. Choose an option to close it, or drag down to dismiss it without changing the value."
+/>
+
+A sheet makes the page behind it inert and locks scrolling unless `[modal]="false"`. [Popups](../popups#modals-and-sheets) explains the shared presentation options.
+
+## Controlled
+
+Use `[(value)]` to own the selection and `[(open)]` to own the popup state. A single value is `T | null`; with `multiple`, it is `T[]`. `(beforeValueChange)` and `(beforeOpenChange)` receive the requested value first and change details second. Call `$event.cancel()` to refuse a change.
+
+[State and Events](../state-and-events) explains this pattern. The [reason tables](#reasons) list Select's reasons, including `item-press`, `list-navigation`, and `clear-press`.
+
+## Controller
+
+`createSelectController()` can open, read, or change the select from outside its component. It can also connect a separate trigger. See [Controllers](../controllers) for setup and waiting for a popup to close, and the [Select controller reference](#controller-1) for its methods.
+
+## Positioning
+
+Use `side`, `align`, and offsets to place the popup. `uiSelectArrow` follows the side it lands on. [Popups](../popups#place-the-content) covers anchoring and collisions.
+
+## Modal
+
+By default, pressing outside closes the list without activating the element behind it. `[modal]="true"` also locks scrolling and makes the page inert. `[modal]="false"` allows outside presses through. See [Control Dismissal](../popups#control-dismissal).
+
+## Container
+
+The popup uses the top layer without a portal. Use `container` when it must render in another DOM container. [Mounting and Containers](../popups#mounting-and-containers) covers the shared setup.
+
+## Animation
+
+Select keeps closing content mounted until its exit animation finishes. `(openChangeComplete)` runs afterward. Use `keepMounted` when your animation library needs the closed content to remain in the DOM. [Styling and Animation](../styling-and-animation) covers the lifecycle attributes.
+
+## Custom Rendering
+
+Each directive goes on an element you write, so you choose the element and its content. Read a part's state from a template reference, like `#item="uiSelectItem"` and then `item.state().selected`. [Parts and Composition](../parts-and-composition#choose-the-element) covers the shared pattern. Select's part states are listed under [State](#state).
+
+## Styling
+
+Use `data-highlighted` for the active item, `data-selected` for chosen items, and `data-placeholder` on the trigger and value while nothing is selected. `data-modality="keyboard"` on the content tells a keyboard highlight from a pointer one.
+
+`--anchor-width` matches the trigger's width, and `--available-height` says how much room the popup has. Use them to size the content.
+
+Each part has a `data-slot`, such as `select-trigger`, and its state attributes are listed under [Data Attributes](#data-attributes).
+
+### SelectContent [#styling-selectcontent]
+
+<CssVariables component="select" part="content" />
+
+### Viewport [#styling-viewport]
+
+<CssVariables component="select" part="viewport" />
+
+## Data Attributes
+
+`uiSelectList`, `uiSelectInput`, `uiSelectGroup`, `uiSelectGroupLabel`, `uiSelectSeparator` and `uiSelectValueIcon` have no state attributes.
+
+### SelectLabel [#data-attributes-selectlabel]
+
+<DataAttributes component="select" part="label" />
+
+### SelectTrigger [#data-attributes-selecttrigger]
+
+<DataAttributes component="select" part="trigger" />
+
+### SelectValue [#data-attributes-selectvalue]
+
+<DataAttributes component="select" part="value" />
+
+### SelectClear [#data-attributes-selectclear]
+
+<DataAttributes component="select" part="clear" />
+
+### SelectContent [#data-attributes-selectcontent]
+
+<DataAttributes component="select" part="content" />
+
+### SelectItem [#data-attributes-selectitem]
+
+<DataAttributes component="select" part="item" />
+
+### SelectItemText [#data-attributes-selectitemtext]
+
+<DataAttributes component="select" part="item-text" />
+
+### SelectItemIndicator [#data-attributes-selectitemindicator]
+
+<DataAttributes component="select" part="item-indicator" />
+
+### SelectSelectAll [#data-attributes-selectselectall]
+
+<DataAttributes component="select" part="select-all" />
+
+### SelectEmpty [#data-attributes-selectempty]
+
+<DataAttributes component="select" part="empty" />
+
+### SelectStatus [#data-attributes-selectstatus]
+
+<DataAttributes component="select" part="status" />
+
+### SelectArrow [#data-attributes-selectarrow]
+
+<DataAttributes component="select" part="arrow" />
+
+### SelectItemIcon [#data-attributes-selectitemicon]
+
+<DataAttributes component="select" part="item-icon" />
+
+## API Reference
+
+Each option below is an input on the directive, and each callback an output. A change callback is two outputs: `(beforeValueChange)`, with the details and `cancel()`, then `(valueChange)` with the new value alone. `value`, `open` and `query` can be bound with `[(…)]`.
+
+### Select
+
+<TypeTable
+  path="../../packages/core/src/components/select/select.ts"
+  name="SelectOptions"
+/>
+
+### SelectTrigger
+
+A trigger outside the select also takes `controller`.
+
+<TypeTable
+  path="../../packages/core/src/components/select/select.ts"
+  name="SelectTriggerProps"
+/>
+
+### SelectValue
+
+<TypeTable
+  path="../../packages/core/src/components/select/select.ts"
+  name="SelectValueProps"
+/>
+
+### SelectContent
+
+<TypeTable
+  path="../../packages/core/src/components/select/select.ts"
+  name="SelectContentProps"
+/>
+
+### SelectItem
+
+<TypeTable
+  path="../../packages/core/src/components/select/select.ts"
+  name="SelectItemProps"
+/>
+
+### SelectItemIndicator
+
+<TypeTable
+  path="../../packages/core/src/components/select/select.ts"
+  name="SelectItemIndicatorProps"
+/>
+
+### SelectItemIcon
+
+<TypeTable
+  path="../../packages/core/src/components/select/select.ts"
+  name="SelectItemIconProps"
+/>
+
+`uiSelectValueIcon` takes no inputs of its own, and you leave it empty.
+
+### SelectClear
+
+<TypeTable
+  path="../../packages/core/src/components/select/select.ts"
+  name="SelectClearProps"
+/>
+
+### SelectInput, SelectEmpty, SelectStatus, SelectItemText and SelectSelectAll
+
+They take no inputs of their own. A `uiSelectInput` turns searching on, `uiSelectItemText` marks what the search matched in its item's text, and `uiSelectSelectAll` covers its group's items, or every item outside a group. Without a `uiSelectStatus`, result counts go to screen readers through the page's shared live region once typing pauses. `announcement` receives `{ type: "results", count, query, loading }` and returns the words, or `null` for silence. The default is English: "3 results", "No results" or "Loading".
+
+### Items as Data
+
+Each item in `items`. Groups are `{ type: "group", label, items }` and separators `{ type: "separator" }`.
+
+<TypeTable
+  path="../../packages/core/src/foundation/lists/listbox.ts"
+  name="ListItem"
+/>
+
+### State
+
+What each part's `state()` signal holds, per part.
+
+`uiSelectTrigger`:
+
+<StateTable
+  path="../../packages/core/src/components/select/select.ts"
+  name="SelectTriggerState"
+/>
+
+`uiSelectValue`:
+
+<StateTable
+  path="../../packages/core/src/components/select/select.ts"
+  name="SelectValueState"
+/>
+
+`uiSelectContent` and `uiSelectList`:
+
+<StateTable
+  path="../../packages/core/src/components/select/select.ts"
+  name="SelectContentState"
+/>
+
+`uiSelectItem`:
+
+<StateTable
+  path="../../packages/core/src/components/select/select.ts"
+  name="SelectItemState"
+/>
+
+`uiSelectItemIndicator`:
+
+<StateTable
+  path="../../packages/core/src/components/select/select.ts"
+  name="SelectItemIndicatorState"
+/>
+
+`uiSelectItemIcon`:
+
+<StateTable
+  path="../../packages/core/src/components/select/select.ts"
+  name="SelectItemIconState"
+/>
+
+`uiSelectClear`:
+
+<StateTable
+  path="../../packages/core/src/components/select/select.ts"
+  name="SelectClearState"
+/>
+
+`uiSelectArrow`:
+
+<StateTable
+  path="../../packages/core/src/components/select/select.ts"
+  name="SelectArrowState"
+/>
+
+`uiSelectInput`:
+
+<StateTable
+  path="../../packages/core/src/components/select/select.ts"
+  name="SelectInputState"
+/>
+
+`uiSelectItemText`:
+
+<StateTable
+  path="../../packages/core/src/components/select/select.ts"
+  name="SelectItemTextState"
+/>
+
+`uiSelectSelectAll`:
+
+<StateTable
+  path="../../packages/core/src/components/select/select.ts"
+  name="SelectSelectAllState"
+/>
+
+`uiSelectEmpty`:
+
+<StateTable
+  path="../../packages/core/src/components/select/select.ts"
+  name="SelectEmptyState"
+/>
+
+`uiSelectStatus`:
+
+<StateTable
+  path="../../packages/core/src/components/select/select.ts"
+  name="SelectStatusState"
+/>
+
+### Reasons
+
+`$event.reason` says why the value changed:
+
+<ReasonTable
+  path="../../packages/core/src/components/select/select.ts"
+  name="SelectValueChangeReason"
+/>
+
+And why the list opened or closed:
+
+<ReasonTable
+  path="../../packages/core/src/components/select/select.ts"
+  name="SelectOpenChangeReason"
+/>
+
+With `dismissible` false, the refused dismissals `(dismissAttempt)` reports:
+
+<ReasonTable
+  path="../../packages/core/src/components/select/select.ts"
+  name="SelectDismissReason"
+/>
+
+And why the search text changed:
+
+<ReasonTable
+  path="../../packages/core/src/components/select/select.ts"
+  name="SelectQueryChangeReason"
+/>
+
+### Controller
+
+Create one with `createSelectController<Value, Multiple>()` and pass it as `controller`, to the select and to
+a trigger outside it.
+
+Every write method takes an optional `{ reason, event }`, passed to the change outputs.
+
+<ControllerTable
+  path="../../packages/core/src/components/select/select.ts"
+  name="SelectController"
+/>
+
+### Events
+
+A `before` output emits `{ value, reason, event, cancel() }` before the change, and its plain output follows with the value alone. A bound value only updates when the change isn't canceled.
+
+| Binding                | On         | Receives                                                                                                  |
+| ---------------------- | ---------- | --------------------------------------------------------------------------------------------------------- |
+| `[(value)]`            | `uiSelect` | The selected value                                                                                        |
+| `[(open)]`             | `uiSelect` | Whether the list is open                                                                                  |
+| `[(query)]`            | `uiSelect` | The search text                                                                                           |
+| `(beforeValueChange)`  | `uiSelect` | `{ value, reason, cancel() }`: the new value, and the [reason](#reasons)                                  |
+| `(beforeOpenChange)`   | `uiSelect` | `{ value, reason, cancel() }`: the new state, and the [reason](#reasons)                                  |
+| `(openChangeComplete)` | `uiSelect` | `$event`, whether it's open, after the animation                                                          |
+| `(highlight)`          | `uiSelect` | `{ value, index, event }`: the highlighted item and its row                                               |
+| `(beforeQueryChange)`  | `uiSelect` | `{ value, reason, cancel() }`: the search text, the [reason](#reasons) and whether it's still `composing` |
+| `(loadMore)`           | `uiSelect` | `()`, when the last item is reached                                                                       |
+| `(dismissAttempt)`     | `uiSelect` | `{ reason, event }`, when a dismissal was refused                                                         |
+
+## Accessibility
+
+The select follows the [WAI-ARIA select-only combobox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/examples/combobox-select-only/). The trigger has the `combobox` role and the popup is a `listbox`. If you don't need a visible label, give `uiSelectTrigger` an `aria-label` instead.
+
+### Keyboard
+
+Arrow keys move through the open list; Home and End reach its first and last items. Set `[loop]="false"` to stop arrow keys at either end. The popup follows the trigger's inherited text direction; use logical CSS properties for spacing in right-to-left layouts.
+
+Set `virtualFocus` to keep focus on the trigger while the list is open, as on a native select: arrow keys, Home, End and typing move the highlight, the trigger points at it with `aria-activedescendant`, and Tab closes the list and moves on. A search field in the list still takes focus.
+
+### Tested Behavior
+
+Every line below is an automated test.
+
+<SpecList spec="select" />
+
+Also tested:
+
+<SpecList spec="select.enhancements" />
+
+Searching, with a search field in the list:
+
+<SpecList spec="select.search" />
+
+Screen readers hear the same thing in each tested framework, recorded by a virtual screen reader:
+
+<SpecList spec="select.sr" />

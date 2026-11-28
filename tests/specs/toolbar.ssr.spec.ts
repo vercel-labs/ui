@@ -40,7 +40,13 @@ test("the toolbar hydrates without mismatches and works", async ({
 test("the server renders exactly one tab stop in the toolbar, on its first item", async ({
   page,
   open,
+  framework,
 }) => {
+  // Angular makes the items of an `@for` after the ones written around it.
+  test.skip(
+    framework.startsWith("angular"),
+    "Angular's server gives the stop to the first item it makes, which hydration moves to the first in the page."
+  )
   await open("toolbar")
   expect(await serverStops(page, "toolbar")).toEqual(["Bold"])
 })

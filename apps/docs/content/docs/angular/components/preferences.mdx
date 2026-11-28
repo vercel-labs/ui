@@ -1,0 +1,173 @@
+---
+title: Preferences
+description: Apply user preferences to data attributes so your styles can follow them.
+---
+
+`uiPreferences` puts your preferences on `data-*` attributes and keeps them up to date. Use it around a part of your app, or apply a preference to the whole page.
+
+<ComponentExample
+  name="preferences/basic"
+  caption="Choose Grid, then reload the page. The files come back in the view you chose, and the console logs each change."
+/>
+
+## Installation
+
+```bash
+npm install @ui-sdk/angular @ui-sdk/core
+```
+
+## Usage
+
+Define the preference you want to apply. Here, `view` chooses how a file list is laid out:
+
+```ts title="preferences.ts"
+import { createPreference } from "@ui-sdk/core"
+
+const view = createPreference({
+  values: ["list", "grid"],
+  defaultValue: "list",
+  attribute: "data-view",
+})
+
+export { view }
+```
+
+Pass it to `uiPreferences`, then style the content by its attribute:
+
+```ts
+import { Component } from "@angular/core"
+import { view } from "./preferences"
+import { Preferences } from "@ui-sdk/angular/preferences"
+
+@Component({
+  selector: "app-example",
+  imports: [Preferences],
+  template: `
+    <div uiPreferences [preferences]="[view]">
+      <ul data-slot="files">
+        <li>Q3 roadmap.pdf</li>
+        <li>Launch checklist.md</li>
+      </ul>
+    </div>
+  `,
+})
+class Example {
+  readonly view = view
+}
+
+export { Example }
+```
+
+```css
+[data-view="grid"] [data-slot="files"] {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+}
+```
+
+`uiPreferences` starts with `data-view="list"`. Calling `view.set("grid")` updates it, and the list becomes a grid. `uiPreferences` renders with `display: contents`, so it adds no box of its own.
+
+## Save the Value
+
+Add `storage` to save the choice between visits:
+
+```ts title="preferences.ts"
+import { createLocalStorage, createPreference } from "@ui-sdk/core"
+
+const view = createPreference({
+  values: ["list", "grid"],
+  defaultValue: "list",
+  attribute: "data-view",
+  storage: createLocalStorage("ui-sdk-preferences-view"),
+})
+
+export { view }
+```
+
+The preference now saves changes in local storage and restores the saved value when the page reloads. You can also [use session storage or cookies with `createPreference`](../../core/behaviors/preferences#remember-the-choice).
+
+## Read the Value
+
+Use `usePreference` when the value affects what your component renders:
+
+```ts
+import { Component } from "@angular/core"
+import { view } from "./preferences"
+import { usePreference } from "@ui-sdk/angular/preferences"
+
+@Component({
+  selector: "app-example",
+  template: `
+    <button
+      [attr.aria-pressed]="state().value === 'grid'"
+      (click)="view.set(state().value === 'grid' ? 'list' : 'grid')"
+    >
+      Grid
+    </button>
+  `,
+})
+class Example {
+  readonly view = view
+
+  readonly state = usePreference(view)
+}
+
+export { Example }
+```
+
+Pass the same preference instance wherever you need its value. `usePreference` also works outside a `uiPreferences` element.
+
+## Apply to the Whole Page
+
+Set `global: true` when defining the preference:
+
+```ts
+const view = createPreference({
+  values: ["list", "grid"],
+  defaultValue: "list",
+  attribute: "data-view",
+  global: true,
+  storage: createLocalStorage("ui-sdk-preferences-view"),
+})
+```
+
+Keep passing it to `uiPreferences`. Its attribute now goes on `<html>`, so styles throughout the page can use it. A global preference needs only one `uiPreferences` on the page to apply it.
+
+## Multiple Preferences
+
+Pass more than one preference in the list. For example, you can apply `view` alongside a [color scheme](../../core/behaviors/preferences#choose-a-color-scheme):
+
+```angular-html
+<div uiPreferences [preferences]="[view, colorScheme]">
+  <router-outlet />
+</div>
+```
+
+Each preference uses its own attribute and `global` option. Wrappers that share a preference instance follow the same value. For independent choices, use separate preference instances and different storage keys.
+
+## Server Rendering
+
+On the server, `uiPreferences` includes a script that applies saved values before the page paints. CSS can use those attributes immediately. `usePreference` starts with the server's value and updates after hydration.
+
+Follow the [server rendering setup](../server-rendering#saved-preferences-and-storage) to place `uiPreferences` in your app and keep cookie-backed preferences separate for each request.
+
+If your Content Security Policy requires a nonce, pass the nonce from your response:
+
+```angular-html
+<div uiPreferences [preferences]="[view]" [nonce]="nonce">
+  <router-outlet />
+</div>
+```
+
+## API Reference
+
+### Preferences
+
+| Prop          | Type                        | Description                                                                                             |
+| ------------- | --------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `preferences` | `readonly PreferenceLike[]` | The preferences to apply, from `createPreference` or `createColorScheme`. See [Usage](#usage).          |
+| `nonce?`      | `string`                    | The nonce your Content Security Policy gives inline scripts. See [Server Rendering](#server-rendering). |
+
+### usePreference
+
+`usePreference(preference)` returns a signal of the preference's state. For a preference created with `createPreference`, read `state().value`. For a color scheme, the state also includes `system` and `resolved`. Call it in a field initializer, and read the signal where you render it so the template follows changes.

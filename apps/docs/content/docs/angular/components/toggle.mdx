@@ -1,0 +1,386 @@
+---
+title: Toggle
+description: Keep a button pressed, or group toggles with a shared value and arrow-key navigation.
+---
+
+Use a toggle for a button that stays on until you press it again, like starring a document or turning on Bold. Put several in a toggle group to share one value, as a text editor's formatting buttons or a view switcher do.
+
+<ComponentExample
+  name="toggle/basic"
+  caption="Press the star beside Q3 Roadmap, or focus it and press Enter or Space. It fills in while pressed, and its accessible name stays Star."
+/>
+
+## Installation
+
+```bash
+npm install @ui-sdk/angular @ui-sdk/core
+```
+
+## Composition
+
+Use the following composition to build Toggle:
+
+```text
+uiToggle
+└── uiToggleIcon
+```
+
+And a `uiToggleGroup`:
+
+```text
+ToggleGroup
+├── Toggle
+│   └── ToggleIcon
+└── Toggle
+    └── ToggleIcon
+```
+
+`uiToggle` goes on a native button that reports its state with `aria-pressed`. `uiToggleIcon` is optional: it holds an icon and hides it from screen readers. In a group, give each toggle a `value`; the group's value lists the pressed ones.
+
+## Usage
+
+Import the parts and put them together:
+
+```ts
+import { Component } from "@angular/core"
+import { LucideStar } from "@lucide/angular"
+import { Toggle, ToggleIcon } from "@ui-sdk/angular/toggle"
+
+@Component({
+  selector: "app-example",
+  imports: [Toggle, ToggleIcon, LucideStar],
+  template: `
+    <button uiToggle aria-label="Star">
+      <span uiToggleIcon>
+        <svg lucideStar></svg>
+      </span>
+    </button>
+  `,
+})
+class Example {}
+
+export { Example }
+```
+
+Keep the label the same in both states: screen readers announce whether the button is pressed. An icon-only toggle needs an `aria-label`, as above. Set `defaultPressed` to start pressed. The toggle always uses `type="button"`, so pressing it never submits a form.
+
+## Group
+
+Put toggles in a `uiToggleGroup`, from the same `@ui-sdk/angular/toggle` entry, to share a value and arrow-key navigation. Give the group an accessible name and each toggle a `value`. Set `multiple` to let several toggles stay pressed.
+
+<ComponentExample
+  name="toggle/group"
+  caption="Press Bold and Italic to keep both pressed. Left and Right move focus without changing either."
+/>
+
+The group owns which toggles are pressed, so a toggle's own `pressed` and `defaultPressed` don't apply inside it. Its value is always an array, in the toggles' document order.
+
+## Single Selection
+
+Without `multiple`, pressing a toggle unpresses the others. Pressing the pressed toggle again clears the selection, unless you set `deselectable` to `false`, as this alignment group does. `deselectable` doesn't choose an initial value for you, so pair it with `defaultValue`.
+
+<ComponentExample
+  name="toggle/group-single"
+  caption="Press Align center to replace Align start, then press Align center again. One alignment always stays pressed."
+/>
+
+`mirror` on Align start and Align end flips their icons in right-to-left text. Use [Radio](./radio) instead when the arrow keys should select an option as they move; a toggle group moves focus first and waits for a press.
+
+## Icon and Label
+
+Put an icon beside the label with `uiToggleIcon`. The icon is hidden from screen readers, so the text alone names the button.
+
+```angular-html
+<button uiToggle>
+  <span uiToggleIcon>
+    <svg lucidePin></svg>
+  </span>
+  Pin
+</button>
+```
+
+## Disabled
+
+Set `disabled` on a toggle or a group to prevent presses. A disabled toggle can still start pressed, and a disabled `<fieldset>` around it disables it too.
+
+```angular-html
+<button uiToggle disabled defaultPressed>Pin</button>
+```
+
+A disabled toggle on its own leaves the tab order. In a group, disabled toggles stay reachable with the arrow keys and report `aria-disabled`, but ignore presses.
+
+```angular-html
+<div uiToggleGroup multiple aria-label="Text formatting">
+  <button uiToggle value="bold">Bold</button>
+  <button uiToggle value="italic">Italic</button>
+  <button uiToggle value="underline" disabled>Underline</button>
+</div>
+```
+
+## Focusable When Disabled
+
+Set `focusableWhenDisabled` to keep a disabled toggle focusable. It uses `aria-disabled` and still ignores presses. Use `aria-describedby` to explain why it's unavailable:
+
+```angular-html
+<button uiToggle disabled focusableWhenDisabled aria-describedby="pin-hint">
+  Pin
+</button>
+<p id="pin-hint">Only owners can pin messages.</p>
+```
+
+## Controlled
+
+Bind `[(pressed)]`, or pass `pressed` and handle `(beforePressedChange)`, to own the state. Call `$event.cancel()` in `(beforePressedChange)` to keep the current state. A [controller](#toggle-controller) from `createToggleController()` presses the toggle from anywhere, such as a keyboard shortcut. Create one controller per mounted toggle.
+
+```ts
+import { Component, signal } from "@angular/core"
+import { LucideStar } from "@lucide/angular"
+import {
+  createToggleController,
+  Toggle,
+  ToggleIcon,
+} from "@ui-sdk/angular/toggle"
+
+@Component({
+  selector: "app-example",
+  imports: [Toggle, ToggleIcon, LucideStar],
+  template: `
+    <button
+      uiToggle
+      aria-label="Star"
+      [(pressed)]="starred"
+      [controller]="star"
+    >
+      <span uiToggleIcon>
+        <svg lucideStar></svg>
+      </span>
+    </button>
+    <button type="button" (click)="star.toggle()">Toggle Star</button>
+  `,
+})
+class Example {
+  readonly starred = signal(false)
+
+  readonly star = createToggleController()
+}
+
+export { Example }
+```
+
+`(beforePressedChange)` receives the new state and `details`, whose `reason` is `"press"` or `"imperative"`.
+
+## Controlled Group
+
+Bind `[(value)]`, or pass `value` and handle `(beforeValueChange)`, to own the group's value, or to show it somewhere else. A toggle's own `(beforePressedChange)` runs before the group's, and calling `$event.cancel()` in either cancels the change. A [controller](#togglegroup-controller) from `createToggleGroupController()` changes the value from anywhere: `setValue([])` clears it.
+
+```ts
+import { Component, signal } from "@angular/core"
+import {
+  createToggleGroupController,
+  Toggle,
+  ToggleGroup,
+} from "@ui-sdk/angular/toggle"
+
+@Component({
+  selector: "app-example",
+  imports: [Toggle, ToggleGroup],
+  template: `
+    <div
+      uiToggleGroup
+      multiple
+      aria-label="Text formatting"
+      [(value)]="formats"
+      [controller]="editor"
+    >
+      <button uiToggle value="bold">Bold</button>
+      <button uiToggle value="italic">Italic</button>
+    </div>
+    <button type="button" (click)="editor.setValue([])">
+      Clear Formatting
+    </button>
+  `,
+})
+class Example {
+  readonly formats = signal(["bold"])
+
+  readonly editor = createToggleGroupController()
+}
+
+export { Example }
+```
+
+See [State and Events](../state-and-events) for controlled state, cancellation and debugging.
+
+## Vertical
+
+Set `orientation="vertical"` to move with Up and Down instead of Left and Right. The group and its toggles get `data-orientation`.
+
+```angular-html
+<div uiToggleGroup orientation="vertical" aria-label="Tool">...</div>
+```
+
+## Loop
+
+Arrow keys wrap from the last toggle to the first. Set `loop` to `false` to stop at the ends.
+
+```angular-html
+<div uiToggleGroup multiple [loop]="false" aria-label="Text formatting">
+  ...
+</div>
+```
+
+## Forms
+
+Toggles don't submit values. Use [Checkbox](./checkbox) for several form choices or [Radio](./radio) for one. If you keep a toggle group in a form, copy its value into hidden inputs yourself.
+
+## Custom Rendering
+
+Each directive goes on an element you write. Read its state from a template reference: with `#favorite="uiToggle"`, `favorite.state().pressed` says whether it's pressed, and a group's `state().value` holds its pressed values. See [Parts and Composition](../parts-and-composition) for more.
+
+<ComponentExample
+  name="toggle/render"
+  caption="Press Favorite. The heart renders filled or empty from the toggle's pressed state."
+/>
+
+## Styling
+
+Style the pressed state with `data-pressed`, and use `data-disabled` for unavailable toggles. A toggle with a `uiToggleIcon` gets `data-has-icon`, and its group gets `data-has-icons` while any toggle has one, which helps align icon and text content. `data-orientation` tells a group's toggles which way it runs.
+
+Each part has a `data-slot`, such as `toggle`, and its state attributes are listed under [Data Attributes](#data-attributes).
+
+## Data Attributes
+
+### Toggle [#data-attributes-toggle]
+
+<DataAttributes component="toggle" part="root" />
+
+### ToggleIcon [#data-attributes-toggleicon]
+
+<DataAttributes component="toggle" part="icon" />
+
+### ToggleGroup [#data-attributes-togglegroup]
+
+<DataAttributes component="toggle-group" part="group" />
+
+## API Reference
+
+Each option below is an input on the directive, and each callback an output. A change callback is two outputs: `(beforePressedChange)`, with the details and `cancel()`, then `(pressedChange)` with the new value alone. `pressed`, and a group's `value`, can be bound with `[(pressed)]` and `[(value)]`.
+
+### Toggle
+
+<TypeTable
+  path="../../packages/core/src/components/toggle/toggle.ts"
+  name="ToggleOptions"
+/>
+
+### ToggleIcon
+
+<TypeTable
+  path="../../packages/core/src/components/toggle/toggle.ts"
+  name="ToggleIconProps"
+/>
+
+### ToggleGroup
+
+<TypeTable
+  path="../../packages/core/src/components/toggle/toggle-group.ts"
+  name="ToggleGroupOptions"
+/>
+
+### State
+
+What each part's `state()` signal holds.
+
+<StateTable
+  path="../../packages/core/src/components/toggle/toggle.ts"
+  name="ToggleState"
+/>
+
+In a group, a toggle's `disabled` includes the group's. The group:
+
+<StateTable
+  path="../../packages/core/src/components/toggle/toggle-group.ts"
+  name="ToggleGroupState"
+/>
+
+`uiToggleIcon`:
+
+<StateTable
+  path="../../packages/core/src/components/toggle/toggle.ts"
+  name="ToggleIconState"
+/>
+
+### Reasons
+
+`$event.reason` says why the toggle was pressed or unpressed.
+
+<ReasonTable
+  path="../../packages/core/src/components/toggle/toggle.ts"
+  name="TogglePressedChangeReason"
+/>
+
+For a group, it says why the pressed toggles changed.
+
+<ReasonTable
+  path="../../packages/core/src/components/toggle/toggle-group.ts"
+  name="ToggleGroupValueChangeReason"
+/>
+
+### Toggle Controller
+
+Create one with `createToggleController()` and pass it as `controller`.
+
+Every write method takes an optional `{ reason, event }`, runs the change callback like a press, and returns `false` when the change is canceled.
+
+<ControllerTable
+  path="../../packages/core/src/components/toggle/toggle.ts"
+  name="ToggleController"
+/>
+
+### ToggleGroup Controller
+
+Create one with `createToggleGroupController()` and pass it as `controller`.
+
+Every write method takes an optional `{ reason, event }`, runs `(beforeValueChange)` like a press, and returns `false` when the change is canceled.
+
+<ControllerTable
+  path="../../packages/core/src/components/toggle/toggle-group.ts"
+  name="ToggleGroupController"
+/>
+
+### Events
+
+A `before` output emits `{ value, reason, event, cancel() }` before the change, and its plain output follows with the value alone. `(beforeValueChange)` never runs on mount. A bound `pressed` or `value` only updates when the callback didn't cancel the change.
+
+| Binding                 | On              | Receives                                                                                                                              |
+| ----------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `[(pressed)]`           | `uiToggle`      | Whether the toggle is pressed                                                                                                         |
+| `(beforePressedChange)` | `uiToggle`      | `{ value, reason, cancel() }`: the new state, and the [reason](#reasons). In a group, it runs first and can cancel the group's change |
+| `[(value)]`             | `uiToggleGroup` | The pressed toggles' values                                                                                                           |
+| `(beforeValueChange)`   | `uiToggleGroup` | `{ value, reason, cancel() }`: the pressed toggles' values, and the [reason](#reasons)                                                |
+
+## Accessibility
+
+A toggle follows the toggle button in the [WAI-ARIA button pattern](https://www.w3.org/WAI/ARIA/apg/patterns/button/): a native button with `aria-pressed`. A group follows the keyboard of the [WAI-ARIA toolbar pattern](https://www.w3.org/WAI/ARIA/apg/patterns/toolbar/), with one tab stop and arrow keys between toggles. It has the `group` role, not `toolbar`, so it can sit inside a [Toolbar](./toolbar), and not `radiogroup`, since its toggles are buttons.
+
+### Keyboard
+
+A group is one tab stop. Tab first enters on its first enabled pressed toggle, or its first enabled toggle, and later returns to the last focused one.
+
+| Key          | Does                                                    |
+| ------------ | ------------------------------------------------------- |
+| Enter, Space | Presses or unpresses the focused toggle                 |
+| Tab          | Moves into or out of a group                            |
+| Left, Right  | Move focus in a horizontal group, swapped right to left |
+| Up, Down     | Move focus in a vertical group                          |
+| Home, End    | Move focus to the first or last toggle                  |
+
+### Tested Behavior
+
+Every line below is an automated test.
+
+<SpecList spec="toggle" />
+
+In a group:
+
+<SpecList spec="toggle.group" />

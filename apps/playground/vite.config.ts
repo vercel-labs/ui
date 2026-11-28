@@ -4,6 +4,7 @@ import vue from "@vitejs/plugin-vue"
 import solid from "@solidjs/vite-plugin"
 import tailwind from "@tailwindcss/vite"
 import { defineConfig } from "vite"
+import { compiledAngular } from "./angular-plugin"
 import { ssrFixtures } from "./ssr-plugin"
 import { solidSsr } from "./solid-ssr.ts"
 
@@ -24,5 +25,10 @@ export default defineConfig({
     solidSsr(),
     tailwind(),
     ssrFixtures(),
+    compiledAngular(),
   ],
+  // The linker runs on Angular's packages as files, not as a bundled dependency.
+  optimizeDeps: {
+    exclude: ["@angular/core", "@angular/common", "@angular/platform-browser"],
+  },
 })

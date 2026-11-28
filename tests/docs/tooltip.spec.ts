@@ -5,9 +5,16 @@ import path from "node:path"
 
 // Every Tooltip example on the docs page, used the way its caption says, with hover and Tab.
 
-const frameworks = ["react", "vue", "svelte", "web-components", "solid"]
+const frameworks = [
+  "react",
+  "vue",
+  "svelte",
+  "web-components",
+  "solid",
+  "angular",
+]
 const root = path.join(import.meta.dirname, "../../examples/components/tooltip")
-const folders = ["react", "vue", "svelte", "web", "solid"]
+const folders = ["react", "vue", "svelte", "web", "solid", "angular"]
 const examplesIn = (folder: string) =>
   readdirSync(path.join(root, folder), { withFileTypes: true })
     .filter((entry) => entry.isFile())

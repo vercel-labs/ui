@@ -1,0 +1,294 @@
+---
+title: Toolbar
+description: Give buttons, toggles, menus and fields one tab stop with arrow-key navigation.
+---
+
+Use a Toolbar to group the controls of an editor, a canvas or a table. Tab enters it once, and the arrow keys move between its buttons, toggles, menus and fields.
+
+<ComponentExample
+  name="toolbar/demo"
+  caption="Tab into the toolbar, then use Left and Right to move between Bold, Italic, Underline and Insert link. Press Space to toggle the focused style. The console logs each change."
+/>
+
+## Installation
+
+```bash
+npm install @ui-sdk/angular @ui-sdk/core
+```
+
+## Composition
+
+Use the following composition to build Toolbar:
+
+```text
+uiToolbar
+├── uiToolbarButton
+├── uiToolbarSeparator
+├── uiToolbarGroup
+│   ├── uiToolbarButton
+│   └── uiToolbarButton
+├── uiToolbarLink
+└── uiToolbarInput
+```
+
+Put buttons, links and fields straight inside the toolbar. `uiToolbarGroup` names a set of related items, and `uiToolbarSeparator` draws a line between sets. Toggles and toggle groups join the toolbar on their own, and menu and select triggers join through `uiToolbarButton`.
+
+## Usage
+
+Import the parts and put them together:
+
+```ts
+import { Component } from "@angular/core"
+import {
+  Toolbar,
+  ToolbarButton,
+  ToolbarSeparator,
+} from "@ui-sdk/angular/toolbar"
+
+@Component({
+  selector: "app-example",
+  imports: [Toolbar, ToolbarButton, ToolbarSeparator],
+  template: `
+    <div uiToolbar aria-label="Formatting">
+      <button uiToolbarButton>Undo</button>
+      <button uiToolbarButton>Redo</button>
+      <div uiToolbarSeparator></div>
+      <button uiToolbarButton>Insert Link</button>
+    </div>
+  `,
+})
+class Example {}
+
+export { Example }
+```
+
+Name the toolbar with `aria-label`, and give every icon-only control its own.
+
+## Toggle Groups
+
+A [Toggle](./toggle) group inside a toolbar joins its navigation instead of adding another tab stop. Arrow keys move focus without pressing anything; Enter or Space presses the focused toggle.
+
+<ComponentExample
+  name="toolbar/toggle-group"
+  caption="Arrow from the alignment group to the list group, then press Space on Align center or Numbered list. The console logs each choice."
+/>
+
+## Groups
+
+Use `uiToolbarGroup` to name related controls. Set `disabled` on the group to disable them together; they stay focusable with `aria-disabled`.
+
+<ComponentExample
+  name="toolbar/group"
+  caption="Move through Cut, Copy and Paste into History with the arrow keys. Undo and Redo stay focusable but do nothing."
+/>
+
+## Menus
+
+Put `uiToolbarButton` on a [Menu](./menu) trigger. In a horizontal toolbar, Down opens the menu while Left and Right keep moving between toolbar items.
+
+```angular-html
+<ng-container uiMenu>
+  <button uiMenuTrigger uiToolbarButton>Share</button>
+  <div *uiMenuContent>…</div>
+</ng-container>
+```
+
+<ComponentExample
+  name="toolbar/menu"
+  caption="Focus Share and press Down, then choose Email or Copy Link. Escape closes the menu and returns focus to Share."
+/>
+
+## Selects
+
+A [Select](./select) trigger joins the same way. It keeps its select behavior while it takes part in the toolbar's focus order.
+
+<ComponentExample
+  name="toolbar/select"
+  caption="Open Zoom and choose a value, or step it with Zoom out and Zoom in. Each button turns off at the end of the range."
+/>
+
+## Fields
+
+Use `uiToolbarInput` for a text field, or put it on another field, like a [Number Input](./number-input) control. A field keeps Home, End and the arrow keys while they move its caret. At the matching end, with no text selected, an arrow moves to the next item.
+
+Entering a field with an arrow puts its caret at the far end in that direction: press the same arrow again to leave, or the other arrow to edit. A number input keeps Up and Down for stepping its value.
+
+<ComponentExample
+  name="toolbar/input"
+  caption="Move into Font size and press Up or Down to change it. In Find, type a word, then move the caret to an edge before that arrow leaves the field."
+/>
+
+## Links
+
+`uiToolbarLink` joins the same focus order and keeps its link behavior. The demo handles a plain click itself and leaves modified clicks, like opening in a new tab, to the browser.
+
+<ComponentExample
+  name="toolbar/link"
+  caption="Arrow to Files Changed and press Enter. The console logs the page it opened."
+/>
+
+## Vertical
+
+Set `orientation="vertical"` to move with Up and Down, like a canvas tool palette. Separators turn to run across the toolbar.
+
+<ComponentExample
+  name="toolbar/vertical"
+  caption="Use Up and Down to move between the tools and Delete. Space picks the focused tool."
+/>
+
+## Disabled
+
+A disabled item stays reachable with `aria-disabled`, so people can find it, but it ignores presses, including keys meant for another part on the same element. Set `focusableWhenDisabled` to `false` to skip it instead.
+
+<ComponentExample
+  name="toolbar/disabled"
+  caption="Arrow from Reply to Archive, which is disabled but focusable. Delete is skipped. Only Reply logs a press."
+/>
+
+Set `disabled` on the toolbar to disable every item. The toolbar keeps its tab stop, and its fields can't be edited.
+
+```angular-html
+<div uiToolbar disabled aria-label="Formatting">
+  <button uiToolbarButton>Bold</button>
+  <input uiToolbarInput aria-label="Find" />
+</div>
+```
+
+## Loop
+
+Arrow keys wrap from the last item to the first by default. Set `loop` to `false` to stop at the ends.
+
+<ComponentExample
+  name="toolbar/loop"
+  caption="Focus Last and press Right. Focus stays there; Home still moves to First."
+/>
+
+## Controller
+
+Create a controller with `createToolbarController` and pass it as `controller`. Its `focus()` moves focus to the item focused last, like the Alt+F10 shortcut editors give their toolbars. Create one controller per toolbar.
+
+<ComponentExample
+  name="toolbar/controller"
+  caption="Type in Notes, then press Alt+F10 or choose Focus Toolbar. Press a toolbar button and the console logs it."
+/>
+
+## Custom Rendering
+
+Put `uiToolbarButton` or `uiToolbarInput` on the same element as another part to combine their behavior, like `<button uiSelectTrigger uiToolbarButton>`, as the menu, select and number input examples do. [Parts and Composition](../parts-and-composition) explains more.
+
+## Styling
+
+Use `data-orientation` on the root for a row or a column, and on a separator for the way its line runs, across the toolbar. Use `data-disabled` to style unavailable items and groups. Toggles inside keep their own `data-pressed`.
+
+Each part has a `data-slot`, such as `toolbar-button`, and its state attributes are listed under [Data Attributes](#data-attributes).
+
+## Data Attributes
+
+### Toolbar [#data-attributes-toolbar]
+
+<DataAttributes component="toolbar" part="root" />
+
+### ToolbarButton [#data-attributes-toolbarbutton]
+
+<DataAttributes component="toolbar" part="button" />
+
+### ToolbarLink [#data-attributes-toolbarlink]
+
+<DataAttributes component="toolbar" part="link" />
+
+### ToolbarInput [#data-attributes-toolbarinput]
+
+<DataAttributes component="toolbar" part="input" />
+
+### ToolbarGroup [#data-attributes-toolbargroup]
+
+<DataAttributes component="toolbar" part="group" />
+
+### ToolbarSeparator [#data-attributes-toolbarseparator]
+
+<DataAttributes component="toolbar" part="separator" />
+
+## API Reference
+
+### Toolbar
+
+<TypeTable
+  path="../../packages/core/src/components/toolbar/toolbar.ts"
+  name="ToolbarOptions"
+/>
+
+### ToolbarButton
+
+<TypeTable
+  path="../../packages/core/src/components/toolbar/toolbar.ts"
+  name="ToolbarButtonProps"
+/>
+
+### ToolbarInput
+
+<TypeTable
+  path="../../packages/core/src/components/toolbar/toolbar.ts"
+  name="ToolbarInputProps"
+/>
+
+### ToolbarGroup
+
+<TypeTable
+  path="../../packages/core/src/components/toolbar/toolbar.ts"
+  name="ToolbarGroupProps"
+/>
+
+`uiToolbarLink` and `uiToolbarSeparator` take no inputs of their own.
+
+### State
+
+What each part's `state()` signal holds on `uiToolbarButton` and `uiToolbarInput`:
+
+<StateTable
+  path="../../packages/core/src/components/toolbar/toolbar.ts"
+  name="ToolbarButtonState"
+/>
+
+On `uiToolbarLink`:
+
+<StateTable
+  path="../../packages/core/src/components/toolbar/toolbar.ts"
+  name="ToolbarLinkState"
+/>
+
+On `uiToolbarSeparator`:
+
+<StateTable
+  path="../../packages/core/src/components/toolbar/toolbar.ts"
+  name="ToolbarSeparatorState"
+/>
+
+### Controller
+
+<ControllerTable
+  path="../../packages/core/src/components/toolbar/toolbar.ts"
+  name="ToolbarController"
+/>
+
+## Accessibility
+
+The toolbar follows the [WAI-ARIA toolbar pattern](https://www.w3.org/WAI/ARIA/apg/patterns/toolbar/). The root has the `toolbar` role and `aria-orientation`, and separators have the `separator` role.
+
+### Keyboard
+
+The toolbar has one tab stop, a roving focus. Tab enters on the first enabled item, then returns to the item focused last. The next Tab leaves the toolbar.
+
+| Key                        | Action                                          |
+| -------------------------- | ----------------------------------------------- |
+| `ArrowRight` / `ArrowLeft` | Move focus in a horizontal toolbar              |
+| `ArrowDown` / `ArrowUp`    | Move focus in a vertical toolbar                |
+| `Home` / `End`             | Focus the first or last item, except in a field |
+| `Enter` / `Space`          | Activate a button or toggle, or open its popup  |
+
+Controls keep the keys they use: Down opens a menu, and Up and Down step a number input. Moving focus never presses a toggle. In right-to-left text, Left and Right swap.
+
+### Tested Behavior
+
+Every line below is an automated test.
+
+<SpecList spec="toolbar" />

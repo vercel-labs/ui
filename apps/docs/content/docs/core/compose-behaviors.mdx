@@ -252,6 +252,56 @@ Then add the stars to your HTML. Each star's behavior connects to the native but
 ```
 
 </FrameworkContent>
+<FrameworkContent value="angular">
+
+Each part is a directive in Angular: `usePrimitive` creates the rating, and `usePart` connects an element to a slot.
+
+```ts
+import { Component, Directive, inject, input } from "@angular/core"
+import { usePart, usePrimitive } from "@ui-sdk/angular/primitive"
+import { rating } from "./rating"
+
+@Directive({ selector: "[appRating]" })
+export class Rating {
+  readonly handle = usePrimitive(rating, () => ({}))
+
+  constructor() {
+    usePart(this.handle, "root")
+  }
+}
+
+@Directive({ selector: "[appRatingStar]" })
+export class RatingStar {
+  readonly value = input.required<string>()
+
+  constructor() {
+    usePart(inject(Rating).handle, "star", () => ({ value: this.value() }))
+  }
+}
+
+@Component({
+  selector: "app-review",
+  imports: [Rating, RatingStar],
+  template: `
+    <div appRating aria-label="Rating">
+      @for (star of stars; track star) {
+        <button
+          appRatingStar
+          [value]="star.toString()"
+          [attr.aria-label]="star + (star === 1 ? ' star' : ' stars')"
+        >
+          ★
+        </button>
+      }
+    </div>
+  `,
+})
+export class Review {
+  readonly stars = [1, 2, 3, 4, 5]
+}
+```
+
+</FrameworkContent>
 
 Use `data-filled` to color the stars, the way [Style a Component](./kernel/style-a-component#style-its-state) styled the copy button from `data-copied`:
 

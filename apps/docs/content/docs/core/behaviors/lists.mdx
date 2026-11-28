@@ -279,6 +279,33 @@ const off = [
 ```
 
 </FrameworkContent>
+<FrameworkContent value="angular">
+
+A directive hands `findableText` its element:
+
+```ts
+import { Directive, effect, ElementRef, inject, input } from "@angular/core"
+
+@Directive({ selector: "[appFindableText]" })
+export class FindableText {
+  readonly index = input.required<number>()
+  readonly part = input(0)
+
+  constructor() {
+    const el = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement
+    effect((onCleanup) =>
+      onCleanup(virtual.findableText(this.index(), el, this.part()))
+    )
+  }
+}
+```
+
+```angular-html
+<span appFindableText [index]="item.index"></span>
+<span appFindableText [index]="item.index" [part]="1"></span>
+```
+
+</FrameworkContent>
 
 A row that leaves `items()` gives its text back on its own, so frameworks that call a ref with `null` instead of running what it returned work the same.
 
@@ -465,6 +492,28 @@ const listbox = document.querySelector("ui-listbox")!
 const unbind = bindScrollPicker(listbox, {
   onSelect: (index) => (listbox.value = hours[index]),
 })
+```
+
+</FrameworkContent>
+<FrameworkContent value="angular">
+
+```ts
+readonly list = viewChild.required("list", { read: ElementRef })
+
+constructor() {
+  const destroyRef = inject(DestroyRef)
+  afterNextRender(() =>
+    destroyRef.onDestroy(
+      bindScrollPicker(this.list().nativeElement, {
+        onSelect: (index) => this.hour.set(hours[index]),
+      })
+    )
+  )
+}
+```
+
+```angular-html
+<div uiListbox #list [(value)]="hour" [keepInView]="false">…</div>
 ```
 
 </FrameworkContent>

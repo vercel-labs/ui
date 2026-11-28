@@ -97,7 +97,12 @@ test.describe("selection", () => {
     await page.addInitScript(() => {
       const changes: string[] = []
       ;(window as unknown as { __tabChanges: string[] }).__tabChanges = changes
+      // A framework that renders into the page adds the panel on its own, in
+      // the same batch as the tabs. One added later came after the first render.
+      let rendered = false
       new MutationObserver((records) => {
+        const first = !rendered
+        rendered ||= document.querySelector('[role="tab"]') !== null
         for (const record of records) {
           const el = record.target as Element
           const role = el.getAttribute("role")
@@ -113,6 +118,7 @@ test.describe("selection", () => {
           }
           for (const node of record.addedNodes) {
             if (
+              !first &&
               node instanceof Element &&
               node.getAttribute("role") === "tabpanel"
             ) {

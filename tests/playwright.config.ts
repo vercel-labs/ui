@@ -9,7 +9,7 @@ import {
 // Each session can run its own playground with PLAYGROUND_PORT, so parallel work never shares a server.
 const port = process.env.PLAYGROUND_PORT ?? "5300"
 
-// *-ssr fixtures render to a string, then hydrate it. Vue, Svelte and Solid render theirs in Node.
+// *-ssr fixtures render to a string, then hydrate it. Vue, Svelte, Solid and Angular render theirs in Node.
 const frameworks = [
   "react",
   "vue",
@@ -25,6 +25,9 @@ const frameworks = [
   "solid",
   "solid-data",
   "solid-ssr",
+  "angular",
+  "angular-data",
+  "angular-ssr",
 ]
 
 // CI runs on 2-core Linux runners, so it uses one worker per core and retries timing
@@ -120,16 +123,18 @@ export default defineConfig<{ playground: boolean }>({
       testMatch: portalSpecs,
       testIgnore: [kitchenSinks, countGates, ...specsThatSkip(framework)],
     })),
-    ...["react", "vue", "web", "svelte", "solid"].map((framework) => ({
-      name: `${framework}-sheet`,
-      use: {
-        browserName: "chromium" as const,
-        framework,
-        fixtureOptions: { presentation: "sheet" },
-      },
-      testMatch: sheetSpecs,
-      testIgnore: specsThatSkip(framework),
-    })),
+    ...["react", "vue", "web", "svelte", "solid", "angular"].map(
+      (framework) => ({
+        name: `${framework}-sheet`,
+        use: {
+          browserName: "chromium" as const,
+          framework,
+          fixtureOptions: { presentation: "sheet" },
+        },
+        testMatch: sheetSpecs,
+        testIgnore: specsThatSkip(framework),
+      })
+    ),
     ...browsers.map((browser) => ({
       name: `web-${browser.name}`,
       use: { ...browser.use, framework: "web" },

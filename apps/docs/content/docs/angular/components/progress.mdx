@@ -1,0 +1,251 @@
+---
+title: Progress
+description: Show a task’s progress, or an indeterminate state while its progress is unknown.
+---
+
+<ComponentExample
+  name="progress/basic"
+  caption="Read the export bar. Its label and 60% value are available both visually and to a screen reader."
+/>
+
+## Installation
+
+```bash
+npm install @ui-sdk/angular @ui-sdk/core
+```
+
+## Composition
+
+Use the following composition to build Progress:
+
+```text
+uiProgress
+├── uiProgressLabel
+├── uiProgressValue
+└── uiProgressTrack
+    └── uiProgressIndicator
+```
+
+- `uiProgress` holds the value and range.
+- `uiProgressLabel` gives it a visible name. You can use `aria-label` on the root instead.
+- `uiProgressValue` displays the formatted value.
+- `uiProgressTrack` gives the bar its size, and `uiProgressIndicator` fills it.
+
+The value is already part of the root's accessible description. The visible value is hidden from screen readers to avoid reading it twice.
+
+## Usage
+
+Import the parts and put them together:
+
+```angular-html
+<div uiProgress [value]="40">
+  <span uiProgressLabel></span>
+  <span uiProgressValue></span>
+  <div uiProgressTrack>
+    <div uiProgressIndicator></div>
+  </div>
+</div>
+```
+
+## Build Your Own
+
+`@ui-sdk/angular/progress` comes with a ready-made Progress. If you'd like to build your own, with your own names, start from the `progress` primitive in `@ui-sdk/core`:
+
+```ts title="upload.ts"
+import { Directive, inject, input } from "@angular/core"
+import { progress } from "@ui-sdk/core/progress"
+import { usePart, usePrimitive } from "@ui-sdk/angular/primitive"
+
+@Directive({ selector: "[appUpload]" })
+class Upload {
+  readonly value = input<number>()
+  readonly handle = usePrimitive(progress, () => ({ value: this.value() }))
+  readonly state = usePart(this.handle, "root").state
+}
+
+@Directive({ selector: "[appUploadLabel]" })
+class UploadLabel {
+  readonly state = usePart(inject(Upload).handle, "label").state
+}
+
+@Directive({ selector: "[appUploadValue]", exportAs: "appUploadValue" })
+class UploadValue {
+  readonly state = usePart(inject(Upload).handle, "value").state
+}
+
+@Directive({ selector: "[appUploadTrack]" })
+class UploadTrack {
+  readonly state = usePart(inject(Upload).handle, "track").state
+}
+
+@Directive({ selector: "[appUploadBar]" })
+class UploadBar {
+  readonly state = usePart(inject(Upload).handle, "indicator").state
+}
+
+export { Upload, UploadBar, UploadLabel, UploadTrack, UploadValue }
+```
+
+```ts
+import { Component } from "@angular/core"
+import {
+  Upload,
+  UploadBar,
+  UploadLabel,
+  UploadTrack,
+  UploadValue,
+} from "./upload"
+
+@Component({
+  selector: "app-upload-example",
+  imports: [Upload, UploadBar, UploadLabel, UploadTrack, UploadValue],
+  template: `
+    <div appUpload [value]="40">
+      <span appUploadLabel>Uploading photos</span>
+      <span appUploadValue #uploadValue="appUploadValue">{{
+        uploadValue.state().text
+      }}</span>
+      <div appUploadTrack>
+        <div appUploadBar></div>
+      </div>
+    </div>
+  `,
+})
+export class UploadExample {}
+```
+
+`uiProgressValue` fills an empty element with the formatted value. A directive of your own leaves its content to you, so show `state().text` in it, as above.
+
+Connect the other slots the same way, each with `usePart`. Each part keeps the behavior, state and data attributes of its ready-made counterpart: the root is the `progressbar`, and the indicator sets its width from the value. See [Rendering Primitives](../rendering) and [Custom Parts](../custom-parts) for more.
+
+## Indeterminate
+
+Leave out `value` when you do not know how much work is complete. Every part gets `data-indeterminate`, and the root has no `aria-valuenow`.
+
+The indicator has no inline width in this state. This example sweeps a short highlight across the track, and shows a still, full-width fill when reduced motion is on.
+
+<ComponentExample
+  name="progress/indeterminate"
+  caption="Read the Connecting to server bar. It shows an ongoing task without announcing a percentage."
+/>
+
+## Changing the Value
+
+Pass the latest `value` as your task progresses. The parts get `data-progressing` while the value is below `max`, and `data-complete` when it reaches the end.
+
+<ComponentExample
+  name="progress/controlled"
+  caption="Click Upload Next to add one photo, or 20%, and watch the console count them. At 100%, the button stops advancing the bar. Click Reset to start at 0%."
+/>
+
+Progress displays your state; it has no `(beforeValueChange)` callback.
+
+## Bounds
+
+`min` and `max` default to 0 and 100. A value outside that range is clamped for the fill, the percentage and `aria-valuenow`, but the state's `value` and a format other than percent keep it as you passed it. A value of 3 between 1 and 5 fills half the track.
+
+<ComponentExample
+  name="progress/min-max"
+  caption="Compare step 3 of 5 with the fill. Because the range starts at 1, the value is halfway through the range."
+/>
+
+## Format and Locale
+
+Pass `Intl.NumberFormat` options to `format` for units or decimal places. A function can return custom text, such as the time remaining.
+
+<ComponentExample
+  name="progress/format"
+  caption="Compare the progress readings. They show downloaded data, a precise percentage, time remaining, and a localized percentage."
+/>
+
+A percent format reports the value's position between `min` and `max`. Other formats use the value itself.
+
+`locale` controls digits and separators. If you omit it, the component reads the page's language after it mounts, with the browser's language as a fallback. The initial server and client render use English.
+
+Set `dir="rtl"` on the surrounding content to fill the track from the right.
+
+## Value Label
+
+Use `getValueLabel` to give screen readers more context than the visible number. Its details include `formatted`, `percent`, `min`, and `max`. Handle a `null` value when the task can be indeterminate; `percent` is also `null` and `formatted` is empty then.
+
+<ComponentExample
+  name="progress/value-label"
+  caption="Read Copying files with a screen reader. It announces 3 of 12 files and 25%, while the visible value stays compact."
+/>
+
+Use [Meter](./meter) for a reading such as storage used, rather than a task that will finish.
+
+## Custom Rendering
+
+See [Parts and Composition](../parts-and-composition) for changing a part's element or reading its state. Use `format` for text that should be shared by the visible value and screen readers.
+
+## Styling
+
+Give the track a height, background, and width. The indicator sets its width as an inline percentage of the track. Style `data-indeterminate` for a task whose progress is unknown, since the indicator has no width then, and `data-complete` once the task finishes. Both styling options are shown in each example's Code tab.
+
+Each part has a `data-slot`, such as `progress-indicator`, and its state attributes are listed under [Data Attributes](#data-attributes).
+
+### Progress [#styling-progress]
+
+The root exposes a CSS variable for positioning other content alongside the reading.
+
+<CssVariables component="progress" part="root" />
+
+## Data Attributes
+
+### Progress [#data-attributes-progress]
+
+<DataAttributes component="progress" part="root" />
+
+### ProgressLabel [#data-attributes-progresslabel]
+
+<DataAttributes component="progress" part="label" />
+
+### ProgressValue [#data-attributes-progressvalue]
+
+<DataAttributes component="progress" part="value" />
+
+### ProgressTrack [#data-attributes-progresstrack]
+
+<DataAttributes component="progress" part="track" />
+
+### ProgressIndicator [#data-attributes-progressindicator]
+
+<DataAttributes component="progress" part="indicator" />
+
+## API Reference
+
+Each option below is an input on the directive.
+
+### Progress
+
+<TypeTable
+  path="../../packages/core/src/components/progress/progress.ts"
+  name="ProgressOptions"
+/>
+
+### State
+
+What each part's `state()` signal holds. Every part gets the same state.
+
+<StateTable
+  path="../../packages/core/src/components/progress/progress.ts"
+  name="ProgressState"
+/>
+
+`uiProgressValue` adds the formatted text:
+
+<StateTable
+  path="../../packages/core/src/components/progress/progress.ts"
+  name="ProgressValueState"
+/>
+
+## Accessibility
+
+Name the component with `uiProgressLabel` or `aria-label`. It exposes the range and formatted value through the `progressbar` role. Use `getValueLabel` when that value needs more explanation.
+
+### Tested Behavior
+
+Every line below is an automated test.
+
+<SpecList spec="progress" />

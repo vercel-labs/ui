@@ -1,0 +1,100 @@
+---
+title: Parts and Composition
+description: Put a component's parts together and choose what each one renders.
+---
+
+A component can have several parts. A Popover has a root to hold its state, a trigger to open it, and content to show.
+
+## Put Parts Together
+
+Import the parts you need, add them to `imports`, and put each one on an element, nested as shown in the component's Composition:
+
+```ts
+import { Component } from "@angular/core"
+import {
+  Popover,
+  PopoverClose,
+  PopoverContent,
+  PopoverTitle,
+  PopoverTrigger,
+} from "@ui-sdk/angular/popover"
+
+@Component({
+  selector: "app-project-details",
+  imports: [
+    Popover,
+    PopoverClose,
+    PopoverContent,
+    PopoverTitle,
+    PopoverTrigger,
+  ],
+  template: `
+    <ng-container uiPopover>
+      <button uiPopoverTrigger>Details</button>
+      <div *uiPopoverContent>
+        <h2 uiPopoverTitle>Project Details</h2>
+        <p>Last updated today.</p>
+        <button uiPopoverClose>Done</button>
+      </div>
+    </ng-container>
+  `,
+})
+export class ProjectDetails {}
+```
+
+`uiPopover` shares state without needing an element of its own, so it sits on an `<ng-container>`. Other roots, such as `uiTabs`, go on an element. Parts find their root through Angular's dependency injection, so you can put your own elements and components between them.
+
+The `*` in `*uiPopoverContent` renders the content only while it's open. Parts that come and go, like popup content and an item's check mark, take that form.
+
+## Choose the Element
+
+Each part works on the element you put it on. Put `uiMenuItem` on a link to render a menu item as a link:
+
+```ts
+import { Component } from "@angular/core"
+import { Menu, MenuContent, MenuItem, MenuTrigger } from "@ui-sdk/angular/menu"
+
+@Component({
+  selector: "app-account-menu",
+  imports: [Menu, MenuContent, MenuItem, MenuTrigger],
+  template: `
+    <ng-container uiMenu>
+      <button uiMenuTrigger>Account</button>
+      <div *uiMenuContent>
+        <a uiMenuItem href="/settings">Settings</a>
+      </div>
+    </ng-container>
+  `,
+})
+export class AccountMenu {}
+```
+
+Listen for events on the same element, like `<a uiMenuItem (click)="track()">`. Your handler runs first, and calling `$event.preventDefault()` skips the built-in one. Keep the supplied roles, IDs, and ARIA state on the element. A name or typing hint you write replaces the part's own: `aria-label`, `aria-labelledby`, `aria-description`, `title`, `autocomplete`, `autocapitalize`, `autocorrect`, `inputmode` and `spellcheck`. Roles, `tabindex`, references like `aria-controls` and `aria-describedby`, state attributes and `data-slot` stay the part's, since its behavior reads them.
+
+## Read the State
+
+Each part has a `state` signal. Give the element a template reference to read it:
+
+```ts
+import { Component } from "@angular/core"
+import { Toggle } from "@ui-sdk/angular/toggle"
+
+@Component({
+  selector: "app-mute-button",
+  imports: [Toggle],
+  template: `
+    <button uiToggle aria-label="Mute" #mute="uiToggle">
+      {{ mute.state().pressed ? "Mute on" : "Mute off" }}
+    </button>
+  `,
+})
+export class MuteButton {}
+```
+
+Keep the accessible name stable when the content changes. Here, `aria-label="Mute"` names the toggle and `aria-pressed` reports its state.
+
+## Name the Control
+
+Use the component's label or title part, such as `uiFieldLabel` or `uiDialogTitle`. Give controls without visible text an `aria-label`.
+
+[Custom Parts](./custom-parts) covers writing a part with logic of its own.

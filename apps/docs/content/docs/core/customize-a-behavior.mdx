@@ -270,6 +270,21 @@ rating.addEventListener("valuechange", (event) => {
 ```
 
 </FrameworkContent>
+<FrameworkContent value="angular">
+
+```angular-html
+<div
+  appRating
+  aria-label="Rating"
+  (beforeValueChange)="saving() && $event.cancel()"
+>
+  <ng-content />
+</div>
+```
+
+`(beforeValueChange)` is the output your rating directive emits from `onValueChange`, as [Custom Parts](/docs/custom-parts) shows.
+
+</FrameworkContent>
 
 It refuses a press, an arrow key and a number key alike, since they all ask through `change`. To refuse only some of them, check `details.reason`: the rating reports `item-press` and `list-navigation`. [What a Change Reports](./kernel/handle-changes#what-a-change-reports) lists everything a callback gets.
 
@@ -364,6 +379,22 @@ rating.addEventListener(
 ```
 
 Listen in the capture phase, on the rating or anything around it. The star's own listener is on its button, so a plain listener added to that button later runs after it.
+
+</FrameworkContent>
+<FrameworkContent value="angular">
+
+```angular-html
+<button appRatingStar value="3" (keydown)="onKeydown($event)"></button>
+```
+
+```ts
+onKeydown(event: KeyboardEvent) {
+  if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+    event.preventDefault()
+    this.moveRow(event.key)
+  }
+}
+```
 
 </FrameworkContent>
 

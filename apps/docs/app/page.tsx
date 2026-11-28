@@ -209,7 +209,7 @@ export default function HomePage() {
           }
         >
           Every component is made from the same behaviors and works in React,
-          Vue, Svelte, Solid and Web Components.
+          Vue, Svelte, Solid, Web Components and Angular.
         </Section>
         <PhoneStrip
           names={components

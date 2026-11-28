@@ -1,0 +1,23 @@
+{
+  "title": "Angular",
+  "pages": [
+    "---Get Started---",
+    "index",
+    "installation",
+    "first-component",
+    "---Using Components---",
+    "parts-and-composition",
+    "state-and-events",
+    "styling-and-animation",
+    "controllers",
+    "popups",
+    "lists-and-menus",
+    "forms",
+    "server-rendering",
+    "---Build Your Own---",
+    "rendering",
+    "custom-parts",
+    "utilities",
+    "components"
+  ]
+}

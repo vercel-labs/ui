@@ -3,7 +3,7 @@ import {
   toastDuration,
   toastFixture,
   type FixtureToast,
-} from "tests/fixtures/toast.ts"
+} from "../../../../../tests/fixtures/toast.ts"
 
 // The page's toaster, the buttons' handlers and `window.showToast`, shared by
 // every framework's fixture. `record` reports to the Last action output.

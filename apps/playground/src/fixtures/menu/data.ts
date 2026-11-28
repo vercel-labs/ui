@@ -1,5 +1,8 @@
 import type { MenuData } from "@ui-sdk/core/menu"
-import { menuFixture, type MenuFixtureItem } from "tests/fixtures/menu.ts"
+import {
+  menuFixture,
+  type MenuFixtureItem,
+} from "../../../../../tests/fixtures/menu.ts"
 
 // The shared fixture as a data menu.
 function convert(items: MenuFixtureItem[]): MenuData {

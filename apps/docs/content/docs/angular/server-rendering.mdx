@@ -1,0 +1,137 @@
+---
+title: Server Rendering
+description: Render initial HTML on the server and add interactions in the browser.
+---
+
+ui-sdk parts render HTML with Angular's server renderer, in an app set up with `@angular/ssr`. Their initial attributes include ARIA state and the group's tab stop, and the page hydrates with `provideClientHydration()`.
+
+## Render the Initial State
+
+```ts
+import { Component } from "@angular/core"
+import { Toggle } from "@ui-sdk/angular/toggle"
+
+@Component({
+  selector: "app-bold-toggle",
+  imports: [Toggle],
+  template: `<button uiToggle defaultPressed>Bold</button>`,
+})
+export class BoldToggle {}
+```
+
+The server sends a button with `aria-pressed="true"`. It can toggle after hydration. Native HTML behavior, such as submitting a form, can work before hydration.
+
+## Read Browser Values After Render
+
+The server does not know the browser's language. Start with the same placeholder on the server and in the browser, then read the language after the first render:
+
+```ts
+import { afterNextRender, Component, signal } from "@angular/core"
+
+@Component({
+  selector: "app-language",
+  template: `<p>{{ language() || "Loading language…" }}</p>`,
+})
+export class Language {
+  readonly language = signal("")
+
+  constructor() {
+    afterNextRender(() => this.language.set(navigator.language))
+  }
+}
+```
+
+Both renders start with "Loading language…". `afterNextRender` runs only in the browser, so the paragraph then shows the browser's language. Read other browser-only values in the same place, or in an event handler.
+
+## Saved Preferences and Storage
+
+Preferences like a color scheme or an emoji skin tone are saved in the browser, so the server can't render them. [Preferences](../core/behaviors/preferences) covers the preferences themselves; this is how they fit server rendering.
+
+### Show Them Before Hydration
+
+Put `uiPreferences` on an element around your app. On the server it renders one inline script as its first child, which puts every saved value on its `data-*` attribute as the page loads, before Angular hydrates, so CSS that selects those attributes is right from the first paint:
+
+```ts title="app.ts"
+import { Component } from "@angular/core"
+import { RouterOutlet } from "@angular/router"
+import { Preferences } from "@ui-sdk/angular/preferences"
+import { colorScheme, skinTone } from "./preferences"
+
+@Component({
+  selector: "app-root",
+  imports: [Preferences, RouterOutlet],
+  template: `
+    <div uiPreferences [preferences]="preferences">
+      <router-outlet />
+    </div>
+  `,
+})
+export class App {
+  readonly preferences = [colorScheme, skinTone]
+}
+```
+
+The element gets `display: contents`, so it doesn't change your layout. A preference made with `global: true` goes on `<html>` instead. Pass `nonce` if your Content Security Policy only allows inline scripts with one.
+
+Content that reads a preference through `usePreference` renders the default on the server and the saved value once rendered in the browser. Style by the attribute instead wherever the first paint has to be right, as [Style by Preferences](../core/behaviors/preferences#style-by-preferences) shows.
+
+### Read a Cookie on the Server
+
+A preference kept in a cookie can render on the server too, content included. Create it in a service, which Angular creates for each request on the server, and read the request's `Cookie` header from the `REQUEST` token:
+
+```ts title="skin-tone.ts"
+import { inject, Injectable, REQUEST } from "@angular/core"
+import { createCookieStorage, createPreference } from "@ui-sdk/core"
+
+@Injectable({ providedIn: "root" })
+export class SkinTone {
+  readonly preference = createPreference({
+    values: ["default", "light", "medium", "dark"],
+    defaultValue: "default",
+    attribute: "data-skin-tone",
+    storage: createCookieStorage("skin-tone", {
+      cookie: inject(REQUEST)?.headers.get("cookie") ?? null,
+    }),
+  })
+}
+```
+
+Then pass it to `uiPreferences`:
+
+```ts title="app.ts"
+import { Component, inject } from "@angular/core"
+import { RouterOutlet } from "@angular/router"
+import { Preferences } from "@ui-sdk/angular/preferences"
+import { SkinTone } from "./skin-tone"
+
+@Component({
+  selector: "app-root",
+  imports: [Preferences, RouterOutlet],
+  template: `
+    <div uiPreferences [preferences]="[skinTone.preference]">
+      <router-outlet />
+    </div>
+  `,
+})
+export class App {
+  readonly skinTone = inject(SkinTone)
+}
+```
+
+The server reads the value from the request's cookie, and the browser from `document.cookie`, where `REQUEST` is `null`, so both render it and hydration matches.
+
+## Keep IDs and Values Consistent
+
+Use the same initial component values on the server and in the browser. For example, do not render an open dialog on the server and a closed one for the first render in the browser.
+
+Parts generate IDs for relationships such as a Dialog trigger's `aria-controls` and a Field label's `for`. You usually do not need to supply them.
+
+Pass an explicit `id` when something outside the component needs to refer to a part. On the server, render order matters: if a Field label renders before a control with your ID, the label initially uses the generated ID. Hydration updates the reference to yours. The same applies to Dialog triggers, titles, and descriptions.
+
+Use classes or data attributes for styling, rather than generated IDs.
+
+## Give Each Request Its Own State
+
+The server runs your modules once and reuses them for every request. Keep app state in a service, which Angular creates for each request's application, so each visitor gets their own copy. [State and Events](./state-and-events#share-state-across-components) shows how.
+
+Popups render in place, so your server layout doesn't need a portal root. [Popups](./popups) covers containers; [Forms](./forms) covers submission and validation.

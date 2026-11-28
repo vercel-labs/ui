@@ -16,12 +16,16 @@ function quickStartFile(name: string) {
 const site = "https://ui-sdk.dev"
 
 describe("setup prompts", () => {
-  test.each(["react", "vue", "svelte", "solid", "web-components"] as const)(
-    "rebuilds the %s Quick Start prompt word for word",
-    (stackId) => {
-      expect(quickStartPrompt(stackId)).toBe(quickStartFile(stackId))
-    }
-  )
+  test.each([
+    "react",
+    "vue",
+    "svelte",
+    "solid",
+    "web-components",
+    "angular",
+  ] as const)("rebuilds the %s Quick Start prompt word for word", (stackId) => {
+    expect(quickStartPrompt(stackId)).toBe(quickStartFile(stackId))
+  })
 
   test("names the project and how to create it", () => {
     const prompt = setupPrompt({

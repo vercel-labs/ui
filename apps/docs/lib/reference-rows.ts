@@ -98,14 +98,14 @@ function exportDocs(file: string, name: string) {
   )
 }
 
-// A prop's name, marked `?` when it's optional. Callbacks are events in Vue
-// and on web components, named as those frameworks write them.
+// A prop's name, marked `?` when it's optional. Callbacks are events in Vue,
+// on web components and in Angular, named as those frameworks write them.
 function rowName(
   entry: { name: string; required: boolean },
   framework: Framework,
   isEvent: boolean
 ) {
-  if (isEvent && framework === "vue") {
+  if (isEvent && (framework === "vue" || framework === "angular")) {
     return callbackIn(entry.name, framework)
   }
   if (isEvent && framework === "web-components") {
@@ -161,9 +161,10 @@ async function typeRows({
       const isEvent = events && isCallback(entry.name)
       return {
         name: rowName(entry, framework, isEvent),
-        // Web events carry `detail`, not the callback's arguments.
+        // Web events carry `detail`, and Angular outputs one object, not the
+        // callback's arguments.
         type:
-          isEvent && framework === "web-components"
+          isEvent && (framework === "web-components" || framework === "angular")
             ? undefined
             : (types?.[entry.name] ?? shortType(entry)),
         detail: fallback

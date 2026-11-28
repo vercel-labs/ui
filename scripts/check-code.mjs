@@ -132,6 +132,8 @@ const dragSessionAllowlist = {
 const htmlSinkAllowlist = {
   "packages/core/src/components/token-input/token-input-view.ts":
     "Parses its own markup, built from escaped text, in a template that never joins the page, to compare it with the server's.",
+  "packages/angular/src/token-input.ts":
+    "Writes the editor's markup, which core builds from escaped text.",
   "packages/react/src/token-input.tsx":
     "Writes the editor's markup, which core builds from escaped text.",
   "packages/solid/src/token-input.tsx":
@@ -185,12 +187,9 @@ const importLayersAllowlist = {
 // Public exports public-docs-pages lets through until a docs page names them.
 const undocumentedExports = new Set([
   "AutocompleteItems",
-  "ComboboxItems",
   "CommandItems",
   "ListboxItems",
-  "MenuItems",
-  "SelectItems",
-  "TreeItems",
+  "TokenInputTokenDef",
   "TriggerMenuItems",
   "createOverlays",
   "defaultCodec",
@@ -215,7 +214,7 @@ const publicNameAllowlist = {
 const registries = ["registerShortcut", "registerTools"]
 
 // The packages that render primitives, which import core only through its entries.
-const renderers = ["react", "vue", "solid", "svelte", "web"]
+const renderers = ["react", "vue", "solid", "svelte", "web", "angular"]
 
 // Renderer entries whose component lives in a core entry of another name, each with why.
 const coreEntryOf = {

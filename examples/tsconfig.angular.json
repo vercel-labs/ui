@@ -1,0 +1,16 @@
+{
+  "extends": "../tsconfig.base.json",
+  "include": ["*/angular/*.ts", "components/*/angular/*.ts"],
+  "compilerOptions": {
+    "noEmit": false,
+    "rewriteRelativeImportExtensions": true,
+    "noUnusedLocals": false,
+    "rootDir": "..",
+    "outDir": "node_modules/.angular",
+    "paths": {
+      "@ui-sdk/angular": ["../packages/angular/src/index.ts"],
+      "@ui-sdk/angular/*": ["../packages/angular/src/*"]
+    }
+  },
+  "angularCompilerOptions": { "strictTemplates": true }
+}

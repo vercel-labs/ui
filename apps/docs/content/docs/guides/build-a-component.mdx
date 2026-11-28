@@ -54,6 +54,13 @@ npm add @ui-sdk/core @ui-sdk/web
 ```
 
 </FrameworkContent>
+<FrameworkContent value="angular">
+
+```bash
+npm add @ui-sdk/core @ui-sdk/angular
+```
+
+</FrameworkContent>
 
 ## Define the Primitive
 
@@ -85,7 +92,7 @@ export { reactions }
 
 ## Render the Parts
 
-`createParts` turns each slot into a component you can render. The object says which element each one renders: a `<div>` for the root and a `<button>` for each reaction. With web components, it names a custom element for each part instead.
+`createParts` turns each slot into a component you can render. The object says which element each one renders: a `<div>` for the root and a `<button>` for each reaction. With web components, it names a custom element for each part instead. In Angular, you write each part as a directive.
 
 <FrameworkContent value="react">
 
@@ -228,6 +235,49 @@ Then use the elements in your HTML:
     <button>🎉</button>
   </my-reaction>
 </my-reactions>
+```
+
+</FrameworkContent>
+<FrameworkContent value="angular">
+
+```ts title="components/message-reactions.ts"
+import { Component, Directive, inject, input } from "@angular/core"
+import { usePart, usePrimitive } from "@ui-sdk/angular/primitive"
+import { reactions } from "../lib/reactions"
+
+@Directive({ selector: "[appReactions]" })
+export class Reactions {
+  readonly handle = usePrimitive(reactions, () => ({}))
+
+  constructor() {
+    usePart(this.handle, "root")
+  }
+}
+
+@Directive({ selector: "[appReaction]" })
+export class Reaction {
+  readonly value = input.required<string>()
+
+  constructor() {
+    usePart(inject(Reactions).handle, "reaction", () => ({
+      value: this.value(),
+    }))
+  }
+}
+
+@Component({
+  selector: "app-message-reactions",
+  imports: [Reaction, Reactions],
+  template: `
+    <div appReactions>
+      <button appReaction value="thumbs-up">👍</button>
+      <button appReaction value="heart">❤️</button>
+      <button appReaction value="laugh">😂</button>
+      <button appReaction value="celebrate">🎉</button>
+    </div>
+  `,
+})
+export class MessageReactions {}
 ```
 
 </FrameworkContent>
@@ -540,6 +590,49 @@ export { MessageReactions }
 ```
 
 </FrameworkContent>
+<FrameworkContent value="angular">
+
+```ts title="components/message-reactions.ts" {29-33}
+import { Component, Directive, inject, input } from "@angular/core"
+import { usePart, usePrimitive } from "@ui-sdk/angular/primitive"
+import { reactions } from "../lib/reactions"
+
+@Directive({ selector: "[appReactions]" })
+export class Reactions {
+  readonly handle = usePrimitive(reactions, () => ({}))
+
+  constructor() {
+    usePart(this.handle, "root")
+  }
+}
+
+@Directive({ selector: "[appReaction]" })
+export class Reaction {
+  readonly value = input.required<string>()
+
+  constructor() {
+    usePart(inject(Reactions).handle, "reaction", () => ({
+      value: this.value(),
+    }))
+  }
+}
+
+@Component({
+  selector: "app-message-reactions",
+  imports: [Reaction, Reactions],
+  template: `
+    <div appReactions aria-label="Reactions">
+      <button appReaction value="thumbs-up" aria-label="Thumbs up">👍</button>
+      <button appReaction value="heart" aria-label="Heart">❤️</button>
+      <button appReaction value="laugh" aria-label="Laugh">😂</button>
+      <button appReaction value="celebrate" aria-label="Celebrate">🎉</button>
+    </div>
+  `,
+})
+export class MessageReactions {}
+```
+
+</FrameworkContent>
 
 That's the bar at the top of this page. A screen reader announces it as the Reactions toolbar, then reads each reaction by name, and says whether it's pressed.
 
@@ -573,7 +666,7 @@ Parts render without styles. Use `data-slot` to pick a part, and `aria-pressed` 
 }
 ```
 
-These attributes are the same in every framework, so the same CSS styles all five versions.
+These attributes are the same in every framework, so the same CSS styles every version.
 
 ## Check It
 

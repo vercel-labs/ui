@@ -6,7 +6,7 @@ ui-sdk is a TypeScript library of UI behaviors for building interfaces. It isn't
 
 - **Behaviors** are the building blocks. Each is one thing an interface does, like moving focus with the arrow keys (`createRovingFocus`).
 - **Primitives** put one component's options, state, behaviors and parts together in a single definition (`definePrimitive`), with no styles.
-- **Adapters** render a primitive in React, Vue, Svelte, Solid and web components, with the same names everywhere (`createParts`). You write the markup and styles. State shows up as data attributes and CSS variables.
+- **Adapters** render a primitive in React, Vue, Svelte, Solid, web components and Angular, with the same names everywhere (`createParts`, and directives in Angular). You write the markup and styles. State shows up as data attributes and CSS variables.
 - **Checking.** `@ui-sdk/core/testing` checks the result against its WAI-ARIA pattern, in right to left and on the server.
 - **Agents** can operate a finished interface through `@ui-sdk/core/agent` (`snapshot`, `act`).
 
@@ -45,4 +45,4 @@ Component libraries cover familiar patterns like menus, dialogs and tabs. Real p
 
 ## Framework experts
 
-One expert per framework in `.agents/experts/<framework>/` (react, vue, svelte, solid, web): who it is in `expert.md`, what it knows in `knowledge.md` and what's already decided in `decisions.md`. Claude Code also loads each one as a named subagent from `.claude/agents/<framework>-expert.md`. Ask one any question about its framework, or ask it to review code. Before merging a change to an adapter, core, the specs, examples or framework docs, run `ui-sdk-expert-review` on it; `node scripts/expert-scope.mjs` shows which experts it reaches.
+One expert per framework in `.agents/experts/<framework>/` (react, vue, svelte, solid, web, angular): who it is in `expert.md`, what it knows in `knowledge.md` and what's already decided in `decisions.md`. Claude Code also loads each one as a named subagent from `.claude/agents/<framework>-expert.md`. Ask one any question about its framework, or ask it to review code. Before merging a change to an adapter, core, the specs, examples or framework docs, run `ui-sdk-expert-review` on it; `node scripts/expert-scope.mjs` shows which experts it reaches.

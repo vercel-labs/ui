@@ -285,7 +285,7 @@ jobs:
           PLAYWRIGHT_BLOB_OUTPUT_NAME: report-${{ matrix.engine }}-${{ matrix.shard }}.zip
         run: |
           if [ "${{ matrix.engine }}" = chromium ]; then
-            projects=(--project react --project vue --project web --project solid --project svelte --project "*-data" --project "*-ssr" --project "*-portal" --project "*-sheet")
+            projects=(--project react --project vue --project web --project solid --project svelte --project angular --project "*-data" --project "*-ssr" --project "*-portal" --project "*-sheet")
           else
             projects=(--project "*-${{ matrix.engine }}")
           fi

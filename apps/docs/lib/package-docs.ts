@@ -26,6 +26,7 @@ const packageFrameworks: Record<string, Framework | undefined> = {
   svelte: "svelte",
   solid: "solid",
   web: "web-components",
+  angular: "angular",
 }
 
 const guidesByFramework = new Map(

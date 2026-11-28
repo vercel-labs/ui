@@ -8,7 +8,7 @@ const root = path.join(
   import.meta.dirname,
   "../../examples/components/autocomplete"
 )
-const folders = ["react", "vue", "svelte", "web", "solid"]
+const folders = ["react", "vue", "svelte", "web", "solid", "angular"]
 const examplesIn = (folder: string) =>
   readdirSync(path.join(root, folder), { withFileTypes: true })
     .filter((entry) => entry.isFile())
@@ -471,7 +471,14 @@ const order = [
   "custom-rendering",
 ]
 
-for (const framework of ["react", "vue", "svelte", "web-components", "solid"]) {
+for (const framework of [
+  "react",
+  "vue",
+  "svelte",
+  "web-components",
+  "solid",
+  "angular",
+]) {
   test(`every autocomplete example works in ${framework}`, async ({ page }) => {
     test.setTimeout(120_000)
     const errors: string[] = []

@@ -1,0 +1,87 @@
+---
+title: First Component
+description: Add a component to your app and style its state.
+---
+
+Let's add a Bookmark toggle. Press it once to turn it on, then again to turn it off.
+
+If you haven't installed the packages yet, start with [Installation](./installation).
+
+## Create the Component
+
+Create `bookmark-button.ts` next to your app component, and put `uiToggle` on a button:
+
+```ts title="bookmark-button.ts"
+import { Component } from "@angular/core"
+import { Toggle } from "@ui-sdk/angular/toggle"
+
+@Component({
+  selector: "app-bookmark-button",
+  imports: [Toggle],
+  template: `<button uiToggle>Bookmark</button>`,
+})
+export class BookmarkButton {}
+```
+
+`uiToggle` turns the button into a toggle. It keeps track of its pressed state, handles Enter and Space, and sets `aria-pressed` for screen readers.
+
+## Use It in Your App
+
+In your app component (`app.ts` here), import `BookmarkButton` and render it:
+
+```ts title="app.ts"
+import { Component } from "@angular/core"
+import { BookmarkButton } from "./bookmark-button"
+
+@Component({
+  selector: "app-root",
+  imports: [BookmarkButton],
+  template: `<app-bookmark-button />`,
+})
+export class App {}
+```
+
+Open your app. You should see a button labeled Bookmark. Next, add styles so you can tell when it is pressed.
+
+## Add Styles
+
+When the toggle is pressed, it has a `data-pressed` attribute. Use that attribute to change its appearance.
+
+With Tailwind CSS configured in your app, add utility classes to the button's `class`. The `data-pressed:` variant applies while the toggle is pressed:
+
+```ts title="bookmark-button.ts"
+import { Component } from "@angular/core"
+import { Toggle } from "@ui-sdk/angular/toggle"
+
+@Component({
+  selector: "app-bookmark-button",
+  imports: [Toggle],
+  template: `
+    <button
+      uiToggle
+      class="inline-flex h-8 items-center rounded-md border border-neutral-300 px-3 text-sm font-medium hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-2 data-pressed:bg-neutral-900 data-pressed:text-white"
+    >
+      Bookmark
+    </button>
+  `,
+})
+export class BookmarkButton {}
+```
+
+Try the styled toggle:
+
+<ComponentExample
+  name="toggle/first-component"
+  hideCode={true}
+  caption="Click Bookmark to turn it on or off. A filled background means it is on. You can also focus the button with Tab and press Enter or Space."
+/>
+
+Keep the label the same in both states. `aria-pressed` tells a screen reader whether the toggle is on.
+
+## Keep Going
+
+- [Toggle](./components/toggle) covers disabled states, controlled state, and groups of toggles.
+- [Components](./components) lists the other components you can add with the same install.
+- [Parts and Composition](./parts-and-composition) shows how to put a component with several parts together.
+- [State and Events](./state-and-events) shows how to read changes and control state from your app.
+- [Styling and Animation](./styling-and-animation) covers state attributes, CSS variables, and transitions.

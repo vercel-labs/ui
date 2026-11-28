@@ -29,6 +29,8 @@
 // `skipLibCheck: false`, so an error in a shipped declaration fails here as it
 // does in the strictest app that checks its libraries. An error prints once,
 // under the first package that reaches it.
+// Angular's consumers build with its own compiler and strict templates,
+// which is what checks a template against the packed directives.
 // Every package is unpacked side by side, as an app installs an adapter with
 // `@ui-sdk/core` beside it. A package that needs another `@ui-sdk` package
 // takes it as a peer, never a dependency, so an app ends up with one copy.
@@ -54,6 +56,7 @@ import {
 import { tmpdir } from "node:os"
 import path from "node:path"
 import { parseArgs } from "node:util"
+import { performCompilation } from "@angular/compiler-cli"
 import ts from "typescript"
 
 const root = path.resolve(import.meta.dirname, "..")
@@ -74,6 +77,7 @@ const peers = [
   "svelte",
   "solid-js",
   "@solidjs/web",
+  "@angular/core",
   "@nuxt/kit",
   "@nuxt/schema",
   "@types/node",
@@ -218,6 +222,9 @@ function checkPackage(name, manifest, manifests, reported) {
     writeEntryImports(name, manifest.name, subpaths, "entries.ts"),
     ...consumers,
   ].map((file) => typecheck(name, file))
+  if (name === "angular") {
+    checks.push(...consumers.map(typecheckTemplates))
+  }
   if (tools.length) {
     checks.push(
       typecheckTool(writeEntryImports(name, manifest.name, tools, "tools.ts"))
@@ -445,6 +452,20 @@ function typecheck(name, file) {
     ...errors,
     ...ts.getPreEmitDiagnostics(ts.createProgram([file], options)),
   ]
+}
+
+// TypeScript alone never reads a template, so Angular's compiler builds the
+// file, as an app's build does.
+function typecheckTemplates(file) {
+  const { options, errors } = ts.convertCompilerOptionsFromJson(
+    { ...compilerOptions, noEmit: true },
+    app
+  )
+  const { diagnostics } = performCompilation({
+    rootNames: [file],
+    options: { ...options, strictTemplates: true },
+  })
+  return [...errors, ...diagnostics]
 }
 
 function typecheckTool(file) {

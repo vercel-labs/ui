@@ -9,6 +9,9 @@ allowBuilds:
   esbuild: true
 minimumReleaseAge: 1440
 trustPolicy: no-downgrade
+# @angular/compiler-cli needs @babel/core, whose semver@6.3.1 has no provenance.
+trustPolicyExclude:
+  - semver@6.3.1
 blockExoticSubdeps: true
 
 catalog:

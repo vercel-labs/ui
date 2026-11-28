@@ -1,0 +1,80 @@
+---
+title: Controllers
+description: Read and change a component from outside its parts.
+---
+
+A controller connects code to a mounted component. Use one when the button or action that changes it lives somewhere else.
+
+## Connect a Controller
+
+Create it once in your component and pass it to the root:
+
+```ts
+import { Component } from "@angular/core"
+import { createToggleController, Toggle } from "@ui-sdk/angular/toggle"
+
+@Component({
+  selector: "app-bold-toggle",
+  imports: [Toggle],
+  template: `
+    <button (click)="toggle.toggle()">Toggle Bold</button>
+    <button uiToggle [controller]="toggle">Bold</button>
+  `,
+})
+export class BoldToggle {
+  readonly toggle = createToggleController()
+}
+```
+
+Controller methods run the same outputs as user input. Controlled values and cancellation follow [State and Events](./state-and-events).
+
+Each component lists its methods, such as `open()`, `close()`, `setValue()`, or `focus()`.
+
+A read like `toggle.isPressed()` answers when you call it, so call it from an event handler or async code. It returns `undefined` on the server and until the component is created, so a template that reads it renders differently on the server and in the browser. It doesn't update when the state changes either. To render the state, keep it in a signal with `[(pressed)]`.
+
+## Share a Popup
+
+Triggers outside the root can use the same controller. A `payload` tells the content which item was opened, and `*uiPopoverContent="let popover"` reads it from the content's state:
+
+```ts
+import { Component } from "@angular/core"
+import {
+  createPopoverController,
+  Popover,
+  PopoverContent,
+  PopoverTitle,
+  PopoverTrigger,
+} from "@ui-sdk/angular/popover"
+
+@Component({
+  selector: "app-editors",
+  imports: [Popover, PopoverContent, PopoverTitle, PopoverTrigger],
+  template: `
+    <button uiPopoverTrigger [controller]="editor" payload="Notes">
+      Edit Notes
+    </button>
+    <button uiPopoverTrigger [controller]="editor" payload="Tasks">
+      Edit Tasks
+    </button>
+    <ng-container uiPopover [controller]="editor">
+      <div *uiPopoverContent="let popover">
+        <h2 uiPopoverTitle>Edit {{ popover.payload }}</h2>
+      </div>
+    </ng-container>
+  `,
+})
+export class Editors {
+  readonly editor = createPopoverController<string>()
+}
+```
+
+## Wait for a Popup to Close
+
+A popup controller's `open()` returns a promise. It settles when the popup closes, with its reason and return value:
+
+```ts
+const result = await this.editor.open({ payload: "Notes" })
+console.log(result.reason, result.returnValue)
+```
+
+For confirmations, [Alert Dialog](./components/alert-dialog) provides `createConfirm()`, which gives you a function you can await.

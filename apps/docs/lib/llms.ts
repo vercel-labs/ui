@@ -19,6 +19,7 @@ const packageNames: Record<Framework, string> = {
   svelte: "svelte",
   solid: "solid",
   "web-components": "web",
+  angular: "angular",
 }
 
 // Headings one level deeper for each of `levels`, outside fenced code.

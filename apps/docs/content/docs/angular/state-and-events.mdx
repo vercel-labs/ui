@@ -1,0 +1,182 @@
+---
+title: State and Events
+description: Set an initial value, control it, and respond to changes.
+---
+
+Components manage their own state until you bind a value. Outputs let you respond to changes in either case.
+
+## Set the Starting Value
+
+Use a default input to choose the starting state. Here, Bold starts pressed and changes when you click it:
+
+```ts
+import { Component } from "@angular/core"
+import { Toggle } from "@ui-sdk/angular/toggle"
+
+@Component({
+  selector: "app-bold-toggle",
+  imports: [Toggle],
+  template: `<button uiToggle defaultPressed>Bold</button>`,
+})
+export class BoldToggle {}
+```
+
+The input depends on the component: `defaultPressed`, `defaultChecked`, `defaultOpen`, or `defaultValue`.
+
+## Control the Value
+
+Bind a signal with `[( )]`:
+
+```ts
+import { Component, signal } from "@angular/core"
+import { Toggle } from "@ui-sdk/angular/toggle"
+
+@Component({
+  selector: "app-bold-toggle",
+  imports: [Toggle],
+  template: `
+    <button uiToggle [(pressed)]="pressed">Bold</button>
+    <output>{{ pressed() ? "On" : "Off" }}</output>
+  `,
+})
+export class BoldToggle {
+  readonly pressed = signal(false)
+}
+```
+
+Clicking Bold updates `pressed`, so the output changes too. Other components bind `open`, `checked`, or `value`.
+
+`[pressed]` without the parentheses controls the toggle without writing changes back, so it stays as your signal says. Listen for `(pressedChange)` to set the signal yourself.
+
+A bound value may start as `undefined`. Until it has a defined value, the component manages its own state. For example, `signal<boolean | undefined>(undefined)` lets the toggle start from `defaultPressed`; the signal receives its first change, or you can set it yourself.
+
+### Decide Which Changes to Accept
+
+Every change goes through an output named for it with `before` in front, like `(beforePressedChange)`, before the value changes. Call `$event.cancel()` there to keep the current value:
+
+```ts
+import { Component, signal } from "@angular/core"
+import { Toggle } from "@ui-sdk/angular/toggle"
+
+@Component({
+  selector: "app-bold-toggle",
+  imports: [Toggle],
+  template: `
+    <label>
+      <input
+        type="checkbox"
+        [checked]="allowChanges()"
+        (change)="allowChanges.set(!allowChanges())"
+      />
+      Allow changes
+    </label>
+    <button
+      uiToggle
+      [(pressed)]="pressed"
+      (beforePressedChange)="allowChanges() || $event.cancel()"
+    >
+      Bold
+    </button>
+  `,
+})
+export class BoldToggle {
+  readonly pressed = signal(false)
+  readonly allowChanges = signal(true)
+}
+```
+
+Uncheck Allow changes, then press Bold. The change is canceled, so `pressed` stays as it was and the toggle doesn't move.
+
+## Respond to a Change
+
+`(beforePressedChange)` and the other `before` outputs receive the requested value as `$event.value`, with details about the change. `(pressedChange)` follows with the value alone, once the change goes through.
+
+| Detail     | What It Tells You                                                                                |
+| ---------- | ------------------------------------------------------------------------------------------------ |
+| `value`    | The value the change would set.                                                                  |
+| `reason`   | What requested the change, such as `press` or `outside-press`. Each component lists its reasons. |
+| `event`    | The DOM event, when there is one.                                                                |
+| `source`   | `keyboard`, `mouse`, `touch`, `pen`, `virtual`, `programmatic`, or `agent`.                      |
+| `cancel()` | Stops the requested change.                                                                      |
+
+For example, keep a popover open when someone clicks outside it:
+
+```ts
+import { Component } from "@angular/core"
+import {
+  Popover,
+  PopoverClose,
+  PopoverContent,
+  PopoverTitle,
+  PopoverTrigger,
+  type PopoverOpenChange,
+} from "@ui-sdk/angular/popover"
+
+@Component({
+  selector: "app-project-details",
+  imports: [
+    Popover,
+    PopoverClose,
+    PopoverContent,
+    PopoverTitle,
+    PopoverTrigger,
+  ],
+  template: `
+    <ng-container uiPopover (beforeOpenChange)="keepOpen($event)">
+      <button uiPopoverTrigger>Details</button>
+      <div *uiPopoverContent>
+        <h2 uiPopoverTitle>Project Details</h2>
+        <p>Last updated today.</p>
+        <button uiPopoverClose>Done</button>
+      </div>
+    </ng-container>
+  `,
+})
+export class ProjectDetails {
+  keepOpen(change: PopoverOpenChange) {
+    if (!change.value && change.reason === "outside-press") {
+      change.cancel()
+    }
+  }
+}
+```
+
+The Done button still closes it. Cancellation also works when you control the value. Add `debug` to a root to log changes while you work.
+
+## Share State Across Components
+
+When several components need the same state, keep it in a service and inject it where you need it:
+
+```ts title="editor.ts"
+import { Injectable, signal } from "@angular/core"
+
+@Injectable({ providedIn: "root" })
+export class Editor {
+  readonly bold = signal(false)
+}
+```
+
+Any component can then bind the same signal:
+
+```ts
+import { Component, inject } from "@angular/core"
+import { Toggle } from "@ui-sdk/angular/toggle"
+import { Editor } from "./editor"
+
+@Component({
+  selector: "app-bold-toggle",
+  imports: [Toggle],
+  template: `<button uiToggle [(pressed)]="editor.bold">Bold</button>`,
+})
+export class BoldToggle {
+  readonly editor = inject(Editor)
+}
+```
+
+On the server, Angular creates the application's injector for each request, so every visitor starts with a fresh `Editor`. A signal exported from a module lives as long as the server does, so every visitor would read and change the same copy. Keep shared state in a service, and use module state only for values that are the same for everyone.
+
+## Empty and Multiple Values
+
+Select, Tabs, and Radio Group report `null` when nothing is selected. A multiple Select or Combobox uses an array. Accordion and Toggle Group always use arrays.
+
+To change a component from outside its parts, use a [Controller](./controllers).

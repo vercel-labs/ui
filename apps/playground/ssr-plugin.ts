@@ -2,12 +2,9 @@ import type { IncomingMessage, ServerResponse } from "node:http"
 import path from "node:path"
 import type { Plugin } from "vite"
 
-// Answers /__ssr?fixture=<name>&framework=<svelte|vue>&url=<page url> with
-// the fixture rendered on the server, for the *-ssr fixtures. Svelte's server
-// output is a separate compile, and Vue's renders in Node so its markup uses
-// Node's ICU, as a real server's does. In development it loads the renderer
-// through Vite. The preview server, which CI uses, loads the build
-// `vite build --ssr` wrote to dist-ssr.
+// Answers /__ssr?fixture=<name>&framework=<name>&url=<page url> with the
+// fixture rendered in Node, as a real server would, for the *-ssr fixtures.
+// Development loads the renderer through Vite. Preview loads dist-ssr's build.
 type Renderer = {
   renderFixture: (fixture: string, url: string) => Promise<string>
 }
@@ -15,6 +12,7 @@ type Renderer = {
 const renderers: Record<string, string> = {
   svelte: "/src/ssr.ts",
   vue: "/src/ssr/vue.ts",
+  angular: "/src/ssr/angular.ts",
 }
 
 function ssrFixtures() {

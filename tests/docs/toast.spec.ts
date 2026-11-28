@@ -3,10 +3,17 @@ import { test } from "./docs-test"
 import { readdirSync } from "node:fs"
 import path from "node:path"
 
-const frameworks = ["react", "solid", "vue", "svelte", "web-components"]
+const frameworks = [
+  "react",
+  "solid",
+  "vue",
+  "svelte",
+  "web-components",
+  "angular",
+]
 // Every framework folder must have the same examples.
 const root = path.join(import.meta.dirname, "../../examples/components/toast")
-const folders = ["react", "solid", "vue", "svelte", "web"]
+const folders = ["react", "solid", "vue", "svelte", "web", "angular"]
 const examplesIn = (folder: string) =>
   readdirSync(path.join(root, folder), { withFileTypes: true })
     .filter((file) => file.isFile())

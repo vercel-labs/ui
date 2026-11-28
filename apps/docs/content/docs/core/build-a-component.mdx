@@ -97,6 +97,13 @@ npm add @ui-sdk/web
 ```
 
 </FrameworkContent>
+<FrameworkContent value="angular">
+
+```bash
+npm add @ui-sdk/angular
+```
+
+</FrameworkContent>
 
 First, create the component from the `muteButton` primitive.
 
@@ -216,6 +223,40 @@ This registers a `<mute-button>` element for the root part, and `wrappedButton` 
 ```
 
 </FrameworkContent>
+<FrameworkContent value="angular">
+
+In Angular, the component is a directive you put on your own `<button>`:
+
+```ts title="components/ui/mute-button.ts"
+import { Directive } from "@angular/core"
+import { usePart, usePrimitive } from "@ui-sdk/angular/primitive"
+import { muteButton } from "@/lib/mute-button"
+
+@Directive({ selector: "[appMuteButton]" })
+export class MuteButton {
+  readonly handle = usePrimitive(muteButton, () => ({}))
+
+  constructor() {
+    usePart(this.handle, "root")
+  }
+}
+```
+
+`usePrimitive` creates the mute button, and `usePart` connects the directive's element to the root part. Then import it wherever you want to use it:
+
+```ts title="pages/home.ts"
+import { Component } from "@angular/core"
+import { MuteButton } from "@/components/ui/mute-button"
+
+@Component({
+  selector: "app-home",
+  imports: [MuteButton],
+  template: `<button appMuteButton>Mute</button>`,
+})
+export class Home {}
+```
+
+</FrameworkContent>
 
 Because we use a native `<button>`, clicks, Enter and Space all reach the primitive's `press` handler. Screen readers get its pressed state from `aria-pressed`.
 
@@ -301,12 +342,24 @@ Parts render without styles. Here's a complete look for the button, with hover, 
 ```
 
 </FrameworkContent>
+<FrameworkContent value="angular">
+
+```angular-html
+<button
+  appMuteButton
+  class="rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-sm hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-400 aria-pressed:bg-neutral-900 aria-pressed:text-white"
+>
+  Mute
+</button>
+```
+
+</FrameworkContent>
 
 </StyleTabs>
 
 The pressed look comes from `aria-pressed`. While `muted` is `true`, the root part renders `aria-pressed="true"`, from the `attrs` you wrote when you defined the primitive. In the CSS tab, the `&[aria-pressed="true"]` rule selects it. In the Tailwind tab, the `aria-pressed:` classes do the same.
 
-`data-slot` identifies the part, and these attributes are the same in every framework, so this CSS works for all five versions. [Style a Component](./kernel/style-a-component) covers more state attributes, CSS variables and parts that come and go.
+`data-slot` identifies the part, and these attributes are the same in every framework, so this CSS works for every version. [Style a Component](./kernel/style-a-component) covers more state attributes, CSS variables and parts that come and go.
 
 ## Next
 

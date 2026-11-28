@@ -1,0 +1,367 @@
+---
+title: Image Cropper
+description: Choose the part of an image to keep by moving and resizing a selection, or by panning and zooming the image under it.
+---
+
+Use an image cropper to choose the part of a photo to keep, like a profile picture or a cover image. The crop is a box in the image's own pixels, with a quarter-turn rotation and a flip, ready to pass to [`cropImage`](../../core/image).
+
+<ComponentExample
+  name="image-cropper/basic"
+  inspect
+  caption="Pick a ratio, drag the selection or one of its handles, then press Crop. Tab to the selection and use the arrow keys, with Shift to move further."
+/>
+
+## Installation
+
+```bash
+npm install @ui-sdk/angular @ui-sdk/core
+```
+
+## Composition
+
+Use the following composition to build ImageCropper:
+
+```text
+uiImageCropper
+├── uiImageCropperViewport
+│   ├── uiImageCropperImage
+│   ├── uiImageCropperSelection
+│   │   └── uiImageCropperGrid
+│   └── uiImageCropperHandle
+├── uiImageCropperZoom
+├── uiImageCropperRotate
+└── uiImageCropperFlip
+```
+
+- **ImageCropper** holds the crop and the image's `src`, and is a group around the parts.
+- **ImageCropperViewport** is the area the image shows in. Give it a size, and its padding keeps the image off its edges.
+- **ImageCropperImage** is the image, turned and flipped. Give it `alt`.
+- **ImageCropperSelection** shows the crop over the image. It's a slider you drag or move with the arrow keys.
+- **ImageCropperGrid** draws lines across the selection, in thirds, for you to style.
+- **ImageCropperHandle** resizes the selection from one edge or corner, its `position`, like `"se"` for the bottom right. It goes beside the selection, not inside it, and sits on its edge or corner.
+- **ImageCropperZoom** is a range input from 1, the largest crop, to `maxZoom`.
+- **ImageCropperRotate** turns the image a quarter clockwise.
+- **ImageCropperFlip** mirrors the image left to right, or top to bottom with `direction="vertical"`.
+
+The viewport, image and selection are needed. The rest are optional.
+
+## Usage
+
+Import the parts and put them together:
+
+```ts
+import { Component, input } from "@angular/core"
+import {
+  ImageCropper,
+  ImageCropperHandle,
+  ImageCropperImage,
+  ImageCropperSelection,
+  ImageCropperViewport,
+} from "@ui-sdk/angular/image-cropper"
+
+@Component({
+  selector: "app-example",
+  imports: [
+    ImageCropper,
+    ImageCropperHandle,
+    ImageCropperImage,
+    ImageCropperSelection,
+    ImageCropperViewport,
+  ],
+  template: `
+    <div
+      uiImageCropper
+      aria-label="Cover photo"
+      [src]="src()"
+      [aspectRatio]="3"
+    >
+      <div *uiImageCropperViewport>
+        <img uiImageCropperImage alt="Your cover photo" />
+        <div uiImageCropperSelection></div>
+        <div uiImageCropperHandle position="nw"></div>
+        <div uiImageCropperHandle position="se"></div>
+      </div>
+    </div>
+  `,
+})
+class Example {
+  readonly src = input.required<string>()
+}
+
+export { Example }
+```
+
+Name the cropper with `aria-label`. Until the image loads, the root has `data-loading` and `aria-busy`, and the selection is hidden. The crop then starts in the middle at `aspectRatio`, four fifths as large as the image allows so its edges show, or as large as it allows in a frame, unless you pass `defaultCrop`:
+
+```angular-html
+<div
+  uiImageCropper
+  aria-label="Photo"
+  [src]="src"
+  [defaultCrop]="{ x: 40, y: 40, width: 320, height: 240 }"
+>
+  <!-- … -->
+</div>
+```
+
+## Aspect Ratio
+
+Set `aspectRatio` to keep the crop's width over its height, like `1` for a square or `16 / 9`. Changing it fits the crop to the new ratio about its middle. Without one, the crop is free, and holding Shift while dragging a handle keeps its current ratio. `minWidth` and `minHeight` stop it getting too small, in image pixels.
+
+<ComponentExample
+  name="image-cropper/aspect-ratio"
+  caption="Choose Square or Wide, then drag an edge. Flip mirrors the image and the crop with it."
+/>
+
+## Frame Mode
+
+Set `mode="frame"` for an avatar editor. The selection stays still and as large as it fits, and you pan the image under it with a drag, and zoom with the wheel, a pinch or the zoom input. Handles don't show in a frame.
+
+`shape="circle"` rounds the selection, but the crop is still its box, so pass `shape: "circle"` to `cropImage` too. Here, Save Avatar crops a 128 pixel round file:
+
+<ComponentExample
+  name="image-cropper/avatar"
+  caption="Drag the image or move the zoom, then press Save Avatar. The new avatar shows beside the button."
+/>
+
+## Rotate and Flip
+
+`uiImageCropperRotate` turns the image a quarter clockwise, and R does the same from the keyboard, with Shift to turn it back. `uiImageCropperFlip` mirrors the image. The crop turns and flips with the image, so it keeps the same part of the photo. Its `x` and `y` count from the top left of the image as it shows, turned and flipped, which is what `cropImage` takes.
+
+## Disabled
+
+Set `disabled`. The selection and handles can't be focused or dragged, and the zoom input and buttons are disabled.
+
+```angular-html
+<div uiImageCropper aria-label="Photo" [src]="src" disabled>
+  <!-- … -->
+</div>
+```
+
+## Controlled
+
+Bind `crop` with `[(crop)]`, and pass `(beforeCropChange)` for the details. Each change carries a [reason](#reasons), like `drag`, `step-key` or `zoom-input`. Call `$event.cancel()` in the callback to keep the current crop.
+
+`(beforeCropChange)` runs on every step of a drag and once the image loads. `(cropCommit)` runs once, when the drag, key press or wheel ends, so use it to save. A controller from `createImageCropperController()` sets the crop from anywhere:
+
+```ts
+import { Component, input } from "@angular/core"
+import {
+  createImageCropperController,
+  ImageCropper,
+  ImageCropperImage,
+  ImageCropperSelection,
+  ImageCropperViewport,
+  type ImageCropperCropCommit,
+} from "@ui-sdk/angular/image-cropper"
+
+@Component({
+  selector: "app-example",
+  imports: [
+    ImageCropper,
+    ImageCropperImage,
+    ImageCropperSelection,
+    ImageCropperViewport,
+  ],
+  template: `
+    <div
+      uiImageCropper
+      aria-label="Photo"
+      [src]="src()"
+      [controller]="controller"
+      (cropCommit)="onCropCommit($event)"
+    >
+      <div *uiImageCropperViewport>
+        <img uiImageCropperImage alt="Your photo" />
+        <div uiImageCropperSelection></div>
+      </div>
+    </div>
+    <button type="button" (click)="controller.setZoom(2)">Zoom In</button>
+  `,
+})
+class Example {
+  readonly src = input.required<string>()
+
+  readonly controller = createImageCropperController()
+
+  onCropCommit(commit: ImageCropperCropCommit) {
+    console.log(commit.value, commit.reason)
+  }
+}
+
+export { Example }
+```
+
+See [State and Events](../state-and-events) for controlled state, cancellation and debugging.
+
+## Custom Rendering
+
+Each directive goes on an element you write. Read the state from a template reference. Every part has the `crop`, the `zoom`, and whether it's `loading`, has an `error` or is `dragging`:
+
+```angular-html
+<div
+  uiImageCropper
+  #imageCropper="uiImageCropper"
+  aria-label="Photo"
+  [src]="src"
+>
+  <div *uiImageCropperViewport>
+    <img uiImageCropperImage alt="Your photo" />
+    <div uiImageCropperSelection></div>
+  </div>
+  @if (imageCropper.state().loading) {
+    <p>Loading…</p>
+  }
+  @if (imageCropper.state().error) {
+    <p>The image didn't load.</p>
+  }
+  <output>{{ imageCropper.state().zoom | percent }}</output>
+</div>
+```
+
+See [Parts and Composition](../parts-and-composition) for the rendering contract and [State](#state) for each part's fields.
+
+## Styling
+
+Parts are unstyled, apart from the positions they need: the viewport is `position: relative` with `overflow: hidden`, and the image, the selection and each handle get their place as inline styles in pixels. A handle's place is the point on its edge or corner, so give it a size and center it with `translate: -50% -50%`. Give the viewport a size too.
+
+A box viewport fits the whole image, so set its `aspect-ratio` to `--image-cropper-aspect-ratio`. A wide `box-shadow` on the selection dims the image outside it. Show the grid only while `data-dragging` is on it.
+
+Each part has a `data-slot`, such as `image-cropper-selection`, and its state attributes are listed under [Data Attributes](#data-attributes).
+
+### ImageCropperViewport [#styling-imagecropperviewport]
+
+<CssVariables component="image-cropper" part="viewport" />
+
+## Data Attributes
+
+### ImageCropper [#data-attributes-imagecropper]
+
+<DataAttributes component="image-cropper" part="root" />
+
+### ImageCropperViewport [#data-attributes-imagecropperviewport]
+
+<DataAttributes component="image-cropper" part="viewport" />
+
+### ImageCropperImage [#data-attributes-imagecropperimage]
+
+<DataAttributes component="image-cropper" part="image" />
+
+### ImageCropperSelection [#data-attributes-imagecropperselection]
+
+<DataAttributes component="image-cropper" part="selection" />
+
+### ImageCropperGrid [#data-attributes-imagecroppergrid]
+
+<DataAttributes component="image-cropper" part="grid" />
+
+### ImageCropperHandle [#data-attributes-imagecropperhandle]
+
+<DataAttributes component="image-cropper" part="handle" />
+
+### ImageCropperZoom [#data-attributes-imagecropperzoom]
+
+<DataAttributes component="image-cropper" part="zoom" />
+
+### ImageCropperRotate [#data-attributes-imagecropperrotate]
+
+<DataAttributes component="image-cropper" part="rotate" />
+
+### ImageCropperFlip [#data-attributes-imagecropperflip]
+
+<DataAttributes component="image-cropper" part="flip" />
+
+## API Reference
+
+Each option below is an input on the directive, and each callback an output. A change callback is two outputs: `(beforeCropChange)`, with the details and `cancel()`, then `(cropChange)` with the new value alone. Bind `crop` with `[(crop)]`.
+
+### ImageCropper
+
+<TypeTable
+  path="../../packages/core/src/components/image-cropper/image-cropper.ts"
+  name="ImageCropperOptions"
+/>
+
+### ImageCropperHandle
+
+<TypeTable
+  path="../../packages/core/src/components/image-cropper/image-cropper.ts"
+  name="ImageCropperHandleProps"
+/>
+
+### ImageCropperFlip
+
+<TypeTable
+  path="../../packages/core/src/components/image-cropper/image-cropper.ts"
+  name="ImageCropperFlipProps"
+/>
+
+### State
+
+What each part's `state()` signal holds. Every part gets the cropper's state.
+
+<StateTable
+  path="../../packages/core/src/components/image-cropper/image-cropper.ts"
+  name="ImageCropperState"
+/>
+
+Handles add their own:
+
+<StateTable
+  path="../../packages/core/src/components/image-cropper/image-cropper.ts"
+  name="ImageCropperHandleState"
+/>
+
+### Reasons
+
+`$event.reason` says why the crop changed.
+
+<ReasonTable
+  path="../../packages/core/src/components/image-cropper/image-cropper.ts"
+  name="ImageCropperCropChangeReason"
+/>
+
+### Controller
+
+Create one with `createImageCropperController()` and pass it as `controller`.
+
+Each write method takes an optional `{ reason, event }`, runs the change callback like a drag, and returns `false` when nothing changed or the change is canceled.
+
+<ControllerTable
+  path="../../packages/core/src/components/image-cropper/image-cropper.ts"
+  name="ImageCropperController"
+/>
+
+### Events
+
+A `before` output emits `{ value, reason, event, cancel() }` before the change, and its plain output follows with the value alone. A bound `crop` only updates when `(beforeCropChange)` wasn't canceled.
+
+| Binding              | On               | Receives                                                                      |
+| -------------------- | ---------------- | ----------------------------------------------------------------------------- |
+| `[(crop)]`           | `uiImageCropper` | The crop                                                                      |
+| `(beforeCropChange)` | `uiImageCropper` | `{ value, reason, cancel() }`: the new crop and the [reason](#reasons)        |
+| `(cropCommit)`       | `uiImageCropper` | `{ value, reason, cancel() }`: the crop once the interaction ends, its reason |
+
+## Accessibility
+
+No WAI-ARIA pattern covers an image cropper, so it's built from ones that do. The cropper is a group. The selection and each handle follow the [WAI-ARIA slider pattern](https://www.w3.org/WAI/ARIA/apg/patterns/slider/), and say the crop in words, like "300 by 300 pixels, at 50, 0". The zoom is a native range input that says its level, like "125%".
+
+The selection, handles and zoom are named in English by default. Pass `aria-label` to name them in another language.
+
+### Keyboard
+
+| Key                 | Does                                                     |
+| ------------------- | -------------------------------------------------------- |
+| Arrow keys          | Move the selection, or on a handle, move its edges       |
+| Shift with an arrow | Moves ten times as far                                   |
+| Plus or Minus       | Zooms in or out, about the crop's middle                 |
+| R                   | Turns the image a quarter clockwise, or back with Shift  |
+| Escape              | During a drag, puts the crop back where the drag started |
+
+Each key press commits, like the end of a drag.
+
+### Tested Behavior
+
+Every line below is an automated test.
+
+<SpecList spec="image-cropper" />

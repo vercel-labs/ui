@@ -222,6 +222,18 @@ const code = [
       code: '<user-picker>\n  <user-picker-trigger>\n    <button>Assign to</button>\n  </user-picker-trigger>\n  <user-picker-content>\n    <user-picker-option value="ada">Ada Lovelace</user-picker-option>\n    <user-picker-option value="grace">Grace Hopper</user-picker-option>\n  </user-picker-content>\n</user-picker>',
     },
   },
+  {
+    value: "angular",
+    label: "Angular",
+    parts: {
+      name: "user-picker.ts",
+      code: 'import { Directive, inject, input } from "@angular/core"\nimport { usePart, usePrimitive } from "@ui-sdk/angular/primitive"\n\n@Directive({ selector: "[appUserPicker]" })\nexport class UserPicker {\n  readonly handle = usePrimitive(userPicker, () => ({}))\n}\n\n@Directive({ selector: "[appUserPickerTrigger]" })\nexport class UserPickerTrigger {\n  constructor() {\n    usePart(inject(UserPicker).handle, "trigger")\n  }\n}\n\n@Directive({ selector: "[appUserPickerContent]" })\nexport class UserPickerContent {\n  constructor() {\n    usePart(inject(UserPicker).handle, "content")\n  }\n}\n\n@Directive({ selector: "[appUserPickerOption]" })\nexport class UserPickerOption {\n  readonly value = input.required<string>()\n\n  constructor() {\n    usePart(inject(UserPicker).handle, "option", () => ({\n      value: this.value(),\n    }))\n  }\n}',
+    },
+    usage: {
+      name: "assign-task.html",
+      code: '<ng-container appUserPicker>\n  <button appUserPickerTrigger>Assign to</button>\n  <div *appUserPickerContent>\n    @for (person of people; track person.value) {\n      <div appUserPickerOption [value]="person.value">{{ person.label }}</div>\n    }\n  </div>\n</ng-container>',
+    },
+  },
 ]
 
 const people = [
@@ -364,7 +376,7 @@ function Code({
         <TabsPanel
           key={entry.value}
           value={entry.value}
-          className="overflow-x-auto overflow-y-hidden outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:-outline-offset-2 focus-visible:outline-blue"
+          className="overflow-auto outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:-outline-offset-2 focus-visible:outline-blue"
           style={{ height: panelHeight(lines) }}
         >
           {([entry.parts, entry.usage] as const).map((part, index) => (

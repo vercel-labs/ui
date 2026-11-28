@@ -1,0 +1,377 @@
+---
+title: Hover Card
+description: Preview a link on hover or keyboard focus while keeping its normal navigation.
+---
+
+A hover card shows a preview of where a link goes, like a person's profile, to someone who pauses on it. The link still works as a link.
+
+<ComponentExample
+  name="hover-card/basic"
+  caption="Hover @hollis, or Tab to it and wait, to open Hollis Grant's profile preview. Move the pointer away or press Escape to close it."
+/>
+
+## Installation
+
+```bash
+npm install @ui-sdk/angular @ui-sdk/core
+```
+
+## Composition
+
+Use the following composition to build HoverCard:
+
+```text
+uiHoverCard
+├── uiHoverCardTrigger
+└── uiHoverCardContent
+    └── uiHoverCardArrow
+```
+
+The trigger is a link (an `<a>`, so give it an `href`), and pressing it follows the link. The content is the preview, and the arrow is optional.
+
+The card only adds a preview for people who pause on the link: everything in it should be reachable from the page the link goes to, since touch and screen reader users may never open it. For a tip on a button, use a [Tooltip](./tooltip). For content that opens with a press, use a [Popover](./popover).
+
+## Usage
+
+Import the parts and put them together:
+
+```ts
+import { Component } from "@angular/core"
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@ui-sdk/angular/hover-card"
+
+@Component({
+  selector: "app-example",
+  imports: [HoverCard, HoverCardContent, HoverCardTrigger],
+  template: `
+    <ng-container uiHoverCard>
+      <a uiHoverCardTrigger href="/people/hollis">@hollis</a>
+      <div *uiHoverCardContent>
+        <p>Hollis Grant</p>
+        <p>Design engineer on the payments team.</p>
+      </div>
+    </ng-container>
+  `,
+})
+class Example {}
+
+export { Example }
+```
+
+## Positioning
+
+`side` picks where the card opens, `bottom` by default, and `align` lines it up with the start, center or end of the link. The card flips to the other side when there isn't room and shifts along the link to stay on screen.
+
+`uiHoverCardArrow` follows the side the card actually lands on, including after a flip, and gets the same `data-side`. It points at the middle of the link and keeps `arrowPadding` away from the corners; `data-arrow-clamped` tells you when it can't reach the middle.
+
+<ComponentExample
+  name="hover-card/side"
+  caption="Choose a side and an alignment, then hover @ines. The card opens there and its arrow points at the link."
+/>
+
+`sideOffset` is the gap to the link, 4 pixels by default. `alignOffset` shifts the card along it, and `collisionPadding` is the space kept from the edges of the window. `anchor` positions the card against something other than the link: an element, a CSS selector, a point like `{ x, y }`, or anything with `getBoundingClientRect()`.
+
+```angular-html
+<div
+  *uiHoverCardContent="{
+    side: 'right',
+    align: 'start',
+    sideOffset: 8,
+    collisionPadding: 16,
+    anchor: row,
+  }"
+></div>
+```
+
+## Delays
+
+`delay` is how long the pointer rests on the link, or keyboard focus stays on it, before the card opens: 600 milliseconds by default. `closeDelay` is how long it stays open once the pointer leaves the link and the card: 300 milliseconds by default. The pointer can cross the gap between the link and the card without closing it.
+
+`disabled` stops the card from opening and leaves a plain link.
+
+```angular-html
+<ng-container
+  uiHoverCard
+  [delay]="300"
+  [closeDelay]="150"
+  [disabled]="!previews"
+></ng-container>
+```
+
+## Controlled
+
+Use `[(open)]`. Every change carries a [reason](#reasons) in `(beforeOpenChange)`, like `trigger-hover`, `trigger-focus`, `focus-out`, `escape-key` or `outside-press`. Call `$event.cancel()` to stop it.
+
+```ts
+import { Component, signal } from "@angular/core"
+import { HoverCard } from "@ui-sdk/angular/hover-card"
+
+@Component({
+  selector: "app-example",
+  imports: [HoverCard],
+  template: `
+    <ng-container uiHoverCard [(open)]="open">
+      <!-- … -->
+    </ng-container>
+  `,
+})
+class Example {
+  readonly open = signal(false)
+}
+
+export { Example }
+```
+
+## One Card for Many Links
+
+A feed or a list can share one card instead of rendering one per link. Connect the links and the card to one `createHoverCardController<Payload>()`. Each link passes a `payload`, like its person, and the content reads it from its state, `*uiHoverCardContent="let content"`, as `content.payload`. In a template the payload is `unknown`, so give it its type in a method, like the example's `payloadOf()`. Only the link that opened the card gets `data-open`. `controller.open({ payload })` opens the card from code.
+
+```ts
+import { Component } from "@angular/core"
+import {
+  createHoverCardController,
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@ui-sdk/angular/hover-card"
+
+type Person = { handle: string; name: string; url: string; bio: string }
+
+@Component({
+  selector: "app-example",
+  imports: [HoverCard, HoverCardContent, HoverCardTrigger],
+  template: `
+    @for (person of people; track person.handle) {
+      <a
+        uiHoverCardTrigger
+        [controller]="profile"
+        [payload]="person"
+        [href]="person.url"
+      >
+        {{ person.name }}
+      </a>
+    }
+
+    <ng-container uiHoverCard [controller]="profile">
+      <div *uiHoverCardContent="let content">
+        <p>{{ payloadOf(content)?.bio }}</p>
+      </div>
+    </ng-container>
+  `,
+})
+class Example {
+  readonly people: Person[] = [
+    {
+      handle: "ada",
+      name: "Ada Lovelace",
+      url: "/people/ada",
+      bio: "Wrote the first program.",
+    },
+  ]
+  readonly profile = createHoverCardController<Person>()
+
+  payloadOf(state: { payload?: unknown }) {
+    return state.payload as Person | undefined
+  }
+}
+
+export { Example }
+```
+
+A card can have links of its own. Tab from a link with an open card moves into the card, and Tab past its end moves on to the page after the link. Focus leaving the card closes it.
+
+## Container
+
+Cards render in place and show in the top layer, so no ancestor clips or covers them. `container` renders the card somewhere else, for iframes, shadow roots or a specific stacking context. See the shared [popup guide](../popups).
+
+```angular-html
+<div *uiHoverCardContent="{ container: shadowRoot }"></div>
+```
+
+## Animation
+
+The content has `data-starting-style` while it opens and `data-ending-style` while it closes. Transition from those states, and the card stays mounted until the exit finishes. `(openChangeComplete)` runs after the transition, and `keepMounted` keeps the closed card in the page, hidden, for animation libraries that drive the exit from state.
+
+<StyleTabs>
+
+```css
+[data-slot="hover-card-content"] {
+  transition:
+    opacity 150ms,
+    scale 150ms;
+
+  &:is([data-starting-style], [data-ending-style]) {
+    opacity: 0;
+    scale: 0.96;
+  }
+}
+```
+
+```angular-html
+<div
+  *uiHoverCardContent
+  class="origin-(--transform-origin) transition-[opacity,scale] duration-150 data-starting-style:scale-96 data-starting-style:opacity-0 data-ending-style:scale-96 data-ending-style:opacity-0"
+></div>
+```
+
+</StyleTabs>
+
+## Custom Rendering
+
+Each directive goes on an element you write. Read a part's state from a template reference, like `#trigger="uiHoverCardTrigger"` and then `trigger.state().open`, and the content's from `*uiHoverCardContent="let content"`.
+
+```angular-html
+<a uiHoverCardTrigger href="/people/hollis">
+  <span aria-hidden="true">HG</span>
+  Hollis Grant
+</a>
+```
+
+## Styling
+
+Each part has a `data-slot`, such as `hover-card-content`, and shows its state through the attributes listed under [Data Attributes](#data-attributes). Use `data-open` on the trigger to mark the link whose card is showing, and `data-side` to style the content and arrow for the side they landed on. Put `transform-origin: var(--transform-origin)` on the content so it scales from the link.
+
+Keep overflow visible around an arrow that extends outside the card. If the body needs to scroll, put scrolling on an inner element.
+
+### HoverCardContent [#styling-hovercardcontent]
+
+<CssVariables component="hover-card" part="content" />
+
+## Data Attributes
+
+### HoverCardTrigger [#data-attributes-hovercardtrigger]
+
+<DataAttributes component="hover-card" part="trigger" />
+
+### HoverCardContent [#data-attributes-hovercardcontent]
+
+<DataAttributes component="hover-card" part="content" />
+
+### HoverCardArrow [#data-attributes-hovercardarrow]
+
+<DataAttributes component="hover-card" part="arrow" />
+
+## API Reference
+
+Each option below is an input on the directive, and each callback an output. A change callback is two outputs: `(beforeOpenChange)`, with the details and `cancel()`, then `(openChange)` with the new value alone. Bind `open` with `[(open)]`.
+
+### HoverCard
+
+<TypeTable
+  path="../../packages/core/src/components/hover-card/hover-card.ts"
+  name="HoverCardOptions"
+/>
+
+### HoverCardTrigger
+
+A trigger outside the card also takes `controller`.
+
+<TypeTable
+  path="../../packages/core/src/components/hover-card/hover-card.ts"
+  name="HoverCardTriggerProps"
+/>
+
+### HoverCardContent
+
+<TypeTable
+  path="../../packages/core/src/components/hover-card/hover-card.ts"
+  name="HoverCardContentProps"
+/>
+
+### HoverCardArrow
+
+Points at the link from the side the card landed on. Goes on a `div`.
+
+### State
+
+What each part's `state()` signal holds, per part.
+
+`uiHoverCardTrigger`:
+
+<StateTable
+  path="../../packages/core/src/components/hover-card/hover-card.ts"
+  name="HoverCardTriggerState"
+/>
+
+`uiHoverCardContent`:
+
+<StateTable
+  path="../../packages/core/src/components/hover-card/hover-card.ts"
+  name="HoverCardContentState"
+/>
+
+`uiHoverCardArrow`:
+
+<StateTable
+  path="../../packages/core/src/components/hover-card/hover-card.ts"
+  name="HoverCardArrowState"
+/>
+
+### Reasons
+
+`$event.reason` says why the card opened or closed.
+
+<ReasonTable
+  path="../../packages/core/src/components/hover-card/hover-card.ts"
+  name="HoverCardOpenChangeReason"
+/>
+
+For a payload change, it says what opened the card or took it over.
+
+<ReasonTable
+  path="../../packages/core/src/components/hover-card/hover-card.ts"
+  name="HoverCardPayloadChangeReason"
+/>
+
+### Controller
+
+Create one with `createHoverCardController<Payload>()` and pass it to `[controller]`, on the card and on any triggers outside it. `Payload` is the type of the data triggers and `open()` pass.
+
+Every write method takes an optional `{ reason, event }`, passed to `(beforeOpenChange)`.
+
+<ControllerTable
+  path="../../packages/core/src/components/hover-card/hover-card.ts"
+  name="HoverCardController"
+/>
+
+### Events
+
+A `before` output emits `{ value, reason, event, cancel() }` before the change, and its plain output follows with the value alone. A bound `open` only updates when `(beforeOpenChange)` wasn't canceled.
+
+| Binding                 | On            | Receives                                                                             |
+| ----------------------- | ------------- | ------------------------------------------------------------------------------------ |
+| `[(open)]`              | `uiHoverCard` | Whether the card is open                                                             |
+| `(beforeOpenChange)`    | `uiHoverCard` | `{ value, reason, cancel() }`: the new state, and the [reason](#reasons)             |
+| `(openChangeComplete)`  | `uiHoverCard` | `$event`, whether it's open, after the animation                                     |
+| `(beforePayloadChange)` | `uiHoverCard` | `{ value, reason, cancel() }`: the content's new payload, and the [reason](#reasons) |
+
+## Accessibility
+
+The trigger stays a plain link, and the card is a preview beside it, not a dialog. Every line below is an automated test.
+
+### Keyboard
+
+| Key    | Does                                                                         |
+| ------ | ---------------------------------------------------------------------------- |
+| Tab    | On the link, opens the card after `delay`; with the card open, moves into it |
+| Enter  | Follows the link                                                             |
+| Escape | Closes the card and leaves focus on the link                                 |
+
+Keyboard focus opens the card after the same `delay` as the pointer, so tabbing through a page of links doesn't flash a card at every stop. Focus leaving the card closes it.
+
+Touch screens have no hover, so a tap follows the link without opening the card. Anything in the card should be on the page the link goes to.
+
+### Tested Behavior
+
+<SpecList spec="hover-card" />
+
+Also tested:
+
+<SpecList spec="hover-card.enhancements" />
+
+Screen readers hear the same thing in each tested framework, recorded by a virtual screen reader:
+
+<SpecList spec="hover-card.sr" />

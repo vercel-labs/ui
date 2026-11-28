@@ -1,0 +1,318 @@
+---
+title: Radio
+description: Choose one option, move the selection with arrow keys, and submit it with a form.
+---
+
+Use radios for a short list of choices where only one can be picked, like a shipping speed or a plan. The group keeps one value and gives the whole list a single tab stop.
+
+<ComponentExample
+  name="radio/basic"
+  caption="Choose Express, then use the arrow keys to move the selection between speeds."
+/>
+
+## Installation
+
+```bash
+npm install @ui-sdk/angular @ui-sdk/core
+```
+
+## Composition
+
+Use the following composition to build RadioGroup:
+
+```text
+uiRadioGroup
+├── uiRadio
+│   └── uiRadioIndicator
+└── uiRadio
+    └── uiRadioIndicator
+```
+
+Give each radio a `value` and wrap it with its text in a label. The group's value is the checked radio's value, and the indicator shows while its radio is checked.
+
+## Usage
+
+Import the parts and put them together:
+
+```ts
+import { Component } from "@angular/core"
+import { Field, FieldLabel } from "@ui-sdk/angular/field"
+import { Radio, RadioGroup, RadioIndicator } from "@ui-sdk/angular/radio"
+
+@Component({
+  selector: "app-example",
+  imports: [Field, FieldLabel, Radio, RadioGroup, RadioIndicator],
+  template: `
+    <div uiField>
+      <label uiFieldLabel>Shipping speed</label>
+      <div uiRadioGroup defaultValue="standard">
+        <label>
+          <button uiRadio value="standard">
+            <span uiRadioIndicator></span>
+          </button>
+          Standard
+        </label>
+        <label>
+          <button uiRadio value="express">
+            <span uiRadioIndicator></span>
+          </button>
+          Express
+        </label>
+      </div>
+    </div>
+  `,
+})
+class Example {}
+
+export { Example }
+```
+
+The field's label names the group. Without a field, name it with `aria-label` or `aria-labelledby`. Without `defaultValue`, nothing starts checked and Tab enters on the first enabled radio.
+
+## Description
+
+Put each radio in its own `uiField` with a `uiFieldLabel` and `uiFieldDescription` when an option needs more explanation. That field connects both to its radio, while the outer field still names the group.
+
+<ComponentExample
+  name="radio/description"
+  caption="Choose Weekly digest by its label. Each radio is also described by the line under it."
+/>
+
+## Choice Card
+
+Wrap an option's content in its label to make the whole card clickable. `:has([data-checked])` lets the card reflect the radio inside it.
+
+<ComponentExample
+  name="radio/choice-card"
+  caption="Click anywhere on the Pro card to choose it. Arrow keys move the selection between cards too."
+/>
+
+## Fieldset and Legend
+
+Use `uiFieldSet` and `uiFieldLegend` to describe a set of choices together. Connect the group to the legend with `aria-labelledby`, and to the description with `aria-describedby`.
+
+<ComponentExample
+  name="radio/legend"
+  caption="Choose Yearly. The legend and the line under it describe both billing periods."
+/>
+
+## Disabled
+
+Set `disabled` on the group or on one radio. Disabled radios can't be focused or checked, and arrow keys skip them. A disabled fieldset disables the group too, and a disabled group submits nothing.
+
+<ComponentExample
+  name="radio/disabled"
+  caption="The Theme group is disabled. In Backups, Hourly is disabled, so the arrow keys move between Daily and Weekly."
+/>
+
+## Read-Only
+
+Set `readOnly` on the group to keep its value while still letting people focus and read the options. Arrow keys move focus without checking anything, and the value still submits with a form.
+
+<ComponentExample
+  name="radio/read-only"
+  caption="Click Team, or focus Pro and press the Down arrow. Pro stays checked."
+/>
+
+## Controlled
+
+Use `[(value)]` to own the value, and `(beforeValueChange)` for the reason. Call `$event.cancel()` in the callback to keep the current value. A [controller](#controller) from `createRadioGroupController()` checks a radio from anywhere, like the Choose Team button below. Create one controller per mounted group.
+
+<ComponentExample
+  name="radio/controlled"
+  caption="Choose Starter, then press Choose Team. The console logs each change and its reason."
+/>
+
+See [State and Events](../state-and-events) for controlled state, cancellation and debugging.
+
+## Form
+
+Each radio renders a button with the `radio` role and a hidden native radio, so the group takes part in forms. Set `name` to submit the checked value; the group submits nothing without a name or a checked radio. `required` blocks submission until there's a choice, and a reset returns to `defaultValue`.
+
+Set `form` to a form's id to join it from elsewhere on the page, as this group does.
+
+<ComponentExample
+  name="radio/form"
+  caption="Choose Express and press Continue. The console logs the submitted value, and Reset returns the choice to Standard."
+/>
+
+## Validation
+
+Put a required group in a [Field](./field) with a `uiFieldError`. Submitting without a choice shows the error under the group and moves focus to it. The [Forms guide](../forms) covers the shared field behavior.
+
+<ComponentExample
+  name="radio/invalid"
+  caption="Press Save without a choice to see the error. Choose SMS only and save again; the console logs the saved value."
+/>
+
+## Animation
+
+The indicator has `data-starting-style` as it appears and `data-ending-style` while it leaves, and stays mounted until its exit finishes. Transition from those states:
+
+<StyleTabs>
+
+```css
+[data-slot="radio-indicator"] {
+  transition:
+    opacity 0.15s,
+    scale 0.15s;
+
+  &:is([data-starting-style], [data-ending-style]) {
+    opacity: 0;
+    scale: 0.5;
+  }
+}
+```
+
+```angular-html
+<span
+  uiRadioIndicator
+  class="transition-[opacity,scale] duration-150 data-starting-style:scale-50 data-starting-style:opacity-0 data-ending-style:scale-50 data-ending-style:opacity-0"
+></span>
+```
+
+</StyleTabs>
+
+`keepMounted` keeps the indicator showing while unchecked, with `data-unchecked`. Here it lets a hovered option preview its dot.
+
+<ComponentExample
+  name="radio/indicator"
+  caption="Hover Light to preview its dot, then choose it. The dot scales in on Light and out of System."
+/>
+
+## Loop
+
+Arrow keys wrap from the last radio to the first. Set `loop` to `false` to stop at the ends.
+
+```angular-html
+<div uiRadioGroup defaultValue="low" [loop]="false">...</div>
+```
+
+## Custom Rendering
+
+The group, radio and indicator go on elements you write. Put `uiRadio` on the interactive element so its role, label and keyboard behavior stay connected, and read its state from a template reference: with `#radio="uiRadio"`, `radio.state().checked` says whether it's chosen. See [Parts and Composition](../parts-and-composition) for more.
+
+<ComponentExample
+  name="radio/render"
+  caption="Choose Nothing. Each radio renders a full-width button that shows a check from its state."
+/>
+
+## Styling
+
+Use `data-checked` and `data-unchecked` for the checked state, and `data-disabled`, `data-readonly` and `data-required` for the rest. The indicator gets the same state attributes as its radio, and the group gets `data-disabled`, `data-readonly` and `data-required`.
+
+Each part has a `data-slot`, such as `radio`, and its state attributes are listed under [Data Attributes](#data-attributes).
+
+## Data Attributes
+
+### RadioGroup [#data-attributes-radiogroup]
+
+<DataAttributes component="radio" part="group" />
+
+### Radio [#data-attributes-radio]
+
+<DataAttributes component="radio" part="root" />
+
+### RadioIndicator [#data-attributes-radioindicator]
+
+<DataAttributes component="radio" part="indicator" />
+
+## API Reference
+
+Each option below is an input on the directive, and each callback an output. A change callback is two outputs: `(beforeValueChange)`, with the details and `cancel()`, then `(valueChange)` with the new value alone. Bind `value` with `[(value)]`.
+
+### RadioGroup
+
+<TypeTable
+  path="../../packages/core/src/components/radio/radio.ts"
+  name="RadioGroupOptions"
+/>
+
+### Radio
+
+<TypeTable
+  path="../../packages/core/src/components/radio/radio.ts"
+  name="RadioProps"
+/>
+
+### RadioIndicator
+
+<TypeTable
+  path="../../packages/core/src/components/radio/radio.ts"
+  name="RadioIndicatorProps"
+/>
+
+### State
+
+What each part's `state()` signal holds.
+
+<StateTable
+  path="../../packages/core/src/components/radio/radio.ts"
+  name="RadioGroupState"
+/>
+
+<StateTable
+  path="../../packages/core/src/components/radio/radio.ts"
+  name="RadioState"
+/>
+
+<StateTable
+  path="../../packages/core/src/components/radio/radio.ts"
+  name="RadioIndicatorState"
+/>
+
+### Reasons
+
+`$event.reason` says why the checked value changed.
+
+<ReasonTable
+  path="../../packages/core/src/components/radio/radio.ts"
+  name="RadioGroupValueChangeReason"
+/>
+
+### Controller
+
+Create one with `createRadioGroupController()` and pass it as `controller`.
+
+Every write method takes an optional `{ reason, event }`, runs the change callback like a press, and returns `false` when the change is canceled.
+
+<ControllerTable
+  path="../../packages/core/src/components/radio/radio.ts"
+  name="RadioGroupController"
+/>
+
+### Events
+
+A `before` output emits `{ value, reason, event, cancel() }` before the change, and its plain output follows with the value alone. A bound `value` only updates when `(beforeValueChange)` wasn't canceled.
+
+| Binding               | On             | Receives                                                                     |
+| --------------------- | -------------- | ---------------------------------------------------------------------------- |
+| `[(value)]`           | `uiRadioGroup` | The checked value                                                            |
+| `(beforeValueChange)` | `uiRadioGroup` | `{ value, reason, cancel() }`: the checked value, and the [reason](#reasons) |
+
+## Accessibility
+
+Radio groups follow the [WAI-ARIA radio group pattern](https://www.w3.org/WAI/ARIA/apg/patterns/radio/), and behave like native radios that share a name. `uiRadio` renders a button with the `radio` role, and a hidden native radio that takes part in forms.
+
+### Keyboard
+
+| Key        | Does                                                                    |
+| ---------- | ----------------------------------------------------------------------- |
+| Tab        | Moves into the group, onto the checked radio or the first enabled one   |
+| Arrow keys | Move to the next or previous radio and check it, skipping disabled ones |
+| Space      | Checks the focused radio                                                |
+| Enter      | Submits its form                                                        |
+
+### Tested Behavior
+
+Every line below is an automated test.
+
+<SpecList spec="radio" />
+
+In a field:
+
+<SpecList spec="radio.field" />
+
+In right-to-left pages:
+
+<SpecList spec="forms.rtl" />

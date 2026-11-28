@@ -2,6 +2,7 @@
 // `size-budget.json`, and the code no entry may ship. tests/README.md
 // ("Bundle size") says how each row is measured.
 import { build, transform } from "esbuild"
+import { execFileSync } from "node:child_process"
 import {
   appendFileSync,
   readdirSync,
@@ -143,6 +144,16 @@ const adapters = [
     // entries. Behaviors with no elements, like `gesture`, come from core.
     options: {},
     defines: true,
+  },
+  {
+    name: "angular",
+    // Like React DOM, Angular's runtime is in the app already: an entry uses
+    // what templates and signals do. A production build turns `ngDevMode` off.
+    options: {
+      external: ["@angular/*", "rxjs", "rxjs/*"],
+      define: { ngDevMode: "false" },
+      plugins: [angularFiles()],
+    },
   },
 ]
 
@@ -568,6 +579,37 @@ function svelteFiles() {
       build.onLoad(
         { filter: /\.svelte\.(js|ts)$/, namespace: "file" },
         ({ path: file }) => load(file, runesModule)
+      )
+    },
+  }
+}
+
+// Serves each file of the Angular adapter as Angular's compiler writes it in
+// an app's production build. Every entry bundles the same files, so they
+// compile once, into `packages/angular/node_modules/.size`.
+function angularFiles() {
+  const packageDir = path.join(root, "packages/angular")
+  const source = path.join(packageDir, "src") + path.sep
+  execFileSync("npx", ["ngc", "-p", "tsconfig.size.json"], {
+    cwd: packageDir,
+    stdio: "inherit",
+  })
+  return {
+    name: "angular",
+    setup(build) {
+      build.onLoad(
+        { filter: /\.ts$/, namespace: "file" },
+        async ({ path: file }) => {
+          if (!file.startsWith(source)) {
+            return undefined
+          }
+          const compiled = path.join(
+            packageDir,
+            "node_modules/.size",
+            file.slice(source.length).replace(/\.ts$/, ".js")
+          )
+          return { contents: await readFile(compiled, "utf8"), loader: "js" }
+        }
       )
     },
   }

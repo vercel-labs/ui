@@ -54,6 +54,13 @@ npm add @ui-sdk/core @ui-sdk/web
 ```
 
 </FrameworkContent>
+<FrameworkContent value="angular">
+
+```bash
+npm add @ui-sdk/core @ui-sdk/angular
+```
+
+</FrameworkContent>
 
 ## Create the Color Scheme
 
@@ -163,6 +170,29 @@ import "@ui-sdk/web/preferences"
 import { colorScheme } from "./lib/color-scheme"
 
 document.querySelector("ui-preferences")!.preferences = [colorScheme]
+```
+
+</FrameworkContent>
+<FrameworkContent value="angular">
+
+```ts title="src/app/app.ts"
+import { Component } from "@angular/core"
+import { RouterOutlet } from "@angular/router"
+import { Preferences } from "@ui-sdk/angular/preferences"
+import { colorScheme } from "./lib/color-scheme"
+
+@Component({
+  selector: "app-root",
+  imports: [Preferences, RouterOutlet],
+  template: `
+    <div uiPreferences [preferences]="[colorScheme]">
+      <router-outlet />
+    </div>
+  `,
+})
+export class App {
+  readonly colorScheme = colorScheme
+}
 ```
 
 </FrameworkContent>
@@ -414,6 +444,46 @@ switcher.addEventListener("valuechange", (event) => {
 })
 show()
 colorScheme.subscribe(show)
+```
+
+</FrameworkContent>
+<FrameworkContent value="angular">
+
+```ts title="src/app/color-scheme-switcher.ts"
+import { Component } from "@angular/core"
+import type { ColorSchemeValue } from "@ui-sdk/core"
+import { usePreference } from "@ui-sdk/angular/preferences"
+import {
+  SegmentedControl,
+  SegmentedControlIndicator,
+  SegmentedControlItem,
+} from "@ui-sdk/angular/segmented-control"
+import { colorScheme } from "./lib/color-scheme"
+
+@Component({
+  selector: "app-color-scheme-switcher",
+  imports: [SegmentedControl, SegmentedControlIndicator, SegmentedControlItem],
+  template: `
+    <div
+      uiSegmentedControl
+      aria-label="Color scheme"
+      [value]="scheme().value"
+      (valueChange)="choose($event)"
+    >
+      <span uiSegmentedControlIndicator></span>
+      <button uiSegmentedControlItem value="light">Light</button>
+      <button uiSegmentedControlItem value="dark">Dark</button>
+      <button uiSegmentedControlItem value="system">System</button>
+    </div>
+  `,
+})
+export class ColorSchemeSwitcher {
+  readonly scheme = usePreference(colorScheme)
+
+  choose(next: string | null) {
+    colorScheme.set(next as ColorSchemeValue)
+  }
+}
 ```
 
 </FrameworkContent>
@@ -762,6 +832,59 @@ export { colorScheme }
 ```
 
 Then import `colorScheme` from `./lib/app-color-scheme` in `src/main.ts` and the switcher, where they imported it from `./lib/color-scheme`.
+
+</FrameworkContent>
+<FrameworkContent value="angular">
+
+With Angular's server rendering, create the color scheme in a service. Angular creates the service for each request on the server, where the `REQUEST` token holds the request:
+
+```ts title="src/app/color-scheme.service.ts"
+import { inject, Injectable, REQUEST } from "@angular/core"
+import { createAppColorScheme, readColorScheme } from "./lib/color-scheme"
+
+@Injectable({ providedIn: "root" })
+export class ColorScheme {
+  readonly scheme = createAppColorScheme(
+    readColorScheme(inject(REQUEST)?.headers.get("cookie") ?? null)
+  )
+}
+```
+
+In the root component, pass it to `uiPreferences` and write the choice on `<html>`:
+
+```ts title="src/app/app.ts"
+import { Component, DOCUMENT, inject } from "@angular/core"
+import { RouterOutlet } from "@angular/router"
+import { Preferences } from "@ui-sdk/angular/preferences"
+import { ColorScheme } from "./color-scheme.service"
+
+@Component({
+  selector: "app-root",
+  imports: [Preferences, RouterOutlet],
+  template: `
+    <div uiPreferences [preferences]="[colorScheme]">
+      <router-outlet />
+    </div>
+  `,
+})
+export class App {
+  readonly colorScheme = inject(ColorScheme).scheme
+
+  constructor() {
+    inject(DOCUMENT).documentElement.setAttribute(
+      "data-color-scheme",
+      this.colorScheme.get().value
+    )
+  }
+}
+```
+
+In the switcher, inject the service instead of importing the color scheme:
+
+```ts
+readonly colorScheme = inject(ColorScheme).scheme
+readonly scheme = usePreference(this.colorScheme)
+```
 
 </FrameworkContent>
 

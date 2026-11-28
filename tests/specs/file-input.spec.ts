@@ -33,12 +33,13 @@ const folder = (page: Page) =>
 const send = (page: Page) => page.getByRole("button", { name: "Send" })
 const actions = (page: Page) => page.getByRole("status", { name: "Actions" })
 // The hidden input of the file input around a trigger, which opens the picker.
+// An Angular directive renders its input right after its element.
 const inputOf = (button: Locator) =>
-  button.evaluateHandle((el) =>
-    el
-      .closest('[data-slot="file-input"]')!
-      .querySelector<HTMLInputElement>('input[type="file"]')!
-  )
+  button.evaluateHandle((el) => {
+    const root = el.closest('[data-slot="file-input"]')!
+    return (root.querySelector('input[type="file"]') ??
+      root.nextElementSibling) as HTMLInputElement
+  })
 
 test.describe("drops and pastes", () => {
   test("dropped files are reported, the rejected ones with every reason", async ({

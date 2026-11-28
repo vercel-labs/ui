@@ -5,8 +5,15 @@ import path from "node:path"
 
 // Every framework folder must have the same examples.
 const root = path.join(import.meta.dirname, "../../examples/components/menu")
-const frameworks = ["react", "vue", "web-components", "svelte", "solid"]
-const folders = ["react", "vue", "web", "svelte", "solid"]
+const frameworks = [
+  "react",
+  "vue",
+  "web-components",
+  "svelte",
+  "solid",
+  "angular",
+]
+const folders = ["react", "vue", "web", "svelte", "solid", "angular"]
 const examplesIn = (folder: string) =>
   readdirSync(path.join(root, folder)).map((file) => file.replace(/\.\w+$/, ""))
 const examples = examplesIn("react")
@@ -21,7 +28,7 @@ const triggers: Record<string, string | RegExp> = {
   icons: "Share",
   checkboxes: "View",
   "radio-group": "Panel",
-  "context-menu": /long-press here$/i,
+  "context-menu": /long-press here\s*$/i,
   disabled: "Document",
   animation: "Animated",
   presentation: "Options",

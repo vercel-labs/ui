@@ -1,0 +1,82 @@
+---
+title: Custom Parts
+description: Give a part logic of its own and connect it to a primitive.
+---
+
+The directives from [Rendering Primitives](./rendering) connect slots to elements. A part can do more: let a parent cancel a change, call the primitive's API, or render only while its slot is present. These examples keep the same `rating.ts` from [Compose Behaviors](../core/compose-behaviors#complete-primitive).
+
+## Decide Which Changes to Accept
+
+`onValueChange` receives the requested value and its `details`, before the value changes. Emit both from a `before` output, so a parent can call `cancel()`, and the value alone from `valueChange` once it goes through:
+
+```ts title="rating-parts.ts"
+import { Directive, input, output } from "@angular/core"
+import type { ChangeDetails } from "@ui-sdk/core"
+import { usePart, usePrimitive } from "@ui-sdk/angular/primitive"
+import { rating } from "./rating"
+
+export type RatingChange = ChangeDetails & { value: number }
+
+@Directive({ selector: "[appRating]", exportAs: "appRating" })
+export class Rating {
+  readonly value = input<number>()
+  readonly defaultValue = input<number>()
+  readonly beforeValueChange = output<RatingChange>()
+  readonly valueChange = output<number>()
+
+  readonly handle = usePrimitive(rating, () => ({
+    value: this.value(),
+    defaultValue: this.defaultValue(),
+    onValueChange: (value, details) => {
+      this.beforeValueChange.emit({ ...details, value })
+      if (!details.canceled) {
+        this.valueChange.emit(value)
+      }
+    },
+  }))
+  readonly state = usePart(this.handle, "root").state
+}
+```
+
+A parent can now write `(beforeValueChange)="$event.value < 2 && $event.cancel()"` to refuse a rating below two stars, the same way it does on the components in the catalog.
+
+## Call the Primitive's API
+
+`handle.api` holds what the primitive's `api` returns, so a directive of your own can call it. This one clears the rating when pressed:
+
+```ts
+import { Directive, inject } from "@angular/core"
+import { Rating } from "./rating-parts"
+
+@Directive({
+  selector: "[appRatingClear]",
+  host: { type: "button", "(click)": "clear($event)" },
+})
+export class RatingClear {
+  readonly #rating = inject(Rating)
+
+  clear(event: Event) {
+    this.#rating.handle.api.rate(0, event)
+  }
+}
+```
+
+`rate` goes through `onValueChange` like a press on a star, so `(beforeValueChange)` can still cancel it. Put it on a button inside the element with `appRating`, and give it a label like Clear Rating.
+
+## Render Only While Present
+
+A slot can come and go, like popup content that's there only while it's open. Put the directive in the `*` form and `usePart` renders the element only while its slot is present:
+
+```angular-html
+<div *appDetailsContent>Shown while it's open.</div>
+```
+
+Without the `*`, the element stays in the page and gets `hidden` while the slot isn't present. `usePart` also returns a `present` signal, for a part that needs to know.
+
+## Merge Attributes
+
+`usePart` writes the slot's attributes onto your element and leaves your own alone. Where both set one, the slot's wins, except an `id`, or a name or typing hint you write, like `aria-label` or `autocomplete`, which replaces the slot's. Your event listeners on the element run first, and calling `$event.preventDefault()` in one skips the built-in behavior.
+
+## Compose a Popup
+
+A custom component can also use an existing Popover or Dialog. [Compose Ours](../core/behaviors/popups#compose-ours) shows that connection with an emoji picker.

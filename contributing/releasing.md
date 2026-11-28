@@ -1,6 +1,6 @@
 # Releasing
 
-The six `@ui-sdk/*` packages go to npm together, always at the same version. `@ui-sdk/react@0.3.0` goes with `@ui-sdk/core@0.3.0`, so nobody has to work out which versions match.
+The seven `@ui-sdk/*` packages go to npm together, always at the same version. `@ui-sdk/react@0.3.0` goes with `@ui-sdk/core@0.3.0`, so nobody has to work out which versions match.
 
 ## Add a changeset
 
@@ -35,7 +35,28 @@ npm sets up a trusted publisher only for a package that exists, so the first ver
    pnpm install && pnpm build && pnpm docs:packages && pnpm check:packages && pnpm changeset publish && git push --follow-tags
    ```
 
-5. On npmjs.com, add a trusted publisher to each of the six packages: GitHub Actions, repository `vercel-labs/ui`, workflow `release.yml`.
+5. On npmjs.com, add a trusted publisher to each package: GitHub Actions, repository `vercel-labs/ui`, workflow `release.yml`.
 6. In the repo's settings, set the Actions variable `NPM_PUBLISH` to `true`.
 
 From then on, merging a version pull request is the whole release.
+
+## A new package
+
+A new package has no trusted publisher yet, so its first version goes out by hand too, at the version the others have, before the next version pull request merges:
+
+1. From the commit of main that adds it, signed in to npm with publish rights on `@ui-sdk`:
+
+   ```bash
+   pnpm install && pnpm build && pnpm docs:packages && pnpm check:packages
+   cd packages/<name> && pnpm publish --access public --tag beta
+   ```
+
+   `--tag beta` is for a beta version. A stable one takes no tag.
+
+2. Add its trusted publisher, the same as the others have:
+
+   ```bash
+   npm trust github @ui-sdk/<name> --file release.yml --repo vercel-labs/ui --allow-publish -y
+   ```
+
+The next version pull request then releases it with the rest.
