@@ -594,6 +594,11 @@ function createListboxEngine(
     }
   }
 
+  // The highlight last scrolled into view, so one that mounts highlighted, like
+  // a default value's, scrolls into view once, and not again each time a
+  // virtualized list mounts it.
+  let shown: string | null = null
+
   function highlight(
     key: string | null,
     { focus = true, event }: { focus?: boolean; event?: Event } = {}
@@ -618,6 +623,7 @@ function createListboxEngine(
     }
     const el = registry.get(key)?.el
     if (el?.isConnected) {
+      shown = key
       reveal(el, focus)
     }
   }
@@ -747,6 +753,10 @@ function createListboxEngine(
         return
       }
       liveLabel(key, entry)
+      if (store.get().highlighted === key && shown !== key) {
+        shown = key
+        reveal(entry.el, false)
+      }
       // Watched once it's in the page: Vue registers items before it inserts them.
       if (entry.el.parentNode) {
         moves?.observe(entry.el.parentNode, { childList: true })
