@@ -79,7 +79,13 @@ function direct(names: readonly string[]) {
       const update = () => {
         const values = attrs(part)
         for (const name of names) {
-          const value = values[name]
+          // The author's `aria-label` replaces the part's reference here too.
+          const value =
+            name === "aria-labelledby" &&
+            values["aria-label"] === undefined &&
+            el.hasAttribute("aria-label")
+              ? undefined
+              : values[name]
           if (value === undefined) {
             if (
               last[name] !== undefined &&
