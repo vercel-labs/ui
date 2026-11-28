@@ -73,18 +73,30 @@ function rovingStop(
   items: readonly RovingCandidate[],
   remembered: string | null = null
 ) {
-  const focusable = items.filter((item) => item.focusable)
-  if (
-    remembered !== null &&
-    focusable.some((item) => item.key === remembered)
-  ) {
-    return remembered
+  let firstFocusable: string | null = null
+  let firstEnabled: string | null = null
+  let firstPreferred: string | null = null
+  for (let index = 0; index < items.length; index++) {
+    const item = items[index]
+    if (!item.focusable) {
+      continue
+    }
+    if (remembered !== null && item.key === remembered) {
+      return remembered
+    }
+    if (firstFocusable === null) {
+      firstFocusable = item.key
+    }
+    if (!item.disabled) {
+      if (firstEnabled === null) {
+        firstEnabled = item.key
+      }
+      if (firstPreferred === null && item.preferred) {
+        firstPreferred = item.key
+      }
+    }
   }
-  const enabled = focusable.filter((item) => !item.disabled)
-  return (
-    (enabled.find((item) => item.preferred) ?? enabled[0] ?? focusable[0])
-      ?.key ?? null
-  )
+  return firstPreferred ?? firstEnabled ?? firstFocusable
 }
 
 // Whether a text field keeps a key for its caret instead of letting a roving

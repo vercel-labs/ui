@@ -138,7 +138,8 @@ type Listener = (
 type Fanout = (
   changed: readonly PropertyKey[],
   previous: object,
-  run: (listener: Listener) => void
+  liveOnly: boolean,
+  delivered: boolean
 ) => void
 
 /**
@@ -151,10 +152,6 @@ function createStore<State extends object>(
   live: readonly (keyof State)[]
 ) {
   let state = initial
-  // Changes that can change what renders: all but those to live keys alone.
-  let renders = 0
-  // Changes other than what `follow` delivered.
-  let writes = 0
   // Keys a framework delivers before the store has them, from `follow`, and
   // what `get()` made of them last, so reads in between see one object.
   let followed: ((state: State) => Partial<State> | undefined) | undefined
@@ -168,6 +165,14 @@ function createStore<State extends object>(
   // Parts, by the keys whose changes alone they skip, then the fanout.
   const skipping = new Map<object, Set<Listener>>()
   let fanout: Fanout | undefined
+
+  const meta: StoreMeta = {
+    state: initial,
+    renders: 0,
+    writes: 0,
+    touch: () => notify([], state, false, false),
+    skipping,
+  }
 
   const store = {
     get() {
@@ -191,18 +196,27 @@ function createStore<State extends object>(
           store.set(rest, true)
         }
       }
-      const changed: (keyof State & string)[] = []
+      let changed: (keyof State & string)[] | undefined
       for (const key in patch) {
         if (!sameValue(state[key], patch[key])) {
-          changed.push(key)
+          ;(changed ??= []).push(key)
         }
       }
-      if (!changed.length) {
+      if (!changed) {
         return
       }
       const previous = state
       state = { ...state, ...patch }
-      const liveOnly = changed.every((key) => live.includes(key))
+      meta.state = state
+      let liveOnly = live.length > 0
+      if (liveOnly) {
+        for (let index = 0; index < changed.length; index++) {
+          if (!live.includes(changed[index])) {
+            liveOnly = false
+            break
+          }
+        }
+      }
       notify(changed, previous, liveOnly, delivered)
     },
     subscribe(listener: Listener) {
@@ -269,41 +283,46 @@ function createStore<State extends object>(
     delivered: boolean
   ) {
     if (!liveOnly) {
-      renders++
+      meta.renders++
     }
     if (!delivered) {
-      writes++
+      meta.writes++
     }
-    const run = (listener: Listener) => listener(liveOnly, delivered, changed)
-    listeners.forEach(run)
+    for (const listener of listeners) {
+      listener(liveOnly, delivered, changed)
+    }
     // A change of no keys, from `touch`, reaches every part.
     for (const [skip, group] of skipping) {
-      if (!changed.length || changed.some((key) => !Object.hasOwn(skip, key))) {
-        group.forEach(run)
+      let notifyGroup = !changed.length
+      if (!notifyGroup) {
+        for (let index = 0; index < changed.length; index++) {
+          if (!Object.hasOwn(skip, changed[index])) {
+            notifyGroup = true
+            break
+          }
+        }
+      }
+      if (notifyGroup) {
+        for (const listener of group) {
+          listener(liveOnly, delivered, changed)
+        }
       }
     }
-    fanout?.(changed, previous, run)
+    fanout?.(changed, previous, liveOnly, delivered)
   }
-  held.set(store, {
-    state: () => state,
-    renders: () => renders,
-    writes: () => writes,
-    touch: () => notify([], state, false, false),
-    skipping,
-  })
+  held.set(store, meta)
   return store
 }
 
-const held = new WeakMap<
-  object,
-  {
-    state: () => object
-    renders: () => number
-    writes: () => number
-    touch: () => void
-    skipping: Map<object, Set<Listener>>
-  }
->()
+type StoreMeta = {
+  state: object
+  renders: number
+  writes: number
+  touch: () => void
+  skipping: Map<object, Set<Listener>>
+}
+
+const held = new WeakMap<object, StoreMeta>()
 
 /**
  * Runs `listener` after the component's own listeners on every change that
@@ -341,16 +360,16 @@ function join<Group>(
 
 /** The state a store holds, without what `follow` delivers ahead of `set`. */
 const heldState = <State extends object>(store: Store<State>) =>
-  held.get(store)!.state() as State
+  held.get(store)!.state as State
 
 /**
  * How many changes a store made other than what `follow` delivered, for a
  * renderer to tell whether anything changed since it last read.
  */
-const writes = (store: object) => held.get(store)!.writes()
+const writes = (store: object) => held.get(store)!.writes
 
 /** How many changes a store made that can change what renders: all but those to live keys alone. */
-const renders = (store: object) => held.get(store)!.renders()
+const renders = (store: object) => held.get(store)!.renders
 
 /**
  * Lets `owner`, like the instance a store belongs to, stand for the store in

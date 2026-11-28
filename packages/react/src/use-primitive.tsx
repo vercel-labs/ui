@@ -36,6 +36,8 @@ import * as React from "react"
 import {
   mergeProps,
   mergeRefs,
+  mergeStyles,
+  prevented,
   renderElement,
   resolveLazy,
   type RenderProp,
@@ -129,22 +131,6 @@ const host = {
   attaches: /* @__PURE__ */ Object.keys(eventProps),
 } as const
 
-function toReactProps(attrs: Attrs) {
-  const props: Record<string, unknown> = {}
-  for (const name in attrs) {
-    const value = attrs[name]
-    if (value === undefined) {
-      continue
-    }
-    props[propNames[name] ?? name] = booleans.has(name)
-      ? true
-      : name === "style"
-        ? styleObject(value)
-        : value
-  }
-  return props
-}
-
 /**
  * What `usePrimitive` returns, and what a component's context holds: one object for the instance's life.
  * @stable
@@ -159,6 +145,8 @@ type PrimitiveHandle<P extends Primitive> = {
   /** The methods its definition declares, like Tabs' `setValue`. */
   api: TypesOf<P>["api"]
 }
+
+const initialOptions = new WeakMap<PrimitiveInstance, object>()
 
 /**
  * Creates an instance of a primitive for this component, keeps its options
@@ -195,30 +183,49 @@ function usePrimitive<P extends Primitive>(
   // Kept once React commits it: only then do the agent and `observe` hear
   // it, its controller attach and its work outside itself start, so
   // StrictMode's second initializer call, which React throws away, never does.
-  const [instance, setInstance] = React.useState(() => create())
+  const [instance, setInstance] = React.useState(() => {
+    const made = create()
+    initialOptions.set(made, options)
+    return made
+  })
   React.useLayoutEffect(() => keep(instance), [instance])
 
   // The state this render's options make, while the instance doesn't have
   // them yet: a transition renders the new value, and React keeps showing the
   // old one until it's ready, as with plain state. Options that read another
   // instance, like a toggle's group, read it as this render shows it too.
-  const next = { ...options, id }
   const outers = outersOf(options)
-  const base = instance.get()
-  const state = within(outers, () => instance.preview(next))
-  const preview: Preview | undefined = state && {
-    options: next,
-    outers,
-    base,
-    state,
-    handed: false,
-    pending: new Set(),
+  const sameInitial = initialOptions.get(instance) === options && !outers
+  let next: (OptionsOf<P> & { id: string }) | undefined
+  let preview: Preview | undefined
+  if (!sameInitial) {
+    const nextOptions = { ...options, id }
+    next = nextOptions
+    const base = instance.get()
+    const state = within(outers, () => instance.preview(nextOptions))
+    if (state) {
+      preview = {
+        options: nextOptions,
+        outers,
+        base,
+        state,
+        handed: false,
+        pending: new Set(),
+      }
+    }
   }
 
   // Keeps callbacks fresh and syncs controlled options. From here the
   // instance has what the preview showed.
   React.useLayoutEffect(() => {
-    handOver(instance, next, preview, outers)
+    initialOptions.delete(instance)
+    if (
+      sameInitial &&
+      (options as { controller?: unknown }).controller === undefined
+    ) {
+      return
+    }
+    handOver(instance, next ?? { ...options, id }, preview, outers)
   })
 
   // Hidden or gone, the instance lets go of what it holds outside itself,
@@ -556,6 +563,111 @@ function heldRef(part: Part) {
   return held
 }
 
+type CachedReactHandlers = {
+  source: ReturnType<typeof partHandlers>
+  handlers: Record<string, (event: React.SyntheticEvent) => void> | null
+}
+
+const cachedReactHandlers = new WeakMap<Part, CachedReactHandlers>()
+
+function reactHandlersOf(part: Part) {
+  const partEvents = partHandlers(part)
+  const cached = cachedReactHandlers.get(part)
+  if (cached && cached.source === partEvents) {
+    return cached.handlers
+  }
+  let handlers: Record<string, (event: React.SyntheticEvent) => void> | null =
+    null
+  for (const type in partEvents) {
+    const prop = eventProps[type]
+    if (!prop) {
+      continue
+    }
+    const handler = partEvents[type as keyof typeof partEvents]!
+    ;(handlers ??= {})[prop] = (event) => {
+      handler(event.nativeEvent)
+      // A handler that ran after ours, like a router link's own onClick, reads React's event.
+      if (event.nativeEvent.defaultPrevented && !event.isDefaultPrevented()) {
+        event.preventDefault()
+      }
+    }
+  }
+  cachedReactHandlers.set(part, { source: partEvents, handlers })
+  return handlers
+}
+
+function elementPropsFromAttrs(
+  part: Part,
+  slotAttrs: Attrs,
+  user: Record<string, any>,
+  userId: string | undefined,
+  skipRender = false
+) {
+  const result: Record<string, any> = {}
+  const handlers = reactHandlersOf(part)
+  if (handlers) {
+    for (const key in handlers) {
+      result[key] = handlers[key]
+    }
+  }
+  for (const key in user) {
+    if (skipRender && key === "render") {
+      continue
+    }
+    const value = user[key]
+    if (value === undefined) {
+      continue
+    }
+    const earlier = result[key]
+    if (
+      earlier !== undefined &&
+      typeof earlier === "function" &&
+      typeof value === "function"
+    ) {
+      result[key] = (...args: unknown[]) => {
+        value(...args)
+        if (!prevented(args[0])) {
+          earlier(...args)
+        }
+      }
+    } else {
+      result[key] = value
+    }
+  }
+  const own = yieldToAuthor(
+    slotAttrs,
+    (name) => user[propNames[name] ?? name] != null
+  )
+  for (const name in own) {
+    const raw = own[name]
+    if (raw === undefined) {
+      continue
+    }
+    const prop = propNames[name] ?? name
+    const value = booleans.has(name)
+      ? true
+      : name === "style"
+        ? styleObject(raw)
+        : raw
+    const earlier = result[prop]
+    if (earlier === undefined) {
+      result[prop] = value
+    } else if (prop === "className" && earlier) {
+      result.className = `${earlier} ${value}`
+    } else if (prop === "style" && earlier) {
+      result.style = mergeStyles(earlier, value)
+    } else {
+      result[prop] = value
+    }
+  }
+  if (userId !== undefined) {
+    result.id = userId
+  }
+  const slotRef = heldRef(part)
+  result.ref = result.ref ? mergeRefs(result.ref, slotRef) : slotRef
+  return result
+}
+
 // The slot's attributes win over the user's props, but for an `id` and what
 // `yieldToAuthor` leaves to the user. The user's handlers run first and can
 // call preventDefault() to skip the built-in behavior.
@@ -566,30 +678,12 @@ function elementProps(
   state: object
 ) {
   takeOwnId(part, user.id)
-  const handlers: Record<string, (event: React.SyntheticEvent) => void> = {}
-  const partEvents = partHandlers(part)
-  for (const type in partEvents) {
-    const prop = eventProps[type]
-    if (!prop) {
-      continue
-    }
-    const handler = partEvents[type as keyof typeof partEvents]!
-    handlers[prop] = (event) => {
-      handler(event.nativeEvent)
-      // A handler that ran after ours, like a router link's own onClick, reads React's event.
-      if (event.nativeEvent.defaultPrevented && !event.isDefaultPrevented()) {
-        event.preventDefault()
-      }
-    }
-  }
-  const own = yieldToAuthor(
+  return elementPropsFromAttrs(
+    part,
     attrs(part, props as never, state),
-    (name) => user[propNames[name] ?? name] != null
+    user,
+    user.id
   )
-  return mergeProps(handlers, user, toReactProps(own), {
-    id: user.id,
-    ref: heldRef(part),
-  })
 }
 
 /**
@@ -616,13 +710,20 @@ type PartProps<
 function sameAttrs(
   a: Record<string, unknown>,
   b: Record<string, unknown>,
-  skip: readonly string[] = []
+  skip?: readonly string[]
 ) {
-  const keys = Object.keys(a)
-  return (
-    keys.length === Object.keys(b).length &&
-    keys.every((key) => a[key] === b[key] || skip.includes(key))
-  )
+  let aCount = 0
+  for (const key in a) {
+    aCount++
+    if ((a[key] !== b[key] || !(key in b)) && !skip?.includes(key)) {
+      return false
+    }
+  }
+  let bCount = 0
+  for (const _ in b) {
+    bCount++
+  }
+  return aCount === bCount
 }
 
 // Each instance's mounted parts, to check again when a part commits new values.
@@ -634,11 +735,19 @@ function changesValues(
   before: Record<string, unknown>,
   after: Record<string, unknown>
 ) {
-  for (const key in { ...before, ...after }) {
+  for (const key in before) {
     if (typeof before[key] === "function" && typeof after[key] === "function") {
       continue
     }
     if (!sameValue(before[key], after[key])) {
+      return true
+    }
+  }
+  for (const key in after) {
+    if (key in before) {
+      continue
+    }
+    if (!sameValue(undefined, after[key])) {
       return true
     }
   }
@@ -660,7 +769,10 @@ function usePartState<P extends Primitive, S extends SlotName<P>>(
   handle: Pick<PrimitiveHandle<P>, "instance">,
   name: S,
   props: PropsOf<P, S>,
-  around?: Record<string, object>
+  around: Record<string, object> | undefined,
+  needsState: boolean,
+  render: RenderProp<StateOf<P, S>> | undefined,
+  restId: string | undefined
 ) {
   const { instance } = handle
   const [, rerender] = React.useReducer((count: number) => count + 1, 0)
@@ -671,11 +783,28 @@ function usePartState<P extends Primitive, S extends SlotName<P>>(
     handle,
     (showing) => {
       const shows = present(part, props, showing)
+      let userId = restId
+      if (shows) {
+        if (render !== undefined) {
+          // An id on a `render` element wins its merge, so the part takes that one
+          // as it renders. A render function's can't be read until it runs.
+          const resolved = resolveLazy(render)
+          if (
+            React.isValidElement<{ id?: string }>(resolved) &&
+            resolved.props.id !== undefined
+          ) {
+            userId = resolved.props.id
+          }
+        }
+        takeOwnId(part, userId)
+      }
       return {
         handle,
         around,
         props,
-        snapshot: (shows
+        userId,
+        state: showing,
+        snapshot: (shows && needsState
           ? partState(part, props, showing)
           : emptySnapshot) as StateOf<P, S> & Record<string, unknown>,
         // The keys this render read, filled in as it reads them.
@@ -687,16 +816,17 @@ function usePartState<P extends Primitive, S extends SlotName<P>>(
     },
     around
   )
-  const state = rendered.present
-    ? new Proxy(rendered.snapshot, {
-        get(target, key) {
-          if (typeof key === "string") {
-            ;(rendered.read ??= new Set()).add(key)
-          }
-          return target[key as string]
-        },
-      })
-    : (emptySnapshot as StateOf<P, S>)
+  const state =
+    rendered.present && needsState
+      ? new Proxy(rendered.snapshot, {
+          get(target, key) {
+            if (typeof key === "string") {
+              ;(rendered.read ??= new Set()).add(key)
+            }
+            return target[key as string]
+          },
+        })
+      : (emptySnapshot as StateOf<P, S>)
 
   // What the last committed render showed. The listener compares it with
   // what that render's handle and the parts around it show now, so the part
@@ -775,7 +905,14 @@ function usePartState<P extends Primitive, S extends SlotName<P>>(
     }
     last.current = rendered
     // Changes between the render and now, like another part binding, count too.
-    check(true)
+    if (
+      rendered.state !== instance.get() ||
+      rendered.version !== renderVersion(instance) ||
+      rendered.around !== undefined ||
+      preview !== undefined
+    ) {
+      check(true)
+    }
     // Children commit first, and so do parts elsewhere that read this one's
     // committed props, which check again now.
     if (changed) {
@@ -807,7 +944,7 @@ function usePartState<P extends Primitive, S extends SlotName<P>>(
     }
   }, [part, selected, check])
 
-  return state as StateOf<P, S>
+  return { part, rendered, state: state as StateOf<P, S> }
 }
 
 // A list's api, whose items' values key their parts.
@@ -909,6 +1046,19 @@ function useHandle<P extends Primitive>(primitive: P) {
 type PartState<P extends Primitive, S extends SlotName<P>> =
   unknown extends StateOf<P, S> ? {} : StateOf<P, S>
 
+const baseScopes = new WeakMap<PrimitiveHandle<Primitive>, Scope>()
+
+function baseScopeOf(owner: PrimitiveHandle<Primitive>) {
+  let scope = baseScopes.get(owner)
+  if (!scope) {
+    scope = { handle: owner, around: {} }
+    baseScopes.set(owner, scope)
+  }
+  return scope
+}
+
+const emptySlotProps: Record<string, any> = Object.freeze({})
+
 /**
  * Renders one part of a primitive written by hand: its element, with the
  * slot's attributes and handlers merged into `props`, re-rendered when what
@@ -945,55 +1095,61 @@ function usePart<
       `The ${primitive.name} ${slot} part must be used inside its root.`
     )
   }
-  const { render, ...rest } = props
+  const render = props.render
   // An instance a part renders with its handle, like a root's, reaches the parts inside it.
-  const own = React.useMemo<Scope>(
-    () => ({ handle: owner, around: {} }),
-    [owner]
-  )
-  const inside = scope?.handle === owner ? scope : own
+  const inside = scope?.handle === owner ? scope : baseScopeOf(owner)
   // The parts inside a keyed item take its key as its value, as every adapter's do.
-  const around = keyed.has(slot)
-    ? { ...slotProps, value: (slotProps as { id?: string }).id }
-    : slotProps
   const provided: Scope = provides.has(slot)
     ? {
         handle: owner,
-        around: { ...inside.around, [slot]: around },
+        around: {
+          ...inside.around,
+          [slot]: keyed.has(slot)
+            ? { ...slotProps, value: (slotProps as { id?: string }).id }
+            : slotProps,
+        },
         shown: { ...inside.shown, [slot]: slotProps as object },
       }
     : inside
-  const state = usePartState(
+  const needsState =
+    typeof render === "function" ||
+    typeof props.className === "function" ||
+    typeof props.style === "function" ||
+    typeof props.children === "function"
+  const { part, rendered, state } = usePartState(
     owner,
     slot as never,
     slotProps as never,
-    provided.shown
+    provided.shown,
+    needsState,
+    render as RenderProp<any> | undefined,
+    (props as { id?: string }).id
   )
-  // A part that shouldn't be in the page, like an unselected tab's panel, renders nothing.
-  const part = owner.instance.part(slot, slotProps, true)
   // Removed with its component, a part lets go in this commit, not a microtask later.
-  React.useLayoutEffect(() => () => ref(part, host)(null), [part])
+  React.useLayoutEffect(
+    () => () => {
+      if (part.el) {
+        ref(part, host)(null)
+      }
+    },
+    [part]
+  )
   // Before refs attach, and only for a render React commits.
   React.useInsertionEffect(() => {
-    renderedProps.set(part, slotProps as Part["props"])
+    if (part.props !== slotProps) {
+      renderedProps.set(part, slotProps as Part["props"])
+    }
   })
-  const merged = readIn(
-    owner,
-    (showing) => {
-      if (!present(part, slotProps, showing)) {
-        return undefined
-      }
-      // An id on a `render` element wins its merge, so the part takes that one
-      // as it renders. A render function's can't be read until it runs.
-      const rendered = resolveLazy(render)
-      const renderId = React.isValidElement<{ id?: string }>(rendered)
-        ? rendered.props.id
-        : undefined
-      const user = renderId === undefined ? rest : { ...rest, id: renderId }
-      return elementProps(part, slotProps, user, showing)
-    },
-    provided.shown
-  )
+  // A part that shouldn't be in the page, like an unselected tab's panel, renders nothing.
+  const merged = rendered.present
+    ? elementPropsFromAttrs(
+        part,
+        rendered.attrs,
+        props as Record<string, any>,
+        rendered.userId,
+        true
+      )
+    : undefined
   const element = merged ? renderElement(tag, merged, render, state) : null
   if (provided === scope) {
     return element
@@ -1182,6 +1338,9 @@ function createParts<
   const parts: Record<string, (props: Record<string, any>) => React.ReactNode> =
     {}
 
+  const rootOwn = schema.slots.root ?? {}
+  const hasRootOwn = Object.keys(rootOwn).length > 0
+
   function Root(props: Record<string, any>) {
     const [options, rest] = split(props, schema.options)
     const handle = usePrimitive(
@@ -1190,12 +1349,10 @@ function createParts<
     ) as unknown as PrimitiveHandle<Primitive>
     // Whether there's a root tag never changes, so the hooks stay in order.
     if (tags.root) {
-      return usePart(
-        handle,
-        "root",
-        ...split(rest, schema.slots.root ?? {}),
-        tags.root
-      )
+      const [slotProps, elementRest] = hasRootOwn
+        ? split(rest, rootOwn)
+        : [emptySlotProps, rest]
+      return usePart(handle, "root", slotProps as never, elementRest, tags.root)
     }
     return <HandleScope handle={handle}>{props.children}</HandleScope>
   }
@@ -1207,47 +1364,79 @@ function createParts<
       continue
     }
     const own = schema.slots[slot] ?? {}
-    const ids = Object.keys(own).filter((key) => kindOf(own[key]) === "id")
-    const key = Object.keys(own).find((key) => kindOf(own[key]) === "key")
-    const Part = (props: Record<string, any>) => {
-      const [slotProps, rest] = split(props, own)
-      // An `id` the slot reads, like a trigger's key, is the element's own too.
-      if (props.id !== undefined) {
-        rest.id = props.id
+    const ownKeys = Object.keys(own)
+    const ids = ownKeys.filter((key) => kindOf(own[key]) === "id")
+    const key = ownKeys.find((key) => kindOf(own[key]) === "key")
+    const froms: {
+      prop: string
+      slot: string
+      fromProp: string
+      required: boolean
+    }[] = []
+    for (const prop of ownKeys) {
+      const spec = own[prop]
+      const from = fromOf(spec, prop)
+      if (from) {
+        froms.push({
+          prop,
+          slot: from.slot,
+          fromProp: from.prop,
+          required: !!(spec as { required?: boolean }).required,
+        })
       }
-      // Unique ids for `id` props left out. Always made, so the hooks stay in order.
-      for (const key of ids) {
-        const id = React.useId()
-        slotProps[key] ??= id
-      }
-      const scope = React.useContext(context)
-      if (key) {
-        slotProps.id ??= (
-          scope?.handle.api as ListApi | undefined
-        )?.internal.keyOf(slotProps[key])
-      }
-      for (const prop in own) {
-        const spec = own[prop]
-        const from = fromOf(spec, prop)
-        if (!from || slotProps[prop] !== undefined) {
-          continue
-        }
-        const around = scope?.around[from.slot]
-        if (!around && (spec as { required?: boolean }).required) {
-          throw new Error(
-            `<${Part.displayName}> must be used inside <${name}${pascal(from.slot)}>.`
+    }
+    const hasOwn = ownKeys.length > 0
+    const needsScope = key !== undefined || froms.length > 0
+    const Part: ((props: Record<string, any>) => React.ReactNode) & {
+      displayName?: string
+    } = !hasOwn
+      ? (props: Record<string, any>) =>
+          usePart(
+            primitive,
+            slot as SlotName<P>,
+            emptySlotProps as never,
+            props,
+            tag
+          )
+      : (props: Record<string, any>) => {
+          const [slotProps, rest] = split(props, own)
+          // An `id` the slot reads, like a trigger's key, is the element's own too.
+          if (props.id !== undefined) {
+            rest.id = props.id
+          }
+          // Unique ids for `id` props left out. Always made, so the hooks stay in order.
+          for (const idKey of ids) {
+            const id = React.useId()
+            slotProps[idKey] ??= id
+          }
+          if (needsScope) {
+            const scope = React.useContext(context)
+            if (key) {
+              slotProps.id ??= (
+                scope?.handle.api as ListApi | undefined
+              )?.internal.keyOf(slotProps[key])
+            }
+            for (const entry of froms) {
+              if (slotProps[entry.prop] !== undefined) {
+                continue
+              }
+              const around = scope?.around[entry.slot]
+              if (!around && entry.required) {
+                throw new Error(
+                  `<${Part.displayName}> must be used inside <${name}${pascal(entry.slot)}>.`
+                )
+              }
+              slotProps[entry.prop] = around?.[entry.fromProp]
+            }
+          }
+          return usePart(
+            primitive,
+            slot as SlotName<P>,
+            slotProps as never,
+            rest,
+            tag
           )
         }
-        slotProps[prop] = around?.[from.prop]
-      }
-      return usePart(
-        primitive,
-        slot as SlotName<P>,
-        slotProps as never,
-        rest,
-        tag
-      )
-    }
     Part.displayName = name + pascal(slot)
     parts[pascal(slot)] = Part
   }

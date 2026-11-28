@@ -145,6 +145,10 @@ function definePrimitive<
   const slots = definition.slots((slot) => slot)
   const name = definition.name
   const label = definition.label ?? name
+  const slotNames: Record<string, string> = {}
+  for (const slot in slots) {
+    slotNames[slot] = slot === "root" ? name : `${name}-${slot}`
+  }
   if (dev) {
     checkRoles(slots as Record<string, object>, { component: label })
   }
@@ -153,27 +157,27 @@ function definePrimitive<
   const make = (initialOptions: Options & { id: string }) => {
     let options = initialOptions
     const id = initialOptions.id
-    const store = createStore(
-      { ...definition.state(options), ...definition.sync?.(options) },
-      definition.live ?? []
-    )
-    const destroys: (() => void)[] = []
-    const optionsListeners: Parameters<
-      PrimitiveContext<Options, State, Slot>["onOptions"]
-    >[0][] = []
+    const base = definition.state(options)
+    const initialSynced = definition.sync?.(options)
+    const initial = initialSynced ? { ...base, ...initialSynced } : base
+    const store = createStore(initial, definition.live ?? noLive)
+    let destroys: (() => void)[] | undefined
+    let optionsListeners:
+      | Parameters<PrimitiveContext<Options, State, Slot>["onOptions"]>[0][]
+      | undefined
     // Development code below is behind `dev`, so production builds drop it
     // with its arguments. `from` names the instance in warnings and the devtools.
-    const from = { component: label, id }
+    const from = dev ? { component: label, id } : undefined
     const controlled = dev
       ? (definition.controlled ?? ["open", "value", "checked"]).filter(
           (key) => key in store.get()
         )
-      : []
+      : noControlled
     if (dev) {
-      checkControlled(from, controlled, options)
+      checkControlled(from!, controlled, options)
     }
 
-    const baseSlots = dev ? warnMissing(slots, from) : slots
+    const baseSlots = dev ? warnMissing(slots, from!) : slots
     let used: Set<Feature> | undefined
     function use(feature: Feature<Api>) {
       if (used?.has(feature)) {
@@ -193,10 +197,10 @@ function definePrimitive<
       name,
       label,
       slots: baseSlots,
+      slotNames,
       parts: new Map(),
       keyed: new Map(),
       rank: 0,
-      released: [],
     }
     const { parts } = owner
 
@@ -221,7 +225,13 @@ function definePrimitive<
       rendering = false
     ) {
       const key = keyOf(props)
-      let found = owner.keyed.get(slot)?.get(key)
+      const entry = owner.keyed.get(slot)
+      let found =
+        entry instanceof Map
+          ? entry.get(key)
+          : entry?.key === key
+            ? entry
+            : undefined
       if (!found) {
         const mapKey = `${slot}:${key}`
         found = owner.sleeping
@@ -270,8 +280,12 @@ function definePrimitive<
       label,
       store,
       options: () => options,
-      onOptions: (listener) => optionsListeners.push(listener),
-      onDestroy: (cleanup) => destroys.push(cleanup),
+      onOptions: (listener) => {
+        ;(optionsListeners ??= []).push(listener)
+      },
+      onDestroy: (cleanup) => {
+        ;(destroys ??= []).push(cleanup)
+      },
       parts: () => ordered(owner).values(),
       element,
       props: (slot, key = "") => {
@@ -291,7 +305,7 @@ function definePrimitive<
           if (typeof (api as Record<string, unknown>)[action] !== "function") {
             warn(
               `lists \`${action}\` in \`agent.actions\`, but its api has no such method.`,
-              from
+              from!
             )
           }
         }
@@ -378,7 +392,7 @@ function definePrimitive<
         const shown = dev && following ? syncFrom(arriving, held) : undefined
         options = arriving
         if (dev) {
-          checkControlled(from, controlled, options)
+          checkControlled(from!, controlled, options)
         }
         // Options that need it awake, like a controller attached once React commits.
         if (owner.sleeping && !definition.asleep!(options)) {
@@ -386,16 +400,18 @@ function definePrimitive<
         }
         const synced = syncFrom(options, held)
         if (dev && shown) {
-          const torn = tornKeys(shown, synced)
+          const torn = tornKeys(shown, synced, held)
           if (torn.length) {
-            emit({ type: "relay", ...from, keys: torn })
+            emit({ type: "relay", ...from!, keys: torn })
           }
         }
         let source: ChangeSource | undefined
         handing = true
         try {
-          for (const listener of optionsListeners) {
-            source = listener(options, synced) ?? source
+          if (optionsListeners) {
+            for (const listener of optionsListeners) {
+              source = listener(options, synced) ?? source
+            }
           }
           // A listener's write lands what `follow` delivers first, with what
           // that sets off, like a close whose exit ended at once. Synced from
@@ -452,7 +468,7 @@ function definePrimitive<
         if (dev) {
           store.subscribe((_, delivered, keys) => {
             if (handing && !delivered && !isMeasuring()) {
-              emit({ type: "relay", ...from, keys: [...keys] })
+              emit({ type: "relay", ...from!, keys: [...keys] })
             }
           })
         }
@@ -468,16 +484,22 @@ function definePrimitive<
         }
         destroyed = true
         discard(instance)
-        whileDestroying(() => destroys.forEach((cleanup) => cleanup()))
+        if (destroys) {
+          whileDestroying(() => {
+            for (let index = 0; index < destroys!.length; index++) {
+              destroys![index]()
+            }
+          })
+        }
         if (dev) {
-          emit({ type: "instance", action: "destroy", ...from, controlled })
+          emit({ type: "instance", action: "destroy", ...from!, controlled })
         }
       },
     }
     standFor(instance, store)
     watchWhileKept(instance, parts, definition, context.options)
     if (dev) {
-      emit({ type: "instance", action: "create", ...from, controlled })
+      emit({ type: "instance", action: "create", ...from!, controlled })
     }
     return instance
   }
@@ -496,13 +518,22 @@ function definePrimitive<
 // The keys `follow` showed with another value than the handover lands, which
 // the framework rendered for a pass, like state derived from options read
 // from the instance instead of the arriving ones. Development only.
-function tornKeys(shown: object, landed: object | undefined) {
+function tornKeys(shown: object, landed: object | undefined, held: object) {
   const before = shown as Record<string, unknown>
   const after = (landed ?? {}) as Record<string, unknown>
+  const base = held as Record<string, unknown>
   const keys = new Set([...Object.keys(before), ...Object.keys(after)])
-  return [...keys].filter((key) => !sameValue(before[key], after[key]))
+  return [...keys].filter(
+    (key) =>
+      !sameValue(
+        key in before ? before[key] : base[key],
+        key in after ? after[key] : base[key]
+      )
+  )
 }
 
+const noLive: readonly never[] = []
+const noControlled: string[] = []
 const schemas = new WeakMap<Primitive, PrimitiveSchema>()
 
 /** A primitive's options and each slot's props, by name and kind. */

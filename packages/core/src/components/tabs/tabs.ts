@@ -790,7 +790,8 @@ const tabsPrimitive = /* @__PURE__ */ definePrimitive({
         selected: api.internal.shows(state, key),
         disabled: !!props.disabled,
       }),
-      attrs: (state, { id, key, props, api }) => {
+      attrs: (state, part) => {
+        const { id, key, props, api } = part
         const selected = api.internal.shows(state, key)
         return {
           id: `${id}-tab-${idPart(key)}`,
@@ -799,7 +800,7 @@ const tabsPrimitive = /* @__PURE__ */ definePrimitive({
             (state.elements[key] ?? "button") === "button"
               ? "button"
               : undefined,
-          tabindex: api.internal.roving.tabIndex(state, { key, props }),
+          tabindex: api.internal.roving.tabIndex(state, part),
           "aria-selected": String(selected),
           "aria-disabled": props.disabled ? "true" : undefined,
           "data-selected": selected ? "" : undefined,

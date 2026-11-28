@@ -588,22 +588,8 @@ function position(
     const arrowSize = arrow
       ? { width: arrow.offsetWidth, height: arrow.offsetHeight }
       : undefined
-    const key = [
-      a.x,
-      a.y,
-      a.width,
-      a.height,
-      offsets.width,
-      offsets.height,
-      viewport.x,
-      viewport.y,
-      viewport.width,
-      viewport.height,
-      arrowSize?.width,
-      arrowSize?.height,
-      ...Object.values(resolved),
-      arrowPadding,
-    ].join()
+    const surroundings = `${a.x},${a.y},${a.width},${a.height},${viewport.x},${viewport.y},${viewport.width},${viewport.height},${resolved.side},${resolved.align},${resolved.sideOffset},${resolved.alignOffset},${resolved.collisionPadding}`
+    const key = `${surroundings},${offsets.width},${offsets.height},${arrowSize?.width ?? ""},${arrowSize?.height ?? ""},${arrowPadding}`
     // A new arrow element, even one the same size, has no placement of its own yet.
     if (key === last && (!arrow || arrow === arrowWriter?.el)) {
       return false
@@ -644,17 +630,6 @@ function position(
     }
     // Once inside the anchor, it stays while nothing but its own size changes: a
     // popup that shrinks to fit is wider inside than beside, and would swap every frame.
-    const surroundings = [
-      a.x,
-      a.y,
-      a.width,
-      a.height,
-      viewport.x,
-      viewport.y,
-      viewport.width,
-      viewport.height,
-      ...Object.values(resolved),
-    ].join()
     const placement = {
       ...resolved,
       inside: insideAt === surroundings,
@@ -899,6 +874,13 @@ const angle = (value: string) => {
   return (number * Math.PI) / 180
 }
 
+// Offsets round, so a box under a pixel off may be the size they gave.
+// Sizes from styles are exact, so any visible difference is a scale.
+const remainingScale = (shown: number, whole: number, exact = false) =>
+  whole > 0.01 && Math.abs(shown - whole) >= (exact ? 0.05 : 1)
+    ? shown / whole
+    : 1
+
 // Where a popup's box would be on screen without its own transforms, like an
 // entrance animation's: each corner goes through them around the transform
 // origin. The scale left over is an ancestor's `zoom` or a scaled containing block.
@@ -917,6 +899,20 @@ function untransformed(
     transform?: string
   }
 ) {
+  const hasTranslate = !!style.translate && style.translate !== "none"
+  const hasRotate = !!style.rotate && style.rotate !== "none"
+  const hasScale = !!style.scale && style.scale !== "none"
+  const hasTransform = !!style.transform && style.transform !== "none"
+  if (!hasTranslate && !hasRotate && !hasScale && !hasTransform) {
+    return {
+      x: rect.x,
+      y: rect.y,
+      scale: {
+        x: remainingScale(rect.width, size.width, size.exact?.width),
+        y: remainingScale(rect.height, size.height, size.exact?.height),
+      },
+    }
+  }
   const [originX = 0, originY = 0] = style.transformOrigin
     .split(" ")
     .map((part) => parseFloat(part) || 0)
@@ -927,16 +923,12 @@ function untransformed(
       : part.endsWith("%")
         ? (parseFloat(part) / 100) * whole
         : parseFloat(part) || 0
-  const moves =
-    style.translate && style.translate !== "none"
-      ? style.translate.split(" ")
-      : []
+  const moves = hasTranslate ? style.translate.split(" ") : []
   const moveX = length(moves[0], size.width)
   const moveY = length(moves[1], size.height)
   // A turn around any axis shows on screen as its rotation matrix's top left
   // corner: a tilt around x or y squashes the box rather than turning it.
-  const turn =
-    style.rotate && style.rotate !== "none" ? style.rotate.split(" ") : []
+  const turn = hasRotate ? style.rotate!.split(" ") : []
   const named = { x: [1, 0, 0], y: [0, 1, 0], z: [0, 0, 1] }[turn[0]]
   const [kx, ky, kz] =
     named ?? (turn.length === 4 ? turn.slice(0, 3).map(parseFloat) : [0, 0, 1])
@@ -950,11 +942,12 @@ function untransformed(
     (1 - cos) * ux * uy + sin * uz,
     cos + (1 - cos) * uy * uy,
   ]
-  const [scaleX = 1, scaleY = scaleX] =
-    style.scale && style.scale !== "none"
-      ? style.scale.split(" ").map(parseFloat)
-      : []
-  const matrix = /^matrix(3d)?\((.*)\)$/.exec(style.transform ?? "")
+  const [scaleX = 1, scaleY = scaleX] = hasScale
+    ? style.scale!.split(" ").map(parseFloat)
+    : []
+  const matrix = hasTransform
+    ? /^matrix(3d)?\((.*)\)$/.exec(style.transform!)
+    : null
   const m = matrix?.[2].split(",").map(parseFloat) ?? []
   // A `perspective()` puts depth in the last row, which divides each corner.
   const [a, b, c, d, e, f, p, q, w] = !matrix
@@ -982,15 +975,9 @@ function untransformed(
   const ys = corners.map(([, y]) => y)
   const left = Math.min(...xs)
   const top = Math.min(...ys)
-  // Offsets round, so a box under a pixel off may be the size they gave.
-  // Sizes from styles are exact, so any visible difference is a scale.
-  const rest = (shown: number, whole: number, exact = false) =>
-    whole > 0.01 && Math.abs(shown - whole) >= (exact ? 0.05 : 1)
-      ? shown / whole
-      : 1
   const scale = {
-    x: rest(rect.width, Math.max(...xs) - left, size.exact?.width),
-    y: rest(rect.height, Math.max(...ys) - top, size.exact?.height),
+    x: remainingScale(rect.width, Math.max(...xs) - left, size.exact?.width),
+    y: remainingScale(rect.height, Math.max(...ys) - top, size.exact?.height),
   }
   return { x: rect.x - scale.x * left, y: rect.y - scale.y * top, scale }
 }

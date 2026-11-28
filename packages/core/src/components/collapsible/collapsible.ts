@@ -22,6 +22,8 @@ import type {
   PrimitiveOptions,
 } from "../../foundation/kernel/primitive-types"
 import { direct } from "../../foundation/kernel/live"
+import { trackInput } from "../../foundation/kernel/modality"
+import { awake } from "../../foundation/kernel/part"
 import { createChange } from "../../foundation/kernel/input-source"
 
 /**
@@ -171,6 +173,9 @@ const collapsiblePrimitive = /* @__PURE__ */ definePrimitive({
     // until the trigger binds, like on a server, where an open one is.
     panel: null as boolean | null,
   }),
+  // Closed and uncontrolled, it waits for a press or a mounted panel.
+  asleep: (options) =>
+    options.open === undefined && !options.defaultOpen && !options.controller,
   sync: (options) => ({
     disabled: options.disabled ?? false,
     ...(options.open === undefined ? {} : { open: options.open }),
@@ -257,7 +262,10 @@ const collapsiblePrimitive = /* @__PURE__ */ definePrimitive({
         ...openAttrs(state.open),
         "data-disabled": isDisabled(state) ? "" : undefined,
       }),
-      bind: (el, { store }) => watchFormDisabled(el, store),
+      asleep(el, { store }) {
+        trackInput()
+        return watchFormDisabled(el, store)
+      },
     }),
 
     trigger: slot<CollapsibleTriggerProps, CollapsibleTriggerState>({
@@ -284,9 +292,12 @@ const collapsiblePrimitive = /* @__PURE__ */ definePrimitive({
         api.toggle({ reason: "trigger-press", event })
       },
       on: { keydown: (event, { el }) => triggerKeydown(event, el) },
-      bind(el, { store }) {
-        settleFlag(store, "panel")
+      asleep(el) {
+        trackInput()
         return bindTriggerElement(el)
+      },
+      bind(_el, { store }) {
+        settleFlag(store, "panel")
       },
     }),
 
@@ -304,6 +315,9 @@ const collapsiblePrimitive = /* @__PURE__ */ definePrimitive({
         ...openAttrs(state.open),
         "data-disabled": isDisabled(state) ? "" : undefined,
       }),
+      asleep(_el, part) {
+        awake(part)
+      },
       bind(el, part) {
         const { api, store } = part
         const unregister = api.internal.registerPanel()

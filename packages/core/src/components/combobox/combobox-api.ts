@@ -390,6 +390,10 @@ function comboboxApiBody(
   keepListing(store, listbox, {
     entry: (key, value) =>
       selection.isSelected(key, value) ? "s" : maxReached() ? "f" : "",
+    selectedKeys: () =>
+      options().isItemEqualToValue || maxReached()
+        ? undefined
+        : selection.keys(),
     inputs: () => [
       store.get().value,
       store.get().multiple,

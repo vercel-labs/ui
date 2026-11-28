@@ -46,6 +46,9 @@ type PartRecord = Part & {
   leases: number
   dropped?: boolean
   ref?: (el: HTMLElement | null) => void
+  view?: { id: string; key: string; props: unknown; api: unknown }
+  handlers?: Partial<Record<keyof EventMap, (event: Event) => void>>
+  handlersFor?: AnySlot
   // What `onProps` registered, which hears each render.
   propsListeners?: Set<() => void>
   // The bound element's id when it isn't the one the slot makes, like an author's.
@@ -61,6 +64,7 @@ type PartOwner = {
   // What warnings call the component.
   readonly label: string
   slots: Record<string, AnySlot>
+  readonly slotNames: Record<string, string>
   api?: unknown
   // One record per part, by `slot:key`. Binding moves a part to the end, so
   // `element(slot)` finds the part of a slot that bound first. Read in that
@@ -69,15 +73,15 @@ type PartOwner = {
   rank: number
   unordered?: boolean
   // The same records by slot, then key, which a render finds its part in
-  // without making `slot:key`.
-  readonly keyed: Map<string, Map<string, PartRecord>>
+  // without making `slot:key`. Single-part slots hold the record directly.
+  readonly keyed: Map<string, PartRecord | Map<string, PartRecord>>
   // While the instance is asleep: what wakes it, and the binds that wait for it.
   sleeping?: { wake: () => void; binds: Set<() => void> }
   // A part stays while something leases it: its bound element or a
   // subscription. Once released, it's dropped a microtask later unless leased
   // again, so StrictMode's unmount and remount in one task, or Suspense hiding
   // and showing it, keeps its props and its ref callback.
-  released: PartRecord[]
+  released?: PartRecord[]
   // Parts with an `own` id, and, once per version of state, the own id that
   // stands for each id their slots make.
   named?: Set<PartRecord>
@@ -88,6 +92,11 @@ type PartOwner = {
   // once the elements bind, so a part rendered before it points at it too.
   renamed?: boolean
 }
+
+const emptyState: Readonly<Record<string, never>> = Object.freeze({})
+const emptyAttrs: Attrs = Object.freeze({})
+const emptyHandlers: Partial<Record<keyof EventMap, (event: Event) => void>> =
+  Object.freeze({})
 
 // The part a sleeping instance's view was made for, which `firstAsleep` reads.
 const viewed = Symbol()
@@ -164,17 +173,30 @@ class AsleepContext {
   }
 }
 
+const isAsleep = (value: object) => value instanceof AsleepContext
+
 // What pure reads see of a part: no element and no store. Reading the api
 // wakes an instance that sleeps, so a part that can render asleep reads none.
-const view = <Api, Props>(part: Part<any, Api>, props: Props) =>
-  ownerOf(part).sleeping
-    ? (new AsleepView(part as PartRecord, props) as unknown as {
-        id: string
-        key: string
-        props: Props
-        api: Api
-      })
-    : { id: part.id, key: part.key, props, api: part.api }
+function view<Api, Props>(part: Part<any, Api>, props: Props) {
+  const kept = part as PartRecord
+  if (kept.owner.sleeping) {
+    return new AsleepView(kept, props) as unknown as {
+      id: string
+      key: string
+      props: Props
+      api: Api
+    }
+  }
+  const cached = kept.view
+  if (cached && cached.props === props && cached.api === part.api) {
+    return cached as { id: string; key: string; props: Props; api: Api }
+  }
+  const next = { id: part.id, key: part.key, props, api: part.api }
+  if (props === part.props) {
+    kept.view = next
+  }
+  return next
+}
 const context = (part: Part, props = part.props) =>
   ownerOf(part).sleeping
     ? new AsleepContext(part, props)
@@ -205,10 +227,12 @@ function lease(part: PartRecord) {
       return
     }
     const { owner } = part
-    if (!owner.released.length) {
+    if (!owner.released) {
+      owner.released = [part]
       queueMicrotask(() => sweep(owner))
+    } else {
+      owner.released.push(part)
     }
-    owner.released.push(part)
   }
 }
 
@@ -216,21 +240,33 @@ function lease(part: PartRecord) {
 // with the next sweep unless something leases it first.
 function provisional(part: PartRecord) {
   const { owner } = part
-  if (!owner.released.length) {
+  if (!owner.released) {
+    owner.released = [part]
     queueMicrotask(() => sweep(owner))
+  } else {
+    owner.released.push(part)
   }
-  owner.released.push(part)
 }
 
 function sweep(owner: PartOwner) {
-  for (const part of owner.released) {
+  const released = owner.released
+  if (!released) {
+    return
+  }
+  owner.released = undefined
+  for (let index = 0; index < released.length; index++) {
+    const part = released[index]
     if (!part.leases && owner.parts.get(part.mapKey) === part) {
       owner.parts.delete(part.mapKey)
-      owner.keyed.get(part.slot)?.delete(part.key)
+      const slot = owner.keyed.get(part.slot)
+      if (slot === part) {
+        owner.keyed.delete(part.slot)
+      } else if (slot instanceof Map && slot.get(part.key) === part) {
+        slot.delete(part.key)
+      }
       part.dropped = true
     }
   }
-  owner.released = []
 }
 
 // The instance's parts in the order they joined and bound. Parts mostly bind
@@ -264,11 +300,19 @@ function enlist(part: PartRecord) {
   const { parts, keyed } = owner
   part.rank = ++owner.rank
   parts.set(part.mapKey, part)
-  let slot = keyed.get(part.slot)
+  const slot = keyed.get(part.slot)
   if (!slot) {
-    keyed.set(part.slot, (slot = new Map()))
+    keyed.set(part.slot, part)
+  } else if (slot instanceof Map) {
+    slot.set(part.key, part)
+  } else if (slot.key === part.key) {
+    keyed.set(part.slot, part)
+  } else {
+    const map = new Map<string, PartRecord>()
+    map.set(slot.key, slot)
+    map.set(part.key, part)
+    keyed.set(part.slot, map)
   }
-  slot.set(part.key, part)
 }
 
 // Reads take the props to read with, so an adapter can compare against the
@@ -283,21 +327,39 @@ function enlist(part: PartRecord) {
  * @stable
  */
 function attrs(part: Part, props = part.props, state = part.store.get()) {
-  const definition = definitionOf(part) as AnySlot & RoleFields<any, any, any>
-  const context = view(part, props)
-  const own = definition.attrs?.(state, context)
+  const owner = ownerOf(part)
+  const definition = owner.slots[part.slot] as AnySlot &
+    RoleFields<any, any, any>
   const declared = definition.role
+  const context =
+    definition.attrs ||
+    typeof declared === "function" ||
+    (dev && definition.live)
+      ? view(part, props)
+      : undefined
+  const own = definition.attrs?.(state, context!)
   const role =
-    typeof declared === "function" ? declared(state, context) : declared
+    typeof declared === "function" ? declared(state, context!) : declared
   if (dev) {
     checkRole(
       definition,
       part.slot,
       own,
       role,
-      { component: ownerOf(part).label, id: part.id },
-      definition.live?.read(state, context)
+      { component: owner.label, id: part.id },
+      definition.live?.read(state, context!)
     )
+  }
+  if (own) {
+    const known = slotFlags.get(definition)
+    if (known === undefined) {
+      slotFlags.set(
+        definition,
+        ("hidden" in own ? canHide : 0) | ("id" in own ? canMakeId : 0)
+      )
+    } else if (!(known & canMakeId) && "id" in own) {
+      slotFlags.set(definition, known | canMakeId)
+    }
   }
   // A slot renders an author's id as it is, so any other id is one it made.
   const authored = (props as { id?: unknown }).id
@@ -305,12 +367,14 @@ function attrs(part: Part, props = part.props, state = part.store.get()) {
     authored === undefined || own?.id !== authored
       ? (own?.id ?? null)
       : undefined
-  const { name } = ownerOf(part)
-  const result: Attrs = {
-    "data-slot": part.slot === "root" ? name : `${name}-${part.slot}`,
-    ...(declared === undefined ? undefined : { role }),
-    ...own,
-  }
+  const dataSlot =
+    owner.slotNames[part.slot] ??
+    (owner.slotNames[part.slot] =
+      part.slot === "root" ? owner.name : `${owner.name}-${part.slot}`)
+  const result: Attrs =
+    declared === undefined
+      ? { "data-slot": dataSlot, ...own }
+      : { "data-slot": dataSlot, role: role as Attrs[string], ...own }
   // The declared role wins over one in `attrs`, and keeps its place first.
   if (declared !== undefined) {
     result.role = role as Attrs[string]
@@ -355,7 +419,8 @@ const madeLabel = (value: unknown) =>
  * @stable
  */
 function partState(part: Part, props = part.props, state = part.store.get()) {
-  return definitionOf(part).state?.(state, view(part, props)) ?? {}
+  const read = definitionOf(part).state
+  return read ? read(state, view(part, props)) : emptyState
 }
 
 /**
@@ -363,7 +428,8 @@ function partState(part: Part, props = part.props, state = part.store.get()) {
  * @stable
  */
 function present(part: Part, props = part.props, state = part.store.get()) {
-  return definitionOf(part).present?.(state, view(part, props)) ?? true
+  const read = definitionOf(part).present
+  return read ? read(state, view(part, props)) : true
 }
 
 /** Whether the part's presence depends on state, so a renderer shows and hides it. */
@@ -376,10 +442,13 @@ const held = (part: Part) => (part as PartRecord).leases > 0
 
 /** Live attributes, which core writes to a bound element itself. */
 function liveAttrs(part: Part, props = part.props) {
-  return aliased(
-    part as PartRecord,
-    definitionOf(part).live?.read(part.store.get(), view(part, props)) ?? {}
-  )
+  const read = definitionOf(part).live
+  return read
+    ? aliased(
+        part as PartRecord,
+        read.read(part.store.get(), view(part, props))
+      )
+    : emptyAttrs
 }
 
 /** The attributes core keeps current on an element a framework rendered. */
@@ -460,18 +529,28 @@ const skipNone = {}
  */
 function subscribe(part: Part, listener: Listener, props = part.props) {
   const narrowed = definitionOf(part).selects
-  const cleanups = [
-    lease(part as PartRecord),
-    narrowed
-      ? narrowed.subscribe(part, listener, props)
-      : subscribeSkipping(part.store, skipNone, listener),
-  ]
-  return () => cleanups.forEach((cleanup) => cleanup())
+  const unlease = lease(part as PartRecord)
+  const unsubscribe = narrowed
+    ? narrowed.subscribe(part, listener, props)
+    : subscribeSkipping(part.store, skipNone, listener)
+  return () => {
+    unlease()
+    unsubscribe()
+  }
 }
 
 /** Event handlers, for adapters that attach events through the framework. */
 function handlers(part: Part) {
-  const { on: events, press: activate } = definitionOf(part)
+  const kept = part as PartRecord
+  const definition = definitionOf(part)
+  if (kept.handlersFor === definition && kept.handlers) {
+    return kept.handlers
+  }
+  const { on: events, press: activate } = definition
+  if (!events && typeof activate !== "function") {
+    kept.handlersFor = definition
+    return (kept.handlers = emptyHandlers)
+  }
   const result: Partial<Record<keyof EventMap, (event: Event) => void>> = {}
   for (const type in events) {
     const handler = events[type as keyof EventMap] as (
@@ -482,19 +561,19 @@ function handlers(part: Part) {
       if (event.defaultPrevented || ignoredKey(event)) {
         return
       }
-      ownerOf(part).sleeping?.wake()
       handler(event, context(part))
     }
   }
   if (typeof activate === "function" && !result.click) {
     result.click = (event) => {
       if (!event.defaultPrevented) {
-        ownerOf(part).sleeping?.wake()
+        kept.owner.sleeping?.wake()
         activate(context(part), event)
       }
     }
   }
-  return result
+  kept.handlersFor = definition
+  return (kept.handlers = result)
 }
 
 /**
@@ -600,20 +679,33 @@ function onProps(part: Part, listener: () => void) {
   }
 }
 
-// A slot names `hidden` in its attributes whether it's set or not, so one
-// read per slot says whether its parts can be hidden.
-const hidingSlots = new WeakMap<object, boolean>()
+// A slot names `hidden` and `id` in its attributes whether they're set or
+// not, so one read per slot says whether its parts can hide or make an id.
+const canHide = 1
+const canMakeId = 2
+const slotFlags = new WeakMap<object, number>()
+const attachedSets = new WeakMap<readonly string[], Set<string>>()
 
-function canHide(part: Part) {
-  const definition = definitionOf(part)
-  let hides = hidingSlots.get(definition)
-  if (hides === undefined) {
-    hides =
-      !!definition.attrs &&
-      "hidden" in definition.attrs(part.store.get(), view(part, part.props))
-    hidingSlots.set(definition, hides)
+function attachedSet(list: readonly string[]) {
+  let set = attachedSets.get(list)
+  if (!set) {
+    set = new Set(list)
+    attachedSets.set(list, set)
   }
-  return hides
+  return set
+}
+
+function flagsOf(part: Part) {
+  const definition = definitionOf(part)
+  let flags = slotFlags.get(definition)
+  if (flags === undefined) {
+    const own = definition.attrs?.(part.store.get(), view(part, part.props))
+    flags = own
+      ? ("hidden" in own ? canHide : 0) | ("id" in own ? canMakeId : 0)
+      : 0
+    slotFlags.set(definition, flags)
+  }
+  return flags
 }
 
 /** Attaches behavior to an element. Leases the part while bound. Returns the cleanup. */
@@ -627,9 +719,10 @@ function bind(part: Part, el: HTMLElement, host: Host = { by: "core" }) {
     kept.rank = ++owner.rank
     owner.unordered = true
   }
+  const definition = definitionOf(part)
   if (dev) {
     checkShared(part, part.el, el)
-    const { focus } = definitionOf(part) as RoleFields<any, any, any>
+    const { focus } = definition as RoleFields<any, any, any>
     checkFocus(
       typeof focus === "function"
         ? focus(part.store.get(), view(part, part.props))
@@ -637,7 +730,7 @@ function bind(part: Part, el: HTMLElement, host: Host = { by: "core" }) {
       part.slot,
       el,
       {
-        component: ownerOf(part).label,
+        component: owner.label,
         id: part.id,
       }
     )
@@ -646,19 +739,51 @@ function bind(part: Part, el: HTMLElement, host: Host = { by: "core" }) {
   part.el = el
   kept.binding = binding
   const cleanups = [lease(kept)]
-  if (canHide(part)) {
+  const flags = flagsOf(part)
+  if (flags & canHide) {
     enforceHidden(el.ownerDocument)
   }
 
-  if (host.by === "core" || host.attaches !== "all") {
-    for (const [type, handler] of Object.entries(handlers(part))) {
-      if (host.by === "core" || !host.attaches.includes(type)) {
-        cleanups.push(on(el, type as keyof EventMap, handler))
+  if (
+    (host.by === "core" || host.attaches !== "all") &&
+    (definition.on || typeof definition.press === "function")
+  ) {
+    const attached =
+      host.by === "framework" && host.attaches !== "all"
+        ? attachedSet(host.attaches)
+        : undefined
+    let needsAttach = host.by === "core"
+    if (attached) {
+      for (const type in definition.on) {
+        if (!attached.has(type)) {
+          needsAttach = true
+          break
+        }
+      }
+      if (
+        !needsAttach &&
+        typeof definition.press === "function" &&
+        !attached.has("click")
+      ) {
+        needsAttach = true
+      }
+    }
+    if (needsAttach) {
+      const boundHandlers = handlers(part)
+      for (const type in boundHandlers) {
+        if (!attached || !attached.has(type)) {
+          cleanups.push(
+            on(
+              el,
+              type as keyof EventMap,
+              boundHandlers[type as keyof EventMap]!
+            )
+          )
+        }
       }
     }
   }
 
-  const definition = definitionOf(part)
   if (definition.live) {
     cleanups.push(definition.live.attach(part, el))
   }
@@ -670,26 +795,31 @@ function bind(part: Part, el: HTMLElement, host: Host = { by: "core" }) {
   if (early) {
     cleanups.push(early)
   }
-  const late = () => {
-    const cleanup = definition.bind?.(el, part)
+  const { sleeping } = owner
+  if (sleeping && definition.bind) {
+    const late = () => {
+      const cleanup = definition.bind?.(el, part)
+      if (cleanup) {
+        cleanups.push(cleanup)
+      }
+    }
+    sleeping.binds.add(late)
+    cleanups.push(() => sleeping.binds.delete(late))
+  } else if (definition.bind) {
+    const cleanup = definition.bind(el, part)
     if (cleanup) {
       cleanups.push(cleanup)
     }
   }
-  const { sleeping } = kept.owner
-  if (sleeping && definition.bind) {
-    sleeping.binds.add(late)
-    cleanups.push(() => sleeping.binds.delete(late))
-  } else {
-    late()
-  }
   // Stand-ins that unit tests bind in Node have no ids to follow.
-  if (definition.attrs && typeof MutationObserver !== "undefined") {
+  if (flags & canMakeId && typeof MutationObserver !== "undefined") {
     cleanups.push(followId(kept, el))
   }
 
   return () => {
-    cleanups.forEach((cleanup) => cleanup())
+    for (let index = 0; index < cleanups.length; index++) {
+      cleanups[index]()
+    }
     if (kept.binding !== binding) {
       return
     }
@@ -1014,6 +1144,7 @@ export {
   followed,
   handlers,
   held,
+  isAsleep,
   liveAttrs,
   madeLabel,
   nextAsleep,

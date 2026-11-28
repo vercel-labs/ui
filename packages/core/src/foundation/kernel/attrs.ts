@@ -25,6 +25,8 @@ function checkedAttrs(checked: boolean | "indeterminate") {
   }
 }
 
+const unsafeIdPart = /[\s%]/
+
 /**
  * A value made safe inside an id, like `${id}-item-${idPart(value)}`. Values
  * may hold spaces or `%`, which would break an `aria-controls` or
@@ -32,7 +34,9 @@ function checkedAttrs(checked: boolean | "indeterminate") {
  * @stable
  */
 function idPart(value: string) {
-  return value.replace(/[\s%]/g, encodeURIComponent)
+  return unsafeIdPart.test(value)
+    ? value.replace(/[\s%]/g, encodeURIComponent)
+    : value
 }
 
 export { checkedAttrs, idPart, openAttrs }

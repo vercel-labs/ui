@@ -51,7 +51,13 @@ const watchers: {
 // watching each, so an agent created later, like one a chat panel loads on
 // demand, still finds the components already on the page.
 const earlier = new Set<WeakRef<PrimitiveInstance>>()
-const watchLater = new WeakMap<PrimitiveInstance, () => void>()
+type PendingWatch = {
+  parts: ReadonlyMap<string, Part>
+  definition: WatchedDefinition
+  options: () => object
+  unwatch?: () => void
+}
+const watchLater = new WeakMap<PrimitiveInstance, PendingWatch>()
 
 /**
  * Lets the watchers hear the instance being made while the framework keeps
@@ -63,26 +69,17 @@ function watchWhileKept(
   definition: WatchedDefinition,
   options: () => object
 ) {
-  let unwatch: (() => void) | undefined
-  let waiting: WeakRef<PrimitiveInstance> | undefined
-  const untrack = () => {
-    unwatch?.()
-    unwatch = undefined
-    if (waiting) {
-      earlier.delete(waiting)
-    }
-    waiting = undefined
-  }
   whenKept(() => {
+    let unwatch: (() => void) | undefined
+    let waiting: WeakRef<PrimitiveInstance> | undefined
+    let entry: PendingWatch | undefined
     if (watchers.add) {
       unwatch = watchers.add(instance, parts, definition, options)
     } else if (typeof document !== "undefined") {
       earlier.add((waiting = new WeakRef(instance)))
       // Weakly held, by the instance, so the list never keeps one alive.
-      watchLater.set(
-        instance,
-        () => (unwatch = watchers.add?.(instance, parts, definition, options))
-      )
+      entry = { parts, definition, options }
+      watchLater.set(instance, entry)
       // Instances a framework made and threw away are never destroyed. Their refs go now and then.
       if (earlier.size % 1000 === 0) {
         for (const old of earlier) {
@@ -92,7 +89,17 @@ function watchWhileKept(
         }
       }
     }
-    return untrack
+    return () => {
+      ;(unwatch ?? entry?.unwatch)?.()
+      unwatch = undefined
+      if (entry) {
+        entry.unwatch = undefined
+      }
+      if (waiting) {
+        earlier.delete(waiting)
+        waiting = undefined
+      }
+    }
   })
 }
 
@@ -101,8 +108,14 @@ function watchEarlier() {
   for (const ref of earlier) {
     earlier.delete(ref)
     const instance = ref.deref()
-    if (instance) {
-      watchLater.get(instance)?.()
+    const entry = instance && watchLater.get(instance)
+    if (instance && entry) {
+      entry.unwatch = watchers.add?.(
+        instance,
+        entry.parts,
+        entry.definition,
+        entry.options
+      )
     }
   }
 }

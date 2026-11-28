@@ -325,34 +325,65 @@ type Association = {
   disabled: (disabled: boolean) => void
 }
 
+type ResetEntry = {
+  input: HTMLInputElement
+  run: () => void
+}
+
+type DocumentReset = {
+  entries: Set<ResetEntry>
+  listen: (event: Event) => void
+}
+
+const documentResets = new WeakMap<Document, DocumentReset>()
+
+function watchDocumentReset(input: HTMLInputElement, run: () => void) {
+  const doc = input.ownerDocument
+  let watcher = documentResets.get(doc)
+  if (!watcher) {
+    const entries = new Set<ResetEntry>()
+    const listen = (event: Event) => {
+      for (const entry of entries) {
+        if (event.target === entry.input.form) {
+          afterReset(event, entry.run)
+        }
+      }
+    }
+    doc.addEventListener("reset", listen, true)
+    watcher = { entries, listen }
+    documentResets.set(doc, watcher)
+  }
+  const entry: ResetEntry = { input, run }
+  watcher.entries.add(entry)
+  return () => {
+    watcher.entries.delete(entry)
+    if (!watcher.entries.size) {
+      doc.removeEventListener("reset", watcher.listen, true)
+      documentResets.delete(doc)
+    }
+  }
+}
+
 // The form side of a hidden native input: a form reset, the browser focusing
 // it (like on an invalid submit), and ancestor fieldsets disabling it.
 function associate(
   input: HTMLInputElement,
   options: Association & { focus: () => void; write: () => void }
 ) {
-  const cleanups: (() => void)[] = []
-
-  const onReset = (event: Event) => {
-    if (event.target !== input.form) {
-      return
-    }
-    afterReset(event, () => {
-      options.reset()
-      options.write()
-    })
-  }
-  input.ownerDocument.addEventListener("reset", onReset, true)
-  cleanups.push(() =>
-    input.ownerDocument.removeEventListener("reset", onReset, true)
-  )
+  const unwatchReset = watchDocumentReset(input, () => {
+    options.reset()
+    options.write()
+  })
 
   const onFocus = () => options.focus()
   input.addEventListener("focus", onFocus)
-  cleanups.push(() => input.removeEventListener("focus", onFocus))
 
-  cleanups.push(watchFieldsets(input, options.disabled))
-  return () => cleanups.forEach((cleanup) => cleanup())
+  const unwatchFieldsets = watchFieldsets(input, options.disabled)
+  return () => {
+    unwatchReset()
+    input.removeEventListener("focus", onFocus)
+    unwatchFieldsets()
+  }
 }
 
 // What a watched element checks again once it moves, for a renderer that
@@ -369,20 +400,34 @@ function watchFieldsets(el: Element, onChange: (disabled: boolean) => void) {
   // A move out of a fieldset removes `el`, or a node between it and the
   // fieldset, from its parent, so those parents are watched too.
   const check = () => {
-    if (observer) {
+    let lastFieldset: HTMLFieldSetElement | null = null
+    let now = false
+    for (let node = el.parentElement; node; node = node.parentElement) {
+      if (node instanceof HTMLFieldSetElement) {
+        lastFieldset = node
+        if (!now && node.disabled) {
+          const legend = node.querySelector(":scope > legend")
+          if (!legend?.contains(el)) {
+            now = true
+          }
+        }
+      }
+    }
+    if (lastFieldset && typeof MutationObserver !== "undefined") {
+      observer ??= new MutationObserver(check)
       observer.disconnect()
-      for (
-        let node = el.parentElement;
-        node?.closest("fieldset");
-        node = node.parentElement
-      ) {
+      for (let node = el.parentElement; node; node = node.parentElement) {
         observer.observe(node, {
           childList: true,
           attributeFilter: ["disabled"],
         })
+        if (node === lastFieldset) {
+          break
+        }
       }
+    } else {
+      observer?.disconnect()
     }
-    const now = fieldsetDisabled(el)
     if (now !== disabled) {
       onChange((disabled = now))
     }
@@ -390,9 +435,6 @@ function watchFieldsets(el: Element, onChange: (disabled: boolean) => void) {
   const watch = () => {
     if (!active) {
       return
-    }
-    if (typeof MutationObserver !== "undefined") {
-      observer = new MutationObserver(check)
     }
     check()
     moves.set(el, check)

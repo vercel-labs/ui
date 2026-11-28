@@ -26,7 +26,12 @@ import {
 import { checkedAttrs, idPart, openAttrs } from "../../foundation/kernel/attrs"
 import { on, selectEvent } from "../../foundation/kernel/events"
 import { trackInput } from "../../foundation/kernel/modality"
-import { awake, firstAsleep, onProps } from "../../foundation/kernel/part"
+import {
+  awake,
+  firstAsleep,
+  isAsleep,
+  onProps,
+} from "../../foundation/kernel/part"
 import type { SlotFactory } from "../../foundation/kernel/primitive-types"
 import {
   adoptPlatform,
@@ -253,17 +258,25 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
         // Mouse and pen open on press, like native menus. The click that follows is ignored.
         api.internal.pointerPress(el!, event, key, props.payload)
       },
-      pointermove(event, { api, el, id }) {
+      pointermove(event, context) {
+        if (isAsleep(context)) {
+          return
+        }
+        const { api, el, id } = context
         api.parentMenu()?.internal.hoverItem(el!, event)
         api.menubar()?.internal.hoverMove(id, event)
       },
-      pointerenter(event, { api, id }) {
-        api.menubar()?.internal.hover(id, event)
-      },
-      pointerleave(event, { api, id }) {
-        if (event.pointerType === "touch") {
+      pointerenter(event, context) {
+        if (isAsleep(context)) {
           return
         }
+        context.api.menubar()?.internal.hover(context.id, event)
+      },
+      pointerleave(event, context) {
+        if (isAsleep(context) || event.pointerType === "touch") {
+          return
+        }
+        const { api, id } = context
         const popup = api.popupElement()
         api.menubar()?.internal.leave(id, event, popup)
         if (api.isOpen() && popup) {

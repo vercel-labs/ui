@@ -13,6 +13,17 @@ import {
 } from "./listbox-engine"
 import { foldText, leadingSpaces } from "../text/match"
 
+function textMatchesNeedle(
+  text: string,
+  needle: string,
+  mode: "contains" | "startsWith"
+) {
+  const haystack = foldText(text)
+  return mode === "startsWith"
+    ? haystack.startsWith(needle, leadingSpaces(haystack))
+    : haystack.includes(needle)
+}
+
 // Whether text matches a query the way a filter asks. Case and accents are
 // ignored the way the user's language ignores them.
 function textMatches(
@@ -21,13 +32,26 @@ function textMatches(
   mode: "contains" | "startsWith"
 ) {
   const needle = foldText(query.trim())
-  if (!needle) {
+  return !needle || textMatchesNeedle(text, needle, mode)
+}
+
+function itemMatchesNeedle<T>(
+  item: ListItem<T>,
+  needle: string,
+  mode: "contains" | "startsWith"
+) {
+  if (textMatchesNeedle(item.label, needle, mode)) {
     return true
   }
-  const haystack = foldText(text)
-  return mode === "startsWith"
-    ? haystack.startsWith(needle, leadingSpaces(haystack))
-    : haystack.includes(needle)
+  const keywords = item.keywords
+  if (keywords) {
+    for (let index = 0; index < keywords.length; index++) {
+      if (textMatchesNeedle(keywords[index], needle, mode)) {
+        return true
+      }
+    }
+  }
+  return false
 }
 
 // How well an item matches a query: 0 hides it, and higher ranks it first.
@@ -43,11 +67,8 @@ function itemScore<T>(
     const result = filter(item, query)
     return typeof result === "number" ? Math.max(0, result) : result ? 1 : 0
   }
-  return [item.label, ...(item.keywords ?? [])].some((text) =>
-    textMatches(text, query, filter)
-  )
-    ? 1
-    : 0
+  const needle = foldText(query.trim())
+  return !needle || itemMatchesNeedle(item, needle, filter) ? 1 : 0
 }
 
 function itemMatches<T>(
@@ -67,11 +88,28 @@ function filterData<T>(
   filter: ListFilter<T> | undefined,
   { rank = false }: { rank?: boolean } = {}
 ) {
-  if (filter === false || filter === undefined || !query.trim()) {
+  if (filter === false || filter === undefined) {
+    return data
+  }
+  const trimmed = query.trim()
+  if (!trimmed) {
     return data
   }
   if (rank) {
-    return rankData(data, query, filter)
+    return rankData(data, query, trimmed, filter)
+  }
+  const needle = typeof filter === "function" ? "" : foldText(trimmed)
+  if (typeof filter !== "function" && !needle) {
+    return data
+  }
+  const matchesEntry = (entry: ListItem<T> | (T & string)) => {
+    if (typeof filter === "function") {
+      const result = filter(toListItem(entry), query)
+      return typeof result === "number" ? result > 0 : !!result
+    }
+    return typeof entry === "string"
+      ? textMatchesNeedle(entry, needle, filter)
+      : itemMatchesNeedle(entry, needle, filter)
   }
   const result: ListData<T> = []
   // A separator waits for the next kept entry, so none leads, trails or doubles.
@@ -83,21 +121,26 @@ function filterData<T>(
     separator = undefined
     result.push(entry)
   }
-  for (const entry of data) {
+  for (let index = 0; index < data.length; index++) {
+    const entry = data[index]
     if (isSeparator(entry)) {
       separator = entry
       continue
     }
     if (isGroup(entry)) {
-      const items = entry.items.filter((child) =>
-        itemMatches(toListItem(child), query, filter)
-      )
+      const items: ListGroup<T>["items"] = []
+      for (let childIndex = 0; childIndex < entry.items.length; childIndex++) {
+        const child = entry.items[childIndex]
+        if (matchesEntry(child)) {
+          items.push(child)
+        }
+      }
       if (items.length) {
         keep({ ...entry, items })
       }
       continue
     }
-    if (itemMatches(toListItem(entry), query, filter)) {
+    if (matchesEntry(entry)) {
       keep(entry)
     }
   }
@@ -113,10 +156,38 @@ type Ranked<T> = {
 // Sorts by score, best first. Equal scores keep their order, since sort is stable.
 const byScore = <T>(a: Ranked<T>, b: Ranked<T>) => b.score - a.score
 
-function rankData<T>(data: ListData<T>, query: string, filter: ListFilter<T>) {
+function rankData<T>(
+  data: ListData<T>,
+  query: string,
+  trimmed: string,
+  filter: Exclude<ListFilter<T>, false>
+) {
+  const needle = typeof filter === "function" ? "" : foldText(trimmed)
+  const scoreEntry = (entry: ListItem<T> | (T & string)) => {
+    if (typeof filter === "function") {
+      const result = filter(toListItem(entry), query)
+      return typeof result === "number" ? Math.max(0, result) : result ? 1 : 0
+    }
+    if (!needle) {
+      return 1
+    }
+    return (
+      typeof entry === "string"
+        ? textMatchesNeedle(entry, needle, filter)
+        : itemMatchesNeedle(entry, needle, filter)
+    )
+      ? 1
+      : 0
+  }
   const ranked: Ranked<T>[] = []
+  let ordered = true
+  let previousScore = Infinity
   let separator: ListData<T>[number] | undefined
   const keep = (entry: ListData<T>[number], score: number) => {
+    if (score > previousScore) {
+      ordered = false
+    }
+    previousScore = score
     ranked.push({
       entry,
       score,
@@ -124,44 +195,62 @@ function rankData<T>(data: ListData<T>, query: string, filter: ListFilter<T>) {
     })
     separator = undefined
   }
-  for (const entry of data) {
+  for (let index = 0; index < data.length; index++) {
+    const entry = data[index]
     if (isSeparator(entry)) {
       separator = entry
       continue
     }
     if (isGroup(entry)) {
       const items: Ranked<T>[] = []
-      for (const child of entry.items) {
-        const score = itemScore(toListItem(child), query, filter)
+      let groupOrdered = true
+      let groupPrevious = Infinity
+      for (let childIndex = 0; childIndex < entry.items.length; childIndex++) {
+        const child = entry.items[childIndex]
+        const score = scoreEntry(child)
         if (score > 0) {
+          if (score > groupPrevious) {
+            groupOrdered = false
+          }
+          groupPrevious = score
           items.push({ entry: child, score })
         }
       }
       if (!items.length) {
         continue
       }
-      items.sort(byScore)
-      keep(
-        {
-          ...entry,
-          items: items.map((item) => item.entry) as ListGroup<T>["items"],
-        },
-        items[0].score
-      )
+      if (!groupOrdered) {
+        items.sort(byScore)
+      }
+      const entries: ListGroup<T>["items"] = []
+      for (let itemIndex = 0; itemIndex < items.length; itemIndex++) {
+        entries.push(items[itemIndex].entry as ListGroup<T>["items"][number])
+      }
+      keep({ ...entry, items: entries }, items[0].score)
       continue
     }
-    const score = itemScore(toListItem(entry), query, filter)
+    const score = scoreEntry(entry)
     if (score > 0) {
       keep(entry, score)
     }
   }
-  const sorted = [...ranked].sort(byScore)
-  if (sorted.some((item, index) => item !== ranked[index])) {
-    return sorted.map((item) => item.entry)
+  if (!ordered) {
+    ranked.sort(byScore)
+    const result: ListData<T> = []
+    for (let index = 0; index < ranked.length; index++) {
+      result.push(ranked[index].entry)
+    }
+    return result
   }
-  return ranked.flatMap((item) =>
-    item.separator ? [item.separator, item.entry] : [item.entry]
-  )
+  const result: ListData<T> = []
+  for (let index = 0; index < ranked.length; index++) {
+    const item = ranked[index]
+    if (item.separator) {
+      result.push(item.separator)
+    }
+    result.push(item.entry)
+  }
+  return result
 }
 
 const filtering = { data: filterData, matches: itemMatches }

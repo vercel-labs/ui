@@ -105,28 +105,39 @@ function withDerived<State extends object>(
     return synced
   }
   let result = (synced ?? {}) as Record<string, unknown>
-  for (const derivation of list) {
+  let copied = !synced
+  let hasKeys = !!synced
+  for (let index = 0; index < list.length; index++) {
+    const derivation = list[index]
     // With nothing synced, state is as it was, so only what options derive can change.
     if (!synced && derivation.from === "state") {
       continue
     }
-    const next = { ...state, ...result } as State
+    const next = hasKeys ? ({ ...state, ...result } as State) : state
     const derived = (
       derivation.from === "state"
         ? store.view(next, () => derivation.derive(next))
         : derivation.derive(result, state, options)
     ) as Record<string, unknown> | undefined
-    result = { ...result }
-    for (const key of derivation.keys) {
+    if (!derived && derivation.from === "options") {
+      continue
+    }
+    if (!copied) {
+      result = { ...result }
+      copied = true
+    }
+    for (let keyIndex = 0; keyIndex < derivation.keys.length; keyIndex++) {
+      const key = derivation.keys[keyIndex]
       if (derived && key in derived) {
         result[key] = derived[key]
+        hasKeys = true
       } else if (derivation.from === "state") {
         result[key] = next[key as keyof State]
+        hasKeys = true
       }
     }
   }
-  return (synced || Object.keys(result).length ? result : undefined) as
-    Partial<State> | undefined
+  return (hasKeys ? result : undefined) as Partial<State> | undefined
 }
 
 export { deriveFromOptions, deriveState, withDerived }

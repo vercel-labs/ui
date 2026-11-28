@@ -97,10 +97,12 @@ function createFolder(locale?: string) {
 type Folder = ReturnType<typeof createFolder>
 
 let folder: Folder | undefined
+let folderVersion = 0
 let watching = false
 
 /** Matches text in another locale than the user's, or in the user's again without one. */
 function setMatchLocale(locale?: string) {
+  folderVersion++
   folder = createFolder(locale ?? userLocale())
 }
 
@@ -115,13 +117,19 @@ function userFolder() {
     typeof window.addEventListener === "function"
   ) {
     watching = true
-    window.addEventListener("languagechange", () => (folder = undefined))
+    window.addEventListener("languagechange", () => {
+      folderVersion++
+      folder = undefined
+    })
   }
+  folderVersion++
   return (folder = createFolder(userLocale()))
 }
 
+const matchVersion = () => folderVersion
+
 /** Text folded for matching in the user's language: case and accents that don't count there are gone. */
-const foldText = (text: string) => userFolder().fold(text)
+const foldText = (text: string) => (folder ?? userFolder()).fold(text)
 
 // How many spaces and line breaks a text starts with, so "startsWith" skips
 // the indentation a label's markup may carry.
@@ -134,25 +142,17 @@ function leadingSpaces(text: string) {
 }
 
 // Characters that end a word, so the one after them starts the next.
-const separators = new Set([
-  " ",
-  "-",
-  "_",
-  "/",
-  ".",
-  ":",
-  ",",
-  "(",
-  ")",
-  "[",
-  "]",
-  "@",
-  "#",
-])
+const separatorTable = /* @__PURE__ */ (() => {
+  const table = new Uint8Array(128)
+  for (const char of " -_/.:,()[]@#") {
+    table[char.charCodeAt(0)] = 1
+  }
+  return table
+})()
 
 // Whether a word starts at an index, after a separator or at the start.
 const startsWord = (text: string, index: number) =>
-  index === 0 || separators.has(text[index - 1])
+  index === 0 || separatorTable[text.charCodeAt(index - 1)] === 1
 
 /**
  * The ranges of `text` that `query` matched, the way a filter matches:
@@ -254,6 +254,7 @@ export {
   matchRanges,
   type MatchSegment,
   matchSegments,
+  matchVersion,
   setMatchLocale,
   startsWord,
 }

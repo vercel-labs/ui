@@ -5,7 +5,7 @@
 // substring, then the query's letters in order with bonuses for word starts
 // and runs, so "gp" finds "Git push". Scores run from 0, no match, to 1.
 import { normalize } from "./typeahead"
-import { startsWord } from "./match"
+import { matchVersion, startsWord } from "./match"
 
 // How much of the text the query covers, as a small bonus that ranks "Set"
 // above "Settings" for "set".
@@ -34,10 +34,15 @@ function subsequenceScore(haystack: string, needle: string) {
   let previous = -2
   let bonus = 0
   let letters = 0
-  for (const char of needle) {
-    if (char === " ") {
+  for (let index = 0; index < needle.length; index++) {
+    const code = needle.charCodeAt(index)
+    if (code === 32) {
       continue
     }
+    const char =
+      code >= 0xd800 && code <= 0xdbff && index + 1 < needle.length
+        ? needle.slice(index, ++index + 1)
+        : needle[index]
     const found = haystack.indexOf(char, position)
     if (found === -1) {
       return 0
@@ -58,16 +63,7 @@ function subsequenceScore(haystack: string, needle: string) {
   return 0.1 + (0.4 * bonus) / (2 * letters)
 }
 
-/**
- * How well `text` matches `query`, from 0 (no match) to 1 (the same text), ignoring case and accents.
- * @stable
- */
-function fuzzyScore(text: string, query: string) {
-  const needle = normalize(query)
-  if (!needle) {
-    return 1
-  }
-  const haystack = normalize(text)
+function scoreFolded(haystack: string, needle: string) {
   if (haystack === needle) {
     return 1
   }
@@ -84,6 +80,29 @@ function fuzzyScore(text: string, query: string) {
   return subsequenceScore(haystack, needle)
 }
 
+let cachedQuery: string | undefined
+let cachedVersion = -1
+let cachedNeedle = ""
+
+function normalizedQuery(query: string) {
+  const version = matchVersion()
+  if (query !== cachedQuery || version !== cachedVersion) {
+    cachedQuery = query
+    cachedVersion = version
+    cachedNeedle = normalize(query)
+  }
+  return cachedNeedle
+}
+
+/**
+ * How well `text` matches `query`, from 0 (no match) to 1 (the same text), ignoring case and accents.
+ * @stable
+ */
+function fuzzyScore(text: string, query: string) {
+  const needle = normalizedQuery(query)
+  return needle ? scoreFolded(normalize(text), needle) : 1
+}
+
 /**
  * A filter that keeps items with the query's letters in order, scored by
  * `fuzzyScore` over the label and keywords. Keywords count a little less than
@@ -93,9 +112,19 @@ function fuzzyFilter(
   item: { label: string; keywords?: string[] },
   query: string
 ) {
-  let best = fuzzyScore(item.label, query)
-  for (const keyword of item.keywords ?? []) {
-    best = Math.max(best, fuzzyScore(keyword, query) * 0.95)
+  const needle = normalizedQuery(query)
+  if (!needle) {
+    return 1
+  }
+  let best = scoreFolded(normalize(item.label), needle)
+  const keywords = item.keywords
+  if (keywords) {
+    for (let index = 0; index < keywords.length; index++) {
+      const score = scoreFolded(normalize(keywords[index]), needle) * 0.95
+      if (score > best) {
+        best = score
+      }
+    }
   }
   return best
 }

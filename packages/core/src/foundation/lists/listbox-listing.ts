@@ -23,6 +23,8 @@ function keepListing<State extends { listing: Listing }>(
   selection?: {
     // What an option adds to its entry, like "s" while it's selected.
     entry: (key: string, value: unknown) => string
+    // When every non-empty `entry` is `"s"` on these keys, avoids scanning the whole list.
+    selectedKeys?: () => readonly string[] | undefined
     // The state that decides it.
     inputs: () => readonly unknown[]
   }
@@ -37,7 +39,10 @@ function keepListing<State extends { listing: Listing }>(
         ...(selection?.inputs() ?? []),
       ]
       if (!last || !sameValue(inputs, last.inputs)) {
-        const next = listbox.listing(selection?.entry)
+        const next = listbox.listing(
+          selection?.entry,
+          selection?.selectedKeys?.()
+        )
         last = {
           inputs,
           listing: sameEntries(state.listing, next) ? state.listing : next,

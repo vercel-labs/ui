@@ -180,4 +180,12 @@ function renderElement<State>(
   return React.createElement(tag, props)
 }
 
-export { mergeProps, mergeRefs, renderElement, resolveLazy, type RenderProp }
+export {
+  mergeProps,
+  mergeRefs,
+  mergeStyles,
+  prevented,
+  renderElement,
+  resolveLazy,
+  type RenderProp,
+}

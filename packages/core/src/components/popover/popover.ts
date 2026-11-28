@@ -54,6 +54,7 @@ import { trackInput } from "../../foundation/kernel/modality"
 import {
   awake,
   firstAsleep,
+  isAsleep,
   nextAsleep,
   onProps,
 } from "../../foundation/kernel/part"
@@ -386,12 +387,13 @@ const popoverPrimitive = /* @__PURE__ */ definePrimitive({
     modal: options.modal ?? false,
     apple: initialApple(),
   }),
-  // A popover that may present as a sheet sets that up as it mounts.
+  // A popover that may present as a sheet or open on hover sets that up as it mounts.
   asleep: (options) =>
     options.open === undefined &&
     !options.defaultOpen &&
     !options.controller &&
-    !options.presentation,
+    !options.presentation &&
+    !options.openOnHover,
   sync: (options) => (options.open === undefined ? {} : { open: options.open }),
   api: popoverApi,
   slots: (slot) => {
@@ -426,7 +428,19 @@ const popoverPrimitive = /* @__PURE__ */ definePrimitive({
             ? ariaKeyshortcuts(part.props.shortcut, state.apple)
             : undefined,
         }),
-        on: trigger.on,
+        on: {
+          keydown: trigger.on!.keydown,
+          pointerenter(event, context) {
+            if (!isAsleep(context)) {
+              trigger.on!.pointerenter!(event, context)
+            }
+          },
+          pointerleave(event, context) {
+            if (!isAsleep(context)) {
+              trigger.on!.pointerleave!(event, context)
+            }
+          },
+        },
         press: trigger.press,
         asleep(el, part) {
           const { key, id, store } = part

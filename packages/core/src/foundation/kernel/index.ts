@@ -62,6 +62,7 @@ export {
   bind,
   firstAsleep,
   held,
+  isAsleep,
   madeLabel,
   nextAsleep,
   onProps,

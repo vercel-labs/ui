@@ -280,6 +280,8 @@ function selectApiBody(
   })
   keepListing(store, listbox, {
     entry: (key, value) => (selection.isSelected(key, value) ? "s" : ""),
+    selectedKeys: () =>
+      options().isItemEqualToValue ? undefined : selection.keys(),
     inputs: () => [store.get().value],
   })
   // What the features the parts register add, like select-all to choosing.

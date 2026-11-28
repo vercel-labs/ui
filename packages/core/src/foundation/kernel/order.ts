@@ -20,24 +20,77 @@ const walkPerEntry = 32
 // holding it instead, which stops at the last entry. Entries the walk can't reach, like
 // ones in separate shadow roots, are compared.
 function inDocumentOrder<Entry extends { el: HTMLElement }>(entries: Entry[]) {
-  let container = entries.length < walkFrom ? null : entries[0].el.parentNode
-  while (container && !entries.every(({ el }) => container!.contains(el))) {
+  const count = entries.length
+  if (count <= 1) {
+    return entries
+  }
+  const firstParent = entries[0].el.parentNode
+  if (firstParent) {
+    let sameParent = true
+    let contiguous = true
+    for (let index = 1; index < count; index++) {
+      const el = entries[index].el
+      if (el.parentNode !== firstParent) {
+        sameParent = false
+        break
+      }
+      if (contiguous && entries[index - 1].el.nextElementSibling !== el) {
+        contiguous = false
+      }
+    }
+    if (sameParent) {
+      if (contiguous) {
+        return entries
+      }
+      if ("firstElementChild" in firstParent) {
+        const byElement = new Map<Element, Entry>()
+        for (let index = 0; index < count; index++) {
+          byElement.set(entries[index].el, entries[index])
+        }
+        const sorted: Entry[] = []
+        let budget = count * walkPerEntry
+        for (
+          let child = (firstParent as ParentNode).firstElementChild;
+          child && budget--;
+          child = child.nextElementSibling
+        ) {
+          const entry = byElement.get(child)
+          if (entry && sorted.push(entry) === count) {
+            return sorted
+          }
+        }
+      }
+    }
+  }
+  let container = count < walkFrom ? null : firstParent
+  while (container) {
+    let containsAll = true
+    for (let index = 0; index < count; index++) {
+      if (!container.contains(entries[index].el)) {
+        containsAll = false
+        break
+      }
+    }
+    if (containsAll) {
+      break
+    }
     container = container.parentNode
   }
   if (container) {
-    const byElement = new Map<Node, Entry>(
-      entries.map((entry) => [entry.el, entry])
-    )
+    const byElement = new Map<Node, Entry>()
+    for (let index = 0; index < count; index++) {
+      byElement.set(entries[index].el, entries[index])
+    }
     const sorted: Entry[] = []
     const walker = entries[0].el.ownerDocument.createTreeWalker(container, 1)
-    let budget = entries.length * walkPerEntry
+    let budget = count * walkPerEntry
     for (
       let node: Node | null = container;
       node && budget--;
       node = walker.nextNode()
     ) {
       const entry = byElement.get(node)
-      if (entry && sorted.push(entry) === entries.length) {
+      if (entry && sorted.push(entry) === count) {
         return sorted
       }
     }
@@ -85,10 +138,15 @@ function createOrder<Entry extends { key: string; el: HTMLElement }>() {
   }
 
   function sorted() {
-    const all = [...entries.values()]
-    const list = inDocumentOrder(all.filter((entry) => entry.el.isConnected))
+    const connected: Entry[] = []
+    for (const entry of entries.values()) {
+      if (entry.el.isConnected) {
+        connected.push(entry)
+      }
+    }
+    const list = inDocumentOrder(connected)
     // Vue adds items before it inserts them, so only a complete list is kept.
-    if (list.length < all.length) {
+    if (list.length < entries.size) {
       return list
     }
     if (typeof MutationObserver !== "undefined") {

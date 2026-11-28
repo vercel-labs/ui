@@ -341,22 +341,24 @@ function createRovingFocus<State extends object, Props = any>(
       // An item disabled, enabled or preferred after it joined, like a radio
       // a field around it disables, can move the stop. An item that joins with
       // its part hears each render; one joined with plain data never does.
-      let wasDisabled = isDisabled(part)
-      let wasPreferred = isPreferred(part)
-      const unwatch = onProps(part as Part, () => {
-        if (
-          isDisabled(part) === wasDisabled &&
-          isPreferred(part) === wasPreferred
-        ) {
-          return
-        }
-        wasDisabled = isDisabled(part)
-        wasPreferred = isPreferred(part)
-        queue(false)
-      })
+      let unwatch: (() => void) | undefined
+      if (options.disabled || options.preferred) {
+        let wasDisabled = isDisabled(part)
+        let wasPreferred = isPreferred(part)
+        unwatch = onProps(part as Part, () => {
+          const nextDisabled = isDisabled(part)
+          const nextPreferred = isPreferred(part)
+          if (nextDisabled === wasDisabled && nextPreferred === wasPreferred) {
+            return
+          }
+          wasDisabled = nextDisabled
+          wasPreferred = nextPreferred
+          queue(false)
+        })
+      }
       queue(true)
       return () => {
-        unwatch()
+        unwatch?.()
         el.removeEventListener("focus", focused)
         el.removeEventListener("blur", blurred)
         stops.delete(el)
@@ -407,29 +409,64 @@ function createRovingFocus<State extends object, Props = any>(
       if (event.defaultPrevented || event.altKey) {
         return
       }
+      if (!options.move) {
+        if (event.ctrlKey || event.metaKey) {
+          return
+        }
+        const eventKey = event.key
+        const dir = orientation()
+        let step: number | "first" | "last" | undefined
+        if (eventKey === "Home") {
+          step = "first"
+        } else if (eventKey === "End") {
+          step = "last"
+        } else if (eventKey === "ArrowDown") {
+          if (dir !== "horizontal") {
+            step = 1
+          }
+        } else if (eventKey === "ArrowUp") {
+          if (dir !== "horizontal") {
+            step = -1
+          }
+        } else if (eventKey === "ArrowLeft" || eventKey === "ArrowRight") {
+          if (dir !== "vertical") {
+            step = stepFor(eventKey, dir, isRTL(el))
+          }
+        }
+        if (step === undefined) {
+          return
+        }
+        const list = options.focusable ? focusables() : order.list()
+        let fromIndex = -1
+        for (let index = 0; index < list.length; index++) {
+          if (list[index].el === el) {
+            fromIndex = index
+            break
+          }
+        }
+        if (fromIndex === -1) {
+          return
+        }
+        const from = list[fromIndex]
+        const next =
+          list[
+            moveIndex(fromIndex, step, list.length, options.loop?.() ?? false)
+          ]
+        if (!next) {
+          return
+        }
+        event.preventDefault()
+        if (next !== from && !focusOn(next.el)) {
+          moveTo(next.key, el)
+        }
+        return { key: next.key, from: from.key, shift: event.shiftKey }
+      }
       const list = focusables()
       const from = list.find((item) => item.el === el)
       if (!from) {
         return
       }
-      const rtl = isRTL(el)
-      let to: string | undefined
-      if (options.move) {
-        to = options.move(event, { from, items: list, rtl })
-      } else if (!event.ctrlKey && !event.metaKey) {
-        const step = stepFor(event.key, orientation(), rtl)
-        if (step !== undefined) {
-          to =
-            list[
-              moveIndex(
-                list.indexOf(from),
-                step,
-                list.length,
-                options.loop?.() ?? false
-              )
-            ]?.key
-        }
-      }
+      const to = options.move(event, { from, items: list, rtl: isRTL(el) })
       if (to === undefined) {
         return
       }

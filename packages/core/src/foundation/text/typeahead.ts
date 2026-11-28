@@ -4,7 +4,19 @@ import { foldText } from "./match"
 // don't count there are gone, and so is surrounding space. "Éditer" matches
 // "e". Folding is remembered, since filtering and typeahead fold the same
 // labels on every keystroke.
-const normalize = (text: string) => foldText(text).trim()
+function normalize(text: string) {
+  const folded = foldText(text)
+  const length = folded.length
+  if (!length) {
+    return folded
+  }
+  const first = folded.charCodeAt(0)
+  const last = folded.charCodeAt(length - 1)
+  if (first > 32 && first < 127 && last > 32 && last < 127) {
+    return folded
+  }
+  return folded.trim()
+}
 
 /**
  * Whether a key press types a character a typeahead should search for: one
@@ -17,27 +29,44 @@ function isTypeaheadKey(event: KeyboardEvent) {
   )
 }
 
+function collectText(node: Node) {
+  let text = ""
+  for (let child = node.firstChild; child; child = child.nextSibling) {
+    if (child.nodeType === 3) {
+      text += child.nodeValue
+    } else if (child.nodeType === 1) {
+      const element = child as Element
+      if (
+        element.hasAttribute("hidden") ||
+        (element.hasAttribute("aria-hidden") &&
+          element.getAttribute("aria-hidden") === "true")
+      ) {
+        continue
+      }
+      text += element.firstElementChild
+        ? collectText(element)
+        : (element.textContent ?? "")
+    }
+  }
+  return text
+}
+
 // Text a user would type to find an element, skipping hidden parts like
 // shortcuts, and parts that aren't shown, like an unchecked item's indicator.
 // The element's own `hidden` doesn't count: an item the search filtered out
 // keeps its text, so it can match again when the search changes. Its own
 // `aria-hidden` does, like a shortcut part's.
 function textOf(el: Element) {
-  let text = ""
-  const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT)
-  while (walker.nextNode()) {
-    const node = walker.currentNode
-    const hidden = node.parentElement?.closest('[aria-hidden="true"], [hidden]')
-    if (
-      hidden &&
-      el.contains(hidden) &&
-      (hidden !== el || hidden.getAttribute("aria-hidden") === "true")
-    ) {
-      continue
-    }
-    text += node.textContent
+  if (
+    el.hasAttribute("aria-hidden") &&
+    el.getAttribute("aria-hidden") === "true"
+  ) {
+    return ""
   }
-  return text
+  if (!el.firstElementChild) {
+    return el.textContent ?? ""
+  }
+  return collectText(el)
 }
 
 /**

@@ -89,7 +89,7 @@ function dialogSlots(
           ? ariaKeyshortcuts(part.props.shortcut, state.apple)
           : undefined,
       }),
-      on: trigger.on,
+      on: { keydown: trigger.on!.keydown },
       press: trigger.press,
       asleep(el, part) {
         const { key, id, store } = part

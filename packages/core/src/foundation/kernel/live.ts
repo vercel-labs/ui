@@ -68,17 +68,18 @@ function direct(names: readonly string[]) {
       let last = attrs(part)
       // A framework that reuses the element for another key never saw what
       // this slot wrote for the last one, so what the new key lacks goes.
-      const own = written.get(el) ?? new Map<string, string>()
-      written.set(el, own)
-      for (const [name, value] of own) {
-        if (last[name] === undefined && el.getAttribute(name) === value) {
-          el.removeAttribute(name)
+      let own = written.get(el)
+      if (own) {
+        for (const [name, value] of own) {
+          if (last[name] === undefined && el.getAttribute(name) === value) {
+            el.removeAttribute(name)
+          }
         }
+        own.clear()
       }
-      own.clear()
-      const update = () => {
-        const values = attrs(part)
-        for (const name of names) {
+      const sync = (values: Attrs) => {
+        for (let index = 0; index < names.length; index++) {
+          const name = names[index]
           const value = values[name]
           if (value === undefined) {
             if (
@@ -102,14 +103,17 @@ function direct(names: readonly string[]) {
             continue
           }
           el.setAttribute(name, value)
+          if (!own) {
+            written.set(el, (own = new Map()))
+          }
           own.set(name, value)
         }
         last = values
       }
       // Vue hydrates a part from the vnode it rendered before a sibling bound
       // and changed what it reads, so the element can start out behind.
-      update()
-      return subscribe(part, update)
+      sync(last)
+      return subscribe(part, () => sync(attrs(part)))
     },
   }
 }
@@ -180,14 +184,37 @@ function writeChannel(
   channel: string,
   release: boolean
 ) {
-  const channels = applied.get(el) ?? {}
-  const previous = channels[channel] ?? new Map()
-  const written = new Map<string, string>()
-  const styles = attrs.style === undefined ? [] : styleDeclarations(attrs.style)
-  for (const [property, value] of styles) {
-    written.set(`style:${property}`, value)
+  let channels = applied.get(el)
+  const previous = channels?.[channel]
+  let hasDefined = false
+  let hasAuthorOwned = false
+  for (const name in attrs) {
+    if (attrs[name] !== undefined) {
+      hasDefined = true
+      if (authorOwned.has(name)) {
+        hasAuthorOwned = true
+      }
+    }
   }
-  for (const [name, value] of Object.entries(attrs)) {
+  if (!previous && !hasDefined) {
+    if (release) {
+      delete found.get(el)?.[channel]
+    }
+    return
+  }
+  if (!channels) {
+    applied.set(el, (channels = {}))
+  }
+  const written = new Map<string, string>()
+  const styles =
+    attrs.style === undefined ? undefined : styleDeclarations(attrs.style)
+  if (styles) {
+    for (let index = 0; index < styles.length; index++) {
+      written.set(`style:${styles[index][0]}`, styles[index][1])
+    }
+  }
+  for (const name in attrs) {
+    const value = attrs[name]
     if (value !== undefined && name !== "style") {
       written.set(name, value)
     }
@@ -195,76 +222,105 @@ function writeChannel(
   // Only a channel that writes an id, or wrote one, reads the element's, so
   // live attributes and parts without an id cost no extra read per change.
   const id =
-    written.has("id") || previous.has("id") ? el.getAttribute("id") : null
+    written.has("id") || previous?.has("id") ? el.getAttribute("id") : null
   const keeps = keepsId(id, channels, channel)
   if (keeps) {
     written.delete("id")
   }
+  if (!hasAuthorOwned && previous) {
+    for (const name of previous.keys()) {
+      if (authorOwned.has(name)) {
+        hasAuthorOwned = true
+        break
+      }
+    }
+  }
   // A value no channel wrote, and not the part's own, like a copied
   // component's, is the author's, even when set after the part wrote its own.
-  const authors = new Set<string>()
-  const read = new Map<string, string | null>()
-  for (const name of new Set([...written.keys(), ...previous.keys()])) {
-    if (!authorOwned.has(name)) {
-      continue
+  let authors: Set<string> | undefined
+  let read: Map<string, string | null> | undefined
+  if (hasAuthorOwned) {
+    authors = new Set<string>()
+    read = new Map<string, string | null>()
+    const checkAuthor = (name: string) => {
+      if (!authorOwned.has(name) || read!.has(name)) {
+        return
+      }
+      const current = el.getAttribute(name)
+      read!.set(name, current)
+      if (
+        current === null ||
+        current === written.get(name) ||
+        (name === "aria-labelledby" && madeLabel(current))
+      ) {
+        return
+      }
+      for (const key in channels) {
+        if (channels[key].get(name) === current) {
+          return
+        }
+      }
+      authors!.add(name)
     }
-    const current = el.getAttribute(name)
-    read.set(name, current)
-    if (
-      current === null ||
-      current === written.get(name) ||
-      (name === "aria-labelledby" && madeLabel(current))
-    ) {
-      continue
+    for (const name of written.keys()) {
+      checkAuthor(name)
     }
-    if (!Object.values(channels).some((wrote) => wrote.get(name) === current)) {
-      authors.add(name)
+    if (previous) {
+      for (const name of previous.keys()) {
+        checkAuthor(name)
+      }
     }
-  }
-  for (const name of authors) {
-    written.delete(name)
-  }
-  for (const name of previous.keys()) {
-    if (written.has(name) || authors.has(name) || (name === "id" && keeps)) {
-      continue
-    }
-    if (name.startsWith("style:")) {
-      el.style.removeProperty(name.slice(6))
-      continue
-    }
-    if (!release) {
-      el.removeAttribute(name)
-      keepFound(el, channel, name, null)
-      continue
-    }
-    // One changed since the channel last wrote it, or removed, is the author's.
-    const current = el.getAttribute(name)
-    if (current !== previous.get(name)) {
-      continue
-    }
-    const original = found.get(el)?.[channel]?.get(name)
-    if (original === undefined) {
-      el.removeAttribute(name)
-    } else if (current !== original) {
-      el.setAttribute(name, original)
+    for (const name of authors) {
+      written.delete(name)
     }
   }
-  for (const [property, value] of styles) {
-    if (el.style.getPropertyValue(property) !== value) {
-      el.style.setProperty(property, value)
+  if (previous) {
+    for (const name of previous.keys()) {
+      if (written.has(name) || authors?.has(name) || (name === "id" && keeps)) {
+        continue
+      }
+      if (name.startsWith("style:")) {
+        el.style.removeProperty(name.slice(6))
+        continue
+      }
+      if (!release) {
+        el.removeAttribute(name)
+        keepFound(el, channel, name, null)
+        continue
+      }
+      // One changed since the channel last wrote it, or removed, is the author's.
+      const current = el.getAttribute(name)
+      if (current !== previous.get(name)) {
+        continue
+      }
+      const original = found.get(el)?.[channel]?.get(name)
+      if (original === undefined) {
+        el.removeAttribute(name)
+      } else if (current !== original) {
+        el.setAttribute(name, original)
+      }
     }
   }
-  for (const [name, value] of Object.entries(attrs)) {
+  if (styles) {
+    for (let index = 0; index < styles.length; index++) {
+      const [property, value] = styles[index]
+      if (el.style.getPropertyValue(property) !== value) {
+        el.style.setProperty(property, value)
+      }
+    }
+  }
+  for (const name in attrs) {
+    const value = attrs[name]
     if (value === undefined || !written.has(name)) {
       continue
     }
     const current =
       name === "id"
         ? id
-        : read.has(name)
+        : read?.has(name)
           ? read.get(name)
           : el.getAttribute(name)
-    if (current !== (previous.get(name) ?? null)) {
+    if (current !== (previous?.get(name) ?? null)) {
       keepFound(el, channel, name, current)
     }
     if (current === value) {
@@ -278,8 +334,11 @@ function writeChannel(
     }
     el.setAttribute(name, value)
   }
-  channels[channel] = written
-  applied.set(el, channels)
+  if (written.size) {
+    channels[channel] = written
+  } else {
+    delete channels[channel]
+  }
   if (release) {
     delete found.get(el)?.[channel]
   }
@@ -329,10 +388,15 @@ function keepsId(
   if (id === null || id === channels[channel]?.get("id")) {
     return false
   }
-  return (
-    !id.startsWith("ui-sdk-") ||
-    Object.values(channels).some((written) => written.get("id") === id)
-  )
+  if (!id.startsWith("ui-sdk-")) {
+    return true
+  }
+  for (const key in channels) {
+    if (channels[key].get("id") === id) {
+      return true
+    }
+  }
+  return false
 }
 
 // A file input's value can only be cleared, so it keeps the attribute alone.

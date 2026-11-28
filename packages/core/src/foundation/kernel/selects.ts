@@ -80,31 +80,58 @@ function narrowedOf(store: Store<any>) {
     selecting: new Map(),
   }
   narrowedStores.set(store, narrowed)
-  store.setFanout((changed, previous, run) => {
+  store.setFanout((changed, previous, liveOnly, delivered) => {
     const state = store.get()
-    for (const key of changed) {
+    const keys = changed as readonly string[]
+    let activeSelectors: Map<string, Listener | Set<Listener>> | undefined
+    const notify = (value: unknown) => {
+      const selector = activeSelectors?.get(String(value))
+      if (typeof selector === "function") {
+        selector(liveOnly, delivered, keys)
+      } else if (selector) {
+        for (const listener of selector) {
+          listener(liveOnly, delivered, keys)
+        }
+      }
+    }
+    for (let index = 0; index < changed.length; index++) {
+      const key = changed[index]
       const movers = narrowed.selecting.get(key)
       if (!movers) {
         continue
       }
-      const selectors = narrowed.selectors.get(key)
-      const notify = (value: unknown) => {
-        const selector = selectors?.get(String(value))
-        if (typeof selector === "function") {
-          run(selector)
-        } else {
-          selector?.forEach(run)
-        }
-      }
+      activeSelectors = narrowed.selectors.get(key)
       const before = (previous as Record<PropertyKey, unknown>)[key]
       for (const [moved, { naming }] of movers) {
         if (moved(before, state[key], notify) === true) {
-          naming.forEach(run)
+          for (const listener of naming) {
+            listener(liveOnly, delivered, keys)
+          }
         }
       }
     }
   })
   return narrowed
+}
+
+// Encodes one selected value unambiguously so strings, numbers and lists never collide.
+function encodeSelected(value: unknown) {
+  if (typeof value === "string") {
+    return `s${value.length}:${value}`
+  }
+  if (typeof value === "number") {
+    return `n:${value}`
+  }
+  if (typeof value === "boolean") {
+    return value ? "t" : "f"
+  }
+  if (value === null) {
+    return "0"
+  }
+  if (value === undefined) {
+    return "u"
+  }
+  return `o:${String(value)}`
 }
 
 /**
@@ -142,16 +169,30 @@ function selects<State extends object, Api, Props>(
       : typeof values === "function"
         ? values(partView)
         : values) as Values
-  const selected = (part: Part<State, Api, Props>, props: Props) => {
-    const partView = view(part, props)
-    return narrowing.map(
-      ([key, values]) => [key, valuesOf(values, partView)] as const
-    )
-  }
   const moverOf = (key: keyof State) => {
     const reader = reads[key]
     return isReader(reader) ? (reader.moved as Moved) : eachMoved
   }
+  const formatValues = (values: Values) => {
+    let out = `${values.length}:`
+    for (let index = 0; index < values.length; index++) {
+      if (index) {
+        out += ","
+      }
+      out += encodeSelected(values[index])
+    }
+    return out
+  }
+  const staticKey = !narrowing.length
+    ? ""
+    : narrowing.every(([, values]) => Array.isArray(values))
+      ? narrowing
+          .map(
+            ([key, values]) =>
+              `${String(key)}=${formatValues(values as Values)}`
+          )
+          .join("|")
+      : undefined
   return {
     /**
      * The values a part reads `key` by, an empty list for a key it never
@@ -173,8 +214,19 @@ function selects<State extends object, Api, Props>(
     },
     /** The values a part selects on, which it subscribes again for when they change. */
     selection(part: Part<State, Api, Props>, props: Props) {
-      const values = selected(part, props)
-      return values.length ? JSON.stringify(values) : ""
+      if (staticKey !== undefined) {
+        return staticKey
+      }
+      const partView = view(part, props)
+      let out = ""
+      for (let index = 0; index < narrowing.length; index++) {
+        const [key, source] = narrowing[index]
+        if (index) {
+          out += "|"
+        }
+        out += `${String(key)}=${formatValues(valuesOf(source, partView))}`
+      }
+      return out
     },
     /**
      * Runs `listener` when a change can affect the part: a key it selects on
@@ -188,11 +240,15 @@ function selects<State extends object, Api, Props>(
         return leaveSkipping
       }
       const narrowed = narrowedOf(store)
-      const joined = selected(part, props)
-      for (const [key, values] of joined) {
+      const partView = view(part, props)
+      const joined: [keyof State, Values, Moved][] = []
+      for (let index = 0; index < narrowing.length; index++) {
+        const [key, source] = narrowing[index]
+        const values = valuesOf(source, partView)
         const moved = moverOf(key)
-        for (const value of values) {
-          enter(narrowed, key, value, listener, moved)
+        joined.push([key, values, moved])
+        for (let i = 0; i < values.length; i++) {
+          enter(narrowed, key, values[i], listener, moved)
         }
         if (moved !== eachMoved) {
           hold(narrowed, key, moved, listener)
@@ -205,10 +261,10 @@ function selects<State extends object, Api, Props>(
         }
         subscribed = false
         leaveSkipping()
-        for (const [key, values] of joined) {
-          const moved = moverOf(key)
-          for (const value of values) {
-            leave(narrowed, key, value, listener, moved)
+        for (let index = 0; index < joined.length; index++) {
+          const [key, values, moved] = joined[index]
+          for (let i = 0; i < values.length; i++) {
+            leave(narrowed, key, values[i], listener, moved)
           }
           if (moved !== eachMoved) {
             release(narrowed, key, moved, listener)
@@ -378,7 +434,9 @@ function eachMoved(
     return
   }
   if (!Array.isArray(before) || !Array.isArray(after)) {
-    return [before, after].forEach(notify)
+    notify(before)
+    notify(after)
+    return
   }
   let start = 0
   let end = 0
@@ -392,10 +450,11 @@ function eachMoved(
   ) {
     end++
   }
-  for (const values of [before, after]) {
-    for (let index = start; index < values.length - end; index++) {
-      notify(values[index])
-    }
+  for (let index = start; index < before.length - end; index++) {
+    notify(before[index])
+  }
+  for (let index = start; index < after.length - end; index++) {
+    notify(after[index])
   }
 }
 
