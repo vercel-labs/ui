@@ -157,9 +157,17 @@ function revealInList(el: HTMLElement, stop: HTMLElement | undefined) {
       /(auto|scroll)/.test(style.overflowY) &&
       node.scrollHeight > node.clientHeight
     ) {
+      // A transform around the list, like a popup's scale as it opens, scales
+      // the boxes and not the scroll position, so the offset is scaled back.
+      // The layout size is rounded, so a size within its rounding isn't scaled.
+      const box = node.getBoundingClientRect()
+      const layout = node.offsetHeight
+      const scale =
+        layout > 0 && box.height > 0 && Math.abs(layout - box.height) > 0.5
+          ? layout / box.height
+          : 1
       const top =
-        el.getBoundingClientRect().top -
-        node.getBoundingClientRect().top -
+        (el.getBoundingClientRect().top - box.top) * scale -
         node.clientTop +
         node.scrollTop
       const before = parseFloat(style.scrollPaddingTop) || 0

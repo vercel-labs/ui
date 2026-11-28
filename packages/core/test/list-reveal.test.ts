@@ -83,3 +83,16 @@ describe("revealInList", () => {
     expect(root.scrollTop).toBe(160)
   })
 })
+
+test("reveals an option inside a scaled ancestor, like a popup that scales in", () => {
+  const { root, options } = list({})
+  Object.defineProperty(root, "offsetHeight", { value: 102 })
+  // At scale 0.95 every box shrinks, and the scroll position doesn't.
+  root.getBoundingClientRect = () => new DOMRect(0, 0, 95, 102 * 0.95)
+  options.forEach((option, index) => {
+    option.getBoundingClientRect = () =>
+      new DOMRect(0, (1 + index * 20 - root.scrollTop) * 0.95, 95, 19)
+  })
+  revealInList(options[15]!, root)
+  expect(root.scrollTop).toBeCloseTo(220)
+})
