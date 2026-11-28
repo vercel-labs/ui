@@ -73,7 +73,9 @@ test("no component writes whitespace beside a hidden form element", () => {
     file: string,
     source: string
   ) => {
-    if (!fragment?.nodes) return
+    if (!fragment?.nodes) {
+      return
+    }
     // Svelte drops comments, so the whitespace on both sides of one renders.
     const nodes = fragment.nodes
       .filter((node) => node.type !== "Comment")
