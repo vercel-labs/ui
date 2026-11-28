@@ -40,10 +40,11 @@ function mergeProps(...sources: Record<string, any>[]) {
         typeof value === "function"
       ) {
         result[key] = (...args: unknown[]) => {
-          value(...args)
+          const returned = value(...args)
           if (!prevented(args[0])) {
             earlier(...args)
           }
+          return returned
         }
       } else {
         result[key] = value

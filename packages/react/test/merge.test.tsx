@@ -29,6 +29,16 @@ describe("render elements", () => {
     expect(part).not.toHaveBeenCalled()
   })
 
+  test("the merged handler returns what the render element's handler returns", () => {
+    const pending = Promise.resolve()
+    const element = renderElement(
+      "button",
+      { onClick: () => {} },
+      <button onClick={() => pending} />
+    ) as React.ReactElement<{ onClick: (event: unknown) => unknown }>
+    expect(element.props.onClick({ defaultPrevented: false })).toBe(pending)
+  })
+
   test("an undefined className on the render element adds nothing", () => {
     const element = renderElement(
       "button",
