@@ -899,6 +899,8 @@ function menuApiBody(
       highlight,
       childOpenChanged(childId: string, open: boolean) {
         if (open) {
+          // Opening one ends the hover wait, which would reopen it after Escape.
+          clearTimeout(hoverTimer)
           store.set({ openChild: childId })
         } else if (store.get().openChild === childId) {
           store.set({ openChild: null })
