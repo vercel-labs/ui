@@ -109,7 +109,11 @@ function userFolder() {
     return folder
   }
   // The user can switch languages while the page is open.
-  if (!watching && typeof window !== "undefined") {
+  if (
+    !watching &&
+    typeof window !== "undefined" &&
+    typeof window.addEventListener === "function"
+  ) {
     watching = true
     window.addEventListener("languagechange", () => (folder = undefined))
   }
