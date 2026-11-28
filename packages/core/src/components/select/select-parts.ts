@@ -172,6 +172,7 @@ const unreadByItems = {
   groupLabels: [],
   payload: [],
   titled: [],
+  named: [],
   described: [],
   modal: [],
 } satisfies Record<

@@ -2,4 +2,4 @@
 "@ui-sdk/core": patch
 ---
 
-An `aria-label` you give a part now replaces the `aria-labelledby` the part sets itself, like a popover's content pointing at its trigger, so your label names it.
+Popup content with an `aria-label` of its own, like `<PopoverContent aria-label="Add a deliverable">`, is now named by it instead of its trigger.

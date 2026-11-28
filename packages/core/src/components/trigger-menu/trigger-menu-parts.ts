@@ -89,6 +89,7 @@ const unreadByItems = {
   payload: [],
   pending: [],
   titled: [],
+  named: [],
   described: [],
   modal: [],
   presentation: [],

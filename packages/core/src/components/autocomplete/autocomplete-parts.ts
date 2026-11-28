@@ -98,6 +98,7 @@ const unreadByItems = {
   trigger: [],
   payload: [],
   titled: [],
+  named: [],
   described: [],
   modal: [],
 } satisfies Record<

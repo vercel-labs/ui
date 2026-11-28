@@ -70,6 +70,8 @@ type PopupState = {
    * while a title may still render, as on the server.
    */
   titled: boolean | null
+  /** Whether its content has an `aria-label` of its own, which names it in place of its trigger. */
+  named?: boolean
   /** Whether a description is rendered, which describes it. */
   described: boolean
   /** The `modal` in effect, from the option, the preset and the presentation. */

@@ -337,15 +337,8 @@ const authorOwned = new Set([
 /** The part's attributes without the ones the author gives, for `given(name)` to say which. */
 function yieldToAuthor(attrs: Attrs, given: (name: string) => boolean) {
   let result: Attrs | undefined
-  // A label reference wins over a label, so the author's `aria-label` replaces
-  // the part's `aria-labelledby` too.
-  const labelled = given("aria-label")
   for (const name in attrs) {
-    if (
-      attrs[name] !== undefined &&
-      authorOwned.has(name) &&
-      (given(name) || (name === "aria-labelledby" && labelled))
-    ) {
+    if (attrs[name] !== undefined && authorOwned.has(name) && given(name)) {
       ;(result ??= { ...attrs })[name] = undefined
     }
   }

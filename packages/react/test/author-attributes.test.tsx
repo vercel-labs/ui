@@ -92,18 +92,3 @@ test("a popover's content takes the label it's given over its trigger's name", a
   expect(content.getAttribute("aria-label")).toBe("Add a deliverable")
   expect(content.hasAttribute("aria-labelledby")).toBe(false)
 })
-
-test("a select trigger takes the label it's given over the select's own label", async () => {
-  const view = await render(
-    <Select items={["Free", "Pro"]}>
-      <SelectLabel>Tier</SelectLabel>
-      <SelectTrigger aria-label="Plan">
-        <SelectValue />
-      </SelectTrigger>
-    </Select>
-  )
-  await React.act(async () => new Promise((resolve) => setTimeout(resolve, 20)))
-  const trigger = view.querySelector("button")!
-  expect(trigger.getAttribute("aria-label")).toBe("Plan")
-  expect(trigger.hasAttribute("aria-labelledby")).toBe(false)
-})

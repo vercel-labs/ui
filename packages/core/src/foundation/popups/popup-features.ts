@@ -172,10 +172,9 @@ function pressOpening(core: PopupCore) {
       }
       return isBrowser && setting instanceof HTMLElement ? setting : content
     },
-    // Named by its title, else its trigger, and described by its description.
-    // Until the content binds, as on the server, the trigger names it: a title
-    // may not render, and a missing one would leave it with no name at all.
-    // Only a popup that can present as a sheet says how it presents.
+    // Named by its title, else its own `aria-label`, else its trigger. Until
+    // the content binds, as on the server, the trigger names it: a title may
+    // not render, and a missing one would leave it with no name at all.
     contentAttrs: (
       state: PopupState,
       id: string,
@@ -184,7 +183,9 @@ function pressOpening(core: PopupCore) {
       "aria-labelledby": role
         ? state.titled
           ? `${id}-title`
-          : `${id}-trigger`
+          : state.named
+            ? undefined
+            : `${id}-trigger`
         : undefined,
       "aria-describedby": state.described ? `${id}-description` : undefined,
       "aria-modal":

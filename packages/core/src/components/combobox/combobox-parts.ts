@@ -151,6 +151,7 @@ const unreadByItems = {
   visibleChips: [],
   payload: [],
   titled: [],
+  named: [],
   described: [],
   modal: [],
 } satisfies Record<
