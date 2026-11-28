@@ -16,10 +16,10 @@ type Layer = {
   // False once the layer starts to close. Closed layers ignore dismissal.
   active: () => boolean
   // True while the layer animates out. It's inert then, so presses fall through
-  // it to the page. A modal one swallows those on its backdrop, so a double
-  // click that dismissed it can't land on the page, and shields the layers beneath it.
+  // it to the page. A modal one a press closed swallows those on its backdrop, so
+  // a double click that dismissed it can't land on the page, and shields the layers beneath it.
   exiting?: () => boolean
-  // Whether a point is on the layer's backdrop, outside its popup.
+  // Whether a point is on the backdrop of a layer a press closed, outside its popup.
   overBackdrop?: (x: number, y: number) => boolean
   // "pointer" and true consume the outside press, so it only closes the layer.
   modal: boolean | "pointer"
