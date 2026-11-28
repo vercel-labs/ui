@@ -5,6 +5,7 @@ import { expect, test } from "vitest"
 import { defineCalendarElements } from "../src/calendar"
 import { defineComboboxElements } from "../src/combobox"
 import { defineFieldElements } from "../src/field"
+import { definePopoverElements } from "../src/popover"
 
 const wait = () => new Promise((resolve) => setTimeout(resolve, 10))
 
@@ -68,4 +69,14 @@ test("a combobox input inside a labelled field keeps the label reference written
   expect(document.querySelector("input")!.getAttribute("aria-labelledby")).toBe(
     "mine"
   )
+})
+
+test("a popover's content keeps the label written on it over its trigger's name", async () => {
+  definePopoverElements()
+  document.body.innerHTML = `<ui-popover open><ui-popover-trigger><button>Add deliverable</button></ui-popover-trigger><ui-popover-content aria-label="Add a deliverable"><input aria-label="Name"></ui-popover-content></ui-popover>`
+  await wait()
+  const content = document.querySelector("ui-popover-content")!
+  expect(content.getAttribute("role")).toBe("dialog")
+  expect(content.getAttribute("aria-label")).toBe("Add a deliverable")
+  expect(content.hasAttribute("aria-labelledby")).toBe(false)
 })

@@ -4,6 +4,7 @@ import { createRoot, type Root } from "react-dom/client"
 import { afterEach, expect, test } from "vitest"
 import { Combobox, ComboboxInput, ComboboxLabel } from "../src/combobox"
 import { Field, FieldLabel } from "../src/field"
+import { Popover, PopoverContent, PopoverTrigger } from "../src/popover"
 import { Select, SelectLabel, SelectTrigger, SelectValue } from "../src/select"
 
 Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true })
@@ -76,4 +77,18 @@ test("a combobox input inside a labelled field keeps the label reference passed 
   expect(view.querySelector("input")!.getAttribute("aria-labelledby")).toBe(
     "mine"
   )
+})
+
+test("a popover's content takes the label it's given over its trigger's name", async () => {
+  await render(
+    <Popover defaultOpen>
+      <PopoverTrigger>Add deliverable</PopoverTrigger>
+      <PopoverContent aria-label="Add a deliverable">
+        <input aria-label="Name" />
+      </PopoverContent>
+    </Popover>
+  )
+  const content = document.querySelector('[data-slot="popover-content"]')!
+  expect(content.getAttribute("aria-label")).toBe("Add a deliverable")
+  expect(content.hasAttribute("aria-labelledby")).toBe(false)
 })

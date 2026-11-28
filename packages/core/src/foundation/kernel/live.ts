@@ -224,6 +224,19 @@ function writeChannel(
   for (const name of authors) {
     written.delete(name)
   }
+  // A label reference wins over a label, so the author's `aria-label`
+  // replaces the part's `aria-labelledby` too.
+  if (written.has("aria-labelledby") && !written.has("aria-label")) {
+    const label = el.getAttribute("aria-label")
+    if (
+      label !== null &&
+      !Object.values(channels).some(
+        (wrote) => wrote.get("aria-label") === label
+      )
+    ) {
+      written.delete("aria-labelledby")
+    }
+  }
   for (const name of previous.keys()) {
     if (written.has(name) || authors.has(name) || (name === "id" && keeps)) {
       continue
