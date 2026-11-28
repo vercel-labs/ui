@@ -123,10 +123,16 @@ function textFieldApi<Slot extends string>(
     if ((event as InputEvent).isComposing) {
       return
     }
-    const inserted = next.length - previous.length
-    const caret = Math.max(0, (el.selectionStart ?? next.length) - inserted)
+    const { selectionStart } = el
     el.value = previous
-    el.setSelectionRange?.(caret, caret)
+    // A date, time, email or number input has no selection, and setting one throws.
+    if (selectionStart !== null) {
+      const caret = Math.max(
+        0,
+        selectionStart - (next.length - previous.length)
+      )
+      el.setSelectionRange(caret, caret)
+    }
   }
 
   const api = {
