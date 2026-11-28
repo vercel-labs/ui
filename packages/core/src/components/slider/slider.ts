@@ -417,6 +417,9 @@ const sliderPrimitive = /* @__PURE__ */ definePrimitive({
       on: {
         pointerdown: (event, { api, el }) =>
           el && api.internal.press(event, el),
+        // WebKit sends a tap on a surface that ignores clicks to a clickable
+        // node nearby, like a button beside the track, so this one listens.
+        click: () => {},
       },
     }),
 

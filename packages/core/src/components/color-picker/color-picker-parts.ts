@@ -240,6 +240,8 @@ function colorPickerSlots(slot: SlotFactory<State, ColorPickerApi>) {
       on: {
         pointerdown: (event, { api, el, props }) =>
           el && api.internal.areaPointerdown(event, el, props.x, props.y),
+        // A tap here isn't a nearby button's, as on Slider's control.
+        click: () => {},
       },
     }),
 
@@ -367,6 +369,8 @@ function colorPickerSlots(slot: SlotFactory<State, ColorPickerApi>) {
             props.channel,
             props.orientation
           ),
+        // A tap here isn't a nearby button's, as on Slider's control.
+        click: () => {},
       },
     }),
 
