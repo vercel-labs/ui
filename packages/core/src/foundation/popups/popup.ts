@@ -635,6 +635,7 @@ function createPopupLayer<
   let shown:
     { el: HTMLElement; cleanup: () => void; backdrop?: HTMLElement } | undefined
   let layer: Layer | undefined
+  let closedByPress = false
   let stopExit: (() => void) | undefined
   let releaseInert: (() => void) | undefined
   let releaseWatcher: (() => void) | undefined
@@ -761,6 +762,7 @@ function createPopupLayer<
     opener = "imperative"
     openedByKey = false
     const closed = observer?.(false)
+    closedByPress = closed?.reason === "outside-press"
     const el = shown?.el
     if (layer) {
       markClosed(returnTarget())
@@ -1201,6 +1203,7 @@ function createPopupLayer<
           ? options.contains(target, event)
           : !!options.trigger()?.contains(target)),
       overBackdrop: (x, y) =>
+        closedByPress &&
         !!shown?.backdrop &&
         !outsideBox({ x, y }, shown.backdrop.getBoundingClientRect()) &&
         outsideBox({ x, y }, el.getBoundingClientRect()),

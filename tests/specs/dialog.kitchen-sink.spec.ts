@@ -53,7 +53,7 @@ test("every kitchen sink variant opens and closes", async ({
         .click()
     }
     await expect(open, `variant ${index} closes`).toHaveCount(0)
-    // A dialog animating out still swallows presses that land on it, and it may cover the next trigger.
+    // A dialog animating out may still cover the next trigger.
     await expect(page.locator("[data-ending-style]")).toHaveCount(0, {
       timeout: 3000,
     })

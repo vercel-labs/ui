@@ -306,7 +306,27 @@ describe("a popup animating out", () => {
     }
   )
 
-  test("a modal dialog swallows a press on its backdrop, so it never reaches the page", async () => {
+  test("a modal dialog a press on its backdrop closed swallows the next press there", async () => {
+    const view = mount(dialog, { modal: true }, backdropMarkup)
+    mounts.push(view)
+    await view.click(view.part("trigger")!)
+    const [backdrop, content] = [view.part("backdrop")!, view.part("content")!]
+    holdExit(backdrop, content)
+    place(backdrop, new DOMRect(0, 0, 1000, 1000))
+    place(content, new DOMRect(300, 300, 200, 200))
+    await view.click(backdrop)
+    expect(view.state).toMatchObject({ open: false, mounted: true })
+    const after = outsideButton(view.root)
+    expect(
+      await pressOn(view, place(after, new DOMRect(50, 50, 20, 20)))
+    ).toEqual(["pointerdown prevented"])
+    expect(
+      await pressOn(view, place(after, new DOMRect(350, 350, 20, 20)))
+    ).toEqual(["pointerdown", "click"])
+    expect(view.state.mounted).toBe(true)
+  })
+
+  test("a modal dialog closed with Escape lets a press on its backdrop through to the page", async () => {
     const view = mount(dialog, { modal: true }, backdropMarkup)
     mounts.push(view)
     await view.click(view.part("trigger")!)
@@ -316,13 +336,8 @@ describe("a popup animating out", () => {
     place(content, new DOMRect(300, 300, 200, 200))
     await view.keys("Escape")
     expect(view.state).toMatchObject({ open: false, mounted: true })
-    const after = outsideButton(view.root)
-    expect(
-      await pressOn(view, place(after, new DOMRect(50, 50, 20, 20)))
-    ).toEqual(["pointerdown prevented"])
-    expect(
-      await pressOn(view, place(after, new DOMRect(350, 350, 20, 20)))
-    ).toEqual(["pointerdown", "click"])
+    const after = place(outsideButton(view.root), new DOMRect(50, 50, 20, 20))
+    expect(await pressOn(view, after)).toEqual(["pointerdown", "click"])
     expect(view.state.mounted).toBe(true)
   })
 })
