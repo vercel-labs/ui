@@ -96,5 +96,4 @@ The root, and the hidden input that submits the number as is.
   const hidden = useHandlePart(numberInput, "hidden-input")
 </script>
 
-<Part tag="div" part={root} props={rest} />
-<input {...hidden.slot()} />
+<Part tag="div" part={root} props={rest} /><input {...hidden.slot()} />

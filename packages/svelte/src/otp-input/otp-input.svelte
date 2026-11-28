@@ -105,8 +105,7 @@ and the `aria-*` naming attributes go to that input.
 </script>
 
 {#snippet content(state: OTPInputState)}
-  {@render children?.(state)}
-  <input
+  {@render children?.(state)}<input
     {...fieldControl
       ? fieldControl(control.slot(split.named))
       : control.slot(split.named)}

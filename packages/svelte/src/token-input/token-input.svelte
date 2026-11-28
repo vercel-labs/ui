@@ -214,8 +214,8 @@ it. The `token` snippet renders each token's content.
   onDestroy(() => sync(undefined))
 </script>
 
-{@render children?.()}
-{#if formInput.attrs.name}
-  {@const { value: text, ...attrs } = formInput.slot()}
-  <textarea {...attrs}>{text}</textarea>
+{@render children?.()}{#if formInput.attrs.name}
+  {@const { value: text, ...attrs } = formInput.slot()}<textarea {...attrs}
+    >{text}</textarea
+  >
 {/if}

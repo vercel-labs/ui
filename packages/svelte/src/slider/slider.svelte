@@ -145,5 +145,6 @@ The root: a group around the thumbs, and the hidden input the form submits.
     : undefined
 </script>
 
-<Part tag="div" part={wrapPart(root, control)} props={rest} />
-<input {...input.slot()} />
+<Part tag="div" part={wrapPart(root, control)} props={rest} /><input
+  {...input.slot()}
+/>

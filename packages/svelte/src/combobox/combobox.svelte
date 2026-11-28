@@ -277,11 +277,8 @@ list are its parts.
   )
 </script>
 
-{@render children?.()}
-{#if items && !own()}
+{@render children?.()}{#if items && !own()}
   <ComboboxContent fromRoot />
-{/if}
-<textarea {...formAttrs}>{formValue}</textarea>
-{#each values as key (key)}
+{/if}<textarea {...formAttrs}>{formValue}</textarea>{#each values as key (key)}
   <ValueInput owner={combobox} value={key} />
 {/each}

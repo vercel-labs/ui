@@ -265,11 +265,8 @@ Picks one value, or several with `multiple`, from a list in a popup.
   )
 </script>
 
-{@render children?.()}
-{#if items && !own()}
+{@render children?.()}{#if items && !own()}
   <SelectContent fromRoot />
-{/if}
-<textarea {...formAttrs}>{formValue}</textarea>
-{#each values as key (key)}
+{/if}<textarea {...formAttrs}>{formValue}</textarea>{#each values as key (key)}
   <ValueInput owner={select} value={key} />
 {/each}

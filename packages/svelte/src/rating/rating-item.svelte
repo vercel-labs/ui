@@ -23,8 +23,9 @@ radios that pick its score sit over it.
 </script>
 
 {#snippet content(state: RatingItemState)}
-  {@render children?.(state)}
-  {#each ratingItemValues(item.index, item.step()) as score (score)}
+  {@render children?.(
+    state
+  )}{#each ratingItemValues(item.index, item.step()) as score (score)}
     <RatingRadio value={String(score)} />
   {/each}
 {/snippet}

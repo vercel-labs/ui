@@ -25,5 +25,4 @@ One option, and the hidden native radio that takes part in the form.
   const input = usePart(segmentedControl, "input", item)
 </script>
 
-<Part tag="button" part={button} props={rest} />
-<input {...input.slot()} />
+<Part tag="button" part={button} props={rest} /><input {...input.slot()} />

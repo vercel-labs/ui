@@ -114,5 +114,6 @@ The root: a group around the picker's parts, and the hidden input the form submi
   )
 </script>
 
-<Part tag="div" part={wrapPart(root, fieldControl)} props={rest} />
-<input {...input.slot()} />
+<Part tag="div" part={wrapPart(root, fieldControl)} props={rest} /><input
+  {...input.slot()}
+/>

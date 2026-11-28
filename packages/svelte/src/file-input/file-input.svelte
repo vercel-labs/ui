@@ -135,15 +135,13 @@ the picker and that a form submits.
 
 <!-- The hidden input lives inside the root. A render snippet gets only your children, so the input goes beside it then: it renders once, whether or not the snippet renders them. -->
 {#snippet content(state: FileInputState)}
-  {@render children?.(state)}
-  <input {...input.slot()} />
+  {@render children?.(state)}<input {...input.slot()} />
 {/snippet}
 
 <Part
   tag="div"
   part={root}
   props={{ ...rest, render, children: render ? children : content }}
-/>
-{#if render}
+/>{#if render}
   <input {...input.slot()} />
 {/if}

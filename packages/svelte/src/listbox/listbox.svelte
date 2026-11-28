@@ -158,8 +158,6 @@ An always-visible list to choose one option from, or several with `multiple`.
   tag="div"
   part={wrapPart(root, control)}
   props={{ ...rest, children: children ?? data }}
-/>
-<textarea {...formAttrs}>{formValue}</textarea>
-{#each values as key (key)}
+/><textarea {...formAttrs}>{formValue}</textarea>{#each values as key (key)}
   <ValueInput owner={listbox} value={key} />
 {/each}

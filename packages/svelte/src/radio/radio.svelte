@@ -36,5 +36,6 @@ A radio and the hidden native radio that takes part in the form.
   )
 </script>
 
-<Part tag="button" part={wrapPart(root, control)} props={rest} />
-<input {...input.slot()} />
+<Part tag="button" part={wrapPart(root, control)} props={rest} /><input
+  {...input.slot()}
+/>

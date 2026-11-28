@@ -120,8 +120,9 @@ text. Its text is its content, so it takes no children.
     props={{ ...element(), render, children: text }}
   />
 {:else}
-  <!-- A static element, so the compiler renders the text as a textarea's content, without hydration markers. -->
-  <textarea {...bound.slot(element())} {@attach setDefault} {@attach toStart}
-    >{controlled ? value : defaultValue}</textarea
+  <!-- A static element, so the compiler renders the text as a textarea's content, without hydration markers. --><textarea
+    {...bound.slot(element())}
+    {@attach setDefault}
+    {@attach toStart}>{controlled ? value : defaultValue}</textarea
   >
 {/if}

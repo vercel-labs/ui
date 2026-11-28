@@ -84,5 +84,6 @@ A control that turns a setting on or off, with the hidden native input that take
   )
 </script>
 
-<Part tag="button" part={wrapPart(root, inField)} props={rest} />
-<input {...input.slot()} />
+<Part tag="button" part={wrapPart(root, inField)} props={rest} /><input
+  {...input.slot()}
+/>

@@ -199,7 +199,11 @@ renders an input, or two in range mode, the trigger and the popup.
   {#if children}{@render children(state)}{:else}{@render fallback()}{/if}
 {/snippet}
 
-<Part tag="div" part={root} props={{ ...rest, children: content }} />
 <!-- Beside the root, so a `render` snippet keeps them. -->
-{#if submitsStart}<input {...startInput.slot()} />{/if}
-{#if submitsEnd}<input {...endInput.slot()} />{/if}
+<Part
+  tag="div"
+  part={root}
+  props={{ ...rest, children: content }}
+/>{#if submitsStart}<input {...startInput.slot()} />{/if}{#if submitsEnd}<input
+    {...endInput.slot()}
+  />{/if}

@@ -102,8 +102,7 @@ names, its segments, and the hidden input the value submits with.
     {#each state.segments as segment (segment.key)}
       <Segment {segment} />
     {/each}
-  {/if}
-  <input {...hidden.slot()} />
+  {/if}<input {...hidden.slot()} />
 {/snippet}
 
 <Part

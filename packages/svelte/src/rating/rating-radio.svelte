@@ -9,5 +9,4 @@
   const input = usePart(rating, "input", () => ({ value }))
 </script>
 
-<Part tag="button" part={radio} props={{}} />
-<input {...input.slot()} />
+<Part tag="button" part={radio} props={{}} /><input {...input.slot()} />

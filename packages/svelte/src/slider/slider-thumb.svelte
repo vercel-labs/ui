@@ -43,8 +43,9 @@ A thumb, with the native range input that takes focus inside it. Its
 </script>
 
 {#snippet content(state: SliderThumbState)}
-  {@render children?.(state)}
-  <input {...control ? control(input.slot(named)) : input.slot(named)} />
+  {@render children?.(state)}<input
+    {...control ? control(input.slot(named)) : input.slot(named)}
+  />
 {/snippet}
 
 <Part tag="div" part={thumb} props={{ ...rest, children: content }} />

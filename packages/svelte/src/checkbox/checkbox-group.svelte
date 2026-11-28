@@ -97,5 +97,6 @@ each checkbox, sits in a field.
   )
 </script>
 
-<Part tag="div" part={wrapPart(root, control)} props={rest} />
-<input {...input.slot()} />
+<Part tag="div" part={wrapPart(root, control)} props={rest} /><input
+  {...input.slot()}
+/>
